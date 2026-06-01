@@ -51,13 +51,12 @@ final class DateHelper
     {
         if (empty($datetime)) {
             return '';
-        } else {
-            $this->helper->setDateTime($datetime, $fromFormat, $timezone);
-
-            return $this->helper->toLocalString(
-                $this->formats[$type]
-            );
         }
+        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+
+        return $this->helper->toLocalString(
+            $this->formats[$type]
+        );
     }
 
     /**
@@ -155,17 +154,16 @@ final class DateHelper
 
         if ($textDate) {
             return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format($this->coreParametersHelper->get('date_format_timeonly'))]);
-        } else {
-            $interval = $this->helper->getDiff('now', null, true);
-
-            if ($interval->invert && !$forceDateForNonText) {
-                // In the past
-                return $this->translator->trans('mautic.core.date.ago', ['%days%' => $interval->days]);
-            } else {
-                // In the future
-                return $this->toFullConcat($datetime, $timezone, $fromFormat);
-            }
         }
+        $interval = $this->helper->getDiff('now', null, true);
+
+        if ($interval->invert && !$forceDateForNonText) {
+            // In the past
+            return $this->translator->trans('mautic.core.date.ago', ['%days%' => $interval->days]);
+        }
+
+        // In the future
+        return $this->toFullConcat($datetime, $timezone, $fromFormat);
     }
 
     /**
@@ -268,5 +266,29 @@ final class DateHelper
         }
 
         return $this->translator->trans('mautic.core.date.just.now');
+    }
+
+    /**
+     * Returns short text date like "Today", "Yesterday", or formatted date.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toTextShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        if (empty($datetime)) {
+            return '';
+        }
+
+        $this->helper->setDateTime($datetime, $fromFormat, $timezone);
+        $textDate = $this->helper->getTextDate();
+
+        if ($textDate) {
+            $translated = $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => '']);
+
+            return trim(str_replace(',', '', $translated));
+        }
+
+        // For other dates, return a formatted date
+        return $this->format('date', $datetime, $timezone, $fromFormat);
     }
 }

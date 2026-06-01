@@ -230,7 +230,7 @@ class MessageQueueModel extends FormModel
                 continue;
             }
 
-            $messageChannel   = $message->getChannel();
+            $messageChannel   = $message->getChannel() ?? '';
             $messageChannelId = $message->getChannelId();
             if (!$messageChannelId) {
                 $messageChannelId = 0;
@@ -349,8 +349,8 @@ class MessageQueueModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

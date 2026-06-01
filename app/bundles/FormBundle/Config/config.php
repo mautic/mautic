@@ -4,6 +4,7 @@ use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
+use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Helper\TokenHelper;
@@ -263,10 +264,11 @@ return [
     ],
 
     'parameters' => [
-        'form_upload_dir'           => '%mautic.application_dir%/media/files/form',
-        'blacklisted_extensions'    => ['php', 'sh'],
-        'do_not_submit_emails'      => [],
-        'form_results_data_sources' => false,
-        'successful_submit_action'  => 'top',
+        'form_upload_dir'              => '%mautic.application_dir%/media/files/form',
+        'blacklisted_extensions'       => ['php', 'sh'],
+        'do_not_submit_emails'         => [],
+        'blocked_free_email_providers' => BlockedFreeEmailProvidersHelper::load(),
+        'form_results_data_sources'    => false,
+        'successful_submit_action'     => 'top',
     ],
 ];

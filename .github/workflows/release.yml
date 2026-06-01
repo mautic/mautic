@@ -243,8 +243,8 @@ jobs:
   upload-release-asset:
     name: Upload release asset to m.mautic.org
     needs: [release, test-fresh-install, test-update-install]
-    # We only want this job to run in Mautic's repo, not in forks
-    if: github.repository_owner == 'mautic' && needs.release.outputs.is-prerelease
+    # We only want this job to run in Mautic's repo, not in forks. Upload only stable releases, not pre-releases.
+    if: github.repository_owner == 'mautic' && needs.release.outputs.is-prerelease == 'false'
     runs-on: ubuntu-latest
 
     steps:
@@ -260,13 +260,9 @@ jobs:
       working-directory: ./.github/workflows/mautic-asset-upload
       run: composer install --prefer-dist --no-progress
 
-    - name: Download full installation package from previous step
-      uses: actions/download-artifact@v4
-      with:
-        name: ${{ needs.release.outputs.mautic-version }}.zip
-
-    # Category ID is 2 for Mautic release assets on m.mautic.org, that's why you're seeing "2" in the command below
-    - name: Upload release asset ZIP to m.mautic.org
+    # Category ID 4 is for Mautic release assets on m.mautic.org
+    # Creates a remote asset pointing to the GitHub release URL instead of uploading the file locally
+    - name: Create remote asset on m.mautic.org pointing to GitHub release
       run: |
         php ./.github/workflows/mautic-asset-upload/upload.php \
         https://m.mautic.org \
@@ -274,4 +270,4 @@ jobs:
         "${{ secrets.MAUTIC_INSTANCE_PASSWORD }}" \
         "${{ needs.release.outputs.mautic-version }}" \
         4 \
-        "${{ github.workspace }}/${{ needs.release.outputs.mautic-version }}.zip"
+        "https://github.com/mautic/mautic/releases/download/${{ needs.release.outputs.mautic-version }}/${{ needs.release.outputs.mautic-version }}.zip"

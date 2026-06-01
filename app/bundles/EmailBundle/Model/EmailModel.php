@@ -6,7 +6,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
+use Mautic\ApiBundle\Model\ApiEntityLockTrait;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -76,12 +77,13 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface, ApiLockAwareInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
     use FilterTrait;
+    use ApiEntityLockTrait;
 
     /**
      * @var bool
@@ -154,6 +156,47 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getPermissionBase(): string
     {
         return 'email:emails';
+    }
+
+    /**
+     * @return list<Email>
+     */
+    public function cloneEmailWithTranslationsAndVariants(Email $email): array
+    {
+        $clonedEmails = [];
+
+        $clonedParent = $this->cloneEmailForRelatedClone($email);
+        $this->saveEntity($clonedParent);
+        $clonedEmails[] = $clonedParent;
+
+        foreach ($email->getTranslationChildren() as $translation) {
+            \assert($translation instanceof Email);
+
+            $clonedTranslation = $this->cloneEmailForRelatedClone($translation);
+            $clonedTranslation->setTranslationParent($clonedParent);
+            $this->saveEntity($clonedTranslation);
+            $clonedEmails[] = $clonedTranslation;
+        }
+
+        foreach ($email->getVariantChildren() as $variant) {
+            \assert($variant instanceof Email);
+
+            $clonedVariant = $this->cloneEmailForRelatedClone($variant);
+            $clonedVariant->setVariantParent($clonedParent);
+            $this->saveEntity($clonedVariant);
+            $clonedEmails[] = $clonedVariant;
+
+            foreach ($variant->getTranslationChildren() as $variantTranslation) {
+                \assert($variantTranslation instanceof Email);
+
+                $clonedVariantTranslation = $this->cloneEmailForRelatedClone($variantTranslation);
+                $clonedVariantTranslation->setTranslationParent($clonedVariant);
+                $this->saveEntity($clonedVariantTranslation);
+                $clonedEmails[] = $clonedVariantTranslation;
+            }
+        }
+
+        return $clonedEmails;
     }
 
     /**
@@ -350,9 +393,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -379,10 +422,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $readDateTime = new DateTimeHelper($hitDateTime);
         $userAgent    = $request->server->get('HTTP_USER_AGENT');
@@ -931,6 +975,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         ?int $threadId = null,
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
+
         $total      = $this->getRepository()->getEmailPendingLeads(
             $email->getId(),
             $variantIds,
@@ -1283,9 +1328,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
-        $emailType           = ArrayHelper::getValue('email_type', $options, '');
-        $isMarketing         = (in_array($emailType, [MailHelper::EMAIL_TYPE_MARKETING]) || !empty($listId));
-        $emailAttempts       = ArrayHelper::getValue('email_attempts', $options, 3);
         $emailPriority       = ArrayHelper::getValue('email_priority', $options, MessageQueue::PRIORITY_NORMAL);
         $messageQueue        = ArrayHelper::getValue('resend_message_queue', $options);
         $returnErrorMessages = ArrayHelper::getValue('return_errors', $options, false);
@@ -1336,15 +1378,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if (!$email->getSendToDnc() && count($sendTo)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
+
             $this->messageQueueModel->processFrequencyRules(
                 $sendTo,
                 'email',
                 $email->getId(),
                 $campaignEventId,
-                $emailAttempts,
+                ArrayHelper::getValue('email_attempts', $options, 3),
                 $emailPriority,
                 $messageQueue
             );
@@ -1426,7 +1469,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $emailType)
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
@@ -2313,6 +2356,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function isUpdatingTranslationChildren(): bool
     {
         return $this->updatingTranslationChildren;
+    }
+
+    private function cloneEmailForRelatedClone(Email $email): Email
+    {
+        $clonedEmail = clone $email;
+        $clonedEmail->setEmailType($email->getEmailType());
+        $clonedEmail->setName($this->getRelatedCloneName($email->getName()));
+
+        return $clonedEmail;
+    }
+
+    private function getRelatedCloneName(?string $name): ?string
+    {
+        if (null === $name) {
+            return null;
+        }
+
+        $suffix    = $this->translator->trans('mautic.email.clone.copy_suffix');
+        $maxLength = Email::MAX_NAME_SUBJECT_LENGTH - mb_strlen($suffix);
+
+        return mb_substr($name, 0, $maxLength).$suffix;
     }
 
     /**

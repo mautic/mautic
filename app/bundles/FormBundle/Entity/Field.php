@@ -18,16 +18,16 @@ use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('form:forms:viewown')"),
         new Post(security: "is_granted('form:forms:create')"),
-        new Get(security: "is_granted('form:forms:viewown')"),
-        new Put(security: "is_granted('form:forms:editown')"),
-        new Patch(security: "is_granted('form:forms:editother')"),
-        new Delete(security: "is_granted('form:forms:deleteown')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['field:read'],
@@ -228,7 +228,7 @@ class Field implements UuidInterface
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $mappedField;
 
-    public ?int $deletedId;
+    public ?int $deletedId = null;
 
     public function __clone()
     {
@@ -265,6 +265,7 @@ class Field implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');
@@ -901,11 +902,11 @@ class Field implements UuidInterface
             return true;
         }
 
-        if (!isset($data[$parentField->getAlias()])) {
+        if (!isset($data[$parentField->getAlias() ?? ''])) {
             return false;
         }
 
-        $sendValues = $data[$parentField->getAlias()];
+        $sendValues = $data[$parentField->getAlias() ?? ''];
         if (!is_array($sendValues)) {
             $sendValues = [$sendValues];
         }
@@ -1079,5 +1080,10 @@ class Field implements UuidInterface
     public function setIsReadOnly(?bool $isReadOnly): void
     {
         $this->isReadOnly = $isReadOnly ?? false;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getForm()?->getCreatedBy();
     }
 }

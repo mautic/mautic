@@ -25,7 +25,7 @@ use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -35,10 +35,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('sms:smses:viewown')"),
         new Post(security: "is_granted('sms:smses:create')"),
-        new Get(security: "is_granted('sms:smses:viewown')"),
-        new Put(security: "is_granted('sms:smses:editown')"),
-        new Patch(security: "is_granted('sms:smses:editother')"),
-        new Delete(security: "is_granted('sms:smses:deleteown')"),
+        new Get(security: "is_granted('sms:smses:viewown', object)"),
+        new Put(security: "is_granted('sms:smses:editown', object)"),
+        new Patch(security: "is_granted('sms:smses:editother', object)"),
+        new Delete(security: "is_granted('sms:smses:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['sms:read'],

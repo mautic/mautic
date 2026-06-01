@@ -55,4 +55,11 @@
         {% endif %}
       {% endif %}
     </div>
+    {% if item.email_id is defined and item.email_id %}
+    <div class="mt-sm">
+        <a href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': item.email_id}) }}" data-toggle="ajax">
+            <i class="ri-information-line"></i> {{ 'mautic.core.details'|trans }}
+        </a>
+    </div>
+    {% endif %}
 {% endif %}

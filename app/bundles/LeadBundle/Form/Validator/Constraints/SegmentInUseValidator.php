@@ -37,6 +37,8 @@ class SegmentInUseValidator extends ConstraintValidator
             $this->context->buildViolation($constraint->message)
                 ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
                 ->setParameter('%segments%', implode(',', $lists))
+                ->setParameter('%segmentNames%', $leadList->getName())
+                ->atPath('isPublished')
                 ->addViolation();
         }
     }

@@ -259,7 +259,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function toggleLeadListAction(Request $request): JsonResponse
+    public function toggleLeadListAction(Request $request, LeadModel $leadModel, ListModel $listModel): JsonResponse
     {
         $dataArray = ['success' => 0];
         $leadId    = (int) $request->request->get('leadId');
@@ -267,9 +267,6 @@ class AjaxController extends CommonAjaxController
         $action    = InputHelper::clean($request->request->get('listAction'));
 
         if (!empty($leadId) && !empty($listId) && in_array($action, ['remove', 'add'])) {
-            $leadModel = $this->getModel('lead');
-            $listModel = $this->getModel('lead.list');
-
             $lead = $leadModel->getEntity($leadId);
             $list = $listModel->getEntity($listId);
 

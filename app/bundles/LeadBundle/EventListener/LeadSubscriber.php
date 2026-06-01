@@ -36,8 +36,6 @@ class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
 
-    private RouterInterface $router;
-
     /**
      * @var string[]
      */
@@ -56,7 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
         private DncReasonHelper $dncReasonHelper,
         private EntityManager $entityManager,
         private TranslatorInterface $translator,
-        RouterInterface $router,
+        private RouterInterface $router,
         private LeadListRepository $leadListRepository,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         private CoreParametersHelper $coreParametersHelper,
@@ -64,8 +62,6 @@ class LeadSubscriber implements EventSubscriberInterface
         ?ModelFactory $modelFactory = null,
         private $isTest = false,
     ) {
-        $this->router = $router;
-
         if ($modelFactory) {
             $this->setModelFactory($modelFactory);
         }
@@ -413,9 +409,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this in engagements graph as it's info only
         }
+        // Purposively not including this in engagements graph as it's info only
     }
 
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
@@ -442,9 +437,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this in engagements graph as it's info only
         }
+        // Purposively not including this in engagements graph as it's info only
     }
 
     /**
@@ -485,9 +479,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         ]
                     );
                 }
-            } else {
-                // Purposively not including this in engagements graph as it's info only
             }
+            // Purposively not including this in engagements graph as it's info only
         }
     }
 
@@ -543,9 +536,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this in engagements graph as the engagement is counted by the page hit
         }
+        // Purposively not including this in engagements graph as the engagement is counted by the page hit
     }
 
     private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
@@ -666,9 +658,8 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this
         }
+        // Purposively not including this
     }
 
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
@@ -715,8 +706,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     ]
                 );
             }
-        } else {
-            // Purposively not including this
         }
+        // Purposively not including this
     }
 }

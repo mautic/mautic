@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -11,20 +12,41 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<array<mixed>>
  */
 class DynamicFiltersType extends AbstractType
 {
+    public function __construct(
+        private TranslatorInterface $translator,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($options['report']->getFilters() as $filter) {
             if (isset($filter['dynamic']) && 1 === $filter['dynamic']) {
                 $column     = $filter['column'];
                 $definition = $options['filterDefinitions']->definitions[$column];
-                $args       = [
-                    'label'      => $definition['label'],
+
+                $operatorGroup = $definition['operatorGroup'] ?? $definition['type'];
+
+                if (!array_key_exists($operatorGroup, MauticReportBuilder::OPERATORS)) {
+                    $operatorGroup = 'default';
+                }
+
+                $operatorLabelKey = $definition['operators'][$filter['condition']] ?? MauticReportBuilder::OPERATORS[$operatorGroup][$filter['condition']] ?? null;
+                $operatorLabel    = $operatorLabelKey ? $this->translator->trans($operatorLabelKey) : null;
+
+                $label = $definition['label'];
+                if ($operatorLabel) {
+                    $label .= ' ('.$operatorLabel.')';
+                }
+
+                $args = [
+                    'label'      => $label,
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'    => 'form-control',

@@ -16,7 +16,6 @@ class RedirectTest extends TestCase
         $reflected = new \ReflectionClass(Redirect::class);
         $property  = $reflected->getProperty('url');
 
-        $property->setAccessible(true);
         $property->setValue($redirect, 'https://example.com '); // trailing whitespace
 
         Assert::assertSame('https://example.com', $redirect->getUrl());
@@ -28,7 +27,6 @@ class RedirectTest extends TestCase
         $reflected = new \ReflectionClass(Redirect::class);
         $property  = $reflected->getProperty('url');
 
-        $property->setAccessible(true);
         $redirect->setUrl('https://example.com '); // trailing whitespace
 
         Assert::assertSame('https://example.com', $property->getValue($redirect));

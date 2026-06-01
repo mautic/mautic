@@ -429,7 +429,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         foreach ($expectedMessages as $expectedMessage) {
             $translatedMessage = $translator->trans($expectedMessage['message'], $expectedMessage['message_arg']);
-            $this->assertStringContainsString($translatedMessage, $crawler->html());
+            $this->assertStringContainsString(strip_tags($translatedMessage), $crawler->html());
         }
     }
 
