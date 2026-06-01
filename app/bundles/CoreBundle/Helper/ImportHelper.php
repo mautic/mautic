@@ -18,7 +18,8 @@ class ImportHelper
      */
     public function readZipFile(string $filePath): array
     {
-        $tempDir      = sys_get_temp_dir();
+        // Use Mautic setting, instead of sys_get_temp_dir. The latter is considered unsafe, because other processes are able to read from the dir.
+        $tempDir      = $this->pathsHelper->getTemporaryPath();
         $zip          = new \ZipArchive();
         $jsonFilePath = null;
 
@@ -34,8 +35,6 @@ class ImportHelper
 
         $fileCount   = 0;
         $totalSize   = 0;
-        $realTempDir = rtrim(realpath($tempDir), '/');
-
         // Store file information before closing the ZIP
         $fileList = [];
         for ($i = 0; $i < $zip->numFiles; ++$i) {
@@ -79,17 +78,6 @@ class ImportHelper
                     throw new \RuntimeException('Suspicious compression ratio detected in ZIP file.');
                 }
             }
-
-            // For files in subdirectories, ensure they don't escape the temp directory
-            if (str_contains($normalizedFilename, '/')) {
-                $extractionPath           = $tempDir.'/'.$normalizedFilename;
-                $normalizedExtractionPath = $this->normalizePath($extractionPath);
-
-                if (!str_starts_with($normalizedExtractionPath, $realTempDir)) {
-                    $zip->close();
-                    throw new \RuntimeException('Unsafe file path detected in ZIP: '.$filename);
-                }
-            }
         }
 
         // Extract files using streaming to prevent zip bomb
@@ -101,7 +89,8 @@ class ImportHelper
                 continue;
             }
 
-            $sourcePath = $tempDir.'/'.$filename;
+            $normalizedFilename = $this->normalizePath($filename);
+            $sourcePath         = $tempDir.'/'.$normalizedFilename;
 
             if (!str_ends_with($filename, '/')) {
                 // Create directory if needed
@@ -170,14 +159,15 @@ class ImportHelper
 
         $zip->close();
 
-        $mediaPath = $this->pathsHelper->getSystemPath('media').'/files/';
+        $mediaPath = $this->pathsHelper->getMediaPath().'/files/';
 
         // Process extracted files using stored file list
         foreach ($fileList as $filename) {
-            $sourcePath      = $tempDir.'/'.$filename;
-            $destinationPath = $mediaPath.substr($filename, strlen('assets/'));
+            $normalizedFilename = $this->normalizePath($filename);
+            $sourcePath         = $tempDir.'/'.$normalizedFilename;
+            $destinationPath    = $mediaPath.substr($normalizedFilename, strlen('assets/'));
 
-            if (str_starts_with($filename, 'assets/')) {
+            if (str_starts_with($normalizedFilename, 'assets/')) {
                 if (is_dir($sourcePath)) {
                     if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
                         throw new \RuntimeException(sprintf('Failed to create directory: %s', $destinationPath));
@@ -191,8 +181,8 @@ class ImportHelper
                         throw new \RuntimeException(sprintf('Failed to copy file to destination: %s', $destinationPath));
                     }
                 }
-            } elseif ('json' === pathinfo($filename, PATHINFO_EXTENSION)) {
-                $jsonFilePath = $tempDir.'/'.$filename;
+            } elseif ('json' === pathinfo($normalizedFilename, PATHINFO_EXTENSION)) {
+                $jsonFilePath = $tempDir.'/'.$normalizedFilename;
             }
         }
 
@@ -217,7 +207,9 @@ class ImportHelper
     private function normalizePath(string $path): string
     {
         $parts    = [];
-        $segments = explode('/', str_replace('\\', '/', $path));
+        $unixPath = str_replace('\\', '/', $path);
+        $absolute = str_starts_with($unixPath, '/');
+        $segments = explode('/', $unixPath);
 
         foreach ($segments as $segment) {
             if ('' === $segment || '.' === $segment) {
@@ -226,13 +218,16 @@ class ImportHelper
             if ('..' === $segment) {
                 if (!empty($parts)) {
                     array_pop($parts);
+                } else {
+                    // Cannot resolve upward — preserve so callers detect traversal.
+                    $parts[] = '..';
                 }
             } else {
                 $parts[] = $segment;
             }
         }
 
-        return implode('/', $parts);
+        return ($absolute ? '/' : '').implode('/', $parts);
     }
 
     /**

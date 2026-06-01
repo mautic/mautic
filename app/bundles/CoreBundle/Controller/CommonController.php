@@ -211,9 +211,9 @@ class CommonController extends AbstractController implements MauticController
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['redirect' => $url]);
-        } else {
-            return $this->redirect($url);
         }
+
+        return $this->redirect($url);
     }
 
     /**

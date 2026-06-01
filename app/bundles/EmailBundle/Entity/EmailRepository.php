@@ -353,7 +353,7 @@ class EmailRepository extends CommonRepository
             $sendStopDate
         );
 
-        if (!($q instanceof QueryBuilder)) {
+        if (!$q instanceof QueryBuilder) {
             return $q;
         }
 
@@ -364,14 +364,13 @@ class EmailRepository extends CommonRepository
             return $results[0];
         } elseif ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
-        } else {
-            $leads = [];
-            foreach ($results as $r) {
-                $leads[$r['id']] = $r;
-            }
-
-            return $leads;
         }
+        $leads = [];
+        foreach ($results as $r) {
+            $leads[$r['id']] = $r;
+        }
+
+        return $leads;
     }
 
     /**

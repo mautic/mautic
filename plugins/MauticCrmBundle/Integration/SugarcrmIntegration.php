@@ -20,9 +20,11 @@ use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\UserBundle\Model\UserModel;
+use MauticPlugin\MauticCrmBundle\Api\SugarcrmApi;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -170,22 +172,21 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $success = $this->isAuthorized();
             if (!$success) {
                 return $this->authorizationError;
-            } else {
-                return false;
             }
-        } else {
-            $settings = [
-                'grant_type'         => 'password',
-                'ignore_redirecturi' => true,
-            ];
-            $parameters = [
-                'username' => $this->keys['username'],
-                'password' => $this->keys['password'],
-                'platform' => 'base',
-            ];
 
-            return parent::authCallback($settings, $parameters);
+            return false;
         }
+        $settings = [
+            'grant_type'         => 'password',
+            'ignore_redirecturi' => true,
+        ];
+        $parameters = [
+            'username' => $this->keys['username'],
+            'password' => $this->keys['password'],
+            'platform' => 'base',
+        ];
+
+        return parent::authCallback($settings, $parameters);
     }
 
     /**
@@ -459,7 +460,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $query  = $this->getFetchQuery($params);
         $config = $this->mergeConfigToFeatureSettings([]);
 
-        /** @var SugarApi $apiHelper */
+        /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
 
         $sugarObjects[] = 'Leads';
@@ -596,12 +597,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ('6' == $this->keys['version']) {
             if (!empty($response['name'])) {
                 return $response['description'];
-            } else {
-                return $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
             }
-        } else {
-            return parent::getErrorsFromResponse($response);
+
+            return $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
         }
+
+        return parent::getErrorsFromResponse($response);
     }
 
     public function getAuthenticationType(): string
@@ -626,9 +627,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             ];
 
             return [$parameters, $headers];
-        } else {
-            return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
         }
+
+        return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
     }
 
     /**
@@ -675,12 +676,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $this->authorizationError = $error;
 
             return empty($error);
-        } else {
-            // SugarCRM 7 uses password grant type so login each time to ensure session is valid
-            $this->authCallback();
-
-            return parent::isAuthorized();
         }
+        // SugarCRM 7 uses password grant type so login each time to ensure session is valid
+        $this->authCallback();
+
+        return parent::isAuthorized();
     }
 
     public function prepareResponseForExtraction($data)
@@ -914,9 +914,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param Form|FormBuilder $builder
+     * @param array            $data
+     * @param string           $formArea
      */
     public function appendToForm(&$builder, $data, $formArea): void
     {
@@ -1765,9 +1765,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
         if (preg_match($regex, $stringToCheck)) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

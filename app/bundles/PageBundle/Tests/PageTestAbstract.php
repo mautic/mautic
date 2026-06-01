@@ -69,6 +69,7 @@ class PageTestAbstract extends TestCase
         $this->router = $this->createMock(Router::class);
 
         $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
 
         $leadModel = $this->createMock(LeadModel::class);
 

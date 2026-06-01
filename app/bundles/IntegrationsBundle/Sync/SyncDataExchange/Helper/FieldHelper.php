@@ -30,21 +30,15 @@ class FieldHelper
 
     private array $syncFields = [];
 
-    /**
-     * @var EventDispatcher
-     */
-    private $eventDispatcher;
-
     public function __construct(
         private FieldModel $fieldModel,
         private FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
         private VariableExpresserHelperInterface $variableExpresserHelper,
         private ChannelListHelper $channelListHelper,
         private TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher,
+        private EventDispatcherInterface $eventDispatcher,
         private ObjectProvider $objectProvider,
     ) {
-        $this->eventDispatcher         = $eventDispatcher;
     }
 
     public function getFieldList(string $object): array

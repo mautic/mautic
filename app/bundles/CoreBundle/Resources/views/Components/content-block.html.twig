@@ -26,13 +26,13 @@
         {% set cta = cta|merge({
             'variant': 'link',
             'icon': 'ri-arrow-right-line',
-            'href': cta.link
+            'href': cta.link,
         }) %}
         {% include '@MauticCore/Helper/button.html.twig' with {buttons: [cta]} %}
     </div>
     {% endif %}
     
     {% if hasBorder is defined and hasBorder %}
-    <hr class="mt-64">
+    <hr class="mt-64 mb-0">
     {% endif %}
 </div>

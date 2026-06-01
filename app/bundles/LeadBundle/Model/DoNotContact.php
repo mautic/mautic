@@ -213,14 +213,13 @@ class DoNotContact implements MauticModelInterface
         $cacheItem    = $this->cacheProvider->getItem('dnc.reason_channel_combinations');
         if ($useCache && $cacheItem->isHit()) {
             return $cacheItem->get();
-        } else {
-            $reasonChannelCombinations = $this->dncRepo->getReasonChannelCombinations();
-            $cacheItem->set($reasonChannelCombinations);
-            $cacheItem->expiresAfter($cacheTimeout * 60);
-            $this->cacheProvider->save($cacheItem);
-
-            return $reasonChannelCombinations;
         }
+        $reasonChannelCombinations = $this->dncRepo->getReasonChannelCombinations();
+        $cacheItem->set($reasonChannelCombinations);
+        $cacheItem->expiresAfter($cacheTimeout * 60);
+        $this->cacheProvider->save($cacheItem);
+
+        return $reasonChannelCombinations;
     }
 
     /**

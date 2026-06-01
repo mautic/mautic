@@ -228,40 +228,64 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($emailChild);
         $this->em->flush();
 
-        $crawler      = $this->client->request(Request::METHOD_GET, '/s/emails');
-        $htmlLine1    = $crawler->filter('.email-list > tbody > tr:nth-child(1)')->html();
-        $htmlLine2    = $crawler->filter('.email-list > tbody > tr:nth-child(2)')->html();
-        $htmlLine3    = $crawler->filter('.email-list > tbody > tr:nth-child(3)')->html();
+        $crawler   = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $emailRows = $crawler->filter('.email-list > tbody > tr');
 
-        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine3);
-        Assert::assertStringContainsString('Is A/B variant', $htmlLine3);
-        Assert::assertStringContainsString('Email C', $htmlLine3);
-        Assert::assertStringContainsString('Email B', $htmlLine2);
-        Assert::assertStringContainsString('ri-a-b fs-14', $htmlLine2);
-        Assert::assertStringContainsString('Is A/B variant', $htmlLine2);
-        Assert::assertStringContainsString('ri-organization-chart', $htmlLine2);
-        Assert::assertStringContainsString('Has A/B tests', $htmlLine2);
-        Assert::assertStringContainsString('Has A/B tests', $htmlLine1);
-        Assert::assertStringContainsString('ri-organization-chart', $htmlLine1);
-        Assert::assertStringContainsString('Email A', $htmlLine1);
+        // Find rows by email name to avoid relying on table order
+        $emailARow = null;
+        $emailBRow = null;
+        $emailCRow = null;
+
+        foreach ($emailRows as $row) {
+            $rowCrawler = new \Symfony\Component\DomCrawler\Crawler($row);
+            $html       = $rowCrawler->html();
+
+            if (str_contains($html, 'Email A')) {
+                $emailARow = $html;
+            } elseif (str_contains($html, 'Email B')) {
+                $emailBRow = $html;
+            } elseif (str_contains($html, 'Email C')) {
+                $emailCRow = $html;
+            }
+        }
+
+        Assert::assertNotNull($emailARow, 'Could not find Email A row');
+        Assert::assertNotNull($emailBRow, 'Could not find Email B row');
+        Assert::assertNotNull($emailCRow, 'Could not find Email C row');
+
+        // Email C (child) - should have A/B variant icon only
+        Assert::assertStringContainsString('ri-a-b fs-14', $emailCRow);
+        Assert::assertStringContainsString('Is A/B variant', $emailCRow);
+
+        // Email B (parent) - should have both A/B variant icon AND organization chart icon
+        Assert::assertStringContainsString('ri-a-b fs-14', $emailBRow);
+        Assert::assertStringContainsString('Is A/B variant', $emailBRow);
+        Assert::assertStringContainsString('ri-organization-chart', $emailBRow);
+        Assert::assertStringContainsString('Has A/B tests', $emailBRow);
+
+        // Email A (grandparent) - should have organization chart icon only
+        Assert::assertStringContainsString('Has A/B tests', $emailARow);
+        Assert::assertStringContainsString('ri-organization-chart', $emailARow);
     }
 
-    public function testSegmentEmailSend(): void
+    #[DataProvider('provideHtmlForEmailTracking')]
+    public function testSegmentEmailSend(string $htmlContent, bool $singleOrDoubleQuotes): void
     {
         $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
+        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', $htmlContent, $segment);
 
         $this->addContactsToSegment($segment, ['contact@one.email', 'contact@two.email']);
         $this->em->flush();
 
         $this->sendBatchEmail($email);
 
-        $email = $this->getMailerMessage();
+        $email = self::getMailerMessage();
         \assert($email instanceof MauticMessage);
 
+        $quote = $singleOrDoubleQuotes ? '\'' : '"';
         // The order of the recipients is not guaranteed, so we need to check both possibilities.
         Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
+        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());
         Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
         Assert::assertCount(1, $email->getFrom());
         Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
@@ -301,6 +325,28 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $iconNodes2 = $crawler->filter('.email-list .ri-translate-2');
         Assert::assertGreaterThanOrEqual(1, $iconNodes2->count(), 'Translate icon not found in the email list rows.');
+    }
+
+    public static function provideHtmlForEmailTracking(): \Generator
+    {
+        $variantQuotes   = ['single quote' => "'", 'double quote' => '"'];
+        $variantSpaces   = ['no space' => '$', 'start space' => ' $', 'end space' => '$ ', 'both spaces' => ' $ '];
+        $variantNewlines = ['no newlines' => '$', 'start \r\n' => "\r\n$", 'end \r\n' => "$\r\n", 'both \r\n' => "\r\n$\r\n", 'start \n' => "\n$", 'end \n' => "$\n", 'both \n' => "\n$\n"];
+
+        foreach ($variantQuotes as $quotesName => $variantQuote) {
+            foreach ($variantSpaces as $spaceName => $variantSpace) {
+                foreach ($variantNewlines as $newLineName => $variantNewline) {
+                    $href = $variantQuote
+                        .str_replace('$', str_replace('$', 'https://mautic.org', $variantSpace), $variantNewline)
+                        .$variantQuote;
+
+                    yield $quotesName.', '.$spaceName.', '.$newLineName => [
+                        'Ahoy <i>{contactfield=email}</i><a href='.$href.'>Mautic</a>',
+                        'single quote' === $quotesName,
+                    ];
+                }
+            }
+        }
     }
 
     public function testSegmentEmailSendWithAdvancedOptions(): void
@@ -440,6 +486,96 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 
+    public function testCloneWithTranslationsAndVariantsAction(): void
+    {
+        $segment = $this->createSegment('Segment C', 'segment-C');
+
+        $parent = $this->createEmail('Parent email', 'Parent subject', 'list', 'blank', 'Parent html', $segment);
+        $parent->setLanguage('en_US');
+        $parent->setIsPublished(true);
+
+        $translation = $this->createEmail('Parent French', 'French subject', 'list', 'blank', 'French html', $segment);
+        $translation->setLanguage('fr_FR');
+        $translation->setTranslationParent($parent);
+        $parent->addTranslationChild($translation);
+
+        $variantSettings = ['weight' => 50, 'winnerCriteria' => 'email.openrate'];
+        $variant         = $this->createEmail(
+            'Variant email',
+            'Variant subject',
+            'list',
+            'blank',
+            'Variant html',
+            $segment,
+            $variantSettings
+        );
+        $variant->setLanguage('en_US');
+        $variant->setVariantParent($parent);
+        $parent->addVariantChild($variant);
+
+        $variantTranslation = $this->createEmail(
+            'Variant French',
+            'Variant French subject',
+            'list',
+            'blank',
+            'Variant French html',
+            $segment
+        );
+        $variantTranslation->setLanguage('fr_FR');
+        $variantTranslation->setTranslationParent($variant);
+        $variant->addTranslationChild($variantTranslation);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertStringContainsString(
+            "/s/emails/cloneWithTranslations/{$parent->getId()}",
+            $this->client->getResponse()->getContent()
+        );
+        $this->assertStringContainsString('Clone with translations and variants', $this->client->getResponse()->getContent());
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
+            Request::METHOD_POST,
+            "/s/emails/cloneWithTranslations/{$parent->getId()}",
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $emailRepository = $this->em->getRepository(Email::class);
+        $emails          = $emailRepository->findBy([], ['id' => 'ASC']);
+
+        Assert::assertCount(8, $emails);
+
+        $clonedParent             = $emailRepository->findOneBy(['name' => 'Parent email (copy)']);
+        $clonedTranslation        = $emailRepository->findOneBy(['name' => 'Parent French (copy)']);
+        $clonedVariant            = $emailRepository->findOneBy(['name' => 'Variant email (copy)']);
+        $clonedVariantTranslation = $emailRepository->findOneBy(['name' => 'Variant French (copy)']);
+
+        Assert::assertInstanceOf(Email::class, $clonedParent);
+        Assert::assertInstanceOf(Email::class, $clonedTranslation);
+        Assert::assertInstanceOf(Email::class, $clonedVariant);
+        Assert::assertInstanceOf(Email::class, $clonedVariantTranslation);
+
+        Assert::assertSame('list', $clonedParent->getEmailType());
+        Assert::assertFalse($clonedParent->isPublished(false));
+        Assert::assertSame(0, $clonedParent->getSentCount());
+        Assert::assertSame('Parent html', $clonedParent->getCustomHtml());
+        Assert::assertCount(1, $clonedParent->getLists());
+
+        Assert::assertSame($clonedParent->getId(), $clonedTranslation->getTranslationParent()->getId());
+        Assert::assertSame('fr_FR', $clonedTranslation->getLanguage());
+        Assert::assertSame('French html', $clonedTranslation->getCustomHtml());
+
+        Assert::assertSame($clonedParent->getId(), $clonedVariant->getVariantParent()->getId());
+        Assert::assertSame($variantSettings, $clonedVariant->getVariantSettings());
+        Assert::assertSame('Variant html', $clonedVariant->getCustomHtml());
+
+        Assert::assertSame($clonedVariant->getId(), $clonedVariantTranslation->getTranslationParent()->getId());
+        Assert::assertSame('fr_FR', $clonedVariantTranslation->getLanguage());
+        Assert::assertSame('Variant French html', $clonedVariantTranslation->getCustomHtml());
+    }
+
     public function testEmailDetailsPageShouldNotHavePendingCount(): void
     {
         $segment = $this->createSegment('Test Segment A', 'test-segment-a');
@@ -563,6 +699,29 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $savedEmail = $this->em->find(Email::class, $email->getId());
         Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
+    }
+
+    public function testOptimisticLock(): void
+    {
+        $version = 1;
+        $email   = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
+        $this->em->flush();
+        $this->assertEmailVersion($email->getId(), $version);
+
+        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailVersion($email->getId(), ++$version, 'The version should be incremented after submitting the form.');
+
+        $form    = $crawler->selectButton('Save')->form();
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailVersion($email->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
+        Assert::assertStringContainsString(
+            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
+            $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.',
+        );
     }
 
     /**
@@ -1087,6 +1246,92 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Email name maximum length is 190 characters', $response->getContent());
     }
 
+    #[DataProvider('provideFromAddressValidationValues')]
+    public function testFromAddressAllowsEmailOrContactFieldToken(string $fromAddress, bool $expectSaved): void
+    {
+        $name    = sprintf('From address validation %s', md5($fromAddress));
+        $subject = sprintf('Subject %s', md5($fromAddress));
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue($name);
+        $form['emailform[subject]']->setValue($subject);
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('content');
+        $form['emailform[fromAddress]']->setValue($fromAddress);
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
+
+        if ($expectSaved) {
+            $this->assertInstanceOf(Email::class, $email);
+            $this->assertSame($fromAddress, $email->getFromAddress());
+
+            return;
+        }
+
+        $this->assertNull($email);
+        $this->assertStringContainsString($fromAddress, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array{fromAddress: string, expectSaved: bool}>
+     */
+    public static function provideFromAddressValidationValues(): iterable
+    {
+        yield 'standard email address is valid' => [
+            'fromAddress' => 'sender@nowhere.com',
+            'expectSaved' => true,
+        ];
+
+        yield 'email token is valid for email field alias' => [
+            'fromAddress' => '{contactfield=email|fallback@nowhere.com}',
+            'expectSaved' => true,
+        ];
+
+        yield 'plain invalid value is rejected' => [
+            'fromAddress' => 'not-an-email-or-token',
+            'expectSaved' => false,
+        ];
+
+        yield 'csv from addresses are rejected' => [
+            'fromAddress' => 'sender1@nowhere.com, sender2@nowhere.com',
+            'expectSaved' => false,
+        ];
+    }
+
+    public function testInvalidFromAddressMarksAdvancedTabAndShowsSingleError(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue('Invalid advanced from address');
+        $form['emailform[subject]']->setValue('Invalid advanced from address');
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('content');
+        $form['emailform[fromAddress]']->setValue('{contactfieldd=companyemail|info@default.com}');
+
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $matchingAlerts = array_filter(
+            $crawler->filter('.alert.alert-danger')->each(
+                static fn ($node): string => trim($node->text())
+            ),
+            static fn (string $text): bool => str_contains($text, 'is not an email address nor a token built on an email field type.')
+        );
+
+        $this->assertCount(1, $matchingAlerts);
+        $this->assertCount(1, $crawler->filter('a[href="#advanced-container"] span.text-danger'));
+    }
+
     /**
      * Test email subject length validation (190 character limit).
      */
@@ -1177,5 +1422,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+    }
+
+    private function assertEmailVersion(int $id, int $expectedVersion, string $message = ''): void
+    {
+        $this->em->clear();
+        $email = $this->em->find(Email::class, $id);
+        Assert::assertSame($expectedVersion, $email->getVersion(), $message);
     }
 }

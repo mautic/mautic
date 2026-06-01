@@ -185,7 +185,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             $height = $widget->getHeight();
-            $limit  = round(($height - 80) / 60);
+            $limit  = round(($height - 80) / 80);
 
             $upcomingEmails = $this->emailModel->getUpcomingEmails($limit, $canViewOthers);
 

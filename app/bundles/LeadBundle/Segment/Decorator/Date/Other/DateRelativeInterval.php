@@ -68,11 +68,19 @@ class DateRelativeInterval implements FilterDecoratorInterface
 
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
-        if ('like' === $operator || 'notLike' === $operator) {
+
+        $isLikeOperator = 'like' === $operator || 'notLike' === $operator;
+        if (!$isLikeOperator && $contactSegmentFilterCrate->hasTimeParts()) {
+            $format .= ' H:i:s';
+        }
+        if ($isLikeOperator) {
             $format .= '%';
         }
+        if (!$contactSegmentFilterCrate->hasTimeParts() && 'gt' === $operator) {
+            $format .= ' 23:59:59';
+        }
 
-        return $date->toLocalString($format);
+        return $date->toUtcString($format);
     }
 
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string

@@ -364,7 +364,6 @@ class HttpFactoryTest extends TestCase
         $handler    = $client->getConfig()['handler']; /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
         $reflection = new \ReflectionClass($handler);
         $property   = $reflection->getProperty('stack');
-        $property->setAccessible(true);
 
         $stack = $property->getValue($handler);
 
@@ -377,7 +376,6 @@ class HttpFactoryTest extends TestCase
     private function getProperty(\ReflectionClass $reflection, $object, string $name)
     {
         $property = $reflection->getProperty($name);
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }

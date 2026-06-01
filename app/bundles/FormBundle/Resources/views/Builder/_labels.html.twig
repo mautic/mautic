@@ -179,6 +179,20 @@
         } %}
     {% endif %}
 
+    {% if field.validation.blockfreeemail is defined and field.validation.blockfreeemail == 1 %}
+    <!-- Blocked free email providers -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.type.email.blocked_free_providers',
+                    icon: 'ri-mail-forbid-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
     {% if field.isRequired is defined and field.isRequired == 1 %}
     <!-- Required -->
     {% include '@MauticCore/Helper/_tag.html.twig' with {

@@ -49,7 +49,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block button_group_widget %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons">
+<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
     {% for child in form %}
         {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
         <label class="btn {{ class }} btn-block mt-0 list-group-item">
@@ -567,7 +567,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
     {% set yes_choice = form.vars.choices[1] %}
     {% set no_choice = form.vars.choices[0] %}
 
-    <div class="toggle"
+    <div class="toggle{{ attr.disabled|default(false) ? ' toggle--disabled' : '' }}{{ attr.readonly|default(false) ? ' toggle--readonly' : '' }}"
          data-yes="{{ yes_choice.label|trans }}"
          data-no="{{ no_choice.label|trans }}"
          data-yes-value="{{ yes_choice.value }}"
