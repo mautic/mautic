@@ -125,8 +125,7 @@ class AssetsHelperTest extends TestCase
 
         $reflectionObject = new \ReflectionObject($this->assetHelper);
         $method           = $reflectionObject->getMethod('getCKEditorScripts');
-        $method->setAccessible(true);
-        $ckEditorScripts = $method->invokeArgs($this->assetHelper, []);
+        $ckEditorScripts  = $method->invokeArgs($this->assetHelper, []);
         Assert::assertEquals(
             [
                 "media/libraries/ckeditor/ckeditor.js?v{$version}",

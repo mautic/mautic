@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -27,10 +27,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('point:triggers:viewown')"),
         new Post(security: "is_granted('point:triggers:create')"),
-        new Get(security: "is_granted('point:triggers:viewown')"),
-        new Put(security: "is_granted('point:triggers:editown')"),
-        new Patch(security: "is_granted('point:triggers:editother')"),
-        new Delete(security: "is_granted('point:triggers:deleteown')"),
+        new Get(security: "is_granted('point:triggers:viewown', object)"),
+        new Put(security: "is_granted('point:triggers:editown', object)"),
+        new Patch(security: "is_granted('point:triggers:editother', object)"),
+        new Delete(security: "is_granted('point:triggers:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['point:read'],

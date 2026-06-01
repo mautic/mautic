@@ -482,7 +482,7 @@ class EmailController extends FormController
         ThemeHelper $themeHelper,
         $entity = null,
     ) {
-        if (!($entity instanceof Email)) {
+        if (!$entity instanceof Email) {
             $entity = $model->getEntity();
         }
 
@@ -711,6 +711,7 @@ class EmailController extends FormController
             $entity->setEmailType('template');
         }
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $this->setOptimisticLockVersion($entity, $form);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {
@@ -718,7 +719,7 @@ class EmailController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $existingEmail = clone $entity;
                 $this->restoreNullifiedFieldsDuringClone($existingEmail, $entity);
-                if ($valid = $this->isFormValid($form)) {
+                if ($valid = ($this->isFormValid($form) && $this->checkOptimisticLockVersion($entity, $form, false))) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
@@ -809,9 +810,10 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
+            } elseif ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+                $this->setOptimisticLockVersion($entity, $form);
             }
         } else {
             // lock the entity
@@ -858,6 +860,14 @@ class EmailController extends FormController
             );
         }
 
+        $route = $this->generateUrl('mautic_email_action', $routeParams);
+        $error = $this->getFormErrorForBuilder($form);
+        $data  = ['version' => $error ? $form['version']->getData() : $entity->getVersion()];
+
+        if ($optimizedResponse = $this->returnOptimizedResponse($request, $form, '#mautic_email_index', 'email', $route, $data)) {
+            return $optimizedResponse;
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -882,7 +892,7 @@ class EmailController extends FormController
                     'mauticContent'   => 'email',
                     'updateSelect'    => InputHelper::clean($request->query->get('updateSelect')),
                     'route'           => $this->generateUrl('mautic_email_action', $routeParams),
-                    'validationError' => $this->getFormErrorForBuilder($form),
+                    'validationError' => $error,
                 ],
             ]
         );
@@ -984,9 +994,9 @@ class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
-                            return $this->redirectToRoute('mautic_email_action', [
-                                'objectAction' => 'edit',
-                                'objectId'     => $entity->getId(),
+                            return $this->forward(static::class.'::editAction', [
+                                'objectId'   => $entity->getId(),
+                                'ignorePost' => true,
                             ]);
                         }
                     } catch (InvalidRenderedHtmlException $e) {
@@ -1048,6 +1058,100 @@ class EmailController extends FormController
                 ],
             ]
         );
+    }
+
+    /**
+     * Clone an email and its translation/variant family.
+     */
+    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    {
+        $page = $request->getSession()->get('mautic.email.page', 1);
+
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email',
+            ],
+        ];
+
+        if (Request::METHOD_POST !== $request->getMethod()) {
+            return $this->postActionRedirect($postActionVars);
+        }
+
+        $emailEntity = $model->getEntity($objectId);
+
+        if (null === $emailEntity) {
+            $postActionVars['flashes'][] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.email.error.notfound',
+                'msgVars' => ['%id%' => $objectId],
+            ];
+
+            return $this->postActionRedirect($postActionVars);
+        }
+
+        if (!$this->security->isGranted('email:emails:create')
+            || !$this->security->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $emailEntity->getCreatedBy()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        if ($model->isLocked($emailEntity)) {
+            return $this->isLocked($postActionVars, $emailEntity, 'email');
+        }
+
+        if ($emailEntity->isTranslation(true) || $emailEntity->isVariant(true)) {
+            $postActionVars['flashes'][] = [
+                'type' => 'error',
+                'msg'  => 'mautic.email.error.clone_with_relations_parent_only',
+            ];
+
+            return $this->postActionRedirect($postActionVars);
+        }
+
+        try {
+            $clonedEmails = $model->cloneEmailWithTranslationsAndVariants($emailEntity);
+            $clonedParent = $clonedEmails[0];
+
+            $postActionVars['flashes'] = [
+                [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.email.notice.cloned_with_relations',
+                    'msgVars' => [
+                        '%name%'  => $clonedParent->getName(),
+                        '%count%' => count($clonedEmails),
+                    ],
+                ],
+            ];
+
+            $postActionVars['viewParameters'] = [
+                'objectAction' => 'view',
+                'objectId'     => $clonedParent->getId(),
+            ];
+            $postActionVars['returnUrl'] = $this->generateUrl(
+                'mautic_email_action',
+                $postActionVars['viewParameters']
+            );
+            $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
+        } catch (InvalidRenderedHtmlException $e) {
+            $postActionVars['flashes'] = [
+                [
+                    'type' => 'error',
+                    'msg'  => $e->getMessage(),
+                ],
+            ];
+        }
+
+        return $this->postActionRedirect($postActionVars);
     }
 
     /**
@@ -1164,7 +1268,7 @@ class EmailController extends FormController
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-        return $this->render(
+        return new Response($themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'    => $isNew,
@@ -1173,7 +1277,7 @@ class EmailController extends FormController
                 'template' => $template,
                 'basePath' => $request->getBasePath(),
             ]
-        );
+        ));
     }
 
     /**

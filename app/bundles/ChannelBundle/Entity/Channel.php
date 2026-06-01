@@ -16,16 +16,16 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
         new Post(security: "is_granted('channel:messages:create')"),
-        new Get(security: "is_granted('channel:messages:viewown')"),
-        new Put(security: "is_granted('channel:messages:editown')"),
-        new Patch(security: "is_granted('channel:messages:editother')"),
-        new Delete(security: "is_granted('channel:messages:deleteown')"),
+        new Get(security: "is_granted('channel:messages:viewown', object)"),
+        new Put(security: "is_granted('channel:messages:editown', object)"),
+        new Patch(security: "is_granted('channel:messages:editother', object)"),
+        new Delete(security: "is_granted('channel:messages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['channel:read'],
@@ -104,6 +104,7 @@ class Channel extends CommonEntity implements UuidInterface
         $builder->createManyToOne('message', Message::class)
                 ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
                 ->inversedBy('channels')
+                ->isOwnershipParent()
                 ->build();
 
         static::addUuidField($builder);
@@ -259,5 +260,10 @@ class Channel extends CommonEntity implements UuidInterface
         $this->isEnabled = $isEnabled;
 
         return $this;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getMessage()->getCreatedBy();
     }
 }

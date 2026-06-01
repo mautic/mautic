@@ -12,12 +12,13 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\AssetBundle\Validator\Constraints\Upload;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -25,17 +26,17 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('asset:assets:viewown')"),
         new Post(security: "is_granted('asset:assets:create')"),
-        new Get(security: "is_granted('asset:assets:viewown')"),
-        new Put(security: "is_granted('asset:assets:editown')"),
-        new Patch(security: "is_granted('asset:assets:editother')"),
-        new Delete(security: "is_granted('asset:assets:deleteown')"),
+        new Get(security: "is_granted('asset:assets:viewown', object)"),
+        new Put(security: "is_granted('asset:assets:editown', object)"),
+        new Patch(security: "is_granted('asset:assets:editother', object)"),
+        new Delete(security: "is_granted('asset:assets:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['asset:read'],
@@ -132,7 +133,7 @@ class Asset extends FormEntity implements UuidInterface
     private $tempName;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $alias;
@@ -224,7 +225,10 @@ class Asset extends FormEntity implements UuidInterface
 
         $builder->addIdColumns('title');
 
-        $builder->addField('alias', 'string');
+        $builder->createField('alias', 'string')
+            ->columnName('alias')
+            ->nullable()
+            ->build();
 
         $builder->createField('storageLocation', 'string')
             ->columnName('storage_location')
@@ -283,6 +287,15 @@ class Asset extends FormEntity implements UuidInterface
         self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
 
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new Upload());
+        $metadata->addPropertyConstraint('remotePath', new Sequentially([
+            new Assert\Url(message: 'mautic.asset.validation.error.url'),
+            new SafeRemoteUrl(),
+        ]));
+    }
+
     /**
      * Prepares the metadata for API usage.
      */
@@ -332,7 +345,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -389,9 +402,7 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get title.
-     *
-     * @return string
+     * @return ?string
      */
     public function getTitle()
     {
@@ -485,13 +496,9 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set path.
-     *
-     * @param string $path
-     *
-     * @return Asset
+     * @param ?string $path
      */
-    public function setPath($path)
+    public function setPath($path): Asset
     {
         $this->isChanged('path', $path);
         $this->path = $path;
@@ -502,7 +509,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Get path.
      *
-     * @return string
+     * @return ?string
      */
     public function getPath()
     {
@@ -510,13 +517,9 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set remote path.
-     *
-     * @param string $remotePath
-     *
-     * @return Asset
+     * @param ?string $remotePath
      */
-    public function setRemotePath($remotePath)
+    public function setRemotePath($remotePath): Asset
     {
         $this->isChanged('remotePath', $remotePath);
         $this->remotePath = $remotePath;
@@ -525,9 +528,7 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get remote path.
-     *
-     * @return string
+     * @return ?string
      */
     public function getRemotePath()
     {
@@ -536,12 +537,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Set alias.
-     *
-     * @param string $alias
-     *
-     * @return Asset
      */
-    public function setAlias($alias)
+    public function setAlias(?string $alias): self
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -551,10 +548,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Get alias.
-     *
-     * @return string
      */
-    public function getAlias()
+    public function getAlias(): ?string
     {
         return $this->alias;
     }
@@ -951,19 +946,16 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Returns some file info.
      *
-     * @return array
+     * @return array<string, float|string|false|null>|string
      */
     public function getFileInfo()
     {
         $fileInfo = [];
 
         if ($this->isRemote()) {
-            $ch = curl_init($this->getRemotePath());
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            $ch = $this->buildRemoteCurl();
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_NOBODY, true);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
             curl_exec($ch);
 
             // build an array of handy info
@@ -986,29 +978,19 @@ class Asset extends FormEntity implements UuidInterface
         return $fileInfo;
     }
 
-    /**
-     * Returns file mime type.
-     *
-     * @return string
-     */
-    public function getFileMimeType()
+    public function getFileMimeType(): ?string
     {
         if ($this->isRemote()) {
-            $ch = curl_init($this->getRemotePath());
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($ch, CURLOPT_HEADER, true);
-            curl_setopt($ch, CURLOPT_NOBODY, true);
-            curl_exec($ch);
-
-            return curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            return $this->getRemoteMimeTypeFromHeader();
         }
 
-        if (null === $this->loadFile()) {
+        $file = $this->loadFile();
+
+        if (null === $file) {
             return '';
         }
 
-        return $this->loadFile()->getMimeType();
+        return $file->getMimeType();
     }
 
     /**
@@ -1164,11 +1146,14 @@ class Asset extends FormEntity implements UuidInterface
     }
 
     /**
-     * Load content of the file from it's path.
+     * Load the content of the file from its path.
      */
     public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
+        if (!file_exists($path)) {
+            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', $path));
+        }
 
         return file_get_contents($path);
     }
@@ -1197,83 +1182,6 @@ class Asset extends FormEntity implements UuidInterface
     public function setDescription($description): void
     {
         $this->description = $description;
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        // Add a constraint to manage the file upload data
-        $metadata->addConstraint(new Assert\Callback([self::class, 'validateFile']));
-    }
-
-    /**
-     * Validator to ensure proper data for the file fields.
-     *
-     * @param Asset                     $object  Entity object to validate
-     * @param ExecutionContextInterface $context Context object
-     */
-    public static function validateFile($object, ExecutionContextInterface $context): void
-    {
-        if ($object->isLocal()) {
-            $tempName = $object->getTempName();
-            $path     = $object->getPath();
-
-            // If the object is stored locally, we should have file data
-            if ($object->isNew() && null === $tempName && null === $path) {
-                $context->buildViolation('mautic.asset.asset.error.missing.file')
-                    ->atPath('tempName')
-                    ->setTranslationDomain('validators')
-                    ->addViolation();
-            }
-
-            if (null === $object->getTitle()) {
-                $context->buildViolation('mautic.asset.asset.error.missing.title')
-                    ->atPath('title')
-                    ->setTranslationDomain('validators')
-                    ->addViolation();
-            }
-            $parameters        = (new ParameterLoader())->getParameterBag();
-            $extensionsAllowed = $parameters->get('allowed_extensions');
-            $mimeTypesMap      = $parameters->get('allowed_mimetypes');
-            $mimeTypesAllowed  = array_intersect_key($mimeTypesMap, array_flip($extensionsAllowed));
-
-            $fileMimeType        = $object->getFileMimeType();
-            $fileExtension       = strtolower($object->getExtension() ?? '');
-            $lowercaseMimeTypes  = array_change_key_case($mimeTypesAllowed, CASE_LOWER);
-            $lowercaseMimeValues = array_map('strtolower', $mimeTypesAllowed);
-
-            if (!empty($fileMimeType) && array_key_exists($fileExtension, $lowercaseMimeTypes) && !in_array(strtolower($fileMimeType), $lowercaseMimeValues, true)) {
-                $context->buildViolation('mautic.asset.asset.error.invalid.mimetype', [
-                    '%fileMimetype%'=> $object->getFileMimeType(),
-                    '%mimetypes%'   => implode(', ', $mimeTypesAllowed),
-                ])->atPath('file')
-                    ->setTranslationDomain('validators')
-                    ->addViolation();
-            }
-
-            $fileType = $object->getExtension();
-            if (null !== $fileType && !in_array(strtolower($fileType), array_map('strtolower', $extensionsAllowed), true)) {
-                $context->buildViolation('mautic.asset.asset.error.file.extension', [
-                    '%fileExtension%'=> $object->getExtension(),
-                    '%extensions%'   => implode(', ', $extensionsAllowed),
-                ])->atPath('file')
-                    ->setTranslationDomain('validators')
-                    ->addViolation();
-            }
-
-            // Unset any remote file data
-            $object->setRemotePath(null);
-        } elseif ($object->isRemote()) {
-            // If the object is stored remotely, we should have a remote path
-            if (null === $object->getRemotePath()) {
-                $context->buildViolation('mautic.asset.asset.error.missing.remote.path')
-                    ->atPath('remotePath')
-                    ->setTranslationDomain('validators')
-                    ->addViolation();
-            }
-
-            // Unset any local file data
-            $object->setPath(null);
-        }
     }
 
     /**
@@ -1317,7 +1225,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Get temporary file name.
      *
-     * @return string
+     * @return ?string
      */
     public function getTempName()
     {
@@ -1336,12 +1244,9 @@ class Asset extends FormEntity implements UuidInterface
         if (empty($this->size) || $forceUpdate) {
             // Try to fetch it
             if ($this->isRemote()) {
-                $ch = curl_init($this->getRemotePath());
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                $ch = $this->buildRemoteCurl();
                 curl_setopt($ch, CURLOPT_HEADER, true);
                 curl_setopt($ch, CURLOPT_NOBODY, true);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
                 curl_exec($ch);
 
@@ -1472,5 +1377,81 @@ class Asset extends FormEntity implements UuidInterface
     public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;
+    }
+
+    /**
+     * Returns the public slug for this asset.
+     *
+     * Uses `{uuid}` as the canonical slug.
+     * Falls back to `{id}:{alias}` for backward compatibility.
+     *
+     * @throws \LogicException if the asset has not been saved yet and has no ID
+     */
+    public function getSlug(): string
+    {
+        if (null === $this->id) {
+            throw new \LogicException('This asset must be saved before it can be used in a URL.');
+        }
+
+        return $this->uuid ?: $this->id.':'.$this->alias;
+    }
+
+    public function getRemoteMimeTypeFromHeader(): string
+    {
+        if (!$this->remotePath) {
+            return '';
+        }
+
+        $ch = $this->buildRemoteCurl();
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_exec($ch);
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            return '';
+        }
+
+        $contentTypes = explode(',', (string) curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
+        $mimeType     = end($contentTypes);
+
+        return $this->extractMimeType($mimeType);
+    }
+
+    public function getRemoteMimeTypeFromMagicBytes(): string
+    {
+        if (!$this->remotePath) {
+            return '';
+        }
+
+        $ch = $this->buildRemoteCurl();
+        curl_setopt($ch, CURLOPT_RANGE, '0-1023');
+
+        $chunk = curl_exec($ch);
+
+        if (false === $chunk) {
+            return '';
+        }
+
+        $mimeType = (string) (new \finfo(FILEINFO_MIME_TYPE))->buffer($chunk);
+
+        return $this->extractMimeType($mimeType);
+    }
+
+    private function extractMimeType(string $mimeType): string
+    {
+        return trim(explode(';', $mimeType)[0]);
+    }
+
+    private function buildRemoteCurl(): \CurlHandle
+    {
+        $ch = curl_init($this->remotePath);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+
+        return $ch;
     }
 }

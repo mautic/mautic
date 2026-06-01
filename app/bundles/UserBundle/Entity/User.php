@@ -29,10 +29,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/users', security: "is_granted('user:users:viewown')"),
         new Post(uriTemplate: '/users', security: "is_granted('user:users:create')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown')"),
-        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother')", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
-        new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown')"),
+        new Get(uriTemplate: '/users/{id}', security: "is_granted('user:users:viewown', object)"),
+        new Put(uriTemplate: '/users/{id}', security: "is_granted('user:users:editown', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Patch(uriTemplate: '/users/{id}', security: "is_granted('user:users:editother', object)", processor: \Mautic\UserBundle\ApiPlatform\UserProcessor::class),
+        new Delete(uriTemplate: '/users/{id}', security: "is_granted('user:users:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['user:read'],
@@ -264,6 +264,13 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
                 'fields'           => ['email'],
                 'message'          => 'mautic.user.user.email.unique',
                 'repositoryMethod' => 'checkUniqueUsernameEmail',
+            ]
+        ));
+
+        $metadata->addPropertyConstraint('position', new Assert\Length(
+            [
+                'max'        => 191,
+                'maxMessage' => 'mautic.user.user.position.toolong',
             ]
         ));
 
@@ -727,9 +734,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     {
         if (null !== $this->role) {
             return $this->role->isAdmin();
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**

@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,6 +58,57 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
         Assert::assertStringContainsString('Edit Custom Field - Best Date Ever', $text);
+    }
+
+    public function testFieldDeleteValidationUsedInSegment(): void
+    {
+        $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
+        $field_first      = $this->createField('First');
+        $fieldModel->saveEntity($field_first);
+
+        $field_second      = $this->createField('Second');
+        $fieldModel->saveEntity($field_second);
+
+        // Create a segment which uses the custom field we just created.
+        $segment = new LeadList();
+        $segment->setName('Field Segment');
+        $segment->setPublicName('Field Segment');
+        $segment->setAlias('field_segment');
+        $segment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'field_first',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'display'    => null,
+                'operator'   => '=',
+            ],
+            [
+                'glue'       => 'and',
+                'field'      => 'field_second',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'display'    => null,
+                'operator'   => '=',
+            ],
+        ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        // Try deleting single field.
+        $this->client->request(Request::METHOD_POST,
+            '/s/contacts/fields/delete/'.$field_first->getId(), [], [], $this->createAjaxHeaders());
+
+        Assert::assertStringContainsString('please go back and check mentioned resource(s) before deleting.',
+            strip_tags($this->client->getResponse()->getContent()));
+
+        // Try deleting multiple fields.
+        $parameters = 'ids=["'.$field_first->getId().'","'.$field_second->getId().'"]';
+        $this->client->request(Request::METHOD_POST,
+            '/s/contacts/fields/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+
+        Assert::assertStringContainsString('cannot be deleted because they are in use by other entities.',
+            strip_tags($this->client->getResponse()->getContent()));
     }
 
     public function testNewSelectField(): void

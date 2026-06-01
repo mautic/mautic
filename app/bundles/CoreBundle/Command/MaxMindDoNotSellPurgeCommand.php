@@ -116,15 +116,19 @@ EOT
         return $result->fetchAllAssociative();
     }
 
-    private function purgeData(string $contactId, string $ip): bool
+    private function purgeData(string $contactId, string $ip): void
     {
         /** @var Lead $lead */
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
         $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn ($item): bool => $item->getIpAddress() == $ip);
 
+        if (!$matchedIps) {
+            return;
+        }
+
         // We only purge data from the contact if it matches the data in the IP details
         if ($ipDetails = $matchedIps[0]->getIpDetails()) {
-            return false;
+            return;
         }
 
         $changed = false;
@@ -147,10 +151,6 @@ EOT
 
         if ($changed) {
             $this->leadRepository->saveEntity($lead);
-
-            return true;
         }
-
-        return false;
     }
 }
