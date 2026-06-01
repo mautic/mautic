@@ -119,6 +119,7 @@ class WebhookControllerTest extends TestCase
             ->method('post')
             ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
                 Assert::assertEquals( // Changed from assertSame (works on all DBs)
+                    $payload,
                     $testPayload,
                     json_encode($payload, JSON_THROW_ON_ERROR),
                 );
