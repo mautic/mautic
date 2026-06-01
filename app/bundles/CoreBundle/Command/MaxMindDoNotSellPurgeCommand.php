@@ -151,8 +151,6 @@ EOT
 
         if ($changed) {
             $this->leadRepository->saveEntity($lead);
-
-            return;
         }
     }
 }

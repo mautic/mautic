@@ -52,12 +52,6 @@ return [
                     'mautic.security',
                 ],
             ],
-            'mautic.focus.helper.iframe_availability_checker' => [
-                'class'     => MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
         ],
     ],
 

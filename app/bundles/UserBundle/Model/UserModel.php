@@ -271,7 +271,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         }
         $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $mailer->setTo([$user->getEmail() => $user->getName()]);
+        $mailer->setTo([$user->getEmail() ?? '' => $user->getName()]);
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
         $text = $this->translator->trans(
             'mautic.user.user.passwordreset.email.body',
@@ -328,7 +328,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function emailUser(User $user, string $subject, string $content): void
     {
         $mailer  = $this->prepareEMail($subject, $content);
-        $mailer->setTo([$user->getEmail() => $user->getName()]);
+        $mailer->setTo([$user->getEmail() ?? '' => $user->getName()]);
         $mailer->send();
     }
 

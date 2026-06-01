@@ -134,7 +134,7 @@ class StageController extends AbstractFormController
         $model = $this->getModel('stage');
         \assert($model instanceof StageModel);
 
-        if (!($entity instanceof Stage)) {
+        if (!$entity instanceof Stage) {
             /** @var Stage $entity */
             $entity = $model->getEntity();
         }

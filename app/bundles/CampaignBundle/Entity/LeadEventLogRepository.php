@@ -144,9 +144,15 @@ class LeadEventLogRepository extends CommonRepository
     {
         $leadIps = [];
 
-        $query = $this->_em->getConnection()->createQueryBuilder();
-        $query->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-            ->select('ll.event_id,
+        $query = new \Mautic\LeadBundle\Segment\Query\QueryBuilder($this->_em->getConnection());
+
+        $joinCondition = 'e.id = ll.event_id';
+        if (isset($options['type'])) {
+            $joinCondition .= ' AND e.type = :type';
+            $query->setParameter('type', $options['type']);
+        }
+
+        $query->select('ll.event_id,
                     ll.campaign_id,
                     ll.trigger_date,
                     ll.lead_id,
@@ -156,7 +162,12 @@ class LeadEventLogRepository extends CommonRepository
                     c.description AS campaign_description,
                     ll.metadata,
                     CONCAT(CONCAT(l.firstname, \' \'), l.lastname) AS lead_name')
-            ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id')
+            ->add('from', [
+                'table' => MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'alias' => 'll',
+                'hint'  => 'USE INDEX ('.MAUTIC_TABLE_PREFIX.'idx_scheduled_events)',
+            ], true)
+            ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', $joinCondition)
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = e.campaign_id')
             ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = ll.lead_id')
             ->where($query->expr()->eq('ll.is_scheduled', 1))
@@ -170,11 +181,6 @@ class LeadEventLogRepository extends CommonRepository
 
             $query->andWhere('ll.lead_id = :leadId')
                 ->setParameter('leadId', $options['lead']->getId());
-        }
-
-        if (isset($options['type'])) {
-            $query->andwhere('e.type = :type')
-            ->setParameter('type', $options['type']);
         }
 
         if (isset($options['eventType'])) {
@@ -220,6 +226,7 @@ class LeadEventLogRepository extends CommonRepository
         ?\DateTimeInterface $dateFrom = null,
         ?\DateTimeInterface $dateTo = null,
         ?int $eventId = null,
+        int $cacheTTL = 0,
     ): array {
         $join = $all ? 'leftJoin' : 'innerJoin';
 
@@ -289,11 +296,11 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if ($this->_em->getConnection()->getConfiguration()->getResultCache()) {
-            $results = $this->_em->getConnection()->executeCacheQuery(
+            $results  = $this->_em->getConnection()->executeCacheQuery(
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile(600)
+                new QueryCacheProfile($cacheTTL)
             )->fetchAllAssociative();
         } else {
             $results = $q->executeQuery()->fetchAllAssociative();
@@ -687,7 +694,7 @@ SQL;
     public function getEventLogStats(int $eventId): EventLogStatsDto
     {
         $qb = $this->getReplicaConnection()->createQueryBuilder();
-        $qb->select([
+        $qb->select(
             'COUNT(log.id) as total_logs',
             'COUNT(DISTINCT log.lead_id) as unique_executions',
             'SUM(log.is_scheduled) as pending_executions',
@@ -696,7 +703,7 @@ SQL;
             'MIN(log.date_triggered) as first_execution_date',
             'MAX(log.date_triggered) as last_execution_date',
             'MAX(log.rotation) as max_rotations',
-        ])
+        )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
                 $qb->expr()->and(
