@@ -31,10 +31,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/segments', security: "is_granted('lead:lists:viewown')"),
         new Post(uriTemplate: '/segments', security: "is_granted('lead:lists:create')"),
-        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown')"),
-        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown')"),
-        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother')"),
-        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown')"),
+        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown', object)"),
+        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown', object)"),
+        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother', object)"),
+        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['segment:read'],

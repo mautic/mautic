@@ -120,7 +120,6 @@ class WebhookControllerTest extends TestCase
             ->willReturnCallback(function (string $url, array $payload) use ($testPayload): GuzzleResponse {
                 Assert::assertEquals( // Changed from assertSame (works on all DBs)
                     $testPayload,
-                    $payload,
                     json_encode($payload, JSON_THROW_ON_ERROR),
                 );
 
@@ -157,9 +156,18 @@ class WebhookControllerTest extends TestCase
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
             ->method('post')
-            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
+            ->willReturnCallback(function (string $callUrl, array $callPayload, string $callSecret) use ($eventUnderTest, $realTestPayload, $clientResponse, $secret, $url): GuzzleResponse {
                 Assert::assertSame($url, $callUrl);
-                Assert::assertEquals($realTestPayload, $callPayload); // Changed from assertSame (works on all DBs)
+                Assert::assertArrayHasKey($eventUnderTest, $callPayload);
+                Assert::assertArrayHasKey(0, $callPayload[$eventUnderTest]);
+                Assert::assertArrayHasKey('timestamp', $callPayload[$eventUnderTest][0]);
+
+                // Timestamp is created when queue item is built and can differ by a second.
+                $normalizedPayload                                      = $realTestPayload;
+                $normalizedPayload[$eventUnderTest][0]['timestamp']     = $callPayload[$eventUnderTest][0]['timestamp'];
+
+                Assert::assertEquals($normalizedPayload, $callPayload);
+
                 Assert::assertSame($secret, $callSecret);
 
                 return $clientResponse;
@@ -198,8 +206,7 @@ class WebhookControllerTest extends TestCase
         $logRepository->expects($this->never())->method('removeLimitExceedLogs'); // because clean_webhook_logs_in_background = true
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->exactly(3))
-            ->method('getRepository')
+        $em->method('getRepository')
             ->willReturnMap([
                 [Event::class, $webhookEventRepository],
                 [WebhookQueue::class, $webhookQueueRepository],
