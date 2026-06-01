@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Service;
 
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Helper\InputHelper;
 
 final class ArchiveBuilder
@@ -33,7 +34,7 @@ final class ArchiveBuilder
         $zipPath = tempnam(sys_get_temp_dir(), 'mautic_asset_batch_');
 
         if (false === $zipPath) {
-            throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.zip_creation');
         }
 
         return $zipPath;
@@ -45,7 +46,7 @@ final class ArchiveBuilder
 
         if (true !== $zipArchive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
             @unlink($zipPath);
-            throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.zip_creation');
         }
 
         return $zipArchive;
@@ -74,7 +75,7 @@ final class ArchiveBuilder
         $content = @file_get_contents($asset->getFilePath());
 
         if (false === $content || false === $zipArchive->addFromString($filename, $content)) {
-            throw new \RuntimeException('mautic.asset.asset.batch_download.error.unavailable');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
         }
     }
 
@@ -83,7 +84,7 @@ final class ArchiveBuilder
         $absolutePath = $asset->getAbsolutePath();
 
         if (empty($absolutePath) || false === $zipArchive->addFile($absolutePath, $filename)) {
-            throw new \RuntimeException('mautic.asset.asset.batch_download.error.unavailable');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
         }
     }
 
@@ -91,7 +92,7 @@ final class ArchiveBuilder
     {
         if (true !== $zipArchive->close()) {
             @unlink($zipPath);
-            throw new \RuntimeException('mautic.asset.asset.batch_download.error.zip_creation');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.zip_creation');
         }
     }
 
@@ -124,7 +125,7 @@ final class ArchiveBuilder
     /**
      * @param array<string> $usedNames
      */
-    private function ensureUniqueFilename(string $filename, array &$usedNames): string
+    private function ensureUniqueFilename(string $filename, array $usedNames): string
     {
         $finalName = $filename;
         $index     = 1;

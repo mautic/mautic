@@ -365,10 +365,10 @@ Mautic.executeBatchAction = function (action, el) {
  * @param action
  */
 Mautic.batchAssetDownload = function (action, el) {
-    var items = Mautic.getCheckedListIds(el, true);
+    const items = Mautic.getCheckedListIds(el, true);
 
-    var queryGlue   = action.indexOf('?') >= 0 ? '&' : '?';
-    var downloadUrl = action + queryGlue + 'ids=' + encodeURIComponent(items);
+    const queryGlue   = action.includes('?') ? '&' : '?';
+    const downloadUrl = action + queryGlue + 'ids=' + encodeURIComponent(items);
 
     Mautic.initiateFileDownload(downloadUrl);
 };
@@ -422,20 +422,20 @@ mQuery(document).on('click', '[data-mautic-batch-download]', function (event) {
     event.stopPropagation();
     event.stopImmediatePropagation();
 
-    var trigger = mQuery(this);
-    var action  = trigger.data('mautic-batch-download');
+    const trigger = mQuery(this);
+    const action  = trigger.data('mautic-batch-download');
 
     if (!action) {
         return;
     }
 
-    var targetSelector = trigger.data('target') || '';
-    var selectedCount  = Mautic.batchActionPrecheck(targetSelector);
+    const targetSelector = trigger.data('target') || '';
+    const selectedCount  = Mautic.batchActionPrecheck(targetSelector);
 
     if (!selectedCount) {
-        var messageKey = 'mautic.asset.asset.batch_download.error.no_selection';
-        var message    = Mautic.translate(messageKey);
-        var flash      = Mautic.addErrorFlashMessage(message);
+        const messageKey = 'mautic.asset.asset.batch_download.error.no_selection';
+        const message    = Mautic.translate(messageKey);
+        const flash      = Mautic.addErrorFlashMessage(message);
         Mautic.setFlashes(flash);
 
         return;

@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Service\ArchiveBuilder;
 use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;
 use Mautic\AssetBundle\Service\BatchDownloadResponder;
 use Mautic\AssetBundle\Service\BatchFileCollector;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -667,21 +668,21 @@ class AssetController extends FormController
         ArchiveBuilder $archiveBuilder,
         BatchDownloadResponder $responder,
     ): Response {
-        if (!$requestValidator->validatePermissions()) {
-            return $this->accessDenied();
+        if ($requestValidator->validatePermissions()) {
+            try {
+                $ids                = $requestValidator->validateAndExtractIds($request);
+                $downloadableAssets = $fileCollector->collectDownloadableAssets($ids);
+                $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
+
+                $response = $responder->createResponse($zipPath);
+            } catch (BatchDownloadException|\InvalidArgumentException $e) {
+                $response = $this->createBatchDownloadErrorResponse($e->getMessage());
+            }
+        } else {
+            $response = $this->accessDenied();
         }
 
-        try {
-            $ids                = $requestValidator->validateAndExtractIds($request);
-            $downloadableAssets = $fileCollector->collectDownloadableAssets($ids);
-            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
-
-            return $responder->createResponse($zipPath);
-        } catch (\InvalidArgumentException $e) {
-            return $this->createBatchDownloadErrorResponse($e->getMessage());
-        } catch (\RuntimeException $e) {
-            return $this->createBatchDownloadErrorResponse($e->getMessage());
-        }
+        return $response;
     }
 
     /**
