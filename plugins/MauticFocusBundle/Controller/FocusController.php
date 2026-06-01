@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,6 +27,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
+    use CategoryListFiltersTrait;
+
     /**
      * @var array<string, mixed>
      */
@@ -73,84 +76,9 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
     {
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('plugin:focus', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.core.filter.categories' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
-
-        $request        = $this->getCurrentRequest();
-        $session        = $request->getSession();
-        $currentFilters = $session->get('mautic.'.$this->getSessionBase().'.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-
-        if ($updatedFilters) {
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr]       = explode(':', $updatedFilter);
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.'.$this->getSessionBase().'.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $categoryIdsByAlias = [];
-            foreach ($categories as $category) {
-                if (!empty($category['alias'])) {
-                    $categoryIdsByAlias[$category['alias']] = (int) $category['id'];
-                }
-            }
-
-            $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                if ($type === $categoryFilterPrefix) {
-                    $type = 'category';
-                }
-
-                if ('category' !== $type) {
-                    continue;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.categories']['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if (is_numeric($fltr)) {
-                        $catIds[] = (int) $fltr;
-                        continue;
-                    }
-
-                    if (isset($categoryIdsByAlias[$fltr])) {
-                        $catIds[] = $categoryIdsByAlias[$fltr];
-                    }
-                }
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => array_values(array_unique($catIds))];
-            }
-        }
-
-        $this->listFilters = $listFilters;
+        $request           = $this->getCurrentRequest();
+        $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'plugin:focus', 'c.id', $filter);
+        $this->listFilters = $categoryFilters['filters'];
 
         return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
     }

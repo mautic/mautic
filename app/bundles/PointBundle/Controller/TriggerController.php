@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Controller;
 
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\PageHelperInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TriggerController extends FormController
 {
+    use CategoryListFiltersTrait;
+
     /**
      * @param int $page
      *
@@ -41,81 +44,7 @@ class TriggerController extends FormController
 
         [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.point.trigger.filter');
 
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('point', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.core.filter.categories' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
-
-        $session        = $request->getSession();
-        $currentFilters = $session->get('mautic.point.trigger.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-
-        if ($updatedFilters) {
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr]       = explode(':', $updatedFilter);
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.point.trigger.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $categoryIdsByAlias = [];
-            foreach ($categories as $category) {
-                if (!empty($category['alias'])) {
-                    $categoryIdsByAlias[$category['alias']] = (int) $category['id'];
-                }
-            }
-
-            $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                if ($type === $categoryFilterPrefix) {
-                    $type = 'category';
-                }
-
-                if ('category' !== $type) {
-                    continue;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.categories']['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if (is_numeric($fltr)) {
-                        $catIds[] = (int) $fltr;
-                        continue;
-                    }
-
-                    if (isset($categoryIdsByAlias[$fltr])) {
-                        $catIds[] = $categoryIdsByAlias[$fltr];
-                    }
-                }
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => array_values(array_unique($catIds))];
-            }
-        }
+        $categoryFilters = $this->applyCategoryListFilter($request, 'mautic.point.trigger.list_filters', 'point', 'cat.id', $filter);
 
         $orderBy    = $request->getSession()->get('mautic.point.trigger.orderby', 't.name');
         $orderByDir = $request->getSession()->get('mautic.point.trigger.orderbydir', 'ASC');
@@ -153,7 +82,7 @@ class TriggerController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
-                'filters'     => $listFilters,
+                'filters'     => $categoryFilters['filters'],
                 'items'       => $triggers,
                 'page'        => $page,
                 'limit'       => $limit,
@@ -243,7 +172,7 @@ class TriggerController extends FormController
         /** @var TriggerModel $model */
         $model = $this->getModel('point.trigger');
 
-        if (!($entity instanceof Trigger)) {
+        if (!$entity instanceof Trigger) {
             /** @var Trigger $entity */
             $entity = $model->getEntity();
         }
