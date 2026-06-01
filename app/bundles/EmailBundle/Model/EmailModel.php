@@ -159,6 +159,47 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @return list<Email>
+     */
+    public function cloneEmailWithTranslationsAndVariants(Email $email): array
+    {
+        $clonedEmails = [];
+
+        $clonedParent = $this->cloneEmailForRelatedClone($email);
+        $this->saveEntity($clonedParent);
+        $clonedEmails[] = $clonedParent;
+
+        foreach ($email->getTranslationChildren() as $translation) {
+            \assert($translation instanceof Email);
+
+            $clonedTranslation = $this->cloneEmailForRelatedClone($translation);
+            $clonedTranslation->setTranslationParent($clonedParent);
+            $this->saveEntity($clonedTranslation);
+            $clonedEmails[] = $clonedTranslation;
+        }
+
+        foreach ($email->getVariantChildren() as $variant) {
+            \assert($variant instanceof Email);
+
+            $clonedVariant = $this->cloneEmailForRelatedClone($variant);
+            $clonedVariant->setVariantParent($clonedParent);
+            $this->saveEntity($clonedVariant);
+            $clonedEmails[] = $clonedVariant;
+
+            foreach ($variant->getTranslationChildren() as $variantTranslation) {
+                \assert($variantTranslation instanceof Email);
+
+                $clonedVariantTranslation = $this->cloneEmailForRelatedClone($variantTranslation);
+                $clonedVariantTranslation->setTranslationParent($clonedVariant);
+                $this->saveEntity($clonedVariantTranslation);
+                $clonedEmails[] = $clonedVariantTranslation;
+            }
+        }
+
+        return $clonedEmails;
+    }
+
+    /**
      * @param Email $entity
      */
     public function saveEntity($entity, $unlock = true): void
@@ -2315,6 +2356,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function isUpdatingTranslationChildren(): bool
     {
         return $this->updatingTranslationChildren;
+    }
+
+    private function cloneEmailForRelatedClone(Email $email): Email
+    {
+        $clonedEmail = clone $email;
+        $clonedEmail->setEmailType($email->getEmailType());
+        $clonedEmail->setName($this->getRelatedCloneName($email->getName()));
+
+        return $clonedEmail;
+    }
+
+    private function getRelatedCloneName(?string $name): ?string
+    {
+        if (null === $name) {
+            return null;
+        }
+
+        $suffix    = $this->translator->trans('mautic.email.clone.copy_suffix');
+        $maxLength = Email::MAX_NAME_SUBJECT_LENGTH - mb_strlen($suffix);
+
+        return mb_substr($name, 0, $maxLength).$suffix;
     }
 
     /**

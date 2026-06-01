@@ -35,10 +35,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('sms:smses:viewown')"),
         new Post(security: "is_granted('sms:smses:create')"),
-        new Get(security: "is_granted('sms:smses:viewown')"),
-        new Put(security: "is_granted('sms:smses:editown')"),
-        new Patch(security: "is_granted('sms:smses:editother')"),
-        new Delete(security: "is_granted('sms:smses:deleteown')"),
+        new Get(security: "is_granted('sms:smses:viewown', object)"),
+        new Put(security: "is_granted('sms:smses:editown', object)"),
+        new Patch(security: "is_granted('sms:smses:editother', object)"),
+        new Delete(security: "is_granted('sms:smses:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['sms:read'],

@@ -49,10 +49,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('email:emails:viewown')"),
         new Post(security: "is_granted('email:emails:create')"),
-        new Get(security: "is_granted('email:emails:viewown')"),
-        new Put(security: "is_granted('email:emails:editown')"),
-        new Patch(security: "is_granted('email:emails:editother')"),
-        new Delete(security: "is_granted('email:emails:deleteown')"),
+        new Get(security: "is_granted('email:emails:viewown', object)"),
+        new Put(security: "is_granted('email:emails:editown', object)"),
+        new Patch(security: "is_granted('email:emails:editother', object)"),
+        new Delete(security: "is_granted('email:emails:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['email:read'],
@@ -503,7 +503,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new EmailOrEmailTokenList(),
+            new EmailOrEmailTokenList(['allowMultiple' => false]),
         );
 
         $metadata->addPropertyConstraint(
