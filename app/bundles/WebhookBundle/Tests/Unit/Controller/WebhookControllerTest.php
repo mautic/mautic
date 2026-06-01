@@ -166,7 +166,7 @@ class WebhookControllerTest extends TestCase
                 $normalizedPayload                                      = $realTestPayload;
                 $normalizedPayload[$eventUnderTest][0]['timestamp']     = $callPayload[$eventUnderTest][0]['timestamp'];
 
-                Assert::assertEquals($normalizedPayload, $callPayload);
+                Assert::assertEquals($normalizedPayload, $callPayload); // Changed from assertSame (works on all DBs)
 
                 Assert::assertSame($secret, $callSecret);
 
