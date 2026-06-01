@@ -844,7 +844,10 @@ class CampaignController extends AbstractStandardFormController
         return '@MauticCampaign/Campaign';
     }
 
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    /**
+     * @return array{0: int, 1: array<int, mixed>}
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $sourceLists = $this->getCampaignModel()->getSourceLists();
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
@@ -1342,14 +1345,22 @@ class CampaignController extends AbstractStandardFormController
         foreach ($typeFilters as $fltr) {
             if ('list' === $type) {
                 $listIds[] = (int) $fltr;
-            } elseif ('form' === $type) {
+                continue;
+            }
+
+            if ('form' === $type) {
                 $formIds[] = (int) $fltr;
-            } elseif ('category' === $type) {
-                foreach ($categories as $category) {
-                    if (($category['alias'] ?? null) === $fltr) {
-                        $catIds[] = (int) $category['id'];
-                        break;
-                    }
+                continue;
+            }
+
+            if ('category' !== $type) {
+                continue;
+            }
+
+            foreach ($categories as $category) {
+                if (($category['alias'] ?? null) === $fltr) {
+                    $catIds[] = (int) $category['id'];
+                    break;
                 }
             }
         }

@@ -74,7 +74,7 @@ class FocusController extends AbstractStandardFormController
      *
      * @return array{0: int, 1: array<int, mixed>}
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $request           = $this->getCurrentRequest();
         $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'plugin:focus', 'c.id', $filter);

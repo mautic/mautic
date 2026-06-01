@@ -62,7 +62,7 @@ class WebhookController extends FormController
      *
      * @return array{0: int, 1: array<int, mixed>}
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $request           = $this->getCurrentRequest();
         $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'Webhook', 'cat.id', $filter);
