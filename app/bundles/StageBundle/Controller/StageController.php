@@ -50,12 +50,12 @@ class StageController extends AbstractFormController
         \assert($stageModel instanceof StageModel);
         $stagesPaginator = $stageModel->getEntities(
             [
-                'start'           => $start,
-                'limit'           => $limit,
-                'filter'          => $filter,
-                'orderBy'         => $orderBy,
-                'orderByDir'      => $orderByDir,
-                'withContactCount'=> true,
+                'start'            => $start,
+                'limit'            => $limit,
+                'filter'           => $filter,
+                'orderBy'          => $orderBy,
+                'orderByDir'       => $orderByDir,
+                'withContactCount' => true,
             ]
         );
 
