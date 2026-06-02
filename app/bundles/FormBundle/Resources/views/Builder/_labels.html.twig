@@ -165,7 +165,7 @@
         } %}
     {% endif %}
 
-    {% if field.validation.country_validation is defined and field.validation.country_validation is not empty %}
+    {% if field.validation.country is defined and field.validation.country is not empty %}
     <!-- Country specific phone number -->
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [
