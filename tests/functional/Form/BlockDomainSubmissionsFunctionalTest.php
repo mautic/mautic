@@ -62,6 +62,8 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
 
+        $this->setUpSymfony($this->configParams);
+
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -70,8 +72,8 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             Request::METHOD_POST,
             "/s/forms/results/{$formId}/action",
             [
-                'action'  => 'markSpam',
-                'formId'  => $formId,
+                'action'   => 'markSpam',
+                'formId'   => $formId,
                 'objectId' => $submission->getId(),
             ]
         );
@@ -91,6 +93,7 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        $this->assertStringContainsString('mautic.form.submission.errors', $clientResponse->getContent());
+        $this->assertStringContainsString('Errors:', $clientResponse->getContent());
+        $this->assertStringContainsString('Cannot be sent with this email', $clientResponse->getContent());
     }
 }
