@@ -37,10 +37,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
         new Post(security: "is_granted('campaign:campaigns:create')"),
-        new Get(security: "is_granted('campaign:campaigns:viewown')"),
-        new Put(security: "is_granted('campaign:campaigns:editown')"),
-        new Patch(security: "is_granted('campaign:campaigns:editother')"),
-        new Delete(security: "is_granted('campaign:campaigns:deleteown')"),
+        new Get(security: "is_granted('campaign:campaigns:viewown', object)"),
+        new Put(security: "is_granted('campaign:campaigns:editown', object)"),
+        new Patch(security: "is_granted('campaign:campaigns:editother', object)"),
+        new Delete(security: "is_granted('campaign:campaigns:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['campaign:read'],

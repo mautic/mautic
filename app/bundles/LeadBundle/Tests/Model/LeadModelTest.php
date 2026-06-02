@@ -599,7 +599,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 return true;
             }));
 
-        $this->fieldModelMock->expects($this->exactly(2))
+        $this->fieldModelMock->expects($this->exactly(1))
             ->method('getFieldListWithProperties')
             ->willReturn([]);
 
