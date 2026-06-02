@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Tests\Functional\Form;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -43,7 +44,7 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
-        $formCrawler = $crawler->filter('form[id=mauticform_blockdomainspamtetstform]');
+        $formCrawler = $crawler->filter('form[id^="mauticform_"]');
         $form        = $formCrawler->form();
 
         $form->setValues([
@@ -55,6 +56,12 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
+        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $this->assertCount(1, $submissions);
+
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
@@ -65,7 +72,7 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
             [
                 'action'  => 'markSpam',
                 'formId'  => $formId,
-                'objectId'=> 1,
+                'objectId' => $submission->getId(),
             ]
         );
 
@@ -73,11 +80,11 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
-        $formCrawler = $crawler->filter('form[id=mauticform_blockdomainspamtetstform]');
+        $formCrawler = $crawler->filter('form[id^="mauticform_"]');
         $form        = $formCrawler->form();
 
         $form->setValues([
-            'mauticform[email]' => 'another@blocked.example.com',
+            'mauticform[email]' => 'another@example.com',
         ]);
 
         $this->client->submit($form);
