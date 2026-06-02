@@ -61,25 +61,58 @@ trait CategoryListFiltersTrait
      */
     private function getCurrentCategoryListFilters(Request $request, string $sessionKey): array
     {
-        $currentFilters = $request->getSession()->get($sessionKey, []);
+        $currentFilters = $this->normalizeCategoryFilters($request->getSession()->get($sessionKey, []));
         $updatedFilters = $request->get('filters', false);
 
         if (!$updatedFilters) {
             return $currentFilters;
         }
 
+        if (!is_string($updatedFilters)) {
+            return [];
+        }
+
         $decodedFilters = json_decode($updatedFilters, true);
-        if (!$decodedFilters) {
+        if (!is_array($decodedFilters)) {
             return [];
         }
 
         $newFilters = [];
         foreach ($decodedFilters as $updatedFilter) {
-            [$column, $value]       = explode(':', $updatedFilter);
-            $newFilters[$column][]  = $value;
+            if (!is_string($updatedFilter) || !str_contains($updatedFilter, ':')) {
+                continue;
+            }
+
+            [$column, $value]      = explode(':', $updatedFilter, 2);
+            $newFilters[$column][] = $value;
         }
 
         return $newFilters;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function normalizeCategoryFilters(mixed $filters): array
+    {
+        if (!is_array($filters)) {
+            return [];
+        }
+
+        $normalizedFilters = [];
+        foreach ($filters as $type => $typeFilters) {
+            if (!is_string($type) || !is_array($typeFilters)) {
+                continue;
+            }
+
+            foreach ($typeFilters as $typeFilter) {
+                if (is_scalar($typeFilter)) {
+                    $normalizedFilters[$type][] = (string) $typeFilter;
+                }
+            }
+        }
+
+        return $normalizedFilters;
     }
 
     /**

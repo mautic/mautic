@@ -116,6 +116,39 @@ final class CategoryListFiltersTraitTest extends TestCase
         );
     }
 
+    public function testIgnoresMalformedCategoryFilterPayload(): void
+    {
+        $request = $this->createRequest([
+            'filters' => json_encode(['missing-delimiter', 123, 'category:first-category'], JSON_THROW_ON_ERROR),
+        ]);
+        $filter = $this->createFilter();
+
+        $this->createController()->apply(
+            $request,
+            'mautic.test.list_filters',
+            'email',
+            'cat.id',
+            $filter
+        );
+
+        Assert::assertSame(
+            [
+                'category' => ['first-category'],
+            ],
+            $request->getSession()->get('mautic.test.list_filters')
+        );
+        Assert::assertSame(
+            [
+                [
+                    'column' => 'cat.id',
+                    'expr'   => 'in',
+                    'value'  => [11],
+                ],
+            ],
+            $filter['force']
+        );
+    }
+
     /**
      * @param array<string, mixed> $query
      */
