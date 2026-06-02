@@ -24,6 +24,22 @@ class RoleController extends FormController
     private const TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
 
     /**
+     * @param int|string|null $objectId
+     *
+     * @return string
+     */
+    protected function getSessionBase($objectId = null)
+    {
+        $base = 'role';
+
+        if (null !== $objectId) {
+            $base .= '.'.$objectId;
+        }
+
+        return $base;
+    }
+
+    /**
      * Generate's default role list view.
      *
      * @param int $page
@@ -80,18 +96,11 @@ class RoleController extends FormController
             ]);
         }
 
-        $roleIds = [];
-
-        foreach ($items as $role) {
-            $roleIds[] = $role->getId();
-        }
-
         $pageHelper->rememberPage($page);
 
         return $this->delegateView([
             'viewParameters'  => [
                 'items'       => $items,
-                'userCounts'  => (!empty($roleIds)) ? $model->getRepository()->getUserCount($roleIds) : [],
                 'searchValue' => $filter,
                 'page'        => $page,
                 'limit'       => $limit,
@@ -193,17 +202,13 @@ class RoleController extends FormController
 
     /**
      * Clone an existing role and present it as a new form.
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction(Request $request, int $objectId)
+    public function cloneAction(Request $request, int $objectId, RoleModel $model): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             return $this->accessDenied();
         }
 
-        /** @var RoleModel $model */
-        $model  = $this->getModel('user.role');
         $source = $model->getEntity($objectId);
 
         // set the page we came from
@@ -219,8 +224,6 @@ class RoleController extends FormController
                 'mauticContent' => 'role',
             ],
         ];
-
-        $response = null;
 
         if (null === $source) {
             return $this->postActionRedirect(
@@ -266,29 +269,27 @@ class RoleController extends FormController
             }
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                $response = $this->postActionRedirect($postActionVars);
-            } elseif ($valid) {
-                $response = $this->editAction($request, $entity->getId(), true);
+                return $this->postActionRedirect($postActionVars);
+            }
+
+            if ($valid) {
+                return $this->editAction($request, $entity->getId(), true);
             }
         }
 
-        if (!$response instanceof Response) {
-            $response = $this->delegateView([
-                'viewParameters' => [
-                    'form'              => $form->createView(),
-                    'permissionsConfig' => $permissionsConfig,
-                ],
-                'contentTemplate' => self::TEMPLATE_FORM,
-                'passthroughVars' => [
-                    'activeLink'     => '#mautic_role_new',
-                    'route'          => $action,
-                    'mauticContent'  => 'role',
-                    'permissionList' => $permissionsConfig['list'],
-                ],
-            ]);
-        }
-
-        return $response;
+        return $this->delegateView([
+            'viewParameters' => [
+                'form'              => $form->createView(),
+                'permissionsConfig' => $permissionsConfig,
+            ],
+            'contentTemplate' => self::TEMPLATE_FORM,
+            'passthroughVars' => [
+                'activeLink'     => '#mautic_role_new',
+                'route'          => $action,
+                'mauticContent'  => 'role',
+                'permissionList' => $permissionsConfig['list'],
+            ],
+        ]);
     }
 
     /**
@@ -333,7 +334,7 @@ class RoleController extends FormController
                         [
                             'type'    => 'error',
                             'msg'     => 'mautic.user.role.error.notfound',
-                            'msgVars' => ['%id' => $objectId],
+                            'msgVars' => ['%id%' => $objectId],
                         ],
                     ],
                 ])
@@ -377,11 +378,10 @@ class RoleController extends FormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
-            } else {
-                // the form has to be rebuilt because the permissions were updated
-                $permissionsConfig = $this->getPermissionsConfig($entity);
-                $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
             }
+            // the form has to be rebuilt because the permissions were updated
+            $permissionsConfig = $this->getPermissionsConfig($entity);
+            $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
         } else {
             // lock the entity
             $model->lockEntity($entity);

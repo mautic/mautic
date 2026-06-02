@@ -11,12 +11,12 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('asset:assets:viewown')"),
-        new Get(security: "is_granted('asset:assets:viewown')"),
+        new Get(security: "is_granted('asset:assets:viewown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['download:read'],
@@ -57,7 +57,7 @@ class Download
     private $ipAddress;
 
     #[Groups(['download:read', 'download:write'])]
-    private ?Lead $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var int
@@ -123,6 +123,7 @@ class Download
 
         $builder->createManyToOne('asset', 'Asset')
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addIpAddress(true);
@@ -421,5 +422,10 @@ class Download
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getAsset()->getCreatedBy();
     }
 }

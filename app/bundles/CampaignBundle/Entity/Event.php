@@ -16,21 +16,22 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\DateAddedTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\LeadBundle\Entity\Lead as Contact;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
         new Post(security: "is_granted('campaign:campaigns:create')"),
-        new Get(security: "is_granted('campaign:campaigns:viewown')"),
-        new Put(security: "is_granted('campaign:campaigns:editown')"),
-        new Patch(security: "is_granted('campaign:campaigns:editother')"),
-        new Delete(security: "is_granted('campaign:campaigns:deleteown')"),
+        new Get(security: "is_granted('campaign:campaigns:viewown', object)"),
+        new Put(security: "is_granted('campaign:campaigns:editown', object)"),
+        new Patch(security: "is_granted('campaign:campaigns:editother', object)"),
+        new Delete(security: "is_granted('campaign:campaigns:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['event:read'],
@@ -44,6 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Event implements ChannelInterface, UuidInterface
 {
     use UuidTrait;
+    use DateAddedTrait;
 
     public const TABLE_NAME = 'campaign_events';
 
@@ -154,7 +156,7 @@ class Event implements ChannelInterface, UuidInterface
     private $triggerRestrictedDaysOfWeek = [];
 
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
-    private ?int $triggerWindow;
+    private ?int $triggerWindow = null;
 
     /**
      * @var string|null
@@ -229,6 +231,9 @@ class Event implements ChannelInterface, UuidInterface
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private ?Event $redirectEvent;
 
+    #[Groups(['event:read', 'event:write', 'campaign:read'])]
+    private ?\DateTime $dateLinked = null;
+
     /**
      * Collection of events that redirect to this event.
      *
@@ -236,12 +241,19 @@ class Event implements ChannelInterface, UuidInterface
      */
     private Collection $redirectingEvents;
 
-    public function __construct()
+    public function __construct(?\DateTime $dateAdded = null)
     {
         $this->log               = new ArrayCollection();
         $this->children          = new ArrayCollection();
         $this->redirectEvent     = null;
         $this->redirectingEvents = new ArrayCollection();
+
+        if ($dateAdded) {
+            $this->setDateAdded($dateAdded);
+            $this->setDateLinked($dateAdded);
+        } else {
+            $this->setDateAdded(new \DateTime());
+        }
     }
 
     public function __clone()
@@ -343,6 +355,7 @@ class Event implements ChannelInterface, UuidInterface
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('children', 'Event')
@@ -388,6 +401,16 @@ class Event implements ChannelInterface, UuidInterface
             ->build();
 
         static::addUuidField($builder);
+
+        $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
+            ->columnName('date_added')
+            ->option('default', '1970-01-01 00:00:00')
+            ->build();
+
+        $builder->createField('dateLinked', Types::DATETIME_MUTABLE)
+            ->columnName('date_linked')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -503,7 +526,7 @@ class Event implements ChannelInterface, UuidInterface
      * @param string $prop
      * @param mixed  $val
      */
-    private function isChanged($prop, $val): void
+    private function isChanged($prop, $val): bool
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -512,10 +535,16 @@ class Event implements ChannelInterface, UuidInterface
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
+
+                return true;
             }
         } elseif ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];
+
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -797,7 +826,10 @@ class Event implements ChannelInterface, UuidInterface
      */
     public function setParent(?Event $parent = null)
     {
-        $this->isChanged('parent', $parent);
+        $isChanged = $this->isChanged('parent', $parent);
+        if ($isChanged) {
+            $this->setDateLinked(new \DateTime());
+        }
         $this->parent = $parent;
 
         return $this;
@@ -809,6 +841,7 @@ class Event implements ChannelInterface, UuidInterface
     public function removeParent(): void
     {
         $this->isChanged('parent', '');
+        $this->setDateLinked(new \DateTime());
         $this->parent = null;
     }
 
@@ -1178,6 +1211,17 @@ class Event implements ChannelInterface, UuidInterface
         return $triggerDate;
     }
 
+    public function getDateLinked(): ?\DateTime
+    {
+        return $this->dateLinked;
+    }
+
+    public function setDateLinked(?\DateTime $dateLinked): void
+    {
+        $this->isChanged('dateLinked', $dateLinked);
+        $this->dateLinked = $dateLinked;
+    }
+
     public function setRedirectEvent(?Event $redirectEvent = null): Event
     {
         $this->isChanged('redirectEvent', $redirectEvent);
@@ -1203,5 +1247,10 @@ class Event implements ChannelInterface, UuidInterface
     public function isRedirectTarget(): bool
     {
         return $this->redirectingEvents->count() > 0;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getCampaign()->getCreatedBy();
     }
 }

@@ -20,6 +20,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -47,10 +49,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('email:emails:viewown')"),
         new Post(security: "is_granted('email:emails:create')"),
-        new Get(security: "is_granted('email:emails:viewown')"),
-        new Put(security: "is_granted('email:emails:editown')"),
-        new Patch(security: "is_granted('email:emails:editother')"),
-        new Delete(security: "is_granted('email:emails:deleteown')"),
+        new Get(security: "is_granted('email:emails:viewown', object)"),
+        new Put(security: "is_granted('email:emails:editown', object)"),
+        new Patch(security: "is_granted('email:emails:editother', object)"),
+        new Delete(security: "is_granted('email:emails:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['email:read'],
@@ -66,17 +68,20 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use VariantEntityTrait<Email>
  * @use TranslationEntityTrait<Email>
  */
-class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
+class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use VariantEntityTrait;
     use TranslationEntityTrait;
     use DynamicContentEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    use OptimisticLockTrait;
 
     public const ENTITY_NAME = 'email';
 
     public const MAX_NAME_SUBJECT_LENGTH = 190;
+
+    public const TABLE_NAME = 'emails';
 
     /**
      * @var int
@@ -107,6 +112,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $useOwnerAsMailer;
+
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private ?string $preheaderText = null;
@@ -346,7 +354,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('emails')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(EmailRepository::class)
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
@@ -359,6 +367,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
         $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
         $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
+
+        $builder->createField('sendToDnc', Types::BOOLEAN)
+            ->columnName('send_to_dnc')
+            ->option('default', 0)
+            ->build();
+
         $builder->addNullableField('template', Types::STRING);
         $builder->addNullableField('content', Types::ARRAY);
         $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
@@ -434,6 +448,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'email_projects_xref', 'email_id');
+        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -488,7 +503,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new EmailOrEmailTokenList(),
+            new EmailOrEmailTokenList(['allowMultiple' => false]),
         );
 
         $metadata->addPropertyConstraint(
@@ -560,6 +575,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'replyToAddress',
                     'bccAddress',
                     'useOwnerAsMailer',
+                    'sendToDnc',
                     'utmTags',
                     'preheaderText',
                     'customHtml',
@@ -580,6 +596,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'variantChildren',
                     'translationParent',
                     'translationChildren',
+                    'preferenceCenter',
                     'unsubscribeForm',
                     'dynamicContent',
                     'lists',
@@ -815,6 +832,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setUseOwnerAsMailer($useOwnerAsMailer)
     {
         $this->useOwnerAsMailer = $useOwnerAsMailer;
+
+        return $this;
+    }
+
+    public function getSendToDnc(): bool
+    {
+        return $this->sendToDnc;
+    }
+
+    public function setSendToDnc(bool $sendToDnc): Email
+    {
+        $this->isChanged('sendToDnc', $sendToDnc);
+        $this->sendToDnc = $sendToDnc;
 
         return $this;
     }
@@ -1297,9 +1327,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         if ($this->getSentCount($includevariants) > 0) {
             return round($this->getReadCount($includevariants) / $this->getSentCount($includevariants) * 100, 2);
-        } else {
-            return 0;
         }
+
+        return 0;
     }
 
     /**

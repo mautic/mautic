@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class UrlHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -83,14 +84,14 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
     public function testSanitizeAbsoluteUrlSanitizeQuery(): void
     {
         $this->assertEquals(
-            'http://username:password@hostname:9090/path?ar_g1=value&arg2=some%20email%40address.com#anchor',
+            'http://username:password@hostname:9090/path?ar%20g1=value&arg2=some%20email%40address.com#anchor',
             UrlHelper::sanitizeAbsoluteUrl(
                 'http://username:password@hostname:9090/path?ar g1=value&arg2=some+email@address.com#anchor'
             )
         );
 
         $this->assertEquals(
-            'http://username:password@hostname:9090/path?a=',
+            'http://username:password@hostname:9090/path?a',
             UrlHelper::sanitizeAbsoluteUrl(
                 'http://username:password@hostname:9090/path?a'
             )
@@ -103,6 +104,30 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
             'http://username:password@hostname:9090/some%20path%20with%20whitespace',
             UrlHelper::sanitizeAbsoluteUrl('http://username:password@hostname:9090/some path with whitespace')
         );
+    }
+
+    #[DataProvider('provideUrlsForSanitizeQueryParameters')]
+    public function testSanitizeQueryParameters(string $url, string $expected): void
+    {
+        self::assertSame($expected, UrlHelper::sanitizeAbsoluteUrl($url));
+    }
+
+    public static function provideUrlsForSanitizeQueryParameters(): \Generator
+    {
+        yield 'With array list parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?par[]=one&par[]=two&ct=parameter',
+            'https://some.test.url/asset/1:examplefilejpg?par%5B%5D=one&par%5B%5D=two&ct=parameter',
+        ];
+
+        yield 'With array hash parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?par[a]=one&par[b]=two&ct=parameter',
+            'https://some.test.url/asset/1:examplefilejpg?par%5Ba%5D=one&par%5Bb%5D=two&ct=parameter',
+        ];
+
+        yield 'With duplicated parameter' => [
+            'https://some.test.url/asset/1:examplefilejpg?ct=parameter&ct=dummy_click_through',
+            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+        ];
     }
 
     public function testGetUrlsFromPlaintextWithHttp(): void
@@ -188,7 +213,7 @@ STRING
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurlé'));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataDecodeAmpersands')]
+    #[DataProvider('dataDecodeAmpersands')]
     public function testDecodeAmpersands(string $value, string $expected): void
     {
         $this->assertSame($expected, UrlHelper::decodeAmpersands($value));

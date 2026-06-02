@@ -105,7 +105,7 @@ class ExceptionController extends CommonController
                         'exception' => ('dev' == MAUTIC_ENV) ? $exception->getMessage() : '',
                         'trace'     => ('dev' == MAUTIC_ENV) ? $exception->getTrace() : '',
                     ],
-                    'route' => $urlParts['path'],
+                    'route' => $urlParts['path'] ?? $url,
                 ],
                 'responseCode'    => $code,
             ]

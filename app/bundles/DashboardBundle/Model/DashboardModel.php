@@ -167,7 +167,7 @@ class DashboardModel extends FormModel
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
-                if (!($widget instanceof Widget)) {
+                if (!$widget instanceof Widget) {
                     $widget = $this->populateWidgetEntity($widget);
                 }
                 $this->populateWidgetContent($widget, $filter);
@@ -239,10 +239,18 @@ class DashboardModel extends FormModel
 
         $widget->setParams($resultParams);
 
-        $this->dispatcher->dispatch(
-            $this->widgetEventFactory->create($widget),
-            DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
-        );
+        try {
+            $this->dispatcher->dispatch(
+                $this->widgetEventFactory->create($widget),
+                DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
+            );
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Dashboard widget "{type}" failed to load: {message}',
+                ['type' => $widget->getType(), 'message' => $e->getMessage(), 'exception' => $e]
+            );
+            $widget->setErrorMessage('mautic.dashboard.widget.load.failed');
+        }
     }
 
     /**

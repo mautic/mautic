@@ -44,9 +44,8 @@ class InstallCommand extends Command
         } catch (ApiException $e) {
             if (404 === $e->getCode()) {
                 throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.');
-            } else {
-                throw new \Exception('Error while trying to get package details: '.$e->getMessage());
             }
+            throw new \Exception('Error while trying to get package details: '.$e->getMessage());
         }
 
         if (empty($package->packageBase->type) || 'mautic-plugin' !== $package->packageBase->type) {

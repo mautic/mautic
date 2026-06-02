@@ -640,4 +640,66 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('Form Field ID 123 not found', $responseContent->errors[0]->message);
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, 'Return code must be 404.');
     }
+
+    public function testFormIsNotUnpublishedWhenEdited(): void
+    {
+        $payload = [
+            'name'        => 'Test Form with Fields',
+            'description' => 'Form that triggers transaction error',
+            'fields'      => [
+                [
+                    'label' => 'First Name',
+                    'type'  => 'text',
+                    'alias' => 'first_name',
+                ],
+                [
+                    'label' => 'Email Address',
+                    'type'  => 'email',
+                    'alias' => 'email',
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($response['errors'][0])) {
+            $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
+        }
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED, 'Return code must be 201.');
+
+        $formId = $response['form']['id'];
+        Assert::assertGreaterThan(0, $formId);
+        Assert::assertTrue($response['form']['isPublished']);
+
+        $newFormName = 'Updated Form Name';
+
+        $payload = [
+            'name'   => $newFormName,
+            'fields' => [
+                [
+                    'label' => 'Modified Field',
+                    'type'  => 'text',
+                    'alias' => 'modified_field',
+                ],
+                [
+                    'label' => 'New Additional Field',
+                    'type'  => 'textarea',
+                    'alias' => 'additional_field',
+                ],
+            ],
+        ];
+        $this->client->request(Request::METHOD_PATCH, '/api/forms/'.$formId.'/edit', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($response['errors'][0])) {
+            $this->fail($response['errors'][0]['code'].': '.$response['errors'][0]['message']);
+        }
+        self::assertResponseStatusCodeSame(Response::HTTP_OK, 'Return code must be 200.');
+
+        Assert::assertSame($newFormName, $response['form']['name']);
+        Assert::assertTrue($response['form']['isPublished']);
+    }
 }

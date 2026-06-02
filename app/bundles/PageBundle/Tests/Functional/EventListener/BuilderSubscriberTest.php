@@ -26,7 +26,7 @@ class BuilderSubscriberTest extends MauticMysqlTestCase
     public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist input';
     public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel select';
     public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency div[data-contact-frequency="1"]';
-    public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs a.btn-save';
+    public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs button.btn-save';
 
     // Default preference center page
     public const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';

@@ -35,8 +35,6 @@ trait OperatorListTrait
                 OperatorOptions::NOT_REGEXP,
                 OperatorOptions::INCLUDING_ANY,
                 OperatorOptions::EXCLUDING_ANY,
-                OperatorOptions::INCLUDING_ALL,
-                OperatorOptions::EXCLUDING_ALL,
             ],
         ],
         'bool' => [
@@ -153,7 +151,7 @@ trait OperatorListTrait
 
         if (is_array($type)) {
             return $this->getOperatorChoiceList($type, $overrideHiddenTypes);
-        } elseif (array_key_exists($type, $processedTypes)) {
+        } elseif (array_key_exists($type ?? '', $processedTypes)) {
             return $processedTypes[$type];
         }
 

@@ -20,9 +20,11 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
+use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\StageBundle\Model\StageModel;
@@ -56,6 +58,7 @@ class EmailType extends AbstractType
         private ThemeHelperInterface $themeHelper,
         private CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
+        private EmailDefaultsHelper $defaultsHelper,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }
@@ -67,6 +70,11 @@ class EmailType extends AbstractType
 
         $emailEntity =  $options['data'];
         \assert($emailEntity instanceof Email);
+
+        // Pre-populates the form with config defaults for UI display.
+        // The authoritative application of defaults (covering API and programmatic creation)
+        // is handled by EmailDefaultsSubscriber on EMAIL_PRE_SAVE.
+        $this->applyDefaultsForNewEmail($emailEntity);
 
         $builder->add(
             'name',
@@ -168,6 +176,27 @@ class EmailType extends AbstractType
                         ['%value%' => $this->translator->trans($this->getGlobalMailerIsOwner() ? 'mautic.core.yes' : 'mautic.core.no')]
                     ),
                 ],
+            ]
+        );
+
+        $builder->add(
+            'sendToDnc',
+            YesNoButtonGroupType::class,
+            [
+                'label'    => 'mautic.email.send.dnc.label',
+                'attr'     => [
+                    'onchange'               => 'Mautic.showSendToDncConfirmation(mQuery(this))',
+                    'data-toggle'            => 'confirmation',
+                    'data-message'           => $this->translator->trans('mautic.email.send.dnc.confirmation'),
+                    'data-confirm-text'      => $this->translator->trans('mautic.email.send.dnc.confirmation.confirm.text'),
+                    'data-confirm-callback'  => 'dismissConfirmation',
+                    'data-cancel-text'       => $this->translator->trans('mautic.email.send.dnc.confirmation.cancel.text'),
+                    'data-cancel-callback'   => 'setSendToDncToNo',
+                    'data-confirm-btn-class' => 'btn btn-success',
+                    'tooltip'                => 'mautic.email.send.dnc.tooltip',
+                    'readonly'               => !$this->corePermissions->isGranted('email:emails:sendtodnc'),
+                ],
+                'required' => false,
             ]
         );
 
@@ -296,7 +325,7 @@ class EmailType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class, 'id');
         $builder->add(
             $builder->create(
                 'preferenceCenter',
@@ -579,6 +608,10 @@ class EmailType extends AbstractType
 
         $this->addDynamicContentField($builder);
 
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
@@ -672,6 +705,15 @@ class EmailType extends AbstractType
     private function getGlobalMailerIsOwner(): bool
     {
         return (bool) $this->coreParametersHelper->get('mailer_is_owner');
+    }
+
+    private function applyDefaultsForNewEmail(Email $emailEntity): void
+    {
+        if (!$emailEntity->isNew() || $emailEntity->getIsClone()) {
+            return;
+        }
+
+        $this->defaultsHelper->applyDefaults($emailEntity);
     }
 
     private function addDynamicContentField(FormBuilderInterface $builder): void

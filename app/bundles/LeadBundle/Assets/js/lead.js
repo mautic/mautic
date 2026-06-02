@@ -4,6 +4,8 @@ Mautic.companyOnLoad = function (container, response) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.company');
     }
+    Mautic.loadAndProcessPageContent('#company_contact_engagement');
+    Mautic.loadAndProcessPageContent('#contacts-table');
 }
 Mautic.leadOnLoad = function (container, response) {
     Mautic.addKeyboardShortcut('a', 'Quick add a New Contact', function(e) {
@@ -115,7 +117,7 @@ Mautic.leadOnLoad = function (container, response) {
         mQuery('.lead-avatar-panel .avatar-collapser a.arrow').on('click', function() {
             setTimeout(function() {
                 var status = (mQuery('#lead-avatar-block').hasClass('in') ? 'expanded' : 'collapsed');
-                Cookies.set('mautic_lead_avatar_panel', status, {expires: 30});
+                document.cookie = 'mautic_lead_avatar_panel=' + status + '; path=/; max-age=' + (30 * 24 * 60 * 60) + '; SameSite=Strict';
             }, 500);
         });
     }
@@ -150,13 +152,13 @@ Mautic.leadOnLoad = function (container, response) {
         mQuery(container + ' .panel-companies .ri-check-line').tooltip({html: true});
     }
 
-    // Adding behavior to be able to create new tags by pressing the `Escape` key
+    // Adding behavior to be able to create new tags by pressing the `Enter` or `Escape` key
     // when the search field is active (ie: the tag name we are typing is a substring of an existing tag)
     mQuery('#lead_tags_chosen input').keyup(function(el) {
-        const newTag = mQuery('#lead_tags_chosen input').val();
-        if (el.key === "Escape" && newTag !== '') {
+        const newTag = mQuery('#lead_tags_chosen input').val().trim();
+        if ((el.key === "Escape" || el.key === "Enter") && newTag !== '') {
             const selectElement = mQuery('#lead_tags').get();
-            const selectedValues = mQuery('#lead_tags').val();
+            const selectedValues = mQuery('#lead_tags').val() || [];
             const payload = [...selectedValues, newTag];
 
             Mautic.activateLabelLoadingIndicator(mQuery(selectElement).attr('id'));
@@ -1675,7 +1677,7 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 };
 
 Mautic.listOnLoad = function(container, response) {
-    Mautic.lazyLoadContactListOnSegmentDetail();
+    Mautic.loadAndProcessPageContent('#contacts-container');
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
@@ -1784,8 +1786,7 @@ Mautic.buildSegmentDependencyNode = function(nodeData) {
     return node;
 }
 
-Mautic.lazyLoadContactListOnSegmentDetail = function() {
-    const containerId = '#contacts-container';
+Mautic.loadAndProcessPageContent = function(containerId) {
     const container = mQuery(containerId);
 
     // Load the contacts only if the container exists.
