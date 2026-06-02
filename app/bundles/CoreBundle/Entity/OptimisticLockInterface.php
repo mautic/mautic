@@ -9,6 +9,8 @@ namespace Mautic\CoreBundle\Entity;
  */
 interface OptimisticLockInterface
 {
+    public const INITIAL_VERSION = 1;
+
     /**
      * Returns the current version of the entity.
      */

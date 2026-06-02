@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
 use Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeyword;
 use Mautic\LeadBundle\Validator\LeadFieldMinimumLength;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('lead:leads:viewown')"),
         new Post(security: "is_granted('lead:leads:create')"),
-        new Get(security: "is_granted('lead:leads:viewown')"),
-        new Put(security: "is_granted('lead:leads:editown')"),
-        new Patch(security: "is_granted('lead:leads:editother')"),
-        new Delete(security: "is_granted('lead:leads:deleteown')"),
+        new Get(security: "is_granted('lead:leads:viewown', object)"),
+        new Put(security: "is_granted('lead:leads:editown', object)"),
+        new Patch(security: "is_granted('lead:leads:editother', object)"),
+        new Delete(security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['leadfield:read'],
@@ -691,7 +691,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function setIsShortVisible(?bool $isShortVisible): self
     {
-        $isShortVisible = $isShortVisible ?? false;
+        $isShortVisible ??= false;
         $this->isChanged('isShortVisible', $isShortVisible);
         $this->isShortVisible = $isShortVisible;
 

@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -25,10 +25,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('user:roles:viewown')"),
         new Post(security: "is_granted('user:roles:create')"),
-        new Get(security: "is_granted('user:roles:viewown')"),
-        new Put(security: "is_granted('user:roles:editown')"),
-        new Patch(security: "is_granted('user:roles:editother')"),
-        new Delete(security: "is_granted('user:roles:deleteown')"),
+        new Get(security: "is_granted('user:roles:viewown', object)"),
+        new Put(security: "is_granted('user:roles:editown', object)"),
+        new Patch(security: "is_granted('user:roles:editother', object)"),
+        new Delete(security: "is_granted('user:roles:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['role:read'],
@@ -46,44 +46,38 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     public const CACHE_NAMESPACE = 'Role';
     /**
      * @var int
-     *
-     * @Groups({"role:read"})
      */
+    #[Groups(['role:read'])]
     private $id;
 
     /**
      * @var string
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $name;
 
     /**
      * @var string|null
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $description;
 
     /**
      * @var bool
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $isAdmin = false;
 
     /**
      * @var ArrayCollection<int, Permission>
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $permissions;
 
     /**
      * @var array
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $rawPermissions;
 
     /**

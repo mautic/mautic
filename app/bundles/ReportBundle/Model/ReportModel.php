@@ -174,9 +174,9 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -448,19 +448,21 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         // Clone dateFrom/dateTo because they handled separately in charts
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));
         $chartDateTo   = isset($options['dateTo']) ? clone $options['dateTo'] : (new \DateTime());
+        $debugData     = [];
 
-        $debugData = [];
+        // UI doesn't set time so reset it to midnight. API can set time so do not reset it. Using DateTimeImmutable to distinguish.
+        $resetTime = !(isset($options['dateFrom']) && $options['dateFrom'] instanceof \DateTimeImmutable);
 
-        if (isset($options['dateFrom'])) {
-            // Fix date ranges if applicable
+        if ($resetTime && isset($options['dateFrom'])) {
+            $now = new \DateTime();
+
             if (!isset($options['dateTo'])) {
-                $options['dateTo'] = new \DateTime();
+                $options['dateTo'] = $now;
             }
 
-            // Adjust dateTo to be end of day or to current hour if today
-            $now = new \DateTime();
-            if ($now->format('Y-m-d') == $options['dateTo']->format('Y-m-d')) {
-                $options['dateTo'] = $now;
+            // Set time to the last second of the "to date" date
+            if ($now->format('Y-m-d') === $options['dateTo']->format('Y-m-d')) {
+                $options['dateTo'] = $now->setTime(23, 59, 59);
             } else {
                 $options['dateTo']->setTime(23, 59, 59);
             }
@@ -672,12 +674,18 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function getOrderBySanitized(iterable $orderBys, \stdClass $allowedColumns): iterable
     {
-        $hasOrderBy = false;
+        $hasOrderBy  = false;
+        $definitions = $allowedColumns->definitions ?? [];
+
         foreach ($orderBys as $key => $orderBy) {
-            if ($this->orderByIsValid($orderBy, $allowedColumns->choices)) {
-                $hasOrderBy = true;
+            $order = $this->parseOrderBy((string) $orderBy);
+
+            if (null !== $order && $this->orderByIsValid($order['column'], $order['direction'], $allowedColumns->choices)) {
+                $orderBys[$key] = $this->getOrderByExpression($order['column'], $order['direction'], $definitions);
+                $hasOrderBy     = true;
                 continue;
             }
+
             $orderBys[$key] = '';
         }
 
@@ -688,30 +696,59 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @return array{column: string, direction: string}|null
+     */
+    private function parseOrderBy(string $order): ?array
+    {
+        $order = trim($order);
+
+        if (empty($order)) {
+            return null;
+        }
+
+        $direction = '';
+
+        if (preg_match('/\s+(ASC|DESC)$/i', $order, $matches)) {
+            $direction = strtoupper($matches[1]);
+            $order     = trim(substr($order, 0, -strlen($matches[0])));
+        }
+
+        return [
+            'column'    => trim($order, '`'),
+            'direction' => $direction,
+        ];
+    }
+
+    /**
      * Check if order by is valid.
      *
      * @param array<string, string> $allowedColumns
      */
-    private function orderByIsValid(string $order, array $allowedColumns): bool
+    private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        if (empty($order)) {
-            return false;
-        }
-
-        $orderBy         = $order;
-        $oderByDirection = '';
-
-        if (str_contains($order, ' ')) {
-            $orderTemp       = explode(' ', $order);
-            $orderBy         = $orderTemp[0];
-            $oderByDirection = $orderTemp[1];
-        }
-
-        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($oderByDirection, ['ASC', 'DESC', ''])) {
+        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($orderByDirection, ['ASC', 'DESC', ''], true)) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param array<string, array<string, mixed>> $definitions
+     */
+    private function getOrderByExpression(string $orderBy, string $orderByDirection, array $definitions): string
+    {
+        $expression = $orderBy;
+
+        if (!empty($definitions[$orderBy]['formula'])) {
+            $expression = $definitions[$orderBy]['formula'];
+
+            if (!empty($definitions[$orderBy]['prefix']) || !empty($definitions[$orderBy]['suffix'])) {
+                $expression = sprintf('(%s) + 0', $expression);
+            }
+        }
+
+        return trim($expression.' '.$orderByDirection);
     }
 
     /**

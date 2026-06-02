@@ -48,7 +48,7 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 height-auto">
+    <div class="col-md-7 col-lg-8 height-auto">
         <div>
             <!-- notification detail collapseable -->
             <div class="collapse pr-md pl-md" id="notification-details">
@@ -148,7 +148,10 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-5 col-lg-4 height-auto">
+        <div class="pa-md mb-32 animation--slide-in-right">
+            {{ include('@MauticNotification/Notification/preview.html.twig') }}
+        </div>
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
     </div>

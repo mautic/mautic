@@ -17,18 +17,18 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
         new GetCollection(uriTemplate: '/focus_items', security: "is_granted('focus:items:viewown')"),
-        new Get(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:viewown')"),
+        new Get(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:viewown', object)"),
         new Post(uriTemplate: '/focus_items', security: "is_granted('focus:items:create')"),
-        new Put(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editown')"),
-        new Patch(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editother')"),
-        new Delete(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:deleteown')"),
+        new Put(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editown', object)"),
+        new Patch(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:editother', object)"),
+        new Delete(uriTemplate: '/focus_items/{id}', security: "is_granted('focus:items:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['focus:read'],
@@ -46,98 +46,83 @@ class Focus extends FormEntity implements UuidInterface
 
     /**
      * @var int
-     *
-     * @Groups("focus:read")
      */
+    #[Groups(['focus:read'])]
     private $id;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $description;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $editor;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $html;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $htmlMode;
 
     /**
      * @var string
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $name;
 
-    /**
-     * @Groups({"focus:read", "focus:write"})
-     */
+    #[Groups(['focus:read', 'focus:write'])]
     private $category;
 
     /**
      * @var string
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $type;
 
     /**
      * @var string|null
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $website;
 
     /**
      * @var string
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $style;
 
     /**
      * @var \DateTimeInterface
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $publishDown;
 
     /**
      * @var array<mixed>
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $properties = [];
 
     /**
      * @var array
-     *
-     * @Groups({"focus:read", "focus:write"})
      */
+    #[Groups(['focus:read', 'focus:write'])]
     private $utmTags = [];
 
     /**

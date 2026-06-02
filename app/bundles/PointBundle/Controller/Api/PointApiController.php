@@ -50,7 +50,7 @@ class PointApiController extends CommonApiController
         $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
-        $this->serializerGroups = ['pointDetails', 'categoryList', 'publishDetails', 'projectList'];
+        $this->serializerGroups = ['pointDetails', 'categoryList', 'publishDetails'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }

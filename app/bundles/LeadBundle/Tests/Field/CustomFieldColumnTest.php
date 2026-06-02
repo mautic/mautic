@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -514,7 +515,8 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $customFieldColumn->updateLeadColumn($leadField);
     }
 
-    public function testUpdateLeadColumnNow(): void
+    #[DataProvider('provideColumnLength')]
+    public function testUpdateLeadColumnNow(?int $length): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -530,6 +532,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $leadField->setId(42);
         $leadField->setObject('lead');
         $leadField->setAlias('IamAlias');
+        $leadField->setCharLengthLimit($length);
 
         $fieldColumnDispatcher->expects($this->once())
             ->method('dispatchPreUpdateColumnEvent')
@@ -542,13 +545,14 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 
         $columnSchemaHelper->expects($this->once())
             ->method('updateColumnLength')
-            ->with('IamAlias', 64)
+            ->with('IamAlias', $length)
             ->willReturn($columnSchemaHelper);
 
         $customFieldColumn->updateLeadColumn($leadField);
     }
 
-    public function testProcessUpdateLeadColumnLength(): void
+    #[DataProvider('provideColumnLength')]
+    public function testProcessUpdateLeadColumnLength(?int $length): void
     {
         $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $schemaDefinition      = $this->createMock(SchemaDefinition::class);
@@ -564,6 +568,7 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
         $leadField->setId(42);
         $leadField->setObject('lead');
         $leadField->setAlias('IamAlias');
+        $leadField->setCharLengthLimit($length);
 
         $columnSchemaHelper->expects($this->once())
             ->method('setName')
@@ -572,12 +577,18 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 
         $columnSchemaHelper->expects($this->once())
             ->method('updateColumnLength')
-            ->with('IamAlias', 64)
+            ->with('IamAlias', $length)
             ->willReturn($columnSchemaHelper);
 
         $columnSchemaHelper->expects($this->once())
             ->method('executeChanges');
 
         $customFieldColumn->processUpdateLeadColumnLength($leadField);
+    }
+
+    public static function provideColumnLength(): \Generator
+    {
+        yield 'null' => [null];
+        yield '100' => [100];
     }
 }

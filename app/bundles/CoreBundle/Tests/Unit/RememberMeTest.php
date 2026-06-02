@@ -18,7 +18,6 @@ class RememberMeTest extends TestCase
         $k1             = new \AppKernel('test', false);
         $reflectedClass = new \ReflectionClass($k1);
         $prop           = $reflectedClass->getProperty('parameterLoader');
-        $prop->setAccessible(true);
         $prop->setValue($k1, $p1);
 
         // Boot the kernel and get the value of the rememberme_key value.
@@ -34,7 +33,6 @@ class RememberMeTest extends TestCase
         $k2             = new \AppKernel('test', false);
         $reflectedClass = new \ReflectionClass($k2);
         $prop           = $reflectedClass->getProperty('parameterLoader');
-        $prop->setAccessible(true);
         $prop->setValue($k2, $p2);
 
         // Boot the kernel and get the value of the rememberme_key value.

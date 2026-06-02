@@ -347,7 +347,10 @@ ul.tag-cloud li {
     padding-right: 3px;
 }
 
-#leads-container .spinner {
+#leads-container .spinner,
+#company_contact_engagement .spinner,
+#contacts-table .spinner
+{
     text-align: center;
     line-height: 250px;
     font-size: 24px;

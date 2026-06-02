@@ -141,12 +141,11 @@ class VideoModel extends FormModel
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
-            } else {
-                $this->logger->error(
-                    $exception->getMessage(),
-                    ['exception' => $exception]
-                );
             }
+            $this->logger->error(
+                $exception->getMessage(),
+                ['exception' => $exception]
+            );
         }
 
         if ($this->dispatcher->hasListeners(PageEvents::VIDEO_ON_HIT)) {

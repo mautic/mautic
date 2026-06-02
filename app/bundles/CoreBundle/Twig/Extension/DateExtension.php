@@ -26,6 +26,7 @@ class DateExtension extends AbstractExtension
             new TwigFunction('dateToShort', [$this, 'toShort'], ['is_safe' => ['all']]),
             new TwigFunction('dateFormatRange', [$this, 'formatRange'], ['is_safe' => ['all']]),
             new TwigFunction('dateToHumanized', [$this, 'toHumanized'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToTextShort', [$this, 'toTextShort'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -104,6 +105,16 @@ class DateExtension extends AbstractExtension
     public function toShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toShort($datetime, $timezone, $fromFormat);
+    }
+
+    /**
+     * Returns short text date like "Today", "Yesterday", or formatted date.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toTextShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        return $this->dateHelper->toTextShort($datetime, $timezone, $fromFormat);
     }
 
     /**

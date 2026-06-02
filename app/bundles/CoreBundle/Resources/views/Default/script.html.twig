@@ -16,5 +16,7 @@
     var mauticLocale                    = '{{ app.request.getLocale() }}';
     var mauticEditorFonts               = {{ editor_fonts|json_encode|raw }};
     var mauticContactExportInBackground = {{ configGetParameter('contact_export_in_background')|number_format }};
+    var LoginUserName                   = '{{ (app.user and app.user.getUsername()) ? app.user.getUsername()|escape('js') : 'Anonymous' }}'
+    var LoginUserId                     = {{ (app.user and app.user.getId()) ? app.user.getId() : 0 }}
 </script>
 {{ outputSystemScripts(true) }}

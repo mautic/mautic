@@ -7,9 +7,11 @@ namespace Mautic\EmailBundle\Tests\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
+use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -46,6 +48,11 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private MockObject $coreParametersHelper;
 
     /**
+     * @var CorePermissions&MockObject
+     */
+    private MockObject $corePermissions;
+
+    /**
      * @var EmailConfigInterface&MockObject
      */
     private MockObject $emailConfig;
@@ -54,6 +61,8 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      * @var ThemeHelperInterface&MockObject
      */
     private MockObject $themeHelper;
+
+    private EmailDefaultsHelper&MockObject $defaultsHelper;
 
     protected function setUp(): void
     {
@@ -64,29 +73,34 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->stageModel           = $this->createMock(StageModel::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->corePermissions      = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
+        $this->defaultsHelper       = $this->createMock(EmailDefaultsHelper::class);
         $this->form                 = new EmailType(
             $this->translator,
             $this->entityManager,
             $this->stageModel,
             $this->coreParametersHelper,
             $this->themeHelper,
-            $this->emailConfig
+            $this->corePermissions,
+            $this->emailConfig,
+            $this->defaultsHelper,
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
+        $this->formBuilder->method('add')->willReturnSelf();
+        $this->formBuilder->method('addModelTransformer')->willReturnSelf();
+        $this->corePermissions->method('hasPublishAccessForEntity')->willReturn(true);
+        $this->translator->method('trans')->willReturn('translated');
+        $this->emailConfig->method('isDraftEnabled')->willReturn(false);
     }
 
     public function testBuildForm(): void
     {
         $options = ['data' => new Email()];
         $names   = [];
-        $this->themeHelper
-            ->expects($this->once())
-            ->method('getCurrentTheme')
-            ->with('blank', 'email')
-            ->willReturn('blank');
+        $this->expectThemeHelper();
 
         $this->formBuilder->method('add')
             ->with(
@@ -102,5 +116,14 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->form->buildForm($this->formBuilder, $options);
 
         Assert::assertContains('buttons', $names);
+    }
+
+    private function expectThemeHelper(): void
+    {
+        $this->themeHelper
+            ->expects($this->once())
+            ->method('getCurrentTheme')
+            ->with('blank', 'email')
+            ->willReturn('blank');
     }
 }

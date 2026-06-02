@@ -6,22 +6,21 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\FormBundle\Entity\Form;
 
 final class Version20250127092200 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'forms';
-
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasColumn('translation_parent_id'),
+            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(Form::ENTITY_NAME))->hasColumn('translation_parent_id'),
             'Column translation_parent_id already exists in forms table'
         );
     }
 
     public function up(Schema $schema): void
     {
-        $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
+        $table = $schema->getTable($this->getPrefixedTableName(Form::ENTITY_NAME));
 
         $table->addColumn('translation_parent_id', 'integer', [
             'unsigned' => true,
@@ -29,7 +28,7 @@ final class Version20250127092200 extends PreUpAssertionMigration
         ]);
 
         $table->addForeignKeyConstraint(
-            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedTableName(Form::ENTITY_NAME),
             ['translation_parent_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
@@ -40,7 +39,7 @@ final class Version20250127092200 extends PreUpAssertionMigration
 
     public function down(Schema $schema): void
     {
-        $table = $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME));
+        $table = $schema->getTable($this->getPrefixedTableName(Form::ENTITY_NAME));
 
         $foreignKeys = $table->getForeignKeys();
         foreach ($foreignKeys as $foreignKey) {

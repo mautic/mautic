@@ -628,16 +628,6 @@ class FormController extends CommonFormController
                         try {
                             $model->getRepository()->saveEntity($entity);
 
-                            // Ensure actions are compatible with form type
-                            if (!$entity->isStandalone()) {
-                                foreach ($actions as $actionId => $action) {
-                                    if (empty($customComponents['actions'][$action['type']]['allowCampaignForm'])) {
-                                        unset($actions[$actionId]);
-                                        $deletedActions[] = $actionId;
-                                    }
-                                }
-                            }
-
                             if (count($actions)) {
                                 // Now set and persist the actions
                                 $model->setActions($entity, $actions);
@@ -928,7 +918,7 @@ class FormController extends CommonFormController
             }
         }
 
-        return $this->editAction($request, $entity, true, true);
+        return $this->editAction($request, $entity, true);
     }
 
     /**
@@ -999,7 +989,7 @@ class FormController extends CommonFormController
                 $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
             }
 
-            return $this->render($logicalName, $viewParams);
+            return new Response($themeHelper->renderThemeTemplate($logicalName, $viewParams));
         }
 
         return $this->render('@MauticForm/form.html.twig', $viewParams);

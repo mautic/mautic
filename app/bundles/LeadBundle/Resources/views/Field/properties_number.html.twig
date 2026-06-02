@@ -17,7 +17,7 @@
                     <option value="{{ v|e }}" {% if roundMode == v %}selected="selected"{% endif %}>{{ l|trans }}</option>
                   {% endfor %}
                 </select>
-                <span class="input-group-addon" data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="{{ 'mautic.lead.field.help.numberrounding'|trans }}">
+                <span class="input-group-addon" data-toggle="tooltip" data-container="body" data-placement="top" data-html="true" data-original-title="{{ 'mautic.lead.field.help.numberrounding'|trans }}">
                     <i class="ri-question-line"></i>
                 </span>
             </div>

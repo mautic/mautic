@@ -43,8 +43,9 @@ class FormListType extends AbstractType
 
                 // sort by language then by name
                 ksort($choices);
-                foreach ($choices as &$group) {
+                foreach ($choices as $language => $group) {
                     ksort($group);
+                    $choices[$language] = $group;
                 }
 
                 return $choices;

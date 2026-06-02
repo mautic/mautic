@@ -67,50 +67,52 @@
 {% endblock %}
 
 {% block publishStatus %}
-{{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
-    'entity': activeForm,
-    'status': 'available'
-}) -}}
-<div class="label__divider"></div>
-{% include '@MauticCore/Helper/_tag.html.twig' with {
-    tags: [
-        {
-            type: 'read-only',
-            icon: activeForm.formType == 'campaign'
-            ? 'ri-megaphone-line'
-            : 'ri-survey-line',
-            color: 'high-contrast',
-            label: activeForm.formType == 'campaign'
-                ? 'mautic.form.type.campaign.header'
-                : 'mautic.form.type.standalone.header'
-        }
-    ]
-} %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+        'entity': activeForm,
+        'status': 'available'
+    }) -}}
 
-{% if activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
-        tags: [{
+    {% set showNoIndex  = activeForm.noIndex is defined and activeForm.noIndex == 1 %}
+    {% set showKiosk    = activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
+    {% set showLanguage = activeForm.language is defined and activeForm.language is not empty %}
+    {% set showTranslationParent = activeForm.isTranslation(true) %}
+    {% set showTranslationGroup  = activeForm.isTranslation and not showTranslationParent %}
+
+    {% if showNoIndex or showKiosk or showLanguage or showTranslationParent or showTranslationGroup %}
+        <div class="label__divider"></div>
+    {% endif %}
+
+    {% set tags = [] %}
+
+    {% if showNoIndex %}
+        {% set tags = tags|merge([{
+            label: 'mautic.core.tag.search_index.disabled'|trans,
+            icon: 'ri-eye-off-fill',
+            color: 'blue',
+            icon_only: true
+        }]) %}
+    {% endif %}
+
+    {% if showKiosk %}
+        {% set tags = tags|merge([{
             label: 'mautic.form.tag.kioskmode.label'|trans,
             icon: 'ri-spy-fill',
             color: 'blue',
             icon_only: true
-        }]
-    } %}
-{% endif %}
+        }]) %}
+    {% endif %}
 
-{% if activeForm.isTranslation and not activeForm.isTranslation(true) %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with { 
-        tags: [{
+    {% if showTranslationGroup %}
+        {% set tags = tags|merge([{
             color: 'blue',
-            label: 'mautic.core.icon_tooltip.translation',
+            label: 'mautic.core.icon_tooltip.translation'|trans,
             icon: 'ri-translate',
-            icon_only: true,
-            }] } %}
-{% endif %}
+            icon_only: true
+        }]) %}
+    {% endif %}
 
-{% if activeForm.isTranslation(true) %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with { 
-        tags: [{ 
+    {% if showTranslationParent %}
+        {% set tags = tags|merge([{
             color: 'warm-gray',
             label: 'mautic.core.translation_of'|trans({'%parent%': translations.parent.name}),
             icon: 'ri-translate',
@@ -118,13 +120,11 @@
             attributes: {
                 'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': translations.parent.id})
             }
-        }]
-    } %}
-{% endif %}
+        }]) %}
+    {% endif %}
 
-{% if activeForm.language is defined and activeForm.language is not empty %}
-    {% include '@MauticCore/Helper/_tag.html.twig' with {
-        tags: [{
+    {% if showLanguage %}
+        {% set tags = tags|merge([{
             label: activeForm.language()|language_name,
             icon: 'ri-translate-2',
             color: 'warm-gray',
@@ -133,9 +133,12 @@
                 'data-placement': 'top',
                 'title': 'mautic.core.language'|trans
             }
-        }]
-    } %}
-{% endif %}
+        }]) %}
+    {% endif %}
+
+    {% if tags is not empty %}
+        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}

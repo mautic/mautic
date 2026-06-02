@@ -22,10 +22,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('form:forms:viewown')"),
         new Post(security: "is_granted('form:forms:create')"),
-        new Get(security: "is_granted('form:forms:viewown')"),
-        new Put(security: "is_granted('form:forms:editown')"),
-        new Patch(security: "is_granted('form:forms:editother')"),
-        new Delete(security: "is_granted('form:forms:deleteown')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['action:read'],
@@ -44,43 +44,43 @@ class Action implements UuidInterface
     /**
      * @var int
      */
-    #[Groups(['action:read'])]
+    #[Groups(['action:read', 'form:read'])]
     private $id;
 
     /**
      * @var string
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $name;
 
     /**
      * @var string|null
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $description;
 
     /**
      * @var string
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $type;
 
     /**
      * @var int
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $order = 0;
 
     /**
      * @var array
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $properties = [];
 
     /**
      * @var Form|null
      */
-    #[Groups(['action:read', 'action:write'])]
+    #[Groups(['action:read', 'action:write', 'form:read'])]
     private $form;
 
     /**
@@ -88,9 +88,6 @@ class Action implements UuidInterface
      */
     private $changes;
 
-    /**
-     * Reset properties on clone.
-     */
     public function __clone()
     {
         $this->id   = null;
@@ -120,6 +117,7 @@ class Action implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         static::addUuidField($builder);
@@ -329,5 +327,10 @@ class Action implements UuidInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getForm()?->getCreatedBy();
     }
 }

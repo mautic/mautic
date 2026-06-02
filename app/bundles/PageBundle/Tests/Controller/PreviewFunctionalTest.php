@@ -30,7 +30,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $url = "/page/preview/{$page->getId()}";
 
         // Anonymous visitor is not allowed to access preview if not public
-        $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->logoutUser();
         $this->client->request(Request::METHOD_GET, $url);
         self::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
 

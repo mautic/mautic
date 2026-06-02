@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -690,6 +691,123 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
     }
 
+    public function testFieldListAction(): void
+    {
+        // Check if alias is null
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => '',
+                'filter'     => '',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame('Alias cannot be empty', $response['error']);
+
+        // User search for filter
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => 'owner_id',
+                'filter'     => 'Admin',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame('Admin User', $response[0]['value']);
+
+        // Check if filed type is not lookup
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => 'city',
+                'filter'     => '',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertEmpty($response);
+
+        // Check if filed type is lookup
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => 'title',
+                'filter'     => '',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertArrayHasKey(0, $response);
+    }
+
+    public function testGetLookupChoiceListForGlobalCategory(): void
+    {
+        $category1 = $this->createGlobalCategory('GC11');
+        $category2 = $this->createGlobalCategory('GC12');
+
+        // Search global category with string filter
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'            => 'lead:getLookupChoiceList',
+                'for_lookup'        => 1,
+                'searchKey'         => 'category.category',
+                'category_category' => 'GC11',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertSame($category1->getTitle(), $response[0]['text']);
+
+        // Search global category with array of ids
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'            => 'lead:getLookupChoiceList',
+                'for_lookup'        => 1,
+                'searchKey'         => 'category.category',
+                'category_category' => [$category1->getId(), $category2->getId()],
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertCount(2, $response);
+    }
+
+    public function testLoadSegmentFilterFormForSubscribedCategory(): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/ajax',
+            [
+                'action'            => 'lead:loadSegmentFilterForm',
+                'fieldAlias'        => 'globalcategory',
+                'fieldObject'       => 'lead',
+                'operator'          => 'in',
+                'filterNum'         => 2,
+            ]
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertArrayHasKey('viewParameters', $response);
+        Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
+    }
+
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()
@@ -747,5 +865,19 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    private function createGlobalCategory(string $title): Category
+    {
+        $category = new Category();
+        $category->setIsPublished(true)
+            ->setTitle($title)
+            ->setAlias(strtolower($title))
+            ->setBundle('global');
+
+        $this->em->persist($category);
+        $this->em->flush();
+
+        return $category;
     }
 }

@@ -20,6 +20,8 @@ use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -28,7 +30,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SmsType extends AbstractType
 {
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManager $em,
     ) {
     }
 
@@ -123,6 +125,46 @@ class SmsType extends AbstractType
                 'required' => false,
             ]
         );
+
+        $transformer = new IdToEntityModelTransformer($this->em, Sms::class);
+        $builder->add(
+            $builder->create(
+                'translationParent',
+                HiddenType::class
+            )->addModelTransformer($transformer)
+        );
+
+        $builder->add(
+            'translationParentSelector', // This is a non-mapped field
+            SmsListType::class, // A new form type to be created
+            [
+                'label'      => 'mautic.core.form.translation_parent',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.form.translation_parent.help',
+                ],
+                'required'       => false,
+                'multiple'       => false,
+                'placeholder'    => 'mautic.core.form.translation_parent.empty',
+                'top_level'      => 'translation',
+                'ignore_ids'     => [(int) $options['data']->getId()],
+                'mapped'         => false,
+                'data'           => ($options['data']->getTranslationParent()) ? $options['data']->getTranslationParent()->getId() : null,
+            ]
+        );
+
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = $event->getData();
+                if (isset($data['translationParentSelector'])) {
+                    $data['translationParent'] = $data['translationParentSelector'];
+                }
+                $event->setData($data);
+            }
+        );
+
         $builder->add('smsType', HiddenType::class);
         $builder->add('buttons', FormButtonsType::class);
 

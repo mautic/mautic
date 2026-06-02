@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -15,6 +14,8 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\SMimeHelper;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
@@ -268,6 +269,13 @@ class OwnerSubscriberTest extends TestCase
         /** @var MockObject&RouterInterface $router */
         $router = $this->createMock(RouterInterface::class);
 
+        $coreParametersHelper->method('get')
+            ->willReturnMap(
+                [
+                    ['mailer_custom_headers', [], ['X-Mautic-Test' => 'test', 'X-Mautic-Test2' => 'test']],
+                ]
+            );
+
         /** @var MockObject&Environment $twig */
         $twig = $this->createMock(Environment::class);
 
@@ -296,10 +304,11 @@ class OwnerSubscriberTest extends TestCase
             $this->createMock(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
-            $this->createMock(ModelFactory::class),
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->createMock(SMimeHelper::class),
+            $this->createMock(EmailStatModel::class),
         );
         $mailerHelper->setLead($lead);
 

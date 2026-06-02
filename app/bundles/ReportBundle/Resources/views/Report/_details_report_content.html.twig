@@ -80,7 +80,7 @@
                                             {% if 'datetime' is same as cellType and 10 is same as cellVal|length %}
                                                 {%- set cellType = 'date' -%}
                                             {% endif %}
-                                            {% if cellVal is not empty %}
+                                            {% if cellVal is not empty and cellVal is not null %}
                                                 {% if 'datetime' is same as cellType %}
                                                     {{ dateToFullConcat(cellVal, 'UTC') }}
                                                 {% elseif 'date' is same as cellType %}

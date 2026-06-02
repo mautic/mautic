@@ -1,35 +1,41 @@
 {#
   Variables
-    - notification (\Mautic\NotificationBundle\Entity\Notification)
+    - notification
 #}
-<label>Preview</label>
-<div id="notification-preview" class="panel panel-default">
-    <div class="panel-body">
-        <div class="row">
-            <div class="icon height-auto text-center">
-                <span class="ri-notification-3-fill fs-48"></span>
+
+{% set notificationWrapper %}
+<div class="notification-preview">
+  <div class="notification-preview__body {{ notification.url ? 'animation--grow' }}">
+    <div class="notification-preview__container">
+      <div class="notification-preview__notification notification-preview__notification--web">
+        <span class="notification-preview__before"></span>
+        <div class="d-flex gap-md ai-center">
+            <div class="notification-preview__icon">
+              <i class="ri-safari-fill"></i>
             </div>
-            <div class="text height-auto">
-                <h4>
-                    {%- if notification.heading -%}
-                        {{- notification.heading -}}
-                    {%- else -%}
-                        Your notification header
-                    {%- endif -%}
-                </h4>
-                <p>
-                    {%- if notification.message %}
-                        {{- notification.message -}}
-                    {%- else -%}
-                        The message body of your notification
-                    {%- endif -%}
-                </p>
-                <span>{{ app.request.server.get('HTTP_HOST') }}</span>
+            <div class="notification-preview__content">
+              <h3 class="notification-preview__title type-heading-02">{{ notification.heading|default('mautic.notification.preview.notification'|trans) }}</h3>
+              <p class="notification-preview__message type-body-01 mb-xs">{{ notification.message|default('mautic.notification.preview.message'|trans) }}</p>
+              <span class="notification-preview__more type-label-01">{{ 'mautic.notification.preview.source.web_browser'|trans }} • {{ 'mautic.notification.preview.source.example_com'|trans }}</span>
             </div>
         </div>
-        {% if notification.url and notification.button %}
-            <hr>
-            <a href="{{ notification.url }}">{{ notification.button }}</a>
+        {% if notification.button %}
+        <div class="notification-preview__button">{{ notification.button }}</div>
         {% endif %}
+
+      </div>
     </div>
+  </div>
 </div>
+{% endset %}
+
+{% if notification.url %}
+<a href="{{ notification.url }}" class="notification-preview-wrapper" target="_blank">
+    {{ notificationWrapper }}
+</a>
+{% else %}
+    {{ notificationWrapper }}
+{% endif %}
+
+<style>
+</style>

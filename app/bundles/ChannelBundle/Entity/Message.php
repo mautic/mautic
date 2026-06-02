@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
         new Post(security: "is_granted('channel:messages:create')"),
-        new Get(security: "is_granted('channel:messages:viewown')"),
-        new Put(security: "is_granted('channel:messages:editown')"),
-        new Patch(security: "is_granted('channel:messages:editother')"),
-        new Delete(security: "is_granted('channel:messages:deleteown')"),
+        new Get(security: "is_granted('channel:messages:viewown', object)"),
+        new Put(security: "is_granted('channel:messages:editown', object)"),
+        new Patch(security: "is_granted('channel:messages:editother', object)"),
+        new Delete(security: "is_granted('channel:messages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['message:read'],

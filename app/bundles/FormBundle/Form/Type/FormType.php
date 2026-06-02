@@ -259,7 +259,6 @@ class FormType extends AbstractType
         ]);
 
         $builder->add('buttons', FormButtonsType::class);
-        $builder->add('formType', HiddenType::class, ['empty_data' => 'standalone']);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

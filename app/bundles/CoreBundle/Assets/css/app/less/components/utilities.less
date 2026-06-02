@@ -729,6 +729,26 @@
 .animation--slide-scale-in-left { animation: animationSlideScaleInLeft var(--duration-expressive) forwards; }
 .animation--slide-scale-in-right { animation: animationSlideScaleInRight var(--duration-expressive) forwards; }
 
+// Scale animations
+.animation--grow { 
+  transition: transform var(--duration-expressive);
+  &:hover { transform: scale(1.02); }
+}
+.animation--shrink { 
+  transition: transform var(--duration-expressive);
+  &:hover { transform: scale(0.9); }
+}
+.animation--grow-in { 
+  transform: scale(0);
+  transition: transform var(--duration-expressive);
+  &.active { transform: scale(1); }
+}
+.animation--shrink-out { 
+  transform: scale(1);
+  transition: transform var(--duration-expressive);
+  &.active { transform: scale(0); }
+}
+
 @keyframes animationSlideInUp {
   from { transform: translateY(20px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
@@ -775,3 +795,30 @@
 .as-3-2 { aspect-ratio: 3 / 2; }
 .as-4-3 { aspect-ratio: 4 / 3; }
 .as-16-9 { aspect-ratio: 16 / 9; }
+
+// Grids
+.grid {
+    --grid--columns: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.grid-cols-2 { --grid--columns: 2; }
+.grid-cols-3 { --grid--columns: 3; }
+.grid-cols-4 { --grid--columns: 4; }
+.grid-cols-5 { --grid--columns: 5; }
+.grid-cols-6 { --grid--columns: 6; }
+.grid-cols-7 { --grid--columns: 7; }
+.grid-cols-8 { --grid--columns: 8; }
+
+@media (min-width: @screen-md-min) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: @screen-lg-min) {
+    .grid {
+        grid-template-columns: repeat(var(--grid--columns), 1fr);
+    }
+}

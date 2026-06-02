@@ -100,8 +100,7 @@ class PageModelTest extends PageTestAbstract
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
-        $cleanQueryMethod->setAccessible(true);
-        $res = $cleanQueryMethod->invokeArgs($pageModel, [
+        $res                 = $cleanQueryMethod->invokeArgs($pageModel, [
             [
                 'page_title'    => 'Mautic & PHP',
                 'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
@@ -145,6 +144,33 @@ class PageModelTest extends PageTestAbstract
             $query = $pageModel->getHitQuery($request, $redirect);
             $this->assertUtmQuery($query);
         }
+    }
+
+    /**
+     * This test is somewhat synthetic to test the missing $query['ct'].
+     */
+    public function testNoClickThroughInQuery(): void
+    {
+        $redirectUrl = '/somewhat';
+        $pageModel   = $this->getPageModel();
+
+        $ipAddress = $this->createMock(IpAddress::class);
+        $ipAddress->method('isTrackable')->willReturn(true);
+
+        $this->security->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('getIpAddress')->willReturn($ipAddress);
+        $this->companyModel->method('fetchCompanyFields')->willReturn([]);
+
+        $redirect = $this->createMock(Redirect::class);
+        $redirect->method('getUrl')->willReturn($redirectUrl);
+
+        $this->contactRequestHelper->expects($this->once())
+            ->method('getContactFromQuery')
+            ->with(['page_url' => $redirectUrl])
+            ->willReturn(null);
+
+        $result = $pageModel->hitPage($redirect, new Request());
+        self::assertFalse($result);
     }
 
     private function assertUtmQuery(array $query): void

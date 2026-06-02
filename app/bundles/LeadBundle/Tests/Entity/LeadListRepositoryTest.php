@@ -123,6 +123,51 @@ class LeadListRepositoryTest extends TestCase
         self::assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
+    public function testIsContactInAllSegmentsNoSegments(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1];
+        $queryResult        = [];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        self::assertFalse($this->repository->isContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsContactInAllSegmentsDoesNotMatch(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1, 2];
+        $queryResult        = [1];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        self::assertFalse($this->repository->isContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsContactInAllSegmentsMatches(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1, 2];
+        $queryResult        = [1, 2];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        self::assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsNotContactInAllSegmentsMatches(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1];
+        $queryResult        = [];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        self::assertTrue($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
+    public function testIsNotContactInAllSegmentsDoesNotMatch(): void
+    {
+        $contactId          = 1;
+        $expectedSegmentIds = [1, 2];
+        $queryResult        = [1, 2];
+        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        self::assertFalse($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
+    }
+
     /**
      * @param array<int> $queryResult
      */

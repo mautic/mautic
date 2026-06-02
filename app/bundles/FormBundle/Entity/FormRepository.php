@@ -58,12 +58,16 @@ class FormRepository extends CommonRepository
      * @param int         $limit
      * @param int         $start
      * @param bool        $viewOther
-     * @param string|null $formType
+     * @param string|null $formType  @deprecated since Mautic 7.1, this parameter is ignored and will be removed in 8.0
      * @param bool|string $topLevel
      * @param array<int>  $ignoreIds
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null, $topLevel = false, array $ignoreIds = []): array
     {
+        if (null !== $formType) {
+            trigger_deprecation('mautic/mautic', '7.1', 'The $formType parameter in FormRepository::getFormList() is deprecated and will be removed in 8.0.');
+        }
+
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias, language}');
 
@@ -75,12 +79,6 @@ class FormRepository extends CommonRepository
         if (!$viewOther) {
             $q->andWhere($q->expr()->eq('f.createdBy', ':id'))
                 ->setParameter('id', $this->currentUser->getId());
-        }
-
-        if (!empty($formType)) {
-            $q->andWhere(
-                $q->expr()->eq('f.formType', ':type')
-            )->setParameter('type', $formType);
         }
 
         if ($topLevel) {

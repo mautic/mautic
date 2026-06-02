@@ -5,23 +5,12 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    /**
-     * This method produces HTTP request checking headers which are blocking availability for iframe inheritance for other pages.
-     */
-    public function checkIframeAvailabilityAction(Request $request, IframeAvailabilityChecker $availabilityChecker): JsonResponse
-    {
-        $url = $request->query->get('website');
-
-        return $availabilityChecker->check($url, $request->getScheme());
-    }
-
     public function generatePreviewAction(Request $request): JsonResponse
     {
         $responseContent  = ['html' => '', 'style' => ''];

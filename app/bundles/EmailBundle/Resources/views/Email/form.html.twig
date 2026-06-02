@@ -22,6 +22,17 @@
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
 {% set draftPreviewUrl = draftPreviewUrl|default('') %}
+{% set advancedTabHasErrors =
+    formContainsErrors(form.fromName)
+    or formContainsErrors(form.fromAddress)
+    or formContainsErrors(form.replyToAddress)
+    or formContainsErrors(form.bccAddress)
+    or formContainsErrors(form.assetAttachments)
+    or formContainsErrors(form.headers)
+    or formContainsErrors(form.useOwnerAsMailer)
+    or formContainsErrors(form.customHtml)
+    or formContainsErrors(form.plainText)
+%}
 {% block headerTitle %}
   {% if email.id is not empty %}
     {{ 'mautic.email.header.edit'|trans({'%name%': email.name}) }}
@@ -47,7 +58,14 @@
                             <a href="#email-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                         </li>
                         <li>
-                            <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
+                            <a href="#advanced-container" role="tab" data-toggle="tab">
+                                {% if advancedTabHasErrors %}
+                                <span class="text-danger">
+                                    <i class="ri-alert-line" aria-hidden="true"></i> {{ 'mautic.core.advanced'|trans }}
+                                </span>{% else %}
+                                {{ 'mautic.core.advanced'|trans }}
+                                {% endif %}
+                            </a>
                         </li>
                         <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
                             <a href="#dynamic-content-container" role="tab" data-toggle="tab">{{ 'mautic.core.dynamicContent'|trans }}</a>
@@ -89,10 +107,9 @@
 
                                 </div>
                                 <div class="col-md-6">
-                                    {{ form_row(form.headers) }}
-                                </div>
-                                <div class="col-md-6">
                                     {{ form_row(form.useOwnerAsMailer) }}
+                                    {{ form_row(form.sendToDnc) }}
+                                    {{ form_row(form.headers) }}
                                 </div>
                             </div>
                             <br/>
@@ -172,9 +189,15 @@
                 {% if isVariant %}
                     {{ form_row(form.variantSettings) }}
                     {{ form_row(form.isPublished) }}
-                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                    <div id="scheduleOptions">
+                        {% if emailType == 'template' %}
+                            {{ form_row(form.publishUp) }}
+                            {{ form_row(form.publishDown) }}
+                        {% else %}
+                            <div class="alert alert-info" id="scheduleOptionsNotice" style="display: none;">
+                                {{ 'mautic.email.send.schedule.options_notice'|trans }}
+                            </div>
+                        {% endif %}
                     </div>
                 {% else %}
                     <div id="leadList"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
@@ -201,9 +224,15 @@
                             'data-end': 'mautic.core.form.available_until_scheduled_end'
                         }
                     }) }}
-                    <div id="scheduleOptions"{{ (('template' == emailType) ? ' class="hide"' : '') }}>
-                        {{ form_row(form.publishUp, {'label': 'mautic.core.form.sending.start_at'}) }}
-                        {{ form_row(form.publishDown, {'label': 'mautic.core.form.sending.stop_at'}) }}
+                    <div id="scheduleOptions">
+                        {% if emailType == 'template' %}
+                            {{ form_row(form.publishUp) }}
+                            {{ form_row(form.publishDown) }}
+                        {% else %}
+                            <div class="alert alert-info" id="scheduleOptionsNotice" style="display: none;">
+                                {{ 'mautic.email.send.schedule.options_notice'|trans }}
+                            </div>
+                        {% endif %}
                     </div>
 
                 {% endif %}

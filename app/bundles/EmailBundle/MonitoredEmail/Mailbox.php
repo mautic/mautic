@@ -242,7 +242,7 @@ class Mailbox
      */
     public function isGmail()
     {
-        return $this->isGmail();
+        return $this->isGmail;
     }
 
     /**
@@ -391,7 +391,15 @@ class Mailbox
      */
     protected function isConnected(): bool
     {
-        return $this->isConfigured() && $this->imapStream && @imap_ping($this->imapStream);
+        if (!$this->isConfigured() || !$this->imapStream) {
+            return false;
+        }
+
+        try {
+            return @imap_ping($this->imapStream);
+        } catch (\ValueError|\TypeError) {
+            return false;
+        }
     }
 
     /**
