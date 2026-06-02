@@ -157,9 +157,10 @@ class ConfigSubscriberTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'                    => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'             => ['name', 'email', 'id'],
-                'config[coreconfig][image_path]'                  => $value,
+                'config[coreconfig][site_url]'                       => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]'                => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]'             => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[coreconfig][image_path]'                     => $value,
             ]
         );
 

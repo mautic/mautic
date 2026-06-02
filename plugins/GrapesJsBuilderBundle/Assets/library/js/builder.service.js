@@ -1249,6 +1249,7 @@ export default class BuilderService {
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         [grapesjsckeditor]: {
           ckeditor_module: ckeditorModuleUrl,
+          licenseKey: 'GPL',
           inlineMode: true,
           inline: inlineElements,
           inline_options: emailInlineOptions,

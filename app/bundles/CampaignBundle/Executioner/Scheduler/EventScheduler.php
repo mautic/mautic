@@ -87,6 +87,7 @@ class EventScheduler
     public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn): void
     {
         $log->setTriggerDate($toBeExecutedOn, 'Event rescheduled');
+        $log->setDateQueued(null);
         $this->eventLogger->persistLog($log);
 
         $event  = $log->getEvent();
@@ -102,6 +103,7 @@ class EventScheduler
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn, 'Bulk rescheduling of events');
+            $log->setDateQueued(null);
         }
 
         $this->eventLogger->persistCollection($logs);
