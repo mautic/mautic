@@ -18,6 +18,9 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testStageMenuString(): void
     {
+        $this->createStage('Menu test stage');
+        $this->em->flush();
+
         $stage = $this->client->request(Request::METHOD_GET, '/s/stages');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
         $stageMenuString = $stage->filterXPath('//a[@id="mautic_stage_index"]');
