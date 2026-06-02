@@ -395,8 +395,14 @@ class EmailRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
-                    ->setParameter('search', "%{$search}%");
+                $q->andWhere(
+                    $q->expr()->orX(
+                        $q->expr()->like('e.name', ':search'),
+                        $q->expr()->like('e.id', ':searchId')
+                    )
+                )
+                    ->setParameter('search', "%{$search}%")
+                    ->setParameter('searchId', $search);
             }
         }
 
@@ -846,7 +852,11 @@ class EmailRepository extends CommonRepository
 
         $queryBuilder = $connection->createQueryBuilder();
         $queryBuilder->select('ll.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            /**
+             * Uses FORCE INDEX to ensure the PRIMARY key (leadlist_id, lead_id) is used,
+             * preventing full table scans on large lead_lists_leads tables.
+             */
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads ll FORCE INDEX (`PRIMARY`)')
             ->where($queryBuilder->expr()->in('ll.leadlist_id', $excludedListIds));
 
         return $queryBuilder;
