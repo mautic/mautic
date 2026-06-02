@@ -71,6 +71,7 @@ return [
                     'twig',
                     'mautic.plugin.model.plugin',
                 ],
+                'lazy' => true,
             ],
             'mautic.plugin.helper.reload' => [
                 'class'     => Mautic\PluginBundle\Helper\ReloadHelper::class,
