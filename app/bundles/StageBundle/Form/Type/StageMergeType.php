@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -13,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class StageMergeType extends AbstractType
+final class StageMergeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
