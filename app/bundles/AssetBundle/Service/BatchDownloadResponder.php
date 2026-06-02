@@ -7,16 +7,12 @@ namespace Mautic\AssetBundle\Service;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Contracts\Service\Attribute\Required;
 
 final class BatchDownloadResponder
 {
-    private Translator $translator;
-
-    #[Required]
-    public function setTranslator(Translator $translator): void
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private Translator $translator,
+    ) {
     }
 
     public function createResponse(string $zipPath): BinaryFileResponse
