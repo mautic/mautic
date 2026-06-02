@@ -40,7 +40,6 @@ class CampaignRepositoryTest extends TestCase
         $filter = (object) ['command' => 'is:expired', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
@@ -57,7 +56,6 @@ class CampaignRepositoryTest extends TestCase
         $filter = (object) ['command' => 'is:pending', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 

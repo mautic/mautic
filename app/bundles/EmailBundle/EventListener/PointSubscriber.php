@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -102,6 +103,11 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
+        try {
+            $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
+        } catch (EntityNotFoundException) {
+            // Contact was deleted in the mean time, skip point triggering
+            return;
+        }
     }
 }

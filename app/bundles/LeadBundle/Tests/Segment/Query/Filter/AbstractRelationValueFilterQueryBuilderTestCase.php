@@ -34,6 +34,10 @@ abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
 
     protected function setUp(): void
     {
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
+            define('MAUTIC_TABLE_PREFIX', '');
+        }
+
         $this->randomParameter = $this->createMock(RandomParameterName::class);
         $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock  = $this->getMockedConnection();

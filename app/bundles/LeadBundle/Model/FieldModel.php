@@ -698,14 +698,7 @@ class FieldModel extends FormModel
 
         /** @var LeadField $entity */
         foreach ($entities as $entity) {
-            switch ($entity->getObject()) {
-                case 'lead':
-                    $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
-                    break;
-                case 'company':
-                    $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
-                    break;
-            }
+            $this->customFieldColumn->deleteLeadColumn($entity);
         }
 
         return $entities;

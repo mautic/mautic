@@ -206,7 +206,7 @@ class FieldController extends FormController
                         ],
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $field->getId(), true);
             } elseif (!$valid) {
                 // some bug in Symfony prevents repopulating list options on errors

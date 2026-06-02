@@ -35,10 +35,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/contacts', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/contacts', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['contact:read'],
@@ -769,9 +769,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             return $socialIdentity;
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips->first()->getIpAddress();
-        } else {
-            return 'mautic.lead.lead.anonymous';
         }
+
+        return 'mautic.lead.lead.anonymous';
     }
 
     /**
@@ -1075,10 +1075,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             if ($id->getPushID() === $identifier) {
                 if ($id->isEnabled() === $enabled) {
                     return $this;
-                } else {
-                    $entity = $id;
-                    $this->removePushID($id);
                 }
+                $entity = $id;
+                $this->removePushID($id);
             }
         }
 
@@ -1981,19 +1980,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                         }
 
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
-                    } else {
-                        $convertToMonth = fn ($number, $unit) => match ($unit) {
-                            FrequencyRule::TIME_MONTH => (int) $number,
-                            FrequencyRule::TIME_WEEK  => $number * 4,
-                            FrequencyRule::TIME_DAY   => $number * 30,
-                            default                   => $number,
-                        };
-
-                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
-                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
-
-                        return $bFrequency <=> $aFrequency;
                     }
+                    $convertToMonth = fn ($number, $unit) => match ($unit) {
+                        FrequencyRule::TIME_MONTH => (int) $number,
+                        FrequencyRule::TIME_WEEK  => $number * 4,
+                        FrequencyRule::TIME_DAY   => $number * 30,
+                        default                   => $number,
+                    };
+
+                    $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
+                    $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
+
+                    return $bFrequency <=> $aFrequency;
                 }
 
                 return ($a['preferred_channel'] > $b['preferred_channel']) ? -1 : 1;

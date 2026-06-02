@@ -28,10 +28,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/companies', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/companies', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['company:read'],
@@ -652,10 +652,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         return $this;
     }
 
-    /**
-     * @return Company
-     */
-    public function addTag(Tag $tag)
+    public function addTag(Tag $tag): self
     {
         $this->isChanged('tags', $tag);
         $this->tags[$tag->getTag()] = $tag;
@@ -670,19 +667,19 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return mixed
+     * @return Collection<string, Tag>
      */
-    public function getTags()
+    public function getTags(): Collection
     {
         return $this->tags;
     }
 
     /**
-     * @return $this
+     * @param Collection<string, Tag>|array<string, Tag> $tags
      */
-    public function setTags(mixed $tags)
+    public function setTags(mixed $tags): self
     {
-        $this->tags = $tags;
+        $this->tags = $tags instanceof Collection ? $tags : new ArrayCollection((array) $tags);
 
         return $this;
     }
