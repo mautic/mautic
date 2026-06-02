@@ -293,7 +293,7 @@ class PublicController extends CommonFormController
             }
         }
 
-        return $this->render($contentTemplate, $viewParams);
+        return new Response($themeHelper->renderThemeTemplate($contentTemplate, $viewParams));
     }
 
     public function unsubscribeAllAction(Request $request, string $idHash, ?string $urlEmail = null, ?string $secretHash = null): Response
@@ -387,7 +387,7 @@ class PublicController extends CommonFormController
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
 
-        return $this->render(
+        return new Response($themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'message'  => $message,
@@ -396,7 +396,7 @@ class PublicController extends CommonFormController
                 'lead'     => $lead,
                 'template' => $template,
             ]
-        );
+        ));
     }
 
     /**
@@ -479,7 +479,7 @@ class PublicController extends CommonFormController
 
             $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-            $response = $this->render(
+            $content = $themeHelper->renderThemeTemplate(
                 $logicalName,
                 [
                     'inBrowser' => true,
@@ -489,9 +489,6 @@ class PublicController extends CommonFormController
                     'template'  => $template,
                 ]
             );
-
-            // replace tokens
-            $content = $response->getContent();
         }
 
         // Override tracking_pixel

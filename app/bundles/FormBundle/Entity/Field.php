@@ -24,10 +24,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(security: "is_granted('form:forms:viewown')"),
         new Post(security: "is_granted('form:forms:create')"),
-        new Get(security: "is_granted('form:forms:viewown')"),
-        new Put(security: "is_granted('form:forms:editown')"),
-        new Patch(security: "is_granted('form:forms:editother')"),
-        new Delete(security: "is_granted('form:forms:deleteown')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['field:read'],
@@ -265,6 +265,7 @@ class Field implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addNullableField('labelAttributes', Types::STRING, 'label_attr');
@@ -1079,5 +1080,10 @@ class Field implements UuidInterface
     public function setIsReadOnly(?bool $isReadOnly): void
     {
         $this->isReadOnly = $isReadOnly ?? false;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getForm()?->getCreatedBy();
     }
 }

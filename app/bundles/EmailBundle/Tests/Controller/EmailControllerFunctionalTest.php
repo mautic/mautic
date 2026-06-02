@@ -486,6 +486,96 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
     }
 
+    public function testCloneWithTranslationsAndVariantsAction(): void
+    {
+        $segment = $this->createSegment('Segment C', 'segment-C');
+
+        $parent = $this->createEmail('Parent email', 'Parent subject', 'list', 'blank', 'Parent html', $segment);
+        $parent->setLanguage('en_US');
+        $parent->setIsPublished(true);
+
+        $translation = $this->createEmail('Parent French', 'French subject', 'list', 'blank', 'French html', $segment);
+        $translation->setLanguage('fr_FR');
+        $translation->setTranslationParent($parent);
+        $parent->addTranslationChild($translation);
+
+        $variantSettings = ['weight' => 50, 'winnerCriteria' => 'email.openrate'];
+        $variant         = $this->createEmail(
+            'Variant email',
+            'Variant subject',
+            'list',
+            'blank',
+            'Variant html',
+            $segment,
+            $variantSettings
+        );
+        $variant->setLanguage('en_US');
+        $variant->setVariantParent($parent);
+        $parent->addVariantChild($variant);
+
+        $variantTranslation = $this->createEmail(
+            'Variant French',
+            'Variant French subject',
+            'list',
+            'blank',
+            'Variant French html',
+            $segment
+        );
+        $variantTranslation->setLanguage('fr_FR');
+        $variantTranslation->setTranslationParent($variant);
+        $variant->addTranslationChild($variantTranslation);
+
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertStringContainsString(
+            "/s/emails/cloneWithTranslations/{$parent->getId()}",
+            $this->client->getResponse()->getContent()
+        );
+        $this->assertStringContainsString('Clone with translations and variants', $this->client->getResponse()->getContent());
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
+            Request::METHOD_POST,
+            "/s/emails/cloneWithTranslations/{$parent->getId()}",
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $emailRepository = $this->em->getRepository(Email::class);
+        $emails          = $emailRepository->findBy([], ['id' => 'ASC']);
+
+        Assert::assertCount(8, $emails);
+
+        $clonedParent             = $emailRepository->findOneBy(['name' => 'Parent email (copy)']);
+        $clonedTranslation        = $emailRepository->findOneBy(['name' => 'Parent French (copy)']);
+        $clonedVariant            = $emailRepository->findOneBy(['name' => 'Variant email (copy)']);
+        $clonedVariantTranslation = $emailRepository->findOneBy(['name' => 'Variant French (copy)']);
+
+        Assert::assertInstanceOf(Email::class, $clonedParent);
+        Assert::assertInstanceOf(Email::class, $clonedTranslation);
+        Assert::assertInstanceOf(Email::class, $clonedVariant);
+        Assert::assertInstanceOf(Email::class, $clonedVariantTranslation);
+
+        Assert::assertSame('list', $clonedParent->getEmailType());
+        Assert::assertFalse($clonedParent->isPublished(false));
+        Assert::assertSame(0, $clonedParent->getSentCount());
+        Assert::assertSame('Parent html', $clonedParent->getCustomHtml());
+        Assert::assertCount(1, $clonedParent->getLists());
+
+        Assert::assertSame($clonedParent->getId(), $clonedTranslation->getTranslationParent()->getId());
+        Assert::assertSame('fr_FR', $clonedTranslation->getLanguage());
+        Assert::assertSame('French html', $clonedTranslation->getCustomHtml());
+
+        Assert::assertSame($clonedParent->getId(), $clonedVariant->getVariantParent()->getId());
+        Assert::assertSame($variantSettings, $clonedVariant->getVariantSettings());
+        Assert::assertSame('Variant html', $clonedVariant->getCustomHtml());
+
+        Assert::assertSame($clonedVariant->getId(), $clonedVariantTranslation->getTranslationParent()->getId());
+        Assert::assertSame('fr_FR', $clonedVariantTranslation->getLanguage());
+        Assert::assertSame('Variant French html', $clonedVariantTranslation->getCustomHtml());
+    }
+
     public function testEmailDetailsPageShouldNotHavePendingCount(): void
     {
         $segment = $this->createSegment('Test Segment A', 'test-segment-a');

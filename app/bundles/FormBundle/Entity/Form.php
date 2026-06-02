@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('form:forms:viewown')"),
         new Post(security: "is_granted('form:forms:create')"),
-        new Get(security: "is_granted('form:forms:viewown')"),
-        new Put(security: "is_granted('form:forms:editown')"),
-        new Patch(security: "is_granted('form:forms:editother')"),
-        new Delete(security: "is_granted('form:forms:deleteown')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['form:read'],
