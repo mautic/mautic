@@ -387,7 +387,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $somethingHappened = false;
 
             if (!empty($addTo)) {
-                $this->companySegmentModel->addCompany($companyEntity, $addTo);
+                $this->companySegmentModel->addCompany($companyEntity, $addTo, true);
                 $somethingHappened = true;
             }
 
