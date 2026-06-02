@@ -132,7 +132,7 @@ class ReportDevicesSubscriber implements EventSubscriberInterface
         $data = $event->getData();
         if (isset($data[0]['client_info'])) {
             foreach ($data as &$row) {
-                $clientInfo         = unserialize($row['client_info']);
+                $clientInfo         = \Mautic\CoreBundle\Helper\Serializer::decode($row['client_info']);
                 $row['client_info'] = (is_array($clientInfo) && isset($clientInfo['name'])) ? $clientInfo['name'] : '';
             }
             $event->setData($data);
