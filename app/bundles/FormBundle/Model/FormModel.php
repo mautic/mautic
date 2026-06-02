@@ -438,7 +438,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if ($entity->getRenderStyle()) {
             $styleTheme = $styleToRender;
-            $style      = $this->twig->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $style      = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleTheme), []);
         }
 
         // Determine pages
@@ -450,7 +450,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
-        $html               = $this->twig->render(
+        $html               = $this->themeHelper->renderThemeTemplate(
             $formToRender,
             [
                 'fieldSettings'          => $this->getCustomComponents()['fields'],
@@ -699,7 +699,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        $script = $this->twig->render(
+        $script = $this->themeHelper->renderThemeTemplate(
             $scriptToRender,
             [
                 'form'  => $form,

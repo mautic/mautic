@@ -28,10 +28,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
         new Post(security: "is_granted('campaign:campaigns:create')"),
-        new Get(security: "is_granted('campaign:campaigns:viewown')"),
-        new Put(security: "is_granted('campaign:campaigns:editown')"),
-        new Patch(security: "is_granted('campaign:campaigns:editother')"),
-        new Delete(security: "is_granted('campaign:campaigns:deleteown')"),
+        new Get(security: "is_granted('campaign:campaigns:viewown', object)"),
+        new Put(security: "is_granted('campaign:campaigns:editown', object)"),
+        new Patch(security: "is_granted('campaign:campaigns:editother', object)"),
+        new Delete(security: "is_granted('campaign:campaigns:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['event:read'],
@@ -355,6 +355,7 @@ class Event implements ChannelInterface, UuidInterface
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('children', 'Event')
@@ -1246,5 +1247,10 @@ class Event implements ChannelInterface, UuidInterface
     public function isRedirectTarget(): bool
     {
         return $this->redirectingEvents->count() > 0;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getCampaign()->getCreatedBy();
     }
 }

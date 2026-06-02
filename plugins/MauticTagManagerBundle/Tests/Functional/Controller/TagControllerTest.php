@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
@@ -103,6 +104,29 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
     }
 
+    public function testTagDeletionRemovesContactAssociations(): void
+    {
+        $tag = $this->tagRepository->findOneBy([]);
+        \assert($tag instanceof Tag);
+
+        $contact = new Lead();
+        $contact->setEmail('tagged-contact@example.com');
+        $contact->addTag($tag);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $tagId = (int) $tag->getId();
+
+        Assert::assertSame(1, $this->countLeadTagAssociations($tagId));
+
+        $this->client->request('POST', '/s/tags/delete/'.$tagId);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
+    }
+
     /**
      * Get tag's view page.
      */
@@ -123,6 +147,17 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/tags/view/99999');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
+    }
+
+    private function countLeadTagAssociations(int $tagId): int
+    {
+        return (int) $this->em->getConnection()->createQueryBuilder()
+            ->select('COUNT(*)')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref')
+            ->where('tag_id = :tagId')
+            ->setParameter('tagId', $tagId)
+            ->executeQuery()
+            ->fetchOne();
     }
 
     /**

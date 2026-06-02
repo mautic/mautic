@@ -1715,6 +1715,33 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "fujijin",
+      "name": "fujijin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11382759?v=4",
+      "profile": "https://github.com/fujijin",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "msoukhomlinov",
+      "name": "Max Soukhomlinov",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12015350?v=4",
+      "profile": "https://github.com/msoukhomlinov",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "MoonFuji",
+      "name": "Kadri Mohammed Mouncef",
+      "avatar_url": "https://avatars.githubusercontent.com/u/100423572?v=4",
+      "profile": "https://github.com/MoonFuji",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
