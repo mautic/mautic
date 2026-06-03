@@ -26,7 +26,9 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
@@ -47,6 +49,8 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
+        $this->clearLoggedInUser();
+
         $this->fixtures = $this->loadFixtures(
             [
                 LoadCompanyData::class,
@@ -64,6 +68,8 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             ],
             false
         )->getReferenceRepository();
+
+        $this->loginAdminUser();
 
         $this->contactSegmentService = static::getContainer()->get('mautic.lead.model.lead_segment_service');
     }
@@ -86,6 +92,23 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         \assert($lead instanceof Lead);
 
         return $lead;
+    }
+
+    private function clearLoggedInUser(): void
+    {
+        $tokenStorage = static::getContainer()->get('security.token_storage');
+        \assert($tokenStorage instanceof TokenStorageInterface);
+
+        $tokenStorage->setToken(null);
+        $this->client->getCookieJar()->clear();
+    }
+
+    private function loginAdminUser(): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        \assert($admin instanceof User);
+
+        $this->loginUser($admin);
     }
 
     /**
