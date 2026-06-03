@@ -23,8 +23,8 @@ Mautic.company_segmentsOnLoad = function(container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.company_segment');
     }
 
-    var prefix = 'company_segments';
-    var parent = mQuery('.dynamic-content-filter, .dwc-filter');
+    let prefix = 'company_segments';
+    const parent = mQuery('.dynamic-content-filter, .dwc-filter');
     if (parent.length) {
         prefix = parent.attr('id');
     }
@@ -59,8 +59,8 @@ Mautic.company_segmentsOnLoad = function(container, response) {
 
         mQuery('#' + prefix + '_filters .copy-filter-group').each(function(index, el) {
             mQuery(el).on('click', function() {
-                var filterRow = mQuery(this).closest('.filter--row');
-                var clonedFilter = filterRow.clone(true);
+                const filterRow = mQuery(this).closest('.filter--row');
+                const clonedFilter = filterRow.clone(true);
 
                 clonedFilter.insertAfter(filterRow);
 
@@ -68,7 +68,7 @@ Mautic.company_segmentsOnLoad = function(container, response) {
             });
         });
 
-        var bodyOverflow = {};
+        const bodyOverflow = {};
         mQuery('#' + prefix + '_filters').sortable({
             items: '.filter--row',
             handle: '.ri-draggable',
@@ -109,30 +109,30 @@ Mautic.company_segmentsOnLoad = function(container, response) {
 };
 
 Mautic.addCompanySegmentsFilter = function (elId, elObj) {
-    var filterId = '#available_' + elObj + '_' + elId;
-    var filterOption = mQuery(filterId);
-    var label = filterOption.text();
+    const filterId = '#available_' + elObj + '_' + elId;
+    const filterOption = mQuery(filterId);
+    const label = filterOption.text();
 
-    var filterNum = parseInt(mQuery('.available-filters').data('index'));
+    const filterNum = parseInt(mQuery('.available-filters').data('index'));
     mQuery('.available-filters').data('index', filterNum + 1);
 
-    var prototypeStr = mQuery('.available-filters').data('prototype');
-    var fieldType = filterOption.data('field-type');
-    var fieldObject = filterOption.data('field-object');
+    let prototypeStr = mQuery('.available-filters').data('prototype');
+    const fieldType = filterOption.data('field-type');
+    const fieldObject = filterOption.data('field-object');
 
     prototypeStr = prototypeStr.replace(/__name__/g, filterNum);
     prototypeStr = prototypeStr.replace(/__label__/g, label);
 
-    var prototype = mQuery(prototypeStr);
+    const prototype = mQuery(prototypeStr);
 
-    var prefix = 'company_segments';
-    var parent = mQuery(filterId).parents('.dynamic-content-filter, .dwc-filter');
+    let prefix = 'company_segments';
+    const parent = mQuery(filterId).parents('.dynamic-content-filter, .dwc-filter');
     if (parent.length) {
         prefix = parent.attr('id');
     }
 
-    var filterBase  = prefix + "[filters][" + filterNum + "]";
-    var filterIdBase = prefix + "_filters_" + filterNum + "_";
+    const filterBase  = prefix + "[filters][" + filterNum + "]";
+    const filterIdBase = prefix + "_filters_" + filterNum + "_";
 
     if (mQuery('#' + prefix + '_filters .filter--row').length === 0) {
         prototype.find(".filter--condition-when").removeClass('hide');
@@ -151,8 +151,8 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
     });
 
     prototype.find("a.copy-filter-group").on('click', function() {
-        var filterRow = mQuery(this).closest('.filter--row');
-        var clonedFilter = filterRow.clone(true);
+        const filterRow = mQuery(this).closest('.filter--row');
+        const clonedFilter = filterRow.clone(true);
 
         clonedFilter.insertAfter(filterRow);
 
@@ -167,10 +167,10 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
     prototype.find("input[name='" + filterBase + "[object]']").val(fieldObject);
     prototype.appendTo('#' + prefix + '_filters');
 
-    var operators = filterOption.data('field-operators');
+    const operators = filterOption.data('field-operators');
     mQuery('#' + filterIdBase + 'operator').html('');
     mQuery.each(operators, function (label, value) {
-        var newOption = mQuery('<option/>').val(value).text(label);
+        const newOption = mQuery('<option/>').val(value).text(label);
         newOption.appendTo(mQuery('#' + filterIdBase + 'operator'));
     });
 
@@ -179,19 +179,19 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
 };
 
 Mautic.convertCompanySegmentFilterInput = function(el) {
-    var operatorSelect = mQuery(el);
+    const operatorSelect = mQuery(el);
 
     // Extract the filter number
-    var regExp = /_filters_(\d+)_operator/;
-    var matches = regExp.exec(operatorSelect.attr('id'));
-    var filterNum = matches[1];
-    var fieldAlias = mQuery('#company_segments_filters_'+filterNum+'_field');
-    var fieldObject = mQuery('#company_segments_filters_'+filterNum+'_object');
-    var filterValue = mQuery('#company_segments_filters_'+filterNum+'_properties_filter').val();
-    var filterId  = '#company_segments_filters_' + filterNum + '_properties_filter';
+    const regExp = /_filters_(\d+)_operator/;
+    const matches = regExp.exec(operatorSelect.attr('id'));
+    const filterNum = matches[1];
+    const fieldAlias = mQuery('#company_segments_filters_'+filterNum+'_field');
+    const fieldObject = mQuery('#company_segments_filters_'+filterNum+'_object');
+    const filterValue = mQuery('#company_segments_filters_'+filterNum+'_properties_filter').val();
+    const filterId  = '#company_segments_filters_' + filterNum + '_properties_filter';
 
     Mautic.loadCompanyFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
-        var selector = '#company_segments_filters_'+filterNum;
+        const selector = '#company_segments_filters_'+filterNum;
         mQuery(selector+'_properties').html(propertiesFields);
 
         Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent(selector, filterValue);
@@ -230,9 +230,9 @@ Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent = function(selector, fil
 Mautic.attachJsUiOnCompanySegmentsFilterForms = function() {
     mQuery('#company_segments_filters').on('filter.properties.form.loaded', function(event, selector, filterValue) {
         Mautic.activateChosenSelect(selector + '_properties select');
-        var fieldType = mQuery(selector + '_type').val();
-        var fieldAlias = mQuery(selector + '_field').val();
-        var filterFieldEl = mQuery(selector + '_properties_filter');
+        const fieldType = mQuery(selector + '_type').val();
+        const fieldAlias = mQuery(selector + '_field').val();
+        const filterFieldEl = mQuery(selector + '_properties_filter');
 
         if (filterValue) {
             filterFieldEl.val(filterValue);
@@ -274,10 +274,10 @@ Mautic.attachJsUiOnCompanySegmentsFilterForms = function() {
                 scrollInput: false
             });
         } else if (fieldType === 'lookup_id') {
-            var displayFieldEl = mQuery(selector + '_properties_display');
-            var fieldCallback = displayFieldEl.attr('data-field-callback');
+            const displayFieldEl = mQuery(selector + '_properties_display');
+            const fieldCallback = displayFieldEl.attr('data-field-callback');
             if (fieldCallback && typeof Mautic[fieldCallback] === 'function') {
-                var fieldOptions = displayFieldEl.attr('data-field-list');
+                const fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
         }
@@ -290,10 +290,10 @@ Mautic.attachJsUiOnCompanySegmentsFilterForms = function() {
 };
 
 Mautic.reorderCompanySegmentFilters = function() {
-    var counter = 0;
+    let counter = 0;
 
-    var prefix = 'company_segments';
-    var parent = mQuery('.dynamic-content-filter, .dwc-filter');
+    let prefix = 'company_segments';
+    const parent = mQuery('.dynamic-content-filter, .dwc-filter');
     if (parent.length) {
         prefix = parent.attr('id');
     }
@@ -301,24 +301,25 @@ Mautic.reorderCompanySegmentFilters = function() {
     mQuery('#' + prefix + '_filters .filter--row').each(function() {
         Mautic.updateCompanySegmentFilterPositioning(mQuery(this).find('select.glue-select').first());
         mQuery(this).find('[id^="' + prefix + '_filters_"]').each(function() {
-            var id     = mQuery(this).attr('id');
-            var name   = mQuery(this).attr('name');
-            var suffix = id.split(/[_]+/).pop();
+            const id     = mQuery(this).attr('id');
+            const name   = mQuery(this).attr('name');
+            const suffix = id.split(/[_]+/).pop();
 
-            var isProperties = id.includes("_properties_");
+            const isProperties = id.includes("_properties_");
 
             if (prefix + '_filters___name___filter' === id) {
                 return true;
             }
 
             if (name) {
+                let newName, properties;
                 if (isProperties){
-                    var newName    = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
-                    var properties = 'properties_';
+                    newName    = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
+                    properties = 'properties_';
                 }
                 else {
-                    var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
-                    var properties = '';
+                    newName = prefix + '[filters][' + counter + '][' + suffix + ']';
+                    properties = '';
                 }
                 if (name.slice(-2) === '[]') {
                     newName += '[]';
@@ -346,9 +347,9 @@ Mautic.reorderCompanySegmentFilters = function() {
 };
 
 Mautic.updateCompanySegmentFilterPositioning = function (el) {
-    var $el       = mQuery(el);
-    var $parentEl = $el.closest('.filter--row');
-    var list      = $parentEl.parent().children('.filter--row');
+    const $el       = mQuery(el);
+    const $parentEl = $el.closest('.filter--row');
+    const list      = $parentEl.parent().children('.filter--row');
     const isFirst = list.index($parentEl) === 0;
 
     if (isFirst) {
