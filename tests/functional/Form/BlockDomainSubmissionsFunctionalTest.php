@@ -62,38 +62,36 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
 
-        $this->setUpSymfony($this->configParams);
-
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
         $clientResponse = $this->client->getResponse();
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
         $this->client->request(
             Request::METHOD_POST,
-            "/s/forms/results/{$formId}/action",
-            [
-                'action'   => 'markSpam',
-                'formId'   => $formId,
-                'objectId' => $submission->getId(),
-            ]
+            "/s/forms/results/{$formId}/markSpam/{$submission->getId()}"
         );
 
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
-        $formCrawler = $crawler->filter('form[id^="mauticform_"]');
-        $form        = $formCrawler->form();
+        $this->setUpSymfony($this->configParams);
 
-        $form->setValues([
-            'mauticform[email]' => 'another@example.com',
-        ]);
-
-        $this->client->submit($form);
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}&ajax=1",
+            [
+                'mauticform' => [
+                    'email'    => 'another@example.com',
+                    'formId'   => $formId,
+                    'formName' => 'blockdomainspamtestform',
+                ],
+            ]
+        );
         $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        $this->assertStringContainsString('Errors:', $clientResponse->getContent());
-        $this->assertStringContainsString('Cannot be sent with this email', $clientResponse->getContent());
+        $this->assertSame(0, $response['success']);
+        $this->assertSame('Cannot be sent with this email', $response['validationErrors']['email']);
     }
 }

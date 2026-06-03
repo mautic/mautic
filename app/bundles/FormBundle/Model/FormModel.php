@@ -723,10 +723,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     public function findEmailFieldsWithMissingDonotSubmitValidation(): array
     {
         $connection = $this->em->getConnection();
+        $tableName  = MAUTIC_TABLE_PREFIX.Field::TABLE_NAME;
 
         $fieldsToUpdate = $connection->executeQuery(
             'SELECT ff.id, ff.form_id, ff.validation
-             FROM form_fields ff
+             FROM '.$tableName.' ff
              WHERE ff.type = ?
              AND (ff.validation IS NULL OR ff.validation = ? OR ff.validation = ?)',
             ['email', '[]', '{}']
@@ -753,8 +754,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
 
         $connection->executeStatement(
-            "UPDATE form_fields
-             SET validation = JSON_SET(COALESCE(validation, '{}'), '$.donotsubmit', true)
+            "UPDATE {$tableName}
+             SET validation = JSON_SET('{}', '$.donotsubmit', true)
              WHERE id IN ($placeholders)",
             $fieldIds
         );
