@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +25,7 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -102,6 +103,7 @@ class CompanyController extends FormController
                 'viewParameters' => [
                     'searchValue' => $search,
                     'leadCounts'  => $leadCounts,
+                    'columns'     => $companyColumnsDictionary->getColumns(),
                     'items'       => $companies,
                     'page'        => $page,
                     'limit'       => $limit,

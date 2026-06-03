@@ -188,7 +188,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $now    = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -212,7 +211,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $olderDate = '2023-12-31 23:59:59';

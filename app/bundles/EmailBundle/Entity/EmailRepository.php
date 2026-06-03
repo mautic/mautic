@@ -394,23 +394,32 @@ class EmailRepository extends CommonRepository
             $param = 'search';
             if (is_array($search)) {
                 $search = array_map('intval', $search);
-                $q->andWhere($q->expr()->in('e.id', ':'.$param))
-                    ->setParameter($param, $search);
+                $q->andWhere($q->expr()->in('e.id', ':search'))
+                    ->setParameter('search', $search);
             } else {
                 $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
 
                 $q->andWhere(
-                    DatabasePlatform::getCaseInsensitiveLike(
-                        $platform,
-                        'e.name',
-                        ':'.$param,
-                        DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                    $q->expr()->orX(
+                        DatabasePlatform::getCaseInsensitiveLike(
+                            $platform,
+                            'e.name',
+                            ':'.$param,
+                            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                        ),
+                        DatabasePlatform::getCaseInsensitiveLike(
+                            $platform,
+                            'e.id',
+                            ':'.$param.'Id',
+                            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                        )
                     )
-                );
-
-                $q->setParameter(
+                )->setParameter(
                     $param,
                     '%'.DatabasePlatform::normalizeSearchValue($platform, $search).'%'
+                )->setParameter(
+                    $param.'Id',
+                    DatabasePlatform::normalizeSearchValue($platform, $search)
                 );
             }
         }
@@ -864,8 +873,20 @@ class EmailRepository extends CommonRepository
         }
 
         $queryBuilder = $connection->createQueryBuilder();
+        $platform     = $connection->getDatabasePlatform();
+
+        /**
+         * Uses FORCE INDEX to ensure the PRIMARY key (leadlist_id, lead_id) is used,
+         * preventing full table scans on large lead_lists_leads tables.
+         *
+         * Fix: Only apply MySQL-specific index hints if on a MySQL/MariaDB platform
+         */
+        $from = DatabasePlatform::allowsIndexHint($platform) ?
+            MAUTIC_TABLE_PREFIX.'lead_lists_leads ll FORCE INDEX (`PRIMARY`)' :
+            MAUTIC_TABLE_PREFIX.'lead_lists_leads ll';
+
         $queryBuilder->select('ll.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->from($from)
             ->where($queryBuilder->expr()->in('ll.leadlist_id', $excludedListIds));
 
         return $queryBuilder;
