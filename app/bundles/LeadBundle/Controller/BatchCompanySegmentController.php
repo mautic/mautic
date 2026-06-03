@@ -2,42 +2,17 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Form\Type\CompanyBatchType;
 use Mautic\LeadBundle\Model\CompanySegmentActionModel;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class BatchCompanySegmentController extends AbstractFormController
 {
-    public function __construct(
-        private CompanySegmentActionModel $segmentActionModel,
-        private CompanySegmentModel $segmentModel,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
-    }
-
-    public function setAction(Request $request): JsonResponse
+    public function setAction(CompanySegmentActionModel $segmentActionModel, Request $request): JsonResponse
     {
         $requestParameters = $request->request->all();
         $params            = $requestParameters['company_batch'] ?? [];
@@ -55,11 +30,11 @@ class BatchCompanySegmentController extends AbstractFormController
             $segmentsToRemove = $params['remove'] ?? [];
 
             if (is_array($segmentsToAdd) && [] !== $segmentsToAdd) {
-                $this->segmentActionModel->addCompanies($companyIds, $segmentsToAdd);
+                $segmentActionModel->addCompanies($companyIds, $segmentsToAdd);
             }
 
             if (is_array($segmentsToRemove) && [] !== $segmentsToRemove) {
-                $this->segmentActionModel->removeCompanies($companyIds, $segmentsToRemove);
+                $segmentActionModel->removeCompanies($companyIds, $segmentsToRemove);
             }
 
             $this->addFlashMessage('mautic.company_segments.batch_companies_affected', [
@@ -75,10 +50,10 @@ class BatchCompanySegmentController extends AbstractFormController
         ]);
     }
 
-    public function indexAction(): Response
+    public function indexAction(CompanySegmentModel $segmentModel): Response
     {
         $route    = $this->generateUrl('mautic_company_segments_batch_company_set');
-        $segments = $this->segmentModel->getEntities([
+        $segments = $segmentModel->getEntities([
             'filter' => [
                 'force' => [
                     [
