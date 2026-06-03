@@ -49,6 +49,10 @@ Mautic.campaignOnLoad = function (container, response) {
             // adding delete option modal for events
             mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax-delete']").on("click.ajax", Mautic.handleEventDeleteClick);
 
+            // add modified events data for event clone and insert requests
+            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax']").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
+            mQuery("[data-campaign-event-insert-button]").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
+
             // adding delete option ajax for sources
             mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
                 event.preventDefault();
@@ -396,6 +400,15 @@ Mautic.campaignEventInsertOnError = function (event, jqxhr) {
     }
 };
 
+Mautic.handleCampaignEventAjaxClick = function (event) {
+    event.preventDefault();
+    mQuery('.btns-builder').find('button').prop('disabled', true);
+
+    return Mautic.ajaxifyLink(this, event, {
+        'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents || {}),
+    });
+};
+
 /**
  * Setup the campaign event view
  *
@@ -468,14 +481,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
-        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
-            event.preventDefault();
-            mQuery('.btns-builder').find('button').prop('disabled', true);
-            const extraData = {
-                'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
-            };
-            return Mautic.ajaxifyLink(this, event, extraData);
-        });
+        mQuery(eventId + " a[data-toggle='ajax']").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
 
         //initialize ajax'd modals
         mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
@@ -2246,8 +2252,8 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
 };
 
 Mautic.campaignBuilderUpdateEventCloneButton = function (groups, eventType, anchorName) {
-    var $insertButton = mQuery('#EventInsertButton');
-    var updatedUrl = $insertButton.attr('href').replace(/anchor=(.*?)$/, "anchor=" + anchorName + "&anchorEventType=" + eventType);
+    const $insertButton = mQuery('[data-campaign-event-insert-button]');
+    const updatedUrl = $insertButton.attr('href').replace(/anchor=(.*?)$/, "anchor=" + anchorName + "&anchorEventType=" + eventType);
     $insertButton.attr('href', updatedUrl);
 };
 

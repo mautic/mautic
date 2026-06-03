@@ -2151,7 +2151,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
                 foreach ($emails as $email) {
                     if (empty($options['name_is_key'])) {
-                        $results[$email['language']][$email['id']] = $email['name'];
+                        $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
                     } else {
                         $results[$email['language']][$email['name']] = $email['id'];
                     }
@@ -2164,35 +2164,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         return $results;
-    }
-
-    /**
-     * @param string|array<string> $filter
-     * @param array<string,mixed>  $options
-     *
-     * @return array<string,array<string,string>>
-     */
-    public function getLookupResultsWithIdName(
-        string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = [],
-    ): array {
-        $results    = $this->getLookupResults($type, $filter, $limit, $start, $options);
-        $newResults = [];
-
-        foreach ($results as $language => $emails) {
-            if (!isset($options['name_is_key']) || empty($options['name_is_key'])) {
-                foreach ($emails as $name => $id) {
-                    $newResults[$language][$name] = sprintf('%s (%s)', $id, $name);
-                }
-            } else {
-                foreach ($emails as $id => $name) {
-                    $newResults[$language][$id] = sprintf('%s (%s)', $name, $id);
-                }
-            }
-        }
-        // sort by language
-        ksort($newResults);
-
-        return $newResults;
     }
 
     /**
