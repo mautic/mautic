@@ -410,8 +410,7 @@ class EmailRepository extends CommonRepository
                         DatabasePlatform::getCaseInsensitiveLike(
                             $platform,
                             'e.id',
-                            ':'.$param.'Id',
-                            DatabasePlatform::FLAG_ENSURE_CAST
+                            ':'.$param.'Id'
                         )
                     )
                 )->setParameter(
@@ -419,7 +418,7 @@ class EmailRepository extends CommonRepository
                     '%'.DatabasePlatform::normalizeSearchValue($platform, $search).'%'
                 )->setParameter(
                     $param.'Id',
-                    DatabasePlatform::normalizeSearchValue($platform, $search)
+                    intval($search)
                 );
             }
         }
