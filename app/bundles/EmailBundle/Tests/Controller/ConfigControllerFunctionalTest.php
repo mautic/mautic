@@ -96,10 +96,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // set form data
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $form->setValues($data + [
-                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'], // required
-                'config[emailconfig][email_columns]'     => ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
-                'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
-            ]);
+            'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'], // required
+            'config[emailconfig][email_columns]'     => ['name', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
+            'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+        ]);
 
         // check if there is the given validation error
         $crawler = $this->client->submit($form);
