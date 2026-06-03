@@ -27,9 +27,10 @@ class AjaxController extends CommonAjaxController
      */
     public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper): \Symfony\Component\HttpFoundation\JsonResponse
     {
-        $integration = $request->query->get('integration');
-        $settings    = $request->query->all()['settings'] ?? [];
-        $page        = $request->query->get('page');
+        $payload     = array_replace_recursive($request->query->all(), $request->request->all());
+        $integration = $payload['integration'] ?? null;
+        $settings    = $payload['settings'] ?? [];
+        $page        = $payload['page'] ?? null;
 
         $dataArray = ['success' => 0];
 
