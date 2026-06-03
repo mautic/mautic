@@ -169,7 +169,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $data[$key]['details'] = json_encode(unserialize($auditLog['details'], ['allowed_classes' => false]));
+            $data[$key]['details'] = json_encode(\Mautic\CoreBundle\Helper\Serializer::decode($auditLog['details']));
         }
 
         $event->setData($data);

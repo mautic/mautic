@@ -497,10 +497,6 @@ class TagController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var TagModel $model */
-            $model         = $this->getModel('lead.tag');
-            $overrideModel = $this->getModel('tagmanager.tag');
-            \assert($overrideModel instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
             $tag = $model->getEntity($objectId);
 
             if (null === $tag) {
@@ -511,19 +507,6 @@ class TagController extends FormController
                 ];
             } elseif (!$this->security->isGranted('tagManager:tagManager:delete')) {
                 return $this->accessDenied();
-            }
-
-            if ($overrideModel->getRepository()->countByLeads([$objectId])[$objectId] > 0) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
-                ];
-
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, [
-                        'flashes' => $flashes,
-                    ])
-                );
             }
 
             $model->deleteEntity($tag);
