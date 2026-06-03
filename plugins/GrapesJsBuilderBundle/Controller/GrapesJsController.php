@@ -59,7 +59,7 @@ class GrapesJsController extends CommonController
         });
 
         try {
-            $unserialized = unserialize($content, ['allowed_classes' => false]);
+            $unserialized = \Mautic\CoreBundle\Helper\Serializer::decode($content);
         } catch (\Throwable) {
             return [];
         } finally {
@@ -165,7 +165,7 @@ class GrapesJsController extends CommonController
         // Replace short codes to emoji
         $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
 
-        $renderedTemplate =  $this->renderView(
+        $renderedTemplate =  $themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'     => $isNew,

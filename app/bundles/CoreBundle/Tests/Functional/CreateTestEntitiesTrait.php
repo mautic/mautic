@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLog as CampaignLeadEventLog;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
@@ -196,5 +197,19 @@ trait CreateTestEntitiesTrait
         $this->em->persist($project);
 
         return $project;
+    }
+
+    private function createCampaignLeadEventLog(Lead $lead, Event $event, ?Campaign $campaign, int $rotation = 1, bool $isScheduled =  false): CampaignLeadEventLog
+    {
+        $campaignLeadEventLog = new CampaignLeadEventLog();
+        $campaignLeadEventLog->setLead($lead);
+        $campaignLeadEventLog->setEvent($event);
+        $campaignLeadEventLog->setCampaign($campaign);
+        $campaignLeadEventLog->setRotation($rotation);
+        $campaignLeadEventLog->setIsScheduled($isScheduled);
+
+        $this->em->persist($campaignLeadEventLog);
+
+        return $campaignLeadEventLog;
     }
 }
