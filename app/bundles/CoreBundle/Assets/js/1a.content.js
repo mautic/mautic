@@ -1373,6 +1373,22 @@ Mautic.isTabKey = function (key) {
     return key === 'Tab' || key === 9;
 };
 
+Mautic.isSpaceKey = function (key) {
+    return key === ' ' || key === 'Spacebar' || key === 'Space' || key === 32;
+};
+
+Mautic.isBackspaceKey = function (key) {
+    return key === 'Backspace' || key === 8;
+};
+
+Mautic.getEventKey = function (event) {
+    return event.key || event.which || event.keyCode;
+};
+
+Mautic.isGlobalSearchInput = function (el) {
+    return mQuery(el).attr('id') === 'globalSearchInput';
+};
+
 
 /**
  * Check whether the key event is a navigation key
@@ -1382,7 +1398,7 @@ Mautic.isTabKey = function (key) {
  * @returns {boolean}
  */
 Mautic.isLiveSearchNavigationKey = function (event) {
-    const key = event.key || event.keyCode;
+    const key = Mautic.getEventKey(event);
 
     return (
         Mautic.isArrowDownKey(key) ||
@@ -1422,9 +1438,10 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
         var searchStr = mQuery(el).val().trim();
 
-        var spaceKeyPressed = (event.which == 32 || event.keyCode == 32);
-        var enterKeyPressed = Mautic.isEnterKey(event.which || event.keyCode);
-        var deleteKeyPressed = (event.which == 8 || event.keyCode == 8);
+        const key = Mautic.getEventKey(event);
+        const spaceKeyPressed = Mautic.isSpaceKey(key);
+        const enterKeyPressed = Mautic.isEnterKey(key);
+        const deleteKeyPressed = Mautic.isBackspaceKey(key);
 
         if (!enterKeyPressed && Mautic.currentSearchString && Mautic.currentSearchString == searchStr) {
             return;
@@ -1476,7 +1493,7 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             event.data.livesearch = true;
 
             // Reset active index for global search
-            if (mQuery(el).attr('id') === 'globalSearchInput') {
+            if (Mautic.isGlobalSearchInput(el)) {
                 activeIndex = -1;
                 mQuery('.gsearch--results-item', el).removeClass('active');
             }
@@ -1527,14 +1544,14 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
      * Keyboard navigation for Global Search modal.
      * Supports: ArrowUp, ArrowDown, Tab, Enter, Escape
      */
-    if (mQuery(el).attr('id') === 'globalSearchInput') {
+    if (Mautic.isGlobalSearchInput(el)) {
         mQuery(el).off('keydown.globalSearchNav');
 
         mQuery(el).on('keydown.globalSearchNav', function (e) {
             const items = mQuery('#globalSearchResults .gsearch--results-item');
             if (!items.length) return;
 
-            const key = e.key || e.keyCode;
+            const key = Mautic.getEventKey(e);
             switch (true) {
                 case Mautic.isArrowDownKey(key):
                 case Mautic.isTabKey(key):
@@ -1562,7 +1579,6 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
                 default:
                     return;
             }
-
 
             items.removeClass('active');
 
