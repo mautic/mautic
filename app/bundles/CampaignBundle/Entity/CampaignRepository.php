@@ -526,7 +526,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Returns true if the campaign has at least one lead.
      */
-    public function hasCampaignLeads(int $campaignId): bool
+    public function hasCampaignLeads(int $campaignId, int $cacheTTL = 0): bool
     {
         $q = $this->getReplicaConnection()->createQueryBuilder();
 
@@ -542,11 +542,11 @@ class CampaignRepository extends CommonRepository
             ->setMaxResults(1);
 
         if ($this->getReplicaConnection()->getConfiguration()->getResultCache()) {
-            $results = $this->getReplicaConnection()->executeCacheQuery(
+            $results  = $this->getReplicaConnection()->executeCacheQuery(
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile(600)
+                new QueryCacheProfile($cacheTTL)
             )->fetchAllAssociative();
         } else {
             $results = $q->executeQuery()->fetchAllAssociative();
@@ -699,6 +699,115 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
+     * Find next events for contacts in campaign that haven't been executed yet
+     * based on parent event execution and decision paths.
+     *
+     * @return array<mixed>
+     */
+    public function findStuckEventsToExecute(int $campaignId, int $limit = 100, ?int $minLeadId = 0,
+        ?int $maxLeadId = 0, ?string $recordsAfter = null): array
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select(
+            'log.lead_id AS contact_id',
+            'ce.id AS next_event_id',
+            'ce.name AS next_event_name',
+            'ce.type AS next_event_type',
+            'ce.event_type AS next_event_event_type',
+            'ce.event_order AS event_order',
+            'parent.id AS parent_event_id',
+            'DATE_FORMAT(log.date_triggered, \'%Y-%m-%d %H:%i\') AS last_executed_date'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'clr')
+            // Ensure the contact is still active in the campaign and get the latest rotation
+            ->innerJoin(
+                'clr',
+                MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'log',
+                'clr.lead_id = log.lead_id AND clr.campaign_id = :campaign_id  AND clr.manually_removed = 0
+                 AND clr.rotation = log.rotation'
+            )
+            ->innerJoin(
+                'log',
+                MAUTIC_TABLE_PREFIX.'campaign_events',
+                'parent',
+                'log.campaign_id = :campaign_id AND log.event_id = parent.id AND parent.deleted IS NULL'
+            )
+            // Join to get the next event (child event) in the campaign also ignore scheduled events
+            ->innerJoin(
+                'parent',
+                MAUTIC_TABLE_PREFIX.'campaign_events',
+                'ce',
+                "ce.campaign_id = :campaign_id AND ce.parent_id = parent.id AND ce.deleted IS NULL AND
+                 ce.event_type != 'decision' AND log.is_scheduled = 0 AND ce.date_linked <= log.date_triggered"
+            )
+            // Check the executed events for the current rotation
+            ->leftJoin(
+                'ce',
+                MAUTIC_TABLE_PREFIX.'campaign_lead_event_log',
+                'executed',
+                'executed.lead_id = log.lead_id AND executed.campaign_id = :campaign_id
+                AND (executed.event_id = ce.id OR executed.is_scheduled = 1)
+                AND executed.rotation = log.rotation'
+            )
+            ->andWhere('executed.event_id IS NULL')
+            ->andWhere(
+                $query->expr()->or(
+                    $query->expr()->and(
+                        // For decision/condition events, check the decision path
+                        $query->expr()->in('parent.event_type', ["'condition'", "'decision'"]),
+                        $query->expr()->or(
+                            // "No" path taken
+                            $query->expr()->and(
+                                $query->expr()->eq('ce.decision_path', $query->expr()->literal('no')),
+                                $query->expr()->eq('log.non_action_path_taken', 1)
+                            ),
+                            // "Yes" path or default path taken
+                            $query->expr()->and(
+                                $query->expr()->or(
+                                    $query->expr()->eq('ce.decision_path', $query->expr()->literal('yes')),
+                                    $query->expr()->isNull('ce.decision_path')
+                                ),
+                                $query->expr()->or(
+                                    $query->expr()->eq('log.non_action_path_taken', 0),
+                                    $query->expr()->isNull('log.non_action_path_taken')
+                                )
+                            )
+                        )
+                    ),
+                    // For action events, always proceed
+                    $query->expr()->eq('parent.event_type', $query->expr()->literal('action'))
+                )
+            );
+
+        if ($minLeadId > 0) {
+            $query->andWhere('clr.lead_id >= :minLeadId')
+                ->setParameter('minLeadId', $minLeadId);
+        }
+
+        if ($maxLeadId > 0) {
+            $query->andWhere('clr.lead_id <= :maxLeadId')
+                ->setParameter('maxLeadId', $maxLeadId);
+        }
+
+        if ($recordsAfter) {
+            $query->andWhere('clr.date_added >= :minDateForUnStuck')
+                ->setParameter('minDateForUnStuck', $recordsAfter);
+        }
+
+        $query->orderBy('log.lead_id', 'ASC')
+            ->addOrderBy('log.date_triggered', 'DESC')
+            ->addOrderBy('ce.event_order', 'ASC')
+            ->setMaxResults($limit);
+
+        $query->setParameter('campaign_id', $campaignId);
+
+        $result = $query->executeQuery();
+
+        return $result->fetchAllAssociative();
+    }
+
+    /**
      * @return array<string, mixed>
      *
      * @throws Exception
@@ -713,5 +822,39 @@ class CampaignRepository extends CommonRepository
             )->fetchAssociative();
 
         return $result ?: [];
+    }
+
+    /**
+     * Get campaigns that have events stuck in the queue.
+     *
+     * @return array<mixed>
+     */
+    public function getCampaignsToUnStuckEvents(string $recordsAfter): array
+    {
+        $innerQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $innerQuery->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'clr')
+            ->where(
+                $innerQuery->expr()->and(
+                    $innerQuery->expr()->eq('clr.campaign_id', 'c.id'),
+                    $innerQuery->expr()->eq('clr.manually_removed', '0'),
+                    $innerQuery->expr()->gte('clr.date_added', ':minDateForUnStuck')
+                )
+            );
+
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $query->select(
+            'c.id AS id',
+            'c.name AS name'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+            ->where('c.deleted IS NULL')
+            ->andWhere($this->getPublishedByDateExpression($query))
+            ->andWhere(
+                sprintf('EXISTS (%s)', $innerQuery->getSQL())
+            )
+            ->setParameter('minDateForUnStuck', $recordsAfter);
+
+        return $query->executeQuery()->fetchAllAssociative();
     }
 }

@@ -11,6 +11,8 @@ import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
+import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
+import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
@@ -1089,9 +1091,14 @@ export default class BuilderService {
     // validate
     MjmlService.mjmlToHtml(components);
 
+    const mjHeadContent = extractMjHeadContent(components);
+
     const styles = [
-      `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
+      `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`,
     ];
+
+    // IMPORTANT: mjmlParser must be provided directly to grapesjs-mjml via pluginsOpts
+    const headInjectingParser = createHeadInjectingMjmlParser(mjHeadContent);
 
     const ckeditorModuleUrl = BuilderService.getCkeditorModuleUrl();
     const inlineElements = BuilderService.getInlineElements();
@@ -1116,13 +1123,26 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, grapesjsckeditor, ...BuilderService.getPluginNames('email-mjml')],
+      plugins: [
+        grapesjsmjml,
+        grapesjsMjmlThemeTokens,
+        grapesjspostcss,
+        grapesjsmautic,
+        grapesjsckeditor,
+        ...BuilderService.getPluginNames('email-mjml'),
+      ],
       pluginsOpts: {
         [grapesjsmjml]: {
           hideSelector: false,
           custom: false,
           useCustomTheme: false,
+          mjmlParser: headInjectingParser,
         },
+
+        [grapesjsMjmlThemeTokens]: {
+          headContent: mjHeadContent,
+        },
+
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
         [grapesjsckeditor]: {
           ckeditor_module: ckeditorModuleUrl,
@@ -1150,9 +1170,8 @@ export default class BuilderService {
     const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
     this.editor.setComponents(parsedContent);
 
-    this.editor.BlockManager.get('mj-button').set({
-      content: '<mj-button href="https://">Button</mj-button>',
-    });
+    // Tell plugin initial content is ready: strip defaults for existing tokenized nodes + enable defaults for new drops
+    this.editor.trigger('mjml-theme-tokens:content:ready');
 
     this.removeSelectedElementsEmailMjml();
 
@@ -1230,6 +1249,7 @@ export default class BuilderService {
         grapesjsmautic: BuilderService.getMauticConf('email-html'),
         [grapesjsckeditor]: {
           ckeditor_module: ckeditorModuleUrl,
+          licenseKey: 'GPL',
           inlineMode: true,
           inline: inlineElements,
           inline_options: emailInlineOptions,
