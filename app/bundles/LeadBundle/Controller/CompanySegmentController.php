@@ -14,13 +14,8 @@ class CompanySegmentController extends AbstractStandardFormController
 {
     public const SESSION_KEY = 'company_segments';
 
-    /**
-     * @return Response|array<mixed>
-     */
-    public function indexAction(Request $request, int $page = 1): Response|array
+    public function indexAction(CompanySegmentModel $model, Request $request, int $page = 1): Response
     {
-        $model = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
         $repository = $model->getRepository();
 
         // set some permissions
@@ -111,7 +106,7 @@ class CompanySegmentController extends AbstractStandardFormController
 
         /** @var array<int, int> $companySegmentIds */
         $companySegmentIds = array_keys(iterator_to_array($items->getIterator()));
-        $this->updateCountCompaniesCache($companySegmentIds);
+        $this->updateCountCompaniesCache($model, $companySegmentIds);
         $companyCounts     = $model->getSegmentCompanyCountFromCache($companySegmentIds);
 
         $parameters = [
@@ -147,10 +142,8 @@ class CompanySegmentController extends AbstractStandardFormController
     /**
      * @param array<int, int> $companySegmentIds
      */
-    private function updateCountCompaniesCache(array $companySegmentIds): void
+    private function updateCountCompaniesCache(CompanySegmentModel $model, array $companySegmentIds): void
     {
-        $model = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
         foreach ($companySegmentIds as $id) {
             if (!$model->hasSegmentCompanyCountInCache($id)) {
                 $model->setSegmentCompanyCountInCache([$id]);
@@ -158,10 +151,7 @@ class CompanySegmentController extends AbstractStandardFormController
         }
     }
 
-    /**
-     * @return Response|array<string, mixed>
-     */
-    public function newAction(Request $request): Response|array
+    public function newAction(CompanySegmentModel $model, Request $request): Response
     {
         \assert(null !== $this->security);
         if (false === $this->security->isGranted($this->getPermissionBase().':viewown')) {
@@ -169,8 +159,6 @@ class CompanySegmentController extends AbstractStandardFormController
         }
 
         $companySegment = new CompanySegment();
-        $model          = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
         // set the page we came from
         $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
         // set the return URL for post actions
@@ -211,7 +199,7 @@ class CompanySegmentController extends AbstractStandardFormController
                 $id = $companySegment->getId();
                 \assert(null !== $id);
 
-                return $this->editAction($request, $id, true);
+                return $this->editAction($model, $request, $id, true);
             }
         }
 
@@ -230,13 +218,8 @@ class CompanySegmentController extends AbstractStandardFormController
         ]);
     }
 
-    /**
-     * @return Response|array<string, mixed>
-     */
-    public function editAction(Request $request, int $objectId, bool $ignorePost = false, bool $isNew = false): Response|array
+    public function editAction(CompanySegmentModel $model, Request $request, int $objectId, bool $ignorePost = false, bool $isNew = false): Response
     {
-        $model = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
         \assert(null !== $this->security);
 
         $segment = $model->getEntity($objectId);
@@ -265,6 +248,7 @@ class CompanySegmentController extends AbstractStandardFormController
         }
 
         return $this->createSegmentModifyResponse(
+            $model,
             $request,
             $segment,
             $postActionVars,
@@ -304,14 +288,9 @@ class CompanySegmentController extends AbstractStandardFormController
 
     /**
      * @param array<mixed> $postActionVars
-     *
-     * @return Response|array<string, mixed>
      */
-    private function createSegmentModifyResponse(Request $request, CompanySegment $segment, array $postActionVars, string $action, bool $ignorePost): Response|array
+    private function createSegmentModifyResponse(CompanySegmentModel $segmentModel, Request $request, CompanySegment $segment, array $postActionVars, string $action, bool $ignorePost): Response
     {
-        $segmentModel = $this->getModel(CompanySegmentModel::class);
-        \assert($segmentModel instanceof CompanySegmentModel);
-
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, CompanySegmentModel::class);
         }
@@ -356,7 +335,7 @@ class CompanySegmentController extends AbstractStandardFormController
                         return $this->postActionRedirect($postActionVars);
                     }
 
-                    return $this->viewAction($request, $segmentId);
+                    return $this->viewAction($segmentModel, $request, $segmentId);
                 }
             } else {
                 $segmentModel->unlockEntity($segment);
@@ -384,13 +363,8 @@ class CompanySegmentController extends AbstractStandardFormController
         ]);
     }
 
-    /**
-     * @return Response|array<string, mixed>
-     */
-    public function viewAction(Request $request, int $objectId): Response|array
+    public function viewAction(CompanySegmentModel $model, Request $request, int $objectId): Response
     {
-        $model = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
         \assert(null !== $this->security);
         $security = $this->security;
 
@@ -462,14 +436,9 @@ class CompanySegmentController extends AbstractStandardFormController
         return self::SESSION_KEY;
     }
 
-    /**
-     * @return Response|array<string, mixed>
-     */
-    public function deleteAction(Request $request, int $objectId): Response|array
+    public function deleteAction(CompanySegmentModel $model, Request $request, int $objectId): Response
     {
         \assert(null !== $this->security);
-        $model = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
 
         $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
         $returnUrl = $this->generateUrl('mautic_company_segments_index', ['page' => $page]);
@@ -548,7 +517,7 @@ class CompanySegmentController extends AbstractStandardFormController
         );
     }
 
-    public function batchDeleteAction(Request $request): Response
+    public function batchDeleteAction(CompanySegmentModel $model, Request $request): Response
     {
         \assert(null !== $this->security);
         $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
@@ -570,8 +539,6 @@ class CompanySegmentController extends AbstractStandardFormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            $model = $this->getModel(CompanySegmentModel::class);
-            \assert($model instanceof CompanySegmentModel);
 
             $json = $request->query->get('ids', '{}');
             \assert(is_string($json));
@@ -660,13 +627,8 @@ class CompanySegmentController extends AbstractStandardFormController
         );
     }
 
-    /**
-     * @return Response|array<string, mixed>
-     */
-    public function cloneAction(Request $request, int $objectId, bool $ignorePost = false): Response|array
+    public function cloneAction(CompanySegmentModel $model, Request $request, int $objectId, bool $ignorePost = false): Response
     {
-        $model = $this->getModel(CompanySegmentModel::class);
-        \assert($model instanceof CompanySegmentModel);
         \assert(null !== $this->security);
 
         $segment = $model->getEntity($objectId);
@@ -687,6 +649,7 @@ class CompanySegmentController extends AbstractStandardFormController
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
         return $this->createSegmentModifyResponse(
+            $model,
             $request,
             clone $segment,
             $postActionVars,

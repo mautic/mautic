@@ -63,14 +63,9 @@ final class CompanySegmentApiController extends CommonApiController
     }
 
     /**
-     * @param int $id        Company Segment ID
-     * @param int $companyId Company ID
-     *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeCompanyAction(CompanyModel $companyModel, $id, $companyId)
+    public function removeCompanyAction(CompanyModel $companyModel, int $id, int $companyId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -102,14 +97,9 @@ final class CompanySegmentApiController extends CommonApiController
     }
 
     /**
-     * @param int $id        Company Segment ID
-     * @param int $companyId Company ID
-     *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addCompanyAction(CompanyModel $companyModel, $id, $companyId)
+    public function addCompanyAction(CompanyModel $companyModel, int $id, int $companyId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -143,13 +133,9 @@ final class CompanySegmentApiController extends CommonApiController
     /**
      * Adds companies to a company segment.
      *
-     * @param int $id Company Segment ID
-     *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addCompaniesAction(CompanyModel $companyModel, Request $request, $id)
+    public function addCompaniesAction(CompanyModel $companyModel, Request $request, int $id): Response
     {
         $companyIds = $request->request->all()['ids'] ?? null;
         if (null === $companyIds) {
