@@ -102,6 +102,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
         $tokenStorage->setToken(null);
         $this->client->getCookieJar()->clear();
+        $this->em->clear();
     }
 
     private function loginAdminUser(): void
