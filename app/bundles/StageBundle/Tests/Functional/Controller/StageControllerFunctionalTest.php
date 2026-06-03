@@ -111,6 +111,43 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
         ));
     }
 
+    public function testStageMergeActionMovesContactAndDeletesMergedStage(): void
+    {
+        $primaryStage = $this->createStage('Primary stage from form');
+        $mergedStage  = $this->createStage('Merged stage from form');
+
+        $contact = new Lead();
+        $contact->setEmail('stage-merge-form-test@example.com');
+        $contact->setStage($mergedStage);
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $primaryStageId = $primaryStage->getId();
+        $mergedStageId  = $mergedStage->getId();
+        $contactId      = $contact->getId();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/stages/merge/'.$mergedStageId);
+        $this->assertResponseIsSuccessful();
+        Assert::assertStringContainsString('Primary stage from form', $this->client->getResponse()->getContent());
+        Assert::assertStringNotContainsString('Merged stage from form', $this->client->getResponse()->getContent());
+
+        $form = $crawler->selectButton('stage_merge[buttons][save]')->form();
+        $form['stage_merge[stage_to_merge]']->setValue((string) $primaryStageId);
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $savedContact = $this->em->find(Lead::class, $contactId);
+        Assert::assertNotNull($savedContact);
+        $savedContactStage = $savedContact->getStage();
+        Assert::assertNotNull($savedContactStage);
+        Assert::assertSame($primaryStageId, $savedContactStage->getId());
+        Assert::assertNull($this->em->find(Stage::class, $mergedStageId));
+    }
+
     private function createStage(string $name): Stage
     {
         $stage = new Stage();
