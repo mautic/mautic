@@ -411,7 +411,7 @@ class EmailRepository extends CommonRepository
                             $platform,
                             'e.id',
                             ':'.$param.'Id',
-                            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
+                            DatabasePlatform::FLAG_ENSURE_CAST
                         )
                     )
                 )->setParameter(
