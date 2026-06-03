@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-class CompanySegmentPreDelete extends CompanySegmentEvent
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\DependencyErrorEventTrait;
+
+class CompanySegmentPreDelete extends CompanySegmentEvent implements DependencyErrorEventInterface
 {
+    use DependencyErrorEventTrait;
 }

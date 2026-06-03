@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -156,17 +157,11 @@ class CompanySegmentModel extends FormModel
             throw new \InvalidArgumentException('Entity must have an ID');
         }
 
-        $dependentsCompanySegments = $this->getSegmentsWithDependenciesOnSegment($id, 'name');
-        if ([] !== $dependentsCompanySegments) {
-            throw new DeleteEntityDependencyException($dependentsCompanySegments, implode(', ', $dependentsCompanySegments));
+        $event = $this->dispatchEvent('pre_delete', $entity);
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
         }
 
-        $dependentsContactSegments = $this->getSegmentsWithDependenciesOnSegment($id, 'name', true);
-        if ([] !== $dependentsContactSegments) {
-            throw new DeleteEntityDependencyException($dependentsContactSegments, implode(', ', $dependentsContactSegments));
-        }
-
-        // Proceed with deletion
         parent::deleteEntity($entity);
     }
 
@@ -175,6 +170,15 @@ class CompanySegmentModel extends FormModel
         if (!$entity instanceof CompanySegment) {
             throw new MethodNotAllowedHttpException(['CompanySegment'], 'Entity must be of class CompanySegment()');
         }
+
+        $eventName = match ($action) {
+            'pre_save'      => LeadEvents::COMPANY_SEGMENT_PRE_SAVE,
+            'post_save'     => LeadEvents::COMPANY_SEGMENT_POST_SAVE,
+            'pre_delete'    => LeadEvents::COMPANY_SEGMENT_PRE_DELETE,
+            'post_delete'   => LeadEvents::COMPANY_SEGMENT_POST_DELETE,
+            'pre_unpublish' => LeadEvents::COMPANY_SEGMENT_PRE_UNPUBLISH,
+            default         => null,
+        };
 
         $eventClass = match ($action) {
             'pre_save'      => CompanySegmentPreSave::class,
@@ -189,7 +193,7 @@ class CompanySegmentModel extends FormModel
             throw new \RuntimeException('Either the Event or proper action should be provided.');
         }
 
-        if ($this->dispatcher->hasListeners($eventClass ?? $event::class)) {
+        if ($this->dispatcher->hasListeners($eventName ?? $event::class)) {
             if (null === $event) {
                 if (!class_exists($eventClass)) {
                     throw new \RuntimeException('The class '.$eventClass.' does not exist.');
@@ -201,7 +205,7 @@ class CompanySegmentModel extends FormModel
                     $event = new $eventClass($entity, $this->em);
                 }
             }
-            $this->dispatcher->dispatch($event);
+            $this->dispatcher->dispatch($event, $eventName);
 
             return $event;
         }
