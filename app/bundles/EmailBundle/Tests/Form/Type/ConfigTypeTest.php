@@ -11,9 +11,11 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Mautic\EmailBundle\Form\Type\EmailColumnsType;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Services\EmailColumnsDictionary;
 use Mautic\EmailBundle\Validator\DsnValidator;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
@@ -59,6 +61,7 @@ final class ConfigTypeTest extends TypeTestCase
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
         $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createMock(Mailbox::class));
+        $emailColumns                   = new EmailColumnsType(new EmailColumnsDictionary($translator, $this->createMock(CoreParametersHelper::class)));
         $dsnValidator                   = new DsnValidator($this->createMock(TransportFactory::class));
         $emailValidator                 = $this->createMock(EmailValidator::class);
         $customFieldValidator           = $this->createMock(CustomFieldValidator::class);
@@ -72,7 +75,7 @@ final class ConfigTypeTest extends TypeTestCase
 
         return [
             new ValidatorExtension($validator),
-            new PreloadedExtension([$configType, $dsnType, $preferenceCenterList, $configMonitoredEmail, $configMonitoredMailboxes], []),
+            new PreloadedExtension([$configType, $dsnType, $preferenceCenterList, $configMonitoredEmail, $configMonitoredMailboxes, $emailColumns], []),
         ];
     }
 

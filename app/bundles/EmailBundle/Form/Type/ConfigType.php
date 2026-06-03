@@ -463,7 +463,7 @@ class ConfigType extends AbstractType
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($buildEmailColumnsField): void {
                 $data    = $event->getData();
-                $columns = $data['email_columns'] ?: $this->getDefaultEmailColumns();
+                $columns = empty($data['email_columns']) ? $this->getDefaultEmailColumns() : $data['email_columns'];
                 $buildEmailColumnsField($event->getForm(), $columns, ['data' => $columns]);
             }
         );
