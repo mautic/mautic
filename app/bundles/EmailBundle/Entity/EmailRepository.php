@@ -407,11 +407,7 @@ class EmailRepository extends CommonRepository
                             ':'.$param,
                             DatabasePlatform::FLAG_FORCE_LOWER_COLUMN
                         ),
-                        DatabasePlatform::getCaseInsensitiveLike(
-                            $platform,
-                            'e.id',
-                            ':'.$param.'Id'
-                        )
+                        'e.id = :'.$param.'Id',
                     )
                 )->setParameter(
                     $param,
