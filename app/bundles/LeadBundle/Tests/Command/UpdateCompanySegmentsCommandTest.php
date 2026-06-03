@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Command\UpdateCompanySegmentsCommand;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
+use Mautic\LeadBundle\Services\CompanySegmentRebuildService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -22,6 +23,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
     public function testIdRequiresNoneOrPositiveInteger(int|string|null $segmentId, bool $valid): void
     {
         $companySegmentModel  = $this->createMock(CompanySegmentModel::class);
+        $rebuildService       = $this->createMock(CompanySegmentRebuildService::class);
         $translator           = $this->createMock(TranslatorInterface::class);
         $pathsHelper          = $this->createMock(PathsHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -44,7 +46,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
             $arguments['--segment-id'] = $segmentId;
         }
 
-        $command = new UpdateCompanySegmentsCommand($companySegmentModel, $translator, $pathsHelper, $coreParametersHelper);
+        $command = new UpdateCompanySegmentsCommand($companySegmentModel, $rebuildService, $translator, $pathsHelper, $coreParametersHelper);
         $command->setApplication(new Application());
         self::assertSame(Command::FAILURE, $command->run(new ArrayInput($arguments), $output));
     }
@@ -53,6 +55,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
     public function testBatchLimitRequiresPositiveInteger(int|string $batchLimit, bool $valid): void
     {
         $companySegmentModel  = $this->createMock(CompanySegmentModel::class);
+        $rebuildService       = $this->createMock(CompanySegmentRebuildService::class);
         $translator           = $this->createMock(TranslatorInterface::class);
         $pathsHelper          = $this->createMock(PathsHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -72,7 +75,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
             '--max-companies'  => 'aaa',
         ];
 
-        $command = new UpdateCompanySegmentsCommand($companySegmentModel, $translator, $pathsHelper, $coreParametersHelper);
+        $command = new UpdateCompanySegmentsCommand($companySegmentModel, $rebuildService, $translator, $pathsHelper, $coreParametersHelper);
         $command->setApplication(new Application());
         self::assertSame(Command::FAILURE, $command->run(new ArrayInput($arguments), $output));
     }
@@ -81,6 +84,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
     public function testMaxCompaniesRequiresNoneOrPositiveInteger(int|string|null $maxCompanies, bool $valid): void
     {
         $companySegmentModel  = $this->createMock(CompanySegmentModel::class);
+        $rebuildService       = $this->createMock(CompanySegmentRebuildService::class);
         $translator           = $this->createMock(TranslatorInterface::class);
         $pathsHelper          = $this->createMock(PathsHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
@@ -106,7 +110,7 @@ class UpdateCompanySegmentsCommandTest extends TestCase
             $arguments['--max-companies'] = $maxCompanies;
         }
 
-        $command = new UpdateCompanySegmentsCommand($companySegmentModel, $translator, $pathsHelper, $coreParametersHelper);
+        $command = new UpdateCompanySegmentsCommand($companySegmentModel, $rebuildService, $translator, $pathsHelper, $coreParametersHelper);
         $command->setApplication(new Application());
         self::assertSame(Command::FAILURE, $command->run(new ArrayInput($arguments), $output));
     }

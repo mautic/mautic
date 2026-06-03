@@ -65,7 +65,6 @@ class CompanySegmentTest extends TestCase
         // Simulate a persisted entity by using reflection to set ID
         $reflection = new \ReflectionClass($entity);
         $property   = $reflection->getProperty('id');
-        $property->setAccessible(true);
         $property->setValue($entity, 123);
 
         $clonedEntity = clone $entity;
