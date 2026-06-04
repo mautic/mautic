@@ -8,6 +8,7 @@ use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
@@ -206,16 +207,27 @@ class RoleController extends FormController
     public function cloneAction(Request $request, int $objectId, RoleModel $model): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
-            return $this->accessDenied();
+            $response = $this->accessDenied();
+        } else {
+            $source         = $model->getEntity($objectId);
+            $postActionVars = $this->getRoleClonePostActionVars($request);
+            $response       = null === $source
+                ? $this->getRoleNotFoundResponse($postActionVars, $objectId)
+                : $this->handleRoleClone($request, $objectId, $source, $model, $postActionVars);
         }
 
-        $source = $model->getEntity($objectId);
+        return $response;
+    }
 
-        // set the page we came from
+    /**
+     * @return array<string, mixed>
+     */
+    private function getRoleClonePostActionVars(Request $request): array
+    {
         $page      = $request->getSession()->get('mautic.role.page', 1);
         $returnUrl = $this->generateUrl('mautic_role_index', ['page' => $page]);
 
-        $postActionVars = [
+        return [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
             'contentTemplate' => 'Mautic\\UserBundle\\Controller\\RoleController::indexAction',
@@ -224,59 +236,87 @@ class RoleController extends FormController
                 'mauticContent' => 'role',
             ],
         ];
+    }
 
-        if (null === $source) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.user.role.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
+    /**
+     * @param array<string, mixed> $postActionVars
+     */
+    private function getRoleNotFoundResponse(array $postActionVars, int $objectId): Response
+    {
+        return $this->postActionRedirect(
+            array_merge($postActionVars, [
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.user.role.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
                     ],
-                ])
-            );
-        }
+                ],
+            ])
+        );
+    }
 
+    /**
+     * @param array<string, mixed> $postActionVars
+     */
+    private function handleRoleClone(Request $request, int $objectId, Entity\Role $source, RoleModel $model, array $postActionVars): Response
+    {
         $entity            = $model->cloneEntity($source);
         $permissionsConfig = $this->getPermissionsConfig($source);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
         $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
+        $response          = null;
 
         if ($request->isMethod('POST')) {
-            $cancelled = $this->isFormCancelled($form);
-            $valid     = !$cancelled && $this->isFormValid($form);
-
-            if ($valid) {
-                $role        = $request->request->all()['role'] ?? [];
-                $permissions = $role['permissions'] ?? null;
-
-                if (null !== $permissions) {
-                    $model->setRolePermissions($entity, $permissions);
-                }
-
-                $model->saveEntity($entity);
-
-                $this->addFlashMessage('mautic.core.notice.created', [
-                    '%name%'              => $entity->getName(),
-                    self::FLASH_MENU_LINK => 'mautic_role_index',
-                    self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
-                        'objectAction' => 'edit',
-                        'objectId'     => $entity->getId(),
-                    ]),
-                ]);
-            }
-
-            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-                return $this->postActionRedirect($postActionVars);
-            }
-
-            if ($valid) {
-                return $this->editAction($request, $entity->getId(), true);
-            }
+            $response = $this->handleRoleClonePost($request, $entity, $model, $form, $postActionVars);
         }
 
+        return $response ?? $this->renderRoleCloneForm($form, $permissionsConfig, $action);
+    }
+
+    /**
+     * @param array<string, mixed> $postActionVars
+     */
+    private function handleRoleClonePost(Request $request, Entity\Role $entity, RoleModel $model, FormInterface $form, array $postActionVars): ?Response
+    {
+        $response  = null;
+        $cancelled = $this->isFormCancelled($form);
+        $valid     = !$cancelled && $this->isFormValid($form);
+
+        if ($valid) {
+            $role        = $request->request->all()['role'] ?? [];
+            $permissions = $role['permissions'] ?? null;
+
+            if (null !== $permissions) {
+                $model->setRolePermissions($entity, $permissions);
+            }
+
+            $model->saveEntity($entity);
+
+            $this->addFlashMessage('mautic.core.notice.created', [
+                '%name%'              => $entity->getName(),
+                self::FLASH_MENU_LINK => 'mautic_role_index',
+                self::FLASH_URL       => $this->generateUrl('mautic_role_action', [
+                    'objectAction' => 'edit',
+                    'objectId'     => $entity->getId(),
+                ]),
+            ]);
+        }
+
+        if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
+            $response = $this->postActionRedirect($postActionVars);
+        } elseif ($valid) {
+            $response = $this->editAction($request, $entity->getId(), true);
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param array<string, mixed> $permissionsConfig
+     */
+    private function renderRoleCloneForm(FormInterface $form, array $permissionsConfig, string $action): Response
+    {
         return $this->delegateView([
             'viewParameters' => [
                 'form'              => $form->createView(),
