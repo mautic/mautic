@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
+use MauticRector\UnserializeToSerializerDecodeRector;
+use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
+use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\Set\ValueObject\SetList;
 use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector;
@@ -19,16 +21,40 @@ use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturn
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+return RectorConfig::configure()
+    ->withPaths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
-    ]);
-
-    $rectorConfig->skip([
+    ])
+    ->withPreparedSets(deadCode: true)
+    ->withPhpSets(php80: true)
+    ->withCache(__DIR__.'/var/cache/rector')
+    ->withRules([
+        ReturnTypeFromStrictTypedCallRector::class,
+        TypedPropertyFromAssignsRector::class,
+        NumericReturnTypeFromStrictScalarReturnsRector::class,
+        ReturnTypeFromReturnNewRector::class,
+        ReturnTypeFromStrictNativeCallRector::class,
+        ReturnTypeFromStrictNewArrayRector::class,
+        ReturnTypeFromStrictParamRector::class,
+        ReturnTypeFromStrictTernaryRector::class,
+        ClassPropertyAssignToConstructorPromotionRector::class,
+        AddVoidReturnTypeWhereNoReturnRector::class,
+        TypedPropertyFromStrictConstructorRector::class,
+        TypedPropertyFromStrictSetUpRector::class,
+        RemoveUnusedVariableAssignRector::class,
+        RemoveUselessVarTagRector::class,
+        SimplifyUselessVariableRector::class,
+        ReturnTypeFromStrictConstantReturnRector::class,
+        ReturnTypeFromReturnDirectArrayRector::class,
+        UnserializeToSerializerDecodeRector::class,
+    ])
+    ->withSkip([
         '*/Test/*',
         '*/Tests/*',
 
@@ -75,15 +101,20 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
         ],
 
-        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+        TypedPropertyFromAssignsRector::class => [
             '*/Entity/*',
         ],
 
+        // Skip the rule file itself
+        UnserializeToSerializerDecodeRector::class => [
+            __DIR__.'/rector',
+        ],
+
         // handle later with full PHP 8.0 upgrade
-        Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
+        OptionalParametersAfterRequiredRector::class,
 
         // handle later, case by case as lot of chnaged code
-        Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
+        RemoveAlwaysTrueIfConditionRector::class => [
             __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
             __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
             __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
@@ -92,33 +123,3 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/FormBundle/Form/Type/FieldType.php',
         ],
     ]);
-
-    // Define what rule sets will be applied
-    $rectorConfig->sets([
-        SetList::DEAD_CODE,
-        SetList::PHP_80,
-        // SetList::TYPE_DECLARATION,
-    ]);
-
-    // Define what single rules will be applied
-    $rectorConfig->rules([
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
-
-        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
-        NumericReturnTypeFromStrictScalarReturnsRector::class,
-        ReturnTypeFromReturnNewRector::class,
-        ReturnTypeFromStrictNativeCallRector::class,
-        ReturnTypeFromStrictNewArrayRector::class,
-        ReturnTypeFromStrictParamRector::class,
-        ReturnTypeFromStrictTernaryRector::class,
-        ClassPropertyAssignToConstructorPromotionRector::class,
-        AddVoidReturnTypeWhereNoReturnRector::class,
-        TypedPropertyFromStrictConstructorRector::class,
-        TypedPropertyFromStrictSetUpRector::class,
-        RemoveUnusedVariableAssignRector::class,
-        RemoveUselessVarTagRector::class,
-        SimplifyUselessVariableRector::class,
-        ReturnTypeFromStrictConstantReturnRector::class,
-        ReturnTypeFromReturnDirectArrayRector::class,
-    ]);
-};

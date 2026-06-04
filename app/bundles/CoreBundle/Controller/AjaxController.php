@@ -5,9 +5,10 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
-use Mautic\CoreBundle\Exception\RecordNotUnpublishedException;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Factory\IpLookupFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\TokenSorter;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
@@ -274,12 +275,12 @@ class AjaxController extends CommonController
                                 'item'  => $entity,
                                 'model' => $name,
                                 'query' => $extra,
-                                'size'  => (isset($post['size'])) ? $post['size'] : '',
+                                'size'  => $post['size'] ?? '',
                             ]
                         );
                         $dataArray['statusHtml'] = $html;
                     }
-                } catch (RecordNotUnpublishedException $exception) {
+                } catch (RecordCanNotUnpublishException $exception) {
                     $this->addFlash(FlashBag::LEVEL_ERROR, $exception->getMessage());
                     $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
@@ -331,16 +332,20 @@ class AjaxController extends CommonController
         return $this->sendJsonResponse(['success' => 1]);
     }
 
-    public function getBuilderTokensAction(Request $request): JsonResponse
+    public function getBuilderTokensAction(Request $request, TokenSorter $tokenSorter): JsonResponse
     {
-        $tokens = [];
+        $builderComponents = [];
 
         if (method_exists($this, 'getBuilderTokens')) {
-            $query  = $request->get('query');
-            $tokens = $this->getBuilderTokens($query);
+            $query             = $request->query->get('query', '');
+            $builderComponents = $this->getBuilderTokens($query);
         }
 
-        return $this->sendJsonResponse($tokens);
+        if (array_key_exists('tokens', $builderComponents)) {
+            $builderComponents['tokens'] = $tokenSorter->sortTokens($builderComponents['tokens']);
+        }
+
+        return $this->sendJsonResponse($builderComponents);
     }
 
     /**

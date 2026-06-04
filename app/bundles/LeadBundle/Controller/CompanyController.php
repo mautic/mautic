@@ -7,9 +7,11 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Services\CompanyColumnsDictionary;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +25,7 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, $page = 1)
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -101,6 +103,7 @@ class CompanyController extends FormController
                 'viewParameters' => [
                     'searchValue' => $search,
                     'leadCounts'  => $leadCounts,
+                    'columns'     => $companyColumnsDictionary->getColumns(),
                     'items'       => $companies,
                     'page'        => $page,
                     'limit'       => $limit,
@@ -145,11 +148,8 @@ class CompanyController extends FormController
             'RETURN_ARRAY'
         );
 
-        /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
-
-        /** @var Company $company */
-        $company = $model->getEntity($objectId);
+        \assert($model instanceof CompanyModel);
 
         $companiesRepo  = $model->getCompanyLeadRepository();
         $contacts       = $companiesRepo->getCompanyLeads($objectId);
@@ -161,7 +161,7 @@ class CompanyController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'company'     => $company,
+                    'company_id'  => $objectId,
                     'page'        => $data['page'],
                     'contacts'    => $data['items'],
                     'totalItems'  => $data['count'],
@@ -186,7 +186,7 @@ class CompanyController extends FormController
         $model = $this->getModel('lead.company');
         \assert($model instanceof CompanyModel);
 
-        if (!($entity instanceof Company)) {
+        if (!$entity instanceof Company) {
             /** @var Company $entity */
             $entity = $model->getEntity();
         }
@@ -247,8 +247,9 @@ class CompanyController extends FormController
                     );
 
                     if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
+                        $viewParameters = ['objectAction' => 'view', 'objectId' => $entity->getId()];
+                        $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
+                        $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
                     } else {
                         // return edit view so that all the session stuff is loaded
                         return $this->editAction($request, $entity->getId(), true);
@@ -425,16 +426,18 @@ class CompanyController extends FormController
                     );
 
                     if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-                        $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                        $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
+                        $viewParameters = ['objectAction' => 'view', 'objectId' => $objectId];
+                        $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
+                        $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
                     }
                 }
             } else {
                 // unlock the entity
                 $model->unlockEntity($entity);
 
-                $returnUrl = $this->generateUrl('mautic_company_index', $viewParameters);
-                $template  = 'Mautic\LeadBundle\Controller\CompanyController::indexAction';
+                $viewParameters = ['objectAction' => 'view', 'objectId' => $objectId];
+                $returnUrl      = $this->generateUrl('mautic_company_action', $viewParameters);
+                $template       = 'Mautic\LeadBundle\Controller\CompanyController::viewAction';
             }
 
             $passthrough = [
@@ -510,7 +513,7 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction($objectId)
     {
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
@@ -572,30 +575,46 @@ class CompanyController extends FormController
             return $this->accessDenied();
         }
 
-        $fields         = $company->getFields();
-        $companiesRepo  = $model->getCompanyLeadRepository();
-        $contacts       = $companiesRepo->getCompanyLeads($objectId);
-
-        $leadIds = array_column($contacts, 'lead_id');
-
-        $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
-
-        $contacts = $this->getCompanyContacts($request, $objectId, 0, $leadIds);
+        $fields = $company->getFields();
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'company'           => $company,
                     'fields'            => $fields,
-                    'items'             => $contacts['items'],
                     'permissions'       => $permissions,
-                    'engagementData'    => $engagementData,
                     'security'          => $this->security,
-                    'page'              => $contacts['page'],
-                    'totalItems'        => $contacts['count'],
-                    'limit'             => $contacts['limit'],
                 ],
                 'contentTemplate' => '@MauticLead/Company/company.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_company_index',
+                    'mauticContent' => 'company',
+                    'route'         => $this->generateUrl(
+                        'mautic_company_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $objectId,
+                        ]
+                    ),
+                ],
+            ]
+        );
+    }
+
+    public function graphAction(CompanyLeadRepository $companiesRepo, int $objectId): Response
+    {
+        $contacts       = $companiesRepo->getCompanyLeads($objectId);
+        $engagementData = is_array($contacts) ? $this->getCompanyEngagementsForGraph($contacts) : [];
+
+        return $this->ajaxAction(
+            $this->requestStack->getCurrentRequest(),
+            [
+                'contentTemplate' => '@MauticCore/Helper/chart.html.twig',
+                'viewParameters'  => [
+                    'chartData'   => $engagementData,
+                    'chartType'   => 'line',
+                    'chartHeight' => 250,
+                ],
             ]
         );
     }

@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Event\GlobalSearchEvent;
 
 /**
  * @extends CommonRepository<Role>
@@ -18,8 +19,33 @@ class RoleRepository extends CommonRepository
     public function getEntities(array $args = [])
     {
         $q = $this->createQueryBuilder('r');
+        $q->select('r');
+
+        $sq = $this->_em->createQueryBuilder()
+            ->select('count(u.id)')
+            ->from(User::class, 'u')
+            ->where('u.role = r');
+
+        $q->addSelect('('.$sq->getDql().') as user_count');
 
         $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * Get roles for global search without user count subquery.
+     *
+     * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
+     */
+    public function getEntitiesForGlobalSearch(array $filter): Paginator
+    {
+        $args = [
+            'filter'           => $filter,
+            'start'            => 0,
+            'limit'            => GlobalSearchEvent::RESULTS_LIMIT,
+            'ignore_paginator' => false,
+        ];
 
         return parent::getEntities($args);
     }

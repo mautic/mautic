@@ -15,6 +15,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -34,10 +36,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('page:pages:viewown')"),
         new Post(security: "is_granted('page:pages:create')"),
-        new Get(security: "is_granted('page:pages:viewown')"),
-        new Put(security: "is_granted('page:pages:editown')"),
-        new Patch(security: "is_granted('page:pages:editother')"),
-        new Delete(security: "is_granted('page:pages:deleteown')"),
+        new Get(security: "is_granted('page:pages:viewown', object)"),
+        new Put(security: "is_granted('page:pages:editown', object)"),
+        new Patch(security: "is_granted('page:pages:editother', object)"),
+        new Delete(security: "is_granted('page:pages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['page:read'],
@@ -53,12 +55,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  * @use TranslationEntityTrait<Page>
  * @use VariantEntityTrait<Page>
  */
-class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface
+class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
     use UuidTrait;
     use ProjectTrait;
+    use OptimisticLockTrait;
+
     public const ENTITY_NAME = 'page';
 
     public const TABLE_NAME = 'pages';
@@ -205,6 +209,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $this->cloneObjectId = (int) $this->id;
         $this->isCloned      = true;
         $this->id            = null;
+        $this->sessionId     = 'new_'.hash('sha1', uniqid((string) mt_rand()));
         $this->clearTranslations();
         $this->clearVariants();
         $this->setDraft(null);
@@ -309,6 +314,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         self::addVariantMetadata($builder, self::class);
         static::addUuidField($builder);
         self::addProjectsField($builder, 'page_projects_xref', 'page_id');
+        self::addVersionField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Doctrine\ORM\Exception\ORMException;
@@ -30,7 +32,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['default_signature_text'] = 'Best regards, |FROM_NAME|';
+
         parent::setUp();
+
         $this->loadFixtures([LoadCategoryData::class]);
         $this->setUpMailer();
     }
@@ -198,12 +202,14 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentAId, $response['email']['lists'][0]['id']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
         $this->assertFalse($response['email']['publicPreview']);
+        $this->assertFalse($response['email']['sendToDnc']);
 
         // Edit PATCH:
         $patchPayload = [
             'name'          => 'API email renamed',
             'lists'         => [$segmentBId],
             'publicPreview' => true,
+            'sendToDnc'     => true,
         ];
         $this->client->request('PATCH', "/api/emails/{$emailId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
@@ -211,6 +217,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertSame($emailId, $response['email']['id']);
+        $this->assertTrue($response['email']['sendToDnc']);
         $this->assertEquals('API email renamed', $response['email']['name']);
         $this->assertEquals($payload['subject'], $response['email']['subject']);
         $this->assertCount(1, $response['email']['lists']);
@@ -238,6 +245,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['emailType'], $response['email']['emailType']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
         $this->assertEquals($payload['publicPreview'], $response['email']['publicPreview']);
+        $this->assertFalse($response['email']['sendToDnc']);
 
         // Get:
         $this->client->request('GET', "/api/emails/{$emailId}");
@@ -297,10 +305,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider publishNewPermissionProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('publishNewPermissionProvider')]
     public function testCreateEmailWithoutPublishPermissionWillBeIgnored(array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $user = $this->getUser('sales');
@@ -360,10 +367,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider publishExistingPermissionProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('publishExistingPermissionProvider')]
     public function testEditEmailWithoutPublishPermissionWillBeIgnored(string $creatorUsername, array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $owner = $this->getUser($creatorUsername);
@@ -448,6 +454,27 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             'expectedPublishUp'   => null,
             'expectedPublishDown' => null,
         ];
+    }
+
+    public function testCreateEmailWithoutSendToDncPermission(): void
+    {
+        $user       = $this->getUser('sales');
+        $permission = ['email:emails' => ['create']];
+        $this->setPermission($user->getRole(), $permission);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+        $payload = [
+            'name'       => 'API email',
+            'subject'    => 'Email created via API test',
+            'customHtml' => '<h1>Email content created by an API test</h1>',
+            'sendToDnc'  => true,
+        ];
+        $this->em->clear();
+        $this->client->request('POST', '/api/emails/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertTrue(isset($response['email']['sendToDnc']), print_r($response, true));
+        Assert::assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
     }
 
     public function testReplyAction(): void
@@ -684,7 +711,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function setPrivateProperty(object $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty($object::class, $property);
-        $reflector->setAccessible(true);
         $reflector->setValue($object, $value);
     }
 

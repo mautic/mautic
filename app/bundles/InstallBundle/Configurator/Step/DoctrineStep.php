@@ -72,7 +72,7 @@ class DoctrineStep implements StepInterface
      */
     public $backup_prefix = 'bak_';
 
-    public ?string $server_version;
+    public ?string $server_version = null;
 
     public function __construct(Configurator $configurator)
     {
@@ -135,7 +135,7 @@ class DoctrineStep implements StepInterface
      * Return the key values of the available driver array.
      * Required in step.
      *
-     * @see \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::buildForm()
+     * @see DoctrineStepType::buildForm()
      */
     public static function getDriverKeys(): array
     {

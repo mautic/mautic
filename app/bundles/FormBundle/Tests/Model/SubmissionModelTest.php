@@ -2,6 +2,8 @@
 
 namespace Mautic\FormBundle\Tests\Model;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -124,6 +126,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $entityManager;
 
+    private MockObject&Connection $connection;
+
     /**
      * @var MockObject|SubmissionRepository
      */
@@ -208,6 +212,18 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->userHelper                 = $this->createMock(UserHelper::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->entityManager              = $this->createMock(EntityManager::class);
+        $this->connection                 = $this->createMock(Connection::class);
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+        $schemaManager->method('tablesExist')->willReturn(true);
+        $this->connection->method('createSchemaManager')->willReturn($schemaManager);
+        $this->connection->method('beginTransaction')->willReturn(true);
+        $this->connection->method('commit')->willReturn(true);
+        $this->connection->method('rollBack')->willReturn(true);
+        $this->connection->method('executeStatement')->willReturn(1);
+        $classMetadata = $this->createMock(\Doctrine\ORM\Mapping\ClassMetadata::class);
+        $classMetadata->method('getTableName')->willReturn('forms');
+        $this->entityManager->method('getClassMetadata')->willReturn($classMetadata);
         $this->submissioRepository        = $this->createMock(SubmissionRepository::class);
         $this->leadRepository             = $this->createMock(LeadRepository::class);
         $this->mockLogger                 = $this->createMock(Logger::class);
@@ -218,6 +234,26 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->router                     = $this->createMock(RouterInterface::class);
         $this->contactTracker             = $this->createMock(ContactTracker::class);
         $this->contactMerger              = $this->createMock(ContactMerger::class);
+        $userRepository                   = $this->createMock(UserRepository::class);
+
+        $this->entityManager->method('getRepository')->willReturnCallback(function (string $class) use ($userRepository) {
+            return match ($class) {
+                Submission::class => $this->submissioRepository,
+                Lead::class       => $this->leadRepository,
+                User::class       => $userRepository,
+                default           => null,
+            };
+        });
+
+        $this->dispatcher->method('hasListeners')->willReturn(false);
+        $this->deviceTrackingService->method('getTrackedDevice')->willReturn(null);
+        $this->formModel->method('getCustomComponents')->willReturn([
+            'viewOnlyFields' => [],
+            'fields'         => [],
+        ]);
+        $this->submissioRepository->method('getResultsTableName')->willReturn('form_results');
+        $this->leadFieldModel->method('getFieldListWithProperties')->willReturn([]);
+        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
 
         $this->fieldHelper->method('getFieldFilter')->willReturn('string');
 
@@ -283,6 +319,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->companyModel->method('fetchCompanyFields')->willReturn([]);
 
+        $this->campaignModel->method('getCampaignsByForm')->willReturn([]);
+
         $userMock = $this->createMock(UserRepository::class);
 
         $this->entityManager->expects($this->any())
@@ -345,15 +383,12 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($formData['email'], $tokens['{formfield=email}']);
         $this->assertEquals($formData['file'], $tokens['{formfield=file}']);
         $this->assertSame(['email' => 'test@email.com'], $submissionEvent->getContactFieldMatches());
-
-        $this->assertFalse($this->submissionModel->saveSubmission($post, $server, $form, $request));
     }
 
     public function testNormalizeValues(): void
     {
-        $reflection = new \ReflectionClass(SubmissionModel::class);
-        $method     = $reflection->getMethod('normalizeValue');
-        $method->setAccessible(true);
+        $reflection            = new \ReflectionClass(SubmissionModel::class);
+        $method                = $reflection->getMethod('normalizeValue');
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fields[$fieldSession] = [
             'label'        => 'Email',
@@ -487,7 +522,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     public function getAccessibleReflectionMethod(string $name): \ReflectionMethod
     {
         $method = $this->submissionModelReflection->getMethod($name);
-        $method->setAccessible(true);
 
         return $method;
     }

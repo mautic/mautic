@@ -316,7 +316,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, mixed>
+     * @return iterable<int, mixed>
      */
     public static function dataProvider(): iterable
     {

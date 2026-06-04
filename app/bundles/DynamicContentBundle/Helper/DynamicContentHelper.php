@@ -19,12 +19,12 @@ class DynamicContentHelper
     use MatchFilterForLeadTrait;
 
     /**
-     * @const DYNAMIC_CONTENT_REGEX
+     * @var string
      */
     public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
 
     /**
-     * @const DYNAMIC_WEB_CONTENT_REGEX
+     * @var string
      */
     public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
 
@@ -166,7 +166,7 @@ class DynamicContentHelper
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
         /** @var DynamicContent $translation */
-        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        [$ignore, $translation] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
             $dwc     = $translation;

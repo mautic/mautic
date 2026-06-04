@@ -338,6 +338,9 @@ class PluginController extends FormController
             }
         }
 
+        $plugin  = $entity->getPlugin();
+        $version = $plugin?->getVersion();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -355,6 +358,7 @@ class PluginController extends FormController
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
                     'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
+                    'pluginVersion' => $version,
                 ],
             ]
         );
@@ -395,6 +399,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
                     'route'         => false,
+                    'pluginVersion' => $bundle->getVersion(),
                 ],
             ]
         );

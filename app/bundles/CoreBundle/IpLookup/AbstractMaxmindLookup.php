@@ -99,9 +99,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
         $ip = $this->ip;
         $doNotSellList->loadList();
-        $ipMatch = array_filter($doNotSellList->getList(), function ($item) use ($ip, $doNotSellList): bool {
-            return $doNotSellList->stripCIDR($item['value']) == $ip;
-        });
+        $ipMatch = array_filter($doNotSellList->getList(), fn ($item): bool => $doNotSellList->stripCIDR($item['value']) == $ip);
 
         return !boolval(count($ipMatch));
     }

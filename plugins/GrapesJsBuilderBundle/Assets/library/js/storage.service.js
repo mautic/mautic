@@ -166,14 +166,23 @@ export default class StorageService {
 
     getFormEntityId(name) {
         const form = document.querySelector(`form[name="${name}"]`);
+        if (!form) {
+            return 'new';
+        }
+
         const actionUrl = form.getAttribute('action');
+        if (!actionUrl) {
+            return 'new';
+        }
+
         const urlParts = actionUrl.split('/');
         const lastPart = urlParts.pop();
+
         if (isNaN(lastPart)) {
             return 'new';
-        } else {
-            return lastPart;
         }
+
+        return lastPart;
     }
 
     getForm() {

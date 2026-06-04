@@ -81,7 +81,6 @@ class FieldApiControllerTest extends TestCase
 
         $controllerReflection = new \ReflectionClass(FieldApiController::class);
         $method               = $controllerReflection->getMethod($method);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($controller, $args);
     }

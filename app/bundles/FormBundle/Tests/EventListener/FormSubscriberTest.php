@@ -33,13 +33,12 @@ class FormSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $auditLogModel        = $this->createMock(AuditLogModel::class);
-        $this->mailer         = $this->createMock(MailHelper::class);
-        $translator           = $this->createMock(TranslatorInterface::class);
-        $router               = $this->createMock(RouterInterface::class);
-        $languageHelper       = $this->createMock(LanguageHelper::class);
-
+        $ipLookupHelper    = $this->createMock(IpLookupHelper::class);
+        $auditLogModel     = $this->createMock(AuditLogModel::class);
+        $this->mailer      = $this->createMock(MailHelper::class);
+        $translator        = $this->createMock(TranslatorInterface::class);
+        $router            = $this->createMock(RouterInterface::class);
+        $languageHelper    = $this->createMock(LanguageHelper::class);
         $this->mailer->expects($this->once())
             ->method('getMailer')
             ->willReturnSelf();
@@ -494,7 +493,6 @@ New line',
         $form = new Form();
         $form->setName('Test Form');
         $form->setAlias('test_form');
-        $form->setFormType('standalone');
 
         return $form;
     }

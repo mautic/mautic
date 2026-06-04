@@ -3,10 +3,9 @@
 namespace Mautic\CampaignBundle\Service;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Entity\EmailRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CampaignAuditService
@@ -14,15 +13,13 @@ class CampaignAuditService
     public function __construct(
         private FlashBag $flashBag,
         private UrlGeneratorInterface $urlGenerator,
-        private CampaignRepository $campaignRepository,
-        private EmailRepository $emailRepository,
+        private EventRepository $eventRepository,
     ) {
     }
 
     public function addWarningForUnpublishedEmails(Campaign $campaign): void
     {
-        $emailIds = $this->campaignRepository->fetchEmailIdsById($campaign->getId());
-        $emails   = $this->emailRepository->findBy(['id' => $emailIds]);
+        $emails = $this->eventRepository->getCampaignEmailEvents($campaign->getId());
 
         foreach ($emails as $email) {
             if (!$email->isPublished()) {

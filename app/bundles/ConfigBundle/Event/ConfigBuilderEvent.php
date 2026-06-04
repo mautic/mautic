@@ -97,9 +97,9 @@ class ConfigBuilderEvent extends Event
 
         if (isset($allBundles[$bundle]) && $allBundles[$bundle]['config']['parameters']) {
             return $allBundles[$bundle]['config']['parameters'];
-        } else {
-            return [];
         }
+
+        return [];
     }
 
     /**
