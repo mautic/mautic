@@ -8,19 +8,23 @@ export const extractMjHeadContent = (mjml) => {
   return m && m[1] ? m[1].trim() : '';
 };
 
-export const createHeadInjectingMjmlParser = (headContent = '') => (input, opts) => {
-  if (typeof input !== 'string') {
-    return mjml2html(input, opts);
-  }
+export const createHeadInjectingMjmlParser = (headContent = '') => {
+  const cleanHead = (headContent || '').replace(/<mj-preview[^>]*>[\s\S]*?<\/mj-preview>/gi, '');
 
-  if (!headContent || !/<mjml[\s>]/i.test(input) || /<mj-head[\s>]/i.test(input)) {
-    return mjml2html(input, opts);
-  }
+  return (input, opts) => {
+    if (typeof input !== 'string') {
+      return mjml2html(input, opts);
+    }
 
-  const withHead = input.replace(
-    /<mjml(\s[^>]*)?>/i,
-    (m) => `${m}<mj-head>${headContent}</mj-head>`
-  );
+    if (!cleanHead || !/<mjml[\s>]/i.test(input) || /<mj-head[\s>]/i.test(input)) {
+      return mjml2html(input, opts);
+    }
 
-  return mjml2html(withHead, opts);
+    const withHead = input.replace(
+      /<mjml(\s[^>]*)?>/i,
+      (m) => `${m}<mj-head>${cleanHead}</mj-head>`
+    );
+
+    return mjml2html(withHead, opts);
+  };
 };
