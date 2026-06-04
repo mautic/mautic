@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -61,7 +62,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
 
     protected function shouldAllowMissingCompany(string $filterOperator): bool
     {
-        return in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn'], true);
+        return in_array($filterOperator, ['empty', 'neq', 'notLike', 'notBetween', 'notIn', '!multiselect', OperatorOptions::EXCLUDING_ALL], true);
     }
 
     protected function requiresPrimaryCompany(): bool
@@ -154,13 +155,69 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
                 break;
             case 'multiselect':
             case '!multiselect':
-                $operator    = 'multiselect' === $filterOperator ? 'regexp' : 'notRegexp';
+                $filterArray      = $filter->contactSegmentFilterCrate->getArray();
+                $originalOperator = $filterArray['operator'];
+                $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
+                $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
+
+                $operator = 'regexp';
+                if (OperatorOptions::EXCLUDING_ANY === $originalOperator) {
+                    $operator = 'notRegexp';
+                }
+
+                if (in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true)) {
+                    $filterGlue = 'and';
+                } else {
+                    $filterGlue = 'or';
+                }
+
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
                     $expressions[] = $subQueryBuilder->expr()->$operator($companyAlias.'.'.$filter->getField(), $parameter);
                 }
 
-                $expression = $subQueryBuilder->expr()->and(...$expressions);
+                if (empty($expressions)) {
+                    $expression = $subQueryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
+                    break;
+                }
+
+                if ($applyIsNull) {
+                    if ($applyNot) {
+                        $expression = $subQueryBuilder->expr()->or(
+                            'NOT('.$subQueryBuilder->expr()->$filterGlue(...$expressions).')',
+                            $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField())
+                        );
+                    } else {
+                        $expression = $subQueryBuilder->expr()->or(
+                            $subQueryBuilder->expr()->$filterGlue(...$expressions),
+                            $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField())
+                        );
+                    }
+                } else {
+                    $expression = $subQueryBuilder->expr()->$filterGlue(...$expressions);
+                }
+                break;
+            case OperatorOptions::INCLUDING_ALL:
+                if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
+                    $expression = $subQueryBuilder->expr()->and('1 = 0');
+                    break;
+                }
+                $parameter  = is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder;
+                $expression = $subQueryBuilder->expr()->eq(
+                    $companyAlias.'.'.$filter->getField(),
+                    $parameter
+                );
+                break;
+            case OperatorOptions::EXCLUDING_ALL:
+                if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
+                    $expression = $subQueryBuilder->expr()->and('1 = 1');
+                    break;
+                }
+                $parameter  = is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder;
+                $expression = $subQueryBuilder->expr()->or(
+                    $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField()),
+                    $subQueryBuilder->expr()->neq($companyAlias.'.'.$filter->getField(), $parameter)
+                );
                 break;
             default:
                 throw UnsupportedFilterOperatorException::fromOperator($filterOperator);
