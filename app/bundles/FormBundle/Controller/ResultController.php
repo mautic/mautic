@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+class ResultController extends CommonFormController // NOSONAR Existing controller is not split in this feature PR.
 {
     private const FORM_RESULT_PAGE_SUFFIX = '.page';
 

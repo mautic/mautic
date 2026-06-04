@@ -90,11 +90,9 @@ class FormValidationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!empty($field->getValidation()['donotsubmit'])) {
-            if ($this->isDoNotSubmitEmail((string) $value, (array) $this->coreParametersHelper->get('do_not_submit_emails'))) {
-                $validationMsg = $field->getValidation()['donotsubmit_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.donotsubmit.invalid', [], 'validators');
-                $event->failedValidation($validationMsg);
-            }
+        if (!empty($field->getValidation()['donotsubmit']) && $this->isDoNotSubmitEmail((string) $value, (array) $this->coreParametersHelper->get('do_not_submit_emails'))) {
+            $validationMsg = $field->getValidation()['donotsubmit_validationmsg'] ?? $this->translator->trans('mautic.form.submission.email.donotsubmit.invalid', [], 'validators');
+            $event->failedValidation($validationMsg);
         }
 
         if (!empty($field->getValidation()['blockfreeemail'])) {
