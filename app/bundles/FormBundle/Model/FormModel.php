@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -354,6 +355,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getContent(Form $form, $withScript = true, $useCache = true): string
     {
+        if ($form->isSubmissionLimitReached()) {
+            $message = $form->getSubmissionLimitMessage() ?? $this->translator->trans('mautic.form.submission.limit_reached');
+
+            return sprintf('<div class="mautic-form-message">%s</div>', InputHelper::strict_html($message));
+        }
+
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
