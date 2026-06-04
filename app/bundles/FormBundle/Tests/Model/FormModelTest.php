@@ -181,6 +181,23 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetContentSanitizesSubmissionLimitMessage(): void
+    {
+        $form = new Form();
+        $form->setSubmissionLimit(1);
+        $form->setSubmissionCount(1);
+        $form->setSubmissionLimitMessage('<script>alert(1)</script><img src=x onerror="alert(2)"><strong>Limit reached</strong>');
+
+        $content = $this->formModel->getContent($form);
+
+        $this->assertStringContainsString('mautic-form-message', $content);
+        // Executable XSS vectors must be stripped.
+        $this->assertStringNotContainsString('<script', $content);
+        $this->assertStringNotContainsString('onerror', $content);
+        // Safe inline formatting is preserved (strict_html allowlist).
+        $this->assertStringContainsString('<strong>Limit reached</strong>', $content);
+    }
+
     public function testSetFields(): void
     {
         $form   = new Form();
