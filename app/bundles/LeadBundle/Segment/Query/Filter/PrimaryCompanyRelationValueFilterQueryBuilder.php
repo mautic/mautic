@@ -97,132 +97,156 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
         mixed $filterParametersHolder,
         string $companyAlias,
     ): void {
-        switch ($filterOperator) {
-            case 'empty':
-                $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
-                    [
-                        $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField()),
-                        $subQueryBuilder->expr()->eq($companyAlias.'.'.$filter->getField(), $subQueryBuilder->expr()->literal('')),
-                    ]
-                );
-                break;
-            case 'notEmpty':
-                $expression = new CompositeExpression(CompositeExpression::TYPE_AND,
-                    [
-                        $subQueryBuilder->expr()->isNotNull($companyAlias.'.'.$filter->getField()),
-                        $subQueryBuilder->expr()->neq($companyAlias.'.'.$filter->getField(), $subQueryBuilder->expr()->literal('')),
-                    ]
-                );
-                break;
-            case 'neq':
-                $expression = $subQueryBuilder->expr()->or(
-                    $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField()),
-                    $subQueryBuilder->expr()->$filterOperator(
-                        $companyAlias.'.'.$filter->getField(),
-                        $filterParametersHolder
-                    )
-                );
-                break;
-            case 'startsWith':
-            case 'endsWith':
-                $expression = $subQueryBuilder->expr()->like(
-                    $companyAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
-                );
-                break;
-            case 'gt':
-            case 'eq':
-            case 'gte':
-            case 'like':
-            case 'lt':
-            case 'lte':
-            case 'in':
-            case 'between':
-            case 'regexp':
-            case 'notRegexp':
-                $expression = $subQueryBuilder->expr()->$filterOperator(
-                    $companyAlias.'.'.$filter->getField(),
-                    $filterParametersHolder
-                );
-                break;
-            case 'notLike':
-            case 'notBetween':
-            case 'notIn':
-                $expression = $subQueryBuilder->expr()->or(
-                    $subQueryBuilder->expr()->$filterOperator($companyAlias.'.'.$filter->getField(), $filterParametersHolder),
-                    $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField())
-                );
-                break;
-            case 'multiselect':
-            case '!multiselect':
-                $filterArray      = $filter->contactSegmentFilterCrate->getArray();
-                $originalOperator = $filterArray['operator'];
-                $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
-                $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
-
-                $operator = 'regexp';
-                if (OperatorOptions::EXCLUDING_ANY === $originalOperator) {
-                    $operator = 'notRegexp';
-                }
-
-                if (in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true)) {
-                    $filterGlue = 'and';
-                } else {
-                    $filterGlue = 'or';
-                }
-
-                $expressions = [];
-                foreach ($filterParametersHolder as $parameter) {
-                    $expressions[] = $subQueryBuilder->expr()->$operator($companyAlias.'.'.$filter->getField(), $parameter);
-                }
-
-                if (empty($expressions)) {
-                    $expression = $subQueryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
-                    break;
-                }
-
-                if ($applyIsNull) {
-                    if ($applyNot) {
-                        $expression = $subQueryBuilder->expr()->or(
-                            'NOT('.$subQueryBuilder->expr()->$filterGlue(...$expressions).')',
-                            $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField())
-                        );
-                    } else {
-                        $expression = $subQueryBuilder->expr()->or(
-                            $subQueryBuilder->expr()->$filterGlue(...$expressions),
-                            $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField())
-                        );
-                    }
-                } else {
-                    $expression = $subQueryBuilder->expr()->$filterGlue(...$expressions);
-                }
-                break;
-            case OperatorOptions::INCLUDING_ALL:
-                if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
-                    $expression = $subQueryBuilder->expr()->and('1 = 0');
-                    break;
-                }
-                $parameter  = is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder;
-                $expression = $subQueryBuilder->expr()->eq(
-                    $companyAlias.'.'.$filter->getField(),
-                    $parameter
-                );
-                break;
-            case OperatorOptions::EXCLUDING_ALL:
-                if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
-                    $expression = $subQueryBuilder->expr()->and('1 = 1');
-                    break;
-                }
-                $parameter  = is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder;
-                $expression = $subQueryBuilder->expr()->or(
-                    $subQueryBuilder->expr()->isNull($companyAlias.'.'.$filter->getField()),
-                    $subQueryBuilder->expr()->neq($companyAlias.'.'.$filter->getField(), $parameter)
-                );
-                break;
-            default:
-                throw UnsupportedFilterOperatorException::fromOperator($filterOperator);
-        }
+        $expression = match ($filterOperator) {
+            'empty'                 => $this->getEmptyExpression($subQueryBuilder, $filter, $companyAlias),
+            'notEmpty'              => $this->getNotEmptyExpression($subQueryBuilder, $filter, $companyAlias),
+            'neq'                   => $this->getNotEqualExpression($subQueryBuilder, $filter, $filterParametersHolder, $companyAlias),
+            'startsWith', 'endsWith'=> $this->getLikeExpression($subQueryBuilder, $filter, $filterParametersHolder, $companyAlias),
+            'gt',
+            'eq',
+            'gte',
+            'like',
+            'lt',
+            'lte',
+            'in',
+            'between',
+            'regexp',
+            'notRegexp'             => $this->getOperatorExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias),
+            'notLike',
+            'notBetween',
+            'notIn'                 => $this->getNullableNegativeExpression($subQueryBuilder, $filter, $filterOperator, $filterParametersHolder, $companyAlias),
+            'multiselect',
+            '!multiselect'                 => $this->getMultiselectExpression($subQueryBuilder, $filter, $filterParametersHolder, $companyAlias),
+            OperatorOptions::INCLUDING_ALL => $this->getIncludingAllExpression($subQueryBuilder, $filter, $filterParametersHolder, $companyAlias),
+            OperatorOptions::EXCLUDING_ALL => $this->getExcludingAllExpression($subQueryBuilder, $filter, $filterParametersHolder, $companyAlias),
+            default                        => throw UnsupportedFilterOperatorException::fromOperator($filterOperator),
+        };
 
         $subQueryBuilder->andWhere($expression);
+    }
+
+    private function getEmptyExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $companyAlias): CompositeExpression
+    {
+        return new CompositeExpression(CompositeExpression::TYPE_OR,
+            [
+                $subQueryBuilder->expr()->isNull($this->getCompanyField($filter, $companyAlias)),
+                $subQueryBuilder->expr()->eq($this->getCompanyField($filter, $companyAlias), $subQueryBuilder->expr()->literal('')),
+            ]
+        );
+    }
+
+    private function getNotEmptyExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $companyAlias): CompositeExpression
+    {
+        return new CompositeExpression(CompositeExpression::TYPE_AND,
+            [
+                $subQueryBuilder->expr()->isNotNull($this->getCompanyField($filter, $companyAlias)),
+                $subQueryBuilder->expr()->neq($this->getCompanyField($filter, $companyAlias), $subQueryBuilder->expr()->literal('')),
+            ]
+        );
+    }
+
+    private function getLikeExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, mixed $filterParametersHolder, string $companyAlias): string
+    {
+        return $subQueryBuilder->expr()->like(
+            $this->getCompanyField($filter, $companyAlias),
+            $filterParametersHolder
+        );
+    }
+
+    private function getOperatorExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $filterOperator, mixed $filterParametersHolder, string $companyAlias): string
+    {
+        return $subQueryBuilder->expr()->$filterOperator(
+            $this->getCompanyField($filter, $companyAlias),
+            $filterParametersHolder
+        );
+    }
+
+    private function getNullableNegativeExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $filterOperator, mixed $filterParametersHolder, string $companyAlias): CompositeExpression
+    {
+        return $subQueryBuilder->expr()->or(
+            $subQueryBuilder->expr()->$filterOperator($this->getCompanyField($filter, $companyAlias), $filterParametersHolder),
+            $subQueryBuilder->expr()->isNull($this->getCompanyField($filter, $companyAlias))
+        );
+    }
+
+    private function getNotEqualExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, mixed $filterParametersHolder, string $companyAlias): CompositeExpression
+    {
+        return $subQueryBuilder->expr()->or(
+            $subQueryBuilder->expr()->isNull($this->getCompanyField($filter, $companyAlias)),
+            $subQueryBuilder->expr()->neq($this->getCompanyField($filter, $companyAlias), $filterParametersHolder)
+        );
+    }
+
+    private function getMultiselectExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, mixed $filterParametersHolder, string $companyAlias): CompositeExpression|string
+    {
+        $filterArray      = $filter->contactSegmentFilterCrate->getArray();
+        $originalOperator = $filterArray['operator'];
+        $applyIsNull      = in_array($originalOperator, [OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true);
+        $applyNot         = OperatorOptions::EXCLUDING_ALL === $originalOperator;
+        $operator         = OperatorOptions::EXCLUDING_ANY === $originalOperator ? 'notRegexp' : 'regexp';
+        $filterGlue       = in_array($originalOperator, [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL, OperatorOptions::EXCLUDING_ANY], true) ? 'and' : 'or';
+
+        $expressions = [];
+        foreach ((array) $filterParametersHolder as $parameter) {
+            $expressions[] = $subQueryBuilder->expr()->$operator($this->getCompanyField($filter, $companyAlias), $parameter);
+        }
+
+        return $this->combineMultiselectExpressions($subQueryBuilder, $filter, $companyAlias, $expressions, $filterGlue, $applyIsNull, $applyNot);
+    }
+
+    /**
+     * @param string[] $expressions
+     */
+    private function combineMultiselectExpressions(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, string $companyAlias, array $expressions, string $filterGlue, bool $applyIsNull, bool $applyNot): CompositeExpression|string
+    {
+        if (empty($expressions)) {
+            return $subQueryBuilder->expr()->and($applyIsNull ? '1 = 1' : '1 = 0');
+        }
+
+        if (!$applyIsNull) {
+            return $subQueryBuilder->expr()->$filterGlue(...$expressions);
+        }
+
+        $expression = $subQueryBuilder->expr()->$filterGlue(...$expressions);
+        if ($applyNot) {
+            $expression = 'NOT('.$expression.')';
+        }
+
+        return $subQueryBuilder->expr()->or(
+            $expression,
+            $subQueryBuilder->expr()->isNull($this->getCompanyField($filter, $companyAlias))
+        );
+    }
+
+    private function getIncludingAllExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, mixed $filterParametersHolder, string $companyAlias): CompositeExpression|string
+    {
+        if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
+            return $subQueryBuilder->expr()->and('1 = 0');
+        }
+
+        return $subQueryBuilder->expr()->eq(
+            $this->getCompanyField($filter, $companyAlias),
+            is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder
+        );
+    }
+
+    private function getExcludingAllExpression(QueryBuilder $subQueryBuilder, ContactSegmentFilter $filter, mixed $filterParametersHolder, string $companyAlias): CompositeExpression
+    {
+        if (is_array($filterParametersHolder) && count($filterParametersHolder) > 1) {
+            return $subQueryBuilder->expr()->and('1 = 1');
+        }
+
+        return $subQueryBuilder->expr()->or(
+            $subQueryBuilder->expr()->isNull($this->getCompanyField($filter, $companyAlias)),
+            $subQueryBuilder->expr()->neq(
+                $this->getCompanyField($filter, $companyAlias),
+                is_array($filterParametersHolder) ? $filterParametersHolder[0] : $filterParametersHolder
+            )
+        );
+    }
+
+    private function getCompanyField(ContactSegmentFilter $filter, string $companyAlias): string
+    {
+        return $companyAlias.'.'.$filter->getField();
     }
 }
