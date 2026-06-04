@@ -282,7 +282,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode());
         $this->assertNotEmpty($response);
-        $this->assertEquals($emailName, $response[0]['items'][$email->getId()]);
+        $this->assertEquals($emailName.' ('.$email->getId().')', $response[0]['items'][$email->getId()]);
     }
 
     public function testGetBuilderTokensAction(): void

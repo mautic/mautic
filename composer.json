@@ -110,6 +110,11 @@
       "MauticPlugin\\": "plugins/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "MauticRector\\": "rector/"
+    }
+  },
   "repositories": [
     {
       "type": "path",
