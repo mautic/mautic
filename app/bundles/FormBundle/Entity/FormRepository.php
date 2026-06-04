@@ -219,6 +219,20 @@ class FormRepository extends CommonRepository
     }
 
     /**
+     * @return array<int, array<string,string>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getValidFormResultsTable(): array
+    {
+        return $this->_em->getConnection()->createQueryBuilder()
+            ->select("CONCAT('".MAUTIC_TABLE_PREFIX."','form_results_', t.id, '_', t.alias) as validFormTable")
+            ->from(MAUTIC_TABLE_PREFIX.'forms', 't')
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
+    /**
      * Compile and return the form result table name.
      *
      * @param int    $formId

@@ -406,7 +406,37 @@ class SubmissionModel extends CommonFormModel
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
+        $submissionRepository = $this->getRepository();
+
+        // deleting form submission record in form results table
+        try {
+            $submissionRepository->deleteFormResultsTableRecord($submission);
+        } catch (\Exception $e) {
+            $this->logger->error($e);
+        }
+
         parent::deleteEntity($submission);
+    }
+
+    /**
+     * @param array<int,string> $ids
+     *
+     * @return array<int,mixed>
+     */
+    public function deleteEntities($ids): array
+    {
+        if (!empty($ids)) {
+            $submissionRepository = $this->getRepository();
+
+            // deleting form submission record in form results table
+            try {
+                $submissionRepository->batchDeleteFormResultsTableRecord($ids);
+            } catch (\Exception $e) {
+                $this->logger->error($e);
+            }
+        }
+
+        return parent::deleteEntities($ids);
     }
 
     /**
