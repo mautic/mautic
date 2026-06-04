@@ -370,6 +370,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/fujijin"><img src="https://avatars.githubusercontent.com/u/11382759?v=4?s=100" width="100px;" alt="fujijin"/><br /><sub><b>fujijin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=fujijin" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/msoukhomlinov"><img src="https://avatars.githubusercontent.com/u/12015350?v=4?s=100" width="100px;" alt="Max Soukhomlinov"/><br /><sub><b>Max Soukhomlinov</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=msoukhomlinov" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MoonFuji"><img src="https://avatars.githubusercontent.com/u/100423572?v=4?s=100" width="100px;" alt="Kadri Mohammed Mouncef"/><br /><sub><b>Kadri Mohammed Mouncef</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MoonFuji" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TowyTowy"><img src="https://avatars.githubusercontent.com/u/85077986?v=4?s=100" width="100px;" alt="TowyTowy"/><br /><sub><b>TowyTowy</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TowyTowy" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

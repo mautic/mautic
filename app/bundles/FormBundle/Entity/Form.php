@@ -54,6 +54,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     use ProjectTrait;
 
     public const ENTITY_NAME = 'forms';
+    public const TABLE_NAME  = 'forms';
 
     /**
      * @var int
@@ -180,6 +181,14 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $progressiveProfilingLimit;
 
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private ?int $submissionLimit = null;
+
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private ?string $submissionLimitMessage = null;
+
+    private int $submissionCount = 0;
+
     /**
      * This var is used to cache the result once gained from the loop.
      *
@@ -271,6 +280,15 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
             ->setOrderBy(['dateSubmitted' => 'DESC'])
             ->mappedBy('form')
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->addNullableField('submissionLimit', Types::INTEGER, 'submission_limit');
+        $builder->createField('submissionLimitMessage', Types::TEXT)
+            ->columnName('submission_limit_message')
+            ->nullable()
+            ->build();
+        $builder->createField('submissionCount', Types::INTEGER)
+            ->columnName('submission_count')
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
@@ -982,5 +1000,48 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     public function getProgressiveProfilingLimit()
     {
         return $this->progressiveProfilingLimit;
+    }
+
+    public function setSubmissionLimit(?int $submissionLimit): self
+    {
+        $this->isChanged('submissionLimit', $submissionLimit);
+        $this->submissionLimit = $submissionLimit;
+
+        return $this;
+    }
+
+    public function getSubmissionLimit(): ?int
+    {
+        return $this->submissionLimit;
+    }
+
+    public function setSubmissionLimitMessage(?string $message): self
+    {
+        $this->isChanged('submissionLimitMessage', $message);
+        $this->submissionLimitMessage = $message;
+
+        return $this;
+    }
+
+    public function getSubmissionLimitMessage(): ?string
+    {
+        return $this->submissionLimitMessage;
+    }
+
+    public function getSubmissionCount(): int
+    {
+        return $this->submissionCount;
+    }
+
+    public function setSubmissionCount(int $count): self
+    {
+        $this->submissionCount = $count;
+
+        return $this;
+    }
+
+    public function isSubmissionLimitReached(): bool
+    {
+        return null !== $this->submissionLimit && $this->submissionLimit > 0 && $this->submissionCount >= $this->submissionLimit;
     }
 }
