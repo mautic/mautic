@@ -36,6 +36,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * @var ReferenceRepository
      */
@@ -51,9 +53,14 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->clearLoggedInUser();
+        if (!$this->useCleanupRollback) {
+            $this->resetSegmentFixtureAutoincrement();
+        }
 
         $this->fixtures = $this->loadFixtures(
             [
+                LoadRoleData::class,
+                LoadUserData::class,
                 LoadCompanyData::class,
                 LoadLeadListData::class,
                 LoadLeadData::class,
@@ -61,8 +68,6 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadPageHitData::class,
                 LoadSegmentsData::class,
                 LoadPageCategoryData::class,
-                LoadRoleData::class,
-                LoadUserData::class,
                 LoadDncData::class,
                 LoadClickData::class,
                 LoadTagData::class,
@@ -76,6 +81,11 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     }
 
     protected function beforeBeginTransaction(): void
+    {
+        $this->resetSegmentFixtureAutoincrement();
+    }
+
+    private function resetSegmentFixtureAutoincrement(): void
     {
         $this->resetAutoincrement(
             [

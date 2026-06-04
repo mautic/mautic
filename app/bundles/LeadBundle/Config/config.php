@@ -884,10 +884,9 @@ return [
                 'optional' => true,
             ],
             'mautic.lead.fixture.test.segment' => [
-                'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.lead.model.list', 'mautic.lead.model.lead'],
-                'optional'  => true,
+                'class'    => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData::class,
+                'tag'      => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'optional' => true,
             ],
             'mautic.lead.fixture.test.click' => [
                 'class'     => Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData::class,
