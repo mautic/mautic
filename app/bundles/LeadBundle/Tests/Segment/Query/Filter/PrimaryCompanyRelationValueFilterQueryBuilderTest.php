@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Query\Filter;
 
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 use PHPUnit\Framework\Assert;
 
@@ -179,7 +181,13 @@ class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelation
             'rel2'
         );
 
-        $filter = $this->createFilter('!multiselect', ['alpha', 'beta']);
+        $filter                            = $this->createFilter('!multiselect', ['alpha', 'beta']);
+        $filter->contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'field'    => 'company_name',
+            'filter'   => ['alpha', 'beta'],
+            'operator' => OperatorOptions::EXCLUDING_ANY,
+            'type'     => 'multiselect',
+        ]);
         $this->queryBuilder->applyQuery($queryBuilder, $filter);
 
         $debugOutput = $queryBuilder->getDebugOutput();
