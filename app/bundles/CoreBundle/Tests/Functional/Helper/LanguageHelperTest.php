@@ -18,7 +18,7 @@ final class LanguageHelperTest extends MauticMysqlTestCase
         $languageFiles = $languageHelper->getLanguageFiles();
 
         // As the list depends on installed plugins, let's assert only for random files that should exist.
-        Assert::assertMatchesRegularExpression('/app\/bundles\/EmailBundle\/Translations\/en_US\/(messages|validators|flashes)\.ini/', $languageFiles['EmailBundle'][0]);
+        Assert::assertMatchesRegularExpression('/app\/bundles\/EmailBundle\/Translations\/en_US\/(messages|validators|flashes|javascript)\.ini/', $languageFiles['EmailBundle'][0]);
         Assert::assertMatchesRegularExpression('/app\/bundles\/LeadBundle\/Translations\/en_US\/(messages|validators|flashes)\.ini/', $languageFiles['LeadBundle'][1]);
     }
 }
