@@ -10,6 +10,8 @@ use Mautic\LeadBundle\Entity\TagRepository;
 
 class BatchControllerTest extends MauticMysqlTestCase
 {
+    private const BATCH_TAG_FORM_SELECTOR = 'form[name=batch_tag]';
+
     private TagRepository $tagRepository;
 
     /**
@@ -54,7 +56,7 @@ class BatchControllerTest extends MauticMysqlTestCase
     public function testAddTagBatchSetAction(): void
     {
         $crawler                                = $this->client->request('GET', '/s/tags/batch/view');
-        $form                                   = $crawler->filter('form[name=batch_tag]')->form();
+        $form                                   = $crawler->filter(self::BATCH_TAG_FORM_SELECTOR)->form();
         $values                                 = $form->getValues();
         $values['batch_tag[tags][add_tags]']    = [$this->tags[0]->getId(), $this->tags[1]->getId()];
         $values['batch_tag[tags][remove_tags]'] = [$this->tags[2]->getId(), $this->tags[3]->getId()];
@@ -80,7 +82,7 @@ class BatchControllerTest extends MauticMysqlTestCase
         $leadModel->saveEntity($this->leads[0]);
 
         $crawler                                = $this->client->request('GET', '/s/tags/batch/view');
-        $form                                   = $crawler->filter('form[name=batch_tag]')->form();
+        $form                                   = $crawler->filter(self::BATCH_TAG_FORM_SELECTOR)->form();
         $values                                 = $form->getValues();
         $values['batch_tag[tags][remove_tags]'] = [$this->tags[1]->getId()];
         $values['batch_tag[ids]']               = '["'.$this->leads[0]->getId().'"]';
@@ -97,7 +99,7 @@ class BatchControllerTest extends MauticMysqlTestCase
     public function testAddTagBatchSetActionForCompany(): void
     {
         $crawler                                = $this->client->request('GET', '/s/tags/batch/view?objectType=company');
-        $form                                   = $crawler->filter('form[name=batch_tag]')->form();
+        $form                                   = $crawler->filter(self::BATCH_TAG_FORM_SELECTOR)->form();
         $values                                 = $form->getValues();
         $values['batch_tag[tags][add_tags]']    = [$this->tags[0]->getId(), $this->tags[1]->getId()];
         $values['batch_tag[tags][remove_tags]'] = [$this->tags[2]->getId()];

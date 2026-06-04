@@ -11,6 +11,8 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
+    private const LEAD_ID_COLUMN = '.lead_id';
+
     public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.complex_relation.primary_company_tag';
@@ -92,7 +94,7 @@ class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBu
                 $tagAlias,
                 $tagAlias.'.company_id = '.$relationAlias.'.'.$filter->getRelationJoinTableField()
             )
-            ->andWhere($subQueryBuilder->expr()->eq($relationAlias.'.lead_id', $leadsTableAlias.'.id'));
+            ->andWhere($subQueryBuilder->expr()->eq($relationAlias.self::LEAD_ID_COLUMN, $leadsTableAlias.'.id'));
 
         $this->addRelationScopeCondition($subQueryBuilder, $relationAlias);
         $this->applyTagFilterOperator($subQueryBuilder, $filterOperator, $filterParametersHolder, $tagAlias, $filter->getField(), $relationAlias);
@@ -154,7 +156,7 @@ class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBu
                 }
 
                 $subQueryBuilder->andWhere($subQueryBuilder->expr()->in($tagAlias.'.'.$field, $filterParametersHolder));
-                $subQueryBuilder->groupBy($relationAlias.'.lead_id');
+                $subQueryBuilder->groupBy($relationAlias.self::LEAD_ID_COLUMN);
                 $subQueryBuilder->having('COUNT(DISTINCT '.$tagAlias.'.'.$field.') = '.count($filterParametersHolder));
                 break;
             default:
@@ -168,7 +170,7 @@ class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBu
         $relationQuery = $queryBuilder->createQueryBuilder();
         $relationQuery->select('1')
             ->from($filter->getRelationJoinTable(), $relationAlias)
-            ->andWhere($relationQuery->expr()->eq($relationAlias.'.lead_id', $leadsTableAlias.'.id'));
+            ->andWhere($relationQuery->expr()->eq($relationAlias.self::LEAD_ID_COLUMN, $leadsTableAlias.'.id'));
 
         $this->addRelationScopeCondition($relationQuery, $relationAlias);
 

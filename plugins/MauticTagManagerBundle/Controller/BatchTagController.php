@@ -49,37 +49,33 @@ class BatchTagController extends AbstractFormController
 
     public function execAction(Request $request, TagModel $tagModel): JsonResponse
     {
-        $params     = $request->get('batch_tag');
+        $params     = (array) $request->get('batch_tag');
         $objectType = $this->getObjectType($request);
-        $ids        = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $ids        = empty($params['ids']) ? [] : (array) json_decode($params['ids']);
+
         if (empty($ids)) {
-            $this->addFlashMessage('mautic.core.error.ids.missing');
-
-            return new JsonResponse([
-                'closeModal' => true,
-                'flashes'    => $this->getFlashContent(),
-            ]);
+            return $this->getBatchModalResponse('mautic.core.error.ids.missing');
         }
 
-        $tagsToAdd    = [];
-        $tagsToRemove = [];
-        if (isset($params['tags']['add_tags']) && !empty($params['tags']['add_tags'])) {
-            $tagsToAdd = $params['tags']['add_tags'];
-        }
-        if (isset($params['tags']['remove_tags']) && !empty($params['tags']['remove_tags'])) {
-            $tagsToRemove = $params['tags']['remove_tags'];
-        }
-        if (
-            empty($tagsToAdd) && empty($tagsToRemove)
-        ) {
-            $this->addFlashMessage('mautic.core.error.nothing.to.save');
+        $tagsToAdd    = $params['tags']['add_tags'] ?? [];
+        $tagsToRemove = $params['tags']['remove_tags'] ?? [];
 
-            return new JsonResponse([
-                'closeModal' => true,
-                'flashes'    => $this->getFlashContent(),
-            ]);
+        if (empty($tagsToAdd) && empty($tagsToRemove)) {
+            return $this->getBatchModalResponse('mautic.core.error.nothing.to.save');
         }
 
+        $this->applyBatchTags($objectType, $ids, $tagsToAdd, $tagsToRemove, $tagModel);
+
+        return $this->getBatchModalResponse();
+    }
+
+    /**
+     * @param int[] $ids
+     * @param int[] $tagsToAdd
+     * @param int[] $tagsToRemove
+     */
+    private function applyBatchTags(string $objectType, array $ids, array $tagsToAdd, array $tagsToRemove, TagModel $tagModel): void
+    {
         if ('company' === $objectType) {
             if (!empty($tagsToAdd)) {
                 $tagModel->getRepository()->addTagsToCompanies($ids, $tagsToAdd);
@@ -104,6 +100,13 @@ class BatchTagController extends AbstractFormController
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%' => count($ids),
             ]);
+        }
+    }
+
+    private function getBatchModalResponse(?string $flashMessage = null): JsonResponse
+    {
+        if (null !== $flashMessage) {
+            $this->addFlashMessage($flashMessage);
         }
 
         return new JsonResponse([

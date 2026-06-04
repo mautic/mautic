@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -534,8 +535,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function modifyTags(Company $company, array|string $tags, ?array $removeTags = null, bool $persist = true): bool
     {
-        $tagsModified = false;
-        $companyTags  = $company->getTags();
+        $companyTags = $company->getTags();
 
         if (!$companyTags->isEmpty()) {
             $this->logger->debug('COMPANY: Company currently has tags '.implode(', ', $companyTags->getKeys()));
@@ -543,67 +543,17 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->logger->debug('COMPANY: Company currently does not have any tags');
         }
 
-        if (!is_array($tags)) {
-            $tags = explode(',', $tags);
-        }
+        $tags = $this->normalizeCompanyTags($tags);
 
         if (empty($tags) && empty($removeTags)) {
             return false;
         }
 
         $this->logger->debug('COMPANY: Adding '.implode(', ', $tags).' to company ID# '.$company->getId());
-
-        array_walk($tags, function (&$val): void {
-            $val = html_entity_decode(trim($val), ENT_QUOTES);
-            $val = InputHelper::_($val, 'string');
-        });
-        $tags = array_filter($tags, fn ($tag) => strlen($tag) > 0);
-
-        $foundTags = $this->getTagRepository()->getTagsByName($tags);
-        foreach ($tags as $tag) {
-            if (str_starts_with($tag, '-')) {
-                $tag = substr($tag, 1);
-
-                if (array_key_exists($tag, $foundTags) && $companyTags->contains($foundTags[$tag])) {
-                    $tagsModified = true;
-                    $company->removeTag($foundTags[$tag]);
-                    $this->logger->debug('COMPANY: Removed '.$tag);
-                }
-            } else {
-                $tagToBeAdded = null;
-
-                if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag($tag, false);
-                } elseif (!$companyTags->contains($foundTags[$tag])) {
-                    $tagToBeAdded = $foundTags[$tag];
-                }
-
-                if ($tagToBeAdded) {
-                    $company->addTag($tagToBeAdded);
-                    $tagsModified = true;
-                    $this->logger->debug('COMPANY: Added '.$tag);
-                }
-            }
-        }
+        $tagsModified = $this->applyCompanyTagAdditions($company, $tags, $companyTags);
 
         if (!empty($removeTags)) {
-            $this->logger->debug('COMPANY: Removing '.implode(', ', $removeTags).' for company ID# '.$company->getId());
-
-            array_walk($removeTags, function (&$val): void {
-                $val = html_entity_decode(trim($val), ENT_QUOTES);
-                $val = InputHelper::_($val, 'string');
-            });
-            $removeTags = array_filter($removeTags, fn ($tag) => strlen($tag) > 0);
-
-            $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
-
-            foreach ($removeTags as $tag) {
-                if (array_key_exists($tag, $foundRemoveTags) && $companyTags->contains($foundRemoveTags[$tag])) {
-                    $company->removeTag($foundRemoveTags[$tag]);
-                    $tagsModified = true;
-                    $this->logger->debug('COMPANY: Removed '.$tag);
-                }
-            }
+            $tagsModified = $this->applyCompanyTagRemovals($company, $removeTags, $companyTags) || $tagsModified;
         }
 
         if ($persist && $tagsModified) {
@@ -611,6 +561,110 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         return $tagsModified;
+    }
+
+    /**
+     * @param string[]|string $tags
+     *
+     * @return string[]
+     */
+    private function normalizeCompanyTags(array|string $tags): array
+    {
+        if (!is_array($tags)) {
+            $tags = explode(',', $tags);
+        }
+
+        array_walk($tags, function (&$val): void {
+            $val = html_entity_decode(trim($val), ENT_QUOTES);
+            $val = InputHelper::_($val, 'string');
+        });
+
+        return array_filter($tags, fn ($tag) => strlen($tag) > 0);
+    }
+
+    /**
+     * @param string[]                $tags
+     * @param Collection<string, Tag> $companyTags
+     */
+    private function applyCompanyTagAdditions(Company $company, array $tags, Collection $companyTags): bool
+    {
+        $tagsModified = false;
+        $foundTags    = $this->getTagRepository()->getTagsByName($tags);
+
+        foreach ($tags as $tag) {
+            $tagsModified = $this->applyCompanyTag($company, $tag, $foundTags, $companyTags) || $tagsModified;
+        }
+
+        return $tagsModified;
+    }
+
+    /**
+     * @param array<string, Tag>      $foundTags
+     * @param Collection<string, Tag> $companyTags
+     */
+    private function applyCompanyTag(Company $company, string $tag, array $foundTags, Collection $companyTags): bool
+    {
+        if (str_starts_with($tag, '-')) {
+            return $this->removeCompanyTagIfPresent($company, substr($tag, 1), $foundTags, $companyTags);
+        }
+
+        return $this->addCompanyTagIfMissing($company, $tag, $foundTags, $companyTags);
+    }
+
+    /**
+     * @param string[]                $removeTags
+     * @param Collection<string, Tag> $companyTags
+     */
+    private function applyCompanyTagRemovals(Company $company, array $removeTags, Collection $companyTags): bool
+    {
+        $tagsModified = false;
+        $this->logger->debug('COMPANY: Removing '.implode(', ', $removeTags).' for company ID# '.$company->getId());
+        $removeTags      = $this->normalizeCompanyTags($removeTags);
+        $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
+
+        foreach ($removeTags as $tag) {
+            $tagsModified = $this->removeCompanyTagIfPresent($company, $tag, $foundRemoveTags, $companyTags) || $tagsModified;
+        }
+
+        return $tagsModified;
+    }
+
+    /**
+     * @param array<string, Tag>      $foundTags
+     * @param Collection<string, Tag> $companyTags
+     */
+    private function removeCompanyTagIfPresent(Company $company, string $tag, array $foundTags, Collection $companyTags): bool
+    {
+        $removed = array_key_exists($tag, $foundTags) && $companyTags->contains($foundTags[$tag]);
+
+        if ($removed) {
+            $company->removeTag($foundTags[$tag]);
+            $this->logger->debug('COMPANY: Removed '.$tag);
+        }
+
+        return $removed;
+    }
+
+    /**
+     * @param array<string, Tag>      $foundTags
+     * @param Collection<string, Tag> $companyTags
+     */
+    private function addCompanyTagIfMissing(Company $company, string $tag, array $foundTags, Collection $companyTags): bool
+    {
+        $tagToBeAdded = null;
+
+        if (!array_key_exists($tag, $foundTags)) {
+            $tagToBeAdded = new Tag($tag, false);
+        } elseif (!$companyTags->contains($foundTags[$tag])) {
+            $tagToBeAdded = $foundTags[$tag];
+        }
+
+        if (null !== $tagToBeAdded) {
+            $company->addTag($tagToBeAdded);
+            $this->logger->debug('COMPANY: Added '.$tag);
+        }
+
+        return null !== $tagToBeAdded;
     }
 
     public function removeTag(Company $company, int $tagId): bool

@@ -301,31 +301,48 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $prefix = 'company';
 
         if (str_starts_with($prop, $prefix)) {
-            $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
-            $current = $this->$getter();
-            if ($current !== $val) {
-                $this->addChange($prop, [$current, $val]);
-            }
+            $this->trackCompanyFieldChange($prop, $val, $prefix);
         } elseif ('owner' === $prop) {
-            $current = $this->getOwner();
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $current->getId() != $val->getId()) {
-                $this->changes['owner'] = [
-                    $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
-                ];
-            }
+            $this->trackOwnerChange($val);
         } elseif ('tags' == $prop) {
-            if ($val instanceof Tag) {
-                $this->changes['tags']['added'][] = $val->getTag();
-            } else {
-                $this->changes['tags']['removed'][] = $val;
-            }
+            $this->trackTagChange($val);
         } else {
             parent::isChanged($prop, $val);
+        }
+    }
+
+    private function trackCompanyFieldChange(string $prop, mixed $val, string $prefix): void
+    {
+        $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
+        $current = $this->$getter();
+
+        if ($current !== $val) {
+            $this->addChange($prop, [$current, $val]);
+        }
+    }
+
+    private function trackOwnerChange(mixed $val): void
+    {
+        $current = $this->getOwner();
+
+        if ($current && !$val) {
+            $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
+        } elseif (!$current && $val) {
+            $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
+        } elseif ($current && $current->getId() != $val->getId()) {
+            $this->changes['owner'] = [
+                $current->getName().'('.$current->getId().')',
+                $val->getName().'('.$val->getId().')',
+            ];
+        }
+    }
+
+    private function trackTagChange(mixed $val): void
+    {
+        if ($val instanceof Tag) {
+            $this->changes['tags']['added'][] = $val->getTag();
+        } else {
+            $this->changes['tags']['removed'][] = $val;
         }
     }
 

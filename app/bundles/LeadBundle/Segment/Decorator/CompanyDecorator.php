@@ -44,21 +44,17 @@ class CompanyDecorator extends BaseDecorator
     public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if (self::COMPANY_TAGS_FILTER === $contactSegmentFilterCrate->getField()) {
-            if ($contactSegmentFilterCrate->isCompanyAllType()) {
-                return AnyCompanyTagRelationValueFilterQueryBuilder::getServiceId();
-            }
-
-            return PrimaryCompanyTagRelationValueFilterQueryBuilder::getServiceId();
+            $queryType = $contactSegmentFilterCrate->isCompanyAllType()
+                ? AnyCompanyTagRelationValueFilterQueryBuilder::getServiceId()
+                : PrimaryCompanyTagRelationValueFilterQueryBuilder::getServiceId();
+        } elseif ($contactSegmentFilterCrate->isCompanyAllType()) {
+            $queryType = AnyCompanyRelationValueFilterQueryBuilder::getServiceId();
+        } elseif ($contactSegmentFilterCrate->isPrimaryCompanyType()) {
+            $queryType = PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId();
+        } else {
+            $queryType = ComplexRelationValueFilterQueryBuilder::getServiceId();
         }
 
-        if ($contactSegmentFilterCrate->isCompanyAllType()) {
-            return AnyCompanyRelationValueFilterQueryBuilder::getServiceId();
-        }
-
-        if ($contactSegmentFilterCrate->isPrimaryCompanyType()) {
-            return PrimaryCompanyRelationValueFilterQueryBuilder::getServiceId();
-        }
-
-        return ComplexRelationValueFilterQueryBuilder::getServiceId();
+        return $queryType;
     }
 }

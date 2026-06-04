@@ -234,24 +234,14 @@ class TagRepository extends CommonRepository
         $persisted = 0;
 
         foreach ($entityIds as $entityId) {
-            $entity = null;
-            if (Lead::class === $entityClass) {
-                $entity = $this->_em->find(Lead::class, (int) $entityId);
-            } elseif (Company::class === $entityClass) {
-                $entity = $this->_em->find(Company::class, (int) $entityId);
-            }
+            $entity = $this->findTaggableEntity((int) $entityId, $entityClass);
 
-            if (!$entity instanceof Lead && !$entity instanceof Company) {
+            if (null === $entity) {
                 continue;
             }
 
             foreach ($tags as $tag) {
-                if ('add' === $addOrRemove) {
-                    $entity->addTag($tag);
-                } else {
-                    $entity->removeTag($tag);
-                }
-
+                $this->updateEntityTag($entity, $tag, $addOrRemove);
                 $result[(int) $entityId][$tag->getId()] = true;
             }
 
@@ -267,6 +257,28 @@ class TagRepository extends CommonRepository
         }
 
         return $result;
+    }
+
+    private function findTaggableEntity(int $entityId, string $entityClass): Lead|Company|null
+    {
+        $entity = null;
+
+        if (Lead::class === $entityClass) {
+            $entity = $this->_em->find(Lead::class, $entityId);
+        } elseif (Company::class === $entityClass) {
+            $entity = $this->_em->find(Company::class, $entityId);
+        }
+
+        return $entity instanceof Lead || $entity instanceof Company ? $entity : null;
+    }
+
+    private function updateEntityTag(Lead|Company $entity, Tag $tag, string $addOrRemove): void
+    {
+        if ('add' === $addOrRemove) {
+            $entity->addTag($tag);
+        } else {
+            $entity->removeTag($tag);
+        }
     }
 
     /**
