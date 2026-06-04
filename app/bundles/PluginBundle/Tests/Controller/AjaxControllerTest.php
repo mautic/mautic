@@ -53,6 +53,7 @@ final class AjaxControllerTest extends TestCase
         $integrationSettings = new Integration();
         $integrationSettings->setFeatureSettings([]);
 
+        // @phpstan-ignore-next-line Test coverage intentionally exercises the legacy PluginBundle integration path.
         $integration = $this->createMock(AbstractIntegration::class);
         $integration->expects($this->once())
             ->method('getFormLeadFields')
@@ -162,11 +163,17 @@ final class TestableAjaxController extends AjaxController
         return $this->form;
     }
 
+    /**
+     * @param array<string, mixed> $dataArray
+     */
     protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         return new JsonResponse($dataArray, $statusCode ?? 200);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function render(string $view, array $parameters = [], ?Response $response = null): Response
     {
         return new Response('rendered field mapping form');
