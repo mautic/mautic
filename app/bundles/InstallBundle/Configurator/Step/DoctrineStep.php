@@ -135,7 +135,7 @@ class DoctrineStep implements StepInterface
      * Return the key values of the available driver array.
      * Required in step.
      *
-     * @see \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::buildForm()
+     * @see DoctrineStepType::buildForm()
      */
     public static function getDriverKeys(): array
     {

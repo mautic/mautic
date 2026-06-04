@@ -365,7 +365,6 @@ class ListModelTest extends TestCase
 
         $reflection = new \ReflectionClass($this->model);
         $property   = $reflection->getProperty('doNotContactRepository');
-        $property->setAccessible(true);
         $property->setValue($this->model, $doNotContactRepository);
 
         $active = $this->model->getActiveSegmentContactCount($segmentId);

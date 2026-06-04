@@ -514,7 +514,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('No JSON content found and exactly one ZIP file must be uploaded.', $response->getContent());
+        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', $response->getContent());
     }
 
     private function createTemporaryFile(string $extension): string

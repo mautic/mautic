@@ -21,8 +21,15 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.2', '8.3', '8.4']
-        db-types: ['mysql:8.4', 'mysql:9.2', 'mariadb:10.11', 'mariadb:11.4']
+        include:
+          - php-versions: '8.2'
+            db-types: 'mysql:8.4'
+          - php-versions: '8.2'
+            db-types: 'mariadb:10.11'
+          - php-versions: '8.5'
+            db-types: 'mysql:9.2'
+          - php-versions: '8.5'
+            db-types: 'mariadb:11.4'
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -275,7 +282,7 @@ jobs:
             exit 1
           fi
         elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
-          if [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
+          if [[ -n "${{ github.base_ref }}" ]] && [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
             stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
             echo $stat
             regex="[0-9]+[[:space:]]insertion"
