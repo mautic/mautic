@@ -65,29 +65,26 @@ trait CategoryListFiltersTrait
         $updatedFilters = $request->get('filters', false);
 
         if (!$updatedFilters) {
-            return $currentFilters;
-        }
+            $filters = $currentFilters;
+        } elseif (!is_string($updatedFilters)) {
+            $filters = [];
+        } else {
+            $decodedFilters = json_decode($updatedFilters, true);
+            $filters        = [];
 
-        if (!is_string($updatedFilters)) {
-            return [];
-        }
+            if (is_array($decodedFilters)) {
+                foreach ($decodedFilters as $updatedFilter) {
+                    if (!is_string($updatedFilter) || !str_contains($updatedFilter, ':')) {
+                        continue;
+                    }
 
-        $decodedFilters = json_decode($updatedFilters, true);
-        if (!is_array($decodedFilters)) {
-            return [];
-        }
-
-        $newFilters = [];
-        foreach ($decodedFilters as $updatedFilter) {
-            if (!is_string($updatedFilter) || !str_contains($updatedFilter, ':')) {
-                continue;
+                    [$column, $value]   = explode(':', $updatedFilter, 2);
+                    $filters[$column][] = $value;
+                }
             }
-
-            [$column, $value]      = explode(':', $updatedFilter, 2);
-            $newFilters[$column][] = $value;
         }
 
-        return $newFilters;
+        return $filters;
     }
 
     /**
