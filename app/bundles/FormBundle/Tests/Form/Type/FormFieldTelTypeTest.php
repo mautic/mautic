@@ -16,6 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormFieldTelTypeTest extends TypeTestCase
 {
+    private const COUNTRY_UNITED_STATES = 'United States';
+
     private TranslatorInterface $translator;
 
     protected function setUp(): void
@@ -45,7 +47,7 @@ final class FormFieldTelTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(FormFieldTelType::class, [], [
             'data' => [
-                'country'       => 'United States',
+                'country'       => self::COUNTRY_UNITED_STATES,
                 'international' => true,
             ],
         ]);
@@ -59,7 +61,7 @@ final class FormFieldTelTypeTest extends TypeTestCase
     public function testCountryFieldConfiguration(): void
     {
         $form = $this->factory->create(FormFieldTelType::class, [], [
-            'data' => ['country' => 'United States'],
+            'data' => ['country' => self::COUNTRY_UNITED_STATES],
         ]);
 
         $countryField = $form->get('country');
@@ -67,8 +69,8 @@ final class FormFieldTelTypeTest extends TypeTestCase
         self::assertFalse($countryField->isRequired());
         self::assertSame('mautic.form.field.type.tel.country_validation', $countryField->getConfig()->getOption('label'));
         self::assertSame('mautic.core.none', $countryField->getConfig()->getOption('placeholder'));
-        self::assertSame('United States', $countryField->getData());
-        self::assertArrayHasKey('United States', $countryField->getConfig()->getOption('choices'));
+        self::assertSame(self::COUNTRY_UNITED_STATES, $countryField->getData());
+        self::assertArrayHasKey(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
     }
 
     public function testCountryValidationMessageFieldConfiguration(): void
