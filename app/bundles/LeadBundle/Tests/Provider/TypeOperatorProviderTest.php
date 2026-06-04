@@ -100,7 +100,7 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
-                OperatorOptions::IN => [
+                OperatorOptions::INCLUDING_ANY => [
                     'label'        => 'in',
                     'expr'         => 'in',
                     'negagte_expr' => 'notIn',

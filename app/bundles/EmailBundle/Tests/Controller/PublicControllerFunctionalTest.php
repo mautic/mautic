@@ -48,7 +48,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferences'] = 1;
         }
 
-        if (in_array($this->name(), ['testContactPreferencesSaveMessage'])) {
+        if (in_array($this->name(), ['testContactPreferencesSaveMessage', 'testLandingPageContactPreferencesSaveMessage'])) {
             $this->configParams['show_contact_segments']           = 1;
             $this->configParams['show_contact_frequency']          = 1;
             $this->configParams['show_contact_pause_dates']        = 1;
@@ -136,7 +136,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
+        $this->assertEquals(1, $crawler->filter('#success-message-text')->count(), $this->client->getResponse()->getContent());
         $expectedMessage = static::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
@@ -648,5 +648,30 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $dncRecords, 'Expected one DoNotContact record');
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason(), 'Expected reason to be UNSUBSCRIBED');
         $this->assertEquals('email', $dncRecords[0]->getChannel(), 'Expected channel to be email');
+    }
+
+    public function testLandingPageContactPreferencesSaveMessage(): void
+    {
+        $lead = $this->createLead();
+
+        $page = $this->createCustomPreferencesPage('<html lang=""><body>{successmessage}<br/>{saveprefsbutton}</body></html>');
+
+        $stat = $this->getStat(null, $lead, $page);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->logoutUser();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+
+        $this->assertResponseIsSuccessful();
+        $form = $crawler->filter('form')->form();
+
+        $this->assertStringContainsString('/email/unsubscribe/tracking_hash_unsubscribe_form_email', $form->getUri());
+
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $successMessage = $crawler->filter('div.pref-successmessage');
+        $this->assertEquals(1, $successMessage->count());
     }
 }

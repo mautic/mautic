@@ -36,7 +36,7 @@
     {% if button.attributes is defined %}
         {% for attribute, value in button.attributes %}
             {% if attribute != 'class' %}
-                {% set custom_attributes = custom_attributes ~ ' ' ~ attribute ~ '="' ~ value|e('html_attr') ~ '"' %}
+                {% set custom_attributes = custom_attributes ~ ' ' ~ attribute ~ '="' ~ value ~ '"' %}
             {% endif %}
         {% endfor %}
     {% endif %}

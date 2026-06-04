@@ -50,7 +50,7 @@ class AssetApiController extends CommonApiController
         $this->entityClass      = Asset::class;
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';
-        $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails', 'projectList'];
+        $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails'];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
@@ -60,6 +60,12 @@ class AssetApiController extends CommonApiController
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
+        // During delete responses Doctrine may already de-reference the entity ID.
+        // In that case, generating a public slug is not possible and should be skipped.
+        if (null === $entity->getId()) {
+            return;
+        }
+
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
         );

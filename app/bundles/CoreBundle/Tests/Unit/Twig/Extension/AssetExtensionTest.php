@@ -15,6 +15,6 @@ class AssetExtensionTest extends AbstractMauticTestCase
         $assetExtension = static::getContainer()->get(AssetExtension::class);
         \assert($assetExtension instanceof AssetExtension);
 
-        Assert::assertStringStartsWith('/app/assets/images/flags/Belgium.png', $assetExtension->getCountryFlag('Belgium'));
+        Assert::assertStringStartsWith('/./app/assets/images/flags/Belgium.png', $assetExtension->getCountryFlag('Belgium'));
     }
 }

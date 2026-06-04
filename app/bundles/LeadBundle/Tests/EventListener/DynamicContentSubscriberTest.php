@@ -116,7 +116,7 @@ class DynamicContentSubscriberTest extends TestCase
         $filters   = [
             [
                 'type'     => 'leadlist',
-                'operator' => OperatorOptions::IN,
+                'operator' => OperatorOptions::INCLUDING_ANY,
                 'filter'   => ['something'],
             ],
         ];
@@ -140,7 +140,7 @@ class DynamicContentSubscriberTest extends TestCase
         $filters   = [
             [
                 'type'     => 'leadlist',
-                'operator' => OperatorOptions::NOT_IN,
+                'operator' => OperatorOptions::EXCLUDING_ANY,
                 'filter'   => ['something'],
             ],
         ];
@@ -150,6 +150,54 @@ class DynamicContentSubscriberTest extends TestCase
 
         $this->segmentRepository->expects(self::once())
             ->method('isNotContactInSegments')
+            ->with($contactId, $filters[0]['filter'])
+            ->willReturn(true);
+
+        $this->subscriber->onContactFilterEvaluate($event);
+        self::assertTrue($event->isEvaluated());
+        self::assertTrue($event->isMatched());
+    }
+
+    public function testOnContactFilterEvaluateNotInAll(): void
+    {
+        $contactId = 1;
+        $filters   = [
+            [
+                'type'     => 'leadlist',
+                'operator' => OperatorOptions::INCLUDING_ALL,
+                'filter'   => ['something'],
+            ],
+        ];
+        $contact = (new Lead())->setId($contactId);
+
+        $event = new ContactFiltersEvaluateEvent($filters, $contact);
+
+        $this->segmentRepository->expects(self::once())
+            ->method('isContactInAllSegments')
+            ->with($contactId, $filters[0]['filter'])
+            ->willReturn(true);
+
+        $this->subscriber->onContactFilterEvaluate($event);
+        self::assertTrue($event->isEvaluated());
+        self::assertTrue($event->isMatched());
+    }
+
+    public function testOnContactFilterEvaluateNotNotInAll(): void
+    {
+        $contactId = 1;
+        $filters   = [
+            [
+                'type'     => 'leadlist',
+                'operator' => OperatorOptions::EXCLUDING_ALL,
+                'filter'   => ['something'],
+            ],
+        ];
+        $contact = (new Lead())->setId($contactId);
+
+        $event = new ContactFiltersEvaluateEvent($filters, $contact);
+
+        $this->segmentRepository->expects(self::once())
+            ->method('isNotContactInAllSegments')
             ->with($contactId, $filters[0]['filter'])
             ->willReturn(true);
 

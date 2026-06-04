@@ -9,6 +9,7 @@ use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -37,15 +38,21 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
+    /**
+     * @var DncReportService|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $dncReportService;
+
     private ReportHelper $reportHelper;
 
     public function setUp(): void
     {
-        $this->queryBuilder       = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
-        $this->companyReportData  = $this->createMock(CompanyReportData::class);
-        $this->downloadRepository = $this->createMock(DownloadRepository::class);
+        $this->queryBuilder        = $this->createMock(QueryBuilder::class);
+        $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->reportHelper        = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $this->companyReportData   = $this->createMock(CompanyReportData::class);
+        $this->downloadRepository  = $this->createMock(DownloadRepository::class);
+        $this->dncReportService    = $this->createMock(DncReportService::class);
     }
 
     public function testOnReportBuilderWithUnknownContext(): void
@@ -69,7 +76,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
+        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $this->dncReportService);
 
         $reportSubscriber->onReportBuilder($event);
 
@@ -100,7 +107,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = new ReportBuilderEvent($this->createTranslatorMock(), $this->channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $this->reportHelper);
 
-        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
+        $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository, $this->dncReportService);
 
         $reportSubscriber->onReportBuilder($event);
 
@@ -166,7 +173,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $report             = new Report();
         $report->setSource(ReportSubscriber::CONTEXT_ASSET_DOWNLOAD);
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
-        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
+        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository, $this->dncReportService);
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
@@ -185,7 +192,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $report->setGroupBy(['a.id' => 'desc']);
         $event              = new ReportGeneratorEvent($report, [], $this->queryBuilder, $this->channelListHelper);
-        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository);
+        $subscriber         = new ReportSubscriber($this->companyReportData, $this->downloadRepository, $this->dncReportService);
         $subscriber->onReportGenerate($event);
         $this->assertTrue($event->hasGroupBy());
     }

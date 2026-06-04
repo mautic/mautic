@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\DynamicContentBundle\Tests\EventListener;
+namespace Mautic\DynamicContentBundle\Tests\Unit\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;

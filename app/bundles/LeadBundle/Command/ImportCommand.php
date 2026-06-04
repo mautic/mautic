@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
@@ -34,6 +35,7 @@ class ImportCommand extends Command
         private ProcessSignalService $processSignalService,
         private UserTokenSetter $userTokenSetter,
         private LoggerInterface $logger,
+        private NotificationModel $notificationModel,
     ) {
         parent::__construct();
     }
@@ -96,7 +98,7 @@ EOT
         ).'</info>');
 
         try {
-            $this->importModel->beginImport($import, $progress, $limit);
+            $this->importModel->beginImport($import, $progress, $limit, $start);
         } catch (ImportFailedException $e) {
             $output->writeln('<error>'.$this->translator->trans(
                 'mautic.lead.import.failed',
@@ -106,6 +108,13 @@ EOT
             ).'</error>');
 
             $this->logError($import, $e);
+
+            $this->notify(
+                $import,
+                $start,
+                $this->translator->trans('mautic.lead.import.failed', ['%reason%' => $import->getStatusInfo()]),
+                'error'
+            );
 
             return Command::FAILURE;
         } catch (ImportDelayedException $e) {
@@ -117,6 +126,13 @@ EOT
             ).'</info>');
 
             $this->logError($import, $e);
+
+            $this->notify(
+                $import,
+                $start,
+                $this->translator->trans('mautic.lead.import.delayed', ['%reason%' => $import->getStatusInfo()]),
+                'warning'
+            );
 
             return Command::FAILURE;
         }
@@ -133,6 +149,9 @@ EOT
             ]
         ).'</info>');
 
+        // Notification is now handled in ImportModel::beginImport to avoid duplicates
+        // and to include the link to the imported file
+
         return Command::SUCCESS;
     }
 
@@ -144,5 +163,25 @@ EOT
         $message .= ' Exception: '.$exception;
 
         $this->logger->warning($message);
+    }
+
+    private function notify(Import $import, float $start, string $header, string $type = 'info'): void
+    {
+        $this->notificationModel->addNotification(
+            $this->translator->trans(
+                'mautic.lead.import.result',
+                [
+                    '%lines%'   => $import->getProcessedRows(),
+                    '%created%' => $import->getInsertedCount(),
+                    '%updated%' => $import->getUpdatedCount(),
+                    '%ignored%' => $import->getIgnoredCount(),
+                    '%time%'    => round(microtime(true) - $start, 2),
+                ]
+            ),
+            $type,
+            false,
+            $header,
+            'ri-download-line'
+        );
     }
 }

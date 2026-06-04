@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Helper;
+namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use GuzzleHttp\Client;

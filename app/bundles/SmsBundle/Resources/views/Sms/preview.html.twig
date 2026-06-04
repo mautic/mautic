@@ -1,4 +1,88 @@
 {# sms @var \Mautic\SmsBundle\Entity\Sms #}
-<blockquote>
-    <p>{{ sms.getMessage() }}</p>
-</blockquote>
+<div class="d-flex jc-center pa-md">
+    <div class="phone-preview animation--slide-in-right">
+        <div class="phone-preview__silence-switch phone-preview__button--outer"></div>
+        <div class="phone-preview__volume-rocker--top phone-preview__button--outer"></div>
+        <div class="phone-preview__volume-rocker--bottom phone-preview__button--outer"></div>
+        <div class="phone-preview__power-button phone-preview__button--outer"></div>
+
+        <div class="phone-preview__top-section">
+            <div class="phone-preview__top-bar">
+                <div class="phone-preview__time">12:00</div>
+                <div class="phone-preview__notch">
+                    <div class="phone-preview__speaker">
+                        <div class="phone-preview__front-camera"></div>
+                    </div>
+                </div>
+                <div class="phone-preview__status-icons">
+                    <i class="ri-signal-tower-line"></i>
+                    <i class="ri-wifi-fill"></i>
+                    <i class="ri-battery-fill"></i>
+                </div>
+            </div>
+            <i class="phone-preview__back-arrow phone-preview__back-arrow--left"></i>
+            <div class="phone-preview__user-avatar">
+                <i class="ri-account-circle-fill"></i>
+            </div>
+            <div class="phone-preview__user-name">{{ configGetParameter('brand_name') }}</div>
+        </div>
+
+        <div class="phone-preview__messages">
+            <div class="phone-preview__message phone-preview__message--from">
+                <span class="phone-preview__message-content">{{ sms.getMessage() }}</span>
+            </div>
+            <div class="phone-preview__message phone-preview__message--to">{{ 'mautic.sms.preview.demo.message'|trans }}</div>
+        </div>
+
+        <div class="phone-preview__keyboard">
+            <div class="phone-preview__keyboard-input">
+                <div class="phone-preview__input-addon">
+                    <i class="ri-camera-fill"></i>
+                </div>
+                <div class="phone-preview__cursor">
+                    <i class="ri-arrow-up-circle-fill phone-preview__send-button"></i>
+                </div>
+                <input type="text" class="phone-preview__input-field" placeholder="{{ 'mautic.sms.preview.input.placeholder'|trans }}" maxlength="1000"/>
+            </div>
+
+            <div class="phone-preview__keypad">
+                <div class="phone-preview__key-row">
+                    {% for letter in ['Q','W','E','R','T','Y','U','I','O','P'] %}
+                    <div class="phone-preview__key--white phone-preview__key--clickable">{{ letter }}</div>
+                    {% endfor %}
+                </div>
+                <div class="phone-preview__key-spacer"></div>
+                <div class="phone-preview__key-row">
+                    {% for letter in ['A','S','D','F','G','H','J','K','L'] %}
+                    <div class="phone-preview__key--white phone-preview__key--clickable">{{ letter }}</div>
+                    {% endfor %}
+                </div>
+                <div class="phone-preview__key-spacer"></div>
+                <div class="phone-preview__key-row">
+                    <div class="phone-preview__key--white phone-preview__key--shift">&#8679;</div>
+                    {% for letter in ['Z','X','C','V','B','N','M'] %}
+                    <div class="phone-preview__key--white phone-preview__key--clickable">{{ letter }}</div>
+                    {% endfor %}
+                    <div class="phone-preview__key--grey phone-preview__key--backspace">
+                        <i class="ri-delete-back-2-fill"></i>
+                    </div>
+                </div>
+                <div class="phone-preview__key-spacer"></div>
+                <div class="phone-preview__key-row">
+                    <div class="phone-preview__key--grey">123</div>
+                    <div class="phone-preview__key--grey phone-preview__key--emoji">
+                        <i class="ri-emoji-sticker-line"></i>
+                    </div>
+                    <div class="phone-preview__key--space">space</div>
+                    <div class="phone-preview__key--grey phone-preview__key--return">return</div>
+                </div>
+            </div>
+
+            <div class="phone-preview__bottom-symbols">
+                <i class="ri-global-fill phone-preview__symbol--globe"></i>
+                <i class="ri-mic-fill phone-preview__symbol--mic"></i>
+            </div>
+            <div class="phone-preview__home-button"></div>
+        </div>
+    </div>
+</div>

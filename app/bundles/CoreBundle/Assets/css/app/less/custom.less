@@ -141,6 +141,10 @@ label.required:after {
   color: @brand-danger;
 }
 
+.form-control.form-control-narrow {
+  width: 100px;
+}
+
 //Nav header
 #app-header .nav > li > a {
   padding: 10px 12px;
@@ -662,7 +666,7 @@ code:hover > .copy-icon {
   cursor: pointer;
   transition: var(--transition-all-productive);
   .outline();
-  
+
   &:hover { box-shadow: rgba(0, 0, 0, 0.05) 0px 1px 10px; }
 }
 
@@ -688,7 +692,64 @@ code:hover > .copy-icon {
   border-top: 1px solid var(--border-subtle);
   margin-bottom: 8px;
 }
-  
+
+.code-snippet {
+  position: relative;
+
+  button {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &--single {
+    code {
+      min-height: 24px;
+      display: flex;
+      text-wrap: nowrap;
+      align-items: center;
+    }
+    &:has(button) {
+      code {
+        padding-inline-end: 30px;
+
+        &:before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to right, transparent 80%, var(--layer) 95%);
+          border-top-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+          border-bottom-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+          pointer-events: none;
+        }
+      }
+    }
+    button {
+      border-top-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+      border-bottom-right-radius: clamp(4px, var(--border-radius-sm), 6px);
+    }
+  }
+  &--multi {
+    pre:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 70px;
+      background: linear-gradient(to top, var(--layer) 5%, transparent);
+      pointer-events: none;
+      max-height: 100%;
+    }
+  }
+  &--inline {
+    display: inline-flex;
+    code {
+      cursor: pointer;
+    }
+  }
+}
+
 .asset-preview {
   width: 100%;
   height: 100%;

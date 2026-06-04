@@ -17,37 +17,8 @@ class FormSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::FORM_POST_SAVE   => ['onFormPostSave', 0],
             FormEvents::FORM_POST_DELETE => ['onFormDelete', 0],
         ];
-    }
-
-    /**
-     * Add an entry to the audit log.
-     */
-    public function onFormPostSave(Events\FormEvent $event): void
-    {
-        $form = $event->getForm();
-
-        if ($event->isNew()) {
-            return;
-        }
-
-        $foci = $this->model->getRepository()->findByForm($form->getId());
-
-        if (empty($foci)) {
-            return;
-        }
-
-        // Rebuild each focus
-        /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $focus */
-        foreach ($foci as $focus) {
-            $focus->setCache(
-                $this->model->generateJavascript($focus)
-            );
-        }
-
-        $this->model->saveEntities($foci);
     }
 
     /**
@@ -67,9 +38,6 @@ class FormSubscriber implements EventSubscriberInterface
         /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $focus */
         foreach ($foci as $focus) {
             $focus->setForm(null);
-            $focus->setCache(
-                $this->model->generateJavascript($focus)
-            );
         }
 
         $this->model->saveEntities($foci);

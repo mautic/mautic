@@ -78,9 +78,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
                 // Return passport with the token set in the event, if the event set a different token.
                 if ($eventToken !== $token) {
                     return new SelfValidatingPassport(
-                        new UserBadge($eventToken->getUserIdentifier(), function () use ($eventToken): UserInterface {
-                            return $eventToken->getUser();
-                        }),
+                        new UserBadge($eventToken->getUserIdentifier(), fn (): UserInterface => $eventToken->getUser()),
                         [new PluginBadge($eventToken, null, $authenticatingService)]
                     );
                 }
@@ -186,7 +184,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $this->logger->info(sprintf('Authentication request failed: %s', $exception->getMessage()));
 
         // Gets app/bundles/UserBundle/Security/Firewall/AuthenticationListener.php:74 and till the end of the method referenced.
-        if ('api' === $this->firewallName) {
+        if (in_array($this->firewallName, ['api', 'v2api'])) {
             // Continue with another authentication.
             return null;
         }

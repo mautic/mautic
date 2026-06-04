@@ -13,6 +13,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testTrackingImageAction(): void
+    {
+        $this->client->request('GET', '/mtracking.gif?url=http%3A%2F%2Fmautic.org');
+
+        $this->assertResponseStatusCodeSame(200);
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
     public function testContactTrackingTagsXss(string $payload, ?string $expectedSanitized): void
     {

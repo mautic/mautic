@@ -19,6 +19,16 @@
 <div class="type-helper-text-01 mb-32">{{ 'mautic.campaign.event.condition.descr'|trans }}</div>
 {% endset %}
 
+{% set cloneTileContent %}
+<h3 class="type-heading-02 mb-lg">{{ 'mautic.campaign.event.clone.header'|trans }}</h3>
+<div class="type-helper-text-01 campaign-paste-detail">
+    <span>{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span>
+</div>
+<div class="type-helper-text-01 campaign-paste-detail">
+    <span>{{ 'mautic.campaign.event.clone.from'|trans }}: </span><span data-campaign-event-clone="sourceCampaignName"></span>
+</div>
+{% endset %}
+
 <div class="hide" id="CampaignEventPanel">
     <div id="CampaignEventPanelGroups">
         <div class="row">
@@ -54,39 +64,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="mr-0 ml-0 pl-xs pr-xs mt-xs campaign-group-container col-md-12">
-                <div id="CampaignPasteContainer" class="panel mb-0">
-                    <div id="CampaignPasteDescription" class="panel-body">
-                        <div><b>{{ 'mautic.campaign.event.clone.header'|trans }}</b></div>
-                        <div><span class="text-secondary">{{ 'mautic.campaign.event.clone.name'|trans }}: </span><span data-campaign-event-clone="sourceEventName"></span></div>
-                        <div><span class="text-secondary">{{ 'mautic.campaign.event.clone.from'|trans }}: </span><span data-campaign-event-clone="sourceCampaignName"></span></div>
-
-                    </div>
-                    <div class="panel-footer">
-                        {% include '@MauticCore/Helper/button.html.twig' with {
-                            buttons: [
-                                {
-                                    label: 'mautic.campaign.event.clone.insert',
-                                    size: 'md',
-                                    href: path(route, {
-                                        'objectAction': 'insert',
-                                        'campaignId': campaignId,
-                                        'anchor': 'none',
-                                        'anchorEventType': 'none'
-                                    }),
-                                    variant: 'ghost',
-                                    attributes: {
-                                        'id': 'EventInsertButton',
-                                        'data-toggle': 'ajax',
-                                        'data-target': 'CampaignEvent_',
-                                        'data-ignore-formexit': 'true',
-                                        'data-method': 'POST',
-                                        'data-hide-loadingbar': 'true'
-                                    }
-                                }
-                            ]
-                        } %}
-                    </div>
+            <div class="mr-0 ml-0 pl-xs pr-xs mt-sm campaign-group-container col-md-12">
+                <div id="CampaignPasteContainer">
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        'type': 'clickable',
+                        'content': cloneTileContent,
+                        'icon': 'ri-file-copy-line',
+                        'href': path(route, {
+                            'objectAction': 'insert',
+                            'campaignId': campaignId,
+                            'anchor': 'none',
+                            'anchorEventType': 'none'
+                        }),
+                        'attributes': {
+                            'data-campaign-event-insert-button': 'true',
+                            'data-toggle': 'ajax',
+                            'data-target': 'CampaignEvent_',
+                            'data-ignore-formexit': 'true',
+                            'data-method': 'POST',
+                            'data-hide-loadingbar': 'true',
+                            'aria-label': 'mautic.campaign.event.clone.insert'|trans
+                        }
+                    } %}
                 </div>
             </div>
         </div>

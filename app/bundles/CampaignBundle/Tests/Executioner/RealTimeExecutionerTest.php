@@ -11,57 +11,37 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
+class RealTimeExecutionerTest extends TestCase
 {
-    /**
-     * @var MockObject|LeadModel
-     */
-    private MockObject $leadModel;
+    private MockObject&LeadModel $leadModel;
 
-    /**
-     * @var MockObject|EventRepository
-     */
-    private MockObject $eventRepository;
+    private MockObject&EventRepository $eventRepository;
 
-    /**
-     * @var MockObject|EventExecutioner
-     */
-    private MockObject $executioner;
+    private MockObject&EventExecutioner $executioner;
 
-    /**
-     * @var MockObject|DecisionExecutioner
-     */
-    private MockObject $decisionExecutioner;
+    private MockObject&DecisionExecutioner $decisionExecutioner;
 
-    /**
-     * @var MockObject|EventCollector
-     */
-    private MockObject $eventCollector;
+    private MockObject&EventCollector $eventCollector;
 
-    /**
-     * @var MockObject|EventScheduler
-     */
-    private MockObject $eventScheduler;
+    private MockObject&EventScheduler $eventScheduler;
 
-    /**
-     * @var MockObject|ContactTracker
-     */
-    private MockObject $contactTracker;
+    private MockObject&ContactTracker $contactTracker;
 
-    /**
-     * @var MockObject|LeadRepository
-     */
-    private MockObject $leadRepository;
+    private MockObject&LeadRepository $leadRepository;
 
     private DecisionHelper $decisionHelper;
+
+    private EventRedirectionHelper&MockObject $redirectionHelper;
 
     protected function setUp(): void
     {
@@ -81,7 +61,12 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->decisionHelper = new DecisionHelper($this->leadRepository);
+        $this->decisionHelper    = new DecisionHelper($this->leadRepository);
+        $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
+
+        // Configure the redirection helper mock to return the event it receives
+        $this->redirectionHelper->method('handleEventRedirection')
+            ->willReturnCallback(fn (Event $event) => $event);
     }
 
     public function testContactNotFoundResultsInEmptyResponses(): void
@@ -377,7 +362,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventScheduler,
             $this->contactTracker,
-            $this->decisionHelper
+            $this->decisionHelper,
+            $this->redirectionHelper
         );
     }
 }

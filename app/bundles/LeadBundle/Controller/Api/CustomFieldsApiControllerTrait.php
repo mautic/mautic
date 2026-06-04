@@ -105,7 +105,7 @@ trait CustomFieldsApiControllerTrait
                 if (!isset($fieldDefinition['properties'])) {
                     $fieldDefinition['properties'] = [];
                 }
-                $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
+                $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];
@@ -129,7 +129,7 @@ trait CustomFieldsApiControllerTrait
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
 
-        if (isset($this->fieldCache[$object])) {
+        if (!empty($this->fieldCache[$object])) {
             return $this->fieldCache[$object];
         }
 

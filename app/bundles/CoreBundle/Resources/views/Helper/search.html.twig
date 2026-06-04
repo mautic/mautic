@@ -82,7 +82,7 @@
             'data-toggle': 'popover',
             'data-html': 'true',
             'data-placement': 'left',
-            'data-content': filtering|raw
+            'data-content': filtering|escape('html_attr')
         },
         label: 'mautic.core.quick_filters'
     }

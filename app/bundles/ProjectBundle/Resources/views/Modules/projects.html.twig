@@ -5,7 +5,7 @@
     {% set projectPopover %}
         <header class="project-popover__header mt-xs">
             <span class="project-popover__icon" aria-hidden="true"><i class="ri-archive-stack-line"></i></span>
-            <h2 class="project-popover__title type-heading-02 text-interactive">{{ project.name }}</h2>
+            <h2 class="project-popover__title type-heading-02 text-interactive">{{ project.name|striptags }}</h2>
         </header>
 
         <div class="project-popover__meta mb-md">
@@ -49,7 +49,7 @@
                         size: 'sm',
                         wide: true,
                         attributes: {
-                            class: 'project-popover__action'
+                            class: 'project-popover__action ml-0'
                         }
                     }
                 ]) %}

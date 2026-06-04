@@ -15,6 +15,7 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -60,6 +61,8 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
     private ReportSubscriber $subscriber;
 
+    private MockObject&DncReportService $dncReportService;
+
     public function setUp(): void
     {
         $this->configParams['form_results_data_sources'] = true;
@@ -73,13 +76,15 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->dncReportService     = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
             $this->coreParametersHelper,
-            $this->translator
+            $this->translator,
+            $this->dncReportService
         );
     }
 

@@ -61,6 +61,7 @@
             'iconClass' : 'ri-send-plane-line',
             'btnText'   : 'mautic.email.send',
             'primary'   : true,
+            'priority'  : 500,
         } %}
         {% if email.isBackgroundSending() %}
             {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
@@ -68,6 +69,23 @@
         {% endif %}
 
         {% set customButtons = customButtons|merge([sendButton]) %}
+    {% endif %}
+    {% set sendButtons = [] %}
+    {% if 'list' == emailType %}
+        {% set scheduleButton = {
+            'attr': {
+                'class'       : 'btn btn-tertiary btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': email.getId()}),
+                'data-header': 'mautic.email.send.schedule'|trans
+            },
+            'iconClass': 'ri-calendar-schedule-line',
+            'btnText': 'mautic.email.send.schedule',
+            'primary': true,
+            'priority': 400
+        } %}
+        {% set customButtons = customButtons|merge([scheduleButton]) %}
     {% endif %}
     {% set sendExampleButton = {
         'attr' : {
@@ -80,6 +98,8 @@
         },
         'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
+        'primary'   : true,
+        'priority': 300
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
     {% set heatmapButton = {
@@ -95,6 +115,33 @@
         'btnText'   : 'mautic.email.heatmap.click_heatmap'
     } %}
     {% set customButtons = customButtons|merge([heatmapButton]) %}
+
+    {% if permissions['email:emails:create']
+        and not email.isTranslation(true)
+        and not email.isVariant(true)
+        and (email.hasTranslations() or email.hasVariants())
+    %}
+        {% set cloneWithRelationsButton = {
+            'attr' : {
+                'class'                 : 'btn btn-ghost btn-sm btn-nospin',
+                'data-toggle'           : 'confirmation',
+                'data-message'          : 'mautic.email.form.confirmclone_with_relations'|trans({
+                    '%name%' : email.name
+                })|e,
+                'data-confirm-text'     : 'mautic.email.clone_with_relations'|trans|e,
+                'data-confirm-callback' : 'executeAction',
+                'data-cancel-text'      : 'mautic.core.form.cancel'|trans|e,
+                'href'                  : path('mautic_email_action', {
+                    'objectAction' : 'cloneWithTranslations',
+                    'objectId'     : email.getId()
+                }),
+            },
+            'iconClass' : 'ri-file-copy-2-line',
+            'btnText'   : 'mautic.email.clone_with_relations'|trans,
+            'priority'  : 0,
+        } %}
+        {% set customButtons = customButtons|merge([cloneWithRelationsButton]) %}
+    {% endif %}
 {% endif %}
 
 {# Only show A/B test button if not already a translation of an a/b test #}
@@ -104,13 +151,15 @@
     {% if not isEmbedded %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
         'entity': email,
-        'status': email.getPublishUp() is not null ? 'sending' : 'available'
+        'status': email.getPublishUp() is not null ? 'sending' : 'available',
+        'sendingStatus': email.getSendingStatus(),
     }) -}}
     <div class="label__divider"></div>
 
         {% include '@MauticCore/Helper/_tag.html.twig' with { tags: [
             {
                 color: 'high-contrast',
+                icon: emailType == 'list' ? 'ri-pie-chart-line' : 'ri-mail-open-line',
                 label: emailType == 'list'
                     ? 'mautic.email.type.list.header'
                     : (emailType == 'template' ? 'mautic.email.type.template.header' : type)
@@ -129,7 +178,8 @@
                     label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
                     icon: 'ri-organization-chart',
                     attributes: {
-                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id})
+                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants.parent.id}),
+                        'data-toggle': 'ajax'
                     }
                 }
             ] } %}
@@ -147,7 +197,8 @@
                     label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.name}),
                     icon: 'ri-translate',
                     attributes: {
-                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id})
+                        href: path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations.parent.id}),
+                        'data-toggle': 'ajax'
                     }
                 }
             ] } %}
@@ -275,7 +326,7 @@
                               {% endif %}
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b">{{ 'mautic.email.stat.sent'|trans }}</span>
+                                      <span class="fw-b" data-toggle="tooltip" data-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
                                   </td>
                                   <td>{{ email.sentCount }}</td>
                               </tr>
@@ -323,7 +374,7 @@
                                 {
                                     'title': 'mautic.email.stat.sent',
                                     'value': email.getSentCount(true),
-                                    'tooltip': 'mautic.email.stat.sent.tooltip',
+                                    'tooltip': 'mautic.email.stat.sent.details',
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_sent'|trans) ~ ':' ~ email.getId()}),
                                     'icon': 'ri-mail-unread-line'
                                 },

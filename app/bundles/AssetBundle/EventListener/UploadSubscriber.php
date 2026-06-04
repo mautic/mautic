@@ -5,20 +5,19 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UploadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
         private AssetModel $assetModel,
-        protected Translator $translator,
         private FileUploadValidator $fileUploadValidator,
     ) {
     }
@@ -60,49 +59,35 @@ class UploadSubscriber implements EventSubscriberInterface
      */
     public function onUploadValidation(ValidationEvent $event): void
     {
-        $file                = $event->getFile();
-        $extensions          = $this->coreParametersHelper->get('allowed_extensions');
-        $configuredMimeTypes = $this->coreParametersHelper->get('allowed_mimetypes');
-        $allowedMimeTypes    = array_intersect_key($configuredMimeTypes, array_flip($extensions));
-        $maxSize             = $this->assetModel->getMaxUploadSize('B');
+        $file       = $event->getFile();
+        $extensions = $this->coreParametersHelper->get('allowed_extensions');
+        $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
         if (null === $file) {
             return;
         }
 
         try {
-            $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize, 'mautic.asset.asset.error.file.size');
+            $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize);
         } catch (FileInvalidException $e) {
             throw new ValidationException($e->getMessage());
         }
 
         try {
-            $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions, 'mautic.asset.asset.error.file.extension');
+            $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions);
         } catch (FileInvalidException $e) {
             throw new ValidationException($e->getMessage());
         }
 
-        if (array_key_exists(strtolower($file->getExtension()), array_change_key_case($configuredMimeTypes, CASE_LOWER))) {
-            try {
-                $this->checkMimeType($file->getMimeType(), $allowedMimeTypes, 'mautic.asset.asset.error.file.mimetype');
-            } catch (FileInvalidException $e) {
-                throw new ValidationException($e->getMessage());
-            }
-        }
-    }
+        \assert($file instanceof UploadedFile);
 
-    /**
-     * @param array<string,string> $allowedMimeTypes
-     */
-    private function checkMimeType(string $mimeType, array $allowedMimeTypes, string $extensionErrorMsg): void
-    {
-        if (!in_array(strtolower($mimeType), array_map('strtolower', $allowedMimeTypes), true)) {
-            $error = $this->translator->trans($extensionErrorMsg, [
-                '%fileMimetype%' => $mimeType,
-                '%mimetypes%'    => implode(', ', $allowedMimeTypes),
-            ], 'validators');
-
-            throw new FileInvalidException($error);
+        try {
+            $this->fileUploadValidator->checkMimeTypesMatchExtension([
+                $file->getClientMimeType(),
+                $file->getMimeType(),
+            ], $file->getExtension());
+        } catch (FileInvalidException $e) {
+            throw new ValidationException($e->getMessage());
         }
     }
 }

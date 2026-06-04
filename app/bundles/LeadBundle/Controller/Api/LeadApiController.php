@@ -723,4 +723,14 @@ class LeadApiController extends CommonApiController
 
         return $form->isSubmitted() && $form->isValid();
     }
+
+    /**
+     * @param Lead $entity
+     */
+    protected function detachEntity(object $entity): void
+    {
+        if (empty($entity->getPreviousId())) {
+            parent::detachEntity($entity);
+        }
+    }
 }

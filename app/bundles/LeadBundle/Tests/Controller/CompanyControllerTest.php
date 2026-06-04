@@ -1,11 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ProjectBundle\Entity\Project;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,7 +42,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
             ],
         ];
 
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /** @var CompanyModel $model */
         $model = self::getContainer()->get('mautic.lead.model.company');
 
         foreach ($companiesData as $i => $companyData) {
@@ -58,13 +64,35 @@ class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionCompany(): void
     {
-        $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
+        $crawler                = $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
+        $this->assertSame('', trim($crawler->filter('#company_contact_engagement')->text()));
+        $this->assertSame('', trim($crawler->filter('#contacts-table')->text()));
+    }
+
+    public function testCompanyViewGraph(): void
+    {
+        $this->createLead();
+        $segment = $this->createSegment();
+        $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $crawler  = $this->client->request('GET', "s/company/graph/{$this->company1Id}");
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $body           = json_decode($response->getContent(), true);
+        $crawler        = new Crawler($body['newContent']);
+        $canvasJson     = trim($crawler->filter('canvas')->html());
+        $canvasData     = json_decode($canvasJson, true);
+        $datasets       = $canvasData['datasets'] ?? [];
+        $engagementData = $datasets[0]['data'] ?? [];
+        $totalContacts  = array_sum($engagementData);
+
+        self::assertStringContainsString('Engagements', $response->getContent());
+        self::assertSame(1, $totalContacts);
     }
 
     /**
@@ -72,57 +100,80 @@ class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testEditActionCompany(): void
     {
-        $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $crawler                = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
+
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
+    }
+
+    public function testEditAndCancelActionCompany(): void
+    {
+        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $buttonCrawler = $crawler->selectButton('Cancel');
+        $form          = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
     }
 
     /* Get company contacts list */
     public function testListCompanyContacts(): void
     {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        $leadModel    = self::getContainer()->get('mautic.lead.model.lead');
-        $company1     = $companyModel->getEntity($this->company1Id);
+        \assert($companyModel instanceof CompanyModel);
+
+        $leadModel = self::getContainer()->get('mautic.lead.model.lead');
+        \assert($leadModel instanceof LeadModel);
+
+        $company1 = $companyModel->getEntity($this->company1Id);
 
         // Create a lead linked to the first company
-        $lead1    = new Lead();
-        $lead1
-          ->setFirstname('lead')
-          ->setLastname('for '.$company1->getName());
+        $lead1 = new Lead();
+        $lead1->setFirstname('lead')
+            ->setEmail('test1@test.com')
+            ->setLastname('for '.$company1->getName());
         $leadModel->saveEntity($lead1);
 
         $companyModel->addLeadToCompany($company1, $lead1);
 
         // Create a lead not linked to a company
-        $lead2    = new Lead();
-        $lead2
-          ->setFirstname('lead')
-          ->setLastname('without company');
+        $lead2 = new Lead();
+        $lead2->setFirstname('lead')
+            ->setLastname('without company');
         $leadModel->saveEntity($lead2);
 
         // Create a lead not linked to a company, but with `ids` in it's name (see https://github.com/mautic/mautic/issues/12415)
-        $lead3    = new Lead();
-        $lead3
-          ->setFirstname('lead')
-          ->setLastname('without company')
-          ->setEmail('example@idstart.com');
+        $lead3 = new Lead();
+        $lead3->setFirstname('lead')
+            ->setLastname('without company')
+            ->setEmail('example@idstart.com');
         $leadModel->saveEntity($lead3);
 
         $crawler        = $this->client->request('GET', '/s/company/'.$this->company1Id.'/contacts/');
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals(1, $leadsTableRows->count(), $crawler->html());
 
-        $crawler         = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
-        $leadsTableRows  = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $clientResponse = $this->client->getResponse();
+        $this->assertStringContainsString('test1@test.com', $clientResponse->getContent());
+        $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), $clientResponse->getContent());
+        $this->assertStringContainsString('1 item', $clientResponse->getContent());
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $crawler        = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+
+        $this->assertResponseIsSuccessful();
         $this->assertEquals(0, $leadsTableRows->count(), $crawler->html());
     }
 
@@ -133,7 +184,6 @@ class CompanyControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/companies/new/');
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -155,7 +205,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
         // Use the Crawler to parse the HTML content
-        $crawler = new \Symfony\Component\DomCrawler\Crawler($clientResponseContent);
+        $crawler = new Crawler($clientResponseContent);
 
         // Check for specific buttons by their IDs
         $applyButton  = $crawler->filter('#company_buttons_apply');
@@ -188,5 +238,55 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
         $savedCompany = $this->em->find(Company::class, $this->company1Id);
         $this->assertSame($project->getId(), $savedCompany->getProjects()->first()->getId());
+    }
+
+    protected function createLead(): Lead
+    {
+        $lead = new Lead();
+        $lead->setFirstname('Firstname');
+        $lead->setLastname('Lastname');
+        $lead->setEmail('test@test.com');
+        $lead->setPhone('555-666-777');
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        \assert($companyModel instanceof CompanyModel);
+
+        $company = $companyModel->getEntity($this->company1Id);
+
+        $companyModel->addLeadToCompany($company, $lead);
+
+        $lead->setCompany($company->getName());
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
+    }
+
+    private function createSegment(): LeadList
+    {
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+
+        $segment = new LeadList();
+        $segment->setFilters($filters);
+        $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
+        $segment->setAlias('segment-a');
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
     }
 }

@@ -38,6 +38,7 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         }
 
         $campaignId = $event->getCampaign()->getId();
+        // For campaign deletion, remove both events and logs
         $this->leadEventLogRepository->removeEventLogsByCampaignId($campaignId);
         $this->eventModel->deleteEventsByCampaignId($campaignId);
         $this->campaignModel->deleteCampaign($event->getCampaign());
@@ -48,8 +49,8 @@ class CampaignEventDeleteSubscriber implements EventSubscriberInterface
         if ($this->campaignConfig->shouldDeleteEventLogInBackground()) {
             return;
         }
-        $eventIds   = $event->getEventIds();
-        $this->leadEventLogRepository->removeEventLogs($eventIds);
+        $eventIds = $event->getEventIds();
+        // For individual event deletion, only soft-delete events but keep the logs
         $this->eventModel->deleteEventsByEventIds($eventIds);
     }
 }

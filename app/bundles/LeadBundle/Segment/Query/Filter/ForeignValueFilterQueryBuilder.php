@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -120,6 +121,44 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
                     $filter->getGlue()
                 );
+                break;
+            case OperatorOptions::INCLUDING_ALL:
+                $subQueryBuilder->select($tableAlias.'.'.$foreignContactColumn)
+                    ->from($filter->getTable(), $tableAlias);
+
+                $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()), $foreignContactColumn);
+
+                $expression = $subQueryBuilder->expr()->in(
+                    $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+                $subQueryBuilder->andWhere($expression);
+
+                $subQueryBuilder->groupBy($tableAlias.'.'.$foreignContactColumn);
+                $subQueryBuilder->having('COUNT(DISTINCT '.$tableAlias.'.'.$filter->getField().') = '.count($filterParametersHolder));
+
+                $queryBuilder->addLogic($queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()), $filter->getGlue());
+                break;
+            case OperatorOptions::EXCLUDING_ALL:
+                $subQueryBuilder
+                    ->select('NULL')->from($filter->getTable(), $tableAlias)
+                    ->andWhere($tableAlias.'.'.$foreignContactColumn.' = '.$leadsTableAlias.'.id');
+
+                // The use of NOT EXISTS here requires the use of IN instead of NOT IN to prevent a "double negative."
+                // We are not using EXISTS...NOT IN because it results in including everyone who has at least one entry that doesn't
+                // match the criteria. For example, with tags, if the contact has the tag in the filter but also another tag, they'll
+                // be included in the results which is not what we want.
+                $expression = $subQueryBuilder->expr()->in(
+                    $tableAlias.'.'.$filter->getField(),
+                    $filterParametersHolder
+                );
+
+                $subQueryBuilder->andWhere($expression);
+
+                $subQueryBuilder->groupBy($tableAlias.'.'.$foreignContactColumn);
+                $subQueryBuilder->having('COUNT(DISTINCT '.$tableAlias.'.'.$filter->getField().') = '.count($filterParametersHolder));
+
+                $queryBuilder->addLogic($queryBuilder->expr()->notExists($subQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
                 $subQueryBuilder->select($tableAlias.'.'.$foreignContactColumn)

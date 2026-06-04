@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignLeads;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadsRepository;
+use Mautic\CampaignBundle\Enum\RepublishBehavior;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -41,6 +42,7 @@ abstract class AbstractCampaignTestCase extends MauticMysqlTestCase
         $campaign = new Campaign();
         $campaign->setName('Campaign ABC');
         $campaign->setCreatedBy(1);
+        $campaign->setRepublishBehavior(RepublishBehavior::COUNT_ALL_TIME->value);
 
         $eventA = new Event();
         $eventA->setName('Event A');
