@@ -24,6 +24,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -51,46 +52,8 @@ class FormType extends AbstractType
         ]);
 
         $languageChoices = $this->langHelper->getLanguageChoices();
-        $builder->add(
-            'language',
-            ChoiceType::class,
-            [
-                'choices'     => $languageChoices,
-                'label'       => 'mautic.core.config.form.locale',
-                'required'    => false,
-                'attr'        => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.form.form.locale.tooltip',
-                ],
-                'placeholder' => '',
-            ]
-        );
-
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($languageChoices): void {
-            $data = $event->getData();
-            if (!is_array($data) || !array_key_exists('language', $data)) {
-                return;
-            }
-            $value = (string) ($data['language'] ?? '');
-            if ('' === $value) {
-                return;
-            }
-            if (!in_array($value, $languageChoices, true)) {
-                $form              = $event->getForm();
-                $augmented         = $languageChoices;
-                $augmented[$value] = $value;
-                $form->add('language', ChoiceType::class, [
-                    'choices'     => $augmented,
-                    'label'       => 'mautic.core.config.form.locale',
-                    'required'    => false,
-                    'attr'        => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.form.locale.tooltip',
-                    ],
-                    'placeholder' => '',
-                ]);
-            }
-        });
+        $this->addLanguageField($builder, $languageChoices);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, fn (FormEvent $event) => $this->addSubmittedLanguageChoice($event, $languageChoices));
 
         $transformer = new IdToEntityModelTransformer($this->em, Form::class);
         $builder->add(
@@ -279,5 +242,46 @@ class FormType extends AbstractType
     public function getBlockPrefix(): string
     {
         return 'mauticform';
+    }
+
+    /**
+     * @param array<string, string> $languageChoices
+     */
+    private function addLanguageField(FormBuilderInterface|FormInterface $form, array $languageChoices): void
+    {
+        $form->add(
+            'language',
+            ChoiceType::class,
+            [
+                'choices'     => $languageChoices,
+                'label'       => 'mautic.core.config.form.locale',
+                'required'    => false,
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.form.locale.tooltip',
+                ],
+                'placeholder' => '',
+            ]
+        );
+    }
+
+    /**
+     * @param array<string, string> $languageChoices
+     */
+    private function addSubmittedLanguageChoice(FormEvent $event, array $languageChoices): void
+    {
+        $data = $event->getData();
+        if (!is_array($data) || !array_key_exists('language', $data)) {
+            return;
+        }
+
+        $value = (string) ($data['language'] ?? '');
+        if ('' === $value || in_array($value, $languageChoices, true)) {
+            return;
+        }
+
+        $augmented         = $languageChoices;
+        $augmented[$value] = $value;
+        $this->addLanguageField($event->getForm(), $augmented);
     }
 }

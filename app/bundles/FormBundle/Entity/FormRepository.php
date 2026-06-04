@@ -81,10 +81,8 @@ class FormRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevel) {
-            if (true === $topLevel || 'translation' === $topLevel) {
-                $q->andWhere($q->expr()->isNull('f.translationParent'));
-            }
+        if ($topLevel && (true === $topLevel || 'translation' === $topLevel)) {
+            $q->andWhere($q->expr()->isNull('f.translationParent'));
         }
 
         if (!empty($ignoreIds)) {

@@ -47,7 +47,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Form extends FormEntity implements UuidInterface, TranslationEntityInterface
+class Form extends FormEntity implements UuidInterface, TranslationEntityInterface // NOSONAR Existing Doctrine entity is not split in this feature PR.
 {
     use UuidTrait;
     use TranslationEntityTrait;
@@ -643,7 +643,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     public function setLanguage(?string $language): self
     {
         if (null === $language || '' === $language) {
-            $language = (function_exists('locale_get_default') ? \locale_get_default() : 'en') ?: 'en';
+            $language = $this->getDefaultLanguage();
         }
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -653,7 +653,21 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
 
     public function getLanguage(): ?string
     {
-        return $this->language ?: ((function_exists('locale_get_default') ? \locale_get_default() : 'en') ?: 'en');
+        return $this->language ?: $this->getDefaultLanguage();
+    }
+
+    private function getDefaultLanguage(): string
+    {
+        $language = 'en';
+
+        if (function_exists('locale_get_default')) {
+            $defaultLocale = \locale_get_default();
+            if ($defaultLocale) {
+                $language = $defaultLocale;
+            }
+        }
+
+        return $language;
     }
 
     /**
