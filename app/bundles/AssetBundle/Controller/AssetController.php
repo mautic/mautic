@@ -3,6 +3,7 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssetController extends FormController
 {
+    use CategoryListFiltersTrait;
+
     /**
      * @return JsonResponse|Response
      */
@@ -64,23 +67,13 @@ class AssetController extends FormController
             ];
         }
 
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('asset', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.core.filter.categories' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.asset.list_filters',
+            'asset',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $request->getSession()->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
@@ -125,9 +118,9 @@ class AssetController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
-                'filters'     => $listFilters,
+                'filters'     => $categoryFilters['filters'],
                 'items'       => $assets,
-                'categories'  => $categories,
+                'categories'  => $categoryFilters['categories'],
                 'limit'       => $limit,
                 'permissions' => $permissions,
                 'model'       => $assetModel,

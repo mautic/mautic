@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -27,6 +28,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ListController extends FormController
 {
+    use CategoryListFiltersTrait;
     use EntityContactsTrait;
 
     public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
@@ -856,83 +858,21 @@ class ListController extends FormController
 
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
-        $request        = $this->getCurrentRequest();
-        $session        = $request->getSession();
-        $currentFilters = $session->get('mautic.lead.list.list_filters', []);
-        $updatedFilters = $request->get('filters', false);
-
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('segment', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-        $listFilters          = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.lead.list.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.lead.list.source.segment.category' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    [$clmn, $fltr] = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.lead.list.list_filters', $currentFilters);
-
-        $joinCategories = false;
-        if (!empty($currentFilters)) {
-            $categoryIdsByAlias = [];
-            foreach ($categories as $category) {
-                if (!empty($category['alias'])) {
-                    $categoryIdsByAlias[$category['alias']] = (int) $category['id'];
-                }
-            }
-
-            $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                if ($type === $categoryFilterPrefix) {
-                    $type = 'category';
-                }
-
-                $listFilters['filters']['groups']['mautic.lead.list.source.segment.'.$type]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    if ('category' == $type && is_numeric($fltr)) {
-                        $catIds[] = (int) $fltr;
-                    } elseif ('category' == $type && isset($categoryIdsByAlias[$fltr])) {
-                        $catIds[] = $categoryIdsByAlias[$fltr];
-                    } // else for other group filters
-                }
-            }
-
-            if (!empty($catIds)) {
-                $joinCategories    = true;
-                $filter['force'][] = ['column' => 'cat.id', 'expr' => 'in', 'value' => array_values(array_unique($catIds))];
-            }
-        }
+        $request          = $this->getCurrentRequest();
+        $filterForceCount = count($filter['force'] ?? []);
+        $categoryFilters  = $this->applyCategoryListFilter(
+            $request,
+            'mautic.lead.list.list_filters',
+            'segment',
+            'cat.id',
+            $filter,
+            'mautic.lead.list.source.segment.category',
+            'mautic.lead.list.filter.placeholder',
+        );
+        $joinCategories = count($filter['force'] ?? []) > $filterForceCount;
 
         // Store for customizeViewArguments
-        $this->listFilters = $listFilters;
+        $this->listFilters = $categoryFilters['filters'];
 
         return parent::getIndexItems(
             $start,

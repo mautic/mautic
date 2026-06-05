@@ -13,7 +13,15 @@ trait CategoryListFiltersTrait
      *
      * @return array{filters: array<string, mixed>, categories: array<int|string, array<string, mixed>>}
      */
-    protected function applyCategoryListFilter(Request $request, string $sessionKey, string $categoryType, string $filterColumn, array &$filter): array
+    protected function applyCategoryListFilter(
+        Request $request,
+        string $sessionKey,
+        string $categoryType,
+        string $filterColumn,
+        array &$filter,
+        string $filterGroup = 'mautic.core.filter.categories',
+        string $placeholder = 'mautic.core.category.filter.placeholder',
+    ): array
     {
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel        = $this->getModel('category');
@@ -22,10 +30,10 @@ trait CategoryListFiltersTrait
 
         $listFilters = [
             'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
+                'placeholder' => $this->translator->trans($placeholder),
                 'multiple'    => true,
                 'groups'      => [
-                    'mautic.core.filter.categories' => [
+                    $filterGroup => [
                         'options' => $categories,
                         'prefix'  => $categoryFilterPrefix,
                     ],
@@ -38,7 +46,7 @@ trait CategoryListFiltersTrait
 
         $selectedCategoryValues = $this->getSelectedCategoryValues($currentFilters, $categoryFilterPrefix);
         if (!empty($selectedCategoryValues)) {
-            $listFilters['filters']['groups']['mautic.core.filter.categories']['values'] = $selectedCategoryValues;
+            $listFilters['filters']['groups'][$filterGroup]['values'] = $selectedCategoryValues;
         }
 
         $categoryIds = $this->getSelectedCategoryIds($selectedCategoryValues, $categories);

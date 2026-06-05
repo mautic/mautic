@@ -149,6 +149,34 @@ final class CategoryListFiltersTraitTest extends TestCase
         );
     }
 
+    public function testAppliesCustomFilterGroupAndPlaceholder(): void
+    {
+        $request = $this->createRequest([
+            'filters' => json_encode(['category:first-category'], JSON_THROW_ON_ERROR),
+        ]);
+        $filter = $this->createFilter();
+
+        $result = $this->createController()->apply(
+            $request,
+            'mautic.test.list_filters',
+            'segment',
+            'cat.id',
+            $filter,
+            'mautic.lead.list.source.segment.category',
+            'mautic.lead.list.filter.placeholder'
+        );
+
+        Assert::assertSame('Filter by segment category', $result['filters']['filters']['placeholder']);
+        Assert::assertSame(
+            ['first-category'],
+            $result['filters']['filters']['groups']['mautic.lead.list.source.segment.category']['values']
+        );
+        Assert::assertArrayNotHasKey(
+            'mautic.core.filter.categories',
+            $result['filters']['filters']['groups']
+        );
+    }
+
     /**
      * @param array<string, mixed> $query
      */
@@ -179,6 +207,7 @@ final class CategoryListFiltersTraitTest extends TestCase
             ->willReturnMap([
                 ['mautic.core.searchcommand.category', [], null, null, 'Category'],
                 ['mautic.core.category.filter.placeholder', [], null, null, 'Filter by category'],
+                ['mautic.lead.list.filter.placeholder', [], null, null, 'Filter by segment category'],
             ]);
 
         return new class($categoryModel, $translator) {
@@ -202,9 +231,25 @@ final class CategoryListFiltersTraitTest extends TestCase
              *
              * @return array{filters: array<string, mixed>, categories: array<int|string, array<string, mixed>>}
              */
-            public function apply(Request $request, string $sessionKey, string $categoryType, string $filterColumn, array &$filter): array
+            public function apply(
+                Request $request,
+                string $sessionKey,
+                string $categoryType,
+                string $filterColumn,
+                array &$filter,
+                string $filterGroup = 'mautic.core.filter.categories',
+                string $placeholder = 'mautic.core.category.filter.placeholder',
+            ): array
             {
-                return $this->applyCategoryListFilter($request, $sessionKey, $categoryType, $filterColumn, $filter);
+                return $this->applyCategoryListFilter(
+                    $request,
+                    $sessionKey,
+                    $categoryType,
+                    $filterColumn,
+                    $filter,
+                    $filterGroup,
+                    $placeholder
+                );
             }
         };
     }

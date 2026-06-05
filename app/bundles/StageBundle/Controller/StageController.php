@@ -3,6 +3,7 @@
 namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Mautic\StageBundle\Entity\Stage;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StageController extends AbstractFormController
 {
+    use CategoryListFiltersTrait;
+
     /**
      * @param int $page
      *
@@ -42,23 +45,13 @@ class StageController extends AbstractFormController
         $pageHelper = $pageHelperFactory->make('mautic.stage', $page);
 
         [$limit, $start, $search, $filter] = $this->initializeIndexFilters($pageHelper, $request, 'mautic.stage.filter');
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('stage', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.core.filter.categories' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
+        $categoryFilters                   = $this->applyCategoryListFilter(
+            $request,
+            'mautic.stage.list_filters',
+            'stage',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
         $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
@@ -104,7 +97,7 @@ class StageController extends AbstractFormController
             [
                 'viewParameters' => [
                     'searchValue' => $search,
-                    'filters'     => $listFilters,
+                    'filters'     => $categoryFilters['filters'],
                     'items'       => $stages,
                     'actions'     => $actions['actions'],
                     'page'        => $page,

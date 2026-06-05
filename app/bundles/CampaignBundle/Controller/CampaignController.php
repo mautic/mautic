@@ -923,19 +923,23 @@ class CampaignController extends AbstractStandardFormController
     {
         $newFilters = [];
 
-        if (is_string($updatedFilters)) {
-            $decodedFilters = json_decode($updatedFilters, true);
+        if (!is_string($updatedFilters)) {
+            return $newFilters;
+        }
 
-            if (is_array($decodedFilters)) {
-                foreach ($decodedFilters as $updatedFilter) {
-                    if (!is_string($updatedFilter) || !str_contains($updatedFilter, ':')) {
-                        continue;
-                    }
+        $decodedFilters = json_decode($updatedFilters, true);
 
-                    [$clmn, $fltr]       = explode(':', $updatedFilter, 2);
-                    $newFilters[$clmn][] = $fltr;
-                }
+        if (!is_array($decodedFilters)) {
+            return $newFilters;
+        }
+
+        foreach ($decodedFilters as $updatedFilter) {
+            if (!is_string($updatedFilter) || !str_contains($updatedFilter, ':')) {
+                continue;
             }
+
+            [$clmn, $fltr]       = explode(':', $updatedFilter, 2);
+            $newFilters[$clmn][] = $fltr;
         }
 
         return $newFilters;

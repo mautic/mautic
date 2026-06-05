@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -28,6 +29,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PageController extends FormController
 {
+    use CategoryListFiltersTrait;
     use FormErrorMessagesTrait;
 
     /**
@@ -110,23 +112,13 @@ class PageController extends FormController
         if (!str_contains($search, "{$langSearchCommand}:")) {
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('page', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.core.filter.categories' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.page.list_filters',
+            'page',
+            'c.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.page.orderby', 'p.dateModified');
         $orderByDir = $request->getSession()->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
@@ -163,9 +155,9 @@ class PageController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
-                'filters'     => $listFilters,
+                'filters'     => $categoryFilters['filters'],
                 'items'       => $pages,
-                'categories'  => $categories,
+                'categories'  => $categoryFilters['categories'],
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,

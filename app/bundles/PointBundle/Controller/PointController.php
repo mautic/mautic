@@ -3,6 +3,7 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Model\PointModel;
@@ -13,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PointController extends AbstractFormController
 {
+    use CategoryListFiltersTrait;
+
     /**
      * @param int $page
      *
@@ -40,24 +43,14 @@ class PointController extends AbstractFormController
         $limit          = $pageHelper->getLimit();
         $start          = $pageHelper->getStart();
         $search         = $request->get('search', $request->getSession()->get('mautic.point.filter', ''));
-        $filter         = ['string' => $search, 'force' => []];
-        /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
-        $categoryModel        = $this->getModel('category');
-        $categories           = $categoryModel->getLookupResults('point', '', 0);
-        $categoryFilterPrefix = $this->translator->trans('mautic.core.searchcommand.category');
-
-        $listFilters = [
-            'filters' => [
-                'placeholder' => $this->translator->trans('mautic.core.category.filter.placeholder'),
-                'multiple'    => true,
-                'groups'      => [
-                    'mautic.core.filter.categories' => [
-                        'options' => $categories,
-                        'prefix'  => $categoryFilterPrefix,
-                    ],
-                ],
-            ],
-        ];
+        $filter          = ['string' => $search, 'force' => []];
+        $categoryFilters = $this->applyCategoryListFilter(
+            $request,
+            'mautic.point.list_filters',
+            'point',
+            'cat.id',
+            $filter
+        );
 
         $orderBy    = $request->getSession()->get('mautic.point.orderby', 'p.name');
         $orderByDir = $request->getSession()->get('mautic.point.orderbydir', 'ASC');
@@ -98,7 +91,7 @@ class PointController extends AbstractFormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
-                'filters'     => $listFilters,
+                'filters'     => $categoryFilters['filters'],
                 'items'       => $points,
                 'actions'     => $actions['actions'],
                 'page'        => $page,

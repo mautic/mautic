@@ -40,6 +40,10 @@ class EmailController extends FormController
 
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
+    private const FILTER_TYPE_CATEGORY = 'category';
+    private const FILTER_TYPE_LIST     = 'list';
+    private const FILTER_TYPE_THEME    = 'theme';
+
     private bool $invalidHtmlError = false;
 
     /**
@@ -110,13 +114,13 @@ class EmailController extends FormController
         \assert($leadListModel instanceof ListModel);
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => $leadListModel->getUserLists(),
-            'prefix'  => 'list',
+            'prefix'  => self::FILTER_TYPE_LIST,
         ];
 
         // retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
             'options' => $themeHelper->getInstalledThemes('email'),
-            'prefix'  => 'theme',
+            'prefix'  => self::FILTER_TYPE_THEME,
         ];
 
         // retrieve a list of categories
@@ -154,29 +158,29 @@ class EmailController extends FormController
             $listIds = $catIds = $templates = [];
             foreach ($currentFilters as $type => $typeFilters) {
                 if ($type === $categoryFilterPrefix) {
-                    $type = 'category';
+                    $type = self::FILTER_TYPE_CATEGORY;
                 }
 
                 $key = match ($type) {
-                    'list'     => 'lists',
-                    'category' => 'categories',
-                    'theme'    => 'themes',
+                    self::FILTER_TYPE_LIST     => 'lists',
+                    self::FILTER_TYPE_CATEGORY => 'categories',
+                    self::FILTER_TYPE_THEME    => 'themes',
                     default    => $type,
                 };
 
                 $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
-                    if ('list' === $type) {
+                    if (self::FILTER_TYPE_LIST === $type) {
                         $listIds[] = (int) $fltr;
-                    } elseif ('category' === $type) {
+                    } elseif (self::FILTER_TYPE_CATEGORY === $type) {
                         foreach ($categories as $category) {
                             if (($category['alias'] ?? null) === $fltr) {
                                 $catIds[] = (int) $category['id'];
                                 break;
                             }
                         }
-                    } elseif ('theme' === $type) {
+                    } elseif (self::FILTER_TYPE_THEME === $type) {
                         $templates[] = $fltr;
                     }
                 }
