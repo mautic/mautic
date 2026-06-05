@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CompanySegmentChangeEvent extends Event
+final class CompanySegmentChangeEvent extends Event
 {
     public function __construct(
         private Company $company,

@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-class CompanySegmentRebuildRemoveEvent extends CompanySegmentRebuildChangeEvent
+final class CompanySegmentRebuildRemoveEvent extends CompanySegmentRebuildChangeEvent
 {
 }

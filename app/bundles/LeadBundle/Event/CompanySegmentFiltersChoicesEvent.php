@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
+final class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
     /**
      * @param array<array<array<mixed>>> $choices

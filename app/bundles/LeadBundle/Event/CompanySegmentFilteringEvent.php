@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
-class CompanySegmentFilteringEvent extends CommonEvent
+final class CompanySegmentFilteringEvent extends CommonEvent
 {
     private bool $isFilteringDone;
 

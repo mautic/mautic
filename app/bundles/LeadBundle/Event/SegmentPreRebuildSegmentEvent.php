@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 /**
  * Event dispatched before a company segment is rebuilt.
  */
-class SegmentPreRebuildSegmentEvent extends CommonEvent
+final class SegmentPreRebuildSegmentEvent extends CommonEvent
 {
     private bool $result = false;
 

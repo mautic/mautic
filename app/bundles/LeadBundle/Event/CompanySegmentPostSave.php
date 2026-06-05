@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-class CompanySegmentPostSave extends CompanySegmentSaveEvent
+final class CompanySegmentPostSave extends CompanySegmentSaveEvent
 {
     /**
      * @return array<mixed>

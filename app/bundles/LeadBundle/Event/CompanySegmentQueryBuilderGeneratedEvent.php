@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CompanySegmentQueryBuilderGeneratedEvent extends Event
+final class CompanySegmentQueryBuilderGeneratedEvent extends Event
 {
     public function __construct(
         private CompanySegment $companySegment,
