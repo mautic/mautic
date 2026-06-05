@@ -101,6 +101,9 @@ abstract class AbstractMauticMigration extends AbstractMigration
         );
     }
 
+    /**
+     * @param array<string> $columns
+     */
     public function createIndex(string $tableName, string $indexName, array $columns, bool $unique = false, bool $ifNotExists = true): void
     {
         $this->addSql(
