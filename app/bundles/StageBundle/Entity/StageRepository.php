@@ -20,9 +20,13 @@ class StageRepository extends CommonRepository
             ->leftJoin($this->getTableAlias().'.category', 'c');
 
         if (!empty($args['withContactCount'])) {
-            $q->leftJoin(Lead::class, 'l', 'WITH', 'l.stage = s')
-                ->addSelect('COUNT(l.id) AS contactCount')
-                ->groupBy('s.id');
+            // Use a subquery so the main stage list query stays safe for pagination and sorting.
+            $sq = $this->_em->createQueryBuilder()
+                ->select('count(l.id)')
+                ->from(Lead::class, 'l')
+                ->where('l.stage = s');
+
+            $q->addSelect('('.$sq->getDql().') as contactCount');
             unset($args['withContactCount']);
         }
 

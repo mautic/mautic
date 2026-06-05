@@ -194,9 +194,8 @@
                                 attributes: {
                                     href: path('mautic_page_results', {'objectId': item.id}),
                                     'data-toggle': 'ajax',
-                                    'data-menu-link': 'mautic_form_index',
-                                    disabled: 0 == i.submission_count ? 'disabled' : null
-                                }
+                                    'data-menu-link': 'mautic_form_index'
+                                }|merge(0 == i.submission_count ? {disabled: 'disabled'} : {})
                             }]
                         } %}
                     </td>

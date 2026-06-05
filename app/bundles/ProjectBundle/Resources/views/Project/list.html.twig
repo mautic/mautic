@@ -127,9 +127,8 @@
                                     attributes: {
                                         href: path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}),
                                         'data-toggle': 'ajax',
-                                        'data-menu-link': 'mautic_project_index',
-                                        disabled: 0 == item.entitiesCount|default(0) ? 'disabled' : null
-                                    }
+                                        'data-menu-link': 'mautic_project_index'
+                                    }|merge(0 == item.entitiesCount|default(0) ? {disabled: 'disabled'} : {})
                                 }]
                             } %}
                         </td>
