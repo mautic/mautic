@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Validator\Constraints\UniqueCompanySegmentAlias;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Doctrine\DBAL\Types\Types;
 
 #[ApiResource(
     shortName: 'CompanySegments',
@@ -49,7 +50,6 @@ class CompanySegment extends FormEntity
     public const LINKED_ENTITY = 'company';
     public const DEFAULT_ALIAS = 'cs';
 
-    /** @phpstan-ignore-next-line */
     private ?int $id = null;
 
     private ?string $name = null;
@@ -92,27 +92,27 @@ class CompanySegment extends FormEntity
 
         $builder->addIdColumns();
 
-        $builder->addField('alias', 'string');
+        $builder->addField('alias', Types::STRING);
 
-        $builder->createField('publicName', 'string')
+        $builder->createField('publicName', Types::STRING)
             ->columnName('public_name')
             ->build();
 
         $builder->addCategory();
 
-        $builder->addField('filters', 'json');
+        $builder->addField('filters', Types::JSON);
 
         $builder->createOneToMany('segmentCompanies', SegmentCompany::class)
             ->mappedBy('companySegment')
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('lastBuiltDate', 'datetime')
+        $builder->createField('lastBuiltDate', Types::DATETIME_MUTABLE)
             ->columnName('last_built_date')
             ->nullable()
             ->build();
 
-        $builder->createField('lastBuiltTime', 'float')
+        $builder->createField('lastBuiltTime', Types::FLOAT)
             ->columnName('last_built_time')
             ->nullable()
             ->build();
