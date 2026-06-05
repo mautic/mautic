@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250618122908 extends PreUpAssertionMigration
@@ -35,18 +34,11 @@ final class Version20250618122908 extends PreUpAssertionMigration
 
     public function postUp(Schema $schema): void
     {
-        $platform     = $this->connection->getDatabasePlatform();
-
         $index = $this->generatePropertyName('stage_projects_xref', 'idx', ['stage_id']);
 
-        $this->addSql(
-            DatabasePlatform::getDropIndexSql(
-                $platform,
-                $this->prefix.'stage_projects_xref',
-                $index,
-                false,
-                true
-            )
+        $this->dropIndex(
+            $this->prefix.'stage_projects_xref',
+            $index
         );
     }
 

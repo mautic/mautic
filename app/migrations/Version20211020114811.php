@@ -54,36 +54,27 @@ final class Version20211020114811 extends PreUpAssertionMigration
         $companiesTable = $this->getPrefixedTableName(self::COMPANIES_TABLE);
 
         $this->dropIndexIfExists($companiesTable, self::INDEX_COMPANY_MATCH);
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $companiesTable,
-                self::INDEX_COMPANY_MATCH,
-                ['companyname(191)', 'companycity(191)', 'companycountry(191)', 'companystate(191)']
-            )
+        $this->createIndex(
+            $companiesTable,
+            self::INDEX_COMPANY_MATCH,
+            ['companyname(191)', 'companycity(191)', 'companycountry(191)', 'companystate(191)']
         );
 
         // 2. sync_object_mapping table – shorten indexed columns to 191 chars
         $syncTable = $this->getPrefixedTableName(self::SYNC_OBJECT_MAPPING_TABLE);
 
         $this->dropIndexIfExists($syncTable, self::INDEX_INTEGRATION_OBJECT);
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $syncTable,
-                self::INDEX_INTEGRATION_OBJECT,
-                ['integration(191)', 'integration_object_name(191)', 'integration_object_id(191)', 'integration_reference_id(191)']
-            )
+        $this->createIndex(
+            $syncTable,
+            self::INDEX_INTEGRATION_OBJECT,
+            ['integration(191)', 'integration_object_name(191)', 'integration_object_id(191)', 'integration_reference_id(191)']
         );
 
         $this->dropIndexIfExists($syncTable, self::INDEX_INTEGRATION_REFERENCE);
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $syncTable,
-                self::INDEX_INTEGRATION_REFERENCE,
-                ['integration(191)', 'integration_object_name(191)', 'integration_reference_id(191)', 'integration_object_id(191)']
-            )
+        $this->createIndex(
+            $syncTable,
+            self::INDEX_INTEGRATION_REFERENCE,
+            ['integration(191)', 'integration_object_name(191)', 'integration_reference_id(191)', 'integration_object_id(191)']
         );
 
         // 3. Convert tables to utf8mb4 / UTF8
@@ -116,17 +107,10 @@ final class Version20211020114811 extends PreUpAssertionMigration
 
     private function dropIndexIfExists(string $tableName, string $indexName): void
     {
-        $platform = $this->connection->getDatabasePlatform();
-
         if ($this->indexExists($tableName, $indexName)) {
-            $this->addSql(
-                DatabasePlatform::getDropIndexSql(
-                    $platform,
-                    $tableName,
-                    $indexName,
-                    false,
-                    true
-                )
+            $this->dropIndex(
+                $tableName,
+                $indexName
             );
         }
     }

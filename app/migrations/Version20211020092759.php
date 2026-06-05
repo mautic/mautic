@@ -10,15 +10,16 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20211020092759 extends PreUpAssertionMigration
 {
-    private const TABLE = 'leads';
+    protected const TABLE_NAME = 'leads';
+    protected const INDEX_NAME = 'lead_date_modified';
 
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
             function () {
-                $tableName = $this->getPrefixedTableName(self::TABLE);
+                $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+                $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);
                 $platform  = $this->connection->getDatabasePlatform();
-                $indexName = $this->getIndexName();
 
                 // Check index limit
                 $indexes = DatabasePlatform::listTableIndexes(
@@ -34,47 +35,26 @@ final class Version20211020092759 extends PreUpAssertionMigration
             },
             sprintf(
                 'Index %s cannot be created because the %s table has hit the table index limit or the index already exists',
-                $this->getIndexName(),
-                $this->getPrefixedTableName(self::TABLE)
+                $this->getPrefixedIndexName(self::INDEX_NAME),
+                $this->getPrefixedTableName(self::TABLE_NAME)
             )
         );
     }
 
     public function up(Schema $schema): void
     {
-        $tableName = $this->getPrefixedTableName(self::TABLE);
-        $platform  = $this->connection->getDatabasePlatform();
-        $indexName = $this->getIndexName();
-
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $tableName,
-                $indexName,
-                ['date_modified']
-            )
+        $this->createIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+            ['date_modified']
         );
     }
 
     public function down(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
-        $tableName = $this->getPrefixedTableName(self::TABLE);
-        $indexName = $this->getIndexName();
-
-        $this->addSql(
-            DatabasePlatform::getDropIndexSql(
-                $platform,
-                $tableName,
-                $indexName,
-                false,
-                true
-            )
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME)
         );
-    }
-
-    private function getIndexName(): string
-    {
-        return $this->prefix.'lead_date_modified';
     }
 }

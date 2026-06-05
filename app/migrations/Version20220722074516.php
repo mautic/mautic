@@ -7,50 +7,43 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20220722074516 extends AbstractMauticMigration
 {
+    protected const TABLE_NAME = 'notifications';
+    protected const INDEX_NAME = 'deduplicate_date_added';
+
     public function preUp(Schema $schema): void
     {
-        if ($schema->getTable($this->getTableName())->hasColumn('deduplicate')) {
-            throw new SkipMigration("The deduplicate column has already been added to the {$this->getTableName()} table.");
+        $table = $this->getPrefixedTableName(self::TABLE_NAME);
+
+        if ($schema->getTable($table)->hasColumn('deduplicate')) {
+            throw new SkipMigration("The deduplicate column has already been added to the {$table} table.");
         }
     }
 
     public function up(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
+        $table = $this->getPrefixedTableName(self::TABLE_NAME);
 
-        $this->addSql("ALTER TABLE {$this->getTableName()} ADD deduplicate VARCHAR(32) DEFAULT NULL");
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $this->getTableName(),
-                'deduplicate_date_added',
-                ['deduplicate', 'date_added']
-            )
+        $this->addSql("ALTER TABLE {$table} ADD deduplicate VARCHAR(32) DEFAULT NULL");
+
+        $this->createIndex(
+            $table,
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+            ['deduplicate', 'date_added']
         );
     }
 
     public function down(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
+        $table = $this->getPrefixedTableName(self::TABLE_NAME);
 
-        $this->addSql(
-            DatabasePlatform::getDropIndexSql(
-                $platform,
-                $this->getTableName(),
-                'deduplicate_date_added',
-                false,
-                true
-            )
+        $this->dropIndex(
+            $table,
+            $this->getPrefixedIndexName(self::INDEX_NAME),
         );
-        $this->addSql("ALTER TABLE {$this->getTableName()} DROP deduplicate");
-    }
 
-    private function getTableName(): string
-    {
-        return $this->prefix.'notifications';
+        $this->addSql("ALTER TABLE {$table} DROP deduplicate");
     }
 }

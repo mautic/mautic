@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20231206152313 extends PreUpAssertionMigration
@@ -67,7 +66,6 @@ final class Version20231206152313 extends PreUpAssertionMigration
     public function postUp(Schema $schema): void
     {
         $tableName  = $this->getTableName();
-        $platform   = $this->connection->getDatabasePlatform();
 
         $oldIndexes = [
             $this->getOldLeadIndexName(),
@@ -76,15 +74,7 @@ final class Version20231206152313 extends PreUpAssertionMigration
 
         foreach ($oldIndexes as $oldIndexName) {
             if ($this->indexExists($tableName, $oldIndexName)) {
-                $this->connection->executeStatement(
-                    DatabasePlatform::getDropIndexSql(
-                        $platform,
-                        $tableName,
-                        $oldIndexName,
-                        false,
-                        true
-                    )
-                );
+                $this->dropIndex($tableName, $oldIndexName);
             }
         }
     }

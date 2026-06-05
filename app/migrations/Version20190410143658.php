@@ -11,10 +11,13 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 class Version20190410143658 extends AbstractMauticMigration
 {
+    protected const TABLE_NAME = 'lead_donotcontact';
+    protected const INDEX_NAME = 'leadid_reason_channel';
+
     public function preUp(Schema $schema): void
     {
-        $tableName    = $this->getTableName();
-        $newIndexName = $this->getNewIndexName();
+        $tableName    = $this->getPrefixedTableName(self::TABLE_NAME);
+        $newIndexName = $this->getPrefixedIndexName(self::INDEX_NAME);
 
         // Check real existence via SQL (case-insensitive where needed)
         if ($this->indexExists($tableName, $newIndexName)) {
@@ -24,36 +27,27 @@ class Version20190410143658 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $platform     = $this->connection->getDatabasePlatform();
-        $tableName    = $this->getTableName();
-        $newIndexName = $this->getNewIndexName();
+        $tableName    = $this->getPrefixedTableName(self::TABLE_NAME);
+        $newIndexName = $this->getPrefixedIndexName(self::INDEX_NAME);
 
         // Skip creation if already exists (extra safety)
         if ($this->indexExists($tableName, $newIndexName)) {
             return;
         }
 
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $tableName,
-                $newIndexName,
-                ['lead_id', 'channel', 'reason']
-            )
+        $this->createIndex(
+            $tableName,
+            $newIndexName,
+            ['lead_id', 'channel', 'reason']
         );
 
         // Drop any old single-column lead_id indexes (find dynamically)
         $oldIndexes = $this->findSingleLeadIdIndexes($tableName);
 
         foreach ($oldIndexes as $oldName) {
-            $this->addSql(
-                DatabasePlatform::getDropIndexSql(
-                    $platform,
-                    $tableName,
-                    $oldName,
-                    false,
-                    true
-                )
+            $this->dropIndex(
+                $tableName,
+                $oldName,
             );
         }
     }
@@ -79,15 +73,5 @@ class Version20190410143658 extends AbstractMauticMigration
         }
 
         return $toDrop;
-    }
-
-    private function getNewIndexName(): string
-    {
-        return "{$this->prefix}leadid_reason_channel";
-    }
-
-    private function getTableName(): string
-    {
-        return "{$this->prefix}lead_donotcontact";
     }
 }

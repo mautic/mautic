@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250409150450 extends PreUpAssertionMigration
@@ -25,7 +24,7 @@ final class Version20250409150450 extends PreUpAssertionMigration
         $leadListIdDataType = $this->getColumnTypeSignedOrUnsigned($schema, 'lead_lists', 'id');
         $projectIdDataType  = $this->getColumnTypeSignedOrUnsigned($schema, 'projects', 'id');
 
-        $table = $schema->createTable($this->prefix.'lead_list_projects_xref');
+        $table = $schema->createTable(self::TABLE_NAME);
         $table->addColumn('leadlist_id', 'integer', ['unsigned' => 'UNSIGNED' === $leadListIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
         $table->setPrimaryKey(['leadlist_id', 'project_id']);
@@ -35,23 +34,16 @@ final class Version20250409150450 extends PreUpAssertionMigration
 
     public function postUp(Schema $schema): void
     {
-        $platform     = $this->connection->getDatabasePlatform();
+        $indexName = $this->generatePropertyName(self::TABLE_NAME, 'idx', ['leadlist_id']);
 
-        $index = $this->generatePropertyName('lead_list_projects_xref', 'idx', ['leadlist_id']);
-
-        $this->addSql(
-            DatabasePlatform::getDropIndexSql(
-                $platform,
-                $this->prefix.'lead_list_projects_xref',
-                $index,
-                false,
-                true
-            )
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $indexName
         );
     }
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable($this->prefix.'lead_list_projects_xref');
+        $schema->dropTable($this->getPrefixedTableName(self::TABLE_NAME));
     }
 }

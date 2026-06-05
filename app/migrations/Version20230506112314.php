@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20230506112314 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'lead_donotcontact';
-    private const INDEX_NAME   = 'dnc_date_added';
+    protected const INDEX_NAME = 'dnc_date_added';
 
     protected function preUpAssertions(): void
     {
@@ -33,38 +32,18 @@ final class Version20230506112314 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
-        $platform  = $this->connection->getDatabasePlatform();
-        $indexName = $this->getPrefixedIndexName();
-
-        $this->addSql(
-            DatabasePlatform::getCreateIndexSql(
-                $platform,
-                $tableName,
-                $indexName,
-                ['date_added']
-            )
+        $this->createIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(),
+            ['date_added']
         );
     }
 
     public function down(Schema $schema): void
     {
-        $platform  = $this->connection->getDatabasePlatform();
-        $indexName = $this->getPrefixedIndexName();
-
-        $this->addSql(
-            DatabasePlatform::getDropIndexSql(
-                $platform,
-                $this->getPrefixedTableName(self::TABLE_NAME),
-                $indexName,
-                false,
-                true
-            )
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName()
         );
-    }
-
-    private function getPrefixedIndexName(): string
-    {
-        return $this->prefix.self::INDEX_NAME;
     }
 }

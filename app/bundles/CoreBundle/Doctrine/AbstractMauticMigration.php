@@ -14,6 +14,8 @@ abstract class AbstractMauticMigration extends AbstractMigration
 {
     protected const TABLE_NAME = null;
 
+    protected const INDEX_NAME = null;
+
     /**
      * @var string
      */
@@ -84,6 +86,34 @@ abstract class AbstractMauticMigration extends AbstractMigration
         }
 
         return false;
+    }
+
+    public function dropIndex(string $tableName, string $indexName, bool $ifExists = true): void
+    {
+        $this->addSql(
+            DatabasePlatform::getDropIndexSql(
+                $this->connection->getDatabasePlatform(),
+                $tableName,
+                $indexName,
+                false,
+                $ifExists
+            )
+        );
+    }
+
+    public function createIndex(string $tableName, string $indexName, array $columns, bool $unique = false, bool $ifNotExists = true): void
+    {
+        $this->addSql(
+            DatabasePlatform::getCreateIndexSql(
+                $this->connection->getDatabasePlatform(),
+                $tableName,
+                $indexName,
+                $columns,
+                $unique,
+                false,
+                $ifNotExists
+            )
+        );
     }
 
     /**
@@ -211,6 +241,19 @@ abstract class AbstractMauticMigration extends AbstractMigration
         }
 
         return $this->prefix.$tableName;
+    }
+
+    /**
+     * This method will remove the burden of getting prefixed table name index in individual migration file.
+     * Individual migration files just need to keep a protected constant INDEX_NAME.
+     */
+    protected function getPrefixedIndexName(?string $indexName = null): string
+    {
+        if (null === $indexName) {
+            $indexName = static::INDEX_NAME;
+        }
+
+        return $this->prefix.$indexName;
     }
 
     protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string
