@@ -213,7 +213,7 @@ class EmailRepositoryTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count')
+            ->with('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count')
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);
@@ -253,7 +253,7 @@ class EmailRepositoryTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('select')
-            ->with('SUM( e.sent_count) as sent_count, SUM( e.read_count) as read_count')
+            ->with('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count')
             ->willReturnSelf();
 
         $resultMock = $this->createMock(Result::class);

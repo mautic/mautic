@@ -479,7 +479,7 @@ class EmailRepository extends CommonRepository
         $queryBuilder->resetQueryPart('groupBy');
         $queryBuilder->resetQueryParts(['join']);
 
-        $queryBuilder->select('SUM( e.sent_count) as sent_count, SUM(e.read_count) as read_count');
+        $queryBuilder->select('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count');
         $results = $queryBuilder->executeQuery()->fetchAssociative();
 
         if ($results) {
