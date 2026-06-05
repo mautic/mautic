@@ -21,8 +21,7 @@ trait CategoryListFiltersTrait
         array &$filter,
         string $filterGroup = 'mautic.core.filter.categories',
         string $placeholder = 'mautic.core.category.filter.placeholder',
-    ): array
-    {
+    ): array {
         /** @var \Mautic\CategoryBundle\Model\CategoryModel $categoryModel */
         $categoryModel        = $this->getModel('category');
         $categories           = $categoryModel->getLookupResults($categoryType, '', 0);

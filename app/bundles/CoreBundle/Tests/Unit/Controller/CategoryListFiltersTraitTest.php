@@ -239,8 +239,7 @@ final class CategoryListFiltersTraitTest extends TestCase
                 array &$filter,
                 string $filterGroup = 'mautic.core.filter.categories',
                 string $placeholder = 'mautic.core.category.filter.placeholder',
-            ): array
-            {
+            ): array {
                 return $this->applyCategoryListFilter(
                     $request,
                     $sessionKey,

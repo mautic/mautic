@@ -40,9 +40,9 @@ class PointController extends AbstractFormController
 
         $pageHelper = $pageHelperFactory->make('mautic.point', $page);
 
-        $limit          = $pageHelper->getLimit();
-        $start          = $pageHelper->getStart();
-        $search         = $request->get('search', $request->getSession()->get('mautic.point.filter', ''));
+        $limit           = $pageHelper->getLimit();
+        $start           = $pageHelper->getStart();
+        $search          = $request->get('search', $request->getSession()->get('mautic.point.filter', ''));
         $filter          = ['string' => $search, 'force' => []];
         $categoryFilters = $this->applyCategoryListFilter(
             $request,

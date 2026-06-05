@@ -165,7 +165,7 @@ class EmailController extends FormController
                     self::FILTER_TYPE_LIST     => 'lists',
                     self::FILTER_TYPE_CATEGORY => 'categories',
                     self::FILTER_TYPE_THEME    => 'themes',
-                    default    => $type,
+                    default                    => $type,
                 };
 
                 $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
