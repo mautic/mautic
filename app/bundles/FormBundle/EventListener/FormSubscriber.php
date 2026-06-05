@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;

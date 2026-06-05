@@ -283,4 +283,32 @@ class FormRepository extends CommonRepository
     {
         return 'f';
     }
+
+    /**
+     * Atomically increment the submission count for a form.
+     */
+    public function incrementSubmissionCount(int $formId): void
+    {
+        $qb = $this->createQueryBuilder('f');
+        $qb->update()
+            ->set('f.submissionCount', 'f.submissionCount + 1')
+            ->where('f.id = :id')
+            ->setParameter('id', $formId)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Atomically decrement the submission count for a form.
+     */
+    public function decrementSubmissionCount(int $formId): void
+    {
+        $qb = $this->createQueryBuilder('f');
+        $qb->update()
+            ->set('f.submissionCount', 'CASE WHEN f.submissionCount > 0 THEN f.submissionCount - 1 ELSE 0 END')
+            ->where('f.id = :id')
+            ->setParameter('id', $formId)
+            ->getQuery()
+            ->execute();
+    }
 }
