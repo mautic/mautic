@@ -97,18 +97,17 @@ final class AjaxControllerTest extends TestCase
         $form->method('createView')->willReturn(new FormView());
 
         $controller = new TestableAjaxController(
-            $pluginModel,
-            $form,
-            $coreParametersHelper,
             $this->createStub(ManagerRegistry::class),
             $this->createStub(ModelFactory::class),
             $this->createStub(UserHelper::class),
+            $coreParametersHelper,
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(FlashBag::class),
             $this->createStub(RequestStack::class),
             $this->createStub(CorePermissions::class),
         );
+        $controller->setTestDoubles($pluginModel, $form);
 
         $response = $controller->getIntegrationFieldsAction($request, $helper);
         $data     = json_decode((string) $response->getContent(), true);
@@ -127,30 +126,14 @@ final class TestableAjaxController extends AjaxController
     /** @var array<string, mixed> */
     public array $formOptions = [];
 
-    public function __construct(
-        private MauticModelInterface $pluginModel,
-        private FormInterface $form,
-        CoreParametersHelper $coreParametersHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-    ) {
-        parent::__construct(
-            $doctrine,
-            $modelFactory,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
-            $translator,
-            $flashBag,
-            $requestStack,
-            $security,
-        );
+    private MauticModelInterface $pluginModel;
+
+    private FormInterface $form;
+
+    public function setTestDoubles(MauticModelInterface $pluginModel, FormInterface $form): void
+    {
+        $this->pluginModel = $pluginModel;
+        $this->form        = $form;
     }
 
     /**
