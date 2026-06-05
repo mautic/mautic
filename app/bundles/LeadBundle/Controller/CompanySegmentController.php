@@ -41,7 +41,6 @@ class CompanySegmentController extends AbstractStandardFormController
 
         $session = $request->getSession();
         $limit   = $session->get('mautic.'.$this->getSessionBase().'.limit', $this->coreParametersHelper->get('default_pagelimit'));
-        /** @phpstan-ignore-next-line */
         $start   = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -67,7 +66,6 @@ class CompanySegmentController extends AbstractStandardFormController
         }
 
         /** @var \Doctrine\ORM\Tools\Pagination\Paginator<CompanySegment> $items */
-        /** @phpstan-ignore-next-line */
         [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         $count = !is_numeric($count) ? 0 : (int) $count;
