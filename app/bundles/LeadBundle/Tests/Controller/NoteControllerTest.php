@@ -57,6 +57,10 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('alert alert-warning', $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('btn-leadnote-add', $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('Test note', $this->client->getResponse()->getContent());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$contact->getId());
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertSame('0', trim($crawler->filter('#NoteCount')->text()));
     }
 
     public function testNewActionIsSuccessful(): void
