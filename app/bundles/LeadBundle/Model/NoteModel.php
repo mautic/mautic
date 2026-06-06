@@ -120,10 +120,7 @@ class NoteModel extends FormModel
         return null;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNoteCount(Lead $lead, $useFilters = false)
+    public function getNoteCount(Lead $lead, $useFilters = false): int
     {
         $filter          = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
         $noteType        = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
