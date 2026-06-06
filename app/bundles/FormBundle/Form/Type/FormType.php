@@ -17,6 +17,7 @@ use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -146,8 +147,7 @@ class FormType extends AbstractType
             [
                 'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
                 'attr'  => [
-                    'style'       => 'width:100px;',
-                    'class'       => 'form-control',
+                    'class'       => 'form-control form-control-narrow',
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
                 ],
@@ -170,6 +170,23 @@ class FormType extends AbstractType
 
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
+
+        $builder->add('submissionLimit', IntegerType::class, [
+            'label'      => 'mautic.form.submission.limit',
+            'attr'       => [
+                'class' => 'form-control form-control-narrow',
+            ],
+            'required'   => false,
+        ]);
+
+        $builder->add('submissionLimitMessage', TextareaType::class, [
+            'label'      => 'mautic.form.submission.limit_message',
+            'attr'       => [
+                'class' => 'form-control',
+                'rows'  => 3,
+            ],
+            'required'   => false,
+        ]);
 
         $builder->add('postAction', ChoiceType::class, [
             'choices' => [
