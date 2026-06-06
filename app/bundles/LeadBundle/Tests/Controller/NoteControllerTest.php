@@ -44,6 +44,21 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
+    public function testIndexActionShowsEmptyPaneWithoutNotesViewPermission(): void
+    {
+        [$user, $contact] = $this->createUserAndOwnedContact([
+            'lead:leads' => ['viewown'],
+        ]);
+        $this->createNoteForContact($contact, $user);
+        $this->loginAs($user);
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId());
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('alert alert-warning', $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('btn-leadnote-add', $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Test note', $this->client->getResponse()->getContent());
+    }
+
     public function testNewActionIsSuccessful(): void
     {
         [$user, $contact] = $this->createUserAndOwnedContact([
@@ -154,7 +169,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         ]);
         $userB = $this->createUserWithPermissions([
             'lead:leads' => ['viewown', 'viewother', 'create'],
-            'lead:notes' => ['viewown', 'viewother', 'create', 'editown'],
+            'lead:notes' => ['viewown', 'create', 'editown'],
         ]);
 
         $contact = new Lead();
@@ -182,6 +197,8 @@ final class NoteControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId());
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Owned by B', (string) $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Owned by A', (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString(
             sprintf('/s/contacts/notes/%d/edit/%d', $contact->getId(), $note->getId()),
             (string) $this->client->getResponse()->getContent()
@@ -196,6 +213,10 @@ final class NoteControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/edit/%d', $contact->getId(), $adminOwnedNote->getId()));
         $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$contact->getId());
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertSame('1', trim($crawler->filter('#NoteCount')->text()));
     }
 
     /**

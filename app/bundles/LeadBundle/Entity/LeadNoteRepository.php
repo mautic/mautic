@@ -26,18 +26,23 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @return mixed
+     * @param array<int, string>|null $noteTypes
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getNoteCount($leadId, $filter = null, $noteTypes = null)
+    public function getNoteCount(int $leadId, ?string $filter = null, ?array $noteTypes = null, ?int $createdBy = null): int
     {
         $q = $this
             ->createQueryBuilder('n');
         $q->select('count(n.id) as note_count')
             ->where($q->expr()->eq('IDENTITY(n.lead)', ':lead'))
             ->setParameter('lead', $leadId);
+
+        if (null !== $createdBy) {
+            $q->andWhere($q->expr()->eq('n.createdBy', ':createdBy'))
+                ->setParameter('createdBy', $createdBy);
+        }
 
         if (null != $filter) {
             $q->andWhere(
@@ -53,7 +58,7 @@ class LeadNoteRepository extends CommonRepository
 
         $results = $q->getQuery()->getArrayResult();
 
-        return $results[0]['note_count'];
+        return (int) $results[0]['note_count'];
     }
 
     public function getTableAlias(): string

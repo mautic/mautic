@@ -8,6 +8,9 @@
         }) }}
     {% endfor %}
 </ul>
+{% if notes|length == 0 %}
+  {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}
 {% if notes|length > 0 %}
   <div class="notes-pagination">
       {{ include('@MauticCore/Helper/pagination.html.twig', {
