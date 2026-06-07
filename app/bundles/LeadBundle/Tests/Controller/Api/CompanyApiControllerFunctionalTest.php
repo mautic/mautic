@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Company;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\CompanyLead;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     private const SALES_USER = 'sales';
 
     private CompanyModel $companyModel;
@@ -51,8 +52,6 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->companyModel = static::getContainer()->get('mautic.lead.model.company');
         $this->leadModel    = static::getContainer()->get('mautic.lead.model.lead');
     }
-
-    // ─── existing company API tests (from upstream 5.2) ─────────────────────
 
     public function testBatchNewEndpoint(): void
     {
@@ -163,12 +162,11 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotEquals($companyId, $response['company']['id']);
     }
 
-    // ─── batch addcontacts tests ─────────────────────────────────────────────
-
     public function testBatchAddContactsSuccess(): void
     {
-        $company = $this->createCompany('Batch Co A');
-        $contact = $this->createContact('batch-success@example.com');
+        $company = $this->createCompany('Batch Co A', 'batch-co-a@example.com');
+        $contact = $this->createLead('Batch', 'Success', 'batch-success@example.com');
+        $this->em->flush();
 
         $this->client->request(Request::METHOD_POST, '/api/companies/batch/addcontacts', [
             'assignments' => [
@@ -183,13 +181,14 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(0, $response['summary']['failed']);
         Assert::assertSame(Response::HTTP_OK, $response['results'][0]['status']);
         Assert::assertSame('Contact added to company', $response['results'][0]['message']);
-        Assert::assertTrue($this->isContactInCompany($contact->getId(), $company->getId()));
+        Assert::assertSame(1, $this->countCompanyLeadRows($contact->getId(), $company->getId()));
     }
 
     public function testBatchAddContactsPartialFailure(): void
     {
-        $company = $this->createCompany('Batch Co B');
-        $contact = $this->createContact('batch-partial@example.com');
+        $company = $this->createCompany('Batch Co B', 'batch-co-b@example.com');
+        $contact = $this->createLead('Batch', 'Partial', 'batch-partial@example.com');
+        $this->em->flush();
 
         $this->client->request(Request::METHOD_POST, '/api/companies/batch/addcontacts', [
             'assignments' => [
@@ -220,8 +219,9 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchAddContactsDuplicatePairs(): void
     {
-        $company = $this->createCompany('Batch Co C');
-        $contact = $this->createContact('batch-dup@example.com');
+        $company = $this->createCompany('Batch Co C', 'batch-co-c@example.com');
+        $contact = $this->createLead('Batch', 'Dup', 'batch-dup@example.com');
+        $this->em->flush();
 
         $this->client->request(Request::METHOD_POST, '/api/companies/batch/addcontacts', [
             'assignments' => [
@@ -232,21 +232,20 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->decodeResponse();
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        // total reflects original input count (including duplicates), succeeded+failed == total
         Assert::assertSame(2, $response['summary']['total']);
         Assert::assertSame(2, $response['summary']['succeeded']);
         Assert::assertSame(0, $response['summary']['failed']);
         Assert::assertCount(2, $response['results']);
         Assert::assertSame(Response::HTTP_OK, $response['results'][0]['status']);
         Assert::assertSame(Response::HTTP_OK, $response['results'][1]['status']);
-        // only one DB row despite two identical input pairs
         Assert::assertSame(1, $this->countCompanyLeadRows($contact->getId(), $company->getId()));
     }
 
     public function testBatchAddContactsAlreadyAssigned(): void
     {
-        $company = $this->createCompany('Batch Co D');
-        $contact = $this->createContact('batch-existing@example.com');
+        $company = $this->createCompany('Batch Co D', 'batch-co-d@example.com');
+        $contact = $this->createLead('Batch', 'Existing', 'batch-existing@example.com');
+        $this->em->flush();
         $this->companyModel->addLeadToCompany($company, $contact);
 
         $this->client->request(Request::METHOD_POST, '/api/companies/batch/addcontacts', [
@@ -259,14 +258,14 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         Assert::assertSame(Response::HTTP_OK, $response['results'][0]['status']);
         Assert::assertSame(1, $response['summary']['succeeded']);
-        // idempotent — still exactly one row in DB
         Assert::assertSame(1, $this->countCompanyLeadRows($contact->getId(), $company->getId()));
     }
 
     public function testBatchAddContactsNoPermissionPerItem(): void
     {
-        $adminContact = $this->createContact('batch-admin-contact@example.com');
-        $company      = $this->createCompany('Batch Co E');
+        $adminContact = $this->createLead('Batch', 'Admin', 'batch-admin-contact@example.com');
+        $company      = $this->createCompany('Batch Co E', 'batch-co-e@example.com');
+        $this->em->flush();
 
         $salesUser = $this->em->getRepository(User::class)->findOneBy(['username' => self::SALES_USER]);
         Assert::assertInstanceOf(User::class, $salesUser);
@@ -285,7 +284,7 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         Assert::assertSame(Response::HTTP_FORBIDDEN, $response['results'][0]['status']);
         Assert::assertSame('Access denied', $response['results'][0]['message']);
-        Assert::assertFalse($this->isContactInCompany($adminContact->getId(), $company->getId()));
+        Assert::assertSame(0, $this->countCompanyLeadRows($adminContact->getId(), $company->getId()));
     }
 
     public function testBatchAddContactsGlobalForbiddenWithoutEditPermission(): void
@@ -320,27 +319,6 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
     }
 
-    // ─── helpers ─────────────────────────────────────────────────────────────
-
-    private function createCompany(string $name): Company
-    {
-        $company = new Company();
-        $company->setIsPublished(true);
-        $company->setName($name);
-        $this->companyModel->saveEntity($company);
-
-        return $company;
-    }
-
-    private function createContact(string $email): Lead
-    {
-        $contact = new Lead();
-        $contact->setEmail($email);
-        $this->leadModel->saveEntity($contact);
-
-        return $contact;
-    }
-
     /**
      * @return array<string, mixed>
      */
@@ -350,11 +328,6 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotFalse($content);
 
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
-    }
-
-    private function isContactInCompany(int $contactId, int $companyId): bool
-    {
-        return $this->countCompanyLeadRows($contactId, $companyId) > 0;
     }
 
     private function countCompanyLeadRows(int $contactId, int $companyId): int

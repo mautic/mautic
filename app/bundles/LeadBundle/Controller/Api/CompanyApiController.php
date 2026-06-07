@@ -123,7 +123,8 @@ class CompanyApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $assignments = $request->request->all('assignments');
+        $parameters  = $request->request->all();
+        $assignments = $parameters['assignments'] ?? null;
 
         if (!is_array($assignments) || [] === $assignments) {
             return $this->returnError('assignments is required and must be a non-empty array', Response::HTTP_BAD_REQUEST);

@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\BatchCompanyContactAssignmentModel;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -27,19 +26,13 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
     /** @var CorePermissions&MockObject */
     private CorePermissions $security;
 
-    /** @var LeadRepository&MockObject */
-    private LeadRepository $leadRepository;
-
     private BatchCompanyContactAssignmentModel $model;
 
     protected function setUp(): void
     {
-        $this->companyModel   = $this->createMock(CompanyModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->security       = $this->createMock(CorePermissions::class);
-        $this->leadRepository = $this->createMock(LeadRepository::class);
-
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepository);
+        $this->companyModel = $this->createMock(CompanyModel::class);
+        $this->leadModel    = $this->createMock(LeadModel::class);
+        $this->security     = $this->createMock(CorePermissions::class);
 
         $this->model = new BatchCompanyContactAssignmentModel(
             $this->companyModel,
@@ -48,27 +41,10 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         );
     }
 
-    public function testDedupeAssignmentsKeepsFirstOccurrenceOrder(): void
-    {
-        $assignments = [
-            ['contactId' => 1, 'companyId' => 7],
-            ['contactId' => 5, 'companyId' => 10],
-            ['contactId' => 1, 'companyId' => 7],
-        ];
-
-        Assert::assertSame(
-            [
-                ['contactId' => 1, 'companyId' => 7],
-                ['contactId' => 5, 'companyId' => 10],
-            ],
-            BatchCompanyContactAssignmentModel::dedupeAssignments($assignments)
-        );
-    }
-
     public function testProcessReturns404ForMissingContact(): void
     {
-        $this->leadRepository->method('findBy')->willReturn([]);
-        $this->companyModel->method('getRepository')->willReturn($this->createMockCompanyRepository([]));
+        $this->leadModel->method('getEntities')->willReturn([]);
+        $this->companyModel->method('getEntities')->willReturn([]);
 
         $payload = $this->model->process([
             ['contactId' => 99, 'companyId' => 1],
@@ -85,8 +61,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
     {
         $contact = $this->createContact(1, 10);
 
-        $this->leadRepository->method('findBy')->willReturn([$contact]);
-        $this->companyModel->method('getRepository')->willReturn($this->createMockCompanyRepository([]));
+        $this->leadModel->method('getEntities')->willReturn([$contact]);
+        $this->companyModel->method('getEntities')->willReturn([]);
 
         $payload = $this->model->process([
             ['contactId' => 1, 'companyId' => 999],
@@ -102,8 +78,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $contact = $this->createContact(1, 10);
         $company = $this->createCompany(7);
 
-        $this->leadRepository->method('findBy')->willReturn([$contact]);
-        $this->companyModel->method('getRepository')->willReturn($this->createMockCompanyRepository([$company]));
+        $this->leadModel->method('getEntities')->willReturn([$contact]);
+        $this->companyModel->method('getEntities')->willReturn([$company]);
         $this->security->method('hasEntityAccess')->willReturn(false);
 
         // Expectation must be set before process() to correctly catch unexpected calls.
@@ -122,8 +98,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $contact = $this->createContact(1, 10);
         $company = $this->createCompany(7);
 
-        $this->leadRepository->method('findBy')->willReturn([$contact]);
-        $this->companyModel->method('getRepository')->willReturn($this->createMockCompanyRepository([$company]));
+        $this->leadModel->method('getEntities')->willReturn([$contact]);
+        $this->companyModel->method('getEntities')->willReturn([$company]);
         $this->security->method('hasEntityAccess')->willReturn(true);
         $this->companyModel->expects($this->once())
             ->method('addLeadToCompany')
@@ -143,8 +119,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $contact = $this->createContact(1, 10);
         $company = $this->createCompany(7);
 
-        $this->leadRepository->method('findBy')->willReturn([$contact]);
-        $this->companyModel->method('getRepository')->willReturn($this->createMockCompanyRepository([$company]));
+        $this->leadModel->method('getEntities')->willReturn([$contact]);
+        $this->companyModel->method('getEntities')->willReturn([$company]);
         $this->security->method('hasEntityAccess')->willReturn(true);
         $this->companyModel->expects($this->once())
             ->method('addLeadToCompany')
@@ -170,8 +146,8 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $company7  = $this->createCompany(7);
         $company11 = $this->createCompany(11);
 
-        $this->leadRepository->method('findBy')->willReturn([$contact]);
-        $this->companyModel->method('getRepository')->willReturn($this->createMockCompanyRepository([$company7, $company11]));
+        $this->leadModel->method('getEntities')->willReturn([$contact]);
+        $this->companyModel->method('getEntities')->willReturn([$company7, $company11]);
         $this->security->method('hasEntityAccess')->willReturn(true);
         $this->companyModel->expects($this->once())
             ->method('addLeadToCompany')
@@ -211,18 +187,5 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         $company->method('getId')->willReturn($id);
 
         return $company;
-    }
-
-    /**
-     * @param Company[] $companies
-     *
-     * @return \Mautic\LeadBundle\Entity\CompanyRepository&MockObject
-     */
-    private function createMockCompanyRepository(array $companies): object
-    {
-        $repo = $this->createMock(\Mautic\LeadBundle\Entity\CompanyRepository::class);
-        $repo->method('findBy')->willReturn($companies);
-
-        return $repo;
     }
 }

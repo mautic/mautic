@@ -38,11 +38,11 @@ class BatchCompanyContactAssignmentModel
 
         $contactIds    = [];
         $companyIds    = [];
+        /** @var array<string, array{contactId: int, companyId: int}> $pairsToAssign */
         $pairsToAssign = [];
 
-        foreach ($dedupedForProcessing as $entry) {
+        foreach ($dedupedForProcessing as $pairKey => $entry) {
             [$contactId, $companyId] = self::parsePair($entry);
-            $pairKey                 = self::pairKey($contactId, $companyId);
 
             if ($contactId <= 0) {
                 $outcomes[$pairKey] = self::resultEntry($contactId, $companyId, Response::HTTP_NOT_FOUND, self::MESSAGE_CONTACT_NOT_FOUND);
@@ -54,9 +54,9 @@ class BatchCompanyContactAssignmentModel
                 continue;
             }
 
-            $contactIds[$contactId] = $contactId;
-            $companyIds[$companyId] = $companyId;
-            $pairsToAssign[]        = ['contactId' => $contactId, 'companyId' => $companyId];
+            $contactIds[$contactId]  = $contactId;
+            $companyIds[$companyId]  = $companyId;
+            $pairsToAssign[$pairKey] = ['contactId' => $contactId, 'companyId' => $companyId];
         }
 
         $contactsById  = $this->loadContactsById(array_values($contactIds));
@@ -65,14 +65,13 @@ class BatchCompanyContactAssignmentModel
         /** @var array<int, list<int>> $companyIdsByContact */
         $companyIdsByContact = [];
 
-        foreach ($pairsToAssign as $pair) {
-            $contactId = $pair['contactId'];
-            $companyId = $pair['companyId'];
-            $pairKey   = self::pairKey($contactId, $companyId);
-
+        foreach ($pairsToAssign as $pairKey => $pair) {
             if (isset($outcomes[$pairKey])) {
                 continue;
             }
+
+            $contactId = $pair['contactId'];
+            $companyId = $pair['companyId'];
 
             $contact = $contactsById[$contactId] ?? null;
             if (!$contact instanceof Lead) {
@@ -97,11 +96,11 @@ class BatchCompanyContactAssignmentModel
             $companyIdsByContact[$contactId][] = $companyId;
         }
 
-        foreach ($companyIdsByContact as $contactId => $idsForContact) {
+        foreach ($companyIdsByContact as $contactId => $companyIdsForContact) {
             $contact = $contactsById[$contactId];
 
             try {
-                $this->companyModel->addLeadToCompany($idsForContact, $contact);
+                $this->companyModel->addLeadToCompany($companyIdsForContact, $contact);
                 $status  = Response::HTTP_OK;
                 $message = self::MESSAGE_ADDED;
             } catch (\Throwable) {
@@ -109,7 +108,7 @@ class BatchCompanyContactAssignmentModel
                 $message = self::MESSAGE_UNEXPECTED;
             }
 
-            foreach ($idsForContact as $companyId) {
+            foreach ($companyIdsForContact as $companyId) {
                 $outcomes[self::pairKey($contactId, $companyId)] = self::resultEntry($contactId, $companyId, $status, $message);
             }
         }
@@ -150,12 +149,12 @@ class BatchCompanyContactAssignmentModel
     /**
      * @param array<int, array<string, mixed>> $assignments
      *
-     * @return list<array{contactId: int, companyId: int}>
+     * @return array<string, array{contactId: int, companyId: int}>
      */
-    public static function dedupeAssignments(array $assignments): array
+    private static function dedupeAssignments(array $assignments): array
     {
+        /** @var array<string, array{contactId: int, companyId: int}> $deduped */
         $deduped = [];
-        $seen    = [];
 
         foreach ($assignments as $entry) {
             if (!is_array($entry)) {
@@ -165,12 +164,11 @@ class BatchCompanyContactAssignmentModel
             [$contactId, $companyId] = self::parsePair($entry);
             $key                     = self::pairKey($contactId, $companyId);
 
-            if (isset($seen[$key])) {
+            if (isset($deduped[$key])) {
                 continue;
             }
 
-            $seen[$key] = true;
-            $deduped[]  = ['contactId' => $contactId, 'companyId' => $companyId];
+            $deduped[$key] = ['contactId' => $contactId, 'companyId' => $companyId];
         }
 
         return $deduped;
@@ -181,7 +179,7 @@ class BatchCompanyContactAssignmentModel
      *
      * @return array{0: int, 1: int}
      */
-    public static function parsePair(array $entry): array
+    private static function parsePair(array $entry): array
     {
         return [
             (int) ($entry['contactId'] ?? 0),
@@ -205,8 +203,11 @@ class BatchCompanyContactAssignmentModel
             return [];
         }
 
-        $contacts = $this->leadModel->getRepository()->findBy(['id' => $ids]);
-        $indexed  = [];
+        $contacts = $this->leadModel->getEntities([
+            'ids'            => $ids,
+            'iterable_mode'  => true,
+        ]);
+        $indexed = [];
 
         foreach ($contacts as $contact) {
             \assert($contact instanceof Lead);
@@ -227,8 +228,11 @@ class BatchCompanyContactAssignmentModel
             return [];
         }
 
-        $companies = $this->companyModel->getRepository()->findBy(['id' => $ids]);
-        $indexed   = [];
+        $companies = $this->companyModel->getEntities([
+            'ids'            => $ids,
+            'iterable_mode'  => true,
+        ]);
+        $indexed = [];
 
         foreach ($companies as $company) {
             \assert($company instanceof Company);
