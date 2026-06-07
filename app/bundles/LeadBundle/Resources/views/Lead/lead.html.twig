@@ -501,9 +501,7 @@
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
-                {% if not upcomingEvents %}
-                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'}) }}
-                {% else %}
+                {% if upcomingEvents %}
                     <div class="panel-body pt-sm">
                         {% set timelineEvents = [] %}
                         {% for event in upcomingEvents %}
@@ -529,7 +527,7 @@
                             } %}
                             {% if errors is not empty %}
                                 {% set timelineEvent = timelineEvent|merge({
-                                    'contentTemplate': '@MauticCore/Modules/timeline_details_dummy.html.twig',
+                                    'contentTemplate': '@MauticCore/Modules/timeline_details.html.twig',
                                     'errors': errors
                                 }) %}
                             {% endif %}
@@ -537,6 +535,8 @@
                         {% endfor %}
                         {{ include('@MauticCore/Modules/timeline.html.twig', {'events': timelineEvents}) }}
                     </div>
+                {% else %}
+                    {{ include('@MauticCore/Helper/no_information.html.twig', {'tip': 'mautic.contact.noinformation.upcoming'}) }}
                 {% endif %}
             </div>
 
