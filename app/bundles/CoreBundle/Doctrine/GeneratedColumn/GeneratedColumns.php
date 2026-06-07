@@ -72,7 +72,7 @@ final class GeneratedColumns implements GeneratedColumnsInterface
         $this->position = 0;
     }
 
-    public function current(): mixed
+    public function current(): GeneratedColumn
     {
         return $this->generatedColumns[$this->position];
     }

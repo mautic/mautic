@@ -325,7 +325,6 @@ class HttpFactoryTest extends TestCase
 
         $reflection = new \ReflectionClass($handler);
         $property   = $reflection->getProperty('stack');
-        $property->setAccessible(true);
 
         $stack = $property->getValue($handler);
 
@@ -338,7 +337,6 @@ class HttpFactoryTest extends TestCase
     private function getProperty(\ReflectionClass $reflection, $object, string $name)
     {
         $property = $reflection->getProperty($name);
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }

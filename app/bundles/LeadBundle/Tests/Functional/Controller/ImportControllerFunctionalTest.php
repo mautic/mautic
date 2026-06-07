@@ -15,6 +15,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -228,6 +229,112 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(5, $importEntity->getIgnoredCount());
     }
 
+    public function testImportWithOwnerUsername(): void
+    {
+        $invalidOwner = 'invalid_owner';
+        $this->generateSmallCSV([
+            ['email', 'firstname', 'lastname', 'ownerusername'],
+            ['john1@doe.email', 'John', 'Doe1'],
+            ['john2@doe.email', 'John', 'Doe2', $invalidOwner],
+        ]);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
+        $this->assertResponseIsSuccessful();
+
+        $uploadButton = $crawler->selectButton('Upload');
+        $form         = $uploadButton->form();
+        $form->setValues([
+            'lead_import[file]'       => $this->csvFile,
+            'lead_import[batchlimit]' => 100,
+            'lead_import[delimiter]'  => ',',
+            'lead_import[enclosure]'  => '"',
+            'lead_import[escape]'     => '\\',
+        ]);
+        $html = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertStringContainsString(
+            'Match the columns from the imported file to Mautic\'s contact fields.',
+            $html->text(null, false)
+        );
+
+        $importButton = $html->selectButton('Import in browser');
+        $importForm   = $importButton->form();
+
+        $this->client->submit($importForm);
+        $this->assertResponseIsSuccessful();
+
+        // Check the status
+        $this->client->request(Request::METHOD_GET, '/s/contacts/import/new?importbatch=1');
+        $this->assertResponseIsSuccessful();
+
+        $this->assertSelectorExists('.alert.alert-danger a.text-danger');
+        $translator = self::getContainer()->get('translator');
+        \assert($translator instanceof TranslatorInterface);
+
+        $this->assertSelectorTextContains(
+            '.alert.alert-danger a.text-danger',
+            $translator->trans('mautic.user.exception.user.not_found', ['%identifier%' => $invalidOwner])
+        );
+    }
+
+    public function testImportWithValidOwnerUsername(): void
+    {
+        $ownerIdentifier = 'admin';
+        $this->generateSmallCSV([
+            ['email', 'firstname', 'lastname', 'ownerusername'],
+            ['john1@doe.email', 'John', 'Doe1', $ownerIdentifier],
+            ['john2@doe.email', 'John', 'Doe2', $ownerIdentifier],
+        ]);
+
+        $import = $this->createCsvContactImport(
+            ['email' => 'email', 'firstname' => 'firstname', 'lastname' => 'lastname', 'ownerusername' => 'ownerusername'],
+            ['email', 'firstname', 'lastname', 'ownerusername']
+        );
+
+        $output = $this->createAndExecuteImport($import);
+        $this->assertStringContainsString('2 items created', $output->getDisplay());
+
+        /** @var LeadRepository $leadRepository */
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $lead           = $leadRepository->findOneBy(['email' => 'john1@doe.email']);
+
+        $this->assertInstanceOf(Lead::class, $lead);
+        $this->assertInstanceOf(User::class, $lead->getOwner());
+        $this->assertSame($ownerIdentifier, $lead->getOwner()->getUsername());
+    }
+
+    public function testImportWithInvalidOwnerUsernameViaCli(): void
+    {
+        $invalidOwner = 'invalid_owner';
+        $this->generateSmallCSV([
+            ['email', 'firstname', 'lastname', 'ownerusername'],
+            ['john1@doe.email', 'John', 'Doe1', 'admin'],
+            ['john2@doe.email', 'John', 'Doe2', $invalidOwner],
+        ]);
+
+        $import = $this->createCsvContactImport(
+            ['email' => 'email', 'firstname' => 'firstname', 'lastname' => 'lastname', 'ownerusername' => 'ownerusername'],
+            ['email', 'firstname', 'lastname', 'ownerusername']
+        );
+
+        $output = $this->createAndExecuteImport($import);
+        $this->assertStringContainsString('2 items ignored', $output->getDisplay());
+
+        $importEntity = $this->em->getRepository(Import::class)->find($import->getId());
+        $this->assertInstanceOf(Import::class, $importEntity);
+        $this->assertSame(1, $importEntity->getInsertedCount());
+        $this->assertSame(2, $importEntity->getIgnoredCount());
+
+        /** @var LeadRepository $leadRepository */
+        $leadRepository = $this->em->getRepository(Lead::class);
+        $validLead      = $leadRepository->findOneBy(['email' => 'john1@doe.email']);
+
+        $this->assertInstanceOf(Lead::class, $validLead);
+        $this->assertInstanceOf(User::class, $validLead->getOwner());
+        $this->assertSame('admin', $validLead->getOwner()->getUsername());
+    }
+
     /**
      * @param array<string, mixed> $properties
      */
@@ -244,8 +351,28 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($field);
     }
 
-    private function createCsvContactImport(): Import
-    {
+    /**
+     * @param array<string, string> $fields
+     * @param array<int, string>    $headers
+     */
+    private function createCsvContactImport(
+        array $fields = [
+            'file'       => 'file',
+            'email'      => 'email',
+            'firstname'  => 'firstname',
+            'lastname'   => 'lastname',
+            'state_from' => 'state_from',
+            'birth_date' => 'birth_date',
+        ],
+        array $headers = [
+            'file',
+            'email',
+            'firstname',
+            'lastname',
+            'state_from',
+            'birth_date',
+        ],
+    ): Import {
         $now    = new \DateTime();
         $import = new Import();
         $import->setIsPublished(true);
@@ -259,28 +386,14 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $import->setObject('lead');
 
         $import->setProperties([
-            'fields' => [
-                'file'       => 'file',
-                'email'      => 'email',
-                'firstname'  => 'firstname',
-                'lastname'   => 'lastname',
-                'state_from' => 'state_from',
-                'birth_date' => 'birth_date',
-            ],
-            'parser'   => [
+            'fields' => $fields,
+            'parser' => [
                 'escape'     => '\\',
                 'delimiter'  => ',',
                 'enclosure'  => '"',
                 'batchlimit' => 100,
             ],
-            'headers'  => [
-                'file',
-                'email',
-                'firstname',
-                'lastname',
-                'state_from',
-                'birth_date',
-            ],
+            'headers'  => $headers,
             'defaults' => [
                 'list'  => null,
                 'tags'  => ['tag1'],

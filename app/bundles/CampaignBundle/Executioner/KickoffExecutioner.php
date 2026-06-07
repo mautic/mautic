@@ -99,7 +99,7 @@ class KickoffExecutioner implements ExecutionerInterface
         }
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
         $totalKickoffEvents = 0;
-        if (!($this->output instanceof NullOutput)) {
+        if (!$this->output instanceof NullOutput) {
             $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
             $totalKickoffEvents = $totalRootEvents * $totalContacts;
 

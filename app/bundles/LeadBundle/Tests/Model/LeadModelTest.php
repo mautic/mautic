@@ -582,7 +582,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 return true;
             }));
 
-        $this->fieldModelMock->expects($this->exactly(2))
+        $this->fieldModelMock->expects($this->exactly(1))
             ->method('getFieldListWithProperties')
             ->willReturn([]);
 
@@ -641,7 +641,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private function setProperty($object, $class, $property, $value): void
     {
         $reflectedProp = new \ReflectionProperty($class, $property);
-        $reflectedProp->setAccessible(true);
         $reflectedProp->setValue($object, $value);
     }
 
@@ -781,7 +780,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass($companyModel);
         $property   = $reflection->getProperty('security');
-        $property->setAccessible(true);
         $property->setValue($companyModel, $security);
     }
 

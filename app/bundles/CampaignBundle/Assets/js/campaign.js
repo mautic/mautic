@@ -49,6 +49,10 @@ Mautic.campaignOnLoad = function (container, response) {
             // adding delete option modal for events
             mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax-delete']").on("click.ajax", Mautic.handleEventDeleteClick);
 
+            // add modified events data for event clone and insert requests
+            mQuery("#CampaignCanvas .list-campaign-event a[data-toggle='ajax']").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
+            mQuery("[data-campaign-event-insert-button]").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
+
             // adding delete option ajax for sources
             mQuery("#CampaignCanvas .list-campaign-source a[data-toggle='ajax-delete']").on("click.ajax", function (event) {
                 event.preventDefault();
@@ -396,6 +400,15 @@ Mautic.campaignEventInsertOnError = function (event, jqxhr) {
     }
 };
 
+Mautic.handleCampaignEventAjaxClick = function (event) {
+    event.preventDefault();
+    mQuery('.btns-builder').find('button').prop('disabled', true);
+
+    return Mautic.ajaxifyLink(this, event, {
+        'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents || {}),
+    });
+};
+
 /**
  * Setup the campaign event view
  *
@@ -468,14 +481,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
         Mautic.campaignBuilderInstance.draggable(domEventId, Mautic.campaignDragOptions);
 
         //activate new stuff
-        mQuery(eventId + " a[data-toggle='ajax']").click(function (event) {
-            event.preventDefault();
-            mQuery('.btns-builder').find('button').prop('disabled', true);
-            const extraData = {
-                'modifiedEvents': JSON.stringify(Mautic.campaignBuilderCampaignElements.modifiedEvents),
-            };
-            return Mautic.ajaxifyLink(this, event, extraData);
-        });
+        mQuery(eventId + " a[data-toggle='ajax']").off('click.ajax').on('click.ajax', Mautic.handleCampaignEventAjaxClick);
 
         //initialize ajax'd modals
         mQuery(eventId + " a[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
@@ -1137,7 +1143,128 @@ Mautic.prepareCampaignCanvas = function() {
                 Mautic.campaignDragOptions
             );
         }
+
+        Mautic.initCampaignCanvasPan();
     }
+};
+
+/**
+ * Allow users to pan the campaign canvas by holding spacebar and dragging
+ */
+Mautic.initCampaignCanvasPan = function () {
+    if (mQuery('.preview').length) {
+        return;
+    }
+
+    const builderContent = mQuery('.builder-content');
+    let isPanMode = false;
+    let isPanning = false;
+    let startX = 0;
+    let startY = 0;
+    let scrollLeft = 0;
+    let scrollTop = 0;
+
+    mQuery(document).on('keydown.campaignPan', function (e) {
+        if (e.keyCode === 32) {
+            const target = e.target;
+            const tagName = target.tagName.toLowerCase();
+
+            if (tagName === 'input' || tagName === 'textarea' || target.isContentEditable) {
+                return;
+            }
+
+            if (mQuery('.modal.in').length > 0) {
+                return;
+            }
+
+            if (mQuery('.chosen-with-drop').length > 0) {
+                return;
+            }
+
+            e.preventDefault();
+
+            if (!isPanMode) {
+                isPanMode = true;
+                builderContent.addClass('pan-mode');
+            }
+        }
+    });
+
+    mQuery(document).on('keyup.campaignPan', function (e) {
+        if (e.keyCode === 32) {
+            const target = e.target;
+            const tagName = target.tagName.toLowerCase();
+
+            if (tagName === 'input' || tagName === 'textarea' || target.isContentEditable) {
+                return;
+            }
+
+            e.preventDefault();
+
+            if (isPanMode) {
+                isPanMode = false;
+                isPanning = false;
+                builderContent.removeClass('pan-mode panning');
+            }
+        }
+    });
+
+    builderContent.on('mousedown.campaignPan', function (e) {
+        if (!isPanMode) {
+            return;
+        }
+
+        if (e.button !== 0) {
+            return;
+        }
+
+        e.preventDefault();
+        isPanning = true;
+        builderContent.addClass('panning');
+
+        startX = e.pageX - builderContent.offset().left;
+        startY = e.pageY - builderContent.offset().top;
+        scrollLeft = builderContent.scrollLeft();
+        scrollTop = builderContent.scrollTop();
+    });
+
+    builderContent.on('mousemove.campaignPan', function (e) {
+        if (!isPanning) {
+            return;
+        }
+
+        e.preventDefault();
+
+        const x = e.pageX - builderContent.offset().left;
+        const y = e.pageY - builderContent.offset().top;
+        const walkX = (x - startX);
+        const walkY = (y - startY);
+
+        builderContent.scrollLeft(scrollLeft - walkX);
+        builderContent.scrollTop(scrollTop - walkY);
+    });
+
+    builderContent.on('mouseup.campaignPan', function (e) {
+        if (isPanning) {
+            isPanning = false;
+            builderContent.removeClass('panning');
+        }
+    });
+
+    builderContent.on('mouseleave.campaignPan', function (e) {
+        if (isPanning) {
+            isPanning = false;
+            builderContent.removeClass('panning');
+        }
+    });
+
+    mQuery(globalThis).on('blur.campaignPan', function () {
+        if (isPanMode || isPanning) {
+            isPanMode = false;
+            isPanning = false;
+            builderContent.removeClass('pan-mode panning');
+        }
+    });
 };
 
 /**
@@ -2125,8 +2252,8 @@ Mautic.campaignBuilderUpdateEventList = function (groups, hidden, view, active, 
 };
 
 Mautic.campaignBuilderUpdateEventCloneButton = function (groups, eventType, anchorName) {
-    var $insertButton = mQuery('#EventInsertButton');
-    var updatedUrl = $insertButton.attr('href').replace(/anchor=(.*?)$/, "anchor=" + anchorName + "&anchorEventType=" + eventType);
+    const $insertButton = mQuery('[data-campaign-event-insert-button]');
+    const updatedUrl = $insertButton.attr('href').replace(/anchor=(.*?)$/, "anchor=" + anchorName + "&anchorEventType=" + eventType);
     $insertButton.attr('href', updatedUrl);
 };
 
@@ -2645,7 +2772,7 @@ Mautic.previewCampaignLabels = function() {
             if (connectionAnchor === 'yes') {
                 connection.addOverlay(["Label", {
                     label: element.dataset.eventYesPercent + '%',
-                    location: 0.44,
+                    location: 0.25,
                     cssClass: 'jtk-label jtk-label--success',
                     id: element.id + 'yes-path-label'
                 }]);
@@ -2653,7 +2780,7 @@ Mautic.previewCampaignLabels = function() {
             if (connectionAnchor === 'no') {
                 connection.addOverlay(["Label", {
                     label: element.dataset.eventNoPercent + '%',
-                    location: 0.44,
+                    location: 0.25,
                     cssClass: 'jtk-label jtk-label--error',
                     id: element.id + 'no-path-label'
                 }]);
@@ -2700,7 +2827,7 @@ Mautic.previewCampaignEventDetails = function() {
                 }
             }
         });
-        
+
         event.preventDefault();
     });
 

@@ -75,10 +75,11 @@ class SamlTest extends MauticMysqlTestCase
 
         // Fill in email in the fields Email, First Name and Last name (we are testing, so no problem that the actual values are not correct)
         $configForm->setValues([
-            'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
-            'config[userconfig][saml_idp_email_attribute]'     => $attributeName,
-            'config[userconfig][saml_idp_firstname_attribute]' => $attributeName,
-            'config[userconfig][saml_idp_lastname_attribute]'  => $attributeName,
+            'config[leadconfig][contact_columns]'               => ['name', 'email', 'id'],
+            'config[companyconfig][company_columns]'            => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+            'config[userconfig][saml_idp_email_attribute]'      => $attributeName,
+            'config[userconfig][saml_idp_firstname_attribute]'  => $attributeName,
+            'config[userconfig][saml_idp_lastname_attribute]'   => $attributeName,
         ]);
         $this->client->submit($configForm);
         $clientResponse = $this->client->getResponse();
