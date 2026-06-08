@@ -267,11 +267,21 @@ class UrlHelper
      */
     public static function isValidUrl($url): bool
     {
-        $path         = parse_url($url, PHP_URL_PATH);
-        $encodedPath  = array_map('urlencode', explode('/', $path));
-        $url          = str_replace($path, implode('/', $encodedPath), $url);
+        $urlToValidate = $url;
 
-        return (bool) filter_var($url, FILTER_VALIDATE_URL);
+        // RFC 3986 allows non-ASCII characters in the fragment that filter_var rejects.
+        $fragment = parse_url($url, PHP_URL_FRAGMENT);
+        if (null !== $fragment) {
+            $urlToValidate = substr($url, 0, -(\strlen($fragment) + 1));
+        }
+
+        $path = parse_url($urlToValidate, PHP_URL_PATH);
+        if (null !== $path && '' !== $path) {
+            $encodedPath   = array_map('urlencode', explode('/', $path));
+            $urlToValidate = str_replace($path, implode('/', $encodedPath), $urlToValidate);
+        }
+
+        return (bool) filter_var($urlToValidate, FILTER_VALIDATE_URL);
     }
 
     /**

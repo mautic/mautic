@@ -184,6 +184,8 @@ STRING
     {
         $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/e'));
         $this->assertTrue(UrlHelper::isValidUrl('https://domain.tld/é'));
+        $this->assertTrue(UrlHelper::isValidUrl('https://www.example.com/page#color=grün'));
+        $this->assertTrue(UrlHelper::isValidUrl('https://www.example.com/page?foo=bar#section=äöü'));
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurl'));
         $this->assertFalse(UrlHelper::isValidUrl('notvalidurlé'));
     }
