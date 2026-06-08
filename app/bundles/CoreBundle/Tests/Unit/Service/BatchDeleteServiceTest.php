@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Service;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteRequest;
 use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
@@ -54,11 +55,13 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
 
         $flashes = $this->batchDeleteService->batchDelete(
             $this->model,
-            [],
-            'all',
-            '',
-            'lead.company',
-            [$this, 'isLocked'],
+            new BatchDeleteRequest(
+                [],
+                'all',
+                '',
+                'lead.company',
+                [$this, 'isLocked'],
+            ),
         );
         $successFlash = $flashes[0];
 
@@ -74,11 +77,13 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
 
         $flashes = $this->batchDeleteService->batchDelete(
             $this->model,
-            [],
-            'all',
-            '',
-            'lead.company',
-            [$this, 'isLocked'],
+            new BatchDeleteRequest(
+                [],
+                'all',
+                '',
+                'lead.company',
+                [$this, 'isLocked'],
+            ),
         );
 
         $this->assertNotEmpty($flashes, 'Flashes array is empty');

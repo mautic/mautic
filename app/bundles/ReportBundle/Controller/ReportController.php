@@ -238,11 +238,13 @@ class ReportController extends FormController
             \assert($model instanceof ReportModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.report.filter', '')),
-                'report.report',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.report.filter', '')),
+                    'report.report',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

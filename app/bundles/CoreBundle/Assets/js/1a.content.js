@@ -473,21 +473,17 @@ Mautic.onPageLoad = function (container, response, inModal) {
 
     // Add total item count to select all buttons.
     mQuery("[data-toggle=selectall]").each(function() {
-        var totalItemCount = mQuery('.pagination-wrapper [data-item-count]').data("item-count")
+        const totalItemCount = mQuery('.pagination-wrapper [data-item-count]').data("item-count");
         if (totalItemCount) {
-            var buttonText = mQuery(this).find("span").text();
+            const buttonText = mQuery(this).find("span").text();
             // Check if there's already a counter in parentheses
-            if (/\(\d+\)$/.test(buttonText)) {
-                // If there is, replace it with the new totalItemCount
-                var updatedText = buttonText.replace(/\(\d+\)$/, `(${totalItemCount})`);
-            } else {
-                // If there isn't, append the new totalItemCount in parentheses
-                var updatedText = buttonText + ` (${totalItemCount})`;
-            }
+            const updatedText = /\(\d+\)$/.test(buttonText)
+                ? buttonText.replace(/\(\d+\)$/, `(${totalItemCount})`)
+                : buttonText + ` (${totalItemCount})`;
             // Update the button's text
             mQuery(this).find("span").text(updatedText);
         }
-    })
+    });
 
     //spin icons on button click
     mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function (event) {

@@ -1568,11 +1568,13 @@ class EmailController extends FormController
             \assert($model instanceof EmailModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.email.filter', '')),
-                $this->getModelName(),
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.email.filter', '')),
+                    $this->getModelName(),
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

@@ -1075,11 +1075,13 @@ class FormController extends CommonFormController
             \assert($model instanceof FormModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.form.filter', '')),
-                $this->getModelName(),
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.form.filter', '')),
+                    $this->getModelName(),
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

@@ -579,11 +579,13 @@ class UserController extends FormController
             \assert($model instanceof UserModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.user.filter', '')),
-                'user.user',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.user.filter', '')),
+                    'user.user',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

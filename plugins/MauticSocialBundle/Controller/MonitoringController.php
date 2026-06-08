@@ -585,11 +585,13 @@ class MonitoringController extends FormController
             $model   = $this->getModel('social.monitoring');
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $session->get('mautic.social.monitoring.filter', '')),
-                'social.monitoring',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $session->get('mautic.social.monitoring.filter', '')),
+                    'social.monitoring',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

@@ -520,11 +520,13 @@ class CategoryController extends AbstractStandardFormController
             \assert($model instanceof CategoryModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.category.filter', '')),
-                'category',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.category.filter', '')),
+                    'category',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

@@ -783,11 +783,13 @@ class CompanyController extends FormController
             \assert($model instanceof CompanyModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.company.filter', '')),
-                'lead.company',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.company.filter', '')),
+                    'lead.company',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

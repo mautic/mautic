@@ -440,11 +440,13 @@ class RoleController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.role.filter', '')),
-                'user.role',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.role.filter', '')),
+                    'user.role',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

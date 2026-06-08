@@ -2,7 +2,7 @@
 Mautic.emailBatchSubmit = function() {
     if (Mautic.batchActionPrecheck("")) {
         if (mQuery('#email_batch_newCategory').val()) {
-            ids = Mautic.getSelectedIds(false, true);
+            const ids = Mautic.getSelectedIds(false, true);
             mQuery('#email_batch_ids').val(ids);
             return true;
         }
@@ -17,7 +17,7 @@ function setCategory(id, newCategory) {
     const span = div.querySelector("span");
 
     div.textContent = newCategory.name;
-    span.style = "background: #" + newCategory.color + ";"
+    span.style = "background: #" + newCategory.color + ";";
 
     div.prepend(span);
 }

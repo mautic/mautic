@@ -38,6 +38,12 @@ class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
+    private const CLOSE_MODAL_MISSING_MESSAGE = 'The response does not contain the `closeModal` param.';
+    private const CONTACT_A_EMAIL             = 'contact@a.email';
+    private const CONTACT_B_EMAIL             = 'contact@b.email';
+    private const CONTACT_C_EMAIL             = 'contact@c.email';
+    private const THREE_CONTACTS_AFFECTED     = '3 contacts affected';
+
     protected function setUp(): void
     {
         $this->configParams['mailer_from_email']   = 'admin@mautic-community.test';
@@ -157,9 +163,9 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testContactsAreAddedToThenRemovedFromCampaignsInBatch(): void
     {
-        $contactA = $this->createContact('contact@a.email');
-        $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
         $campaign = $this->createCampaign();
         $payload  = [
             'lead_batch' => [
@@ -198,9 +204,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString(self::THREE_CONTACTS_AFFECTED, $response['flashes']);
 
         $payload = [
             'lead_batch' => [
@@ -239,9 +245,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString(self::THREE_CONTACTS_AFFECTED, $response['flashes']);
     }
 
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
@@ -468,9 +474,9 @@ class LeadControllerTest extends MauticMysqlTestCase
 
     public function testCompanyIdSearchCommand(): void
     {
-        $contactA = $this->createContact('contact@a.email');
-        $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
 
         $companyName = 'Doe Corp';
         $company     = new Company();
@@ -1124,9 +1130,9 @@ EMAIL;
 
     public function testBatchDeleteAction(): void
     {
-        $contactA = $this->createContact('contact@a.email');
-        $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
         // Perform batch delete action for contact A.
         $this->client->request(Request::METHOD_POST, '/s/contacts/batchDelete?ids=["'.$contactA->getId().'"]');
         // Assert response is correct.
@@ -1149,9 +1155,9 @@ EMAIL;
     public function testBatchStageActionForAll(): void
     {
         // Create contacts and stage.
-        $contactA = $this->createContact('contact@a.email');
-        $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
         $stage    = $this->createStage();
         // Assert that contacts do not have stage set at this point.
         $this->assertNull($contactA->getStage(), 'ContactA has a stage set and is not null.');
@@ -1170,9 +1176,9 @@ EMAIL;
         // Assert response is correct.
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString(self::THREE_CONTACTS_AFFECTED, $response['flashes']);
         // Assert that stage has been assigned to all contacts.
         $this->assertNotNull($contactA->getStage());
         $this->assertNotNull($contactB->getStage());
@@ -1198,8 +1204,8 @@ EMAIL;
     {
         $ownerId = 1;
         // Create contacts.
-        $contactA = $this->createContact('contact@a.email');
-        $contactB = $this->createContact('contact@b.email');
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
         // Assert that contacts do not have stage set at this point.
         $this->assertNull($contactA->getOwner(), 'ContactA owner is not null.');
         $this->assertNull($contactB->getOwner(), 'ContactB owner is not null.');
@@ -1215,7 +1221,7 @@ EMAIL;
         // Assert response is correct.
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 contacts affected', $response['flashes']);
         // Assert that owner has been assigned to all contacts.

@@ -677,11 +677,13 @@ class MobileNotificationController extends FormController
             \assert($model instanceof NotificationModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.mobile_notification.filter', '')),
-                'notification',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.mobile_notification.filter', '')),
+                    'notification',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

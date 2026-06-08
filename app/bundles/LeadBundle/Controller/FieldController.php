@@ -492,11 +492,13 @@ class FieldController extends FormController
             $model           = $this->getModel('lead.field');
             $flashes         = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.leadfield.filter', '')),
-                'lead.field',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.leadfield.filter', '')),
+                    'lead.field',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

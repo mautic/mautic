@@ -573,11 +573,13 @@ class TriggerController extends FormController
             \assert($model instanceof TriggerModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.point.trigger.filter', '')),
-                'point.trigger',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.point.trigger.filter', '')),
+                    'point.trigger',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

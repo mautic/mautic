@@ -573,11 +573,13 @@ class ListController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.segment.filter', '')),
-                'lead.list',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.segment.filter', '')),
+                    'lead.list',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

@@ -551,11 +551,13 @@ class TagController extends FormController
             \assert($model instanceof TagModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.tags.filter', '')),
-                'tagmanager.tag',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.tags.filter', '')),
+                    'tagmanager.tag',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

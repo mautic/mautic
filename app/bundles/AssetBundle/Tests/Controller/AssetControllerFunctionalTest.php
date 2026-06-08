@@ -143,7 +143,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testIndexAction(): void
     {
-        $asset = $this->createAsset([
+        $this->createAsset([
             'title'     => 'test',
             'alias'     => 'test',
             'createdAt' => new \DateTime('2020-02-07 20:29:02'),

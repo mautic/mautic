@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Service;
 
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 
@@ -23,97 +22,24 @@ final class BatchDeleteService
     /**
      * Perform batch delete on entities.
      *
-     * @param FormModel            $model
-     * @param array<string, mixed> $postActionVars
-     * @param array<string, mixed> $getEntitiesArgs
-     *
      * @return list<array{type?: string, msg: string, msgVars?: array<string, mixed>}>
      *                                                                                 Array of flash messages
      */
     public function batchDelete(
-        MauticModelInterface $model,
-        array $postActionVars,
-        string $ids,
-        string $searchValue,
-        string $modelName,
-        callable $isLocked,
-        array $getEntitiesArgs = [],
-        ?string $filterAlias = null,
-        ?string $permissionBase = null,
+        FormModel $model,
+        BatchDeleteRequest $request,
     ): array {
-        $flashes          = [];
-        $entitiesToDelete = [];
-        $filter           = $this->getBatchActionFilter($ids, $searchValue, $model, $filterAlias);
+        $filter = $this->getBatchActionFilter($request->getIds(), $request->getSearchValue(), $model, $request->getFilterAlias());
 
         if (empty($filter)) {
-            $flashes[] = ['msg' => 'mautic.core.error.ids.missing'];
-        } else {
-            $entities = $model->getEntities(array_merge($getEntitiesArgs, [
-                'filter'           => $filter,
-                'ignore_paginator' => true,
-            ]));
-            // If there's a mismatch between given ids and found entities,
-            // flash which ids were not found.
-            if (($ids = json_decode($ids)) && count($entities) !== count($ids)) {
-                $idsNotFound = $this->getIdsNotFound($ids, array_keys($entities), $modelName);
-                $flashes     = array_merge($flashes, $idsNotFound);
-            }
-            $permissionBase ??= $model->getPermissionBase();
-            // Do this in chunks so that we don't run out of memory.
-            $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
-            foreach ($chunks as $chunk) {
-                $chunk = array_map(fn (object|array $entity): object => $this->normalizeEntity($entity), $chunk);
-                // Check if any entities cannot be deleted.
-                if (method_exists($model, 'cannotBeDeleted')) {
-                    $cannotBeDeleted       = $model->cannotBeDeleted(array_map(fn (object $entity): int|string|null => $this->getEntityId($entity), $chunk));
-                    $flashes               = array_merge($flashes, $cannotBeDeleted);
-                    // Filter out the entities that cannot be deleted.
-                    $chunk = array_filter($chunk, fn (object $entity): bool => !isset($cannotBeDeleted[$this->getEntityId($entity)]));
-                }
-                // Loop over the entities to perform access checks pre-delete.
-                foreach ($chunk as $entity) {
-                    if (!$this->checkPermission($permissionBase, $entity)) {
-                        $flashes[] = ['msg' => 'mautic.core.error.accessdenied'];
-                    } elseif ($model->isLocked($entity)) {
-                        // Use isLocked callback.
-                        $flashes[] = $isLocked($postActionVars, $entity, $modelName, true);
-                    } else {
-                        $entitiesToDelete[] = $entity;
-                    }
-                }
-                // Clear the chunk from memory after each iteration.
-                unset($chunk);
-            }
+            return [['msg' => 'mautic.core.error.ids.missing']];
         }
 
-        // Delete everything we are able to
-        if (!empty($entitiesToDelete)) {
-            $deletedEntities = [];
-            foreach ($entitiesToDelete as $entity) {
-                try {
-                    $model->deleteEntity($entity);
-                    $deletedEntities[] = $entity;
-                } catch (DeleteEntityDependencyException $exception) {
-                    foreach ($exception->getErrors() as $error) {
-                        $flashes[] = [
-                            'type' => 'error',
-                            'msg'  => $error,
-                        ];
-                    }
-                }
-            }
+        $entities                           = $this->getEntities($model, $filter, $request);
+        $flashes                            = $this->getEntityLookupFlashes($request, $entities);
+        [$deleteFlashes, $entitiesToDelete] = $this->getEntitiesToDelete($model, $request, $entities);
 
-            if ([] !== $deletedEntities) {
-                $flashes[] = [
-                    'msg'     => $this->getTranslationKey($modelName, 'notice.batch_deleted'),
-                    'msgVars' => [
-                        '%count%' => count($deletedEntities),
-                    ],
-                ];
-            }
-        }
-
-        return $flashes;
+        return array_merge($flashes, $deleteFlashes, $this->deleteEntities($model, $request->getModelName(), $entitiesToDelete));
     }
 
     /**
@@ -149,6 +75,142 @@ final class BatchDeleteService
         }
 
         return $this->security->isGranted($permissionBase.':delete');
+    }
+
+    /**
+     * @param array<string, array{string?:string, force?:array<string, mixed>}> $filter
+     *
+     * @return array<mixed>
+     */
+    private function getEntities(FormModel $model, array $filter, BatchDeleteRequest $request): array
+    {
+        return $model->getEntities(array_merge($request->getEntitiesArgs(), [
+            'filter'           => $filter,
+            'ignore_paginator' => true,
+        ]));
+    }
+
+    /**
+     * @param array<mixed> $entities
+     *
+     * @return list<array{type: string, msg: string, msgVars: array<string, mixed>}>
+     */
+    private function getEntityLookupFlashes(BatchDeleteRequest $request, array $entities): array
+    {
+        $ids = json_decode($request->getIds());
+
+        if (!$ids || count($entities) === count($ids)) {
+            return [];
+        }
+
+        return $this->getIdsNotFound($ids, array_keys($entities), $request->getModelName());
+    }
+
+    /**
+     * @param array<mixed> $entities
+     *
+     * @return array{list<array{type?: string, msg: string, msgVars?: array<string, mixed>}>, list<object>}
+     */
+    private function getEntitiesToDelete(FormModel $model, BatchDeleteRequest $request, array $entities): array
+    {
+        $flashes          = [];
+        $entitiesToDelete = [];
+        $permissionBase   = $request->getPermissionBase() ?? $model->getPermissionBase();
+
+        foreach (array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF) as $chunk) {
+            $chunk                     = array_map(fn (object|array $entity): object => $this->normalizeEntity($entity), $chunk);
+            [$chunk, $cannotBeDeleted] = $this->filterCannotBeDeleted($model, $chunk);
+            $flashes                   = array_merge($flashes, $cannotBeDeleted);
+
+            foreach ($chunk as $entity) {
+                $blockedFlash = $this->getDeleteBlockedFlash($model, $request, $permissionBase, $entity);
+
+                if (null === $blockedFlash) {
+                    $entitiesToDelete[] = $entity;
+                } else {
+                    $flashes[] = $blockedFlash;
+                }
+            }
+        }
+
+        return [$flashes, $entitiesToDelete];
+    }
+
+    /**
+     * @param list<object> $chunk
+     *
+     * @return array{list<object>, list<array{type?: string, msg: string, msgVars?: array<string, mixed>}>}
+     */
+    private function filterCannotBeDeleted(FormModel $model, array $chunk): array
+    {
+        if (!method_exists($model, 'cannotBeDeleted')) {
+            return [$chunk, []];
+        }
+
+        $cannotBeDeleted = $model->cannotBeDeleted(array_map(fn (object $entity): int|string|null => $this->getEntityId($entity), $chunk));
+
+        return [
+            array_values(array_filter($chunk, fn (object $entity): bool => !isset($cannotBeDeleted[$this->getEntityId($entity)]))),
+            array_values($cannotBeDeleted),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function getDeleteBlockedFlash(FormModel $model, BatchDeleteRequest $request, string $permissionBase, object $entity): ?array
+    {
+        if (!$this->checkPermission($permissionBase, $entity)) {
+            return ['msg' => 'mautic.core.error.accessdenied'];
+        }
+
+        if ($model->isLocked($entity)) {
+            return $request->getLockedFlash($entity);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param list<object> $entitiesToDelete
+     *
+     * @return list<array{type?: string, msg: string, msgVars?: array<string, mixed>}>
+     */
+    private function deleteEntities(FormModel $model, string $modelName, array $entitiesToDelete): array
+    {
+        if ([] === $entitiesToDelete) {
+            return [];
+        }
+
+        $flashes         = [];
+        $deletedEntities = [];
+
+        foreach ($entitiesToDelete as $entity) {
+            try {
+                $model->deleteEntity($entity);
+                $deletedEntities[] = $entity;
+            } catch (DeleteEntityDependencyException $exception) {
+                foreach ($exception->getErrors() as $error) {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => $error,
+                    ];
+                }
+            }
+        }
+
+        if ([] === $deletedEntities) {
+            return $flashes;
+        }
+
+        $flashes[] = [
+            'msg'     => $this->getTranslationKey($modelName, 'notice.batch_deleted'),
+            'msgVars' => [
+                '%count%' => count($deletedEntities),
+            ],
+        ];
+
+        return $flashes;
     }
 
     /**

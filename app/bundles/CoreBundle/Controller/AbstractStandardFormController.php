@@ -31,6 +31,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
+    private const SESSION_FILTER_KEY_SUFFIX = '.filter';
+    private const SESSION_PAGE_KEY_SUFFIX   = '.page';
+
     public function __construct(
         protected FormFactoryInterface $formFactory,
         protected FormFieldHelper $fieldHelper,
@@ -97,7 +100,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     protected function batchDeleteStandard(Request $request)
     {
         $sessionBase = $this->getSessionBase();
-        $page        = $request->getSession()->get('mautic.'.$sessionBase.'.page', 1);
+        $page        = $request->getSession()->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
         $returnUrl   = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
         $flashes     = [];
 
@@ -115,14 +118,16 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $model     = $this->getModel($this->getModelName());
             $flashes   = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.'.$sessionBase.'.filter', '')),
-                $this->getModelName(),
-                [$this, 'isLocked'],
-                $this->getBatchDeleteGetEntitiesArgs($request),
-                $this->getBatchDeleteFilterAlias($request),
-                $this->getPermissionBase(),
+                (new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get($this->getSessionKey(self::SESSION_FILTER_KEY_SUFFIX), '')),
+                    $this->getModelName(),
+                    [$this, 'isLocked'],
+                ))
+                    ->withGetEntitiesArgs($this->getBatchDeleteGetEntitiesArgs($request))
+                    ->withFilterAlias($this->getBatchDeleteFilterAlias($request))
+                    ->withPermissionBase($this->getPermissionBase()),
             );
         } // else don't do anything
 
@@ -253,7 +258,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function deleteStandard(Request $request, int $objectId)
     {
-        $page      = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+        $page      = $request->getSession()->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
         $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);
         $flashes   = [];
         $model     = $this->getModel($this->getModelName());
@@ -328,7 +333,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         // set the return URL
         $returnUrl      = $this->generateUrl($this->getIndexRoute());
-        $page           = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+        $page           = $request->getSession()->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
         $viewParameters = ['page' => $page];
 
         $template = $this->getControllerBase().'::'.$this->getPostActionControllerAction('edit').'Action';
@@ -812,7 +817,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $session = $request->getSession();
         if (empty($page)) {
-            $page = $session->get('mautic.'.$this->getSessionBase().'.page', 1);
+            $page = $session->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
         }
 
         // set limits
@@ -822,8 +827,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $start = 0;
         }
 
-        $search = $request->get('search', $session->get('mautic.'.$this->getSessionBase().'.filter', ''));
-        $session->set('mautic.'.$this->getSessionBase().'.filter', $search);
+        $search = $request->get('search', $session->get($this->getSessionKey(self::SESSION_FILTER_KEY_SUFFIX), ''));
+        $session->set($this->getSessionKey(self::SESSION_FILTER_KEY_SUFFIX), $search);
 
         $filter = ['string' => $search, 'force' => []];
 
@@ -843,7 +848,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             // the number of entities are now less then the current page so redirect to the last page
             $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
 
-            $session->set('mautic.'.$this->getSessionBase().'.page', $lastPage);
+            $session->set($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), $lastPage);
             $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $lastPage]);
 
             return $this->postActionRedirect(
@@ -862,7 +867,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         }
 
         // set what page currently on so that we can return here after form submission/cancellation
-        $session->set('mautic.'.$this->getSessionBase().'.page', $page);
+        $session->set($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), $page);
 
         $viewParameters = [
             'permissionBase'  => $this->getPermissionBase(),
@@ -916,7 +921,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         }
 
         // set the page we came from
-        $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+        $page = $request->getSession()->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
@@ -1029,6 +1034,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return parent::setListFilters($name ?: $this->getSessionBase());
     }
 
+    private function getSessionKey(string $suffix): string
+    {
+        return 'mautic.'.$this->getSessionBase().$suffix;
+    }
+
     /**
      * @param string|null $logObject
      * @param string|null $logBundle
@@ -1043,7 +1053,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $entity   = $model->getEntity($objectId);
 
         if (null === $entity) {
-            $page = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
+            $page = $request->getSession()->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
 
             return $this->postActionRedirect(
                 $this->getPostActionRedirectArguments(

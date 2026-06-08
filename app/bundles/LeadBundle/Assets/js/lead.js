@@ -1499,11 +1499,9 @@ Mautic.leadBatchSubmit = function() {
             mQuery('#batch_tag_tags_add_tags').val() ||
             mQuery('#batch_tag_tags_remove_tags').val()
         ) {
-            if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
-                var ids = 'all';
-            } else {
-                var ids = Mautic.getCheckedListIds(false, true);
-            }
+            const ids = mQuery('[data-toggle=selectall]').attr('data-selectall') === "1"
+                ? 'all'
+                : Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
                 mQuery('#lead_batch_ids').val(ids);

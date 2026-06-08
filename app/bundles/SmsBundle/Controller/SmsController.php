@@ -662,11 +662,13 @@ class SmsController extends FormController
             \assert($model instanceof SmsModel);
             $flashes = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.sms.filter', '')),
-                'sms',
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.sms.filter', '')),
+                    'sms',
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

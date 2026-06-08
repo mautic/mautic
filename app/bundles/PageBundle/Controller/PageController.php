@@ -793,11 +793,13 @@ class PageController extends FormController
             $model     = $this->getModel('page');
             $flashes   = $this->batchDeleteService->batchDelete(
                 $model,
-                $postActionVars,
-                $request->query->get('ids', ''),
-                $request->get('search', $request->getSession()->get('mautic.page.filter', '')),
-                $this->getModelName(),
-                [$this, 'isLocked'],
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.page.filter', '')),
+                    $this->getModelName(),
+                    [$this, 'isLocked'],
+                ),
             );
         } // else don't do anything
 

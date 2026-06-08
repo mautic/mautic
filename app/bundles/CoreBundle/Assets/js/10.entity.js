@@ -347,14 +347,14 @@ Mautic.executeBatchAction = function (action, el) {
         // Action is currently being executed
         return;
     }
-    var items = Mautic.getSelectedIds(el, true);
+    const items = Mautic.getSelectedIds(el, true);
 
-    var queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
+    const queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
     // Append the items to the action to send with the POST
-    var action = action + queryGlue + 'ids=' + items;
+    const actionWithItems = action + queryGlue + 'ids=' + items;
 
     // Hand over processing to the executeAction method
-    Mautic.executeAction(action);
+    Mautic.executeAction(actionWithItems);
 };
 
 /**

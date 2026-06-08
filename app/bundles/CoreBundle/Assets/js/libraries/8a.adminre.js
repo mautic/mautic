@@ -452,12 +452,9 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
 
                 // Check if any checkbox is selected and update toolbar state
                 function updateToolbarState(selectall = false) {
-                    var checkedBoxes = 0;
-                    if (selectall) {
-                        checkedBoxes = $('.pagination-wrapper [data-item-count]').data("item-count");
-                    } else {
-                        checkedBoxes = $(toggler + ":checked").length;
-                    }
+                    const checkedBoxes = selectall
+                        ? $('.pagination-wrapper [data-item-count]').data("item-count")
+                        : $(toggler + ":checked").length;
                     $(".toolbar--batch-actions").toggleClass("toolbar--batch-actions--active", checkedBoxes > 0);
 
                     var $summaryCount = $(".toolbar--batch-summary__count");
@@ -480,11 +477,11 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 // Select all items (including items in other pages)
                 $(document).on("click", "[data-toggle=selectall]", function() {
                     if (!mQuery("[data-toggle~=checkall]").is(":checked")) {
-                        // Check all visibile checkboxes
-                        mQuery("[data-toggle~=checkall]").click()
+                        // Check all visible checkboxes
+                        mQuery("[data-toggle~=checkall]").click();
                     }
                     // Update the selected item count
-                    updateToolbarState(true)
+                    updateToolbarState(true);
                     // Set selectall data-attribute to true
                     $(this).attr("data-selectall", "1");
                 });

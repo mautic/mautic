@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListModelFunctionalTest extends MauticMysqlTestCase
 {
+    private const SEGMENT_A = 'Segment A';
+
     public function testPublicSegmentsInContactPreferences(): void
     {
         $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
@@ -45,7 +47,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         $segment = new LeadList();
-        $segment->setName('Segment A');
+        $segment->setName(self::SEGMENT_A);
 
         $segmentModel->saveEntity($segment);
 
@@ -100,7 +102,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         $segment = new LeadList();
-        $segment->setName('Segment A');
+        $segment->setName(self::SEGMENT_A);
 
         $segmentModel->saveEntity($segment);
 
@@ -148,7 +150,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
     public function testBatchDeleteAction(): void
     {
         $user      = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
-        $segmentA  = $this->createLeadList($user, 'Segment A', true);
+        $segmentA  = $this->createLeadList($user, self::SEGMENT_A, true);
         $segmentB  = $this->createLeadList($user, 'Segment B', false);
         $segmentC  = $this->createLeadList($user, 'Segment C', true);
         $this->em->flush();
