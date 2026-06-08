@@ -20,6 +20,10 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
             return '';
         }
 
+        if (is_string($array)) {
+            return $array;
+        }
+
         return implode("\n", $array);
     }
 

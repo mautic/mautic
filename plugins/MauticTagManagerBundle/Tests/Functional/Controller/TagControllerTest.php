@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
@@ -72,6 +73,27 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain tag2');
     }
 
+    public function testIndexActionWhenFilteredByDescription(): void
+    {
+        $matchingTag = $this->tagRepository->findOneBy(['tag' => 'tag1']);
+        \assert($matchingTag instanceof Tag);
+        $matchingTag->setDescription('Contains the test keyword.');
+        $this->tagRepository->saveEntity($matchingTag, false);
+
+        $otherTag = $this->tagRepository->findOneBy(['tag' => 'tag2']);
+        \assert($otherTag instanceof Tag);
+        $otherTag->setDescription('No related content.');
+        $this->tagRepository->saveEntity($otherTag);
+
+        $this->client->request('GET', '/s/tags?search=test');
+        $clientResponse        = $this->client->getResponse();
+        $clientResponseContent = $clientResponse->getContent();
+
+        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain the tag whose description matches.');
+        $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain unrelated tags.');
+    }
+
     public function testTagDeletion(): void
     {
         $tagId = $this->tagRepository->findOneBy([])->getId();
@@ -80,6 +102,29 @@ class TagControllerTest extends MauticMysqlTestCase
 
         $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
         $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+    }
+
+    public function testTagDeletionRemovesContactAssociations(): void
+    {
+        $tag = $this->tagRepository->findOneBy([]);
+        \assert($tag instanceof Tag);
+
+        $contact = new Lead();
+        $contact->setEmail('tagged-contact@example.com');
+        $contact->addTag($tag);
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $tagId = (int) $tag->getId();
+
+        Assert::assertSame(1, $this->countLeadTagAssociations($tagId));
+
+        $this->client->request('POST', '/s/tags/delete/'.$tagId);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
 
     /**
@@ -102,6 +147,17 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/tags/view/99999');
         $clientResponse = $this->client->getResponse();
         $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
+    }
+
+    private function countLeadTagAssociations(int $tagId): int
+    {
+        return (int) $this->em->getConnection()->createQueryBuilder()
+            ->select('COUNT(*)')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref')
+            ->where('tag_id = :tagId')
+            ->setParameter('tagId', $tagId)
+            ->executeQuery()
+            ->fetchOne();
     }
 
     /**

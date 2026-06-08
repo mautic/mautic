@@ -528,6 +528,7 @@ Mautic.updateEntitySelect = function (response) {
 
         newOption.prop('selected', true);
         mQueryParent(el).trigger("chosen:updated");
+        mQueryParent(el).val(response.id).trigger("change");
     }
 
     if (window.opener) {
@@ -553,7 +554,7 @@ Mautic.toggleYesNo = function(element) {
         $textEl = $toggle.find('.toggle__text'),
         isYes = $yesInput.is(':checked');
 
-    if ($yesInput.is(':disabled')) {
+    if ($toggle.hasClass('toggle--disabled') || $toggle.hasClass('toggle--readonly')) {
         return;
     }
 
