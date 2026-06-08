@@ -197,8 +197,18 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $fieldRepository = $this->em->getRepository(LeadField::class);
         $this->assertSame($fieldA, $fieldRepository->find($fieldA->getId()));
         $this->assertSame($fieldB, $fieldRepository->find($fieldB->getId()));
-        // Batch delete all fields.
-        $this->client->request(Request::METHOD_POST, '/s/contacts/fields/batchDelete?ids=all');
+
+        $titleField = $fieldRepository->findOneBy(['alias' => 'title']);
+        $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
+        \assert($titleField instanceof LeadField);
+        \assert($emailField instanceof LeadField);
+
+        $query = http_build_query([
+            'ids' => json_encode([$fieldA->getId(), $fieldB->getId(), $titleField->getId(), $emailField->getId()], JSON_THROW_ON_ERROR),
+        ]);
+
+        // Batch delete selected fields.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/fields/batchDelete?'.$query);
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
         $content = $response->getContent();

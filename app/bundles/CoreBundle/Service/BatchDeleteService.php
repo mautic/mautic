@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Service;
 
-use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Entity\Tag;
 
 final class BatchDeleteService
 {
@@ -27,6 +25,7 @@ final class BatchDeleteService
      *
      * @param FormModel            $model
      * @param array<string, mixed> $postActionVars
+     * @param array<string, mixed> $getEntitiesArgs
      *
      * @return list<array{type?: string, msg: string, msgVars?: array<string, mixed>}>
      *                                                                                 Array of flash messages
@@ -38,35 +37,38 @@ final class BatchDeleteService
         string $searchValue,
         string $modelName,
         callable $isLocked,
+        array $getEntitiesArgs = [],
+        ?string $filterAlias = null,
+        ?string $permissionBase = null,
     ): array {
         $flashes          = [];
         $entitiesToDelete = [];
-        $filter           = $this->getBatchActionFilter($ids, $searchValue, $model);
+        $filter           = $this->getBatchActionFilter($ids, $searchValue, $model, $filterAlias);
 
         if (empty($filter)) {
             $flashes[] = ['msg' => 'mautic.core.error.ids.missing'];
         } else {
-            $entities = $model->getEntities([
+            $entities = $model->getEntities(array_merge($getEntitiesArgs, [
                 'filter'           => $filter,
                 'ignore_paginator' => true,
-            ]);
+            ]));
             // If there's a mismatch between given ids and found entities,
             // flash which ids were not found.
             if (($ids = json_decode($ids)) && count($entities) !== count($ids)) {
                 $idsNotFound = $this->getIdsNotFound($ids, array_keys($entities), $modelName);
                 $flashes     = array_merge($flashes, $idsNotFound);
             }
-            $permissionBase = $model->getPermissionBase();
+            $permissionBase ??= $model->getPermissionBase();
             // Do this in chunks so that we don't run out of memory.
             $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
             foreach ($chunks as $chunk) {
-                $chunk = array_map(fn (CommonEntity|Tag|array $entity): CommonEntity|Tag => $this->normalizeEntity($entity), $chunk);
+                $chunk = array_map(fn (object|array $entity): object => $this->normalizeEntity($entity), $chunk);
                 // Check if any entities cannot be deleted.
                 if (method_exists($model, 'cannotBeDeleted')) {
-                    $cannotBeDeleted       = $model->cannotBeDeleted(array_map(fn ($entity) => $entity->getId(), $chunk));
+                    $cannotBeDeleted       = $model->cannotBeDeleted(array_map(fn (object $entity): int|string|null => $this->getEntityId($entity), $chunk));
                     $flashes               = array_merge($flashes, $cannotBeDeleted);
                     // Filter out the entities that cannot be deleted.
-                    $chunk = array_filter($chunk, fn ($entity) => !isset($cannotBeDeleted[$entity->getId()]));
+                    $chunk = array_filter($chunk, fn (object $entity): bool => !isset($cannotBeDeleted[$this->getEntityId($entity)]));
                 }
                 // Loop over the entities to perform access checks pre-delete.
                 foreach ($chunk as $entity) {
@@ -117,7 +119,7 @@ final class BatchDeleteService
     /**
      * @return array<string, array{string?:string, force?:array<string, mixed>}>
      */
-    public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model): array
+    public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model, ?string $filterAlias = null): array
     {
         $filter = [];
         // When user select 'all'.
@@ -126,7 +128,7 @@ final class BatchDeleteService
         }
         // When user select specific entities.
         if (json_decode($ids)) {
-            $alias           = $model->getRepository()->getTableAlias();
+            $alias           = $filterAlias ?? $model->getRepository()->getTableAlias();
             $filter['force'] = [[
                 'column' => $alias.'.id',
                 'expr'   => 'in',
@@ -137,7 +139,7 @@ final class BatchDeleteService
         return $filter;
     }
 
-    private function checkPermission(string $permissionBase, CommonEntity|Tag $entity): bool
+    private function checkPermission(string $permissionBase, object $entity): bool
     {
         if (method_exists($entity, 'getCreatedBy')) {
             return $this->security->hasEntityAccess(
@@ -152,17 +154,24 @@ final class BatchDeleteService
     /**
      * Some repositories return each entity inside a hydrated row array.
      *
-     * @param CommonEntity|Tag|array<mixed> $entity
+     * @param object|array<mixed> $entity
      */
-    private function normalizeEntity(CommonEntity|Tag|array $entity): CommonEntity|Tag
+    private function normalizeEntity(object|array $entity): object
     {
         if (is_array($entity)) {
             $entity = reset($entity);
         }
 
-        \assert($entity instanceof CommonEntity || $entity instanceof Tag);
+        \assert(is_object($entity));
 
         return $entity;
+    }
+
+    private function getEntityId(object $entity): int|string|null
+    {
+        \assert(method_exists($entity, 'getId'));
+
+        return $entity->getId();
     }
 
     /**

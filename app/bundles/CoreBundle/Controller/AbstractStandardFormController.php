@@ -120,6 +120,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 $request->get('search', $request->getSession()->get('mautic.'.$sessionBase.'.filter', '')),
                 $this->getModelName(),
                 [$this, 'isLocked'],
+                $this->getBatchDeleteGetEntitiesArgs($request),
+                $this->getBatchDeleteFilterAlias($request),
+                $this->getPermissionBase(),
             );
         } // else don't do anything
 
@@ -134,6 +137,19 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'batchDelete'
             )
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getBatchDeleteGetEntitiesArgs(Request $request): array
+    {
+        return [];
+    }
+
+    protected function getBatchDeleteFilterAlias(Request $request): ?string
+    {
+        return null;
     }
 
     /**

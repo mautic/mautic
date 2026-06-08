@@ -446,6 +446,22 @@ class ResultController extends CommonFormController
         return $args;
     }
 
+    protected function getBatchDeleteGetEntitiesArgs(Request $request): array
+    {
+        /** @var FormModel $formModel */
+        $formModel = $this->getModel('form.form');
+
+        return [
+            'form'            => $formModel->getEntity((int) $this->getFormIdFromRequest()),
+            'return_entities' => true,
+        ];
+    }
+
+    protected function getBatchDeleteFilterAlias(Request $request): ?string
+    {
+        return 's';
+    }
+
     /**
      * @param array $parameters
      *
