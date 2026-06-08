@@ -432,9 +432,9 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
             return $event->setFailed('mautic.lead.no_company');
-        } else {
-            return $event->setResult(true);
         }
+
+        return $event->setResult(true);
     }
 
     public function onCampaignTriggerActionUpdateCompany(CampaignExecutionEvent $event)
@@ -506,7 +506,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
-                $triggerDate = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
+                $triggerDate = new \DateTime('now',
+                    new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (str_contains($event->getConfig()['value'], '+P')) { // add date
@@ -526,17 +527,37 @@ class CampaignSubscriber implements EventSubscriberInterface
             } else {
                 $operators = OperatorOptions::getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
-                $value     = $event->getConfig()['value'];
+                $value     = $event->getConfig()['value'] ?? '';
+                $operator  = $event->getConfig()['operator'];
                 $fields    = $this->getFields($lead);
 
-                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
-                $result     = $this->leadFieldModel->getRepository()->compareValue(
-                    $lead->getId(),
-                    $field,
-                    $fieldValue,
-                    $operators[$event->getConfig()['operator']]['expr'],
-                    $fields[$field]['type'] ?? null
-                );
+                $fieldType  = '';
+                $fieldValue = $value;
+                if (isset($fields[$field])) {
+                    $fieldType  = $fields[$field]['type'];
+                    // Keep regex values unchanged so they are evaluated as patterns
+                    // Otherwise CustomFieldHelper::fieldValueTransfomer would attempt to parse
+                    // the regex as a DateTime string, which would throw an error
+                    if (!in_array($operator, [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP])) {
+                        $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value);
+                    }
+                }
+
+                // Preventing date/datetime fields to fail on empty/notEmpty
+                if (in_array($fieldType, ['date', 'datetime']) && in_array($operator, ['empty', '!empty'])) {
+                    $result     = $this->leadFieldModel->getRepository()->compareEmptyDateValue(
+                        $lead->getId(),
+                        $field,
+                        $operators[$operator]['expr']
+                    );
+                } else {
+                    $result     = $this->leadFieldModel->getRepository()->compareValue(
+                        $lead->getId(),
+                        $field,
+                        $fieldValue,
+                        $operators[$operator]['expr']
+                    );
+                }
             }
         } elseif ($event->checkContext('lead.dnc')) {
             $channels  = $event->getConfig()['channels'];

@@ -200,9 +200,7 @@ class FoursquareIntegration extends SocialIntegration
             }
             */
 
-            if (!empty($activity)) {
-                $socialCache['activity'] = $activity;
-            }
+            $socialCache['activity'] = $activity;
         }
     }
 

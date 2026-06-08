@@ -13,20 +13,22 @@ permissions:
 
 jobs:
   push-to-transifex:
-    if: github.repository == 'mautic/mautic'
+    # Run only in the 'mautic/mautic' repository and on the default branch (or manually triggered via UI)
+    if: github.repository == 'mautic/mautic' && (github.ref_name == github.event.repository.default_branch || github.event_name == 'workflow_dispatch')
     name: Push translations to Transifex
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-    - name: Setup PHP, with composer and extensions
+    - name: Setup PHP with extensions
       uses: shivammathur/setup-php@v2
       with:
         php-version: 8.3
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
-    - name: Install dependencies
+    - name: Install Composer dependencies
       uses: "ramsey/composer-install@v3"
 
     - name: Push translations to Transifex

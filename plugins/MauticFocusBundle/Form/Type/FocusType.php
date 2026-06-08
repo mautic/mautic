@@ -35,7 +35,7 @@ class FocusType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html', 'description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
         $builder->add(
@@ -200,7 +200,7 @@ class FocusType extends AbstractType
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin',
                     'icon'    => 'ri-layout-line',
                     'onclick' => 'Mautic.launchFocusBuilder();',
                 ],

@@ -34,6 +34,8 @@ class PathsHelper
 
     private string $importLeadsDir;
 
+    private string $importCampaignDir;
+
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
         $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
@@ -43,6 +45,7 @@ class PathsHelper
         $this->imagePath              = $this->removeTrailingSlash((string) $coreParametersHelper->get('image_path'));
         $this->dashboardImportDir     = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_dir'));
         $this->importLeadsDir         = $this->removeTrailingSlash((string) $coreParametersHelper->get('import_leads_dir'));
+        $this->importCampaignDir      = $this->removeTrailingSlash((string) $coreParametersHelper->get('import_campaigns_dir'));
         $this->temporaryDir           = $this->removeTrailingSlash((string) $coreParametersHelper->get('tmp_path'));
         $this->dashboardUserImportDir = $this->removeTrailingSlash((string) $coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
@@ -120,6 +123,11 @@ class PathsHelper
         return $this->getSystemPath('import.leads.dir', true);
     }
 
+    public function getImportCampaignsPath(): string
+    {
+        return $this->getSystemPath('import.campaigns.dir', true);
+    }
+
     /**
      * Returns absolute path to the root directory where the "vendor" directory is located.
      */
@@ -187,6 +195,9 @@ class PathsHelper
 
             case 'import.leads.dir':
                 return $this->importLeadsDir;
+
+            case 'import.campaigns.dir':
+                return $this->importCampaignDir;
 
             default:
                 if (isset($this->paths[$name])) {

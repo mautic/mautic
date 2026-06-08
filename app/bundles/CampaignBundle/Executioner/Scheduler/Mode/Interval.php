@@ -102,7 +102,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null): array
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, ?\DateTimeInterface $compareFromDateTime = null): array
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
@@ -187,9 +187,9 @@ class Interval implements ScheduleModeInterface
         $eventId,
         Lead $contact,
         \DateTimeInterface $compareFromDateTime,
-        \DateTimeInterface $hour = null,
-        \DateTimeInterface $startTime = null,
-        \DateTimeInterface $endTime = null,
+        ?\DateTimeInterface $hour = null,
+        ?\DateTimeInterface $startTime = null,
+        ?\DateTimeInterface $endTime = null,
         array $daysOfWeek = [],
     ) {
         $this->logger->debug(
@@ -325,7 +325,7 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->defaultTimezone = new \DateTimeZone(
-            $this->coreParametersHelper->get('default_timezone', 'UTC')
+            $this->coreParametersHelper->getDefaultTimezone()
         );
 
         return $this->defaultTimezone;

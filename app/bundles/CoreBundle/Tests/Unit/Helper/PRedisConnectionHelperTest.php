@@ -11,10 +11,9 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Predis\Cluster\ClusterStrategy;
 use Predis\Command\Processor\KeyPrefixProcessor;
-use Predis\Connection\Aggregate\PredisCluster;
-use Predis\Connection\Aggregate\RedisCluster;
-use Predis\Connection\Aggregate\SentinelReplication;
-use Predis\Profile\RedisProfile;
+use Predis\Connection\Cluster\PredisCluster;
+use Predis\Connection\Cluster\RedisCluster;
+use Predis\Connection\Replication\SentinelReplication;
 
 class PRedisConnectionHelperTest extends TestCase
 {
@@ -78,9 +77,8 @@ class PRedisConnectionHelperTest extends TestCase
         Assert::assertSame($prefix, $options->prefix->getPrefix());
         Assert::assertNull($options->aggregate);
 
-        $profile = $client->getProfile();
-        \assert($profile instanceof RedisProfile);
-        Assert::assertTrue($profile->supportsCommand(Unlink::ID));
+        $commandFactory = $client->getCommandFactory();
+        Assert::assertTrue($commandFactory->supports(Unlink::ID));
 
         $connection = $client->getConnection();
 

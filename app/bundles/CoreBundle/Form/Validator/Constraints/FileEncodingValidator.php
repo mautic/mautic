@@ -11,10 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class FileEncodingValidator extends ConstraintValidator
 {
-    /**
-     * @param LeadField $field
-     */
-    public function validate($field, Constraint $constraint): void
+    public function validate(mixed $field, Constraint $constraint): void
     {
         /*
             If the file uploaded exceeds the max size, it will not be considered,

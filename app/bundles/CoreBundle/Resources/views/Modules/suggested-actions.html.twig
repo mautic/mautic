@@ -1,0 +1,45 @@
+{% if (showVariants or showTranslations) and ((entity.isVariant and not entity.isVariant(true)) or (entity.isTranslation and not entity.isTranslation(true))) or (not showVariants and not showTranslations and allowAbTest) %}
+<div class="pa-md mt-80">
+    {% set cards = [] %}
+    
+    {% if allowAbTest %}
+        {% set cards = cards|merge([{
+            heading: 'mautic.core.ab_test.create',
+            copy: (not showVariants and not showTranslations) ? 'mautic.core.ab_test.create.description' : null,
+            pictogram: 'pilot-test',
+            href: path('mautic_' ~ routeBase ~ '_action', {'objectAction': 'abtest', 'objectId': entity.id}),
+            attributes: {
+                'data-toggle': 'ajax'
+            }
+        }]) %}
+    {% endif %}
+    
+    {% set cards = cards|merge([{
+        heading: 'mautic.core.translation.create',
+        copy: (not showVariants and not showTranslations) ? 'mautic.core.translation.create.description' : null,
+        pictogram: 'language--translation',
+        href: path('mautic_' ~ routeBase ~ '_action', {'objectAction': 'clone', 'objectId': entity.id}),
+        attributes: {
+            'data-toggle': 'ajax'
+        }
+    }]) %}
+    
+    {% if additionalCards is defined and additionalCards is not empty %}
+        {% set cards = cards|merge(additionalCards) %}
+    {% endif %}
+    
+    {% set childContainer %}
+    {% include '@MauticCore/Components/card-group.html.twig' with {
+        type: (not showVariants and not showTranslations) ? 'pictogram' : 'link',
+        gridMode: 'narrow',
+        cardsPerRow: 3, 
+        cards: cards
+    } %}
+    {% endset %}
+    
+    {% include '@MauticCore/Components/content-block.html.twig' with {
+        subheading: 'mautic.core.suggested_actions',
+        childContainer: childContainer
+    } %}
+</div>
+{% endif %}

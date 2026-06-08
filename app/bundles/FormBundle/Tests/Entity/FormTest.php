@@ -22,12 +22,12 @@ final class FormTest extends \PHPUnit\Framework\TestCase
 
     public static function setNoIndexDataProvider(): iterable
     {
-        yield [null, null, []];
-        yield [true, true, ['noIndex' => [null, true]]];
-        yield [false, false, ['noIndex' => [null, false]]];
-        yield ['', false, ['noIndex' => [null, false]]];
-        yield [0, false, ['noIndex' => [null, false]]];
-        yield ['string', true, ['noIndex' => [null, true]]];
+        yield [null, null, ['noIndex' => [true, null]]];
+        yield [true, true, []];
+        yield [false, false, ['noIndex' => [true, false]]];
+        yield ['', false, ['noIndex' => [true, false]]];
+        yield [0, false, ['noIndex' => [true, false]]];
+        yield ['string', true, []];
     }
 
     public function testGetMappedFieldValues(): void

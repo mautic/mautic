@@ -38,16 +38,16 @@ trait EntityContactsTrait
         $entityJoinTable,
         $dncChannel = null,
         $entityIdColumnName = 'id',
-        array $contactFilter = null,
-        array $additionalJoins = null,
+        ?array $contactFilter = null,
+        ?array $additionalJoins = null,
         $contactColumnName = null,
         ?array $routeParameters = [],
         $paginationTarget = null,
         $orderBy = null,
         $orderByDir = null,
         $count = null,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ) {
         if ($permission && !$this->security->isGranted($permission)) {
             return $this->delegateView(

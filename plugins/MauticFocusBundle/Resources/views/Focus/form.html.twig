@@ -1,5 +1,3 @@
-{#
-#}
 {% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}focus{% endblock %}
@@ -40,33 +38,66 @@
         </div>
     </div>
 
-    <div class="hide builder focus-builder">
+    <div class="hide builder focus-builder animation--slide-in-down">
+        {% set previewWebsiteMenu %}
+        <!-- Form to get preview URL -->
+        <div class="website-placeholder well well-lg col-xs-12">
+            <div class="row">
+                <div class="mautibot-image col-xs-3 text-center">
+                    <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}"/>
+                </div>
+                <div class="col-xs-9 layer-two">
+                    <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.core.noresults.tip'|trans }}
+                        <i class="ri-double-quotes-r"></i></h4>
+                    <p class="mt-md">
+                        {{ 'mautic.focus.website_placeholder'|trans }}
+                    </p>
+                    <div class="input-group">
+                        <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com">
+                        <span class="input-group-btn">
+                            <button class="btn btn-ghost btn-fetch" type="button">{{ 'mautic.focus.fetch_snapshot'|trans }}</button>
+                        </span>
+                    </div>
+                    <div class="help-block hide"></div>
+                </div>
+            </div>
+        </div>
+        {% endset %}
+        {% include '@MauticCore/Components/uishell.html.twig' with {
+            Header: {
+                ariaLabel: 'mautic.focus.builder',
+                children: {
+                    HeaderName: {
+                        prefix: entity.name is empty ? '' : 'mautic.focus.focus_item',
+                        children: entity.name|default('mautic.focus.unsaved'),
+                    },
+                    'HeaderNavigation': {
+                        'children': [
+                            {
+                                'HeaderMenuDropdown': {
+                                    'menuLinkName': 'mautic.focus.preview',
+                                    'renderMenuContent': previewWebsiteMenu,
+                                },
+                            },
+                        ],
+                    },
+                    HeaderGlobal: {
+                        children: [
+                            {
+                                'HeaderGlobalAction': {
+                                    ariaLabel: 'mautic.core.close.builder',
+                                    onClick: 'Mautic.closeFocusBuilder(this);',
+                                    renderActionIcon: 'ri-close-line',
+                                    className: 'btn-close-builder btn-nospin',
+                                }
+                            }
+                        ],
+                    },
+                },
+            },
+        } %}
         <div class="builder-content">
             <div class="website-preview">
-
-                <!-- Form to get preview URL -->
-                <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3">
-                    <div class="row">
-                        <div class="mautibot-image col-xs-3 text-center">
-                            <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}"/>
-                        </div>
-                        <div class="col-xs-9">
-                            <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.core.noresults.tip'|trans }}
-                                <i class="ri-double-quotes-r"></i></h4>
-                            <p class="mt-md">
-                                {{ 'mautic.focus.website_placeholder'|trans }}
-                            </p>
-                            <div class="input-group">
-                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com">
-                                <span class="input-group-btn">
-                                    <button class="btn btn-ghost btn-fetch" type="button">{{ 'mautic.focus.fetch_snapshot'|trans }}</button>
-                                </span>
-                            </div>
-                            <div class="help-block hide"></div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Viewport switcher -->
                 <div class="viewport-switcher text-center">
                     <div class="btn btn-sm btn-success btn-nospin btn-viewport" data-viewport="desktop">
@@ -88,7 +119,6 @@
         <div class="builder-panel builder-panel-focus">
             <div class="builder-panel-top">
                 <p>
-                    <button type="button" class="btn btn-primary btn-close-builder btn-block" onclick="Mautic.closeFocusBuilder(this);">{{ 'mautic.core.close.builder'|trans }}</button>
                 </p>
             </div>
             {% set class = form.type.vars.data is defined and form.type.vars.data is not empty ? 'focus-type-' ~ form.type.vars.data : 'focus-type-all' %}

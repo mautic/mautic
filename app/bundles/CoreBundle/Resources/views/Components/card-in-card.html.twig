@@ -1,0 +1,24 @@
+<a class="card-in-card" href="{{ href }}">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="card__image-wrapper">
+                <img class="image__img as-16-9" src="{{ asset(image.src) }}" alt="{{ image.alt }}">
+            </div>
+        </div>
+        <div class="row-no-gutters">
+            <div class="col-lg-4 col-md-8 col-xs-12 card__wrapper">
+                <div class="tile">
+                    <div class="tile-content">
+                        {% if eyebrow is defined %}
+                        <div class="card__eyebrow-wrapper type-label-02 text-secondary mb-8">{{ eyebrow }}</div>
+                        {% endif %}
+                        <h3 class="card__heading-wrapper type-heading-03 mb-64">{{ heading }}</h3>
+                    </div>
+                    <div class="fs-20 ml-a">
+                        <i class="ri-arrow-right-line" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>

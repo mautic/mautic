@@ -10,6 +10,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -198,7 +199,7 @@ class DynamicContentController extends FormController
                         'passthroughVars' => $passthrough,
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
@@ -424,9 +425,7 @@ class DynamicContentController extends FormController
     }
 
     /**
-     * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function cloneAction(Request $request, $objectId)
     {

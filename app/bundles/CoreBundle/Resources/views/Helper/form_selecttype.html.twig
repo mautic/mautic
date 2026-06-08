@@ -23,7 +23,7 @@
                         <h3 class="mb-48">{{ typeOneHeader|trans }}</h3>
                         {% if typeOnePictogram is defined and typeOnePictogram is not empty %}
                             <div class="mb-md">
-                                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                                {% include '@MauticCore/Components/pictogram.html.twig' with {
                                     'pictogram': typeOnePictogram,
                                     'size': '64',
                                     'color': 'var(--icon-interactive)'
@@ -55,12 +55,11 @@
                         {% endif %}
                         {% endset %}
 
-                        {% include '@MauticCore/Components/tile--clickable.html.twig' with {
-                            'tiles': [{
-                                'onclick': typeOneOnClick,
-                                'content': typeOneContent,
-                                'icon': typeOneIconClass|default('')
-                            }]
+                        {% include '@MauticCore/Components/tile.html.twig' with {
+                            'type': 'clickable',
+                            'onclick': typeOneOnClick,
+                            'content': typeOneContent,
+                            'icon': typeOneIconClass|default('')
                         } %}
                     </div>
                     <div class="col-md-6">
@@ -68,7 +67,7 @@
                         <h3 class="mb-48">{{ typeTwoHeader|trans }}</h3>
                         {% if typeTwoPictogram is defined and typeTwoPictogram is not empty %}
                         <div class="mb-md">
-                            {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                            {% include '@MauticCore/Components/pictogram.html.twig' with {
                                 'pictogram': typeTwoPictogram,
                                 'size': '64',
                                 'color': 'var(--icon-interactive)'
@@ -99,12 +98,11 @@
                         {% endif %}
                         {% endset %}
 
-                        {% include '@MauticCore/Components/tile--clickable.html.twig' with {
-                            'tiles': [{
-                                'onclick': typeTwoOnClick,
-                                'content': typeTwoContent,
-                                'icon': typeTwoIconClass|default('')
-                            }]
+                        {% include '@MauticCore/Components/tile.html.twig' with {
+                            'type': 'clickable',
+                            'onclick': typeTwoOnClick,
+                            'content': typeTwoContent,
+                            'icon': typeTwoIconClass|default('')
                         } %}
                     </div>
                 </div>

@@ -324,9 +324,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if (count($result)) {
             return $all ? $result : $result[0];
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**
@@ -611,10 +611,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $entityId,
         $filters = [],
         $entityColumnName = 'id',
-        array $additionalJoins = null,
+        ?array $additionalJoins = null,
         $contactColumnName = 'lead_id',
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
@@ -801,7 +801,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
-                $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
+                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
@@ -940,6 +940,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.dnc'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.dnc', [], null, 'en_US'):
+                $anyKeyword   = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any');
+                $anyKeywordEn = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any', [], null, 'en_US');
+                $sq           = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+                    ->where($q->expr()->eq('l.id', 'dnc.lead_id'));
+
+                if ($string === $anyKeyword || $string === $anyKeywordEn) {
+                    $returnParameter = false;
+                } else {
+                    $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
+                    $returnParameter = true;
+                }
+                $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
+                $filter->strict = true;
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
@@ -980,6 +998,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
             'mautic.lead.lead.searchcommand.list',
+            'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
             'mautic.lead.lead.searchcommand.company_id',
@@ -1001,6 +1020,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.sms_sent',
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
+            'mautic.lead.lead.searchcommand.dnc',
         ];
 
         if (!empty($this->availableSearchFields)) {

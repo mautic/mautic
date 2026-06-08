@@ -40,11 +40,15 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
             /**
              * @return array<mixed>
              */
-            public function load(Request $request)
+            public function load(Request $request): array|string
             {
                 $connector = new ElFinderConnector($this->bridge);
+                $result    = $connector->execute($request->query->all());
+                if (null === $result) {
+                    return []; // Can't return null, so return an empty array instead
+                }
 
-                return $connector->execute($request->query->all());
+                return $result;
             }
         };
 

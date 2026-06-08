@@ -329,16 +329,6 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set security object to check the perimissions.
-     *
-     * @depreacated
-     */
-    public function setSecurity(CorePermissions $security): void
-    {
-        $this->security = $security;
-    }
-
-    /**
      * Check if the user has at least one permission of defined array of permissions.
      */
     public function hasPermissions(array $permissions): bool

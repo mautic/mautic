@@ -25,19 +25,17 @@ class SummaryRepository extends CommonRepository
      */
     public function getCampaignLogCounts(
         int $campaignId,
-        \DateTimeInterface $dateFrom = null,
-        \DateTimeInterface $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
     ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
-                [
-                    'cs.event_id',
-                    'SUM(cs.scheduled_count) as scheduled_count',
-                    'SUM(cs.triggered_count) as triggered_count',
-                    'SUM(cs.non_action_path_taken_count) as non_action_path_taken_count',
-                    'SUM(cs.failed_count) as failed_count',
-                    'SUM(cs.log_counts_processed) as log_counts_processed',
-                ]
+                'cs.event_id',
+                'SUM(cs.scheduled_count) as scheduled_count',
+                'SUM(cs.triggered_count) as triggered_count',
+                'SUM(cs.non_action_path_taken_count) as non_action_path_taken_count',
+                'SUM(cs.failed_count) as failed_count',
+                'SUM(cs.log_counts_processed) as log_counts_processed',
             )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
             ->where('cs.campaign_id = '.(int) $campaignId)
@@ -88,8 +86,8 @@ class SummaryRepository extends CommonRepository
     public function summarize(
         \DateTimeInterface $dateFrom,
         \DateTimeInterface $dateTo,
-        int $campaignId = null,
-        int $eventId = null,
+        ?int $campaignId = null,
+        ?int $eventId = null,
     ): void {
         $dateFromTsActual = $dateFrom->getTimestamp();
         $dateToTsActual   = $dateTo->getTimestamp();
@@ -138,7 +136,7 @@ class SummaryRepository extends CommonRepository
             ' triggered_count = s.triggered_count_i, '.
             ' log_counts_processed = s.log_counts_processed_i;';
 
-            $this->getEntityManager()->getConnection()->executeQuery($sql);
+            $this->getEntityManager()->getConnection()->executeStatement($sql);
         }
     }
 }

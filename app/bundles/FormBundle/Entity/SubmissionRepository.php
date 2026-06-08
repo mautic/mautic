@@ -286,7 +286,8 @@ class SubmissionRepository extends CommonRepository
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
         if (!empty($options['leadId'])) {
-            $query->andWhere('fs.lead_id = '.(int) $options['leadId']);
+            $query->andWhere('fs.lead_id = :leadId')
+                ->setParameter('leadId', $options['leadId']);
         }
 
         if (!empty($options['id'])) {
@@ -296,8 +297,8 @@ class SubmissionRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('f.name', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+                $query->expr()->like('f.name', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted'], null, 'fs.id');
@@ -350,7 +351,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * @return mixed[]
      */
-    public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null): array
+    public function getSubmissionCountsByPage($pageId, ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('count(distinct(s.tracking_id)) as count, s.page_id as id, p.title as name, p.variant_hits as total')
@@ -380,7 +381,7 @@ class SubmissionRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getSubmissionCountsByEmail($emailId, \DateTime $fromDate = null): array
+    public function getSubmissionCountsByEmail($emailId, ?\DateTime $fromDate = null): array
     {
         // link email to page hit tracking id to form submission tracking id
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -529,5 +530,66 @@ class SubmissionRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return 'fs';
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function deleteFormResultsTableRecord(Submission $submission): void
+    {
+        $formId     = $submission->getForm()->getId();
+        $formAlias  = $submission->getForm()->getAlias();
+
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete($this->getResultsTableName($formId, $formAlias))
+            ->where('submission_id = :submissionId')
+            ->setParameter('submissionId', $submission->getId());
+
+        $qb->executeStatement();
+    }
+
+    /**
+     * @param array<int,string> $submissionIds
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function batchDeleteFormResultsTableRecord(array $submissionIds): void
+    {
+        if (!empty($submissionIds)) {
+            $entity = $this->getEntity((int) $submissionIds[0]);
+            $form   = $entity->getForm();
+
+            $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $qb->delete($this->getResultsTableName($form->getId(), $form->getAlias()))
+               ->where($qb->expr()->in('submission_id', $submissionIds));
+
+            $qb->executeStatement();
+        }
+    }
+
+    public function getOrphanSubmissionRecords(string $tableName, int $maxResults): DbalQueryBuilder
+    {
+        $submissionTable =  MAUTIC_TABLE_PREFIX.'form_submissions';
+
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('fr.submission_id')
+            ->from($tableName, 'fr')
+            ->leftJoin('fr', $submissionTable, 'fs', 'fs.id = fr.submission_id')
+            ->where('fs.id is null')
+            ->setMaxResults($maxResults);
+    }
+
+    /**
+     * @param array<int,string> $inValidSubmissionIds
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function deleteOrphanSubmissionRecords(string $tableName, array $inValidSubmissionIds): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->delete($tableName)
+            ->where($qb->expr()->in('submission_id', $inValidSubmissionIds))
+            ->executeStatement();
     }
 }

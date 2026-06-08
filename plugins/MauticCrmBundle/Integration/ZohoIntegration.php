@@ -600,12 +600,12 @@ class ZohoIntegration extends CrmAbstractIntegration
             }
 
             return $url;
-        } else {
-            return $this->router->generate(
-                'mautic_integration_auth_callback',
-                ['integration' => $this->getName()]
-            );
         }
+
+        return $this->router->generate(
+            'mautic_integration_auth_callback',
+            ['integration' => $this->getName()]
+        );
     }
 
     /**
@@ -1107,7 +1107,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
-    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, Mapper $mapper = null): int
+    private function consumeResponse($response, $zObject, $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {
         $rows = $response;
         if (isset($rows['data'][0])) {

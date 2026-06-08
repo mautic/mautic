@@ -57,7 +57,7 @@ class EventLogger
     /**
      * @param bool $isInactiveEvent
      */
-    public function buildLogEntry(Event $event, Lead $contact = null, $isInactiveEvent = false): LeadEventLog
+    public function buildLogEntry(Event $event, ?Lead $contact = null, $isInactiveEvent = false): LeadEventLog
     {
         $log = new LeadEventLog();
 

@@ -30,7 +30,7 @@ trait RequestTrait
      *
      * @throws \Exception
      */
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         // ungroup fields if need it
         foreach ($fields as $key=>$field) {

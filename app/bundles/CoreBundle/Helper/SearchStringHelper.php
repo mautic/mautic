@@ -35,7 +35,7 @@ class SearchStringHelper
         'parenthesis' => ')',
     ];
 
-    public function __construct(array $needsParsing = null, array $needsClosing = null, array $closingChars = null)
+    public function __construct(?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null)
     {
         if (null !== $needsParsing) {
             $this->needsParsing = $needsParsing;
@@ -55,7 +55,7 @@ class SearchStringHelper
      *
      * @return \stdClass
      */
-    public static function parseSearchString($input, array $needsParsing = null, array $needsClosing = null, array $closingChars = null)
+    public static function parseSearchString($input, ?array $needsParsing = null, ?array $needsClosing = null, ?array $closingChars = null)
     {
         $input = trim(strip_tags($input));
 

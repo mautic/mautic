@@ -17,7 +17,7 @@ trait ReplicaConnectionTrait
      * If a query is being executed with a limiter with specific contacts
      * then this could be a real-time request being handled so we should avoid forcing a replica connection.
      */
-    private function getReplicaConnection(ContactLimiter $limiter = null): Connection
+    private function getReplicaConnection(?ContactLimiter $limiter = null): Connection
     {
         /** @var Connection $connection */
         $connection = $this->getEntityManager()->getConnection();

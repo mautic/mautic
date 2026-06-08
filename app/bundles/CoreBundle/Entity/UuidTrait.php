@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait UuidTrait
 {
@@ -28,5 +28,17 @@ trait UuidTrait
     public function setUuid(?string $uuid): void
     {
         $this->uuid = $uuid;
+    }
+
+    /**
+     * @deprecated Since Mautic 7.0, use UuidHelper::isValidUuid() instead. Calling static trait methods directly is deprecated in PHP 8.4+
+     * @see \Mautic\CoreBundle\Helper\UuidHelper::isValidUuid()
+     */
+    public static function isValidUuid(string $uuid): bool
+    {
+        return 1 === preg_match(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $uuid
+        );
     }
 }

@@ -7,35 +7,35 @@
     {% endif %}
 {% endset %}
 
-{# IMAGE TYPE #}
+{# === IMAGE TYPE === #}
 {% if type == 'image' %}
     <div class="d-flex fd-column row-gap-xs mb-32">
-        <img src="{{ asset(image.path) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-xs fs-0">
+        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-xs fs-0">
         <div>{{ common_header_content }}</div>
     </div>
 
-{# LOGO TYPE #}
+{# === LOGO TYPE === #}
 {% elseif type == 'logo' %}
     <div class="mb-32">
-        <img src="{{ asset(logo.path) }}" alt="{{ logo.alt|trans }}" title="{{ logo.alt|trans }}" class="mb-32" style="height: 30px; width: fit-content;">
+        <img src="{{ asset(logo.src) }}" alt="{{ logo.alt|trans }}" title="{{ logo.alt|trans }}" class="mb-32" style="height: 30px; width: fit-content;">
         {{ common_header_content }}
     </div>
 
-{# PICTOGRAM TYPE #}
+{# === PICTOGRAM TYPE === #}
 {% elseif type == 'pictogram' %}
     <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}fd-row-sm column-gap-lg {% endif %}fd-column row-gap-xs mb-32">
-        {% include '@MauticCore/Helper/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
+        {% include '@MauticCore/Components/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
         <div>{{ common_header_content }}</div>
     </div>
 
-{# STATISTIC TYPE #}
+{# === STATISTIC TYPE === #}
 {% elseif type == 'statistic' %}
     <div class="mb-32">
         <div class="content-item__statistic type-fluid-display-03 mb-xs">{{ statistic }}</div>
         {{ common_header_content }}
     </div>
 
-{# TEXT TYPE #}
+{# === TEXT TYPE === #}
 {% elseif type == 'text' %}
     <div class="mb-32">{{ common_header_content }}</div>
 {% endif %}

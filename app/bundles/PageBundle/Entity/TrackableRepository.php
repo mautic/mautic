@@ -121,7 +121,7 @@ class TrackableRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id')
+    public function getCount($channel, $channelIds, $listId, ?ChartQuery $chartQuery = null, $combined = false, $countColumn = 'ph.id')
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('count('.$countColumn.') as click_count')

@@ -3,6 +3,8 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
+use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait MatchFilterForLeadTrait
@@ -29,7 +31,7 @@ trait MatchFilterForLeadTrait
                     continue;
                 }
             } else {
-                if (!array_key_exists($data['field'], $lead)) {
+                if (!array_key_exists($data['field'] ?? '', $lead)) {
                     continue;
                 }
             }
@@ -84,11 +86,12 @@ trait MatchFilterForLeadTrait
                     }
                     break;
                 case 'tags':
+                case 'select':
                 case 'multiselect':
-                    if (!is_array($leadVal)) {
+                    if (!is_null($leadVal) && !is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-                    if (!is_array($filterVal)) {
+                    if (!is_null($filterVal) && !is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
                     break;
@@ -96,9 +99,28 @@ trait MatchFilterForLeadTrait
                     $leadVal   = (float) $leadVal;
                     $filterVal = (float) $filterVal;
                     break;
-                case 'select':
-                    if (!is_array($filterVal)) {
-                        $filterVal = explode('|', $filterVal);
+                case 'region':
+                    $regionChoices = FormFieldHelper::getRegionChoices();
+                    $regions       = [];
+                    $currentIndex  = is_array($filterVal) ? 1 : 0; // The index starts at 0 for single value, 1 for array
+
+                    foreach ($regionChoices as $countryRegions) {
+                        foreach ($countryRegions as $region) {
+                            $regions[$currentIndex] = $region;
+                            ++$currentIndex;
+                        }
+                    }
+
+                    if (is_numeric($filterVal) && isset($regions[$filterVal])) {
+                        $filterVal = $regions[$filterVal];
+                    }
+
+                    if (is_array($filterVal)) {
+                        foreach ($filterVal as $key => $value) {
+                            if (is_numeric($value) && isset($regions[$value])) {
+                                $filterVal[$key] = $regions[$value];
+                            }
+                        }
                     }
                     break;
             }
@@ -146,11 +168,17 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
 
-                case OperatorOptions::IN:
+                case OperatorOptions::INCLUDING_ANY:
                     $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
                     break;
-                case OperatorOptions::NOT_IN:
+                case OperatorOptions::EXCLUDING_ANY:
                     $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
+                    break;
+                case OperatorOptions::INCLUDING_ALL:
+                    $groups[$groupNum] = $this->checkAllLeadValuesAreInFilter($leadVal, $filterVal, false);
+                    break;
+                case OperatorOptions::EXCLUDING_ALL:
+                    $groups[$groupNum] = $this->checkAllLeadValuesAreInFilter($leadVal, $filterVal, true);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
@@ -168,6 +196,8 @@ trait MatchFilterForLeadTrait
                 case 'contains':
                     $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                     break;
+                default:
+                    throw new OperatorsNotFoundException('Operator is not defined or invalid operator found.');
             }
         }
 
@@ -195,6 +225,25 @@ trait MatchFilterForLeadTrait
     }
 
     /**
+     * @param mixed $leadVal
+     * @param mixed $filterVal
+     */
+    private function checkAllLeadValuesAreInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    {
+        $leadVal       = !is_array($leadVal) ? [$leadVal] : $leadVal;
+        $filterVal     = !is_array($filterVal) ? [$filterVal] : $filterVal;
+        $valuesMatched = 0;
+
+        foreach ($leadVal as $value) {
+            if (in_array($value, $filterVal)) {
+                ++$valuesMatched;
+            }
+        }
+
+        return $valuesMatched === count($filterVal) ? !$defaultFlag : $defaultFlag;
+    }
+
+    /**
      * Duplicate method. Needs refactoring.
      *
      * @see \Mautic\LeadBundle\EventListener\DynamicContentSubscriber::isContactSegmentRelationshipValid
@@ -202,14 +251,16 @@ trait MatchFilterForLeadTrait
      * @param string $operator   empty, !empty, in, !in
      * @param int[]  $segmentIds
      */
-    private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, array $segmentIds = null): bool
+    private function isContactSegmentRelationshipValid(LeadListRepository $segmentRepository, int $contactId, string $operator, ?array $segmentIds = null): bool
     {
         return match ($operator) {
-            OperatorOptions::EMPTY     => $segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
-            OperatorOptions::NOT_EMPTY => $segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
-            OperatorOptions::IN        => $segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
-            OperatorOptions::NOT_IN    => $segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
-            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+            OperatorOptions::EMPTY         => $segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY     => $segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::INCLUDING_ANY => $segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ANY => $segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
+            OperatorOptions::INCLUDING_ALL => $segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ALL => $segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }
 }

@@ -1,0 +1,389 @@
+.phone-preview__button--outer {
+    background: var(--text-primary);
+  }
+
+  .phone-preview {
+    display: flex;
+    flex-direction: column;
+    border: solid 10px var(--text-primary);
+    width: 336px;
+    height: 725px;
+    padding: 0;
+    border-radius: 50px;
+    background: var(--background);
+    box-shadow: 0 0 0 5px var(--text-primary);
+    position: relative;
+    line-height: 16px;
+  }
+
+  .phone-preview__silence-switch,
+  .phone-preview__volume-rocker--top,
+  .phone-preview__volume-rocker--bottom {
+    position: absolute;
+    margin-left: -19px;
+    width: 4px;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .phone-preview__silence-switch {
+    margin-top: 90px;
+    height: 30px;
+  }
+
+  .phone-preview__volume-rocker--top {
+    margin-top: 140px;
+    height: 50px;
+  }
+
+  .phone-preview__volume-rocker--bottom {
+    margin-top: 200px;
+    height: 50px;
+  }
+
+  .phone-preview__power-button {
+    position: absolute;
+    margin-top: 200px;
+    width: 4px;
+    height: 70px;
+    border-radius: 0 10px 10px 0;
+    right: -18px;
+  }
+
+  .phone-preview__top-section {
+    background: var(--layer-01);
+    min-height: 100px;
+    margin: 0;
+    border-radius: 40px 40px 0 0;
+    border-bottom: 1px solid var(--border-subtle-01);
+  }
+
+  .phone-preview__top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 20px;
+  }
+
+  .phone-preview__time {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .phone-preview__notch {
+    width: 180px;
+    background: var(--text-primary);
+    height: 20px;
+    border-radius: 0 0 20px 20px;
+    padding-top: 5px;
+    align-self: start;
+  }
+
+  .phone-preview__user-avatar,
+  .phone-preview__user-name {
+    margin: auto;
+  }
+
+  .phone-preview__user-avatar {
+    margin-top: 10px;
+    width: 30px;
+    height: 40px;
+    border-radius: 100%;
+    font-size: 40px;
+    color: var(--text-placeholder);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .phone-preview__user-name {
+    margin-top: 3px;
+    height: 10px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .phone-preview__speaker,
+  .phone-preview__front-camera {
+    height: 5px;
+    border-radius: 10px;
+  }
+
+  .phone-preview__speaker {
+    width: 60px;
+    background: var(--text-secondary);
+    margin-left: 55px;
+  }
+
+  .phone-preview__front-camera {
+    width: 5px;
+    background: var(--support-info);
+    margin-left: 70px;
+  }
+
+  .phone-preview__status-icons {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .phone-preview__back-arrow {
+    position: absolute;
+    border: solid var(--primary-60);
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 5px;
+    margin: 45px 0 0 13px;
+    border-radius: 2px;
+    opacity: 0.9;
+    transform: rotate(135deg);
+  }
+
+  .phone-preview__back-arrow:hover {
+    opacity: 1;
+  }
+
+  .phone-preview__messages {
+    margin-top: 18px;
+    background: var(--background);
+    height: 305px;
+    overflow: scroll;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .phone-preview__messages::-webkit-scrollbar {
+    display: none;
+  }
+
+  .phone-preview__keyboard {
+    background: var(--layer-accent-01);
+    border-radius: 0 0 40px 40px;
+    margin-top: auto;
+  }
+
+  .phone-preview__keyboard-input {
+    background: var(--background);
+    height: 40px;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+
+  .phone-preview__input-field {
+    border-radius: 35px;
+    border: 1px solid var(--border-subtle-01);
+    padding: 8px;
+    width: 100%;
+    height: 28px;
+    margin: 0 10px;
+    overflow: scroll;
+    caret-color: var(--primary-60);
+  }
+
+  .phone-preview__input-addon {
+    margin-left: 10px;
+    color: var(--text-placeholder);
+    font-size: 25px;
+  }
+
+  .phone-preview__bottom-symbols {
+    margin: 20px auto 0;
+    font-size: 25px;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 20px;
+  }
+
+  .phone-preview__keypad {
+    background: var(--layer-accent-01);
+    width: 100%;
+    height: 190px;
+    padding-top: 16px;
+    user-select: none;
+    text-align: center;
+  }
+
+  .phone-preview__key-spacer {
+    width: 336px;
+    height: 8px;
+  }
+
+  .phone-preview__key--white,
+  .phone-preview__key--space {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    background: var(--background);
+    border-radius: 6px;
+    padding: 9px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-strong-01);
+    height: 35px;
+    transition: var(--transition-all-productive);
+  }
+
+  .phone-preview__key--white {
+    margin: 0;
+    width: 27px;
+    font-size: 16px;
+  }
+
+  .phone-preview__key--space {
+    margin: 1px;
+    width: 142px;
+    font-size: 13px;
+  }
+
+  .phone-preview__key-row {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+  }
+
+  .phone-preview__key--grey {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--border-tile-01);
+    border-radius: 6px;
+    margin: 0;
+    padding: 9px;
+    width: auto;
+    height: 35px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-strong-01);
+    font-size: 13px;
+    transition: var(--transition-all-productive);
+  }
+
+  .phone-preview__key--grey:hover,
+  .phone-preview__key--clickable:hover {
+    background: var(--layer-accent-hover-02);
+  }
+
+  .phone-preview__key--backspace {
+    width: 40px;
+    padding: 8px;
+    font-weight: normal;
+  }
+
+  .phone-preview__key--backspace > i {
+    font-size: 14px;
+  }
+
+  .phone-preview__home-button {
+    margin: 15px auto 4px;
+    border-radius: 50px;
+    width: 125px;
+    height: 5px;
+    background: var(--text-primary);
+  }
+
+  .phone-preview__cursor {
+    height: 25px;
+    position: absolute;
+    opacity: 1;
+    color: var(--primary-60);
+    padding: 2px;
+    font-size: 22px;
+    right: 10px;
+    top: 26%;
+  }
+
+  .phone-preview__send-button:hover,
+  .phone-preview__cursor:hover {
+    opacity: 1;
+  }
+
+  .phone-preview__send-button:active,
+  .phone-preview__cursor:active {
+    opacity: 0.8;
+  }
+
+  .phone-preview__message {
+    border-radius: 20px;
+    margin: 0 15px 10px;
+    padding: 10px 15px;
+    position: relative;
+    animation: fadeInOpacity 0.4s ease-in;
+  }
+
+  @keyframes fadeInOpacity {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .phone-preview__message--to {
+    background-color: var(--primary-60);
+    color: var(--text-on-color);
+    margin-left: 80px;
+    transition: width 2s;
+  }
+
+  .phone-preview__message--from {
+    background-color: var(--layer-accent-01);
+    color: var(--text-primary);
+    margin-right: 80px;
+  }
+
+  .phone-preview__message-content {
+    z-index: 1;
+    position: relative;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .phone-preview__message--to:before {
+    content: "";
+    width: 0;
+    height: 0;
+    left: 93%;
+    top: 30%;
+    position: absolute;
+    border-top: 13px solid transparent;
+    border-left: 26px solid var(--primary-60);
+    border-bottom: 13px solid transparent;
+    border-radius: 40px;
+    transform: rotate(40deg);
+  }
+
+  .phone-preview__message--from:before {
+    content: "";
+    width: 0;
+    height: 0;
+    right: 92%;
+    top: 35%;
+    position: absolute;
+    border-top: 13px solid transparent;
+    border-right: 26px solid var(--layer-accent-01);
+    border-bottom: 13px solid transparent;
+    border-radius: 40px;
+    transform: rotate(-40deg);
+  }
+
+  textarea:focus,
+  input:focus {
+    outline: none;
+  }
+
+  .phone-preview__key--shift {
+    width: 40px;
+  }
+
+  .phone-preview__key--emoji {
+    font-size: 16px;
+    padding: 5px;
+    font-weight: normal;
+  }
+
+  .phone-preview__key--return {
+    padding: 0 10px;
+    width: 60px;
+  }

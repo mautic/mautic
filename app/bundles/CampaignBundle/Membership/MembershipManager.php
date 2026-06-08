@@ -218,7 +218,7 @@ class MembershipManager
         $this->leadRepository->detachEntities($campaignMembers);
     }
 
-    public function setProgressBar(ProgressBar $progressBar = null): void
+    public function setProgressBar(?ProgressBar $progressBar = null): void
     {
         $this->progressBar = $progressBar;
     }

@@ -15,7 +15,7 @@ class DateTimeToken
     /**
      * @return array<string>
      */
-    public function getTokens(string $content, string $contactTimezone = null): array
+    public function getTokens(string $content, ?string $contactTimezone = null): array
     {
         $tokens = [];
         preg_match_all('/{today(.*?)}/', $content, $matches);

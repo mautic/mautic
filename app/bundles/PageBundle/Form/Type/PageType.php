@@ -331,12 +331,16 @@ class PageType extends AbstractType
             ]
         );
 
+        $builder->add('version', HiddenType::class, [
+            'mapped' => false,
+        ]);
+
         $extraButtons['pre_extra_buttons'] = [
             [
                 'name'  => 'builder',
                 'label' => 'mautic.core.builder',
                 'attr'  => [
-                    'class'   => 'btn btn-ghost btn-dnd btn-nospin btn-builder text-interactive',
+                    'class'   => 'btn btn-tertiary btn-dnd btn-nospin btn-builder text-interactive',
                     'icon'    => 'ri-layout-line',
                     'onclick' => "Mautic.launchBuilder('page');",
                 ],

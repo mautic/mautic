@@ -1,6 +1,7 @@
 *.git*
 *.idea*
 .ddev/*
+.devcontainer/*
 .DS_Store
 .env.dist
 .github/*

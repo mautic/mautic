@@ -10,13 +10,13 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PreviewFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
-
     private const PREHEADER_TEXT = 'Preheader text';
 
     protected $useCleanupRollback = false;
@@ -280,6 +280,9 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         $email->setCustomHtml('<html><body>Contact emails is {contactfield=email}. Company Name: {contactfield=companyname} and Company City: {contactfield=companycity}</body></html>');
 
         $this->em->flush();
+
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
 
         $url                    = "/email/preview/{$email->getId()}";
         $urlWithContact         = "{$url}?contactId={$lead->getId()}";

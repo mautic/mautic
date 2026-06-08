@@ -75,7 +75,7 @@
                         }) }}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.category}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ ('mautic.focus.type.' ~ item.type)|trans }}</td>
                     <td class="visible-md visible-lg">{{ ('mautic.focus.style.' ~ item.style)|trans }}</td>
@@ -101,7 +101,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'spotlight',
                         'size': '80'
                     } %}

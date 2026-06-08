@@ -236,7 +236,7 @@ class Stat
         return $this->notification;
     }
 
-    public function setNotification(Notification $notification = null): void
+    public function setNotification(?Notification $notification = null): void
     {
         $this->notification = $notification;
     }
@@ -289,7 +289,7 @@ class Stat
     /**
      * @param mixed $lead
      */
-    public function setLead(Lead $lead = null): void
+    public function setLead(?Lead $lead = null): void
     {
         $this->lead = $lead;
     }

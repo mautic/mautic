@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -21,9 +19,11 @@ use Mautic\EmailBundle\EventListener\EmailSubscriber;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -77,7 +77,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailModel       = $this->createMock(EmailModel::class);
         $this->translator       = $this->createMock(TranslatorInterface::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->createMock(EntityManager::class), $this->createMock(EmailDraftModel::class));
+        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->createMock(EntityManagerInterface::class), $this->createMock(EmailDraftModel::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
@@ -331,10 +331,11 @@ CONTENT,
             $this->createMock(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
-            $this->createMock(ModelFactory::class),
             $this->createMock(AssetModel::class),
             $this->createMock(TrackableModel::class),
             $this->createMock(RedirectModel::class),
+            $this->createMock(SMimeHelper::class),
+            $this->createMock(EmailStatModel::class),
         );
 
         $email = new Email();

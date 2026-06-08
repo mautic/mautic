@@ -44,7 +44,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                    <div class="pt-0 pl-15 pb-15 pr-15 col-xs-6 min-h-256">
                         {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData' : stats,
                             'chartType' : type,
@@ -52,7 +52,7 @@
                         })
                         -}}
                     </div>
-                    <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
+                    <div class="pt-0 pl-15 pb-15 pr-15 col-xs-6 min-h-256">
                         {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData' : statsDevices,
                             'chartType' : 'horizontal-bar',

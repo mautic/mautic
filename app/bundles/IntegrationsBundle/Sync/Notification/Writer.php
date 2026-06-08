@@ -21,7 +21,7 @@ class Writer
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    public function writeUserNotification(string $header, string $message, int $userId, string $deduplicateValue = null, \DateTime $deduplicateDateTimeFrom = null): void
+    public function writeUserNotification(string $header, string $message, int $userId, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
     {
         $this->notificationModel->addNotification(
             $message,

@@ -423,7 +423,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * @param mixed[] $flags
      * @param mixed[] $options
      */
-    public function addIndex(array $columns, $name, array $flags = null, array $options = null): self
+    public function addIndex(array $columns, $name, ?array $flags = null, ?array $options = null): self
     {
         $cm = $this->getClassMetadata();
 
@@ -444,17 +444,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
         $cm->table['indexes'][$name] = $definition;
 
         return $this;
-    }
-
-    /**
-     * @deprecated this method will be removed as MySQL does not support partial indices whatsoever
-     *
-     * @param string $name
-     * @param string $where
-     */
-    public function addPartialIndex(array $columns, $name, $where): ClassMetadataBuilder
-    {
-        return $this->addIndex($columns, $name, null, ['where' => $where]);
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ProjectBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
@@ -15,6 +16,39 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxController extends CommonAjaxController
 {
+    use AjaxLookupControllerTrait;
+
+    public function getLookupChoiceListAction(Request $request, ProjectModel $projectModel): JsonResponse
+    {
+        $entityType  = $request->query->get('entityType');
+        $projectId   = $request->query->getInt('projectId', 0) ?: null;
+
+        if (empty($entityType)) {
+            return new JsonResponse([]);
+        }
+
+        $searchKey   = $request->query->get('searchKey', '');
+        $searchValue = $request->query->get($searchKey, '');
+        $filter      = $searchValue ?: $request->query->get('search', '');
+        $limit       = (int) $request->query->get('limit', '1000');
+        $start       = (int) $request->query->get('start', '0');
+
+        $results = $projectModel->getLookupResults($entityType, $filter, $limit, $start, [
+            'projectId' => $projectId,
+        ]);
+
+        // Format results to match AjaxLookupControllerTrait structure
+        $dataArray = [];
+        foreach ($results as $value => $text) {
+            $dataArray[] = [
+                'text'  => $text,
+                'value' => $value,
+            ];
+        }
+
+        return new JsonResponse($dataArray);
+    }
+
     public function addProjectsAction(Request $request, ProjectModel $projectModel, ProjectRepository $projectRepository, CorePermissions $corePermissions): JsonResponse
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_ASSOCIATE)) {
@@ -28,8 +62,8 @@ final class AjaxController extends CommonAjaxController
             foreach ($newProjectNames as $projectName) {
                 $project = new Project();
                 $project->setName($projectName);
-                $projectModel->saveEntity($project);
-                $existingProjectIds[] = $project->getId();
+
+                $existingProjectIds[] = $this->createProjectIfNotExists(trim($projectName), $projectModel, $projectRepository);
             }
         }
 
@@ -38,10 +72,25 @@ final class AjaxController extends CommonAjaxController
         $projectOptions = '';
 
         foreach ($allProjects as $project) {
+            $value    = htmlspecialchars((string) $project['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $label    = htmlspecialchars((string) $project['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $selected = in_array($project['value'], $existingProjectIds) ? ' selected="selected"' : '';
-            $projectOptions .= '<option'.$selected.' value="'.$project['value'].'">'.$project['label'].'</option>';
+            $projectOptions .= "<option{$selected} value=\"{$value}\">{$label}</option>";
         }
 
         return $this->sendJsonResponse(['projects' => $projectOptions]);
+    }
+
+    private function createProjectIfNotExists(string $name, ProjectModel $projectModel, ProjectRepository $projectRepository): int
+    {
+        if ($project = $projectRepository->findOneBy(['name' => $name])) {
+            return $project->getId();
+        }
+
+        $project = new Project();
+        $project->setName($name);
+        $projectModel->saveEntity($project);
+
+        return $project->getId();
     }
 }

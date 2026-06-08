@@ -42,7 +42,21 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                 null
             )
             ->addOption('--channel-id', '-i', InputOption::VALUE_REQUIRED, 'The ID of the message i.e. email ID, sms ID.')
-            ->addOption('--message-id', '-m', InputOption::VALUE_REQUIRED, 'ID of a specific queued message');
+            ->addOption('--message-id', '-m', InputOption::VALUE_REQUIRED, 'ID of a specific queued message')
+            ->addOption(
+                '--limit',
+                '-l',
+                InputOption::VALUE_OPTIONAL,
+                'Maximum number of messages to process',
+                null
+            )
+            ->addOption(
+                '--batch',
+                '-b',
+                InputOption::VALUE_OPTIONAL,
+                'Number of messages to process in each batch',
+                50
+            );
 
         parent::configure();
     }
@@ -53,6 +67,8 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         $channel    = $input->getOption('channel');
         $channelId  = $input->getOption('channel-id');
         $messageId  = $input->getOption('message-id');
+        $limit      = $input->getOption('limit') ? (int) $input->getOption('limit') : null;
+        $batch      = (int) $input->getOption('batch');
         $key        = $channel.$channelId.$messageId;
 
         if (!$this->checkRunStatus($input, $output, $key)) {
@@ -66,7 +82,14 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                 $processed = intval($this->messageQueueModel->processMessageQueue($message));
             }
         } else {
-            $processed = intval($this->messageQueueModel->sendMessages($channel, $channelId));
+            // Process messages in batches until the limit is reached or no more messages
+            do {
+                $remainingBatch = $limit ? min($batch, $limit - $processed) : $batch;
+                $batchProcessed = $this->messageQueueModel->sendMessages($channel, $channelId, $remainingBatch);
+                $processed += $batchProcessed;
+
+                // Continue only if messages were processed and limit not reached
+            } while ($batchProcessed > 0 && (!$limit || $processed < $limit));
         }
 
         $output->writeln('<comment>'.$this->translator->trans('mautic.campaign.command.messages.sent', ['%events%' => $processed]).'</comment>'."\n");

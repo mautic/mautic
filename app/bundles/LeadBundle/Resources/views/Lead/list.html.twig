@@ -16,7 +16,7 @@
   {% if isIndex %}
         </div>
     </div>
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
       tip: random(['mautic.protip.contacts.view', 'mautic.protip.contacts.tags', 'mautic.protip.contacts.list'])
   }) }}
   {% endif %}

@@ -8,7 +8,9 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
@@ -31,6 +33,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private ReportHelper $reportHelper,
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
+        private DncReportService $dncReportService,
     ) {
     }
 
@@ -40,6 +43,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
+            ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
         ];
     }
 
@@ -98,7 +102,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             $companyColumns = $this->companyReportData->getCompanyData();
 
-            $formSubmissionColumns = array_merge(
+            $commonColumnsAndFilters = array_merge(
                 $submissionColumns,
                 $columns,
                 $event->getCampaignByChannelColumns(),
@@ -106,10 +110,13 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->getIpColumn(),
                 $companyColumns
             );
+            $formSubmissionColumns = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncColumns());
+            $formSubmissionFilters = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncFilters());
 
             $data = [
                 'display_name' => 'mautic.form.report.submission.table',
                 'columns'      => $formSubmissionColumns,
+                'filters'      => $formSubmissionFilters,
             ];
             $event->addTable(self::CONTEXT_FORM_SUBMISSION, $data, self::CONTEXT_FORMS);
 
@@ -270,6 +277,17 @@ class ReportSubscriber implements EventSubscriberInterface
             }
             unset($queryBuilder);
         }
+    }
+
+    public function onReportDisplay(ReportDataEvent $event): void
+    {
+        $data = $event->getData();
+
+        if ($event->checkContext([self::CONTEXT_FORM_SUBMISSION])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
+        }
+
+        $event->setData($data);
     }
 
     /**

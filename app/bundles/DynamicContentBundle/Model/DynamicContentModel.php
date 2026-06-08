@@ -49,6 +49,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         $repo = $this->em->getRepository(DynamicContent::class);
 
         $repo->setTranslator($this->translator);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
     }
@@ -82,7 +83,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '=',
-        int $skipId = null): bool
+        ?int $skipId = null): bool
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -211,7 +212,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);
@@ -243,9 +244,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -261,10 +262,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * Get line chart data of hits.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFormat
+     * @param array   $filter
+     * @param bool    $canViewOthers
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {

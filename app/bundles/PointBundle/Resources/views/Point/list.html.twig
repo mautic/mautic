@@ -60,7 +60,7 @@
         </div>
     </div>
 
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
       tip: random(['mautic.protip.points.decay', 'mautic.protip.points.reduce', 'mautic.protip.points.limit'])
   }) }}
   {% endif %}

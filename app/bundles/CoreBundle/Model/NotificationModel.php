@@ -90,10 +90,10 @@ class NotificationModel extends FormModel
         $isRead = false,
         $header = null,
         $iconClass = null,
-        \DateTime $datetime = null,
-        User $user = null,
-        string $deduplicateValue = null,
-        \DateTime $deduplicateDateTimeFrom = null,
+        ?\DateTime $datetime = null,
+        ?User $user = null,
+        ?string $deduplicateValue = null,
+        ?\DateTime $deduplicateDateTimeFrom = null,
     ): void {
         if (null === $user) {
             $user = $this->userHelper->getUser();
@@ -214,7 +214,7 @@ class NotificationModel extends FormModel
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
     }
 
-    private function isDuplicate(int $userId, string $deduplicate, \DateTime $from = null): bool
+    private function isDuplicate(int $userId, string $deduplicate, ?\DateTime $from = null): bool
     {
         return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new \DateTime('-1 day'));
     }

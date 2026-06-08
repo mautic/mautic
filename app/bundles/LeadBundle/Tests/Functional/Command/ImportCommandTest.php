@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Command;
 
+use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Model\ImportModel;
@@ -61,7 +62,7 @@ class ImportCommandTest extends MauticMysqlTestCase
         $file    = fopen($tmpFile, 'wb');
 
         foreach ($this->csvRows as $line) {
-            fputcsv($file, $line);
+            CsvHelper::putCsv($file, $line);
         }
 
         fclose($file);

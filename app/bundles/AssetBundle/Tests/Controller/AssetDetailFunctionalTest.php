@@ -22,7 +22,7 @@ class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($asset);
 
         $crawler   = $this->client->request('GET', sprintf('/s/assets/view/%d', $asset->getId()));
-        $imageTag  = $crawler->filter('.tab-content.preview-detail img');
+        $imageTag  = $crawler->filter('.img-thumbnail');
 
         $onError  = $imageTag->attr('onerror');
         $altProp  = $imageTag->attr('alt');

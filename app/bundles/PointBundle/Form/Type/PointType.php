@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -161,6 +162,8 @@ class PointType extends AbstractType
                 'bundle' => 'point',
             ]
         );
+
+        $builder->add('projects', ProjectType::class);
 
         $builder->add('buttons', FormButtonsType::class);
 

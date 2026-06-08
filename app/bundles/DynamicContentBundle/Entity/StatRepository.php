@@ -66,7 +66,7 @@ class StatRepository extends CommonRepository
      *
      * @param array $dynamicContentIds
      */
-    public function getSentCounts($dynamicContentIds = [], \DateTime $fromDate = null): array
+    public function getSentCounts($dynamicContentIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
@@ -115,13 +115,13 @@ class StatRepository extends CommonRepository
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('s.lead_id', (int) $leadId));
+            $query->where('s.lead_id = :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere(
-                $query->expr()->like('dc.name', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+            $query->andWhere('dc.name LIKE :search')
+                ->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'dc.name', 's.date_sent', ['sentDetails'], ['dateSent'], null, 's.id');

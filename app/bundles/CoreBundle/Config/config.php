@@ -305,6 +305,7 @@ return [
                     'request_stack',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.ip_lookup',
                 ],
             ],
@@ -338,6 +339,7 @@ return [
                 'class'     => Mautic\CoreBundle\Helper\FileUploader::class,
                 'arguments' => [
                     'mautic.helper.file_path_resolver',
+                    'translator',
                 ],
             ],
             'mautic.helper.file_path_resolver' => [
@@ -372,6 +374,7 @@ return [
                     'mautic.model.factory',
                     'database_connection',
                     'mautic.helper.user',
+                    'translator',
                 ],
             ],
             'mautic.helper.maxmind_do_not_sell_download' => [
@@ -529,7 +532,7 @@ return [
                 'tagArguments' => [
                     'event'    => 'kernel.exception',
                     'method'   => 'onKernelException',
-                    'priority' => 255,
+                    'priority' => 253,
                 ],
             ],
             // Helpers
@@ -898,8 +901,10 @@ return [
         'dev_hosts'                       => [],
         'trusted_hosts'                   => [],
         'trusted_proxies'                 => [],
+        'validate_remote_domains'         => false, // whether to validate remote domains in remote URLs
+        'allowed_remote_domains'          => [],
         'rememberme_key'                  => '%mautic.secret_key%',
-        'rememberme_lifetime'             => 31_536_000, // 365 days in seconds
+        'rememberme_lifetime'             => 7_776_000, // 90 days in seconds
         'rememberme_path'                 => '/',
         'rememberme_domain'               => '',
         'default_pagelimit'               => 30,
@@ -1330,6 +1335,9 @@ return [
         'debug'                               => false,
         'anonymize_ip_address_in_background'  => false,
         'rss_notification_url'                => '',
+        'motd_url'                            => 'https://mautic.github.io/motd/motd.json',
+        'motd_cache_path'                     => '%mautic.cache_path%/motd.json',
+        'motd_cache_ttl'                      => 3600,
         'translations_list_url'               => 'https://language-packs.mautic.com/manifest.json',
         'translations_fetch_url'              => 'https://language-packs.mautic.com/',
         'stats_update_url'                    => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable

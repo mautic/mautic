@@ -3,76 +3,44 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 interface VariantEntityInterface
 {
     /**
-     * Get translation parent.
-     *
-     * @return mixed
+     * @return int|null
      */
-    public function getVariantParent();
+    public function getId();
+
+    public function getVariantParent(): ?VariantEntityInterface;
 
     /**
-     * Set entity this is a translation of.
-     *
-     * @return mixed
+     * @return $this
      */
-    public function setVariantParent(VariantEntityInterface $parent = null);
+    public function setVariantParent(?VariantEntityInterface $parent = null): static;
+
+    public function removeVariantParent(): void;
+
+    public function getVariantChildren(): ArrayCollection|Collection;
 
     /**
-     * Set this entity as a main content (remove translation parent).
-     *
-     * @return mixed
+     * @return $this
      */
-    public function removeVariantParent();
+    public function addVariantChild(VariantEntityInterface $child): static;
+
+    public function removeVariantChild(VariantEntityInterface $child): void;
 
     /**
-     * Get ArrayCollection of translated entities.
-     *
-     * @return ArrayCollection
+     * @return array<mixed>
      */
-    public function getVariantChildren();
+    public function getVariantSettings(): array;
+
+    public function getVariantStartDate(): mixed;
 
     /**
-     * Add entity to $translationChildren.
-     *
-     * @return mixed
+     * @return array<int, mixed>
      */
-    public function addVariantChild(VariantEntityInterface $child);
+    public function getVariants(): array;
 
-    /**
-     * Remove entity from $translationChildren.
-     *
-     * @return mixed
-     */
-    public function removeVariantChild(VariantEntityInterface $child);
-
-    /**
-     * Get settings array for the variant.
-     *
-     * @return mixed
-     */
-    public function getVariantSettings();
-
-    /**
-     * Get \DateTime when a/b test went into effect.
-     *
-     * @return \DateTime
-     */
-    public function getVariantStartDate();
-
-    /**
-     * Get all entities for variant parent/children.
-     *
-     * @return array [$parent, $children]
-     */
-    public function getVariants();
-
-    /**
-     * @param bool $isChild True to return if the item is a variant of a parent
-     *
-     * @return bool
-     */
-    public function isVariant($isChild = false);
+    public function isVariant(bool $isChild = false): bool;
 }

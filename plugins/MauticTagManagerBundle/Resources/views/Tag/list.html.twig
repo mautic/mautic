@@ -109,6 +109,7 @@
                                         {% else %}
                                             {{ item.getTag() }}
                                         {% endif %}
+                                        {{ customContent('tag.name', _context) }}
                                     </div>
                                     {% set description = item.getDescription() %}
                                     {% if description %}
@@ -146,7 +147,7 @@
                     <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
                         {% set childContainer %}
                             <div class="mt-32 mb-md">
-                                {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                                {% include '@MauticCore/Components/pictogram.html.twig' with {
                                     'pictogram': 'tags',
                                     'size': '80'
                                 } %}
@@ -164,7 +165,7 @@
             {% endif %}
         </div>
     </div>
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.tags.segmentation', 'mautic.protip.tags.multivalue', 'mautic.protip.tags.creation'])
     }) }}
 {% endblock %}

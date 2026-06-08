@@ -11,7 +11,7 @@ class EvaluatedContacts
 
     private ArrayCollection $failed;
 
-    public function __construct(ArrayCollection $passed = null, ArrayCollection $failed = null)
+    public function __construct(?ArrayCollection $passed = null, ?ArrayCollection $failed = null)
     {
         $this->passed = $passed ?? new ArrayCollection();
         $this->failed = $failed ?? new ArrayCollection();

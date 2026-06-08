@@ -132,17 +132,6 @@ final class CoreEvents
     public const VIEW_INJECT_CUSTOM_ASSETS = 'mautic.view_inject_custom_assets';
 
     /**
-     * The mautic.on_form_type_build event is dispatched by views to inject custom fields into any form.
-     *
-     * The event listener receives a Mautic\CoreBundle\Event\CustomFormEvent instance.
-     *
-     * @var string
-     *
-     * @deprecated since Mautic 4 because it is not used anywhere
-     */
-    public const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
-
-    /**
      * The mautic.on_generated_columns_build event is dispatched when a list of generated columns is being built.
      *
      * The event listener receives a Mautic\CoreBundle\Event\GeneratedColumnsEvent instance.

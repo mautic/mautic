@@ -275,7 +275,7 @@ class ThemeHelperTest extends TestCase
                  * @param ?\Traversable<mixed> $iterator
                  * @param mixed[]              $options
                  */
-                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
+                public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/new-theme-name', $targetDir);
@@ -369,7 +369,7 @@ class ThemeHelperTest extends TestCase
                  * @param ?\Traversable<mixed> $iterator
                  * @param array<mixed>         $options
                  */
-                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
+                public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/requested-theme-dir', $targetDir);

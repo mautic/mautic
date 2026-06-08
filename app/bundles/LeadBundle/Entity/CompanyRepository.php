@@ -361,7 +361,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
-            ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
+            ->addOrderBy('l.date_added', 'DESC') // primary should be [0]
+            ->addOrderBy('l.company_id', 'DESC');
 
         $companies = $qb->executeQuery()->fetchAllAssociative();
 
@@ -418,7 +419,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      * @param string $valueColumn
      */
     public function getAjaxSimpleList(
-        CompositeExpression $expr = null,
+        ?CompositeExpression $expr = null,
         array $parameters = [],
         $labelColumn = null,
         $valueColumn = 'id',
@@ -446,18 +447,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
         }
 
-        if (!(isset($parameters['onlyNames']) && $parameters['onlyNames'])) {
-            $labelExpression = '
-            case
-            when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
-            when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
-            when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
-            else comp.companyname
-            end
-            as label';
-        } else {
-            $labelExpression = $prefix.' companyname as label';
-        }
+        $labelExpression = $prefix.' companyname as label';
 
         $q->select($prefix.$valueColumn.' as value, '.$labelExpression)
             ->from($tableName, $alias)
@@ -539,7 +529,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * @return Company[]
      */
-    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null): array
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
     {
         $results = $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.*', $companyId, $limit);
 

@@ -28,7 +28,6 @@ class TriggerBuilderEvent extends Event
      *                      'formTypeOptions' => (optional) array of options to pass to formType
      *                      'callback'        => (required) callback function that will be passed when the action is triggered
      *                      The callback function can receive the following arguments by name (via ReflectionMethod::invokeArgs())
-     *                      Mautic\CoreBundle\Factory\MauticFactory $factory
      *                      Mautic\PointBundle\Entity\TriggerEvent  $event
      *                      Mautic\LeadBundle\Entity\Lead           $lead
      *

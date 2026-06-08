@@ -31,6 +31,13 @@ class PublicController extends FormController
                 $data = $form->getData();
                 $user = $model->getRepository()->findByIdentifier($data['identifier']);
 
+                /**
+                 * Calculation of time to standardize fix response for vulnerability
+                 * Users enumeration - forgot password. Constant response time is 1s.
+                 */
+                $desiredTime = 1.0;
+                $startTime   = microtime(true);
+
                 try {
                     if (null !== $user) {
                         $model->sendResetEmail($user);
@@ -38,6 +45,13 @@ class PublicController extends FormController
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset');
                 } catch (\Exception) {
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
+                }
+
+                $endTime       = microtime(true);
+                $executionTime = $endTime - $startTime;
+
+                if ($executionTime < $desiredTime) {
+                    usleep((int) (($desiredTime - $executionTime) * 1000000));
                 }
 
                 return $this->redirectToRoute('login');
@@ -81,37 +95,35 @@ class PublicController extends FormController
                     $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
 
                     return $this->redirectToRoute('login');
-                } else {
-                    if ($request->getSession()->has('resetToken')) {
-                        $resetToken = $request->getSession()->get('resetToken');
-
-                        if ($model->confirmResetToken($user, $resetToken)) {
-                            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
-                            $user->setPassword($encodedPassword);
-                            $model->saveEntity($user);
-
-                            $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
-
-                            $request->getSession()->remove('resetToken');
-
-                            return $this->redirectToRoute('login');
-                        }
-
-                        return $this->delegateView([
-                            'viewParameters' => [
-                                'form' => $form->createView(),
-                            ],
-                            'contentTemplate' => '@MauticUser/Security/resetconfirm.html.twig',
-                            'passthroughVars' => [
-                                'route' => $action,
-                            ],
-                        ]);
-                    } else {
-                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
-
-                        return $this->redirectToRoute('mautic_user_passwordresetconfirm');
-                    }
                 }
+                if ($request->getSession()->has('resetToken')) {
+                    $resetToken = $request->getSession()->get('resetToken');
+
+                    if ($model->confirmResetToken($user, $resetToken)) {
+                        $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
+                        $user->setPassword($encodedPassword);
+                        $model->saveEntity($user);
+
+                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
+
+                        $request->getSession()->remove('resetToken');
+
+                        return $this->redirectToRoute('login');
+                    }
+
+                    return $this->delegateView([
+                        'viewParameters' => [
+                            'form' => $form->createView(),
+                        ],
+                        'contentTemplate' => '@MauticUser/Security/resetconfirm.html.twig',
+                        'passthroughVars' => [
+                            'route' => $action,
+                        ],
+                    ]);
+                }
+                $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
+
+                return $this->redirectToRoute('mautic_user_passwordresetconfirm');
             }
         }
 

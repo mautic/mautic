@@ -1,0 +1,115 @@
+<header aria-label="{{ Header.children.HeaderName is defined ? Header.children.HeaderName.prefix ~ ' ' ~ Header.children.HeaderName.children|trans : Header.ariaLabel|trans }}" class="header">
+    {% if Header.children.skipToContent is defined %}
+    <a class="skip-to-content {{ Header.children.skipToContent.className|default('') }}" href="{{ Header.children.skipToContent.href }}" tabindex="{{ Header.children.skipToContent.tabIndex|default(0) }}">{{ Header.children.skipToContent.children|trans }}</a>
+    {% endif %}
+
+    {% if Header.children.HeaderMenuButton is defined %}
+    <button aria-expanded="false" aria-label="{{ Header.children.HeaderMenuButton.ariaLabel|trans }}" class="header__action header__menu-trigger header__menu-toggle header__menu-toggle__hidden {{ Header.children.HeaderMenuButton.className|default('') }}" title="{{ Header.children.HeaderMenuButton.ariaLabel|trans }}" type="button" onclick="{{ Header.children.HeaderMenuButton.onClick|default('') }}">
+        {% if Header.children.HeaderMenuButton.renderMenuIcon is defined %}
+        <i class="{{ Header.children.HeaderMenuButton.renderMenuIcon }} fs-16"></i>
+        {% endif %}
+    </button>
+    {% endif %}
+
+    {% if Header.children.HeaderName is defined %}
+    <a {% if Header.children.HeaderName.href is defined %}href="{{ Header.children.HeaderName.href }}"{% endif %} class="header__name {{ Header.children.HeaderName.className|default('') }}">
+        {% if Header.children.HeaderName.prefix is defined %}
+        <span class="header__name--prefix">{{ Header.children.HeaderName.prefix|trans }}</span>
+        {% endif %}
+        &nbsp;{{ Header.children.HeaderName.children|trans }}
+    </a>
+    {% endif %}
+
+    {% if Header.children.HeaderNavigation is defined %}
+    <nav {% if Header.children.HeaderName is defined %}aria-label="{{ Header.children.HeaderName.prefix|default('')|trans }} {{ Header.children.HeaderName.children|trans }}"{% endif %} class="header__nav {{ Header.children.HeaderNavigation.className|default('') }}">
+        <ul class="header__menu-bar">
+            {% for item in Header.children.HeaderNavigation.children %}
+                {% if item.HeaderMenuItem is defined %}
+                <li {% if item.HeaderMenuItem.role is defined %}role="{{ item.HeaderMenuItem.role }}"{% endif %} {% if item.HeaderMenuItem.className is defined %}class="{{ item.HeaderMenuItem.className }}"{% endif %}>
+                    <{{ item.HeaderMenuItem.as|default('a') }} href="{{ item.HeaderMenuItem.href }}" class="header__menu-item" tabindex="{{ item.HeaderMenuItem.tabIndex|default(0) }}">
+                        <span class="text-truncate--end">{{ item.HeaderMenuItem.children|trans }}</span>
+                    </{{ item.HeaderMenuItem.as|default('a') }}>
+                </li>
+                {% elseif item.HeaderMenu is defined %}
+                <li class="header__submenu dropdown {{ item.HeaderMenu.className|default('') }}">
+                    <a aria-haspopup="menu" aria-expanded="false" 
+                       class="header__menu-item header__menu-title dropdown-toggle {% if item.HeaderMenu.isActive %}header__menu-item--current{% endif %}" 
+                       href="#" tabindex="{{ item.HeaderMenu.tabIndex|default(0) }}" 
+                       aria-label="{{ item.HeaderMenu.menuLinkName|trans }}"
+                       {% if item.HeaderMenu.onClick is defined %}onclick="{{ item.HeaderMenu.onClick }}"{% endif %}
+                       {% if item.HeaderMenu.onKeyDown is defined %}onkeydown="{{ item.HeaderMenu.onKeyDown }}"{% endif %}
+                       {% if item.HeaderMenu.onBlur is defined %}onblur="{{ item.HeaderMenu.onBlur }}"{% endif %}
+                       data-toggle="dropdown">{{ item.HeaderMenu.menuLinkName|trans }}
+                        <svg focusable="false" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="header__menu-arrow" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z"></path>
+                        </svg>
+                    </a>
+                    <ul aria-label="{{ item.HeaderMenu.menuLinkName|trans }}" class="header__menu dropdown-menu" role="menu">
+                        {% for menuItem in item.HeaderMenu.renderMenuContent %}
+                            {% if menuItem.HeaderMenuItem is defined %}
+                            <li {% if menuItem.HeaderMenuItem.role is defined %}role="{{ menuItem.HeaderMenuItem.role }}"{% endif %} {% if menuItem.HeaderMenuItem.className is defined %}class="{{ menuItem.HeaderMenuItem.className }}"{% endif %}>
+                                <{{ menuItem.HeaderMenuItem.as|default('a') }} href="{{ menuItem.HeaderMenuItem.href }}" class="header__menu-item dropdown-item" tabindex="{{ menuItem.HeaderMenuItem.tabIndex|default(0) }}">
+                                    <span class="text-truncate--end">{{ menuItem.HeaderMenuItem.children|trans }}</span>
+                                </{{ menuItem.HeaderMenuItem.as|default('a') }}>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% elseif item.HeaderMenuDropdown is defined %}
+                <li class="header__submenu dropdown {{ item.HeaderMenuDropdown.className|default('') }}">
+                    <a aria-haspopup="menu" aria-expanded="false" 
+                       class="header__menu-item header__menu-title dropdown-toggle" 
+                       href="#" tabindex="{{ item.HeaderMenuDropdown.tabIndex|default(0) }}" 
+                       aria-label="{{ item.HeaderMenuDropdown.menuLinkName|trans }}"
+                       data-toggle="dropdown">{{ item.HeaderMenuDropdown.menuLinkName|trans }}
+                        <svg focusable="false" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="header__menu-arrow" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z"></path>
+                        </svg>
+                    </a>
+                    <div aria-label="{{ item.HeaderMenuDropdown.menuLinkName|trans }}" class="header__menu header__menu--custom dropdown-menu" role="menu">
+                        {{ item.HeaderMenuDropdown.renderMenuContent|raw }}
+                    </div>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% if Header.children.HeaderGlobal is defined %}
+    <div class="header__global {{ Header.children.HeaderGlobal.className|default('') }}">
+        {% for item in Header.children.HeaderGlobal.children %}
+            {% if item.HeaderGlobalAction is defined %}
+            <span data-toggle="tooltip" data-placement="{{ item.HeaderGlobalAction.tooltipAlignment|default('bottom') }}" title="{{ item.HeaderGlobalAction.ariaLabel|default('')|trans }}">
+                <div class="tooltip-trigger__wrapper">
+                    <button aria-label="{{ item.HeaderGlobalAction.ariaLabel|default('')|trans }}"
+                        class="header__action btn btn--lg layout--size-lg btn-ghost btn--icon-only {{ item.HeaderGlobalAction.className|default('') }}"
+                        type="button" onclick="{{ item.HeaderGlobalAction.onClick|default('') }}">
+                        <i class="{{ item.HeaderGlobalAction.renderActionIcon }} fs-20"></i>
+                    </button>
+                </div>
+            </span>
+            {% elseif item.HeaderGlobalDropdown is defined %}
+            <div class="dropdown">
+                <span data-toggle="tooltip" data-placement="{{ item.HeaderGlobalDropdown.tooltipAlignment|default('bottom') }}" title="{{ item.HeaderGlobalDropdown.ariaLabel|default('')|trans }}">
+                    <div class="tooltip-trigger__wrapper">
+                        <button aria-label="{{ item.HeaderGlobalDropdown.ariaLabel|default('')|trans }}"
+                            class="header__action btn btn--lg layout--size-lg btn-ghost btn--icon-only btn-nospin {{ item.HeaderGlobalDropdown.className|default('') }} dropdown-toggle"
+                            type="button" 
+                            data-toggle="dropdown" 
+                            aria-haspopup="true" 
+                            aria-expanded="false">
+                            <i class="{{ item.HeaderGlobalDropdown.renderDropdownIcon }} fs-20"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {{ item.HeaderGlobalDropdown.renderMenuContent|raw }}
+                        </div>
+                    </div>
+                </span>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</header>

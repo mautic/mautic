@@ -12,6 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function setUp(): void
+    {
+        $this->configParams += [
+            'saml_idp_own_private_key' => 'any_string',
+        ];
+        parent::setUp();
+    }
+
     public function testEditGetPage(): void
     {
         $this->client->request('GET', '/s/users/edit/1');

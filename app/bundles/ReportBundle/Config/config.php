@@ -55,7 +55,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'reports',
                 'path'            => '/reports',
-                'controller'      => 'Mautic\ReportBundle\Controller\Api\ReportApiController',
+                'controller'      => Mautic\ReportBundle\Controller\Api\ReportApiController::class,
             ],
         ],
     ],
@@ -138,8 +138,6 @@ return [
                 'class'     => Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.file_properties',
-                    'mautic.helper.core_parameters',
                     'router',
                 ],
             ],

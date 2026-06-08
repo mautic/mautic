@@ -23,6 +23,8 @@ class FieldDeleteDispatcher
     }
 
     /**
+     * @deprecated Use regular call of `$this->dispatchEvent(LeadEvents::FIELD_PRE_DELETE, $entity)` instead
+     *
      * @throws NoListenerException
      * @throws AbortColumnUpdateException
      */
@@ -48,7 +50,7 @@ class FieldDeleteDispatcher
      *
      * @throws NoListenerException
      */
-    private function dispatchEvent($action, LeadField $entity, LeadFieldEvent $event = null): LeadFieldEvent
+    private function dispatchEvent($action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');

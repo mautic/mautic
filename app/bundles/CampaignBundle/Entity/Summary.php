@@ -154,7 +154,7 @@ class Summary
         return $this->dateTriggered;
     }
 
-    public function setDateTriggered(\DateTimeImmutable $dateTriggered = null): void
+    public function setDateTriggered(?\DateTimeImmutable $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
     }

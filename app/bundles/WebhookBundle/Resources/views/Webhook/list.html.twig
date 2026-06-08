@@ -144,7 +144,7 @@
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getWebhookUrl() }}</td>
                     <td class="visible-md visible-lg">{{ item.getId() }} </td>
@@ -173,7 +173,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mt-32 mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'event--streams',
                         'size': '80'
                     } %}

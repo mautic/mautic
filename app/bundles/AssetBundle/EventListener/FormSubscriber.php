@@ -18,7 +18,6 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -28,7 +27,6 @@ class FormSubscriber implements EventSubscriberInterface
         private AnalyticsHelper $analyticsHelper,
         private AssetsHelper $assetsHelper,
         private ThemeHelperInterface $themeHelper,
-        private Environment $twig,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
@@ -56,7 +54,6 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'           => FormSubmitActionDownloadFileType::class,
             'formTypeCleanMasks' => ['message' => 'html'],
             'eventName'          => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm'  => true,
             'template'           => '@MauticAsset/Action/asset.html.twig',
         ]);
     }
@@ -139,7 +136,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->setPostSubmitResponse(new Response(
-            $this->twig->render(
+            $this->themeHelper->renderThemeTemplate(
                 $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,

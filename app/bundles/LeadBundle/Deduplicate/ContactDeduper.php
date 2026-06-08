@@ -63,7 +63,7 @@ class ContactDeduper
     /**
      * @param Lead[] $contacts
      */
-    public function deduplicateContactBatch(array $contacts, bool $newerIntoOlder, callable $onContactProcessed = null): void
+    public function deduplicateContactBatch(array $contacts, bool $newerIntoOlder, ?callable $onContactProcessed = null): void
     {
         foreach ($contacts as $contact) {
             $duplicates = $this->checkForDuplicateContacts($contact->getProfileFields(), $newerIntoOlder);

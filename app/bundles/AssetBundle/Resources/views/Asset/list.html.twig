@@ -53,6 +53,18 @@
                         'label': 'mautic.core.searchcommand.ismine.label',
                         'tooltip': 'mautic.core.searchcommand.ismine.description',
                         'icon': 'ri-user-line'
+                    },
+                    {
+                        'search': 'mautic.asset.asset.searchcommand.isexpired',
+                        'label': 'mautic.core.form.no_longer_available',
+                        'tooltip': 'mautic.asset.asset.searchcommand.isexpired.description',
+                        'icon': 'ri-time-line'
+                    },
+                    {
+                        'search': 'mautic.asset.asset.searchcommand.ispending',
+                        'label': 'mautic.core.form.not_yet_available',
+                        'tooltip': 'mautic.asset.asset.searchcommand.ispending.description',
+                        'icon': 'ri-timer-line'
                     }
                 ]
             }) -}}
@@ -180,7 +192,7 @@
                                     },
                                     1: {
                                         'attr' : {
-                                            'data-copy' : url('mautic_asset_download', {'slug': item.getId() ~ ':' ~ item.getAlias()}),
+                                            'data-copy' : url('mautic_asset_download', {'slug': item.getSlug()}),
                                             'data-toggle' : 'none',
                                         },
                                         'btnText'   : 'mautic.core.copy_download_link'|trans,
@@ -204,7 +216,7 @@
                                 {'objectAction' : 'view', 'objectId' : item.getId()}
                             ) }}"
                                data-toggle="ajax">
-                                {{ item.getTitle() }} ({{ item.getAlias() }})
+                                {{ item.getTitle() }}
                             </a>
                             <i class="{{ item.getIconClass() }}"></i>
                             {{ customContent('asset.name', _context) }}
@@ -218,7 +230,7 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        {{ include('@MauticCore/Helper/category--expanded.html.twig', {'category': item.getCategory()}) }}
+                        {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.getCategory()}) }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getDownloadCount() }}</td>
                     <td class="visible-md visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
@@ -252,7 +264,7 @@
         <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
             {% set childContainer %}
                 <div class="mb-md">
-                    {% include '@MauticCore/Helper/pictogram.html.twig' with {
+                    {% include '@MauticCore/Components/pictogram.html.twig' with {
                         'pictogram': 'cloud--assets',
                         'size': '80'
                     } %}
@@ -274,7 +286,7 @@
         'header' : false,
 }) -}}
 
-{{ include('@MauticCore/Helper/protip.html.twig', {
+{{ include('@MauticCore/Modules/protip.html.twig', {
     tip: random(['mautic.protip.assets.gating', 'mautic.protip.assets.naming', 'mautic.protip.assets.repurpose', 'mautic.protip.assets.track'])
 }) }}
 {% endblock %}

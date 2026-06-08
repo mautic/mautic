@@ -396,6 +396,21 @@ class ReportType extends AbstractType
                 }
             );
 
+            $builder->addEventListener(
+                FormEvents::PRE_SUBMIT,
+                function (FormEvent $event): void {
+                    $data = $event->getData();
+
+                    if (SchedulerEnum::UNIT_NOW === $data['scheduleUnit'] || SchedulerEnum::UNIT_DAILY === $data['scheduleUnit']) {
+                        unset($data['scheduleDay'], $data['scheduleMonthFrequency']);
+                    } elseif (SchedulerEnum::UNIT_WEEKLY === $data['scheduleUnit']) {
+                        unset($data['scheduleMonthFrequency']);
+                    }
+
+                    $event->setData($data);
+                }
+            );
+
             $builder->add('buttons', FormButtonsType::class);
         }
 

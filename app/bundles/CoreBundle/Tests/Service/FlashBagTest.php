@@ -154,6 +154,11 @@ class FlashBagTest extends TestCase
         $this->assertAddTypeCases(FlashBag::LEVEL_NOTICE, 'ri-information-2-line');
     }
 
+    public function testAddTypeSuccess(): void
+    {
+        $this->assertAddTypeCases(FlashBag::LEVEL_SUCCESS, 'text-success ri-check-line');
+    }
+
     public function testAddTypeDefault(): void
     {
         $this->assertAddTypeCases('default', 'ri-information-2-line');

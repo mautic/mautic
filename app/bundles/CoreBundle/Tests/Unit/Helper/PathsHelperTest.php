@@ -102,6 +102,28 @@ class PathsHelperTest extends TestCase
         $this->assertEquals(__DIR__.'/resource/paths/plugins', $this->helper->getPluginsPath());
     }
 
+    public function testGetImportCampaignsPath(): void
+    {
+        $campaignImportPath = __DIR__.'/resource/paths/import/campaigns';
+
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->coreParametersHelper->method('get')
+            ->willReturnCallback(
+                function (string $key) use ($campaignImportPath) {
+                    return match ($key) {
+                        'import_campaigns_dir' => $campaignImportPath,
+                        'image_path'           => 'media/images',
+                        'tmp_path'             => __DIR__.'/resource/paths/tmp',
+                        default                => '',
+                    };
+                }
+            );
+
+        $helper = new PathsHelper($this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
+
+        $this->assertEquals($campaignImportPath, $helper->getImportCampaignsPath());
+    }
+
     public function testTempDirectoryIsCreatedIfItDoesNotExist(): void
     {
         $tempPath = __DIR__.'/resource/paths/no_exist/tmp';

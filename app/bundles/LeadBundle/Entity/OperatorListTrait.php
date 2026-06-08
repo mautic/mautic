@@ -33,8 +33,8 @@ trait OperatorListTrait
                 OperatorOptions::NOT_EMPTY,
                 OperatorOptions::REGEXP,
                 OperatorOptions::NOT_REGEXP,
-                OperatorOptions::IN,
-                OperatorOptions::NOT_IN,
+                OperatorOptions::INCLUDING_ANY,
+                OperatorOptions::EXCLUDING_ANY,
             ],
         ],
         'bool' => [
@@ -66,8 +66,10 @@ trait OperatorListTrait
         ],
         'multiselect' => [
             'include' => [
-                OperatorOptions::IN,
-                OperatorOptions::NOT_IN,
+                OperatorOptions::INCLUDING_ANY,
+                OperatorOptions::EXCLUDING_ANY,
+                OperatorOptions::INCLUDING_ALL,
+                OperatorOptions::EXCLUDING_ALL,
                 OperatorOptions::EMPTY,
                 OperatorOptions::NOT_EMPTY,
             ],
@@ -149,7 +151,7 @@ trait OperatorListTrait
 
         if (is_array($type)) {
             return $this->getOperatorChoiceList($type, $overrideHiddenTypes);
-        } elseif (array_key_exists($type, $processedTypes)) {
+        } elseif (array_key_exists($type ?? '', $processedTypes)) {
             return $processedTypes[$type];
         }
 
@@ -207,9 +209,6 @@ trait OperatorListTrait
         return array_flip($choices);
     }
 
-    /**
-     * @deprecated These aliases are subscribed in the TypeOperatorSubscriber now so this is not necessary. To be removed in next Mautic version.
-     */
     protected function normalizeType(mixed $type): mixed
     {
         if (null === $type) {

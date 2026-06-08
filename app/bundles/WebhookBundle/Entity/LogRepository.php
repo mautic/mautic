@@ -50,7 +50,7 @@ class LogRepository extends CommonRepository
 
         if ($id) {
             $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
-            while ($rows = $conn->executeQuery($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])->rowCount()) {
+            while ($rows = $conn->executeStatement($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])) {
                 $deletedLogs += $rows;
             }
         }

@@ -20,22 +20,15 @@ class LeadSubscriber implements EventSubscriberInterface
     use ChannelTrait;
 
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
         private PageModel $pageModel,
         private VideoModel $pageVideoModel,
         private TranslatorInterface $translator,
-        RouterInterface $router,
+        private RouterInterface $router,
         ModelFactory $modelFactory,
     ) {
-        $this->router         = $router;
-
         $this->setModelFactory($modelFactory);
     }
 
@@ -95,19 +88,6 @@ class LeadSubscriber implements EventSubscriberInterface
                                 $icon = $overrideIcon;
                             }
                         }
-
-                        /* @deprecated - BC support to be removed in 3.0 */
-                        // Allow a custom template if applicable
-                        if (method_exists($channelModel, 'getPageHitLeadTimelineTemplate')) {
-                            $template = $channelModel->getPageHitLeadTimelineTemplate($hit);
-                        }
-                        if (method_exists($channelModel, 'getPageHitLeadTimelineLabel')) {
-                            $eventTypeName = $channelModel->getPageHitLeadTimelineLabel($hit);
-                        }
-                        if (method_exists($channelModel, 'getPageHitLeadTimelineIcon')) {
-                            $icon = $channelModel->getPageHitLeadTimelineIcon($hit);
-                        }
-                        /* end deprecation */
 
                         if (!empty($hit['sourceId'])) {
                             if ($source = $this->getChannelEntityName($hit['source'], $hit['sourceId'], true)) {

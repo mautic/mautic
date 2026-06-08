@@ -43,7 +43,7 @@ class LookupHelper
 
         /* @var Clearbit_Person $clearbit */
         if ($clearbit = $this->getClearbit()) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
 
@@ -82,7 +82,7 @@ class LookupHelper
 
         /* @var Clearbit_Company $clearbit */
         if ($clearbit = $this->getClearbit(false)) {
-            if (!$checkAuto || ($checkAuto && $this->integration->shouldAutoUpdate())) {
+            if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($company->getFieldValue('companywebsite'));
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
@@ -161,7 +161,6 @@ class LookupHelper
 
     protected function getCache($entity, $notify): array
     {
-        /** @var User $user */
         $user      = $this->userHelper->getUser();
         $nonce     = substr(EncryptionHelper::generateKey(), 0, 16);
         $cacheId   = sprintf('clearbit%s#', $notify ? '_notify' : '').$entity->getId().'#'.gmdate('YmdH');

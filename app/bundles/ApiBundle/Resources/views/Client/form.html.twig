@@ -13,6 +13,7 @@
         <div class="col-xs-12">
             {{ form(form) }}
         </div>
+        {{ include('@MauticWebhook/Modules/webhooks_card.html.twig', ignore_missing=true) }}
     </div>
 </div>
 {% endblock %}

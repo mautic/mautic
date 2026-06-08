@@ -434,7 +434,7 @@ class FieldType extends AbstractType
             return $cleaningRules;
         };
 
-        $setupOrderField = function (FormInterface $form, string $object = null, string $group = null) use ($builder, $disabled): void {
+        $setupOrderField = function (FormInterface $form, ?string $object = null, ?string $group = null) use ($builder, $disabled): void {
             /** @var LeadFieldRepository $leadFieldRepository */
             $leadFieldRepository = $this->em->getRepository(LeadField::class);
 
@@ -617,7 +617,6 @@ class FieldType extends AbstractType
                 'attr'  => [
                     'tooltip'         => 'mautic.lead.field.form.isuniqueidentifer.tooltip',
                     'onchange'        => 'Mautic.displayUniqueIdentifierWarning(this);',
-                    'data-disable-on' => '{"leadfield_object":"company"}',
                 ],
                 'data' => (!empty($data)),
             ]

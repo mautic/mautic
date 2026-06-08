@@ -191,21 +191,25 @@ class NoteController extends FormController
                     ]
                 );
                 $passthroughVars['noteId'] = $note->getId();
+
+                $this->addFlashMessage('mautic.lead.note.created');
             }
 
+            $passthroughVars['flashes'] = $this->getFlashContent();
+
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form'        => $form->createView(),
-                        'lead'        => $lead,
-                        'permissions' => $permissions,
-                    ],
-                    'contentTemplate' => '@MauticLead/Note/form.html.twig',
-                ]
-            );
         }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form'        => $form->createView(),
+                    'lead'        => $lead,
+                    'permissions' => $permissions,
+                ],
+                'contentTemplate' => '@MauticLead/Note/form.html.twig',
+            ]
+        );
     }
 
     /**
@@ -278,18 +282,18 @@ class NoteController extends FormController
             $passthroughVars['mauticContent'] = 'leadNote';
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form'        => $form->createView(),
-                        'lead'        => $lead,
-                        'permissions' => $permissions,
-                    ],
-                    'contentTemplate' => '@MauticLead/Note/form.html.twig',
-                ]
-            );
         }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form'        => $form->createView(),
+                    'lead'        => $lead,
+                    'permissions' => $permissions,
+                ],
+                'contentTemplate' => '@MauticLead/Note/form.html.twig',
+            ]
+        );
     }
 
     /**
@@ -341,8 +345,8 @@ class NoteController extends FormController
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);
-        } else {
-            return $this->accessDenied();
         }
+
+        return $this->accessDenied();
     }
 }

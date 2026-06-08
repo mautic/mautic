@@ -32,7 +32,7 @@ class AppCallbackController extends CommonController
 
         $pushIdCreated = false;
 
-        if (array_key_exists('push_id', $requestBody)) {
+        if (array_key_exists('push_id', $requestBody) && !empty(trim($requestBody['push_id']))) {
             $pushIdCreated = true;
             $contact->addPushIDEntry($requestBody['push_id'], $requestBody['enabled'], true);
             $contactRepo->saveEntity($contact);

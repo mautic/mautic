@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
@@ -24,12 +25,12 @@ class ConfigSubscriber implements EventSubscriberInterface
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $leadParameters = $event->getParametersFromConfig('MauticLeadBundle');
-        unset($leadParameters['company_unique_identifiers_operator']);
+        unset($leadParameters['company_unique_identifiers_operator'], $leadParameters['company_columns']);
         $event->addForm([
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
             'formType'   => ConfigType::class,
-            'formTheme'  => '@MauticLead/FormTheme/Config/_config_companyconfig_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_leadconfig_widget.html.twig',
             'parameters' => $leadParameters,
         ]);
 
@@ -37,6 +38,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         unset(
             $segmentParameters['contact_unique_identifiers_operator'],
             $segmentParameters['contact_columns'],
+            $segmentParameters['company_columns'],
             $segmentParameters['background_import_if_more_rows_than'],
             $segmentParameters['contact_export_in_background'],
             $segmentParameters['contact_export_limit'],
@@ -46,7 +48,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',
             'formType'   => SegmentConfigType::class,
-            'formTheme'  => '@MauticLead/FormTheme/Config/_config_leadconfig_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_segment_config_widget.html.twig',
             'parameters' => $segmentParameters,
         ]);
     }
@@ -58,9 +60,10 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'companyconfig',
             'formType'   => ConfigCompanyType::class,
-            'formTheme'  => '@MauticLead/FormTheme/Config/_config_segment_config_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_companyconfig_widget.html.twig',
             'parameters' => [
-                'company_unique_identifiers_operator' => $parameters['company_unique_identifiers_operator'],
+                'company_unique_identifiers_operator' => $parameters['company_unique_identifiers_operator'] ?? CompositeExpression::TYPE_OR,
+                'company_columns'                     => $parameters['company_columns'] ?? [],
             ],
         ]);
     }

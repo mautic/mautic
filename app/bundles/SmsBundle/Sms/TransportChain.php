@@ -74,7 +74,7 @@ class TransportChain
      *
      * @throws \Exception
      */
-    public function sendSms(Lead $lead, $content, Stat $stat = null)
+    public function sendSms(Lead $lead, $content, ?Stat $stat = null)
     {
         return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
     }

@@ -156,7 +156,7 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -272,7 +272,7 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
         }
         $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $mailer->setTo([$user->getEmail() => $user->getName()]);
+        $mailer->setTo([$user->getEmail() ?? '' => $user->getName()]);
         $mailer->setSubject($this->translator->trans('mautic.user.user.passwordreset.subject'));
         $text = $this->translator->trans(
             'mautic.user.user.passwordreset.email.body',
@@ -329,7 +329,7 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
     public function emailUser(User $user, string $subject, string $content): void
     {
         $mailer  = $this->prepareEMail($subject, $content);
-        $mailer->setTo([$user->getEmail() => $user->getName()]);
+        $mailer->setTo([$user->getEmail() ?? '' => $user->getName()]);
         $mailer->send();
     }
 
@@ -358,7 +358,7 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
     /**
      * Set user preference.
      */
-    public function setPreference($key, $value = null, User $user = null): void
+    public function setPreference($key, $value = null, ?User $user = null): void
     {
         if (null == $user) {
             $user = $this->userHelper->getUser();
@@ -375,7 +375,7 @@ class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDele
     /**
      * Get user preference.
      */
-    public function getPreference($key, $default = null, User $user = null)
+    public function getPreference($key, $default = null, ?User $user = null)
     {
         if (null == $user) {
             $user = $this->userHelper->getUser();

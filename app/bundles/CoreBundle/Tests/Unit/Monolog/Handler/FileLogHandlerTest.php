@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Monolog\Handler;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Monolog\Handler\FileLogHandler;
 use Monolog\Formatter\FormatterInterface;
-use Monolog\Logger;
+use Monolog\Level;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +46,7 @@ class FileLogHandlerTest extends TestCase
             );
 
         $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
-        $this->assertEquals(Logger::DEBUG, $handler->getLevel());
+        $this->assertEquals(Level::Debug, $handler->getLevel());
         $this->assertEquals(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
 
         $filename = $this->getProperty($handler, 'filename');
@@ -74,7 +74,7 @@ class FileLogHandlerTest extends TestCase
             );
 
         $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
-        $this->assertEquals(Logger::NOTICE, $handler->getLevel());
+        $this->assertEquals(Level::Notice, $handler->getLevel());
         $this->assertNotEquals(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
 
         $filename = $this->getProperty($handler, 'filename');
@@ -87,7 +87,6 @@ class FileLogHandlerTest extends TestCase
     {
         $reflection = new \ReflectionClass($handler);
         $fileName   = $reflection->getProperty($property);
-        $fileName->setAccessible(true);
 
         return $fileName->getValue($handler);
     }

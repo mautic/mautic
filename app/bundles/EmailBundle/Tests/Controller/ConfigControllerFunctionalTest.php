@@ -30,15 +30,16 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form   = $crawler->selectButton('config[buttons][save]')->form();
         $values = $form->getPhpValues();
 
-        $values['config']['leadconfig']['contact_columns']                              = ['name', 'email', 'id']; // required
-        $values['config']['emailconfig']['mailer_dsn']['scheme']                        = $data['scheme'];
-        $values['config']['emailconfig']['mailer_dsn']['host']                          = $data['host'];
-        $values['config']['emailconfig']['mailer_dsn']['port']                          = $data['port'];
-        $values['config']['emailconfig']['mailer_dsn']['path']                          = $data['path'];
-        $values['config']['emailconfig']['mailer_dsn']['user']                          = $data['user'];
-        $values['config']['emailconfig']['mailer_dsn']['password']                      = $data['password'];
-        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['label'] = 'type';
-        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['value'] = $data['type'];
+        $values['config']['leadconfig']['contact_columns']                               = ['name', 'email', 'id']; // required
+        $values['config']['companyconfig']['company_columns']                            = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
+        $values['config']['emailconfig']['mailer_dsn']['scheme']                         = $data['scheme'];
+        $values['config']['emailconfig']['mailer_dsn']['host']                           = $data['host'];
+        $values['config']['emailconfig']['mailer_dsn']['port']                           = $data['port'];
+        $values['config']['emailconfig']['mailer_dsn']['path']                           = $data['path'];
+        $values['config']['emailconfig']['mailer_dsn']['user']                           = $data['user'];
+        $values['config']['emailconfig']['mailer_dsn']['password']                       = $data['password'];
+        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['label']  = 'type';
+        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['value']  = $data['type'];
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
         Assert::assertTrue($this->client->getResponse()->isOk());
@@ -82,7 +83,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // set form data
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $form->setValues($data + [
-            'config[leadconfig][contact_columns]' => ['name', 'email', 'id'], // required
+            'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'], // required
+            'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
         ]);
 
         // check if there is the given validation error
@@ -92,7 +94,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, mixed[]>
+     * @return iterable<string, mixed[]>
      */
     public static function dataInvalidDsn(): iterable
     {

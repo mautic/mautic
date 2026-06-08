@@ -145,7 +145,7 @@ class AuthenticationEvent extends Event
      * @param string    $service           Service that authenticated the user; if using a Integration, it should match that of AbstractIntegration::getName();
      * @param bool|true $createIfNotExists
      */
-    public function setIsAuthenticated($service, User $user = null, $createIfNotExists = true): void
+    public function setIsAuthenticated($service, ?User $user = null, $createIfNotExists = true): void
     {
         $this->authenticatingService = $service;
 

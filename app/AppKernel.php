@@ -121,6 +121,7 @@ class AppKernel extends Kernel
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
             new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
+            new ApiPlatform\Symfony\Bundle\ApiPlatformBundle(),
 
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),

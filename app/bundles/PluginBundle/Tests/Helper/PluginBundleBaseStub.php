@@ -18,7 +18,7 @@ abstract class PluginBundleBaseStub extends Bundle
     /**
      * Called by PluginController::reloadAction when the addon version does not match what's installed.
      */
-    public static function onPluginUpdate(Plugin $plugin, $metadata = null, Schema $installedSchema = null)
+    public static function onPluginUpdate(Plugin $plugin, $metadata = null, ?Schema $installedSchema = null)
     {
     }
 }

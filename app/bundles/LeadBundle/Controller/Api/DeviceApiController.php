@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -65,6 +66,9 @@ class DeviceApiController extends CommonApiController
         }
     }
 
+    /**
+     * @param LeadDevice|FormEntity $entity
+     */
     protected function checkEntityAccess($entity, $action = 'view')
     {
         return parent::checkEntityAccess($entity->getLead(), $action);

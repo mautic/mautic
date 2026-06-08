@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\ManualWinnerEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
@@ -99,6 +100,11 @@ class EmailControllerTest extends TestCase
 
     private RequestStack $requestStack;
 
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private MockObject $dispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -111,18 +117,18 @@ class EmailControllerTest extends TestCase
         $this->formMock      = $this->createMock(Form::class);
         $this->twigMock      = $this->createMock(Environment::class);
 
-        $this->formFactoryMock      = $this->createMock(FormFactory::class);
-        $formFieldHelper            = $this->createMock(FormFieldHelper::class);
-        $doctrine                   = $this->createMock(ManagerRegistry::class);
-        $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
-        $helperUserMock             = $this->createMock(UserHelper::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock       = $this->createMock(Translator::class);
-        $this->flashBagMock         = $this->createMock(FlashBag::class);
-        $this->requestStack         = new RequestStack();
-        $this->corePermissionsMock  = $this->createMock(CorePermissions::class);
-        $batchDeleteService         = new BatchDeleteService($this->corePermissionsMock, $this->translatorMock);
+        $this->formFactoryMock            = $this->createMock(FormFactory::class);
+        $formFieldHelper                  = $this->createMock(FormFieldHelper::class);
+        $doctrine                         = $this->createMock(ManagerRegistry::class);
+        $this->modelFactoryMock           = $this->createMock(ModelFactory::class);
+        $helperUserMock                   = $this->createMock(UserHelper::class);
+        $coreParametersHelper             = $this->createMock(CoreParametersHelper::class);
+        $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $this->translatorMock             = $this->createMock(Translator::class);
+        $this->flashBagMock               = $this->createMock(FlashBag::class);
+        $this->requestStack               = new RequestStack();
+        $this->corePermissionsMock        = $this->createMock(CorePermissions::class);
+        $batchDeleteService               = new BatchDeleteService($this->corePermissionsMock, $this->translatorMock);
 
         $helperUserMock->method('getUser')
             ->willReturn(new User(false));
@@ -134,7 +140,7 @@ class EmailControllerTest extends TestCase
             $this->modelFactoryMock,
             $helperUserMock,
             $coreParametersHelper,
-            $dispatcher,
+            $this->dispatcher,
             $this->translatorMock,
             $this->flashBagMock,
             $this->requestStack,
@@ -273,5 +279,51 @@ class EmailControllerTest extends TestCase
         $request = new Request();
         $this->requestStack->push($request);
         $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FakeContactHelper::class));
+    }
+
+    public function testWinnerActionForDispatchManualWinnerEvent(): void
+    {
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
+            ->method('getSession')
+            ->willReturn($this->sessionMock);
+
+        $this->routerMock->expects($this->exactly(2))
+            ->method('generate')
+            ->willReturn('/test-url');
+        $this->containerMock->expects($this->exactly(2))
+            ->method('get')
+            ->with('router')
+            ->willReturn($this->routerMock);
+
+        $this->corePermissionsMock->expects($this->once())
+            ->method('hasEntityAccess')
+            ->with('email:emails:editown', 'email:emails:editother', null)
+            ->willReturn(true);
+
+        $request->expects(self::once())
+            ->method('getMethod')
+            ->willReturn(Request::METHOD_POST);
+
+        $this->modelFactoryMock->expects($this->once())
+            ->method('getModel')
+            ->with('email')
+            ->willReturn($this->modelMock);
+
+        $this->emailMock->expects($this->once())
+            ->method('getVariantParent')
+            ->willReturn($this->emailMock);
+
+        $this->modelMock->expects($this->once())
+            ->method('getEntity')
+            ->with(5)
+            ->willReturn($this->emailMock);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(new ManualWinnerEvent($this->emailMock));
+
+        $this->requestStack->push($request);
+        $this->controller->winnerAction($request, 5);
     }
 }

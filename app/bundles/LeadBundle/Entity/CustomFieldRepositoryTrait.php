@@ -413,7 +413,7 @@ trait CustomFieldRepositoryTrait
      *
      * @throws Exception
      */
-    private function getFieldList(string $object = null): array
+    private function getFieldList(?string $object = null): array
     {
         // Get the list of custom fields
         $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();

@@ -22,7 +22,7 @@ abstract class AbstractCustomRequestEvent extends Event
      */
     protected $routeParams = [];
 
-    public function __construct(Request $request = null)
+    public function __construct(?Request $request = null)
     {
         if ($request) {
             $this->request = ($request->isXmlHttpRequest() && $request->attributes->has('request')) ? $request->attributes->get('request') : $request;

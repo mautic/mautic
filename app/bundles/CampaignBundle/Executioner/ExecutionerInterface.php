@@ -11,5 +11,5 @@ interface ExecutionerInterface
     /**
      * @return mixed
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, OutputInterface $output = null);
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null);
 }

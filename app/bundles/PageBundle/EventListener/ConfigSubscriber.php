@@ -50,7 +50,6 @@ class ConfigSubscriber implements EventSubscriberInterface
             'parameters' => [
                 'anonymize_ip'                          => false,
                 'track_contact_by_ip'                   => false,
-                'track_by_tracking_url'                 => false,
                 'facebook_pixel_id'                     => null,
                 'facebook_pixel_trackingpage_enabled'   => false,
                 'facebook_pixel_landingpage_enabled'    => false,
@@ -59,6 +58,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'google_analytics_landingpage_enabled'  => false,
                 'google_analytics_anonymize_ip'         => false,
                 'do_not_track_404_anonymous'            => false,
+                'append_segment_id_tracking_url'        => false,
             ],
         ]);
     }

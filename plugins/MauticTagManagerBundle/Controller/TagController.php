@@ -61,19 +61,7 @@ class TagController extends FormController
         $orderBy    = $session->get('mautic.tags.orderby', 'lt.tag');
         $orderByDir = $session->get('mautic.tags.orderbydir', 'ASC');
 
-        if (!empty($search)) {
-            $filter = [
-                'where' => [
-                    [
-                        'expr' => 'like',
-                        'col'  => 'lt.tag',
-                        'val'  => '%'.$search.'%',
-                    ],
-                ],
-            ];
-        } else {
-            $filter = '';
-        }
+        $filter = !empty($search) ? ['string' => $search] : '';
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
 
@@ -212,7 +200,7 @@ class TagController extends FormController
                         'mauticContent' => 'tagmanager',
                     ],
                 ]);
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $tagDependencies, $tag->getId(), true);
             }
         }
@@ -350,9 +338,9 @@ class TagController extends FormController
                         ];
 
                         return $this->postActionRedirect($postActionVars);
-                    } else {
-                        return $this->viewAction($request, $tagDependencies, $tag->getId());
                     }
+
+                    return $this->viewAction($request, $tagDependencies, $tag->getId());
                 }
             }
 
@@ -508,10 +496,6 @@ class TagController extends FormController
         ];
 
         if ('POST' === $request->getMethod()) {
-            /** @var TagModel $model */
-            $model         = $this->getModel('lead.tag');
-            $overrideModel = $this->getModel('tagmanager.tag');
-            \assert($overrideModel instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
             $tag = $model->getEntity($objectId);
 
             if (null === $tag) {
@@ -522,19 +506,6 @@ class TagController extends FormController
                 ];
             } elseif (!$this->security->isGranted('tagManager:tagManager:delete')) {
                 return $this->accessDenied();
-            }
-
-            if ($overrideModel->getRepository()->countByLeads([$objectId])[$objectId] > 0) {
-                $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
-                ];
-
-                return $this->postActionRedirect(
-                    array_merge($postActionVars, [
-                        'flashes' => $flashes,
-                    ])
-                );
             }
 
             $model->deleteEntity($tag);

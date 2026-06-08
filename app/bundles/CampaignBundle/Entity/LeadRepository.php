@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -14,6 +15,8 @@ class LeadRepository extends CommonRepository
 {
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+
+    public const DELETE_BATCH_SIZE = 5000;
 
     /**
      * Get the details of leads added to a campaign.
@@ -160,7 +163,8 @@ class LeadRepository extends CommonRepository
      *
      * @return array<string, \DateTimeInterface>
      */
-    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter): array
+    public function getInactiveContacts($campaignId, $decisionId, $parentDecisionId, ContactLimiter $limiter,
+        bool $ignoreParentCheck = false): array
     {
         // Main query
         $q = $this->getReplicaConnection($limiter)->createQueryBuilder();
@@ -211,7 +215,7 @@ class LeadRepository extends CommonRepository
             $q->andWhere(
                 sprintf('EXISTS (%s)', $grandparentQb->getSQL())
             );
-        } else {
+        } elseif (!$ignoreParentCheck) {
             // Limit to events that have no grandparent and any of events was already executed by jump to event
             $anyEventQb = $this->getReplicaConnection($limiter)->createQueryBuilder();
             $anyEventQb->select('null')
@@ -305,7 +309,7 @@ class LeadRepository extends CommonRepository
             )
         )
             ->setParameter('campaign', $campaign)
-            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->getQuery()->getResult();
 
@@ -331,7 +335,7 @@ class LeadRepository extends CommonRepository
                 )
             )
             ->setParameter('campaignId', (int) $campaignId)
-            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER);
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
@@ -492,7 +496,7 @@ class LeadRepository extends CommonRepository
                     $q->expr()->eq('cl.campaign_id', ':campaignId')
                 )
             )
-            ->setParameter('contactIds', $contactIds, \Doctrine\DBAL\ArrayParameterType::INTEGER)
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER)
             ->setParameter('campaignId', (int) $campaignId)
             ->executeStatement();
     }
@@ -629,5 +633,41 @@ class LeadRepository extends CommonRepository
         ->setParameter('dateTo', $dateToObject->setTime(23, 59, 59)->format('Y-m-d H:i:s'));
 
         return $queryBuilder->executeQuery()->fetchAllAssociative();
+    }
+
+    public function deleteAnonymousContacts(): int
+    {
+        $conn           = $this->getEntityManager()->getConnection();
+        $tableName      = $this->getTableName();
+        $leadsTableName = MAUTIC_TABLE_PREFIX.'leads';
+        $tempTableName  = 'to_delete';
+        $conn->executeQuery(sprintf('DROP TEMPORARY TABLE IF EXISTS %s', $tempTableName));
+        $conn->executeQuery(sprintf('CREATE TEMPORARY TABLE %s select DISTINCT lll.lead_id from %s lll join %s l on l.id = lll.lead_id where l.date_identified is null;', $tempTableName, $tableName, $leadsTableName));
+        $deleteQuery       = sprintf('DELETE lll FROM %s lll JOIN (SELECT lead_id FROM %s LIMIT %d) d USING (lead_id); ', $tableName, $tempTableName, self::DELETE_BATCH_SIZE);
+        $deletedRecordCount= 0;
+        while ($deletedRows = $conn->executeQuery($deleteQuery)->rowCount()) {
+            $deletedRecordCount += $deletedRows;
+        }
+
+        return $deletedRecordCount;
+    }
+
+    /**
+     * @param array<int> $campaignIds
+     *
+     * @return array<mixed>
+     */
+    public function getCampaignContactCounts(array $campaignIds): array
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('cl.campaign_id, COUNT(DISTINCT cl.lead_id) as contact_count')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
+            ->where('cl.campaign_id IN (:campaignIds)')
+            ->andWhere('cl.manually_removed = :manuallyRemoved')
+            ->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER)
+            ->setParameter('manuallyRemoved', 0)
+            ->groupBy('cl.campaign_id');
+
+        return $qb->executeQuery()->fetchAllAssociative();
     }
 }

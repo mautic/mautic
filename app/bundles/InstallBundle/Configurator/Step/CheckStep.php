@@ -94,7 +94,7 @@ class CheckStep implements StepInterface
 
         foreach (\DateTimeZone::listAbbreviations() as $abbreviations) {
             foreach ($abbreviations as $abbreviation) {
-                $timezones[$abbreviation['timezone_id']] = true;
+                $timezones[$abbreviation['timezone_id'] ?? ''] = true;
             }
         }
 

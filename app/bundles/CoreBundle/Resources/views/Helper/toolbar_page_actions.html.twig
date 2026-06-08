@@ -22,9 +22,9 @@
         buttons: [
             {
                 variant: 'ghost',
-                label: 'mautic.core.options',
+                label: toolbarOptionsLabel|default('mautic.core.options'),
                 icon_only: true,
-                icon: 'ri-settings-5-line ri-1x',
+                icon: toolbarOptionsIcon|default('ri-settings-5-line ri-1x'),
                 attributes: {
                     'class': 'dropdown-toggle',
                     'data-toggle': 'dropdown',

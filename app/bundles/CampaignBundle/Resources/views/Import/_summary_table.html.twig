@@ -1,0 +1,82 @@
+{% set summaryId = tableId|default('summaryTable') %}
+{% set showLinks = showLinks|default(false) %}
+{% set isAnalyzeStage = isAnalyzeStage|default(false) %}
+
+<div class="pa-sm mt-md mb-lg">
+    {% if heading is defined %}
+        <h4 class="pa-sm">{{ heading }}</h4>
+    {% endif %}
+
+    <table class="table table-hover" id="{{ summaryId }}">
+        <thead>
+            <tr>
+                <th class="text-center">{{ 'mautic.campaign.campaign.import.entity'|trans }}</th>
+                <th class="text-center">{{ 'mautic.campaign.campaign.import.name'|trans }}</th>
+                <th class="text-center">{{ 'mautic.campaign.event.actions.header'|trans }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entityKey, details in summary %}
+                {% set entity = entityKey|replace({'_create':'', '_update':''}) %}
+
+                {% set entityTranslations = {
+                    'point_group': 'mautic.point.group.header.index',
+                    'page': 'mautic.page.page',
+                    'lists': 'mautic.segment.segment',
+                    'lead_field': 'mautic.lead.field.header.index',
+                    'form_field': 'mautic.form.field',
+                    'form_action': 'mautic.form.actions',
+                    'forms': 'mautic.form.form',
+                    'email': 'mautic.email.email',
+                    'dynamic_content': 'mautic.dynamicContent.dynamicContent',
+                    'campaign_event': 'mautic.campaign.events',
+                    'asset': 'mautic.asset.asset',
+                    'campaign': 'mautic.campaign.campaign'
+                } %}
+
+                {% set translatedEntity = entityTranslations[entity] ? entityTranslations[entity]|trans : entity|capitalize %}
+
+                {% set names = details.names is iterable ? details.names : [details.names] %}
+                {% if isAnalyzeStage %}
+                    {% set ids = details.uuids is iterable ? details.uuids : [details.uuids] %}
+                {% else %}
+                    {% set ids = details.ids is iterable ? details.ids : [details.ids] %}
+                {% endif %}
+                {% for i in 0..(names|length - 1) %}
+                    <tr>
+                        <td class="text-center"><strong>{{ translatedEntity }}</strong></td>
+                        <td>
+                            {% if entity == 'campaign' and showLinks %}
+                                <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': ids[i]}) }}">
+                                    {{ names[i] }}
+                                </a>
+                            {% else %}
+                                {{ names[i] }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if isAnalyzeStage %}
+                                {% if entity == 'campaign_event' %}
+                                    {{ 'mautic.campaign.campaign.import.follow_campaign_action'|trans }}
+                                {% elseif entity == 'form_field' %}
+                                    {{ 'mautic.campaign.campaign.import.follow_form'|trans }}
+                                {% elseif entity == 'form_action' %}
+                                    {{ 'mautic.campaign.campaign.import.follow_form'|trans }}
+                                 {% elseif entityKey ends with '_update' %}
+                                    <select name="importAction[{{ entity }}][{{ ids[i] }}]" class="form-control input-sm">
+                                        <option value="update" selected>{{ 'mautic.campaign.campaign.import.update_entity'|trans }}</option>
+                                        <option value="create">{{ 'mautic.campaign.campaign.import.create_entity'|trans }}</option>
+                                    </select>
+                                {% else %}
+                                    {{ details.status }}
+                                {% endif %}
+                            {% else %}
+                                {{ details.status }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

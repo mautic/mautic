@@ -6,7 +6,6 @@ use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Mautic\CoreBundle\Exception\RecordCanNotBeDeletedException;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -193,7 +192,6 @@ class CategoryController extends AbstractStandardFormController
         $cancelled  = $valid  = false;
         $method     = $request->getMethod();
         $inForm     = $this->getInFormValue($request, $method);
-        $showSelect = $request->get('show_bundle_select', false);
 
         // not found
         if (!$this->security->isGranted($model->getPermissionBase($bundle).':create')) {
@@ -204,7 +202,7 @@ class CategoryController extends AbstractStandardFormController
             'objectAction' => 'new',
             'bundle'       => $bundle,
         ]);
-        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
+        $form = $model->createForm($entity, $this->formFactory, $action, ['bundle' => $bundle, 'show_bundle_select' => 'category' === $bundle]);
         $form['inForm']->setData($inForm);
         // /Check for a submitted form and process it
         if (Request::METHOD_POST === $method) {
@@ -256,24 +254,24 @@ class CategoryController extends AbstractStandardFormController
         } elseif (!empty($valid)) {
             // return edit view to prevent duplicates
             return $this->editAction($request, $bundle, $entity->getId(), true);
-        } else {
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCategory/Category/form.html.twig',
-                    'viewParameters'  => [
-                        'form'           => $form->createView(),
-                        'activeCategory' => $entity,
-                        'bundle'         => $bundle,
-                    ],
-                    'passthroughVars' => [
-                        'mauticContent' => 'category',
-                        'success'       => $success,
-                        'route'         => false,
-                    ],
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCategory/Category/form.html.twig',
+                'viewParameters'  => [
+                    'form'           => $form->createView(),
+                    'activeCategory' => $entity,
+                    'bundle'         => $bundle,
+                ],
+                'passthroughVars' => [
+                    'mauticContent' => 'category',
+                    'success'       => $success,
+                    'route'         => false,
+                ],
+            ]
+        );
     }
 
     /**
@@ -291,28 +289,24 @@ class CategoryController extends AbstractStandardFormController
         $cancelled = $valid = false;
         $method    = $request->getMethod();
         $inForm    = $this->getInFormValue($request, $method);
+        $response  = null;
         // not found
         if (null === $entity) {
             $closeModal = true;
-        } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':view')) {
-            return $this->modalAccessDenied();
+        } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':edit')) {
+            $response = $this->modalAccessDenied();
         } elseif ($model->isLocked($entity)) {
-            $viewParams = [
-                'page'   => $session->get('mautic.category.page', 1),
-                'bundle' => $bundle,
-            ];
-            $postActionVars = [
-                'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParams),
-                'viewParameters'  => $viewParams,
-                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
-                'passthroughVars' => [
-                    'activeLink'    => 'mautic_'.$bundle.'category_index',
-                    'mauticContent' => 'category',
-                    'closeModal'    => 1,
-                ],
-            ];
+            $flashMsg = $this->isLocked([], $entity, 'category', true);
+            $this->addFlashMessage($flashMsg['msg'], $flashMsg['msgVars'], FlashBag::LEVEL_ERROR);
 
-            return $this->isLocked($postActionVars, $entity, 'category.category');
+            $response = new JsonResponse([
+                'closeModal' => true,
+                'flashes'    => $this->getFlashContent(),
+            ]);
+        }
+
+        if (null !== $response) {
+            return $response;
         }
 
         // Create the form
@@ -374,7 +368,7 @@ class CategoryController extends AbstractStandardFormController
 
         if ($closeModal) {
             if ($inForm) {
-                return new JsonResponse(
+                $response = new JsonResponse(
                     [
                         'mauticContent' => 'category',
                         'closeModal'    => 1,
@@ -383,27 +377,27 @@ class CategoryController extends AbstractStandardFormController
                         'categoryId'    => $entity->getId(),
                     ]
                 );
+            } else {
+                $viewParameters = [
+                    'page'   => $session->get('mautic.category.page'),
+                    'bundle' => $bundle,
+                ];
+
+                $response = $this->postActionRedirect(
+                    [
+                        'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
+                        'passthroughVars' => [
+                            'activeLink'    => '#mautic_'.$bundle.'category_index',
+                            'mauticContent' => 'category',
+                            'closeModal'    => 1,
+                        ],
+                    ]
+                );
             }
-
-            $viewParameters = [
-                'page'   => $session->get('mautic.category.page'),
-                'bundle' => $bundle,
-            ];
-
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_'.$bundle.'category_index',
-                        'mauticContent' => 'category',
-                        'closeModal'    => 1,
-                    ],
-                ]
-            );
         } else {
-            return $this->ajaxAction(
+            $response = $this->ajaxAction(
                 $request,
                 [
                     'contentTemplate' => '@MauticCategory/Category/form.html.twig',
@@ -420,6 +414,8 @@ class CategoryController extends AbstractStandardFormController
                 ]
             );
         }
+
+        return $response;
     }
 
     /**
@@ -476,12 +472,13 @@ class CategoryController extends AbstractStandardFormController
                         '%id%'   => $objectId,
                     ],
                 ];
-            } catch (RecordCanNotBeDeletedException $exception) {
-                $postActionVars['responseCode'] = Response::HTTP_UNPROCESSABLE_ENTITY;
-                $flashes[]                      = [
-                    'type' => 'notice',
-                    'msg'  => $exception->getMessage(),
-                ];
+            } catch (DeleteEntityDependencyException $exception) {
+                foreach ($exception->getErrors() as $error) {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => $error,
+                    ];
+                }
             }
         } // else don't do anything
 

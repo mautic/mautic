@@ -11,7 +11,7 @@ class InvalidPayloadException extends MauticMessengerException implements Unreco
     /**
      * @param array<mixed> $payload
      */
-    public function __construct(string $message = '', array $payload = [], \Throwable $previous = null)
+    public function __construct(string $message = '', array $payload = [], ?\Throwable $previous = null)
     {
         $message .= json_encode($payload);
         parent::__construct($message, 400, $previous);

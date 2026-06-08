@@ -3,11 +3,12 @@
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,7 +17,6 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -105,7 +105,16 @@ class CommonApiController extends FetchCommonApiController
                 continue;
             }
 
-            $this->model->deleteEntity($entity);
+            try {
+                $this->model->deleteEntity($entity);
+            } catch (DeleteEntityDependencyException $e) {
+                $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
+                    ['%id%'   => $entity->getId()], 'validators');
+                $this->setBatchError($key, $msg, $e->getCode(), $errors, $entities, $entity);
+                $errors[$key]['details'] = $e->getErrors();
+                continue;
+            }
+
             $this->doctrine->getManager()->detach($entity);
         }
 
@@ -128,21 +137,28 @@ class CommonApiController extends FetchCommonApiController
     public function deleteEntityAction($id)
     {
         $entity = $this->model->getEntity($id);
-        if (null !== $entity) {
-            if (!$this->checkEntityAccess($entity, 'delete')) {
-                return $this->accessDenied();
-            }
 
-            $this->model->deleteEntity($entity);
-
-            $this->preSerializeEntity($entity);
-            $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);
-            $this->setSerializationContext($view);
-
-            return $this->handleView($view);
+        if (null === $entity) {
+            return $this->notFound();
         }
 
-        return $this->notFound();
+        if (!$this->checkEntityAccess($entity, 'delete')) {
+            return $this->accessDenied();
+        }
+
+        try {
+            $this->model->deleteEntity($entity);
+        } catch (DeleteEntityDependencyException $e) {
+            $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
+                ['%id%'   => $entity->getId()], 'validators');
+
+            return $this->returnError($msg, $e->getCode(), $e->getErrors());
+        }
+        $this->preSerializeEntity($entity);
+        $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
     }
 
     /**
@@ -408,7 +424,18 @@ class CommonApiController extends FetchCommonApiController
             $errors[$key] = $formResponse;
         }
 
-        $this->doctrine->getManager()->detach($entity);
+        $lastEntityIndex = -1;
+        foreach ($entities as $index => $moreEntities) {
+            if ($moreEntities !== $entity) {
+                continue;
+            }
+
+            $lastEntityIndex = $index;
+        }
+
+        if (-1 === $lastEntityIndex || $lastEntityIndex === $key) {
+            $this->detachEntity($entity);
+        }
 
         $this->inBatchMode = false;
     }
@@ -452,6 +479,37 @@ class CommonApiController extends FetchCommonApiController
             $parameters        = array_merge($defaultProperties, $parameters);
         }
 
+        if ($this->model instanceof ApiLockAwareInterface
+            && $entity->getId()
+            && $this->model->isApiLocked($entity)
+        ) {
+            $date = $entity->getCheckedOut();
+
+            // Use model name getter for entity display name
+            $nameGetter = $this->model->getNameGetter();
+
+            $name = method_exists($entity, $nameGetter)
+                ? $entity->{$nameGetter}()
+                : '';
+
+            return $this->returnError(
+                $this->translator->trans(
+                    'mautic.api.error.entity.locked',
+                    [
+                        '%name%' => $name,
+                        '%user%' => $entity->getCheckedOutByUser(),
+                        '%date%' => $date->format($this->coreParametersHelper->get('date_format_dateonly')),
+                        '%time%' => $date->format($this->coreParametersHelper->get('date_format_timeonly')),
+                    ]
+                ),
+                Response::HTTP_CONFLICT,
+                [
+                    'checkedOutBy'     => $entity->getCheckedOutByUser(),
+                    'checkedOut'       => $entity->getCheckedOut()->format('Y-m-d H:i:s T'),
+                ]
+            );
+        }
+
         // Check if user has access to publish
         if (
             (
@@ -464,6 +522,7 @@ class CommonApiController extends FetchCommonApiController
                 if (!$this->checkEntityAccess($entity, 'publish')) {
                     if ('new' === $action) {
                         $parameters['isPublished'] = 0;
+                        unset($parameters['publishUp'], $parameters['publishDown']);
                     } else {
                         unset($parameters['isPublished'], $parameters['publishUp'], $parameters['publishDown']);
                     }
@@ -530,9 +589,8 @@ class CommonApiController extends FetchCommonApiController
 
             if ($this->inBatchMode) {
                 return $entity;
-            } else {
-                $view = $this->view([$this->entityNameOne => $entity], $statusCode, $headers);
             }
+            $view = $this->view([$this->entityNameOne => $entity], $statusCode, $headers);
 
             $this->setSerializationContext($view);
         } else {
@@ -576,5 +634,13 @@ class CommonApiController extends FetchCommonApiController
 
             $entity->setCategory($category);
         }
+    }
+
+    /**
+     * Entity not to be detached in case of Lead Batch API.
+     */
+    protected function detachEntity(object $entity): void
+    {
+        $this->doctrine->getManager()->detach($entity);
     }
 }

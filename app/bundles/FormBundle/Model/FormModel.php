@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -28,6 +29,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -126,7 +128,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -158,9 +160,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function setFields(Form $entity, $sessionFields): void
@@ -226,11 +228,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (!isset($existingFields[$fieldId])) {
+            if (!isset($existingFields[$fieldId ?? ''])) {
                 continue;
             }
-            $this->handleFilesDelete($existingFields[$fieldId]);
-            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $this->handleFilesDelete($existingFields[$fieldId ?? '']);
+            $entity->removeField($fieldId, $existingFields[$fieldId ?? '']);
             $deleteFields[] = $fieldId;
         }
 
@@ -353,6 +355,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getContent(Form $form, $withScript = true, $useCache = true): string
     {
+        if ($form->isSubmissionLimitReached()) {
+            $message = $form->getSubmissionLimitMessage() ?? $this->translator->trans('mautic.form.submission.limit_reached');
+
+            return sprintf('<div class="mautic-form-message">%s</div>', InputHelper::strict_html($message));
+        }
+
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
@@ -420,9 +428,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
 
-        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
-            $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+        foreach (['_style', 'style'] as $styleFile) {
+            $stylePath = "@themes/{$theme}/html/MauticFormBundle/Builder/{$styleFile}.html.twig";
+            if ($this->twig->getLoader()->exists($stylePath)) {
+                $styleToRender = $stylePath;
+            }
         }
+
         if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
             $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
         }
@@ -433,7 +445,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if ($entity->getRenderStyle()) {
             $styleTheme = $styleToRender;
-            $style      = $this->twig->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $style      = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleTheme), []);
         }
 
         // Determine pages
@@ -445,7 +457,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
-        $html               = $this->twig->render(
+        $html               = $this->themeHelper->renderThemeTemplate(
             $formToRender,
             [
                 'fieldSettings'          => $this->getCustomComponents()['fields'],
@@ -529,7 +541,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+        if ($isNew || !$this->tableSchemaHelper->checkTableExists($name)) {
             $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
@@ -694,7 +706,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        $script = $this->twig->render(
+        $script = $this->themeHelper->renderThemeTemplate(
             $scriptToRender,
             [
                 'form'  => $form,
@@ -735,9 +747,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml): void
+    public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
-        $formName          = $form->generateFormName();
+        $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
         $objectsToAutoFill = ['contact', 'company'];
@@ -774,6 +786,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $value = $leadArray[$field->getMappedField()] ?? '';
             // just skip string empty field
             if ('' !== $value) {
+                $mappedFieldAlias = $field->getMappedField();
+                $mappedField      = $this->leadFieldModel->getEntityByAlias($mappedFieldAlias);
+                if ($mappedField && 'boolean' === $mappedField->getType()) {
+                    $properties = $mappedField->getProperties();
+                    $value      = CustomFieldValueHelper::normalize($value, 'boolean', $properties);
+                }
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
@@ -849,7 +867,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      * @param array $filters
      * @param array $options
      */
-    public function getFormList($limit = 10, \DateTime $dateFrom = null, \DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
@@ -889,10 +907,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
-        } else {
-            // remove DOCTYPE, <html>, and <body> tags for old libxml
-            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
         }
+
+        // remove DOCTYPE, <html>, and <body> tags for old libxml
+        return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
     }
 
     /**

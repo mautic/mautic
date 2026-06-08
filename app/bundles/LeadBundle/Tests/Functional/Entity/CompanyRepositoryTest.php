@@ -135,7 +135,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
-    private function createEmail(string $name, string $subject, string $emailType, int $segmentId = null): int
+    private function createEmail(string $name, string $subject, string $emailType, ?int $segmentId = null): int
     {
         $payload = [
             'name'       => $name,
@@ -171,7 +171,6 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     private function setPrivateProperty(MailHelper $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty($object::class, $property);
-        $reflector->setAccessible(true);
         $reflector->setValue($object, $value);
     }
 

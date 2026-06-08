@@ -184,7 +184,6 @@ Mautic.focusOnLoad = function () {
 };
 
 Mautic.launchFocusBuilder = function (forceFetch) {
-    mQuery('.website-placeholder').addClass('hide');
     mQuery('body').css('overflow-y', 'hidden');
 
     // Prevent preview updates till the website snapshot is loaded
@@ -215,12 +214,10 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         if (!mQuery('#focus_unlockId').val()) {
             Mautic.setFocusDefaultColors();
         }
-        mQuery('.website-placeholder').removeClass('hide');
         mQuery('#builder-overlay').addClass('hide');
         mQuery('.btn-close-builder').prop('disabled', false);
         mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
         mQuery('#websiteCanvas').html('');
-        mQuery('.website-placeholder').show();
         mQuery('#websiteUrlPlaceholderInput').val('');
         Mautic.focusUpdatePreview();
     } else {
@@ -236,42 +233,18 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
         Mautic.loadedPreviewImage = url;
 
-        // Fetch image
-        var data = {
-            id: mQuery('#focus_unlockId').val(),
-            website: url
-        }
-
         mQuery('.preview-body').html('');
 
-        Mautic.ajaxActionRequest('plugin:focus:checkIframeAvailability', data, function (response) {
-            if (response.errorMessage.length) {
-                mQuery('.website-placeholder')
-                    .addClass('has-error')
-                    .find('.help-block')
-                    .html(response.errorMessage)
-                    .removeClass('hide');
-                mQuery('#builder-overlay').hide();
-                mQuery('.website-placeholder').removeClass('hide').show();
-                mQuery('#websiteCanvas').html('');
-                mQuery('.builder-panel-top p button').prop('disabled', false);
-                return;
-            }
+        // Clear any previous error state
+        mQuery('.website-placeholder').removeClass('has-error').find('.help-block').html('');
 
-            mQuery('#builder-overlay').addClass('hide');
-            mQuery('.btn-close-builder').prop('disabled', false);
+        // Disable droppers
+        mQuery('.btn-dropper').addClass('disabled');
 
+        // Create iframe and check availability client-side via load/error events
+        Mautic.focusCreateIframe(url);
 
-            mQuery('.website-placeholder').removeClass('hide');
-            mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
-
-            // Disable droppers
-            mQuery('.btn-dropper').addClass('disabled');
-
-            Mautic.focusCreateIframe(url);
-
-            Mautic.ignoreMauticFocusPreviewUpdate = false;
-        }, false, false, "GET");
+        Mautic.ignoreMauticFocusPreviewUpdate = false;
     }
 };
 
@@ -398,16 +371,18 @@ Mautic.focusCreateIframe = function (url) {
         mQuery('#websiteScreenshot').removeClass('mobile');
     }
 
-    // Not catching empty iframe
-    try {
-        mQuery('#websiteCanvas').html('<iframe src="'+url+'" scrolling="no" frameBorder="0"></iframe>');
-        mQuery('#websiteCanvas iframe').css(builderCss);
-    } catch(err) {
-        alert(err.toString());
-    } finally {
-        mQuery('.website-placeholder').hide();
+    var iframe = mQuery('<iframe scrolling="no" frameBorder="0"></iframe>');
+    iframe.css(builderCss);
+
+    iframe.on('load', function() {
+        mQuery('#builder-overlay').addClass('hide');
+        mQuery('.btn-close-builder').prop('disabled', false);
+        mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
         Mautic.focusUpdatePreview();
-    }
+    });
+
+    mQuery('#websiteCanvas').html('').append(iframe);
+    iframe.attr('src', url);
 }
 
 Mautic.focusLoadConversionRateTable = function() {

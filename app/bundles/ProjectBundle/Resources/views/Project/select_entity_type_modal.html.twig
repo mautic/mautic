@@ -1,0 +1,25 @@
+<div class="row">
+    <div class="col-md-12">
+        <div class="mb-lg">
+            <p class="text-muted">{{ 'mautic.project.select_entity_type.description'|trans }}</p>
+        </div>
+        
+        <div class="row">
+            {% for entityType, entityData in entityTypes %}
+                <div class="col-md-6 mb-sm">
+                    {% include '@MauticCore/Components/tile.html.twig' with {
+                        type: 'clickable',
+                        content: '<div class="d-flex jc-space-between ai-center"><div class="tile-title">' ~ entityData.label|trans ~ '</div></div>',
+                        href: path('mautic_project_action', {'objectAction': 'addEntity', 'objectId': project.getId(), 'entityType': entityType}),
+                        icon: 'ri-add-line',
+                        attributes: {
+                            'data-toggle': 'ajaxmodal',
+                            'data-target': '#MauticSharedModal',
+                            'data-header': entityData.label|trans
+                        }
+                    } %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

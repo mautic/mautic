@@ -49,7 +49,7 @@
     </testsuite>
   </testsuites>
   <php>
-    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
     <env name="MAXMIND_LICENSE_KEY" value=""/>
     <env name="KERNEL_CLASS" value="AppTestKernel"/>
     <const name="IS_PHPUNIT" value="true"/>

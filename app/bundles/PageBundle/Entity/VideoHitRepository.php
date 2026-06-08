@@ -33,8 +33,8 @@ class VideoHitRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('h.url', $query->expr()->literal('%'.$options['search'].'%'))
-            );
+                $query->expr()->like('h.url', ':search')
+            )->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit'], null, 'h.id');

@@ -181,9 +181,9 @@ trait CampaignEntitiesTrait
         Campaign $campaign,
         string $type,
         string $eventType,
-        array $property = null,
+        ?array $property = null,
         string $decisionPath = '',
-        Event $parentEvent = null,
+        ?Event $parentEvent = null,
     ): Event {
         $event = new Event();
         $event->setName($name);

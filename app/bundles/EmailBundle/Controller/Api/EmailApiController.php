@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -61,7 +60,6 @@ class EmailApiController extends CommonApiController
             'assetList',
             'formList',
             'leadListList',
-            'projectList',
         ];
         $this->dataInputMasks   = [
             'customHtml'     => 'html',
@@ -189,8 +187,7 @@ class EmailApiController extends CommonApiController
                 'tokens'            => $cleanTokens,
                 'assetAttachments'  => $assetsIds,
                 'return_errors'     => true,
-                'ignoreDNC'         => true,
-                'email_type'        => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
+                'ignoreDNC'         => $entity->getSendToDnc(),
             ]
         );
 
@@ -223,12 +220,37 @@ class EmailApiController extends CommonApiController
         );
     }
 
-    protected function prepareParametersFromRequest(FormInterface $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
     {
         if (isset($params['publicPreview']) && $entity instanceof Email) {
             $entity->setPublicPreview(InputHelper::boolean($params['publicPreview']) ?? false);
             unset($params['publicPreview']);
         }
         parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
+    }
+
+    /**
+     * Processes API Form.
+     *
+     * @param Email        $entity
+     * @param mixed[]|null $parameters
+     * @param string       $method
+     *
+     * @return mixed
+     */
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    {
+        if (array_key_exists('sendToDnc', $parameters)
+            && !$this->security->isGranted('email:emails:sendtodnc')) {
+            // do not save user defined value for sendToDnc if user do not have permission
+            unset($parameters['sendToDnc']);
+        }
+
+        if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
+            // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
+            $parameters['sendToDnc'] = false;
+        }
+
+        return parent::processForm($request, $entity, $parameters, $method);
     }
 }

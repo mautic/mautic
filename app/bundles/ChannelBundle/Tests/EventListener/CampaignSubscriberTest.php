@@ -274,7 +274,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setEventType(Event::TYPE_ACTION);
         $event->setType('message.send');
         $event->setChannel('channel.message');
-        $event->setChannelId(1);
+        $event->setChannelId('1');
         $event->setProperties(
             [
                 'canvasSettings'      => [

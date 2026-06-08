@@ -633,9 +633,9 @@ final class AssetsHelper
 
         if ($urlOnly) {
             return $flagImg;
-        } else {
-            return '<img src="'.$flagImg.'" class="'.$class.'" />';
         }
+
+        return '<img src="'.$flagImg.'" class="'.$class.'" />';
     }
 
     /**
@@ -700,7 +700,7 @@ final class AssetsHelper
     /**
      * Appends the version to the path if is not present.
      */
-    private function appendVersion(string $path, string $version = null): string
+    private function appendVersion(string $path, ?string $version = null): string
     {
         $version = $version ?: $this->version;
 

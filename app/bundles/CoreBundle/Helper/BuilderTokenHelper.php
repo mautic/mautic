@@ -4,8 +4,11 @@ namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
+use Mautic\CoreBundle\DTO\TokenLabelFormat;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderTokenHelper
 {
@@ -29,6 +32,7 @@ class BuilderTokenHelper
         private ModelFactory $modelFactory,
         private Connection $connection,
         private UserHelper $userHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -71,7 +75,7 @@ class BuilderTokenHelper
         $filter = '',
         $labelColumn = 'name',
         $valueColumn = 'id',
-        CompositeExpression $expr = null,
+        ?CompositeExpression $expr = null,
     ) {
         if (!$this->isConfigured) {
             throw new \BadMethodCallException('You must call the "'.static::class.'::configure()" method first.');
@@ -95,16 +99,15 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->createExpressionBuilder();
 
-        if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+        if (isset($expr) && isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
         }
 
         if (!empty($filter)) {
-            $expr = $expr->with(
-                $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
-            );
+            $filterExpr = $exprBuilder->like('LOWER('.$labelColumn.')', ':label');
+            $expr       = isset($expr) ? $expr->with($filterExpr) : $exprBuilder->and($filterExpr);
 
             $parameters = [
                 'label' => strtolower($filter).'%',
@@ -125,23 +128,55 @@ class BuilderTokenHelper
     }
 
     /**
+     * Get tokens with formatted labels based on the provided format options.
+     *
+     * @return array<string,string>
+     */
+    public function getFormattedTokens(
+        string $tokenRegex,
+        TokenFormatOptions $formatOptions,
+        string $filter = '',
+        string $labelColumn = 'name',
+        string $valueColumn = 'id',
+        ?CompositeExpression $expr = null,
+    ): array {
+        $tokens = $this->getTokens($tokenRegex, $filter, $labelColumn, $valueColumn, $expr) ?? [];
+
+        if (empty($tokens)) {
+            return [];
+        }
+
+        $prefix    = $this->translator->trans($formatOptions->translationKey).': ';
+        $formatted = [];
+
+        foreach ($tokens as $token => $label) {
+            $formatted[$token] = match ($formatOptions->format) {
+                TokenLabelFormat::SIMPLE_PREFIX => $prefix.$label,
+                TokenLabelFormat::LINK_WITH_ID  => $this->formatLinkWithId($token, $label, $prefix, $formatOptions->tokenIdPattern),
+            };
+        }
+
+        return $formatted;
+    }
+
+    /**
+     * Format a token label with link prefix and ID like "a:Page: my-alias (123)".
+     */
+    private function formatLinkWithId(string $token, string $label, string $prefix, ?string $tokenIdPattern): string
+    {
+        $id = '';
+        if (null !== $tokenIdPattern && preg_match('#'.$tokenIdPattern.'#', $token, $matches)) {
+            $id = ' ('.$matches[1].')';
+        }
+
+        return 'a:'.$prefix.$label.$id;
+    }
+
+    /**
      * Override default permission set of viewown and viewother.
      */
     public function setPermissionSet(array $permissions): void
     {
         $this->permissionSet = $permissions;
-    }
-
-    /**
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public static function getVisualTokenHtml($token, $description, $forPregReplace = false): string
-    {
-        if ($forPregReplace) {
-            return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')
-            .'(.*?)'.preg_quote('**</strong>', '/');
-        }
-
-        return '<strong contenteditable="false" data-token="'.$token.'">**'.$description.'**</strong>';
     }
 }

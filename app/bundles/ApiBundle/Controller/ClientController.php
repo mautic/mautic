@@ -265,7 +265,7 @@ class ClientController extends AbstractStandardFormController
                         ],
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $client->getId(), true);
             }
         }

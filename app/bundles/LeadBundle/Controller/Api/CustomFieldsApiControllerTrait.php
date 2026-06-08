@@ -105,7 +105,7 @@ trait CustomFieldsApiControllerTrait
                 if (!isset($fieldDefinition['properties'])) {
                     $fieldDefinition['properties'] = [];
                 }
-                $properties = is_string($fieldDefinition['properties']) ? unserialize($fieldDefinition['properties']) : $fieldDefinition['properties'];
+                $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];
@@ -129,7 +129,7 @@ trait CustomFieldsApiControllerTrait
     {
         $object = ('company' === $this->entityNameOne) ? 'company' : 'lead';
 
-        if (isset($this->fieldCache[$object])) {
+        if (!empty($this->fieldCache[$object])) {
             return $this->fieldCache[$object];
         }
 
@@ -206,25 +206,6 @@ trait CustomFieldsApiControllerTrait
         }
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
-    }
-
-    /**
-     * @param string $object
-     *
-     * @deprecated since Mautic 5.2, to be removed in 6.0 with no replacement.
-     *
-     * @return void
-     */
-    protected function setCleaningRules($object = 'lead')
-    {
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-        $fields = $leadFieldModel->getFieldListWithProperties($object);
-        foreach ($fields as $field) {
-            if (!empty($field['properties']['allowHtml'])) {
-                $this->dataInputMasks[$field['alias']]  = 'html'; /** @phpstan-ignore-line this is accessing a property from the parent class. Terrible. Refactor for M6. */
-            }
-        }
     }
 
     #[\Symfony\Contracts\Service\Attribute\Required]

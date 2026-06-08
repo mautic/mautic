@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Service;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -57,6 +59,7 @@ final class BatchDeleteService
             // Do this in chunks so that we don't run out of memory.
             $chunks = array_chunk($entities, self::LOAD_RESULTS_IN_CHUNKS_OF);
             foreach ($chunks as $chunk) {
+                $chunk = array_map(fn (CommonEntity|Tag|array $entity): CommonEntity|Tag => $this->normalizeEntity($entity), $chunk);
                 // Check if any entities cannot be deleted.
                 if (method_exists($model, 'cannotBeDeleted')) {
                     $cannotBeDeleted       = $model->cannotBeDeleted(array_map(fn ($entity) => $entity->getId(), $chunk));
@@ -66,13 +69,8 @@ final class BatchDeleteService
                 }
                 // Loop over the entities to perform access checks pre-delete.
                 foreach ($chunk as $entity) {
-                    // In case getEntities does not return array of entities (eg: Form).
-                    if (is_array($entity)) {
-                        $entity = reset($entity);
-                    }
-
                     if (!$this->checkPermission($permissionBase, $entity)) {
-                        $flashes[] =  ['msg' => 'mautic.core.error.accessdenied'];
+                        $flashes[] = ['msg' => 'mautic.core.error.accessdenied'];
                     } elseif ($model->isLocked($entity)) {
                         // Use isLocked callback.
                         $flashes[] = $isLocked($postActionVars, $entity, $modelName, true);
@@ -132,6 +130,22 @@ final class BatchDeleteService
         }
 
         return $this->security->isGranted($permissionBase.':delete');
+    }
+
+    /**
+     * Some repositories return each entity inside a hydrated row array.
+     *
+     * @param CommonEntity|Tag|array<mixed> $entity
+     */
+    private function normalizeEntity(CommonEntity|Tag|array $entity): CommonEntity|Tag
+    {
+        if (is_array($entity)) {
+            $entity = reset($entity);
+        }
+
+        \assert($entity instanceof CommonEntity || $entity instanceof Tag);
+
+        return $entity;
     }
 
     /**

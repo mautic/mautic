@@ -11,56 +11,37 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
+class RealTimeExecutionerTest extends TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject&LeadModel $leadModel;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventRepository;
+    private MockObject&EventRepository $eventRepository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventExecutioner
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $executioner;
+    private MockObject&EventExecutioner $executioner;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DecisionExecutioner
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $decisionExecutioner;
+    private MockObject&DecisionExecutioner $decisionExecutioner;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
+    private MockObject&EventCollector $eventCollector;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventScheduler;
+    private MockObject&EventScheduler $eventScheduler;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContactTracker
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject&ContactTracker $contactTracker;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject&LeadRepository $leadRepository;
 
     private DecisionHelper $decisionHelper;
+
+    private EventRedirectionHelper&MockObject $redirectionHelper;
 
     protected function setUp(): void
     {
@@ -80,7 +61,12 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->decisionHelper = new DecisionHelper($this->leadRepository);
+        $this->decisionHelper    = new DecisionHelper($this->leadRepository);
+        $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
+
+        // Configure the redirection helper mock to return the event it receives
+        $this->redirectionHelper->method('handleEventRedirection')
+            ->willReturnCallback(fn (Event $event) => $event);
     }
 
     public function testContactNotFoundResultsInEmptyResponses(): void
@@ -212,13 +198,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->createMock(Event::class);
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly(4))
-            ->method('getChannelId')
-            ->willReturn(3);
+        $event = $this->getEventMock(2, 4);
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
@@ -245,13 +225,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->createMock(Event::class);
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly(3))
-            ->method('getChannelId')
-            ->willReturn(3);
+        $event = $this->getEventMock(2, 3);
         $event->expects($this->once())
             ->method('getPositiveChildren')
             ->willReturn(new ArrayCollection());
@@ -294,13 +268,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $action1 = $this->createMock(Event::class);
         $action2 = $this->createMock(Event::class);
 
-        $event = $this->createMock(Event::class);
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly(3))
-            ->method('getChannelId')
-            ->willReturn(3);
+        $event = $this->getEventMock(2, 3);
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
         $event->expects($this->once())
@@ -367,6 +335,19 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $responses->containsResponses());
     }
 
+    private function getEventMock(int $getChannelExpectsCount, int $getChannelIdExpectsCount): MockObject
+    {
+        $event = $this->createMock(Event::class);
+        $event->expects($this->exactly($getChannelExpectsCount))
+            ->method('getChannel')
+            ->willReturn('email');
+        $event->expects($this->exactly($getChannelIdExpectsCount))
+            ->method('getChannelId')
+            ->willReturn('3');
+
+        return $event;
+    }
+
     /**
      * @return RealTimeExecutioner
      */
@@ -381,7 +362,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventScheduler,
             $this->contactTracker,
-            $this->decisionHelper
+            $this->decisionHelper,
+            $this->redirectionHelper
         );
     }
 }

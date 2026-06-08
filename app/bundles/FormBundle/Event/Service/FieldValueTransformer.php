@@ -78,12 +78,4 @@ class FieldValueTransformer
     {
         return $this->tokensToUpdate;
     }
-
-    /**
-     * @deprecated will be removed in Mautic 4. This should have been a private method. Not actually needed.
-     */
-    public function isIsTransformed(): bool
-    {
-        return $this->isTransformed;
-    }
 }

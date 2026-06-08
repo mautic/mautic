@@ -2,13 +2,14 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -27,6 +28,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private CompanyReportData $companyReportData,
         private HitRepository $hitRepository,
         private TranslatorInterface $translator,
+        private DncReportService $dncReportService,
     ) {
     }
 
@@ -36,6 +38,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
+            ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
         ];
     }
 
@@ -131,6 +134,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     'label'          => 'mautic.page.report.hits.date_left',
                     'type'           => 'datetime',
                     'groupByFormula' => 'DATE('.$hitPrefix.'date_left)',
+                ],
+                $hitPrefix.'time_spent' => [
+                    'label'   => 'mautic.page.report.hits.time_spent',
+                    'type'    => 'string',
+                    'formula' => 'IF('.$hitPrefix.'date_left IS NOT NULL, SEC_TO_TIME(TIMESTAMPDIFF(SECOND, '.$hitPrefix.'date_hit, '.$hitPrefix.'date_left)), \'\')',
                 ],
                 $hitPrefix.'country' => [
                     'label' => 'mautic.page.report.hits.country',
@@ -232,7 +240,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             $companyColumns = $this->companyReportData->getCompanyData();
 
-            $pageHitsColumns = array_merge(
+            $commonColumnsAndFilters = array_merge(
                 $columns,
                 $hitColumns,
                 $event->getCampaignByChannelColumns(),
@@ -241,9 +249,13 @@ class ReportSubscriber implements EventSubscriberInterface
                 $companyColumns
             );
 
+            $pageHitsColumns = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncColumns());
+            $pageHitsFilters = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncFilters());
+
             $data = [
                 'display_name' => 'mautic.page.hits',
                 'columns'      => $pageHitsColumns,
+                'filters'      => $pageHitsFilters,
             ];
             $event->addTable(self::CONTEXT_PAGE_HITS, $data, self::CONTEXT_PAGES);
 
@@ -560,5 +572,16 @@ class ReportSubscriber implements EventSubscriberInterface
 
             unset($queryBuilder);
         }
+    }
+
+    public function onReportDisplay(ReportDataEvent $event): void
+    {
+        $data = $event->getData();
+
+        if ($event->checkContext([self::CONTEXT_PAGE_HITS])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
+        }
+
+        $event->setData($data);
     }
 }

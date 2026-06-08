@@ -23,7 +23,7 @@ class SegmentDependencyTreeFactory
     ) {
     }
 
-    public function buildTree(LeadList $segment, NodeInterface $rootNode = null): NodeInterface
+    public function buildTree(LeadList $segment, ?NodeInterface $rootNode = null): NodeInterface
     {
         $rootNode ??= new IntNode($segment->getId());
         $childSegments = $this->findChildSegments($segment);

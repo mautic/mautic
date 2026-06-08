@@ -61,7 +61,7 @@ class ContactSegmentService
      *
      * @throws \Exception
      */
-    public function getTotalLeadListLeadsCount(LeadList $segment, array $batchLimiters = null): array
+    public function getTotalLeadListLeadsCount(LeadList $segment, ?array $batchLimiters = null): array
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
 

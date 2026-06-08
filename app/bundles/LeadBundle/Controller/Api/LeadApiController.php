@@ -709,7 +709,7 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      */
-    protected function isFormCancelled(FormInterface $form = null): bool
+    protected function isFormCancelled(?FormInterface $form = null): bool
     {
         return false;
     }
@@ -717,10 +717,20 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      */
-    protected function isFormValid(FormInterface $form, array $data = null): bool
+    protected function isFormValid(FormInterface $form, ?array $data = null): bool
     {
         $form->submit($data, 'PATCH' !== $this->requestStack->getCurrentRequest()->getMethod());
 
         return $form->isSubmitted() && $form->isValid();
+    }
+
+    /**
+     * @param Lead $entity
+     */
+    protected function detachEntity(object $entity): void
+    {
+        if (empty($entity->getPreviousId())) {
+            parent::detachEntity($entity);
+        }
     }
 }
