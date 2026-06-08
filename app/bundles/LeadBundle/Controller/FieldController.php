@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -506,71 +505,5 @@ class FieldController extends FormController
                 'flashes' => $flashes,
             ])
         );
-    }
-
-    /**
-     * Check if the entity can be deleted and add it to the deleteIds array if it can.
-     * Return an array of flash messages if the entity cannot be deleted.
-     *
-     * @param array<int>                                  $deleteIds
-     * @param array<string, array<string, string>|string> $postActionVars
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function checkEntityForDeletion(int $objectId, array &$deleteIds, array $postActionVars): array
-    {
-        /** @var FieldModel $model */
-        $model     = $this->getModel('lead.field');
-        $entity    = $model->getEntity($objectId);
-        $flashes   = [];
-        if (null === $entity) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.lead.field.error.notfound',
-                'msgVars' => ['%id%' => $objectId],
-            ];
-        } elseif ($entity->isFixed()) {
-            $flashes[] = $this->accessDenied(true);
-        } elseif ($model->isLocked($entity)) {
-            $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.field', true);
-        } else {
-            $deleteIds[] = $objectId;
-        }
-
-        return $flashes;
-    }
-
-    /**
-     * Handles dependency exceptions when deleting batch entities.
-     *
-     * @param DeleteEntitiesDependencyException $e the exception that was thrown during the delete process
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function handleDeleteEntitiesDependencyException(DeleteEntitiesDependencyException $e): array
-    {
-        $flashes                = [];
-        $deletedEntities        = $e->getDeletedEntities();
-        $unableToDeleteEntities = $e->getUnableToDeleteEntities();
-
-        if ($deletedEntities) {
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.lead.field.notice.batch_deleted',
-                'msgVars' => ['%count%' => count($deletedEntities)],
-            ];
-        }
-
-        if ($unableToDeleteEntities) {
-            $flashes[] = [
-                'type'    => 'error',
-                'msg'     => 'mautic.core.notice.used.fields',
-                'msgVars' => [
-                    '%fields%' => implode(', ', array_map(fn ($entity) => $entity->getName().' ('.$entity->getId().')', $unableToDeleteEntities)),
-                ],
-            ];
-        }
-
-        return $flashes;
     }
 }

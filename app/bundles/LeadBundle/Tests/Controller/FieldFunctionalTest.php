@@ -107,8 +107,10 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST,
             '/s/contacts/fields/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
 
-        Assert::assertStringContainsString('cannot be deleted because they are in use by other entities.',
-            strip_tags($this->client->getResponse()->getContent()));
+        $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $flashes  = strip_tags($response['flashes']);
+        Assert::assertStringContainsString("Field 'Field First' cannot be deleted, it is used in segment(s):Field Segment", $flashes);
+        Assert::assertStringContainsString("Field 'Field Second' cannot be deleted, it is used in segment(s):Field Segment", $flashes);
     }
 
     public function testNewSelectField(): void
