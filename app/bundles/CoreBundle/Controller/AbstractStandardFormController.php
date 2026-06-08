@@ -233,8 +233,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Deletes the entity.
      *
-     * @param int $objectId
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function deleteStandard(Request $request, int $objectId)

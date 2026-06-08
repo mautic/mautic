@@ -4,8 +4,9 @@ namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\LeadBundle\Entity\Tag as LeadTag;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
-use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use MauticPlugin\MauticTagManagerBundle\Entity\Tag as TagEntity;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -18,17 +19,22 @@ class TagModel extends BaseTagModel implements GlobalSearchInterface, CannotBeDe
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Tag::class);
+        return $this->em->getRepository(TagEntity::class);
+    }
+
+    public function getPermissionBase(): string
+    {
+        return 'tagManager:tagManager';
     }
 
     /**
-     * @param Tag         $entity
+     * @param LeadTag     $entity
      * @param string|null $action
      * @param array       $options
      */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
-        if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
+        if (!$entity instanceof LeadTag) {
             throw new MethodNotAllowedHttpException(['Tag']);
         }
 

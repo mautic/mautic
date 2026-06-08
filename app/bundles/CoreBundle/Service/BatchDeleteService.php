@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Service;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -38,9 +39,9 @@ final class BatchDeleteService
         string $modelName,
         callable $isLocked,
     ): array {
-        $flashes        = [];
-        $deleteIds      = [];
-        $filter         = $this->getBatchActionFilter($ids, $searchValue, $model);
+        $flashes          = [];
+        $entitiesToDelete = [];
+        $filter           = $this->getBatchActionFilter($ids, $searchValue, $model);
 
         if (empty($filter)) {
             $flashes[] = ['msg' => 'mautic.core.error.ids.missing'];
@@ -75,7 +76,7 @@ final class BatchDeleteService
                         // Use isLocked callback.
                         $flashes[] = $isLocked($postActionVars, $entity, $modelName, true);
                     } else {
-                        $deleteIds[] = $entity->getId();
+                        $entitiesToDelete[] = $entity;
                     }
                 }
                 // Clear the chunk from memory after each iteration.
@@ -84,14 +85,30 @@ final class BatchDeleteService
         }
 
         // Delete everything we are able to
-        if (!empty($deleteIds)) {
-            $entities  = $model->deleteEntities($deleteIds);
-            $flashes[] = [
-                'msg'     => $this->getTranslationKey($modelName, 'notice.batch_deleted'),
-                'msgVars' => [
-                    '%count%' => count($entities),
-                ],
-            ];
+        if (!empty($entitiesToDelete)) {
+            $deletedEntities = [];
+            foreach ($entitiesToDelete as $entity) {
+                try {
+                    $model->deleteEntity($entity);
+                    $deletedEntities[] = $entity;
+                } catch (DeleteEntityDependencyException $exception) {
+                    foreach ($exception->getErrors() as $error) {
+                        $flashes[] = [
+                            'type' => 'error',
+                            'msg'  => $error,
+                        ];
+                    }
+                }
+            }
+
+            if ([] !== $deletedEntities) {
+                $flashes[] = [
+                    'msg'     => $this->getTranslationKey($modelName, 'notice.batch_deleted'),
+                    'msgVars' => [
+                        '%count%' => count($deletedEntities),
+                    ],
+                ];
+            }
         }
 
         return $flashes;

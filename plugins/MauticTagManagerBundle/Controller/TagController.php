@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Model\TagModel;
+use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
@@ -30,7 +30,7 @@ class TagController extends FormController
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
         $model = $this->getModel('tagmanager.tag');
-        \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
+        \assert($model instanceof TagModel);
         $session = $request->getSession();
 
         // set some permissions
@@ -145,7 +145,7 @@ class TagController extends FormController
         // retrieve the entity
         $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
         $model = $this->getModel('tagmanager.tag');
-        \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
+        \assert($model instanceof TagModel);
         // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
         // set the return URL for post actions
@@ -530,7 +530,7 @@ class TagController extends FormController
     /**
      * Deletes a group of entities.
      */
-    public function batchDeleteAction(Request $request, TagModel $model): Response
+    public function batchDeleteAction(Request $request): Response
     {
         $page      = $request->getSession()->get('mautic.tagmanager.page', 1);
         $returnUrl = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
@@ -547,9 +547,9 @@ class TagController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            $model           = $this->getModel('tagmanager.tag');
-            \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
-            $flashes         = $this->batchDeleteService->batchDelete(
+            $model = $this->getModel('tagmanager.tag');
+            \assert($model instanceof TagModel);
+            $flashes = $this->batchDeleteService->batchDelete(
                 $model,
                 $postActionVars,
                 $request->query->get('ids', ''),

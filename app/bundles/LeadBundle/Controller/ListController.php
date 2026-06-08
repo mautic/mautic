@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -572,9 +571,7 @@ class ListController extends FormController
         ];
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            /** @var ListModel $model */
-            $model           = $this->getModel('lead.list');
-            $flashes         = $this->batchDeleteService->batchDelete(
+            $flashes = $this->batchDeleteService->batchDelete(
                 $model,
                 $postActionVars,
                 $request->query->get('ids', ''),
