@@ -476,7 +476,6 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $contactA = $this->createContact(self::CONTACT_A_EMAIL);
         $contactB = $this->createContact(self::CONTACT_B_EMAIL);
-        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
 
         $companyName = 'Doe Corp';
         $company     = new Company();

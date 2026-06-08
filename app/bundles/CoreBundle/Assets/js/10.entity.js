@@ -349,7 +349,7 @@ Mautic.executeBatchAction = function (action, el) {
     }
     const items = Mautic.getSelectedIds(el, true);
 
-    const queryGlue = action.indexOf('?') >= 0 ? '&' : '?';
+    const queryGlue = action.includes('?') ? '&' : '?';
     // Append the items to the action to send with the POST
     const actionWithItems = action + queryGlue + 'ids=' + items;
 
