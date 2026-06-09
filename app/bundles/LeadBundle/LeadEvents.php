@@ -650,45 +650,6 @@ final class LeadEvents
      */
     public const COMPANY_POST_MERGE = 'mautic.company_post_merge';
 
-    /**
-     * The mautic.company_segment_pre_save event is dispatched right before a company segment is persisted.
-     *
-     * The event listener receives a
-     * Mautic\LeadBundle\Event\CompanySegmentPreSave instance.
-     *
-     * @var string
-     */
-    public const COMPANY_SEGMENT_PRE_SAVE = 'mautic.company_segment_pre_save';
-
-    /**
-     * The mautic.company_segment_post_save event is dispatched right after a company segment is persisted.
-     *
-     * The event listener receives a
-     * Mautic\LeadBundle\Event\CompanySegmentPostSave instance.
-     *
-     * @var string
-     */
-    public const COMPANY_SEGMENT_POST_SAVE = 'mautic.company_segment_post_save';
-
-    /**
-     * The mautic.company_segment_pre_delete event is dispatched right before a company segment is removed.
-     *
-     * The event listener receives a
-     * Mautic\LeadBundle\Event\CompanySegmentPreDelete instance.
-     *
-     * @var string
-     */
-    public const COMPANY_SEGMENT_PRE_DELETE = 'mautic.company_segment_pre_delete';
-
-    /**
-     * The mautic.company_segment_post_delete event is dispatched right after a company segment is removed.
-     *
-     * The event listener receives a
-     * Mautic\LeadBundle\Event\CompanySegmentPostDelete instance.
-     *
-     * @var string
-     */
-    public const COMPANY_SEGMENT_POST_DELETE = 'mautic.company_segment_post_delete';
 
     /**
      * The mautic.company_segment_change event is dispatched when a company is added to or removed from a company segment.

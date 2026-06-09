@@ -171,15 +171,6 @@ class CompanySegmentModel extends FormModel
             throw new MethodNotAllowedHttpException(['CompanySegment'], 'Entity must be of class CompanySegment()');
         }
 
-        $eventName = match ($action) {
-            'pre_save'      => LeadEvents::COMPANY_SEGMENT_PRE_SAVE,
-            'post_save'     => LeadEvents::COMPANY_SEGMENT_POST_SAVE,
-            'pre_delete'    => LeadEvents::COMPANY_SEGMENT_PRE_DELETE,
-            'post_delete'   => LeadEvents::COMPANY_SEGMENT_POST_DELETE,
-            'pre_unpublish' => LeadEvents::COMPANY_SEGMENT_PRE_UNPUBLISH,
-            default         => null,
-        };
-
         $eventClass = match ($action) {
             'pre_save'      => CompanySegmentPreSave::class,
             'post_save'     => CompanySegmentPostSave::class,
@@ -193,19 +184,19 @@ class CompanySegmentModel extends FormModel
             throw new \RuntimeException('Either the Event or proper action should be provided.');
         }
 
-        if ($this->dispatcher->hasListeners($eventName ?? $event::class)) {
+        if ($this->dispatcher->hasListeners($eventClass ?? $event::class)) {
             if (null === $event) {
                 if (!class_exists($eventClass)) {
                     throw new \RuntimeException('The class '.$eventClass.' does not exist.');
                 }
 
                 if (in_array($eventClass, [CompanySegmentPreSave::class, CompanySegmentPostSave::class], true)) {
-                    $event = new $eventClass($entity, $this->em, $isNew);
+                    $event = new $eventClass($entity, $isNew);
                 } else {
-                    $event = new $eventClass($entity, $this->em);
+                    $event = new $eventClass($entity);
                 }
             }
-            $this->dispatcher->dispatch($event, $eventName);
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }

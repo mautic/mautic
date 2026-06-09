@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -21,7 +20,7 @@ final class CompanySegmentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            LeadEvents::COMPANY_SEGMENT_PRE_DELETE => ['onCompanySegmentPreDelete', 0],
+            CompanySegmentPreDelete::class => ['onCompanySegmentPreDelete', 0],
         ];
     }
 

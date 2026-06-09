@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\CompanySegmentRepository;
@@ -13,7 +12,6 @@ use Mautic\LeadBundle\Event\CompanySegmentPostDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPostSave;
 use Mautic\LeadBundle\Event\CompanySegmentPreDelete;
 use Mautic\LeadBundle\Event\CompanySegmentPreSave;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Tests\Fixtures\CompanySegmentModelStub;
 use PHPUnit\Framework\TestCase;
@@ -122,8 +120,8 @@ class CompanySegmentModelTest extends TestCase
         $model->testDispatchEvent('any', $this->createMock(FormEntity::class));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideActionAndEventName')]
-    public function testDoesNotHaveAnEvent(string $action, string $eventName): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideActionAndEventClass')]
+    public function testDoesNotHaveAnEvent(string $action, string $eventClass): void
     {
         $model = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
@@ -134,7 +132,7 @@ class CompanySegmentModelTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects(self::once())
             ->method('hasListeners')
-            ->with($eventName)
+            ->with($eventClass)
             ->willReturn(false);
 
         $model->setDispatcher($dispatcher);
@@ -142,31 +140,31 @@ class CompanySegmentModelTest extends TestCase
         self::assertNull($result);
     }
 
-    public static function provideActionAndEventName(): \Generator
+    public static function provideActionAndEventClass(): \Generator
     {
         yield 'pre save' => [
             'pre_save',
-            LeadEvents::COMPANY_SEGMENT_PRE_SAVE,
+            CompanySegmentPreSave::class,
         ];
 
         yield 'post save' => [
             'post_save',
-            LeadEvents::COMPANY_SEGMENT_POST_SAVE,
+            CompanySegmentPostSave::class,
         ];
 
         yield 'pre delete' => [
             'pre_delete',
-            LeadEvents::COMPANY_SEGMENT_PRE_DELETE,
+            CompanySegmentPreDelete::class,
         ];
 
         yield 'post delete' => [
             'post_delete',
-            LeadEvents::COMPANY_SEGMENT_POST_DELETE,
+            CompanySegmentPostDelete::class,
         ];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideExistingEvents')]
-    public function testEventsCallsEventFromAction(string $action, string $eventName, string $eventClass, ?bool $isNew, ?bool $expectedIsNew): void
+    public function testEventsCallsEventFromAction(string $action, string $eventClass, ?bool $isNew, ?bool $expectedIsNew): void
     {
         $model = $this->getMockBuilder(CompanySegmentModelStub::class)
             ->disableOriginalConstructor()
@@ -174,16 +172,14 @@ class CompanySegmentModelTest extends TestCase
             ->onlyMethods([])
             ->getMock();
 
-        $em = $this->createMock(EntityManagerInterface::class);
-
         $companySegment = $this->createMock(CompanySegment::class);
 
         if (null !== $isNew) {
-            $providedEvent = new $eventClass($companySegment, $em, $isNew);
-            $expectedEvent = new $eventClass($companySegment, $em, $expectedIsNew);
+            $providedEvent = new $eventClass($companySegment, $isNew);
+            $expectedEvent = new $eventClass($companySegment, $expectedIsNew);
         } else {
-            $providedEvent = new $eventClass($companySegment, $em);
-            $expectedEvent = new $eventClass($companySegment, $em);
+            $providedEvent = new $eventClass($companySegment);
+            $expectedEvent = new $eventClass($companySegment);
             $isNew         = false; // To prevent type error. The class is anyway tested.
         }
 
@@ -197,25 +193,23 @@ class CompanySegmentModelTest extends TestCase
             ->willReturnArgument(0);
         $dispatcher->expects(self::once())
             ->method('hasListeners')
-            ->with($eventName)
+            ->with($eventClass)
             ->willReturn(true);
 
         $model->setDispatcher($dispatcher);
-        $model->setEntityManger($em);
         $returnedEvent = $model->testDispatchEvent($action, $companySegment, $isNew, null);
         self::assertEquals($expectedEvent, $returnedEvent);
         self::assertSame($companySegment, $providedEvent->getCompanySegment());
-        self::assertSame($em, $providedEvent->getEntityManager());
     }
 
     public static function provideExistingEvents(): \Generator
     {
-        yield 'pre_save_is_new' => ['pre_save', LeadEvents::COMPANY_SEGMENT_PRE_SAVE, CompanySegmentPreSave::class, true, true];
-        yield 'pre_save_not_new' => ['pre_save', LeadEvents::COMPANY_SEGMENT_PRE_SAVE, CompanySegmentPreSave::class, false, false];
-        yield 'post_save_is_new' => ['post_save', LeadEvents::COMPANY_SEGMENT_POST_SAVE, CompanySegmentPostSave::class, true, true];
-        yield 'post_save_not_new' => ['post_save', LeadEvents::COMPANY_SEGMENT_POST_SAVE, CompanySegmentPostSave::class, false, false];
-        yield 'pre_delete' => ['pre_delete', LeadEvents::COMPANY_SEGMENT_PRE_DELETE, CompanySegmentPreDelete::class, null, null];
-        yield 'post_delete' => ['post_delete', LeadEvents::COMPANY_SEGMENT_POST_DELETE, CompanySegmentPostDelete::class, null, null];
+        yield 'pre_save_is_new' => ['pre_save', CompanySegmentPreSave::class, true, true];
+        yield 'pre_save_not_new' => ['pre_save', CompanySegmentPreSave::class, false, false];
+        yield 'post_save_is_new' => ['post_save', CompanySegmentPostSave::class, true, true];
+        yield 'post_save_not_new' => ['post_save', CompanySegmentPostSave::class, false, false];
+        yield 'pre_delete' => ['pre_delete', CompanySegmentPreDelete::class, null, null];
+        yield 'post_delete' => ['post_delete', CompanySegmentPostDelete::class, null, null];
     }
 
     public function testEventsCallsEventNotProvidedAndClassDoesNotExist(): void
@@ -226,8 +220,6 @@ class CompanySegmentModelTest extends TestCase
             ->disableOriginalClone()
             ->onlyMethods([])
             ->getMock();
-
-        $em = $this->createMock(EntityManagerInterface::class);
 
         $companySegment = $this->createMock(CompanySegment::class);
 
@@ -241,7 +233,6 @@ class CompanySegmentModelTest extends TestCase
         $this->expectExceptionMessage('Either the Event or proper action should be provided.');
 
         $model->setDispatcher($dispatcher);
-        $model->setEntityManger($em);
         $model->testDispatchEvent($action, $companySegment, true, null);
         self::fail('After exception.');
     }
@@ -254,8 +245,6 @@ class CompanySegmentModelTest extends TestCase
             ->disableOriginalClone()
             ->onlyMethods([])
             ->getMock();
-
-        $em = $this->createMock(EntityManagerInterface::class);
 
         $companySegment = $this->createMock(CompanySegment::class);
         $providedEvent  = $this->createMock(CompanySegmentEvent::class);
@@ -271,7 +260,6 @@ class CompanySegmentModelTest extends TestCase
             ->willReturn(true);
 
         $model->setDispatcher($dispatcher);
-        $model->setEntityManger($em);
         $returnedEvent = $model->testDispatchEvent($action, $companySegment, true, $providedEvent);
         self::assertSame($providedEvent, $returnedEvent);
     }
