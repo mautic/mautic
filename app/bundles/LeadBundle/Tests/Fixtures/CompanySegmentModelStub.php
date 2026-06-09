@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Fixtures;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -20,10 +19,5 @@ class CompanySegmentModelStub extends CompanySegmentModel
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
-    }
-
-    public function setEntityManger(EntityManagerInterface $em): void
-    {
-        $this->em = $em;
     }
 }
