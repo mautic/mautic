@@ -15,6 +15,8 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
 
+    private const API_ENDPOINT = '/api/companysegments';
+
     protected function setUp(): void
     {
         $this->useCleanupRollback = false;
@@ -25,7 +27,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
     {
         $this->createCompanySegment('Segment test', 'segment-test', true);
         $this->createCompanySegment('Segment test 2', 'segment-test-2', true);
-        $this->client->request(Request::METHOD_GET, '/api/companysegments');
+        $this->client->request(Request::METHOD_GET, self::API_ENDPOINT);
         $response = $this->client->getResponse();
         self::assertNotFalse($response->getContent());
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -38,7 +40,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
     public function testGetCompanySegment(): void
     {
         $companySegment = $this->createCompanySegment('Segment test', 'segment-test', true);
-        $this->client->request(Request::METHOD_GET, '/api/companysegments/'.$companySegment->getId());
+        $this->client->request(Request::METHOD_GET, self::API_ENDPOINT.'/'.$companySegment->getId());
         $response = $this->client->getResponse();
         self::assertNotFalse($response->getContent());
         self::assertSame(Response::HTTP_OK, $response->getStatusCode());
@@ -56,7 +58,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
             'alias'       => 'segment-test-a',
             'isPublished' => '1',
         ];
-        $this->client->request(Request::METHOD_POST, '/api/companysegments/new', $data);
+        $this->client->request(Request::METHOD_POST, self::API_ENDPOINT.'/new', $data);
         self::assertSame(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
@@ -77,7 +79,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
             'alias'       => 'segment-test-a',
             'isPublished' => '1',
         ];
-        $this->client->request(Request::METHOD_PATCH, '/api/companysegments/'.$companySegment->getId().'/edit', $data);
+        $this->client->request(Request::METHOD_PATCH, self::API_ENDPOINT.'/'.$companySegment->getId().'/edit', $data);
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
@@ -96,7 +98,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
     {
         $companySegment = $this->createCompanySegment('Segment test', 'segment-test', true);
         $tempId         = $companySegment->getId();
-        $this->client->request(Request::METHOD_DELETE, '/api/companysegments/'.$companySegment->getId().'/delete');
+        $this->client->request(Request::METHOD_DELETE, self::API_ENDPOINT.'/'.$companySegment->getId().'/delete');
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $companySegment = $this->em->getRepository(CompanySegment::class)->find($tempId);
         self::assertNull($companySegment);
@@ -116,7 +118,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
                 'isPublished' => '1',
             ],
         ];
-        $this->client->request(Request::METHOD_POST, '/api/companysegments/batch/new', $data);
+        $this->client->request(Request::METHOD_POST, self::API_ENDPOINT.'/batch/new', $data);
         self::assertSame(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
@@ -143,7 +145,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
                 'isPublished' => '1',
             ],
         ];
-        $this->client->request(Request::METHOD_POST, '/api/companysegments/batch/new', $data);
+        $this->client->request(Request::METHOD_POST, self::API_ENDPOINT.'/batch/new', $data);
         self::assertSame(Response::HTTP_CREATED, $this->client->getResponse()->getStatusCode());
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
@@ -177,7 +179,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
                 'isPublished' => '0',
             ],
         ];
-        $this->client->request(Request::METHOD_PATCH, '/api/companysegments/batch/edit', $data);
+        $this->client->request(Request::METHOD_PATCH, self::API_ENDPOINT.'/batch/edit', $data);
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
@@ -201,7 +203,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/companysegments/'.$companySegment->getId().'/company/'.$company->getId().'/add'
+            self::API_ENDPOINT.'/'.$companySegment->getId().'/company/'.$company->getId().'/add'
         );
 
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -230,7 +232,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/companysegments/'.$companySegment->getId().'/company/'.$company->getId().'/remove'
+            self::API_ENDPOINT.'/'.$companySegment->getId().'/company/'.$company->getId().'/remove'
         );
 
         self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
@@ -262,7 +264,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/companysegments/'.$companySegment->getId().'/companies/add',
+            self::API_ENDPOINT.'/'.$companySegment->getId().'/companies/add',
             $data
         );
 
@@ -306,7 +308,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/companysegments/'.$companySegment->getId().'/companies/add',
+            self::API_ENDPOINT.'/'.$companySegment->getId().'/companies/add',
             $data
         );
 
@@ -333,7 +335,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/companysegments/'.$companySegment->getId().'/company/'.$company->getId().'/add'
+            self::API_ENDPOINT.'/'.$companySegment->getId().'/company/'.$company->getId().'/add'
         );
 
         // Should get 403 because user doesn't have permission to edit the company
@@ -355,7 +357,7 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/companysegments/'.$companySegment->getId().'/company/'.$company->getId().'/remove'
+            self::API_ENDPOINT.'/'.$companySegment->getId().'/company/'.$company->getId().'/remove'
         );
 
         // Should get 403 because user doesn't have permission to edit the company

@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CompanySegmentController extends AbstractStandardFormController
 {
     public const SESSION_KEY = 'company_segments';
+    private const PERMISSION_EDIT_OTHER = ':editother';
 
     public function indexAction(CompanySegmentModel $model, Request $request, int $page = 1): Response
     {
@@ -25,7 +26,7 @@ class CompanySegmentController extends AbstractStandardFormController
                 'lead:leads:viewown',
                 'lead:leads:viewother',
                 $this->getPermissionBase().':viewother',
-                $this->getPermissionBase().':editother',
+                $this->getPermissionBase().self::PERMISSION_EDIT_OTHER,
                 $this->getPermissionBase().':deleteother',
             ],
             'RETURN_ARRAY'
@@ -234,7 +235,7 @@ class CompanySegmentController extends AbstractStandardFormController
         }
 
         if (!$this->security->hasEntityAccess(
-            true, $this->getPermissionBase().':editother', $segment->getCreatedBy()
+            true, $this->getPermissionBase().self::PERMISSION_EDIT_OTHER, $segment->getCreatedBy()
         )) {
             return $this->accessDenied();
         }
@@ -396,7 +397,7 @@ class CompanySegmentController extends AbstractStandardFormController
                 'permissions'  => $security->isGranted([
                     'lead:leads:editown',
                     $this->getPermissionBase().':viewother',
-                    $this->getPermissionBase().':editother',
+                    $this->getPermissionBase().self::PERMISSION_EDIT_OTHER,
                     $this->getPermissionBase().':deleteother',
                 ], 'RETURN_ARRAY'),
                 'security'        => $security,
@@ -639,7 +640,7 @@ class CompanySegmentController extends AbstractStandardFormController
         }
 
         if (!$this->security->hasEntityAccess(
-            true, $this->getPermissionBase().':editother', $segment->getCreatedBy()
+            true, $this->getPermissionBase().self::PERMISSION_EDIT_OTHER, $segment->getCreatedBy()
         )) {
             return $this->accessDenied();
         }
