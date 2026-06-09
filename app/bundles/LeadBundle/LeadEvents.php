@@ -650,7 +650,6 @@ final class LeadEvents
      */
     public const COMPANY_POST_MERGE = 'mautic.company_post_merge';
 
-
     /**
      * The mautic.company_segment_change event is dispatched when a company is added to or removed from a company segment.
      *

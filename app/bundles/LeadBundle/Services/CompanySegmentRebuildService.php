@@ -28,7 +28,7 @@ class CompanySegmentRebuildService
         int $batch,
         ?int $max,
         OutputInterface $output,
-        bool $enableTimeMeasurement = false
+        bool $enableTimeMeasurement = false,
     ): int {
         if (!$companySegment->isPublished()) {
             return 0;

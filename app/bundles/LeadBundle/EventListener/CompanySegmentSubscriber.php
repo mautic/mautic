@@ -40,7 +40,7 @@ final class CompanySegmentSubscriber implements EventSubscriberInterface
                 'mautic.company_segments.is_in_use.delete',
                 [
                     '%segments%'            => implode(', ', $dependentCompanySegments),
-                    '%companySegmentName%' => $companySegment->getName(),
+                    '%companySegmentName%'  => $companySegment->getName(),
                 ],
                 'validators'
             );
@@ -54,7 +54,7 @@ final class CompanySegmentSubscriber implements EventSubscriberInterface
                 'mautic.company_segments.is_in_use.delete_contact_segments',
                 [
                     '%segments%'            => implode(', ', $dependentContactSegments),
-                    '%companySegmentName%' => $companySegment->getName(),
+                    '%companySegmentName%'  => $companySegment->getName(),
                 ],
                 'validators'
             );

@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -22,17 +23,16 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Validator\Constraints\UniqueCompanySegmentAlias;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Doctrine\DBAL\Types\Types;
 
 #[ApiResource(
     shortName: 'CompanySegments',
     operations: [
         new GetCollection(uriTemplate: '/companysegments', security: "is_granted('lead:lists:viewown')"),
         new Post(uriTemplate: '/companysegments', security: "is_granted('lead:lists:create')"),
-        new Get(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:viewown')"),
-        new Put(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:editown')"),
-        new Patch(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:editother')"),
-        new Delete(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:deleteown')"),
+        new Get(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:viewown', object)"),
+        new Put(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:editown', object)"),
+        new Patch(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:editother', object)"),
+        new Delete(uriTemplate: '/companysegments/{id}', security: "is_granted('lead:lists:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['companysegment:read'],

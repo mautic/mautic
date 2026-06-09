@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompanySegmentController extends AbstractStandardFormController
 {
-    public const SESSION_KEY = 'company_segments';
+    public const SESSION_KEY            = 'company_segments';
     private const PERMISSION_EDIT_OTHER = ':editother';
 
     public function indexAction(CompanySegmentModel $model, Request $request, int $page = 1): Response
@@ -538,7 +538,6 @@ class CompanySegmentController extends AbstractStandardFormController
         ];
 
         if ('POST' === $request->getMethod()) {
-
             $json = $request->query->get('ids', '{}');
             \assert(is_string($json));
             $ids = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
