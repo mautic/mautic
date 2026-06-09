@@ -25,7 +25,6 @@
     .mauticform-slider { margin: 0; padding: 0; }
     .mauticform-slider-value { float: right; font-size: 0.875em; min-block-size: 1.145em; margin-top: .25em; }
 
-    /* Make fields display inline when using width classes */
     .mauticform-page-wrapper {
         display: flex;
         flex-wrap: wrap;
@@ -33,20 +32,25 @@
         margin: 0 -10px;
     }
 
-    /* Ensure field containers respect width classes */
     .mauticform-row {
         box-sizing: border-box;
         padding: 0 10px;
         margin-bottom: 15px;
     }
 
-    /* Responsive adjustment for mobile */
+    .mauticform-100 { width: 100%; }
+    .mauticform-75 { width: 75%; }
+    .mauticform-66 { width: 66.66%; }
+    .mauticform-50 { width: 50%; }
+    .mauticform-33 { width: 33.33%; }
+    .mauticform-25 { width: 25%; }
+
     @media (max-width: 767px) {
-        .mauticform-three-quarters-width,
-        .mauticform-two-thirds-width,
-        .mauticform-half-width,
-        .mauticform-one-third-width,
-        .mauticform-one-quarter-width {
+        .mauticform-75,
+        .mauticform-66,
+        .mauticform-50,
+        .mauticform-33,
+        .mauticform-25 {
             width: 100%;
         }
     }
