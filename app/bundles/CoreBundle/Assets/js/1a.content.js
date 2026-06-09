@@ -1957,7 +1957,7 @@ Mautic.getSelectedPopoverFilters = function () {
         return [];
     }
 
-    const serializedFilters = searchInput.getAttribute('data-filters');
+    const serializedFilters = searchInput.dataset.filters;
     if (!serializedFilters) {
         return [];
     }
@@ -1966,7 +1966,7 @@ Mautic.getSelectedPopoverFilters = function () {
         const filters = JSON.parse(serializedFilters);
 
         return Array.isArray(filters) ? filters : [];
-    } catch (error) {
+    } catch {
         return [];
     }
 };
