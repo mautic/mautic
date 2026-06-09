@@ -17,6 +17,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
+    private const SEGMENTS_ROUTE = '/s/segments';
+
     /**
      * @var User
      */
@@ -86,7 +88,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->loginOtherUser($this->userOne->getUserIdentifier());
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/segments');
+        $crawler = $this->client->request(Request::METHOD_GET, self::SEGMENTS_ROUTE);
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $this->assertCount(1, $crawler->filterXPath('//a[contains(@href,"/s/segments/new")]'), 'Listing page has the New button');
@@ -96,7 +98,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->loginOtherUser($this->nonAdminUser->getUserIdentifier());
 
-        $this->client->request(Request::METHOD_GET, '/s/segments');
+        $this->client->request(Request::METHOD_GET, self::SEGMENTS_ROUTE);
         $this->assertEquals(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
     }
 
@@ -130,7 +132,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(
             Request::METHOD_GET,
-            '/s/segments',
+            self::SEGMENTS_ROUTE,
             [
                 'search'  => 'category:os',
                 'filters' => json_encode(['category:os']),
