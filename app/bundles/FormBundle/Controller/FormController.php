@@ -822,7 +822,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedActions,
-                    fn ($a, $b): int => $a['order'] <=> $b['order'] ?: $a['id'] <=> $b['id']
+                    fn ($a, $b): int => $a['order'] <=> $b['order']
                 );
             }
 
