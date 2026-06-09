@@ -5,12 +5,136 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    /**
+     * @see https://github.com/mautic/mautic/issues/11558
+     */
+    public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
+    {
+        /** @var FormModel $formModel */
+        $formModel = static::getContainer()->get('mautic.form.model.form');
+
+        $parentKey     = 'mautic_parent';
+        $sessionFields = [
+            $parentKey => [
+                'id'         => $parentKey,
+                'label'      => 'Yes or No',
+                'alias'      => 'yes_no',
+                'type'       => 'select',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'properties' => [
+                    'list' => [
+                        'list' => [
+                            ['label' => 'Yes', 'value' => 'yes'],
+                            ['label' => 'No', 'value' => 'no'],
+                        ],
+                    ],
+                ],
+            ],
+            'child_a' => [
+                'id'         => 'child_a',
+                'label'      => 'Question A',
+                'alias'      => 'question_a',
+                'type'       => 'text',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'parent'     => $parentKey,
+                'conditions' => [
+                    'expr'   => 'in',
+                    'any'    => 0,
+                    'values' => ['yes'],
+                ],
+            ],
+            'child_b' => [
+                'id'         => 'child_b',
+                'label'      => 'Question B',
+                'alias'      => 'question_b',
+                'type'       => 'text',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'parent'     => $parentKey,
+                'conditions' => [
+                    'expr'   => 'in',
+                    'any'    => 0,
+                    'values' => ['yes'],
+                ],
+            ],
+            'child_c' => [
+                'id'         => 'child_c',
+                'label'      => 'Question C',
+                'alias'      => 'question_c',
+                'type'       => 'text',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'parent'     => $parentKey,
+                'conditions' => [
+                    'expr'   => 'in',
+                    'any'    => 0,
+                    'values' => ['yes'],
+                ],
+            ],
+        ];
+
+        $form = new Form();
+        $form->setName('Conditional field order test');
+        $form->setAlias('cond_order_'.uniqid());
+        $form->setIsPublished(false);
+
+        $formModel->setFields($form, $sessionFields);
+        $formModel->saveEntity($form);
+
+        $formId = $form->getId();
+        $this->em->clear();
+
+        $reloaded = $formModel->getEntity($formId);
+        self::assertNotNull($reloaded);
+        self::assertSame(['Question A', 'Question B', 'Question C'], $this->getConditionalChildLabels($reloaded));
+
+        $resaveSessionFields = [];
+        foreach ($reloaded->getFields() as $field) {
+            $sessionId = 'mautic_re_'.$field->getId();
+            $field->setSessionId($sessionId);
+            $fieldData = $field->convertToArray();
+            unset($fieldData['form']);
+            $fieldData['id']                 = $field->getId();
+            $resaveSessionFields[$sessionId] = $fieldData;
+        }
+
+        $formModel->setFields($reloaded, $resaveSessionFields);
+        $formModel->saveEntity($reloaded);
+        $this->em->clear();
+
+        $savedAgain = $formModel->getEntity($formId);
+        self::assertNotNull($savedAgain);
+        self::assertSame(['Question A', 'Question B', 'Question C'], $this->getConditionalChildLabels($savedAgain));
+
+        $formModel->deleteEntity($savedAgain);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getConditionalChildLabels(Form $form): array
+    {
+        $labels = [];
+
+        foreach ($form->getFields() as $field) {
+            if ($field->getParent()) {
+                $labels[] = $field->getLabel();
+            }
+        }
+
+        return $labels;
+    }
 
     public function testPopulateValuesWithGetParameters(): void
     {

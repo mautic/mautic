@@ -183,7 +183,7 @@ class Form extends FormEntity
 
         $builder->createOneToMany('fields', 'Field')
             ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
+            ->setOrderBy(['order' => 'ASC', 'id' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()

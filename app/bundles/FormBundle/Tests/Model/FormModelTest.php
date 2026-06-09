@@ -216,7 +216,62 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(4, $childField->getOrder());
         $this->assertSame('text', $newChildField->getType());
         $this->assertSame('new_child', $newChildField->getAlias());
-        $this->assertSame(4, $newChildField->getOrder());
+        $this->assertSame(5, $newChildField->getOrder());
+    }
+
+    public function testSetFieldsAssignsUniqueSequentialOrderToConditionalFields(): void
+    {
+        $parentKey = 'parent';
+        $fields    = [
+            $parentKey => [
+                'id'         => $parentKey,
+                'label'      => 'Yes or No',
+                'alias'      => 'yes_no',
+                'type'       => 'select',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'order'      => 1,
+            ],
+            'child_a' => [
+                'id'         => 'child_a',
+                'label'      => 'Question A',
+                'alias'      => 'question_a',
+                'type'       => 'text',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'parent'     => $parentKey,
+            ],
+            'child_b' => [
+                'id'         => 'child_b',
+                'label'      => 'Question B',
+                'alias'      => 'question_b',
+                'type'       => 'text',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'parent'     => $parentKey,
+            ],
+            'child_c' => [
+                'id'         => 'child_c',
+                'label'      => 'Question C',
+                'alias'      => 'question_c',
+                'type'       => 'text',
+                'showLabel'  => 1,
+                'saveResult' => 1,
+                'parent'     => $parentKey,
+            ],
+        ];
+
+        $form = new Form();
+        $this->formModel->setFields($form, $fields);
+
+        $entityFields = $form->getFields()->toArray();
+        $this->assertSame(1, $entityFields[$parentKey]->getOrder());
+        $this->assertSame(2, $entityFields['child_a']->getOrder());
+        $this->assertSame(3, $entityFields['child_b']->getOrder());
+        $this->assertSame(4, $entityFields['child_c']->getOrder());
+
+        $orders = array_map(fn (Field $field) => $field->getOrder(), $entityFields);
+        $this->assertSame(count($entityFields), count(array_unique($orders)));
     }
 
     public function testGetComponentsFields(): void
