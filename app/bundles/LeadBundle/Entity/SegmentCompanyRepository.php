@@ -10,8 +10,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<SegmentCompany>
- *
- * @see ListLeadRepository
  */
 class SegmentCompanyRepository extends CommonRepository
 {
