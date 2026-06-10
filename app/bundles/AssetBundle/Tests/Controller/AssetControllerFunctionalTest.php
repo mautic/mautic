@@ -177,7 +177,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $response   = $this->client->getResponse();
         $translator = static::getContainer()->get('translator');
 
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
@@ -201,7 +201,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $response = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('application/zip', $response->headers->get('Content-Type'));
 
         $contentDisposition = $response->headers->get('Content-Disposition');
