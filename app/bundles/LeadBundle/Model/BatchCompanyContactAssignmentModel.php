@@ -25,7 +25,7 @@ class BatchCompanyContactAssignmentModel
     }
 
     /**
-     * @param array<int, array<string, mixed>> $assignments
+     * @param non-empty-array<int, array<string, mixed>> $assignments
      *
      * @return array{results: list<array{contactId: int, companyId: int, status: int, message: string}>, summary: array{total: int, succeeded: int, failed: int}}
      */
@@ -98,6 +98,7 @@ class BatchCompanyContactAssignmentModel
 
         foreach ($companyIdsByContact as $contactId => $companyIdsForContact) {
             $contact = $contactsById[$contactId];
+            sort($companyIdsForContact);
 
             try {
                 $this->companyModel->addLeadToCompany($companyIdsForContact, $contact);

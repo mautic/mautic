@@ -52,7 +52,7 @@ class CompanyApiController extends CommonApiController
         MauticFactory $factory,
         private BatchCompanyContactAssignmentModel $batchCompanyContactAssignmentModel,
     ) {
-        $companyModel = $modelFactory->getModel('lead.company');
+        $companyModel = $modelFactory->getModel(CompanyModel::class);
         \assert($companyModel instanceof CompanyModel);
 
         $this->model              = $companyModel;
@@ -127,12 +127,12 @@ class CompanyApiController extends CommonApiController
         $assignments = $parameters['assignments'] ?? null;
 
         if (!is_array($assignments) || [] === $assignments) {
-            return $this->returnError('assignments is required and must be a non-empty array', Response::HTTP_BAD_REQUEST);
+            return $this->returnError('"assignments" parameter is required and must be a non-empty array', Response::HTTP_BAD_REQUEST);
         }
 
         foreach ($assignments as $entry) {
             if (!is_array($entry)) {
-                return $this->returnError('assignments is required and must be a non-empty array', Response::HTTP_BAD_REQUEST);
+                return $this->returnError('Assignments entries must be a non-empty array', Response::HTTP_BAD_REQUEST);
             }
         }
 
