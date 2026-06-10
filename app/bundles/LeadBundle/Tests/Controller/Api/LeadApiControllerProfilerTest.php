@@ -76,7 +76,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
         $counter->setValue($leadRepository, 0);
 
         $this->client->request(Request::METHOD_GET, '/api/contacts', $queryParams);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertSame($expectedCount, (int) $response['total']);

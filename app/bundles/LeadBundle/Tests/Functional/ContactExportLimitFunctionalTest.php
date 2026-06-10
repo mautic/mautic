@@ -37,7 +37,7 @@ class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         // Assert response code is 400 (Bad Request)
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         // Decode the JSON response
         $responseData = json_decode($clientResponse->getContent(), true);

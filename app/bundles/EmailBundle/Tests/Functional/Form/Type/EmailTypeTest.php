@@ -150,7 +150,7 @@ class EmailTypeTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
         Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
         Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
         Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());

@@ -629,7 +629,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $this->em->refresh($segment);
         $this->assertFalse($segment->isPublished());
