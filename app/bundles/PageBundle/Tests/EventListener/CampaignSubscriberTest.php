@@ -28,16 +28,10 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerDecisionMatchesPlainTextUrlFilter(): void
     {
-        $hit = $this->createHitMock('https://example.com/product/1234', null);
-
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent([
-            'lead'            => null,
-            'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['url' => 'product/123']],
-            'eventDetails'    => $hit,
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ], true);
+        $event = $this->createCampaignExecutionEvent(
+            $this->createHitMock('https://example.com/product/1234', null),
+            ['url' => 'product/123']
+        );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
@@ -46,16 +40,10 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerDecisionMatchesLegacyWildcardRefererFilter(): void
     {
-        $hit = $this->createHitMock('https://example.com/page', 'https://ref.example.com/source/123');
-
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent([
-            'lead'            => null,
-            'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['referer' => '*source/123*']],
-            'eventDetails'    => $hit,
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ], true);
+        $event = $this->createCampaignExecutionEvent(
+            $this->createHitMock('https://example.com/page', 'https://ref.example.com/source/123'),
+            ['referer' => '*source/123*']
+        );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
@@ -64,16 +52,10 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerDecisionReturnsFalseWhenUrlDoesNotMatch(): void
     {
-        $hit = $this->createHitMock('https://example.com/product/1234', null);
-
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent([
-            'lead'            => null,
-            'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['url' => 'does-not-match']],
-            'eventDetails'    => $hit,
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ], true);
+        $event = $this->createCampaignExecutionEvent(
+            $this->createHitMock('https://example.com/product/1234', null),
+            ['url' => 'does-not-match']
+        );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
@@ -82,16 +64,10 @@ final class CampaignSubscriberTest extends TestCase
 
     public function testOnCampaignTriggerDecisionMatchesCommaSeparatedUrlFilters(): void
     {
-        $hit = $this->createHitMock('https://example.com/product/1234', null);
-
-        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
-        $event = new CampaignExecutionEvent([
-            'lead'            => null,
-            'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => ['url' => 'alpha,product/123,omega']],
-            'eventDetails'    => $hit,
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ], true);
+        $event = $this->createCampaignExecutionEvent(
+            $this->createHitMock('https://example.com/product/1234', null),
+            ['url' => 'alpha,product/123,omega']
+        );
 
         $this->subscriber->onCampaignTriggerDecision($event);
 
@@ -106,5 +82,20 @@ final class CampaignSubscriberTest extends TestCase
         $hit->method('getPage')->willReturn(null);
 
         return $hit;
+    }
+
+    /**
+     * @param array<string, string> $properties
+     */
+    private function createCampaignExecutionEvent(Hit&MockObject $hit, array $properties): CampaignExecutionEvent
+    {
+        // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
+        return new CampaignExecutionEvent([
+            'lead'            => null,
+            'event'           => ['type' => 'page.pagehit', 'parent' => [], 'properties' => $properties],
+            'eventDetails'    => $hit,
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ], true);
     }
 }

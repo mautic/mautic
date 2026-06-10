@@ -125,28 +125,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @var array<string, string>
-     */
-    private $configUrlPageHitPlainText = [
-        'startDate'         => '',
-        'endDate'           => '',
-        'page'              => '',
-        'page_url'          => 'example.com',
-        'accumulative_time' => '',
-    ];
-
-    /**
-     * @var array<string, string>
-     */
-    private $configUrlPageHitLegacyWildcard = [
-        'startDate'         => '',
-        'endDate'           => '',
-        'page'              => '',
-        'page_url'          => '*example.com*',
-        'accumulative_time' => '',
-    ];
-
-    /**
      * @var LeadModel|MockObject
      */
     private $mockLeadModel;
@@ -434,55 +412,36 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->getResult());
     }
 
-    public function testOnCampaignTriggerConditionLeadPageUrlHitWithPlainTextFilter(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function pageUrlFilterProvider(): iterable
+    {
+        yield 'plain text substring' => ['example.com'];
+        yield 'legacy wildcard'      => ['*example.com*'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('pageUrlFilterProvider')]
+    public function testOnCampaignTriggerConditionLeadPageUrlHitMatchesUrlFilter(string $pageUrlFilter): void
     {
         $lead = new Lead();
         $lead->setId(99);
-        $leadTimeline = [
-            0 => [
-                'events' => [
-                    0 => [
-                        'event'     => 'page.hit',
-                        'eventId'   => '5',
-                        'eventType' => 'Page hit',
-                        'timestamp' => new \DateTime('2022-06-08 12:45:22.0'),
-                        'contactId' => '1',
-                        'details'   => [
-                            'hit' => [
-                                'hitId'    => '5',
-                                'page_id'  => '',
-                                'dateHit'  => new \DateTime('2022-06-08 12:45:22.0'),
-                                'dateLeft' => new \DateTime('2022-06-08 12:50:42.0'),
-                                'url'      => 'https://example.com/hello',
-                            ],
-                        ],
-                    ],
-                ],
-            ], ];
 
-        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
+        $this->mockLeadModel->expects($this->once())
+            ->method('getEngagements')
+            ->willReturn($this->createPageHitTimeline('https://example.com/hello'));
 
-        $args = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.pageHit',
-                'properties' => $this->configUrlPageHitPlainText,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-
-        $event = new CampaignExecutionEvent($args, true);
+        $event = new CampaignExecutionEvent($this->createPageHitEventArgs($lead, $pageUrlFilter), true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
     }
 
-    public function testOnCampaignTriggerConditionLeadPageUrlHitWithLegacyWildcardFilter(): void
+    /**
+     * @return array<int, array<string, array<int, array<string, mixed>>>>
+     */
+    private function createPageHitTimeline(string $url): array
     {
-        $lead = new Lead();
-        $lead->setId(99);
-        $leadTimeline = [
+        return [
             0 => [
                 'events' => [
                     0 => [
@@ -497,29 +456,36 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                                 'page_id'  => '',
                                 'dateHit'  => new \DateTime('2022-06-08 12:45:22.0'),
                                 'dateLeft' => new \DateTime('2022-06-08 12:50:42.0'),
-                                'url'      => 'https://example.com/hello',
+                                'url'      => $url,
                             ],
                         ],
                     ],
                 ],
-            ], ];
+            ],
+        ];
+    }
 
-        $this->mockLeadModel->expects($this->once())->method('getEngagements')->willReturn($leadTimeline);
-
-        $args = [
+    /**
+     * @return array<string, mixed>
+     */
+    private function createPageHitEventArgs(Lead $lead, string $pageUrlFilter): array
+    {
+        return [
             'lead'  => $lead,
             'event' => [
                 'type'       => 'lead.pageHit',
-                'properties' => $this->configUrlPageHitLegacyWildcard,
+                'properties' => [
+                    'startDate'         => '',
+                    'endDate'           => '',
+                    'page'              => '',
+                    'page_url'          => $pageUrlFilter,
+                    'accumulative_time' => '',
+                ],
             ],
             'eventDetails'    => [],
             'systemTriggered' => true,
             'eventSettings'   => [],
         ];
-
-        $event = new CampaignExecutionEvent($args, true);
-        $this->subscriber->onCampaignTriggerCondition($event);
-        $this->assertTrue($event->getResult());
     }
 
     public function testOnCampaignTriggerActionUpdateLead(): void
