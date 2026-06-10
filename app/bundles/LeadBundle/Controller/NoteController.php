@@ -19,7 +19,7 @@ class NoteController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, NoteModel $model, $leadId = 0, $page = 1)
+    public function indexAction(Request $request, NoteModel $model, int $leadId = 0, int $page = 1)
     {
         if (empty($leadId)) {
             return $this->accessDenied();
