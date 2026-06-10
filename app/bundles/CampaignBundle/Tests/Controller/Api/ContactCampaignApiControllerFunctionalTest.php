@@ -26,7 +26,7 @@ class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCas
         // Add the contact to the campaign.
         $this->client->request(Request::METHOD_POST, "/api/campaigns/{$campaign->getId()}/contact/{$contact->getId()}/add");
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('{"success":1}', $clientResponse->getContent());
 
         // Assert that the campaign member was really added.
@@ -39,7 +39,7 @@ class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCas
         // Get the contact's campaigns.
         $this->client->request(Request::METHOD_GET, "/api/contacts/{$contact->getId()}/campaigns");
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         $body = json_decode($clientResponse->getContent(), true);
         Assert::assertSame(1, $body['total'], $clientResponse->getContent());
         Assert::assertSame($campaign->getId(), $body['campaigns'][$campaign->getId()]['id'], $clientResponse->getContent());
@@ -51,7 +51,7 @@ class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCas
         // Get campaign contacts API endpoint.
         $this->client->request(Request::METHOD_GET, "/api/campaigns/{$campaign->getId()}/contacts");
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         $body = json_decode($clientResponse->getContent(), true);
         Assert::assertSame(3, (int) $body['total']);
         Assert::assertSame($contact->getId(), (int) $body['contacts'][2]['lead_id']);
@@ -59,7 +59,7 @@ class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCas
         // Remove the contact from the campaign.
         $this->client->request(Request::METHOD_POST, "/api/campaigns/{$campaign->getId()}/contact/{$contact->getId()}/remove");
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('{"success":1}', $clientResponse->getContent());
 
         // Assert that the campaign member was really removed.

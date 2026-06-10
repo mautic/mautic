@@ -78,7 +78,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $parameters = self::getContainer()->get('mautic.helper.core_parameters');
 
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendTestEmail');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $this->assertQueuedEmailCount(0, message: 'Test emails should never be queued.');
         $this->assertEmailCount(1);
@@ -126,7 +126,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$email->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame([
             'success'         => 1,
             'delivered'       => 1,
@@ -181,7 +181,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$emailEn->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame([
             'success'         => 1,
             'delivered'       => 1,
@@ -224,7 +224,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $content = json_decode($response->getContent(), true);
         $this->assertSame('Test html', $content['content']);
         $this->assertSame([
@@ -280,7 +280,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertNotEmpty($response);
         $this->assertEquals($emailName.' ('.$email->getId().')', $response[0]['items'][$email->getId()]);
     }
@@ -288,7 +288,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testGetBuilderTokensAction(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getBuilderTokens');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $response = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertArrayHasKey('tokens', $response);
         Assert::assertArrayHasKey('{contactfield=email}', $response['tokens']);

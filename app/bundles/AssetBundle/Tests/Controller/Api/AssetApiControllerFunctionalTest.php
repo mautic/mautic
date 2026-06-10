@@ -93,10 +93,10 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $content        = $clientResponse->getContent();
 
         if ($isAllowed) {
-            $this->assertSame(201, $clientResponse->getStatusCode(), $content);
+            $this->assertResponseStatusCodeSame(201, $content);
             $this->assertStringNotContainsString($message, $content);
         } else {
-            $this->assertSame(400, $clientResponse->getStatusCode(), $content);
+            $this->assertResponseStatusCodeSame(400, $content);
             $this->assertStringContainsString($message, $content);
         }
     }

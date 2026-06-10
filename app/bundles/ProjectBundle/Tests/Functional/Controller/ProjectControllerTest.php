@@ -123,7 +123,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $crawler                = $this->client->request('GET', '/s/projects/edit/'.$project->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Edit project: '.$project->getName(), $clientResponseContent, 'The return must contain \'Edit project\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
