@@ -353,6 +353,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $exprFunction = $filter['expr'] ?? $filter['condition'];
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
+                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' == trim((string) $filter['value'])) {
+                    // Ignore empty values before applying glue so they do not create empty OR groups.
+                    continue;
+                }
+
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
                     if ($andGroup) {
                         $orGroups[] = CompositeExpression::and(...$andGroup);
@@ -401,11 +406,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $andGroup[] = $expression;
                         break;
                     default:
-                        if ('' == trim($filter['value'])) {
-                            // Ignore empty
-                            break;
-                        }
-
                         $columnValue = ":$paramName";
                         $type        = $filterDefinitions[$filter['column']]['type'];
                         if (isset($filterDefinitions[$filter['column']]['formula'])) {
@@ -469,8 +469,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         if ($orGroups) {
             // Add the remaining $andGroup to the rest of the $orGroups if exists so we don't miss it.
-            $orGroups[] = CompositeExpression::and(...$andGroup);
-            $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
+            if ($andGroup) {
+                $orGroups[] = CompositeExpression::and(...$andGroup);
+            }
+
+            if (1 === count($orGroups)) {
+                $queryBuilder->andWhere($orGroups[0]);
+            } else {
+                $queryBuilder->andWhere(CompositeExpression::or(...$orGroups));
+            }
         } elseif ($andGroup) {
             $queryBuilder->andWhere(CompositeExpression::and(...$andGroup));
         }
@@ -588,5 +595,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $type = $filterDefinitions[$filter['column']]['type'] ?? null;
 
         return !in_array($type, ['date', 'datetime'], true);
+    }
+
+    private function isEmptyValueSupportedCondition(string $condition): bool
+    {
+        return in_array($condition, ['empty', 'notEmpty', 'neq'], true);
     }
 }
