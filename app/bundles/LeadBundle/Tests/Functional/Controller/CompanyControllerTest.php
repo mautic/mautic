@@ -14,8 +14,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
     public function testMergeAction(): void
     {
         $this->client->request('GET', '/s/companies/merge/1');
-        $clientResponse         = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testMergeActionWithoutPermission(): void

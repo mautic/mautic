@@ -13,7 +13,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testGetBuilderTokensAction(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=page:getBuilderTokens');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $response = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertArrayHasKey('tokens', $response);
         Assert::assertArrayHasKey('{pagetitle}', $response['tokens']);
