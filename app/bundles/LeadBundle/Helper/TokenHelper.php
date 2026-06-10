@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 
 class TokenHelper
 {
-    private const CONTACT_FIELD_REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
+    public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 
     private const DATETIME_REGEX = '/({|%7B)datetime=(.*?)(}|%7D)/';
 
@@ -33,7 +33,7 @@ class TokenHelper
 
         // Search for bracket or bracket encoded
         $tokenList        = [];
-        $foundMatches     = preg_match_all(self::CONTACT_FIELD_REGEX, $content, $matches);
+        $foundMatches     = preg_match_all(self::REGEX, $content, $matches);
         $foundDateMatches = preg_match_all(self::DATETIME_REGEX, $content, $dateMatches);
 
         if ($foundMatches || $foundDateMatches) {
@@ -70,12 +70,12 @@ class TokenHelper
 
     public static function validToken(string $content): bool
     {
-        return (bool) preg_match(self::CONTACT_FIELD_REGEX, $content);
+        return (bool) preg_match(self::REGEX, $content);
     }
 
     public static function getTokenFieldAlias(string $content): string
     {
-        $foundMatches = preg_match(self::CONTACT_FIELD_REGEX, $content, $matches);
+        $foundMatches = preg_match(self::REGEX, $content, $matches);
 
         return $foundMatches ? self::getFieldAlias($matches[2]) : '';
     }

@@ -102,16 +102,16 @@ class SamlTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         // The request is going straight to discovery, thus sparing one redirect, that otherwise would be done anyway.
         // @see \LightSaml\SpBundle\Controller\DefaultController::loginAction if 'idp' is empty.
-        Assert::assertSame('/saml/discovery', $clientResponse->headers->get('Location'));
+        self::assertResponseRedirects('/saml/discovery');
         $this->client->followRedirect();
 
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('/s/saml/login?idp=http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php', $clientResponse->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
+        self::assertResponseRedirects('/s/saml/login?idp=http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php');
         $this->client->followRedirect();
 
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
         Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/saml2/idp/SSOService.php?SAMLRequest=', $clientResponse->headers->get('Location'));
 
         // Here need to replicate the browser. The default client will not work, because the test must request an external service.
@@ -164,13 +164,13 @@ class SamlTest extends MauticMysqlTestCase
             $form->getPhpValues(),
         );
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('https://localhost/s/dashboard', $clientResponse->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
+        self::assertResponseRedirects('https://localhost/s/dashboard');
 
         $this->client->followRedirect();
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('/s/dashboard', $clientResponse->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
+        self::assertResponseRedirects('/s/dashboard');
 
         $this->client->followRedirect();
         $clientResponse = $this->client->getResponse();

@@ -76,7 +76,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertGreaterThan(0, $crawler->filter('#leadlist_filters_0_operator option')->count());
     }
 
@@ -312,7 +312,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Remove 1 contact from segment.
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contact/'.$contact1Id.'/remove');
         self::assertSame('{"success":1}', $this->client->getResponse()->getContent());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
@@ -325,7 +325,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $parameters = ['ids' => [$contact1Id]];
         $this->client->request(Request::METHOD_POST, '/api/segments/'.$segmentId.'/contacts/add', $parameters);
         self::assertSame('{"success":1,"details":{"'.$contact1Id.'":{"success":true}}}', $this->client->getResponse()->getContent());
-        self::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
@@ -380,15 +380,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $segmentsCountBefore = $this->em->getRepository(LeadList::class)->count([]);
         // Go to clone segment action
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segmentId);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         // First submit
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $crawler = $this->client->submit($form);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), 'Correct Apply');
+        $this->assertResponseIsSuccessful();
         // Second submit
         $form = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), 'Correct Apply');
+        $this->assertResponseIsSuccessful();
         // Number of segments after clone
         $segmentsCountAfter = $this->em->getRepository(LeadList::class)->count([]);
         // Check that just one segment was created
@@ -411,11 +411,11 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     private function getAliasWhenCloneSegment(int $segmentId): string
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/clone/'.$segmentId);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         // Save cloned segment
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $crawler = $this->client->submit($form);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), 'Correct Apply');
+        $this->assertResponseIsSuccessful();
 
         return $crawler->filter('#leadlist_alias')->attr('value');
     }
@@ -458,13 +458,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $expectedErrorMessage = sprintf('The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
-        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
     }
 
@@ -475,13 +475,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list2->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $rows = $this->listRepo->findAll();
         $this->assertCount(2, $rows);
@@ -558,7 +558,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
 
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
         $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
@@ -790,7 +790,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('1 segments have been deleted!', $clientResponse->getContent());
 
         $this->em->clear();
@@ -826,7 +826,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         if ($shouldContainError) {
             $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());

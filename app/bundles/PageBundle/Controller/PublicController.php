@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -15,8 +16,6 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
-use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
-use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
@@ -454,7 +453,6 @@ class PublicController extends AbstractFormController
     public function redirectAction(
         Request $request,
         ContactRequestHelper $contactRequestHelper,
-        PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $logger,
         RedirectModel $redirectModel,
@@ -517,11 +515,13 @@ class PublicController extends AbstractFormController
                 }
 
                 if ($lead) {
-                    $leadArray = $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-                    $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+                    try {
+                        $emailId = (int) (ClickthroughHelper::decodeArrayFromUrl($ct)['email'] ?? null);
+                    } catch (InvalidDecodedStringException) {
+                        $emailId = null;
+                    }
 
-                    // Dispatch URL token replace event to allow modifications
-                    $urlEvent = new UrlTokenReplaceEvent($url, $lead, null);
+                    $urlEvent = new UrlTokenReplaceEvent($url, $lead, $emailId ?: null);
                     $this->dispatcher->dispatch($urlEvent);
                     $url = $urlEvent->getContent();
                 }

@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
@@ -309,7 +308,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $this->client->request(Request::METHOD_POST, '/s/campaigns/delete/'.$campaign->getId());
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $eventLogs = $this->em->getRepository(LeadEventLog::class)->findAll();
         Assert::assertCount(0, $eventLogs);
@@ -365,7 +364,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign = $this->saveSomeCampaignLeadEventLogs();
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
         self::assertStringContainsString('Campaign ABC', $response->getContent());
         self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
         self::assertSame('', trim($crawler->filter('#actions-container')->text()));
@@ -380,7 +379,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $campaign = $this->saveSomeCampaignLeadEventLogs();
         $this->client->request('GET', sprintf('s/campaigns/event/stats/%d/%s/%s', $campaign->getId(), $from, $to));
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
         $body     = json_decode($response->getContent(), true);
         self::assertCount(2, $body);
         self::arrayHasKey('actions');
