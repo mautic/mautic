@@ -15,6 +15,8 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
+use Twig\Error\RuntimeError;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -431,6 +433,24 @@ class ThemeHelper implements ThemeHelperInterface
                     $this->sandboxEnv->addExtension($extension);
                 }
             }
+
+            $this->sandboxEnv->addRuntimeLoader(new class($this->twig) implements RuntimeLoaderInterface {
+                public function __construct(
+                    private Environment $twig,
+                ) {
+                }
+
+                public function load(string $class): ?object
+                {
+                    try {
+                        $runtime = $this->twig->getRuntime($class);
+                    } catch (RuntimeError) {
+                        return null;
+                    }
+
+                    return is_object($runtime) ? $runtime : null;
+                }
+            });
 
             $this->sandboxEnv->addExtension(new SandboxExtension(new ThemeSandboxPolicy(), true));
         }
