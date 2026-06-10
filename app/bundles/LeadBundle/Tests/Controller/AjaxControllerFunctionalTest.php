@@ -81,6 +81,48 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $response['success']);
     }
 
+    public function testToggleLeadCampaignActionWithInadequatePermissions(): void
+    {
+        $campaign = $this->createCampaign();
+        $contact  = $this->createContact('blabla@contact.email');
+
+        $userRepository = $this->em->getRepository(User::class);
+        \assert($userRepository instanceof UserRepository);
+
+        $role = new Role();
+        $role->setName('No-campaign-edit-access');
+        $role->setIsAdmin(false);
+
+        $roleRepository = $this->em->getRepository(Role::class);
+        \assert($roleRepository instanceof RoleRepository);
+        $roleRepository->saveEntity($role);
+
+        $user = new User();
+        $user->setFirstName('No');
+        $user->setLastName('Campaign');
+        $user->setEmail('no-campaign-edit-user@test.com');
+        $user->setUsername('no-campaign-edit-user');
+        $user->setRole($role);
+
+        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+
+        $user->setPassword($hasher->hash('mautic'));
+        $userRepository->saveEntity($user);
+
+        $this->loginUser($user);
+
+        $payload = [
+            'action'         => 'lead:toggleLeadCampaign',
+            'leadId'         => $contact->getId(),
+            'campaignId'     => $campaign->getId(),
+            'campaignAction' => 'remove',
+        ];
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertEquals(403, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
+    }
+
     public function testSegmentDependencyTreeWithNotExistingSegment(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id=9999');
