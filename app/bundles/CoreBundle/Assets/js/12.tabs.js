@@ -184,27 +184,167 @@ Mautic.deleteTab = function(deleteBtn) {
     return false;
 };
 
-/**
- * Remember the last active tab for each tab list on the page.
- */
-Mautic.rememberActiveTabs = function() {
-    mQuery('.nav-tabs').each(function(index) {
-        const $navTabs = mQuery(this);
-        const storageKey = 'mautic-active-tab-' + window.location.pathname + '-' + index;
+(function () {
+    const EVENT_ALREADY_USED_ID = 'ALREADY_USED_ID';
+    const EVENT_CHECK_TAB_ID = 'CHECK_TAB_ID';
+    const MAUTIC_TAB_KEY = 'mautic-tab-id';
+    const TAB_DATA = 'mautic-tab-initialized';
 
-        const activeTab = localStorage.getItem(storageKey);
-        if (activeTab) {
-            const $tab = $navTabs.find('a[href="' + activeTab + '"]');
-            if ($tab.length) {
-                $tab.tab('show');
+    const channel = new BroadcastChannel('remember-active-tabs');
+
+    /**
+     * Contains keys to the session or local storage to store #href data for each tab.
+     * @type {string[]}
+     */
+    let storageKeys = [];
+
+    const tabStorage = {
+        setItem: function (key, value) {
+            sessionStorage.setItem(key, value);
+            localStorage.setItem(key, value);
+        },
+        getItem: function (key) {
+            if (sessionStorage.getItem(key)) {
+                return sessionStorage.getItem(key);
             }
+
+            return localStorage.getItem(key);
+        },
+        cleanLocalStorage: function () {
+            storageKeys.forEach(function (storageKey, index) {
+                // If current tab is the last opened for the page, then leave the "saved tabs" as is.
+                if (localStorage.getItem(tabId(index)) === storageKeys[index]) {
+                    return;
+                }
+
+                // Otherwise cleanup the localStorage. Current page will use the session storage,
+                // and in case user changes the tab on this page, it will be written to localStorage.
+                localStorage.removeItem(storageKeys[index]);
+            });
+        }
+    }
+
+    // Generate a unique ID (UUID v4)
+    const generateStorageId = (index) => {
+        let result;
+
+        if (window.crypto && window.crypto.randomUUID) {
+            result = window.crypto.randomUUID(); // Modern browsers
+        } else {
+            // Fallback for older browsers (e.g., IE11)
+            result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
         }
 
-        $navTabs.find('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-            localStorage.setItem(storageKey, mQuery(e.target).attr('href'));
+        return result + '_' + index;
+    };
+
+    /**
+     * Generate the per-page hash to store opened tab data.
+     * @param {number} index
+     * @returns {string}
+     */
+    const tabId = function (index) {
+        return MAUTIC_TAB_KEY + '-' + window.location.pathname + '-' + index;
+    }
+
+    // Generate new tab ID if one was already used.
+    channel.addEventListener('message', (event) => {
+        if (event.data.type !== EVENT_ALREADY_USED_ID) {
+            return;
+        }
+
+        if (event.data.storageKey !== storageKeys[event.data.index]) {
+            return;
+        }
+
+        const openedTab = tabStorage.getItem(storageKeys[event.data.index]);
+
+        while (event.data.storageKey === storageKeys[event.data.index]) {
+            storageKeys[event.data.index] = generateStorageId(event.data.index);
+        }
+
+        // Store new tab storage key for current session and "latest used" in localStorage.
+        tabStorage.setItem(tabId(event.data.index), storageKeys[event.data.index]);
+        tabStorage.setItem(storageKeys[event.data.index], openedTab);
+    });
+
+    // Check if tab id is already used. Happens on duplicate browser tab.
+    channel.addEventListener('message', (event) => {
+        if (event.data.type !== EVENT_CHECK_TAB_ID) {
+            return;
+        }
+
+        if (event.data.storageKey !== storageKeys[event.data.index]) {
+            return;
+        }
+
+        channel.postMessage({
+            type: EVENT_ALREADY_USED_ID,
+            storageKey: storageKeys[event.data.index],
+            index: event.data.index,
         });
     });
-};
+
+    // Cleanup localStorage on refresh or tab close.
+    window.addEventListener('beforeunload', (e) => {
+        tabStorage.cleanLocalStorage();
+
+        channel.close();
+    });
+
+    /**
+     * Remember the last active tab for each tab list on the page.
+     */
+    Mautic.rememberActiveTabs = function() {
+        mQuery('.nav-tabs').each(function(index) {
+            // Using index would have nasty effects when tabs, with different tab count, are loaded asynchronously somewhere on the page.
+            const $navTabs = mQuery(this);
+            const mauticTabKey = tabId(index);
+
+            // Prevent "initializing" remember functionality for tab with each AJAX request.
+            if (mauticTabKey === $navTabs.data(TAB_DATA)) {
+                return;
+            }
+
+            $navTabs.data(TAB_DATA, mauticTabKey);
+
+            if (tabStorage.getItem(mauticTabKey)) {
+                // Last opened tab on this page (either from session or from local storage)
+                storageKeys[index] = tabStorage.getItem(mauticTabKey);
+
+                channel.postMessage({
+                    type: EVENT_CHECK_TAB_ID,
+                    storageKey: storageKeys[index],
+                    index: index, // Index must be passed to generateStorageId only.
+                });
+            } else {
+                storageKeys[index] = generateStorageId(index);
+                tabStorage.setItem(mauticTabKey, storageKeys[index]);
+            }
+
+            const activeTab = tabStorage.getItem(storageKeys[index]);
+            if (activeTab) {
+                // With the current tab key get an active tab.
+                const $tab = $navTabs.find('a[href="' + activeTab + '"]');
+                if ($tab.length) {
+                    $tab.tab('show');
+                }
+            } else {
+                // Or store the default, so the script will not end up with NULL value.
+                const href = $navTabs.find('.active a[data-toggle="tab"]').attr('href');
+                tabStorage.setItem(storageKeys[index], href);
+            }
+
+            $navTabs.find('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+                tabStorage.setItem(storageKeys[index], mQuery(e.target).attr('href'));
+            });
+        });
+    };
+})();
 
 // Initialize the Tabs Scroll functionality
 Mautic.initTabsScroll = function() {
