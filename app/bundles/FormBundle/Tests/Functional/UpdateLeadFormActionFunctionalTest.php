@@ -195,8 +195,7 @@ class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $formPayload);
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $formId   = $response['form']['id'];
 

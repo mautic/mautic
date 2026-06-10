@@ -111,18 +111,18 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('Save & Close');
         $form          = $buttonCrawler->form();
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
     }
 
     public function testEditAndCancelActionCompany(): void
     {
         $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $buttonCrawler = $crawler->selectButton('Cancel');
         $form          = $buttonCrawler->form();
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
     }
 

@@ -76,7 +76,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Ensure the contact 1 was removed as a member of campaign 1 member now.
         $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
 
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
     }
@@ -127,7 +127,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id=9999');
         $response = $this->client->getResponse();
-        Assert::assertSame(404, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(404);
         Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
     }
 
@@ -135,7 +135,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=unicorn');
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('[]', $response->getContent());
     }
 
@@ -148,7 +148,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=sa');
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
     }
 
@@ -156,7 +156,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
         $response = $this->client->getResponse();
-        Assert::assertSame(400, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(400);
         Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
     }
 
@@ -177,7 +177,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $content  = json_decode($response->getContent(), true);
 
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertIsArray($content);
         Assert::assertCount(1, $content, 'The result should contain only one element');
         Assert::assertSame('Company 1', $content[0]['text']);
@@ -187,7 +187,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $content  = json_decode($response->getContent(), true);
 
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertIsArray($content);
         Assert::assertCount(1, $content, 'The result should contain only one element');
         Assert::assertSame('Company 2', $content[0]['text']);
@@ -267,7 +267,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=lead:getSegmentDependencyTree&id={$segmentA->getId()}");
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         Assert::assertSame(
             [
@@ -387,7 +387,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=lead:getSegmentDependencyTree&id={$segmentA->getId()}");
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $responseData = json_decode($response->getContent(), true);
 
@@ -477,8 +477,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $clientResponse = $this->client->getResponse();
 
-        $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
 
         // Assert the tag is removed from the lead
         $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
@@ -521,7 +520,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Check suggestions for admin user.
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $data       = json_decode($response->getContent(), true);
         $foundNames = array_column($data, 'value');
@@ -605,7 +604,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->setServerParameter('PHP_AUTH_PW', $passwordNonAdmin);
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $data       = json_decode($response->getContent(), true);
         $foundNames = array_column($data, 'value');
@@ -631,11 +630,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
 
         // Get the response HTML
-        $response    = $this->client->getResponse();
-        $htmlContent = $response->getContent();
+        $htmlContent = $this->client->getResponse()->getContent();
 
         // Assert the response is successful
-        $this->assertTrue($response->isOk(), "Response was not OK for object: $object, group: $group");
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('<form', $htmlContent, 'Response contains a form instead of just field order.');
         $this->assertStringContainsString('<select', $htmlContent, 'Response contains select tag.');
 
