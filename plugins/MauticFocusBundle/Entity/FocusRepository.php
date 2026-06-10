@@ -130,10 +130,12 @@ class FocusRepository extends CommonRepository
 
     private function getPublishedWithFiltersQuery(): \Doctrine\DBAL\Query\QueryBuilder
     {
+        $qb = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'focus', 'f');
+
         // 'N;' and 'a:0:{}' are how the array column type serializes null/empty filters
-        return $this->_em->getConnection()->createQueryBuilder()
-            ->from(MAUTIC_TABLE_PREFIX.'focus', 'f')
-            ->where('f.is_published = 1')
+        return $qb
+            ->where($this->getPublishedByDateExpression($qb, 'f'))
             ->andWhere('f.filters IS NOT NULL')
             ->andWhere("f.filters NOT IN ('a:0:{}', 'N;')");
     }
