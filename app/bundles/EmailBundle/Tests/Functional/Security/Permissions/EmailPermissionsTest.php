@@ -14,7 +14,7 @@ class EmailPermissionsTest extends MauticMysqlTestCase
     public function testEmailSendToDncPermissionIsAvailable(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles/new');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         Assert::assertStringContainsString('Send to unsubscribed contacts', $this->client->getResponse()->getContent());
 
@@ -28,7 +28,7 @@ class EmailPermissionsTest extends MauticMysqlTestCase
     public function testUserCanSaveSendToDncPermission(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles/new');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $submit = $crawler->selectButton('Save & Close');
         $form   = $submit->form();
@@ -37,7 +37,7 @@ class EmailPermissionsTest extends MauticMysqlTestCase
         $form['role[description]']->setValue('This is to send emails with "Send to DNC" permission');
         $form['role[permissions][email:emails][8]']->setValue('sendtodnc');
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $role               = $this->em->getRepository(Role::class)->findOneBy(['name' => 'Send To DNC Permission']);
         $readablePermission = $role->getRawPermissions();

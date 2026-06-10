@@ -40,7 +40,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         Assert::assertSame(
             [
@@ -75,7 +75,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         Assert::assertSame(
             [

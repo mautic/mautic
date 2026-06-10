@@ -96,7 +96,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
             '/s/forms/field/new?type=companyLookup&tmpl=field&formId='.$form->getId().'&inBuilder=1'
         );
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());

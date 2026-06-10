@@ -33,7 +33,7 @@ class EditorFontsSubscriberTest extends MauticMysqlTestCase
         $crawler  = $this->client->request(Request::METHOD_GET, '/');
         $response = $crawler->html();
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         Assert::assertStringContainsString(
             'var mauticEditorFonts               = [{"name":"Arial","font":"Arial, Helvetica, sans-serif","url":"https:\/\/custom-font.test\/arial.css"},{"name":"Courier New","font":"Courier New, Courier, monospace","url":"https:\/\/custom-font.test\/courier.css"}];',
