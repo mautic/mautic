@@ -9,14 +9,16 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
+        $this->configParams['allowed_extensions']      = ['txt', 'csv', 'jpg', 'jpeg', 'png', 'pdf'];
         $this->configParams['validate_remote_domains'] = false;
-        $this->configParams['site_url']                = 'https://site.tld';
+        $this->configParams['site_url']                = 'https://raw.githubusercontent.com';
 
         if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
                 'second-allowed.tld',
+                'fastly.picsum.photos',
             ];
         }
 
@@ -41,17 +43,30 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotNull($response['asset']['size']);
     }
 
-    public function testCreateNewRemoteAssetWithVulnerableFile(): void
+    /**
+     * @return iterable<array{string, string}>
+     */
+    public static function dataCreateNewRemoteAssetWithInvalidFile(): iterable
+    {
+        yield 'Malformed URL' => ['file:///etc/passwd', 'remotePath: The remote should be a valid URL.'];
+        yield 'URL returning 404' => ['https://www.google.com/non-existent-path', 'asset: The mimetype of the remote file could not be resolved. Make sure you entered a valid remote URL.'];
+        yield 'Not allowed html MIME type' => ['https://github.com/mautic/mautic', 'asset: Upload failed as the file mimetype text\/html'];
+        yield 'Not allowed php MIME type' => ['https://raw.githubusercontent.com/mautic/mautic/7.x/index.php', 'asset: Upload failed as the file mimetype text\/x-php'];
+    }
+
+    #[DataProvider('dataCreateNewRemoteAssetWithInvalidFile')]
+    public function testCreateNewRemoteAssetWithInvalidFile(string $file, string $expectedError): void
     {
         $payload = [
-            'file'            => 'file:///etc/passwd',
+            'file'            => $file,
             'storageLocation' => 'remote',
             'title'           => 'title',
         ];
         $this->client->request('POST', 'api/assets/new', $payload);
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseStatusCodeSame(400, $clientResponse->getContent());
-        $this->assertEquals('{"errors":[{"code":400,"message":"remotePath: The remote should be a valid URL.","details":{"remotePath":["The remote should be a valid URL."]}}]}', $clientResponse->getContent());
+        $response = $this->client->getResponse();
+        $content  = $response->getContent();
+        $this->assertResponseStatusCodeSame(400, $response);
+        $this->assertStringContainsString($expectedError, $content);
     }
 
     /**
@@ -60,8 +75,8 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
     public static function dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled(): iterable
     {
         yield 'Not in allowed domains' => ['https://some-domain.com/foo.jpg', false];
-        yield 'Is in allowed domains' => ['https://second-allowed.tld/foo.jpg', true];
-        yield 'Using site URL' => ['https://site.tld/foo.jpg', true];
+        yield 'Is in allowed domains' => ['https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s', true];
+        yield 'Using site URL' => ['https://raw.githubusercontent.com/mautic/mautic/7.x/.github/readme_logo.png', true];
     }
 
     #[DataProvider('dataCreateNewRemoteAssetWithValidateRemoteDomainsEnabled')]

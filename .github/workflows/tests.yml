@@ -113,7 +113,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -282,7 +282,7 @@ jobs:
             exit 1
           fi
         elif [[ "${{ matrix.commands }}" == "PHPStan baseline changes" ]]; then
-          if [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
+          if [[ -n "${{ github.base_ref }}" ]] && [[ "${{ steps.changed-files.outputs.modified_files }}" == *"phpstan-baseline.neon"* ]]; then
             stat=$(git diff --shortstat "origin/${{ github.base_ref }}" ${{ github.sha }} -- phpstan-baseline.neon)
             echo $stat
             regex="[0-9]+[[:space:]]insertion"

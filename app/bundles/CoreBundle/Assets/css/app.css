@@ -10133,6 +10133,42 @@ lesshat-selector { -lh-property: 0 ;
 .as-16-9 {
   aspect-ratio: 16 / 9;
 }
+.grid {
+  --grid--columns: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.grid-cols-2 {
+  --grid--columns: 2;
+}
+.grid-cols-3 {
+  --grid--columns: 3;
+}
+.grid-cols-4 {
+  --grid--columns: 4;
+}
+.grid-cols-5 {
+  --grid--columns: 5;
+}
+.grid-cols-6 {
+  --grid--columns: 6;
+}
+.grid-cols-7 {
+  --grid--columns: 7;
+}
+.grid-cols-8 {
+  --grid--columns: 8;
+}
+@media (min-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(var(--grid--columns), 1fr);
+  }
+}
 .map-options {
   margin-left: 10px;
   margin-bottom: 10px;
@@ -10893,6 +10929,9 @@ label.required:after {
   content: " *";
   color: #F86B4F;
 }
+.form-control.form-control-narrow {
+  width: 100px;
+}
 #app-header .nav > li > a {
   padding: 10px 12px;
 }
@@ -11539,29 +11578,36 @@ code:hover > .copy-icon {
   visibility: visible;
 }
 .toggle--disabled,
+.toggle--readonly,
 .toggle:has(.disabled) {
   cursor: not-allowed;
 }
 .toggle--disabled .toggle__label,
+.toggle--readonly .toggle__label,
 .toggle:has(.disabled) .toggle__label {
   pointer-events: none;
 }
 .toggle--disabled .toggle__label-text,
+.toggle--readonly .toggle__label-text,
 .toggle:has(.disabled) .toggle__label-text,
 .toggle--disabled .toggle__text,
+.toggle--readonly .toggle__text,
 .toggle:has(.disabled) .toggle__text {
   color: var(--text-disabled, rgba(22, 22, 22, 0.25));
 }
 .toggle--disabled .toggle__switch,
+.toggle--readonly .toggle__switch,
 .toggle:has(.disabled) .toggle__switch {
   background-color: var(--button-disabled, #c6c6c6);
 }
 .toggle--disabled .toggle__switch::before,
+.toggle--readonly .toggle__switch::before,
 .toggle:has(.disabled) .toggle__switch::before {
   background-color: var(--icon-on-color-disabled, #8d8d8d);
   box-shadow: none;
 }
 .toggle--disabled .toggle__check,
+.toggle--readonly .toggle__check,
 .toggle:has(.disabled) .toggle__check {
   fill: var(--button-disabled, #c6c6c6);
 }

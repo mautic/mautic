@@ -370,7 +370,7 @@ class PageController extends FormController
      */
     public function newAction(Request $request, PageConfig $pageConfig, AssetsHelper $assetsHelper, Translator $translator, RouterInterface $routerHelper, CoreParametersHelper $coreParametersHelper, ThemeHelper $themeHelper, PageModel $model, $entity = null)
     {
-        if (!($entity instanceof Page)) {
+        if (!$entity instanceof Page) {
             $entity = $model->getEntity();
         }
 
@@ -870,14 +870,17 @@ class PageController extends FormController
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-        return $this->render($logicalName, [
-            'isNew'       => $isNew,
-            'formFactory' => $this->formFactory,
-            'content'     => $entity->getContent(),
-            'page'        => $entity,
-            'template'    => $template,
-            'basePath'    => $request->getBasePath(),
-        ]);
+        return new Response($themeHelper->renderThemeTemplate(
+            $logicalName,
+            [
+                'isNew'       => $isNew,
+                'formFactory' => $this->formFactory,
+                'content'     => $entity->getContent(),
+                'page'        => $entity,
+                'template'    => $template,
+                'basePath'    => $request->getBasePath(),
+            ]
+        ));
     }
 
     /**

@@ -11,6 +11,7 @@
     - limit
 #}
 {% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}company{% endblock %}
 
 
 {% block headerTitle %}{{ company.name }}{% endblock %}
@@ -160,12 +161,9 @@
                                 <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                             </div>
                         </div>
-                        <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
-                        {{ include('@MauticCore/Helper/chart.html.twig', {
-                            'chartData': engagementData,
-                            'chartType': 'line',
-                            'chartHeight': 250,
-                        }) }}
+                        <div id="company_contact_engagement" data-target-url="{{ path('mautic_company_graph', {'objectId': company.id}) }}">
+                            <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                            <div class="clearfix"></div>
                         </div>
                     </div>
                 </div>
@@ -175,17 +173,9 @@
         <div class="pa-md enage">
             <div class="row">
                 <div class="col-sm-12">
-                    <div id="contacts-table">
-                        {{ include('@MauticLead/Company/list_rows_contacts.html.twig', {
-                                'contacts': items,
-                                'company': company,
-                                'tmpl': 'index',
-                                'permissions': permissions,
-                                'security': security,
-                                'page': page,
-                                'limit': limit,
-                                'totalItems': totalItems,
-                        }) }}
+                    <div id="contacts-table" data-target-url="{{ path('mautic_company_contacts_list', {'objectId': company.id}) }}">
+                        <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
+                        <div class="clearfix"></div>
                     </div>
                 </div>
             </div>

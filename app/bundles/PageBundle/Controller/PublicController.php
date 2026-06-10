@@ -79,14 +79,13 @@ class PublicController extends AbstractFormController
 
                     if ($entity->getRedirectUrl()) {
                         return $this->redirect($entity->getRedirectUrl(), (int) $entity->getRedirectType());
-                    } else {
-                        return $this->notFound();
                     }
-                } else {
-                    $model->hitPage($entity, $request, 401);
 
-                    return $this->accessDenied();
+                    return $this->notFound();
                 }
+                $model->hitPage($entity, $request, 401);
+
+                return $this->accessDenied();
             }
 
             $lead  = null;
@@ -267,7 +266,7 @@ class PublicController extends AbstractFormController
 
                 $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-                $response = $this->render(
+                $content = $themeHelper->renderThemeTemplate(
                     $logicalName,
                     [
                         'content'  => $content,
@@ -276,8 +275,6 @@ class PublicController extends AbstractFormController
                         'public'   => true,
                     ]
                 );
-
-                $content = $response->getContent();
             } else {
                 if (!empty($analytics)) {
                     $content = str_replace('</head>', $analytics."\n</head>", $content);
@@ -298,10 +295,10 @@ class PublicController extends AbstractFormController
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
-            $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
+            $isHitTrackable = $model->hitPage($entity, $request, Response::HTTP_OK, $lead, $query);
 
             $response = new Response($content);
-            if ($request->cookies->has('Blocked-Tracking')) {
+            if (!$isHitTrackable || $request->cookies->has('Blocked-Tracking')) {
                 $deviceTrackingService->clearTrackingCookies();
             }
 
@@ -373,7 +370,7 @@ class PublicController extends AbstractFormController
 
             $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-            $response = $this->render(
+            $content = $themeHelper->renderThemeTemplate(
                 $logicalName,
                 [
                     'content'  => $content,
@@ -382,8 +379,6 @@ class PublicController extends AbstractFormController
                     'public'   => true, // @deprecated Remove in 2.0
                 ]
             );
-
-            $content = $response->getContent();
         } else {
             $content = str_replace('</head>', $analytics."\n</head>", $content);
         }

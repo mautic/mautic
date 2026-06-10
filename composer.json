@@ -110,6 +110,11 @@
       "MauticPlugin\\": "plugins/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "MauticRector\\": "rector/"
+    }
+  },
   "repositories": [
     {
       "type": "path",
@@ -143,13 +148,15 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
-      "@generate-assets"
+      "@generate-assets",
+      "@motd"
     ],
     "post-update-cmd": [
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
-      "@generate-assets"
+      "@generate-assets",
+      "@motd"
     ],
     "test": "bin/phpunit -d memory_limit=2G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
     "e2e-test": "APP_ENV=test bin/codecept run acceptance",
@@ -164,7 +171,8 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
-    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./"
+    "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./",
+    "motd": "bin/console mautic:motd"
   },
   "config": {
     "platform": {
@@ -204,10 +212,6 @@
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
     },
-    "patches": {
-      "studio-42/elfinder": {
-        "Fix PHP 8.5 deprecated scalar casts": "patches/studio-42-elfinder-php85-float-cast.patch"
-      }
-    }
+    "patches": {}
   }
 }

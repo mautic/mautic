@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/webhooks', security: "is_granted('webhook:webhooks:viewown')"),
         new Post(uriTemplate: '/webhooks', security: "is_granted('webhook:webhooks:create')"),
-        new Get(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:viewown')"),
-        new Put(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editown')"),
-        new Patch(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editother')"),
-        new Delete(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:deleteown')"),
+        new Get(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:viewown', object)"),
+        new Put(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editown', object)"),
+        new Patch(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editother', object)"),
+        new Delete(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['webhook:read'],
