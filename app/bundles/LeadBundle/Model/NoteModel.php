@@ -122,8 +122,6 @@ class NoteModel extends FormModel
 
     public function getNoteCount(Lead $lead, $useFilters = false): int
     {
-        $filter          = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
-        $noteType        = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
         $viewPermissions = $this->security->isGranted(['lead:notes:viewown', 'lead:notes:viewother'], 'RETURN_ARRAY');
         $canViewOwn      = $viewPermissions['lead:notes:viewown'] ?? false;
         $canViewOther    = $viewPermissions['lead:notes:viewother'] ?? false;
@@ -132,6 +130,8 @@ class NoteModel extends FormModel
             return 0;
         }
 
+        $filter    = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.note.filter', '') : null;
+        $noteType  = ($useFilters) ? $this->requestStack->getSession()->get('mautic.lead.'.$lead->getId().'.notetype.filter', []) : null;
         $createdBy = $canViewOther ? null : $this->userHelper->getUser()?->getId();
 
         return $this->getRepository()->getNoteCount($lead->getId(), $filter, $noteType, $createdBy);
