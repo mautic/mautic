@@ -52,7 +52,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
         // convert html table to php array
