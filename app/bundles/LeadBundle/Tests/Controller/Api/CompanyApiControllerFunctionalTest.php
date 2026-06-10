@@ -169,7 +169,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             'tags'        => ['-Enterprise', 'Strategic'],
         ]);
         $editResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $editResponse->getStatusCode(), $editResponse->getContent());
+        $this->assertResponseIsSuccessful($editResponse->getContent());
 
         $this->em->clear();
 
@@ -195,7 +195,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $response = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
 
         $payload = json_decode($response->getContent(), true);
         $this->assertIsArray($payload);
@@ -355,7 +355,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/api/companies/new', $payload);
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $response->getContent());
 
         $payload = json_decode($response->getContent(), true);
         $this->assertIsArray($payload);
