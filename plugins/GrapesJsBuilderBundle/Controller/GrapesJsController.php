@@ -59,7 +59,7 @@ class GrapesJsController extends CommonController
         });
 
         try {
-            $unserialized = unserialize($content, ['allowed_classes' => false]);
+            $unserialized = \Mautic\CoreBundle\Helper\Serializer::decode($content);
         } catch (\Throwable) {
             return [];
         } finally {

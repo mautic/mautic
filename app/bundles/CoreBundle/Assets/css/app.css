@@ -10929,6 +10929,9 @@ label.required:after {
   content: " *";
   color: #F86B4F;
 }
+.form-control.form-control-narrow {
+  width: 100px;
+}
 #app-header .nav > li > a {
   padding: 10px 12px;
 }

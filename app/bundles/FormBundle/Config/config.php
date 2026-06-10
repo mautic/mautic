@@ -261,6 +261,28 @@ return [
                 'arguments' => ['mautic.page.model.page', 'mautic.form.model.submission'],
             ],
         ],
+        'commands' => [
+            'mautic.form.command.form_submissions_records_clean' => [
+                'tag'       => 'console.command',
+                'class'     => Mautic\FormBundle\Command\DeleteOrphanSubmissionRecordsFromFormResultsTableCommand::class,
+                'arguments' => [
+                    'mautic.form.repository.form',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.form.repository.submission',
+                ],
+            ],
+            'mautic.form.command.form_submissions_table_clean' => [
+                'tag'       => 'console.command',
+                'class'     => Mautic\FormBundle\Command\DeleteOrphanFormResultsTableCommand::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.form.repository.form',
+                ],
+            ],
+        ],
     ],
 
     'parameters' => [

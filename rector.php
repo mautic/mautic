@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
@@ -51,6 +52,7 @@ return RectorConfig::configure()
         SimplifyUselessVariableRector::class,
         ReturnTypeFromStrictConstantReturnRector::class,
         ReturnTypeFromReturnDirectArrayRector::class,
+        UnserializeToSerializerDecodeRector::class,
     ])
     ->withSkip([
         '*/Test/*',
@@ -101,6 +103,11 @@ return RectorConfig::configure()
 
         TypedPropertyFromAssignsRector::class => [
             '*/Entity/*',
+        ],
+
+        // Skip the rule file itself
+        UnserializeToSerializerDecodeRector::class => [
+            __DIR__.'/rector',
         ],
 
         // handle later with full PHP 8.0 upgrade
