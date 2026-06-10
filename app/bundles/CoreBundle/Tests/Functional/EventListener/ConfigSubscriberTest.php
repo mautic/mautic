@@ -150,7 +150,7 @@ class ConfigSubscriberTest extends MauticMysqlTestCase
     private function setImagePathRequest(string $value): Crawler
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // Find save & close button
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
@@ -165,7 +165,7 @@ class ConfigSubscriberTest extends MauticMysqlTestCase
         );
 
         $crawler = $this->client->submit($form);
-        Assert::assertSame(200, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         return $crawler;
     }

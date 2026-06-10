@@ -65,11 +65,9 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
 
         // Try to access the foreign download - should be forbidden
         $this->client->request('GET', '/api/v2/downloads/'.$foreignDownload->getId());
-        $response = $this->client->getResponse();
 
-        self::assertSame(
+        self::assertResponseStatusCodeSame(
             Response::HTTP_FORBIDDEN,
-            $response->getStatusCode(),
             'User with viewown permission should not be able to access downloads of assets they do not own. '.
             'This validates that ApiPermissionVoter correctly uses getPermissionUser() for Download entities.'
         );
@@ -142,7 +140,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->request('GET', '/api/v2/downloads?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
@@ -220,7 +218,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->client->request('GET', '/api/v2/downloads?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful($response->getContent());
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 

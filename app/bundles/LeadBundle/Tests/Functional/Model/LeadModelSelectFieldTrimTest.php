@@ -34,7 +34,7 @@ class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
 
         $campaign = $this->createCampaign('Industry Campaign');
 
-        $event = $this->createEvent(
+        $this->createEvent(
             'Update Industry',
             $campaign,
             'lead.update.field',

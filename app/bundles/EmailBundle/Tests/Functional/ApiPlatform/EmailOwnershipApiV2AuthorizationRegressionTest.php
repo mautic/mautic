@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Functional\ApiPlatform;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Response;
 
 final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
@@ -56,7 +55,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->client->request('GET', '/api/v2/emails?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
@@ -118,7 +117,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->client->request('GET', '/api/v2/emails?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
