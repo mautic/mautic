@@ -299,7 +299,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testExportCampaignAction(): void
     {
-        $entities = $this->createTestEntities();
+        $this->createTestEntities();
 
         // Create the campaign
         $campaign = new Campaign();

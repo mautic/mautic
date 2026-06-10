@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -33,7 +32,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     {
         $segment   = $this->saveSegment('Segment D', 'segment-d', $filters);
         $crawler   = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
 
