@@ -86,7 +86,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $form    = $crawler->selectButton('Apply Draft')->form();
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
 
@@ -100,7 +100,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
         $form    = $crawler->selectButton('Discard Draft')->form();
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
 
@@ -115,7 +115,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $form                          = $crawler->selectButton('Save as Draft')->form();
         $form['emailform[customHtml]'] = 'Test html Draft';
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
         Assert::assertEquals('Test html Draft', $emailDraft->getHtml());

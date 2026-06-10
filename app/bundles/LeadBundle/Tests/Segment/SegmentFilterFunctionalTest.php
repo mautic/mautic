@@ -116,7 +116,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
         $segmentId = $response['list']['id'];
 
-        $this->assertSame(201, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentId);
 
         return $this->em->getRepository(LeadList::class)->find($segmentId);

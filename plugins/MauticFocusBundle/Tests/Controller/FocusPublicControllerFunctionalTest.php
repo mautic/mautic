@@ -20,7 +20,7 @@ class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertNotEmpty($response->getContent());
     }
 
