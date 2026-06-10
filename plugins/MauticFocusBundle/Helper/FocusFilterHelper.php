@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Helper;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
@@ -38,7 +39,12 @@ class FocusFilterHelper
         $matched   = [];
 
         foreach ($rows as $row) {
-            $filters = unserialize($row['filters']);
+            try {
+                $filters = Serializer::decode($row['filters']);
+            } catch (\Throwable) {
+                // Corrupted serialized data; never produced by the filters form
+                continue;
+            }
 
             if (!is_array($filters) || empty($filters)) {
                 continue;

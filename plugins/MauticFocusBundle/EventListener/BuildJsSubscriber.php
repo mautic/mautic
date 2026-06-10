@@ -49,7 +49,8 @@ MauticJS.checkFocusItems = function (params) {
             }
 
             for (var i = 0; i < response.focus_items.length; i++) {
-                if (response.focus_items[i].js_url) {
+                // Skip items already loaded on the page (manual embed, DWC injection)
+                if (response.focus_items[i].js_url && !window['MauticFocus' + response.focus_items[i].id]) {
                     MauticJS.insertScript(response.focus_items[i].js_url);
                 }
             }

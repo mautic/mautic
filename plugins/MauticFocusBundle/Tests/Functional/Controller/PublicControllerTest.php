@@ -4,15 +4,112 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
+use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class PublicControllerTest extends MauticMysqlTestCase
 {
+    use IsolatedTestTrait;
+
+    public function testCheckActionReturnsNoContentWhenNoFilterBasedItemsExist(): void
+    {
+        // A published item without filters must not be served by the check endpoint
+        $this->createFocusItem('No filters', []);
+
+        $this->client->request(Request::METHOD_GET, '/focus/check');
+
+        Assert::assertSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame('', $this->client->getResponse()->getContent());
+    }
+
+    public function testCheckActionReturnsMatchingItemsForTrackedContactOnly(): void
+    {
+        $focus = $this->createFocusItem('Filter based', [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'operator' => '=',
+                'filter'   => 'focus-match@example.com',
+                'display'  => null,
+            ],
+        ]);
+
+        $matchingLead = $this->createLeadWithTrackingStat('focus-match@example.com', 'focus-tracking-hash-1');
+        $this->createLeadWithTrackingStat('focus-other@example.com', 'focus-tracking-hash-2');
+
+        $leadCount   = $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads');
+        $deviceCount = $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_devices');
+
+        // Matching contact gets the focus item
+        $ct = ClickthroughHelper::encodeArrayForUrl(['stat' => 'focus-tracking-hash-1']);
+        $this->client->request(Request::METHOD_GET, '/focus/check?ct='.$ct);
+        $response = $this->client->getResponse();
+
+        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $payload = json_decode((string) $response->getContent(), true);
+        Assert::assertSame($focus->getId(), $payload['focus_items'][0]['id']);
+        Assert::assertStringContainsString(sprintf('/focus/%d.js', $focus->getId()), $payload['focus_items'][0]['js_url']);
+        Assert::assertSame($matchingLead->getId(), $payload['id']);
+        Assert::assertArrayHasKey('device_id', $payload);
+
+        // Non-matching contact gets nothing
+        $ct = ClickthroughHelper::encodeArrayForUrl(['stat' => 'focus-tracking-hash-2']);
+        $this->client->request(Request::METHOD_GET, '/focus/check?ct='.$ct);
+        Assert::assertSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+
+        // The endpoint is non-trackable: it must not have created leads or devices
+        Assert::assertSame($leadCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads'));
+        Assert::assertSame($deviceCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'lead_devices'));
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     */
+    private function createFocusItem(string $name, array $filters): Focus
+    {
+        $focus = new Focus();
+        $focus->setName($name);
+        $focus->setType('notice');
+        $focus->setStyle('modal');
+        $focus->setIsPublished(true);
+        $focus->setFilters($filters);
+        $this->em->persist($focus);
+        $this->em->flush();
+
+        return $focus;
+    }
+
+    private function createLeadWithTrackingStat(string $email, string $trackingHash): Lead
+    {
+        $lead = new Lead();
+        $lead->setEmail($email);
+        $this->em->persist($lead);
+
+        $stat = new Stat();
+        $stat->setLead($lead);
+        $stat->setTrackingHash($trackingHash);
+        $stat->setEmailAddress($email);
+        $stat->setDateSent(new \DateTime());
+        $this->em->persist($stat);
+
+        $this->em->flush();
+
+        return $lead;
+    }
+
     #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
     public function testGenerateActionWithContactTokenInLinkUrl(): void

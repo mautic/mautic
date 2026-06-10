@@ -10,7 +10,7 @@ trait FiltersEntityTrait
     /**
      * @var array
      */
-    #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[Groups(['dynamicContent:read', 'dynamicContent:write', 'focus:read', 'focus:write'])]
     private $filters = [];
 
     protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
