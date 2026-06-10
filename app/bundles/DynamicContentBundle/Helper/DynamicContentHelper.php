@@ -235,7 +235,7 @@ class DynamicContentHelper
      * @param mixed[] $filters
      * @param mixed[] $contactArray
      */
-    private function filtersMatchContact(array $filters, array $contactArray): bool
+    public function filtersMatchContact(array $filters, array $contactArray): bool
     {
         if (empty($contactArray['id'])) {
             return false;

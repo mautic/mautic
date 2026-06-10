@@ -1,0 +1,9 @@
+{% block _focus_filters_entry_widget %}
+  {% use '@MauticDynamicContent/FormTheme/Filter/layout.html.twig' %}
+  {{ block('_dwc_filters_entry_widget') }}
+{% endblock %}
+
+{% block _focus_filters_widget %}
+  {% use '@MauticLead/FormTheme/Filter/_leadlist_filters_widget.html.twig' %}
+  {{ block('_leadlist_filters_widget') }}
+{% endblock %}

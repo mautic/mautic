@@ -1,4 +1,5 @@
 {% extends '@MauticCore/Default/content.html.twig' %}
+{% form_theme form '@MauticFocus/FormTheme/Filter/layout.html.twig' %}
 
 {% block mauticContent %}focus{% endblock %}
 
@@ -11,18 +12,102 @@
 {% endblock %}
 
 {% block content %}
+  {%- set fields = form.vars.fields -%}
+  {%- set index = form.filters.vars.value|keys|length -%}
+  {%- set hasMainErrors = formContainsErrors(form, ['filters']) -%}
+  {%- set hasFilterErrors = formContainsErrors(form.filters) -%}
   {{ includeStylesheet('plugins/MauticFocusBundle/Assets/css/focus.css') }}
   {{ form_start(form) }}
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- container -->
-        <div class="col-md-9 height-auto bdr-r pa-md">
+        <div class="col-md-9 height-auto bdr-r">
             <div class="row">
-                <div class="col-md-6">{{ form_row(form.name) }}</div>
-                <div class="col-md-6">{{ form_row(form.website) }}</div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">{{ form_row(form.description) }}</div>
+                <div class="col-xs-12">
+                    <ul class="nav nav-tabs nav-tabs-contained">
+                        <li class="active">
+                            <a href="#details" role="tab" data-toggle="tab" class="{% if hasMainErrors %}text-danger{% endif %}">
+                                {{ 'mautic.core.details'|trans }}
+                                {% if hasMainErrors %}
+                                    <i class="ri-alert-line"></i>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#filters" role="tab" data-toggle="tab" class="{% if hasFilterErrors %}text-danger{% endif %}">
+                                {{ 'mautic.core.filters'|trans }}
+                                {% if hasFilterErrors %}
+                                    <i class="ri-alert-line"></i>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- start: tab-content -->
+                    <div class="tab-content pa-md">
+                        <div class="tab-pane fade in active bdr-w-0" id="details">
+                            <div class="row">
+                                <div class="col-md-6">{{ form_row(form.name) }}</div>
+                                <div class="col-md-6">{{ form_row(form.website) }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">{{ form_row(form.description) }}</div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade bdr-w-0" id="filters">
+                            {% if hasFilterErrors and '' is not same as form_errors(form.filters) %}
+                                <div class="has-error alert alert-danger" role="alert" style="padding:5px 10px 0 10px;">
+                                    {{ form_errors(form.filters) }}
+                                </div>
+                            {% endif %}
+                            <div class="dwc-filter bdr-w-0" id="{{ form.vars.id }}">
+                                <div class="row">
+                                    <div class="col-xs-7">
+                                        <label>{{ 'Filters'|trans }}</label>
+                                        <p class="text-secondary small">{{ 'mautic.focus.filters.descr'|trans }}</p>
+                                    </div>
+                                    <div class="col-xs-5">
+                                        <div class="form-group">
+                                            <div class="available-filters mb-md pl-0"
+                                                 data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}"
+                                                 data-index="{{ index + 1 }}">
+                                                <select class="chosen form-control" id="available_filters">
+                                                    <option value=""></option>
+                                                    {% for object, field in fields %}
+                                                        {% set icon = 'company' == object ? 'building' : 'user' %}
+                                                        <optgroup label="{{ ('mautic.lead.' ~ object)|trans }}">
+                                                            {% for value, params in field %}
+                                                                {% set list = params.properties.list|default([]) %}
+                                                                {% set callback = params.properties.callback|default('') %}
+                                                                {% set operators = params.operators %}
+                                                                <option value="{{ value|e }}"
+                                                                        id="available_{{ object }}_{{ value }}"
+                                                                        data-field-object="{{ object }}"
+                                                                        data-field-type="{{ params.properties.type }}"
+                                                                        data-field-list="{{ list|json_encode }}"
+                                                                        data-field-callback="{{ callback }}"
+                                                                        data-field-operators="{{ operators|json_encode }}"
+                                                                        class="segment-filter {{ icon }}">{{ params.label|trans }}</option>
+                                                            {% endfor %}
+                                                        </optgroup>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="selected-filters" id="{{ form.vars.id }}_filters" data-filter-container>
+                                            {{ form_widget(form.filters) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-3 height-auto">
@@ -407,5 +492,52 @@
     </div>
 
   {{ form_end(form) }}
+
+{%- set templates = {
+    'countries': 'country-template',
+    'regions': 'region-template',
+    'timezones': 'timezone-template',
+    'select': 'select-template',
+    'lists': 'leadlist-template',
+    'campaign': 'campaign-template',
+    'deviceTypes': 'device_type-template',
+    'deviceBrands': 'device_brand-template',
+    'deviceOs': 'device_os-template',
+    'emails': 'lead_email_received-template',
+    'tags': 'tags-template',
+    'stage': 'stage-template',
+    'locales': 'locale-template',
+    'globalcategory': 'globalcategory-template',
+} -%}
+<div class="hide" id="templates">
+    {% for dataKey, template in templates %}
+        <select class="form-control not-chosen {{ template }}"
+                {% if 'tags' == dataKey %}data-placeholder="{{ 'mautic.lead.tags.select_or_create'|trans }}"{% endif %}
+                {% if 'tags' == dataKey %}data-no-results-text="{{ 'mautic.lead.tags.enter_to_create'|trans }}"{% endif %}
+                {% if 'tags' == dataKey %}data-allow-add="true"{% endif %}
+                {% if 'tags' == dataKey %}onchange="Mautic.createLeadTag(this)"{% endif %}
+                name="{{ form.vars.id }}[filters][__name__][filter]"
+                id="{{ form.vars.id }}_filters___name___filter">
+            {% if form.vars[dataKey] is defined %}
+                {% set index = 0 %}
+                {% for label, value in form.vars[dataKey] %}
+                    {% if value is iterable %}
+                        <optgroup label="{{ label }}">
+                        {% for optionLabel, optionValue in value %}
+                            {% if (dataKey == 'regions') %}
+                                {% set optionValue = index %}
+                                {% set index = index + 1 %}
+                            {% endif %}
+                            <option value="{{ optionValue }}">{{ optionLabel }}</option>
+                        {% endfor %}
+                        </optgroup>
+                    {% else %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </select>
+    {% endfor %}
+</div>
 {{ includeScript('plugins/MauticFocusBundle/Assets/js/focus.js') }}
 {% endblock %}
