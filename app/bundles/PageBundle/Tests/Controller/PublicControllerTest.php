@@ -2,7 +2,10 @@
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -19,6 +22,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Controller\PublicController;
@@ -282,17 +286,10 @@ class PublicControllerTest extends TestCase
             ->method('isTrackable')
             ->willReturn(true);
 
-        $getContactFromRequestCallback = function ($queryFields) use ($clickTrough) {
-            if (empty($queryFields)) {
-                return null;
-            }
-
-            throw new InvalidDecodedStringException($clickTrough);
-        };
-
-        $this->contactRequestHelper->expects(self::exactly(2))
+        $this->contactRequestHelper->expects(self::once())
             ->method('getContactFromQuery')
-            ->willReturnCallback($getContactFromRequestCallback);
+            ->with([])
+            ->willReturn(null);
 
         $this->router->expects(self::once())
             ->method('generate')
@@ -362,17 +359,10 @@ class PublicControllerTest extends TestCase
             ->method('isTrackable')
             ->willReturn(true);
 
-        $getContactFromRequestCallback = function ($queryFields) use ($clickThrough) {
-            if (empty($queryFields)) {
-                return null;
-            }
-
-            throw new InvalidDecodedStringException($clickThrough);
-        };
-
-        $this->contactRequestHelper->expects(self::exactly(2))
+        $this->contactRequestHelper->expects(self::once())
             ->method('getContactFromQuery')
-            ->willReturnCallback($getContactFromRequestCallback);
+            ->with([])
+            ->willReturn(null);
 
         $this->router->expects(self::once())
             ->method('generate')
@@ -412,6 +402,130 @@ class PublicControllerTest extends TestCase
             $redirectId
         );
         self::assertSame($targetUrl, $response->getTargetUrl());
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+    }
+
+    public function testRedirectUsesStoredEmailTokensWhenBlockedTrackingCookieIsPresent(): void
+    {
+        $redirectId      = 'tokenizedRedirectId';
+        $redirectUrl     = 'https://example.com/preferences?token={contactfield=preference_token}';
+        $resolvedToken   = 'stored-token-value';
+        $trackingHash    = 'trackinghash123';
+        $clickThrough    = ClickthroughHelper::encodeArrayForUrl([
+            'source' => [],
+            'email'  => null,
+            'stat'   => $trackingHash,
+            'lead'   => 42,
+        ]);
+        $lead            = new Lead();
+        $emailStat       = $this->createMock(\Mautic\EmailBundle\Entity\Stat::class);
+        $leadModel       = $this->createMock(LeadModel::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $objectManager   = $this->createMock(ObjectManager::class);
+        $repository      = $this->createMock(ObjectRepository::class);
+
+        $this->redirectModel->expects(self::once())
+            ->method('getRedirectById')
+            ->with($redirectId)
+            ->willReturn($this->redirect);
+
+        $this->redirect->expects(self::once())
+            ->method('isPublished')
+            ->with(false)
+            ->willReturn(true);
+
+        $this->redirect->expects(self::once())
+            ->method('getUrl')
+            ->willReturn($redirectUrl);
+
+        $this->ipLookupHelper->expects(self::once())
+            ->method('getIpAddress')
+            ->willReturn($this->ipAddress);
+
+        $this->ipAddress->expects(self::once())
+            ->method('isTrackable')
+            ->willReturn(false);
+
+        $emailStat->expects(self::once())
+            ->method('getTokens')
+            ->willReturn([
+                '{contactfield=preference_token}' => $resolvedToken,
+            ]);
+
+        $emailStat->expects(self::once())
+            ->method('getLead')
+            ->willReturn($lead);
+
+        $repository->expects(self::once())
+            ->method('findOneBy')
+            ->with(['trackingHash' => $trackingHash])
+            ->willReturn($emailStat);
+
+        $objectManager->expects(self::once())
+            ->method('getRepository')
+            ->with(\Mautic\EmailBundle\Entity\Stat::class)
+            ->willReturn($repository);
+
+        $managerRegistry->expects(self::once())
+            ->method('getManager')
+            ->willReturn($objectManager);
+
+        $this->modelFactory->expects(self::once())
+            ->method('getModel')
+            ->with('lead')
+            ->willReturn($leadModel);
+
+        $this->contactRequestHelper->expects(self::never())
+            ->method('getContactFromQuery');
+
+        $this->primaryCompanyHelper->expects(self::once())
+            ->method('getProfileFieldsWithPrimaryCompany')
+            ->with($lead)
+            ->willReturn([]);
+
+        $this->router->expects(self::once())
+            ->method('generate')
+            ->with('mautic_asset_download')
+            ->willReturn('/asset');
+
+        $this->internalContainer
+            ->expects(self::once())
+            ->method('get')
+            ->willReturnMap([
+                ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->router],
+            ]);
+
+        $this->request->cookies->set('Blocked-Tracking', '1');
+        $this->request->query->set('ct', $clickThrough);
+
+        $controller = new PublicController(
+            $managerRegistry,
+            $this->modelFactory,
+            $this->createMock(UserHelper::class),
+            $this->createMock(CoreParametersHelper::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(FlashBag::class),
+            new RequestStack(),
+            $this->createMock(CorePermissions::class)
+        );
+        $controller->setContainer($this->internalContainer);
+
+        $response = $controller->redirectAction(
+            $this->request,
+            $this->contactRequestHelper,
+            $this->primaryCompanyHelper,
+            $this->ipLookupHelper,
+            $this->logger,
+            $this->redirectModel,
+            $this->pageModel,
+            $redirectId
+        );
+
+        self::assertSame(
+            sprintf('https://example.com/preferences?token=%s', $resolvedToken),
+            $response->getTargetUrl()
+        );
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 

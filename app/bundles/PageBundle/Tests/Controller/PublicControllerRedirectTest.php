@@ -12,6 +12,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -127,6 +128,61 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);
         Assert::assertNotNull($hit);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('blockedTrackingCookieProvider')]
+    public function testRedirectReplacesStoredEmailTokensWhenBlockedTrackingCookieIsPresent(bool $blockedTracking): void
+    {
+        $resolvedToken = 'resolved-preference-token';
+        $url           = 'https://example.com/preferences?token={contactfield=preference_token}';
+
+        $lead = new Lead();
+        $lead->setEmail('redirect-test@example.com');
+        $this->em->persist($lead);
+
+        $stat = new Stat();
+        $stat->setTrackingHash('blockedtrackinghash123');
+        $stat->setDateSent(new \DateTime());
+        $stat->setEmailAddress('redirect-test@example.com');
+        $stat->setLead($lead);
+        $stat->setTokens([
+            '{contactfield=preference_token}' => $resolvedToken,
+        ]);
+        $this->em->persist($stat);
+
+        $redirect = new Redirect();
+        $redirect->setUrl($url);
+        $redirect->setRedirectId('57cf5a66a9f9414f301082d0');
+        $this->em->persist($redirect);
+        $this->em->flush();
+
+        if ($blockedTracking) {
+            $this->client->getCookieJar()->set(new Cookie('Blocked-Tracking', '1'));
+        }
+
+        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+
+        $this->logoutUser();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, sprintf('/r/%s?ct=%s', $redirect->getRedirectId(), $ct));
+
+        $response = $this->client->getResponse();
+        \assert($response instanceof RedirectResponse);
+        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        Assert::assertSame(
+            sprintf('https://example.com/preferences?token=%s', $resolvedToken),
+            $response->getTargetUrl()
+        );
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function blockedTrackingCookieProvider(): iterable
+    {
+        yield 'without blocked tracking cookie' => [false];
+        yield 'with blocked tracking cookie' => [true];
     }
 
     private function getEncodedClickThroughValue(string $trackingHash, int $leadId): string

@@ -3,6 +3,7 @@
     - lead
     - fields
     - form
+        - groups
 #}
 {% extends '@MauticCore/Default/content.html.twig' %}
 
@@ -20,7 +21,6 @@
 {% endblock %}
 
 {% block content %}
-  {% set groups = fields|keys|sort %}
   {% set img = leadGetAvatar(lead) %}
   {{ form_start(form) }}
   <!-- start: box layout -->

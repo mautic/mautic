@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -499,32 +500,66 @@ class PublicController extends AbstractFormController
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
-            if ($ipAddress->isTrackable()) {
-                // Search replace lead fields in the URL
-                try {
-                    $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+            try {
+                $decodedClickthrough = is_array($ct) ? $ct : ClickthroughHelper::decodeArrayFromUrl($ct);
+                /** @var LeadModel $leadModel */
+                $leadModel = $this->getModel('lead');
+                /** @var \Mautic\EmailBundle\Entity\StatRepository $emailStatRepository */
+                $emailStatRepository = $this->doctrine->getManager()->getRepository(\Mautic\EmailBundle\Entity\Stat::class);
+
+                // Resolve the contact for tokenized redirect URLs even when tracking is temporarily blocked.
+                $lead = null;
+                $emailTokens = [];
+                if (!empty($decodedClickthrough['stat'])) {
+                    $stat = $emailStatRepository->findOneBy(['trackingHash' => $decodedClickthrough['stat']]);
+                    if (null !== $stat) {
+                        $emailTokens = $stat->getTokens();
+                        $statLead    = $stat->getLead();
+                        if ($statLead instanceof Lead) {
+                            $lead = $statLead;
+                        }
+                    }
+                }
+
+                if (!empty($decodedClickthrough['lead']) && is_numeric($decodedClickthrough['lead'])) {
+                    $lead ??= $leadModel->getEntity((int) $decodedClickthrough['lead']);
+                }
+
+                if (!$lead) {
+                    $lead = $contactRequestHelper->getContactFromQuery(['ct' => $decodedClickthrough]);
+                }
+
+                if ($ipAddress->isTrackable()) {
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
-                } catch (InvalidDecodedStringException $e) {
-                    // Invalid ct value so we must unset it
-                    // and process the request without it
+                }
+            } catch (InvalidDecodedStringException $e) {
+                // Invalid ct value so we must unset it
+                // and process the request without it
 
-                    $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
+                $logger->error(sprintf('Invalid clickthrough value: %s', $ct), ['exception' => $e]);
 
-                    $request->request->remove('ct');
-                    $request->query->remove('ct');
+                $request->request->remove('ct');
+                $request->query->remove('ct');
+                $lead = null;
+                if ($ipAddress->isTrackable()) {
                     $lead           = $contactRequestHelper->getContactFromQuery();
                     $isHitTrackable = $pageModel->hitPage($redirect, $request, 200, $lead);
                 }
+                $emailTokens = [];
+            }
 
-                if ($lead) {
-                    $leadArray = $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-                    $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+            if (!empty($emailTokens)) {
+                $url = str_replace(array_keys($emailTokens), $emailTokens, $url);
+            }
 
-                    // Dispatch URL token replace event to allow modifications
-                    $urlEvent = new UrlTokenReplaceEvent($url, $lead, null);
-                    $this->dispatcher->dispatch($urlEvent);
-                    $url = $urlEvent->getContent();
-                }
+            if ($lead) {
+                $leadArray = $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
+                $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
+
+                // Dispatch URL token replace event to allow modifications
+                $urlEvent = new UrlTokenReplaceEvent($url, $lead, null);
+                $this->dispatcher->dispatch($urlEvent);
+                $url = $urlEvent->getContent();
             }
 
             if (str_contains($url, $this->generateUrl('mautic_asset_download'))) {
