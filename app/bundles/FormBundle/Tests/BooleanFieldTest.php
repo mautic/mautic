@@ -50,7 +50,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $clientResponse->getContent());
 
         $response  = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $formId    = $response['form']['id'];
@@ -64,7 +64,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
         $this->setUpSymfony($this->configParams);
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
     }
 
     public function testBooleanFieldRendersAsRadioWithBothLabelsAndSubmits(): void
@@ -76,7 +76,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
         $formId = $created['formId'];
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $html      = $crawler->html();
         $pageAlias = (string) $crawler->filter(self::FORM_SELECTOR)->attr('data-mautic-form');
 
@@ -97,7 +97,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
             'mauticform[test_boolean]' => '0',
         ]);
         $this->client->submit($form);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions);
@@ -134,7 +134,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
         $formCrawler = $crawler->filter(sprintf(self::FORM_SELECTOR_BY_ALIAS, $pageAlias));
         $form        = $formCrawler->form();
         $this->client->submit($form);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions);
@@ -150,7 +150,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
             'mauticform[test_boolean]' => ['1'],
         ]);
         $this->client->submit($form2);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
         $this->assertCount(2, $submissions);
@@ -187,7 +187,7 @@ final class BooleanFieldTest extends MauticMysqlTestCase
             'mauticform[test_boolean]' => ['0'],
         ]);
         $this->client->submit($form);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions);
