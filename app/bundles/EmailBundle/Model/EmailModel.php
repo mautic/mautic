@@ -942,9 +942,30 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get an array of tracked links.
      */
-    public function getEmailClickStats($emailId): array
+    public function getEmailClickStats($emailId, ?string $orderBy = null, ?string $orderByDir = null): array
     {
-        return $this->pageTrackableModel->getTrackableList('email', $emailId);
+        $stats = $this->pageTrackableModel->getTrackableList('email', $emailId);
+
+        if ('t.hits' !== $orderBy) {
+            return $stats;
+        }
+
+        $direction = 'DESC' === strtoupper((string) $orderByDir) ? -1 : 1;
+
+        usort(
+            $stats,
+            static function (array $first, array $second) use ($direction): int {
+                $comparison = (int) $first['hits'] <=> (int) $second['hits'];
+
+                if (0 === $comparison) {
+                    $comparison = strcmp((string) $first['url'], (string) $second['url']);
+                }
+
+                return $comparison * $direction;
+            }
+        );
+
+        return $stats;
     }
 
     /**

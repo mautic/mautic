@@ -59,7 +59,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true)['email'];
 
@@ -94,7 +94,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true)['email'];
 

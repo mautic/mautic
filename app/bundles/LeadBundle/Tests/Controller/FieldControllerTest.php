@@ -34,7 +34,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $form  = $crawler->selectButton('Save & Close')->form();
         $label = 'Test value for custom field 4';
         $form['leadfield[label]']->setValue($label);
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
         $this->assertNotNull($field);

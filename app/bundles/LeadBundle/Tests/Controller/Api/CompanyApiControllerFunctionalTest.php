@@ -54,7 +54,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -79,7 +79,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -100,7 +100,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -164,7 +164,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertSame($expectedStatusCode, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
 
         if (Response::HTTP_CREATED === $expectedStatusCode) {
             $responseData = json_decode($response->getContent(), true);

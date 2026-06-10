@@ -64,81 +64,21 @@ final class MauticReportBuilderTest extends TestCase
 
     public function testFiltersWithEmptyAndNotEmptyDateTypes(): void
     {
-        $report = new Report();
-        $report->setColumns(['a.someField']);
-        $report->setFilters([
-            [
-                'column'    => 'a.emptyDate',
-                'glue'      => 'and',
-                'value'     => '',
-                'condition' => 'empty',
-            ],
-            [
-                'column'    => 'a.notEmptyDate',
-                'glue'      => 'and',
-                'value'     => '',
-                'condition' => 'notEmpty',
-            ],
-            [
-                'column'    => 'a.emptyDateTime',
-                'glue'      => 'and',
-                'value'     => '',
-                'condition' => 'empty',
-            ],
-            [
-                'column'    => 'a.notEmptyDateTime',
-                'glue'      => 'and',
-                'value'     => '',
-                'condition' => 'notEmpty',
-            ],
-            [
-                'column'    => 'a.emptyString',
-                'glue'      => 'and',
-                'value'     => '',
-                'condition' => 'empty',
-            ],
-            [
-                'column'    => 'a.notEmptyString',
-                'glue'      => 'and',
-                'value'     => '',
-                'condition' => 'notEmpty',
-            ],
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.emptyDate', 'empty'),
+            $this->buildFilter('a.notEmptyDate', 'notEmpty'),
+            $this->buildFilter('a.emptyDateTime', 'empty'),
+            $this->buildFilter('a.notEmptyDateTime', 'notEmpty'),
+            $this->buildFilter('a.emptyString', 'empty'),
+            $this->buildFilter('a.notEmptyString', 'notEmpty'),
         ]);
-        $builder = $this->buildBuilder($report);
-        $query   = $builder->getQuery([
-            'columns' => ['a.someField' => []],
-            'filters' => [
-                'a.emptyDate' => [
-                    'label' => 'Empty date',
-                    'type'  => 'date',
-                    'alias' => 'emptyDate',
-                ],
-                'a.notEmptyDate' => [
-                    'label' => 'Not empty date',
-                    'type'  => 'date',
-                    'alias' => 'notEmptyDate',
-                ],
-                'a.emptyDateTime' => [
-                    'label' => 'Empty date time',
-                    'type'  => 'datetime',
-                    'alias' => 'emptyDateTime',
-                ],
-                'a.notEmptyDateTime' => [
-                    'label' => 'Not empty date time',
-                    'type'  => 'datetime',
-                    'alias' => 'notEmptyDateTime',
-                ],
-                'a.emptyString' => [
-                    'label' => 'Empty string',
-                    'type'  => 'string',
-                    'alias' => 'emptyString',
-                ],
-                'a.notEmptyString' => [
-                    'label' => 'Not empty string',
-                    'type'  => 'string',
-                    'alias' => 'notEmptyString',
-                ],
-            ],
+        $query = $this->buildQueryWithFilters($report, [
+            'a.emptyDate'        => $this->buildFilterDefinition('Empty date', 'date', 'emptyDate'),
+            'a.notEmptyDate'     => $this->buildFilterDefinition('Not empty date', 'date', 'notEmptyDate'),
+            'a.emptyDateTime'    => $this->buildFilterDefinition('Empty date time', 'datetime', 'emptyDateTime'),
+            'a.notEmptyDateTime' => $this->buildFilterDefinition('Not empty date time', 'datetime', 'notEmptyDateTime'),
+            'a.emptyString'      => $this->buildFilterDefinition('Empty string', 'string', 'emptyString'),
+            'a.notEmptyString'   => $this->buildFilterDefinition('Not empty string', 'string', 'notEmptyString'),
         ]);
         Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', "
             SELECT
@@ -179,6 +119,49 @@ final class MauticReportBuilderTest extends TestCase
         Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
             SELECT `a`.`someField` WHERE (a.notEqualString IS NULL) OR (a.notEqualString <> :i0canotEqualString)
         ')), $query->getSql());
+    }
+
+    public function testEmptyOrFilterValueDoesNotCreateEmptyOrGroup(): void
+    {
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.isPublished', 'eq', '1'),
+            $this->buildFilter('a.name', 'contains', '', 'or'),
+        ]);
+        $query = $this->buildQueryWithFilters($report, $this->buildPublishedAndNameFilterDefinitions());
+
+        Assert::assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
+    }
+
+    public function testOrFiltersKeepRemainingAndGroup(): void
+    {
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.isPublished', 'eq', '1'),
+            $this->buildFilter('a.name', 'contains', 'John', 'or'),
+            $this->buildFilter('a.email', 'contains', 'example.com'),
+        ]);
+        $query = $this->buildQueryWithFilters($report, [
+            'a.isPublished' => $this->buildFilterDefinition('Is published', 'bool', 'isPublished'),
+            'a.name'        => $this->buildFilterDefinition('Name', 'string', 'name'),
+            'a.email'       => $this->buildFilterDefinition('Email', 'email', 'email'),
+        ]);
+
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`someField` WHERE (a.isPublished = :i0caisPublished) OR ((a.name LIKE :i1caname) AND (a.email LIKE :i2caemail))
+        ')), $query->getSql());
+    }
+
+    public function testSingleOrGroupIsAppliedWithoutExtraOrExpression(): void
+    {
+        $report = $this->buildReportWithFilters([
+            $this->buildFilter('a.isPublished', 'eq', '1'),
+            $this->buildFilter('a.reset', 'eq', '2', 'or'),
+        ]);
+        $query = $this->buildQueryWithFilters($report, [
+            'a.isPublished' => $this->buildFilterDefinition('Is published', 'bool', 'isPublished'),
+            'a.reset'       => $this->buildFilterDefinition('Reset', 'bool', 'reset'),
+        ]);
+
+        Assert::assertSame('SELECT `a`.`someField` WHERE a.isPublished = :i0caisPublished', $query->getSql());
     }
 
     public function testReportWithPreciseAvg(): void
@@ -305,5 +288,64 @@ final class MauticReportBuilderTest extends TestCase
             $report,
             $this->channelListHelper
         );
+    }
+
+    /**
+     * @param mixed[] $filters
+     */
+    private function buildReportWithFilters(array $filters): Report
+    {
+        $report = new Report();
+        $report->setColumns(['a.someField']);
+        $report->setFilters($filters);
+
+        return $report;
+    }
+
+    /**
+     * @param mixed[] $filterDefinitions
+     */
+    private function buildQueryWithFilters(Report $report, array $filterDefinitions): QueryBuilder
+    {
+        return $this->buildBuilder($report)->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => $filterDefinitions,
+        ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildFilter(string $column, string $condition, string $value = '', string $glue = 'and'): array
+    {
+        return [
+            'column'    => $column,
+            'glue'      => $glue,
+            'value'     => $value,
+            'condition' => $condition,
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildFilterDefinition(string $label, string $type, string $alias): array
+    {
+        return [
+            'label' => $label,
+            'type'  => $type,
+            'alias' => $alias,
+        ];
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    private function buildPublishedAndNameFilterDefinitions(): array
+    {
+        return [
+            'a.isPublished' => $this->buildFilterDefinition('Is published', 'bool', 'isPublished'),
+            'a.name'        => $this->buildFilterDefinition('Name', 'string', 'name'),
+        ];
     }
 }

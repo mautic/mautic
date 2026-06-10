@@ -42,7 +42,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $this->em->flush();
 
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $crawlerTable = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
         // convert html table to php array
@@ -99,7 +99,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $this->em->flush();
 
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
         $crawlerGraphTable  = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
@@ -253,7 +253,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 
         // -- test report table in mautic panel
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
         // convert html table to php array
