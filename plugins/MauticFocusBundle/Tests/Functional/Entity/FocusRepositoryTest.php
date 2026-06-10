@@ -28,7 +28,7 @@ class FocusRepositoryTest extends MauticMysqlTestCase
 
     public function testGetPublishedWithFiltersReturnsOnlyActiveFilterBasedItems(): void
     {
-        $nullFilters = $this->createFocus('Null filters', true);
+        $this->createFocus('Null filters', true);
 
         $emptyFilters = $this->createFocus('Empty filters', true);
         $emptyFilters->setFilters([]);

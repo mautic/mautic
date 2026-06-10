@@ -29,7 +29,7 @@ class PublicControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/focus/check');
 
-        Assert::assertSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
         Assert::assertSame('', $this->client->getResponse()->getContent());
     }
 
@@ -58,7 +58,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/focus/check?ct='.$ct);
         $response = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         $payload = json_decode((string) $response->getContent(), true);
         Assert::assertSame($focus->getId(), $payload['focus_items'][0]['id']);
         Assert::assertStringContainsString(sprintf('/focus/%d.js', $focus->getId()), $payload['focus_items'][0]['js_url']);
@@ -68,7 +68,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         // Non-matching contact gets nothing
         $ct = ClickthroughHelper::encodeArrayForUrl(['stat' => 'focus-tracking-hash-2']);
         $this->client->request(Request::METHOD_GET, '/focus/check?ct='.$ct);
-        Assert::assertSame(Response::HTTP_NO_CONTENT, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
 
         // The endpoint is non-trackable: it must not have created leads or devices
         Assert::assertSame($leadCount, $this->connection->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'leads'));

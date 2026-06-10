@@ -10804,25 +10804,7 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:addFiltersMetadata\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:getFilters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:getUtmTags\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContent\:\:setFilters\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
