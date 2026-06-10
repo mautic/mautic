@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
@@ -26,11 +27,16 @@ use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 
 use function Symfony\Component\Clock\now;
 
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
+
+    private const CLICK_URL_LOW  = 'https://example.com/low';
+    private const CLICK_URL_MID  = 'https://example.com/mid';
+    private const CLICK_URL_HIGH = 'https://example.com/high';
 
     public function setUp(): void
     {
@@ -193,6 +199,44 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('disabled', $html, $html);
     }
 
+    public function testEmailDetailClickCountsCanBeSortedByClicks(): void
+    {
+        $email = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'test html');
+        $this->em->flush();
+
+        $fixtures = new EmailFixturesHelper($this->em);
+        $fixtures->createEmailLink(self::CLICK_URL_LOW, $email->getId(), 1, 1);
+        $fixtures->createEmailLink(self::CLICK_URL_HIGH, $email->getId(), 5, 1);
+        $fixtures->createEmailLink(self::CLICK_URL_MID, $email->getId(), 3, 1);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+        $this->assertResponseIsSuccessful();
+        Assert::assertGreaterThan(0, $crawler->filter('.click-list thead th[scope="col"]')->count());
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}?name=email.clicks&orderby=t.hits");
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame(
+            [
+                self::CLICK_URL_HIGH,
+                self::CLICK_URL_MID,
+                self::CLICK_URL_LOW,
+            ],
+            $this->getClickCountUrls($crawler)
+        );
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}?tmpl=click_counts&name=email.clicks&orderby=t.hits");
+        $this->assertResponseIsSuccessful();
+        Assert::assertSame(
+            [
+                self::CLICK_URL_LOW,
+                self::CLICK_URL_MID,
+                self::CLICK_URL_HIGH,
+            ],
+            $this->getClickCountUrls($crawler)
+        );
+    }
+
     /**
      * @throws ORMException
      * @throws OptimisticLockException
@@ -237,7 +281,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $emailCRow = null;
 
         foreach ($emailRows as $row) {
-            $rowCrawler = new \Symfony\Component\DomCrawler\Crawler($row);
+            $rowCrawler = new Crawler($row);
             $html       = $rowCrawler->html();
 
             if (str_contains($html, 'Email A')) {
@@ -1391,6 +1435,16 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
 
         return $segment;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getClickCountUrls(Crawler $crawler): array
+    {
+        return $crawler->filter('.click-list tbody tr td.long-text a')->each(
+            fn (Crawler $node): string => (string) $node->attr('href')
+        );
     }
 
     /**

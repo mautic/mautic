@@ -74,14 +74,16 @@
   }) %}
 {% endif %}
 
+{% set widthClass = 'mauticform-' ~ (field.fieldWidth|default('100%')|u.replace('%', '').replaceMatches('/\\.\\d+/', '')) %}
+
 {% set containerAttributes = containerAttributes|merge({
         'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
         'class': containerAttributes.class|default([])|merge([
           'mauticform-row',
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
+          widthClass
         ]),
-        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
