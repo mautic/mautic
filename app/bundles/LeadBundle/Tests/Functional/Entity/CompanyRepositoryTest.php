@@ -178,7 +178,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         Assert::assertSame(
             json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR),
             [

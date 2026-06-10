@@ -34,7 +34,7 @@ final class DetailControllerTest extends MauticMysqlTestCase
 
         $responseContent = $this->client->getResponse()->getContent();
 
-        Assert::assertSame($responseCode, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseStatusCodeSame($responseCode);
         Assert::assertStringContainsString($foundPackageDesc, $responseContent);
         Assert::assertStringContainsString($foundPackageName, $responseContent);
         Assert::assertStringContainsString($latestVersion, $responseContent);

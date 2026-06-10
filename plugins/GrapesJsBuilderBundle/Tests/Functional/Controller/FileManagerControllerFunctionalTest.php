@@ -277,7 +277,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request($method, $endpoint, $parameters, $files);
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         return $response;
     }
