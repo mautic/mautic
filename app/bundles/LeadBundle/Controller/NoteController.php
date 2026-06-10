@@ -86,16 +86,16 @@ class NoteController extends FormController
         $canViewOther    = $viewPermissions['lead:notes:viewother'] ?? false;
         $canViewNotes    = $canViewOwn || $canViewOther;
 
-        if ($canViewNotes && !$canViewOther) {
-            $force[] = [
-                'column' => 'n.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user?->getId(),
-            ];
-        }
-
         $items           = [];
         if ($canViewNotes) {
+            if (!$canViewOther) {
+                $force[] = [
+                    'column' => 'n.createdBy',
+                    'expr'   => 'eq',
+                    'value'  => $this->user?->getId(),
+                ];
+            }
+
             $items = $model->getEntities(
                 [
                     'filter' => [
