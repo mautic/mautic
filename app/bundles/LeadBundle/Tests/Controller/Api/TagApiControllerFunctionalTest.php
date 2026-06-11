@@ -112,7 +112,6 @@ class TagApiControllerFunctionalTest extends MauticMysqlTestCase
         // Sending an empty payload should return a 500 server error
         // TODO ensure that the server sends back a 400 status code instead
         $this->client->request('POST', '/api/tags/new', []);
-        $clientResponse = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(500);
     }

@@ -32,7 +32,7 @@ final class FieldCollectorTest extends \PHPUnit\Framework\TestCase
         $fieldCollector->getFields('contact');
 
         // Calling for the second time to ensure it's cached and the dispatcher is called only once.
-        $fieldCollection = $fieldCollector->getFields('contact');
+        $fieldCollector->getFields('contact');
 
         Assert::assertEquals(1, $dispatcher->dispatchMethodCallCounter);
     }

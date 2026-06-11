@@ -423,7 +423,6 @@ class LeadSubscriberTest extends TestCase
         $fieldNames = [];
         $values     = [];
         $valueDAOs  = [];
-        $i          = 0;
 
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
             $values[]     = [$newValue];
