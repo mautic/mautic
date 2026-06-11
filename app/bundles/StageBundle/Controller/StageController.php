@@ -208,13 +208,16 @@ final class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
+        $stageWeights = $model->getRepository()->getStageWeights();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'      => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'entity'    => $entity,
-                    'form'      => $form->createView(),
-                    'actions'   => $actions['actions'],
+                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'       => $entity,
+                    'form'         => $form->createView(),
+                    'actions'      => $actions['actions'],
+                    'stageWeights' => $stageWeights,
                 ],
                 'contentTemplate' => '@MauticStage/Stage/form.html.twig',
                 'passthroughVars' => [
@@ -359,13 +362,16 @@ final class StageController extends AbstractFormController
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
 
+        $stageWeights = $model->getRepository()->getStageWeights();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'    => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'entity'  => $entity,
-                    'form'    => $form->createView(),
-                    'actions' => $actions['actions'],
+                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'       => $entity,
+                    'form'         => $form->createView(),
+                    'actions'      => $actions['actions'],
+                    'stageWeights' => $stageWeights,
                 ],
                 'contentTemplate' => '@MauticStage/Stage/form.html.twig',
                 'passthroughVars' => [
