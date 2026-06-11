@@ -87,7 +87,7 @@ final class CampaignSubscriberTest extends TestCase
     /**
      * @param array<string, string> $properties
      */
-    private function createCampaignExecutionEvent(Hit&MockObject $hit, array $properties): CampaignExecutionEvent
+    private function createCampaignExecutionEvent(Hit&MockObject $hit, array $properties): object
     {
         // @phpstan-ignore-next-line (CampaignExecutionEvent is deprecated but needed for this test)
         return new CampaignExecutionEvent([
