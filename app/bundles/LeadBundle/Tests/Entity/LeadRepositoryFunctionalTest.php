@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -125,14 +124,14 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', $payload);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), print_r(json_decode($this->client->getResponse()->getContent(), true), true));
+        $this->assertResponseIsSuccessful();
         $contentArray = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount($expectedCount, $contentArray['items']);
     }
 
     /**
-     * @return array<string, array<int, int|string|bool|string[]>>
+     * @return iterable<string, array<int, int|string|bool|string[]>>
      */
     public static function dataForTestAjaxGetLeadsByFieldValue(): iterable
     {

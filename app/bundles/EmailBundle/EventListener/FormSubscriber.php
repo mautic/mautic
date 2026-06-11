@@ -37,14 +37,13 @@ class FormSubscriber implements EventSubscriberInterface
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('email.send.user', [
-            'group'             => 'mautic.email.actions',
-            'label'             => 'mautic.email.form.action.sendemail.admin',
-            'description'       => 'mautic.email.form.action.sendemail.admin.descr',
-            'formType'          => FormSubmitActionUserEmailType::class,
-            'formTheme'         => '@MauticEmail/FormTheme/FormAction/_formaction_properties_useremail_row.html.twig',
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticEmail/Action/email.html.twig',
+            'group'       => 'mautic.email.actions',
+            'label'       => 'mautic.email.form.action.sendemail.admin',
+            'description' => 'mautic.email.form.action.sendemail.admin.descr',
+            'formType'    => FormSubmitActionUserEmailType::class,
+            'formTheme'   => '@MauticEmail/FormTheme/FormAction/_formaction_properties_useremail_row.html.twig',
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticEmail/Action/email.html.twig',
         ]);
 
         $event->addSubmitAction('email.send.lead', [

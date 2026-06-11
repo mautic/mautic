@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Message;
 
 final class EmailSendFunctionalTest extends MauticMysqlTestCase
 {
@@ -32,7 +33,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
                         </body></html>';
         $email = $this->createEmail(
             'test subject',
-            [$segment->getId() => $segment],
+            [$segment->getId() ?? '' => $segment],
             $content
         );
         $this->em->flush();
@@ -52,9 +53,10 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
             $response->getContent()
         );
 
+        /** @var MauticMessage[] $messages */
         $messages = [
-            $this->getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
-            $this->getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
+            self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
+            self::getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
         ];
 
         foreach ($messages as $message) {
@@ -94,6 +96,30 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         // The email stat hashes cannot be the same in different emails:
         Assert::assertNotEquals($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
+    }
+
+    public function testEmailSendToBatchOneContactWithMalformedClickThrough(): void
+    {
+        $urlParts = $this->sendEmailToContact('https://localhost/');
+
+        // malform click through parameter
+        parse_str($urlParts['query'], $queryParams);
+        self::assertArrayHasKey('ct', $queryParams);
+        $queryParams['ct'] = substr($queryParams['ct'], 0, -5);
+
+        $this->requestUrl($urlParts['path'], $queryParams);
+        self::assertResponseRedirects('/');
+    }
+
+    public function testEmailSendToBatchOneContactWithTokenInUrl(): void
+    {
+        $urlParts = $this->sendEmailToContact('https://localhost/email-{contactfield=email}/link');
+
+        parse_str($urlParts['query'], $queryParams);
+        self::assertArrayHasKey('ct', $queryParams);
+
+        $this->requestUrl($urlParts['path'], $queryParams);
+        self::assertResponseRedirects('/email-contact-flood-0@doe.com/link');
     }
 
     /**
@@ -152,5 +178,62 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         $listLead->setDateAdded(new \DateTime());
 
         $this->em->persist($listLead);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function sendEmailToContact(string $url): array
+    {
+        $segment = $this->createSegment('Segment A', 'seg-a');
+        $this->createContacts(1, $segment);
+        $content = '<!DOCTYPE html><htm><body><a href="'.$url.'">link</a>
+                        <a id="{unsubscribe_url}">unsubscribe here</a>
+                        <a href="{resubscribe_url}">resubscribe here</a>
+                        </body></html>';
+        $email = $this->createEmail(
+            'test subject',
+            [$segment->getId() ?? '' => $segment],
+            $content
+        );
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
+            Request::METHOD_POST,
+            '/s/ajax?action=email:sendBatch',
+            ['id' => $email->getId(), 'pending' => 1]
+        );
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful($response->getContent());
+        Assert::assertSame(
+            '{"success":1,"percent":100,"progress":[1,1],"stats":{"sent":1,"failed":0,"failedRecipients":[]}}',
+            $response->getContent()
+        );
+
+        $rawMessage = self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0];
+        Assert::assertInstanceOf(Message::class, $rawMessage);
+        \assert($rawMessage instanceof Message);
+
+        $body = quoted_printable_decode($rawMessage->getBody()->bodyToString());
+        preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
+        Assert::assertArrayHasKey(1, $match, $body);
+
+        return parse_url($match[1]);
+    }
+
+    /**
+     * @param mixed[] $queryParams
+     */
+    private function requestUrl(string $uri, array $queryParams): void
+    {
+        // Log out and call as an anonymous.
+        $this->client->followRedirects(false);
+        $this->logoutUser();
+
+        // Do not request an absolute URL in tests.
+        $this->client->request(Request::METHOD_GET, $uri, $queryParams);
     }
 }

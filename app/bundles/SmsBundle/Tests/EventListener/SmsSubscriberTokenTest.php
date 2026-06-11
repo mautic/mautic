@@ -58,7 +58,7 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
 
         $ctRegex        = 'ct=([a-zA-Z0-9%]+)';
         $domainRegex    = 'https?:\/\/([a-zA-Z0-9.-]+)';
-        $assetLinkRegex = $domainRegex.'\/asset\/'.$asset->getId().':test\?'.$ctRegex;
+        $assetLinkRegex = $domainRegex.'\/asset\/'.$asset->getSlug().'\?'.$ctRegex;
         $pageLinkregex  = $domainRegex.'\/test-page\?'.$ctRegex;
         $trackingRegex  = $domainRegex.'\/r\/([a-zA-Z0-9]+)\?'.$ctRegex;
 

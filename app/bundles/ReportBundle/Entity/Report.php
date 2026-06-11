@@ -29,10 +29,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('report:reports:viewown')"),
         new Post(security: "is_granted('report:reports:create')"),
-        new Get(security: "is_granted('report:reports:viewown')"),
-        new Put(security: "is_granted('report:reports:editown')"),
-        new Patch(security: "is_granted('report:reports:editother')"),
-        new Delete(security: "is_granted('report:reports:deleteown')"),
+        new Get(security: "is_granted('report:reports:viewown', object)"),
+        new Put(security: "is_granted('report:reports:editown', object)"),
+        new Patch(security: "is_granted('report:reports:editother', object)"),
+        new Delete(security: "is_granted('report:reports:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['report:read'],

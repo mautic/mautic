@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
@@ -264,9 +265,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
-
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
 
         /** @var Lead $contact */
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
@@ -296,7 +295,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadLeadData::class]);
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv');
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(
             'Contact export scheduled for CSV file type.',
             $clientResponse->getContent()
@@ -468,7 +467,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $contactA = $this->createContact('contact@a.email');
         $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $this->createContact('contact@c.email');
 
         $companyName = 'Doe Corp';
         $company     = new Company();
@@ -495,7 +494,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
@@ -505,11 +504,13 @@ class LeadControllerTest extends MauticMysqlTestCase
                 'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
         $this->assertQueuedEmailCount(1);
 
-        $email      = $this->getMailerMessage();
+        $email = $this->getMailerMessage();
+        \assert($email instanceof MauticMessage);
+
         $userHelper = static::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
@@ -543,7 +544,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
@@ -553,11 +554,13 @@ class LeadControllerTest extends MauticMysqlTestCase
                 'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
         $this->assertQueuedEmailCount(1);
 
-        $email      = $this->getMailerMessage();
+        $email = $this->getMailerMessage();
+        \assert($email instanceof MauticMessage);
+
         $userHelper = static::getContainer()->get(UserHelper::class);
         $user       = $userHelper->getUser();
 
@@ -815,9 +818,9 @@ EMAIL;
 
         $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
+        $this->client->submit($form);
 
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
 
         /** @var Lead $contact */
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
@@ -986,7 +989,7 @@ EMAIL;
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $this->assertResponseIsSuccessful();
-        $response = $this->client->getResponse();
+        $this->client->getResponse();
 
         $scores = $contact->getGroupScores();
         $this->assertCount(2, $scores);
@@ -1025,7 +1028,7 @@ EMAIL;
         $this->client->request(Request::METHOD_GET, '/s/companies/merge/'.$companyA->getId());
         $response = $this->client->getResponse();
 
-        Assert::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
 
@@ -1042,7 +1045,7 @@ EMAIL;
         $this->em->clear();
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Save')->form();
         $form->setValues(
@@ -1051,8 +1054,8 @@ EMAIL;
                 'lead_batch_dnc[ids]'    => json_encode([$contact->getId()]),
             ]
         );
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
 
         $clientResponse = $this->client->getResponse();
 
@@ -1114,5 +1117,90 @@ EMAIL;
             ],
             $auditLog->getDetails()['args']
         );
+    }
+
+    public function testCampaignMembershipOnContactListing(): void
+    {
+        // Setup campaigns
+        $campaignOne = new Campaign();
+        $campaignOne->setName('Test Campaign One');
+        $this->em->persist($campaignOne);
+
+        $campaignTwo = new Campaign();
+        $campaignTwo->setName('Test Campaign Two');
+        $this->em->persist($campaignTwo);
+
+        // Setup leads
+        // Lead in Campaign One only
+        $leadOne = $this->createContact('test.user1@example.com');
+        $this->addContactToCampaign($leadOne, $campaignOne);
+
+        // Lead in Campaign Two only
+        $leadTwo = $this->createContact('test.user2@example.com');
+        $this->addContactToCampaign($leadTwo, $campaignTwo);
+
+        // Lead in both Campaign One and Campaign Two
+        $leadThree = $this->createContact('test.user3@example.com');
+        $this->addContactToCampaign($leadThree, $campaignOne);
+        $this->addContactToCampaign($leadThree, $campaignTwo);
+
+        // Lead not in any campaign
+        $leadFour = $this->createContact('test.user4@example.com');
+
+        // Lead in Campaign One, but manually removed
+        $leadFive = $this->createContact('test.user5@example.com');
+        $this->addContactToCampaign($leadFive, $campaignOne, true); // Manually removed
+
+        // Flush and clear for fresh state
+        $this->em->flush();
+        $this->em->clear();
+
+        // Scenario 1: Basic filtering - Campaign One
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:'.$campaignOne->getId());
+        $this->assertResponseIsSuccessful();
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(2, $leadsTableRows->count(), 'Should find leadOne and leadThree in Campaign One search.');
+        $this->assertStringContainsString($leadOne->getEmail(), $crawler->html());
+        $this->assertStringContainsString($leadThree->getEmail(), $crawler->html());
+        $this->assertStringNotContainsString($leadTwo->getEmail(), $crawler->html());
+        $this->assertStringNotContainsString($leadFour->getEmail(), $crawler->html());
+        $this->assertStringNotContainsString($leadFive->getEmail(), $crawler->html());
+
+        // Scenario 2: Basic filtering - Campaign Two
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:'.$campaignTwo->getId());
+        $this->assertResponseIsSuccessful();
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(2, $leadsTableRows->count(), 'Should find leadTwo and leadThree in Campaign Two search.');
+        $this->assertStringContainsString($leadTwo->getEmail(), $crawler->html());
+        $this->assertStringContainsString($leadThree->getEmail(), $crawler->html());
+        $this->assertStringNotContainsString($leadOne->getEmail(), $crawler->html());
+        $this->assertStringNotContainsString($leadFour->getEmail(), $crawler->html());
+        $this->assertStringNotContainsString($leadFive->getEmail(), $crawler->html());
+
+        // Scenario 3: Contact not in any campaign (should not appear in any campaign search)
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:'.$campaignOne->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString($leadFour->getEmail(), $crawler->html(), 'LeadFour should not appear in Campaign One search.');
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:'.$campaignTwo->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString($leadFour->getEmail(), $crawler->html(), 'LeadFour should not appear in Campaign Two search.');
+
+        // Scenario 4: Manually removed contact (should not appear in search)
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:'.$campaignOne->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString($leadFive->getEmail(), $crawler->html(), 'LeadFive (manually removed) should not appear in Campaign One search.');
+
+        // Scenario 5: Non-existent campaign ID
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:9999');
+        $this->assertResponseIsSuccessful();
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(0, $leadsTableRows->count(), 'Should find 0 results for a non-existent campaign ID.');
+
+        // Scenario 6: Invalid campaign ID format
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts?search=campaign:abc');
+        $this->assertResponseIsSuccessful();
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $this->assertEquals(0, $leadsTableRows->count(), 'Should find 0 results for an invalid campaign ID format.');
     }
 }

@@ -176,7 +176,7 @@ $container->loadFromExtension(
     ]
 );
 
-$this->import('security_api.php');
+$loader->import('security_api.php');
 
 // List config keys we do not want the user to change via the config UI
 $restrictedConfigFields = [

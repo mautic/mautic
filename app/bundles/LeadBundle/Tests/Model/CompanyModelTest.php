@@ -182,7 +182,6 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
     private function setProperty($object, $class, $property, $value): void
     {
         $reflectedProp = new \ReflectionProperty($class, $property);
-        $reflectedProp->setAccessible(true);
         $reflectedProp->setValue($object, $value);
     }
 
@@ -241,7 +240,6 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass($companyModel);
         $property   = $reflection->getProperty('security');
-        $property->setAccessible(true);
         $property->setValue($companyModel, $security);
     }
 }

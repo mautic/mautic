@@ -193,8 +193,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             $sendTo = [$sendTo];
         }
 
-        $sentCount       = 0;
-        $failedCount     = 0;
+        $sentCount       = [];
+        $stats           = [];
         $results         = [];
         $contacts        = [];
         $fetchContacts   = [];
@@ -271,15 +271,16 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                 unset($contacts[$queue]);
             }
 
-            $stats = [];
             // @todo we should allow batch sending based on transport, MessageBird does support 20 SMS at once
             // the transport chain is already prepared for it
             if (count($contacts)) {
                 /** @var Lead $lead */
                 foreach ($contacts as $lead) {
-                    $leadId          = $lead->getId();
-                    $stat            = $this->createStatEntry($sms, $lead, $channel, false, $listId);
+                    $leadId            = $lead->getId();
+                    [, $translatedSms] = $this->getTranslatedEntity($sms, $lead);
+                    \assert($translatedSms instanceof Sms);
 
+                    $stat            = $this->createStatEntry($translatedSms, $lead, $channel, false, $listId);
                     $leadPhoneNumber = $lead->getLeadPhoneNumber();
 
                     if (empty($leadPhoneNumber)) {
@@ -291,11 +292,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         continue;
                     }
 
-                    list($ignore, $sms) = $this->getTranslatedEntity($sms, $lead);
-                    \assert($sms instanceof Sms);
-
-                    $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
-                    $smsEvent->setSmsId($sms->getId());
+                    $smsEvent = new SmsSendEvent($translatedSms->getMessage(), $lead);
+                    $smsEvent->setSmsId($translatedSms->getId());
                     $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
 
                     $tokenEvent = $this->dispatcher->dispatch(
@@ -305,8 +303,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                             [
                                 'channel' => [
                                     'sms',          // Keep BC pre 2.14.1
-                                    $sms->getId(),  // Keep BC pre 2.14.1
-                                    'sms' => $sms->getId(),
+                                    $translatedSms->getId(),  // Keep BC pre 2.14.1
+                                    'sms' => $translatedSms->getId(),
                                 ],
                                 'stat'    => $stat->getTrackingHash(),
                             ]
@@ -318,8 +316,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         'sent'    => false,
                         'type'    => 'mautic.sms.sms',
                         'status'  => 'mautic.sms.timeline.status.delivered',
-                        'id'      => $sms->getId(),
-                        'name'    => $sms->getName(),
+                        'id'      => $translatedSms->getId(),
+                        'name'    => $translatedSms->getName(),
                         'content' => $tokenEvent->getContent(),
                     ];
 
@@ -330,10 +328,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
                         if (is_string($metadata)) {
                             $stat->addDetail('failed', $metadata);
                         }
-                        ++$failedCount;
                     } else {
-                        $sendResult['sent'] = true;
-                        ++$sentCount;
+                        $sendResult['sent']                 = true;
+                        $sentCount[$translatedSms->getId()] = ($sentCount[$translatedSms->getId()] ?? 0) + 1;
                     }
 
                     $stats[]            = $stat;
@@ -345,8 +342,14 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($sentCount || $failedCount) {
-            $this->getRepository()->upCount($sms->getId(), 'sent', $sentCount);
+        if ($sentCount) {
+            $repo = $this->getRepository();
+            foreach ($sentCount as $id => $count) {
+                $repo->upCount($id, 'sent', $count);
+            }
+        }
+
+        if (count($stats)) {
             $this->getStatRepository()->saveEntities($stats);
 
             foreach ($stats as $stat) {
@@ -424,9 +427,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -442,10 +445,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     /**
      * Get line chart data of hits.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFormat
+     * @param array   $filter
+     * @param bool    $canViewOthers
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {

@@ -26,7 +26,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
         $createResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $createResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $responseData = json_decode($createResponse->getContent(), true);
         $this->assertArrayHasKey('pointGroup', $responseData);
         $createdData = $responseData['pointGroup'];
@@ -38,7 +38,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/api/points/groups');
         $getAllResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $getAllResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($getAllResponse->getContent(), true);
         $this->assertArrayHasKey('pointGroups', $responseData);
         $this->assertEquals(1, $responseData['total']);
@@ -56,7 +56,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/points/groups/{$createdData['id']}/edit", $updatePayload);
         $updateResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $updateResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($updateResponse->getContent(), true);
         $this->assertArrayHasKey('pointGroup', $responseData);
         $updatedData = $responseData['pointGroup'];
@@ -67,7 +67,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         $this->client->request('DELETE', "/api/points/groups/{$createdData['id']}/delete");
         $deleteResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $deleteResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($deleteResponse->getContent(), true);
         $this->assertArrayHasKey('pointGroup', $responseData);
         $deleteData = $responseData['pointGroup'];
@@ -77,7 +77,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         // Try to GET the group that should no longer exist
         $this->client->request('GET', "/api/points/groups/{$createdData['id']}");
         $getResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_NOT_FOUND, $getResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($getResponse->getContent(), true);
         $this->assertArrayHasKey('errors', $responseData);
         $this->assertCount(1, $responseData['errors']);
@@ -138,7 +138,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         // Try to GET the group points that should not exist
         $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups/0");
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('errors', $responseData);
         $this->assertCount(1, $responseData['errors']);
@@ -148,7 +148,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
         // Try to GET the group points for a contact that should not exist
         $this->client->request('GET', '/api/contacts/0/points/groups/0');
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $responseData = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('errors', $responseData);
         $this->assertCount(1, $responseData['errors']);
@@ -160,7 +160,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/$operator/{$value}");
         $adjustResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $adjustResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($adjustResponse->getContent(), true);
         $this->assertSame($expectedScore, $responseData['groupScore']['score']);
     }
@@ -172,7 +172,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups");
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame(count($expectedGroups), $responseData['total']);
         $this->assertSame($expectedGroups, $responseData['groupScores']);
@@ -182,7 +182,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}");
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseData = json_decode($response->getContent(), true);
         $this->assertSame($expectedScore, $responseData['groupScore']['score']);
     }

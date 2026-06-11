@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait UuidTrait
 {

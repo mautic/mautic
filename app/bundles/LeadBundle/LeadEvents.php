@@ -219,6 +219,16 @@ final class LeadEvents
     public const LIST_PRE_DELETE = 'mautic.lead_list_pre_delete';
 
     /**
+     * The mautic.lead_list_delete event is dispatched before a lead_list is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListEvent instance.
+     *
+     * @var string
+     */
+    public const ON_LIST_DELETE = 'mautic.lead_list_delete';
+
+    /**
      * The mautic.lead_list_post_delete event is dispatched after a lead_list is deleted.
      *
      * The event listener receives a
@@ -485,6 +495,26 @@ final class LeadEvents
      * @var string
      */
     public const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
+
+    /**
+     * The mautic.lead_tag_pre_merge event is dispatched before two tags are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagMergeEvent instance.
+     *
+     * @var string
+     */
+    public const TAG_PRE_MERGE = 'mautic.lead_tag_pre_merge';
+
+    /**
+     * The mautic.lead_tag_post_merge event is dispatched after two tags are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagMergeEvent instance.
+     *
+     * @var string
+     */
+    public const TAG_POST_MERGE = 'mautic.lead_tag_post_merge';
 
     /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.

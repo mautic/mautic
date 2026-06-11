@@ -14,16 +14,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RouteHelper
 {
-    /**
-     * @var RouEventDispatcherInterfaceter
-     */
-    private $dispatcher;
-
     public function __construct(
         private ObjectProvider $objectProvider,
-        EventDispatcherInterface $dispatcher,
+        private EventDispatcherInterface $dispatcher,
     ) {
-        $this->dispatcher     = $dispatcher;
     }
 
     /**

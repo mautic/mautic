@@ -24,24 +24,25 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // set form data
         $form   = $crawler->selectButton('config[buttons][save]')->form();
         $values = $form->getPhpValues();
 
-        $values['config']['leadconfig']['contact_columns']                              = ['name', 'email', 'id']; // required
-        $values['config']['emailconfig']['mailer_dsn']['scheme']                        = $data['scheme'];
-        $values['config']['emailconfig']['mailer_dsn']['host']                          = $data['host'];
-        $values['config']['emailconfig']['mailer_dsn']['port']                          = $data['port'];
-        $values['config']['emailconfig']['mailer_dsn']['path']                          = $data['path'];
-        $values['config']['emailconfig']['mailer_dsn']['user']                          = $data['user'];
-        $values['config']['emailconfig']['mailer_dsn']['password']                      = $data['password'];
-        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['label'] = 'type';
-        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['value'] = $data['type'];
+        $values['config']['leadconfig']['contact_columns']                               = ['name', 'email', 'id']; // required
+        $values['config']['companyconfig']['company_columns']                            = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
+        $values['config']['emailconfig']['mailer_dsn']['scheme']                         = $data['scheme'];
+        $values['config']['emailconfig']['mailer_dsn']['host']                           = $data['host'];
+        $values['config']['emailconfig']['mailer_dsn']['port']                           = $data['port'];
+        $values['config']['emailconfig']['mailer_dsn']['path']                           = $data['path'];
+        $values['config']['emailconfig']['mailer_dsn']['user']                           = $data['user'];
+        $values['config']['emailconfig']['mailer_dsn']['password']                       = $data['password'];
+        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['label']  = 'type';
+        $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['value']  = $data['type'];
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // check the DSN is escaped properly in the config file (both using double percent signs and URL encoded)
         $configParameters = $this->getConfigParameters();
@@ -57,7 +58,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // check values are unescaped properly in the edit form
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('config[buttons][save]')->form();
         Assert::assertEquals($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
@@ -77,22 +78,23 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // set form data
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $form->setValues($data + [
-            'config[leadconfig][contact_columns]' => ['name', 'email', 'id'], // required
+            'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'], // required
+            'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
         ]);
 
         // check if there is the given validation error
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString($expectedMessage, $crawler->text());
     }
 
     /**
-     * @return array<string, mixed[]>
+     * @return iterable<string, mixed[]>
      */
     public static function dataInvalidDsn(): iterable
     {

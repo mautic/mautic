@@ -32,6 +32,7 @@ use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -259,7 +260,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function toggleLeadListAction(Request $request): JsonResponse
+    public function toggleLeadListAction(Request $request, LeadModel $leadModel, ListModel $listModel): JsonResponse
     {
         $dataArray = ['success' => 0];
         $leadId    = (int) $request->request->get('leadId');
@@ -267,9 +268,6 @@ class AjaxController extends CommonAjaxController
         $action    = InputHelper::clean($request->request->get('listAction'));
 
         if (!empty($leadId) && !empty($listId) && in_array($action, ['remove', 'add'])) {
-            $leadModel = $this->getModel('lead');
-            $listModel = $this->getModel('lead.list');
-
             $lead = $leadModel->getEntity($leadId);
             $list = $listModel->getEntity($listId);
 
@@ -310,6 +308,11 @@ class AjaxController extends CommonAjaxController
 
     public function toggleLeadCampaignAction(Request $request, MembershipManager $membershipManager, LeadModel $leadModel, CampaignModel $campaignModel): JsonResponse
     {
+        if (!$this->security->isGranted('campaign:campaigns:editown')
+            && !$this->security->isGranted('campaign:campaigns:editother')) {
+            return $this->accessDenied();
+        }
+
         $dataArray  = ['success' => 0];
         $leadId     = (int) $request->request->get('leadId');
         $campaignId = (int) $request->request->get('campaignId');
@@ -405,7 +408,7 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the rows for new leads.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|RedirectResponse
      */
     public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model)
     {

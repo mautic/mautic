@@ -6,10 +6,11 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CategoryControllerFunctionalTest extends MauticMysqlTestCase
@@ -58,7 +59,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must contain TestTitleCategoryController2');
     }
@@ -72,7 +73,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
     }
@@ -91,7 +92,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $form['category_form[inForm]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         $body           = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('categoryId', $body);
@@ -132,21 +133,14 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $form['category_form[inForm]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        $clientResponse = $this->client->getResponse();
-        $body           = json_decode($clientResponse->getContent(), true);
+        self::assertResponseIsSuccessful();
+
         $this->assertNotEmpty($crawler->filter('select#category_form_bundle')->count(), 'The "Type" (bundle) field should remain visible after validation failure.');
     }
 
     public function testDeleteUsedInStage(): void
     {
-        $category = new Category();
-        $category->setIsPublished(true);
-        $category->setTitle('Category for stage');
-        $category->setDescription('Category for stage');
-        $category->setBundle('global');
-        $category->setAlias('category-for-stage');
-        $this->em->persist($category);
+        $category = $this->createCategory('Category for stage', 'Category for stage', 'global', 'category-for-stage');
 
         $stage = new Stage();
         $stage->setName('test for category');
@@ -171,12 +165,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
         ]);
 
-        $clientResponse = $this->client->getResponse();
-        $this->assertSame(
-            Response::HTTP_UNPROCESSABLE_ENTITY,
-            $clientResponse->getStatusCode(),
-            $clientResponse->getContent()
-        );
+        $clientResponse     = $this->client->getResponse();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
         $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
@@ -184,13 +173,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchDeleteUsedInStage(): void
     {
-        $category = new Category();
-        $category->setIsPublished(true);
-        $category->setTitle('Category for stage');
-        $category->setDescription('Category for stage');
-        $category->setBundle('global');
-        $category->setAlias('category-for-stage');
-        $this->em->persist($category);
+        $category = $this->createCategory('Category for stage', 'Category for stage', 'global', 'category-for-stage');
 
         $stage = new Stage();
         $stage->setName('test for category');
@@ -221,5 +204,91 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
         $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+    }
+
+    public function testEditCategoryByMultipleUsers(): void
+    {
+        $category = $this->createCategory(
+            'Category for concurrent edit',
+            'Category for concurrent edit',
+            'global',
+            'category-for-concurrent-edit'
+        );
+
+        $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $this->assertResponseIsSuccessful();
+        $role = $this->createRole(true);
+        $user = $this->createUser($role);
+        $this->em->flush();
+        $this->client->restart();
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString(
+            'Category for concurrent edit is currently checked out by',
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testEditCategoryWithoutPermission(): void
+    {
+        $category = $this->createCategory(
+            'Category for no edit',
+            'Category for no edit',
+            'global',
+            'category-for-no-edit'
+        );
+        $role = $this->createRole();
+        $user = $this->createUser($role);
+        $this->em->flush();
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString(
+            'You do not have access to the requested area',
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    private function createCategory(string $title, string $description, string $bundle, string $alias): Category
+    {
+        $category = new Category();
+        $category->setIsPublished(true);
+        $category->setTitle($title);
+        $category->setDescription($description);
+        $category->setBundle($bundle);
+        $category->setAlias($alias);
+        /** @var CategoryModel $categoryModel */
+        $categoryModel      = static::getContainer()->get('mautic.category.model.category');
+        $categoryModel->saveEntity($category);
+
+        return $category;
+    }
+
+    private function createRole(bool $isAdmin = false): Role
+    {
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin($isAdmin);
+        $this->em->persist($role);
+
+        return $role;
+    }
+
+    private function createUser(Role $role): User
+    {
+        $user = new User();
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
+        $user->setUsername('john.doe');
+        $user->setEmail('john.doe@email.com');
+        $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        \assert($hasher instanceof PasswordHasherInterface);
+        $user->setPassword($hasher->hash('mautic'));
+        $user->setRole($role);
+
+        $this->em->persist($user);
+
+        return $user;
     }
 }

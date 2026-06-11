@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
+final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Doctrine\ORM\Exception\ORMException
@@ -52,7 +54,7 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -77,7 +79,7 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -98,7 +100,7 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -162,7 +164,7 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertSame($expectedStatusCode, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
 
         if (Response::HTTP_CREATED === $expectedStatusCode) {
             $responseData = json_decode($response->getContent(), true);
@@ -204,5 +206,75 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
                 'expectedStatusCode' => Response::HTTP_CREATED,
             ],
         ];
+    }
+
+    public function testCreateNewCompany(): void
+    {
+        $payload = [
+            'companyname'     => 'Company A',
+            'companyemail'    => 'test@company.com',
+            'companycity'     => 'City',
+            'companyaddress1' => 'Address one',
+            'companyaddress2' => 'Address two',
+            'companyphone'    => '123456789',
+            'companywebsite'  => 'https://company.com',
+        ];
+        $this->client->request('POST', '/api/companies/new', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        foreach ($payload as $alias => $value) {
+            $this->assertEquals($value, $response['company']['fields']['all'][$alias]);
+        }
+    }
+
+    public function testCreateCompaniesInBatch(): void
+    {
+        $payload = [
+            [
+                'companyname'     => 'Company A',
+                'companyemail'    => 'test@company-a.com',
+                'companycity'     => 'City A',
+                'companyaddress1' => 'Address A one',
+                'companyaddress2' => 'Address A two',
+                'companyphone'    => '123456789',
+                'companywebsite'  => 'https://company.a.com',
+            ],
+            [
+                'companyname'     => 'Company B',
+                'companyemail'    => 'test@company-b.com',
+                'companycity'     => 'City B',
+                'companyaddress1' => 'Address B one',
+                'companyaddress2' => 'Address B two',
+                'companyphone'    => '123456789',
+                'companywebsite'  => 'https://company.b.com',
+            ],
+            [
+                'companyname'     => 'Company B',
+                'companyemail'    => 'test@company-b.com',
+                'companycity'     => 'City B',
+                'companyaddress1' => 'Address B one',
+                'companyaddress2' => 'Address B two',
+                'companyphone'    => '123456789',
+                'companywebsite'  => 'https://company.b.com',
+            ],
+        ];
+        $this->client->request('POST', '/api/companies/batch/new', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        // Assert status codes
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
+        $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][1]);
+        // The third item of payload is duplicate of the second, So expect the 200 only
+        $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][2]);
+
+        foreach ($response['companies'] as $index => $company) {
+            foreach ($payload[$index] as $alias => $value) {
+                $this->assertEquals($value, $company['fields']['all'][$alias]);
+            }
+        }
     }
 }

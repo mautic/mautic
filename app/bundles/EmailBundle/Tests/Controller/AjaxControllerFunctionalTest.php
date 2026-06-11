@@ -22,13 +22,63 @@ use Symfony\Component\Mime\Email as EmailMime;
 
 class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideSendToDncStatus')]
+    public function testGetEmailSendToDncStatusAction(bool $sendToDnc, string $expectedTranslationKey): void
+    {
+        $email = $this->createEmailWithParams(
+            'Email DNC Status',
+            'Email DNC Subject',
+            'list',
+            'beefree-empty',
+            'Test html'
+        );
+        $email->setSendToDnc($sendToDnc);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'email:getEmailSendToDncStatus',
+            'id'     => $email->getId(),
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertIsArray($content);
+        $this->assertArrayHasKey('sendToDncStatus', $content);
+        $this->assertSame($sendToDnc, $content['sendToDncStatus']);
+        $this->assertSame(
+            static::getContainer()->get('translator')->trans($expectedTranslationKey),
+            $content['sendToDncText']
+        );
+    }
+
+    /**
+     * @return iterable<string, array{bool, string}>
+     */
+    public static function provideSendToDncStatus(): iterable
+    {
+        yield 'send to dnc enabled' => [true, 'mautic.core.form.yes'];
+        yield 'send to dnc disabled' => [false, 'mautic.core.form.no'];
+    }
+
+    public function testGetEmailSendToDncStatusActionWithoutIdReturnsEmptyResponse(): void
+    {
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', ['action' => 'email:getEmailSendToDncStatus']);
+        $this->assertResponseIsSuccessful();
+
+        $content = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertSame([], $content);
+    }
+
     public function testSendTestEmailAction(): void
     {
         /** @var CoreParametersHelper $parameters */
         $parameters = self::getContainer()->get('mautic.helper.core_parameters');
 
         $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendTestEmail');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $this->assertQueuedEmailCount(0, message: 'Test emails should never be queued.');
         $this->assertEmailCount(1);
@@ -76,7 +126,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$email->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame([
             'success'         => 1,
             'delivered'       => 1,
@@ -131,7 +181,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:getEmailDeliveredCount&id={$emailEn->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame([
             'success'         => 1,
             'delivered'       => 1,
@@ -174,7 +224,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=email:heatmap&id={$email->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $content = json_decode($response->getContent(), true);
         $this->assertSame('Test html', $content['content']);
         $this->assertSame([
@@ -230,9 +280,20 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertNotEmpty($response);
-        $this->assertEquals($emailName, $response[0]['items'][$email->getId()]);
+        $this->assertEquals($emailName.' ('.$email->getId().')', $response[0]['items'][$email->getId()]);
+    }
+
+    public function testGetBuilderTokensAction(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getBuilderTokens');
+        self::assertResponseIsSuccessful();
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+        Assert::assertArrayHasKey('tokens', $response);
+        Assert::assertArrayHasKey('{contactfield=email}', $response['tokens']);
+        Assert::assertArrayHasKey('{ownerfield=email}', $response['tokens']);
+        Assert::assertArrayHasKey('{unsubscribe_url}', $response['tokens']);
     }
 
     private function createContact(string $email): Lead

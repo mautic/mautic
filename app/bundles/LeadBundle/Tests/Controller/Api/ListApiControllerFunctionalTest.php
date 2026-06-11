@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -81,7 +85,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        Assert::assertSame($expectedResponseCode, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame($expectedResponseCode);
 
         if ($expectedErrorMessage) {
             Assert::assertStringContainsString(
@@ -161,7 +165,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $segmentId = $response['list']['id'];
 
-        $this->assertSame(201, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentId);
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -223,7 +227,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($segmentId, $response['list']['id'], 'ID of the created segment does not match with the edited one.');
         $this->assertEquals('API segment renamed', $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -233,7 +237,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($segmentId, $response['list']['id'], 'ID of the created segment does not match with the fetched one.');
         $this->assertEquals('API segment renamed', $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -243,7 +247,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertNull($response['list']['id']);
         $this->assertEquals('API segment renamed', $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
@@ -253,7 +257,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(404);
         $this->assertSame(404, $response['errors'][0]['code']);
     }
 
@@ -393,13 +397,14 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
         Assert::assertArrayHasKey('errors', $response);
         $errorMessage = $this->translator->trans(
-            'mautic.lead.lists.used_in_campaigns',
+            'mautic.lead.lists.used_in_campaigns.unpublish',
             [
-                '%count%'         => '1',
+                '%count%'         => 1,
                 '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => 'Segment1',
             ],
             'validators'
         );
@@ -425,7 +430,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/segments/{$segment->getId()}/edit", ['isPublished' => 0]);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
         Assert::assertArrayNotHasKey('errors', $response);
     }
 
@@ -453,13 +458,14 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]];
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
-        $expectedErrorMessage = sprintf('leadlist: This segment is used in %s, please go back and check segments before unpublishing', $list2->getName());
 
         $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['name' => 'API segment renamed', 'isPublished' => false]);
+        $expectedErrorMessage = sprintf('isPublished: The segment %s is used in %s, please go back and check segments before unpublishing', 'API segment renamed', $list2->getName());
+
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $clientResponse->getStatusCode());
-        $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $this->assertSame($expectedErrorMessage, $response['errors'][0]['message']);
     }
 
     public function testUnpublishUsedBatchSegment(): void
@@ -486,7 +492,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ]];
         $list2 = $this->saveSegment('s2', 's2', $filter);
         $this->em->clear();
-        $expectedErrorMessage = sprintf('leadlist: This segment is used in %s, please go back and check segments before unpublishing', $list2->getName());
+        $expectedErrorMessage = sprintf('isPublished: The segment %s is used in %s, please go back and check segments before unpublishing', $list1->getName(), $list2->getName());
 
         $segments = [
             ['id' => $list1->getId(), 'isPublished' => false],
@@ -501,6 +507,46 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($response['errors'][0]['message'], $expectedErrorMessage);
 
         $this->assertSame(Response::HTTP_OK, $response['statusCodes'][1]);
+    }
+
+    public function testUnpublishSegmentUsedInAnotherSegment(): void
+    {
+        $filter = [[
+            'glue'     => 'and',
+            'field'    => 'email',
+            'object'   => 'lead',
+            'type'     => 'email',
+            'operator' => '!empty',
+            'display'  => '',
+        ]];
+        $list1  = $this->saveSegment('s1', 's1', $filter);
+        $filter = [[
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => 'leadlist',
+            'type'       => 'leadlist',
+            'operator'   => 'in',
+            'properties' => [
+                'filter' => [$list1->getId()],
+            ],
+            'display' => '',
+        ]];
+        $list2 = $this->saveSegment('s2', 's2', $filter);
+        $this->em->clear();
+
+        $this->client->request('PATCH', "/api/segments/{$list1->getId()}/edit", ['isPublished' => false]);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        Assert::assertArrayHasKey('errors', $response);
+
+        $expectedErrorMessage = sprintf(
+            'isPublished: The segment %s is used in %s, please go back and check segments before unpublishing',
+            $list1->getName(),
+            $list2->getName()
+        );
+
+        Assert::assertSame($expectedErrorMessage, $response['errors'][0]['message']);
     }
 
     public function testSegmentWithCategory(): void
@@ -536,7 +582,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertTrue($clientResponse->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals($segmentPayload['category'], $response['list']['category']['id']);
 
         // Search segments by category:
@@ -544,8 +590,225 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertTrue($clientResponse->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertCount(1, $response['lists']);
+    }
+
+    public function testGetSegmentsWithContactCounts(): void
+    {
+        $segment = new LeadList();
+        $segment->setName('Test Segment for Counts');
+        $segment->setAlias('test-segment-counts');
+        $segment->setPublicName('Test Segment');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'operator' => '!empty',
+            ],
+        ]);
+        $this->em->persist($segment);
+
+        $contact1 = new Lead();
+        $contact1->setEmail('test1@example.com');
+        $this->em->persist($contact1);
+
+        $contact2 = new Lead();
+        $contact2->setEmail('test2@example.com');
+        $this->em->persist($contact2);
+
+        $this->em->flush();
+
+        $listLead1 = new ListLead();
+        $listLead1->setList($segment);
+        $listLead1->setLead($contact1);
+        $listLead1->setDateAdded(new \DateTime());
+        $this->em->persist($listLead1);
+
+        $listLead2 = new ListLead();
+        $listLead2->setList($segment);
+        $listLead2->setLead($contact2);
+        $listLead2->setDateAdded(new \DateTime());
+        $this->em->persist($listLead2);
+
+        $this->em->flush();
+
+        $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
+        $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
+
+        $this->client->request(Request::METHOD_GET, '/api/segments');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        self::assertResponseIsSuccessful();
+        Assert::assertArrayHasKey('lists', $response);
+        Assert::assertArrayHasKey($segment->getId(), $response['lists']);
+        Assert::assertArrayNotHasKey(
+            'contactCount',
+            $response['lists'][$segment->getId()],
+            'contactCount should not be present without withCounts parameter'
+        );
+
+        $this->client->request(Request::METHOD_GET, '/api/segments?withCounts');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        self::assertResponseIsSuccessful();
+        Assert::assertArrayHasKey('lists', $response);
+        Assert::assertArrayHasKey($segment->getId(), $response['lists']);
+        Assert::assertArrayHasKey(
+            'contactCount',
+            $response['lists'][$segment->getId()],
+            'contactCount should be present with withCounts parameter'
+        );
+        Assert::assertSame(2, $response['lists'][$segment->getId()]['contactCount']);
+
+        $contact3 = new Lead();
+        $contact3->setEmail('test3@example.com');
+        $this->em->persist($contact3);
+
+        $listLead3 = new ListLead();
+        $listLead3->setList($segment);
+        $listLead3->setLead($contact3);
+        $listLead3->setDateAdded(new \DateTime());
+        $this->em->persist($listLead3);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/api/segments?withCounts');
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        self::assertResponseIsSuccessful();
+        Assert::assertSame(
+            2,
+            $response['lists'][$segment->getId()]['contactCount'],
+            'Count should remain cached at 2 even after adding third contact'
+        );
+    }
+
+    public function testDeleteUsedInCampaignSegment(): void
+    {
+        $segmentName = 'Segment1';
+        $segment     = $this->saveSegment($segmentName, mb_strtolower($segmentName));
+
+        $campaign     = new Campaign();
+        $campaignName = 'Campaign1';
+        $campaign->setName($campaignName);
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id' => $campaign->getId(),
+            'leadlist_id' => $segment->getId(),
+        ]);
+
+        $this->client->request('DELETE', "/api/segments/{$segment->getId()}/delete");
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_CONFLICT);
+        Assert::assertArrayHasKey('errors', $response);
+
+        $expectedErrorMessage = $this->translator->trans(
+            'mautic.api.dependent.entity.delete.error',
+            [
+                '%id%' => $segment->getId(),
+            ],
+            'validators'
+        );
+
+        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['message']);
+
+        $expectedErrorMessage = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => $segmentName,
+                '%count%'         => 1,
+            ],
+            'validators'
+        );
+
+        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['details'][0]);
+    }
+
+    public function testBatchDeleteUsedInCampaignSegment(): void
+    {
+        $segment1 = $this->saveSegment('s1', 's1');
+        $segment2 = $this->saveSegment('s2', 's2');
+
+        $campaign = new Campaign();
+        $campaign->setName('Campaign1');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id' => $campaign->getId(),
+            'leadlist_id' => $segment1->getId(),
+        ]);
+
+        $this->connection->insert($this->prefix.'campaign_leadlist_xref', [
+            'campaign_id' => $campaign->getId(),
+            'leadlist_id' => $segment2->getId(),
+        ]);
+
+        $ids = $segment1->getId().','.$segment2->getId();
+        $this->client->request('DELETE', "/api/segments/batch/delete?ids={$ids}");
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        self::assertResponseIsSuccessful($clientResponse->getContent());
+        Assert::assertArrayHasKey('errors', $response);
+
+        $expectedErrorMessage1 = $this->translator->trans(
+            'mautic.api.dependent.entity.delete.error',
+            [
+                '%id%' => $segment1->getId(),
+            ],
+            'validators'
+        );
+
+        $expectedErrorMessage2 = $this->translator->trans(
+            'mautic.api.dependent.entity.delete.error',
+            [
+                '%id%' => $segment2->getId(),
+            ],
+            'validators'
+        );
+
+        $expectedDetailMessage1 = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaign->getName().'"',
+                '%segmentNames%'  => $segment1->getName(),
+                '%count%'         => 1,
+            ],
+            'validators'
+        );
+
+        $expectedDetailMessage2 = $this->translator->trans(
+            'mautic.lead.lists.used_in_campaigns.delete',
+            [
+                '%campaignNames%' => '"'.$campaign->getName().'"',
+                '%segmentNames%'  => $segment2->getName(),
+                '%count%'         => 1,
+            ],
+            'validators'
+        );
+
+        $allErrors = implode(' ', array_column($response['errors'], 'message'));
+        Assert::assertStringContainsString($expectedErrorMessage1, $allErrors);
+        Assert::assertStringContainsString($expectedErrorMessage2, $allErrors);
+
+        $allDetails = implode(' ', array_column(array_column($response['errors'], 'details'), 0));
+        Assert::assertStringContainsString($expectedDetailMessage1, $allDetails);
+        Assert::assertStringContainsString($expectedDetailMessage2, $allDetails);
     }
 
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList

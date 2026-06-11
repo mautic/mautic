@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -76,7 +77,17 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         if ($event->tokensRequested([static::pageTokenRegex])) {
             $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
-            $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
+            $tokenFilter = $event->getTokenFilter();
+            $tokens      = $tokenHelper->getFormattedTokens(
+                self::pageTokenRegex,
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
+                'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '',
+                'title',
+                'id'
+            );
+            if ($tokens) {
+                $event->addTokens($tokens);
+            }
         }
     }
 
@@ -115,35 +126,49 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         if ($event->tokensRequested([static::pageTokenRegex, static::dwcTokenRegex])) {
-            $event->addTokensFromHelper($tokenHelper, static::pageTokenRegex, 'title', 'id', true);
+            $tokenFilter = $event->getTokenFilter();
+            $labelFilter = 'label' === $tokenFilter['target'] ? $tokenFilter['filter'] : '';
+            $tokens      = $tokenHelper->getFormattedTokens(
+                self::pageTokenRegex,
+                TokenFormatOptions::linkWithId('mautic.page.token.pagelink', self::pageTokenRegex),
+                $labelFilter,
+                'title'
+            );
+            if ($tokens) {
+                $event->addTokens($tokens);
+            }
 
             // add only filter based dwc tokens
             $dwcTokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('dynamicContent', 'dynamiccontent:dynamiccontents');
             $expr           = $this->connection->createExpressionBuilder()->and('e.is_campaign_based <> 1 and e.slot_name is not null');
-            $tokens         = $dwcTokenHelper->getTokens(
+            $dwcTokens      = $dwcTokenHelper->getFormattedTokens(
                 static::dwcTokenRegex,
-                '',
+                TokenFormatOptions::simplePrefix('mautic.page.token.dwc'),
+                $labelFilter,
                 'name',
                 'slot_name',
                 $expr
             );
-            $event->addTokens(is_array($tokens) ? $tokens : []);
+            if ($dwcTokens) {
+                $event->addTokens($dwcTokens);
+            }
 
+            $thisPagePrefix = $this->translator->trans('mautic.page.token.thispage').': ';
             $event->addTokens(
                 $event->filterTokens(
                     [
-                        static::langBarRegex      => $this->translator->trans('mautic.page.token.lang'),
-                        static::shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
-                        static::titleRegex        => $this->translator->trans('mautic.core.title'),
-                        static::brandName         => $this->translator->trans('mautic.core.token.brand_name'),
-                        static::descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
-                        static::segmentListRegex  => $this->translator->trans('mautic.page.form.segmentlist'),
-                        static::categoryListRegex => $this->translator->trans('mautic.page.form.categorylist'),
-                        static::preferredchannel  => $this->translator->trans('mautic.page.form.preferredchannel'),
-                        static::channelfrequency  => $this->translator->trans('mautic.page.form.channelfrequency'),
-                        static::saveprefsRegex    => $this->translator->trans('mautic.page.form.saveprefs'),
-                        static::successmessage    => $this->translator->trans('mautic.page.form.successmessage'),
-                        static::identifierToken   => $this->translator->trans('mautic.page.form.leadidentifier'),
+                        static::langBarRegex      => $thisPagePrefix.$this->translator->trans('mautic.page.token.lang'),
+                        static::shareButtonsRegex => $thisPagePrefix.$this->translator->trans('mautic.page.token.share'),
+                        static::titleRegex        => $thisPagePrefix.$this->translator->trans('mautic.core.title'),
+                        static::brandName         => $thisPagePrefix.$this->translator->trans('mautic.core.token.brand_name'),
+                        static::descriptionRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.metadescription'),
+                        static::segmentListRegex  => $thisPagePrefix.$this->translator->trans('mautic.page.form.segmentlist'),
+                        static::categoryListRegex => $thisPagePrefix.$this->translator->trans('mautic.page.form.categorylist'),
+                        static::preferredchannel  => $thisPagePrefix.$this->translator->trans('mautic.page.form.preferredchannel'),
+                        static::channelfrequency  => $thisPagePrefix.$this->translator->trans('mautic.page.form.channelfrequency'),
+                        static::saveprefsRegex    => $thisPagePrefix.$this->translator->trans('mautic.page.form.saveprefs'),
+                        static::successmessage    => $thisPagePrefix.$this->translator->trans('mautic.page.form.successmessage'),
+                        static::identifierToken   => $thisPagePrefix.$this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
             );
@@ -189,14 +214,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
             static::titleRegex,
             static::brandName,
             static::descriptionRegex,
-            static::successmessage,
         ], [
             str_contains($content, static::langBarRegex) ? $this->renderLanguageBar($page) : '',
             str_contains($content, static::shareButtonsRegex) ? $this->renderSocialShareButtons() : '',
             str_contains($content, static::titleRegex) ? $page->getTitle() : '',
             str_contains($content, static::brandName) ? $this->coreParametersHelper->get('brand_name') : '',
             str_contains($content, static::descriptionRegex) ? $page->getMetaDescription() : '',
-            str_contains($content, static::successmessage) ? $this->renderSuccessMessage() : '',
         ], $content);
     }
 
@@ -223,12 +246,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
             static::preferredchannel,
             static::channelfrequency,
             static::saveprefsRegex,
+            static::successmessage,
         ], [
             str_contains($content, static::segmentListRegex) ? $this->renderSegmentList($params) : '',
             str_contains($content, static::categoryListRegex) ? $this->renderCategoryList($params) : '',
             str_contains($content, static::preferredchannel) ? $this->renderPreferredChannel($params) : '',
             str_contains($content, static::channelfrequency) ? $this->renderChannelFrequency($params) : '',
             str_contains($content, static::saveprefsRegex) ? $this->renderSavePrefs($params) : '',
+            str_contains($content, static::successmessage) ? $this->renderSuccessMessage($params) : '',
         ], $content);
     }
 
@@ -299,7 +324,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         return $this->renderTemplate(
             '@MauticCore/Slots/channelfrequency.html.twig',
             $params,
-            '<div class="pref-channelfrequency">{templateContent}</div>'
+            '<div class="pref-channelfrequency"%s>{templateContent}</div>',
+            static::firstSlotAttribute
         );
     }
 
@@ -314,12 +340,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function renderSuccessMessage(): string
+    /**
+     * @param array<string,mixed> $params
+     */
+    private function renderSuccessMessage(array $params): string
     {
         return $this->renderTemplate(
             '@MauticCore/Slots/successmessage.html.twig',
-            [],
-            '<div class="pref-successmessage">{templateContent}</div>'
+            $params
         );
     }
 

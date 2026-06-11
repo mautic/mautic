@@ -87,7 +87,6 @@ class FileLogHandlerTest extends TestCase
     {
         $reflection = new \ReflectionClass($handler);
         $fileName   = $reflection->getProperty($property);
-        $fileName->setAccessible(true);
 
         return $fileName->getValue($handler);
     }

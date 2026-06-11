@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DynamicContentBundle\Entity\Stat as StatDC;
 use Mautic\EmailBundle\Entity\Stat as StatEmail;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -24,6 +26,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     protected function setUp(): void
     {
         // Disable API just for specific test.
@@ -58,7 +62,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testActivityApi(): void
     {
         $this->client->request('GET', '/api/contacts/activity');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
         Assert::assertArrayHasKey('events', json_decode($this->client->getResponse()->getContent(), true));
         Assert::assertArrayHasKey('filters', json_decode($this->client->getResponse()->getContent(), true));
         Assert::assertArrayHasKey('order', json_decode($this->client->getResponse()->getContent(), true));
@@ -174,7 +178,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request($method, $route, $payload);
 
-        $this->assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
         $assertResponse($this->client->getResponse(), $contact1->getId(), $contact2->deletedId);
     }
 
@@ -207,7 +211,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/contacts/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -260,7 +264,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -277,8 +281,9 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testBatchNewEndpointDoesNotCreateDuplicates(): void
     {
-        $companyA = $this->createCompany('CompanyA corp');
-        $companyB = $this->createCompany('CompanyB corp');
+        $companyA = $this->createCompany('CompanyA corp', 'contact@companya.corp');
+        $companyB = $this->createCompany('CompanyB corp', 'contact@companya.corp');
+        $this->em->flush();
         $payload  = [
             [
                 'email'            => 'batchemail1@email.com',
@@ -500,7 +505,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/api/contacts?where[0][val]=unicorn&where[0][col]=email&where[0][expr]=eq');
         $clientResponse = $this->client->getResponse();
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals('{"total":"0","contacts":{}}', $clientResponse->getContent());
     }
 
@@ -570,7 +575,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($this->client->getResponse()->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         $payload = json_decode($clientResponse->getContent(), true);
         Assert::assertEquals(1, $payload['total']);
         $contactFromApi = $payload['contacts'][$contact->getId()];
@@ -802,7 +807,6 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Remove contact
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
-        $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
     }
 
@@ -1086,7 +1090,6 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Remove contact
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
-        $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
     }
 
@@ -1186,12 +1189,17 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Remove the contact.
         $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
-        $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
     }
 
     public function testGetAllActivityDownload(): void
     {
+        $asset = new Asset();
+        $asset->setTitle('Initial Title');
+        $asset->setAlias('initial-alias');
+        $asset->setIsPublished(true);
+        $this->em->persist($asset);
+
         $expectedActivites = 0;
         for ($i = 0; $i < 10; ++$i) {
             $contact = new Lead();
@@ -1204,6 +1212,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 $ipAddress->setIpAddress('13.13.13.13');
                 $this->em->persist($ipAddress);
                 $assetDownload = new Download();
+                $assetDownload->setAsset($asset);
                 $assetDownload->setLead($contact);
                 $assetDownload->setDateDownload(date_create('2013-03-15'));
                 $assetDownload->setCode(13);
@@ -1262,7 +1271,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // Call endpoint
         $this->client->request('GET', '/api/contacts/activity');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseJson = json_decode($clientResponse->getContent());
         $this->assertSame($expectedActivites, $responseJson->total);
     }
@@ -1290,7 +1299,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         // Call endpoint
         $this->client->request('GET', '/api/contacts/'.(string) $contact->getId().'/activity');
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseJson = json_decode($clientResponse->getContent());
         $resultOrder  = [];
         foreach ($responseJson->events as $event) {
@@ -1299,14 +1308,77 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedDatesOrder, $resultOrder);
     }
 
-    private function createCompany(string $name): Company
+    public function testGetContactsByCampaign(): void
     {
-        $company = new Company();
-        $company->setName($name);
+        // Create campaigns
+        $campaign1 = new Campaign();
+        $campaign1->setName('Campaign A');
+        $this->em->persist($campaign1);
 
-        $this->em->persist($company);
+        $campaign2 = new Campaign();
+        $campaign2->setName('Campaign B');
+        $this->em->persist($campaign2);
+
+        // Create contacts
+        $contact1 = new Lead();
+        $contact1->setEmail('contact1@test.com');
+        $this->em->persist($contact1);
+
+        $contact2 = new Lead();
+        $contact2->setEmail('contact2@test.com');
+        $this->em->persist($contact2);
+
+        $contact3 = new Lead();
+        $contact3->setEmail('contact3@test.com');
+        $this->em->persist($contact3);
+
+        $contact4 = new Lead();
+        $contact4->setEmail('contact4@test.com');
+        $this->em->persist($contact4);
+
+        // Assign contacts to campaigns
+        $this->addContactToCampaign($contact1, $campaign1);
+        $this->addContactToCampaign($contact2, $campaign2);
+        $this->addContactToCampaign($contact3, $campaign1);
+        $this->addContactToCampaign($contact3, $campaign2);
+
+        // Manually remove contact 4 from campaign 1 for a test
+        $this->addContactToCampaign($contact4, $campaign1, true);
+
         $this->em->flush();
+        $this->em->clear();
 
-        return $company;
+        // Test API endpoint for campaign 1
+        $this->client->request('GET', '/api/contacts', ['search' => 'campaign:'.$campaign1->getId()]);
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertArrayHasKey($contact1->getId(), $response['contacts']);
+        $this->assertArrayHasKey($contact3->getId(), $response['contacts']);
+        $this->assertArrayNotHasKey($contact2->getId(), $response['contacts']);
+        $this->assertArrayNotHasKey($contact4->getId(), $response['contacts']);
+
+        // Test API endpoint for campaign 2
+        $this->client->request('GET', '/api/contacts', ['search' => 'campaign:'.$campaign2->getId()]);
+        $clientResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals(2, $response['total']);
+        $this->assertArrayHasKey($contact2->getId(), $response['contacts']);
+        $this->assertArrayHasKey($contact3->getId(), $response['contacts']);
+        $this->assertArrayNotHasKey($contact1->getId(), $response['contacts']);
+    }
+
+    private function addContactToCampaign(Lead $contact, Campaign $campaign, bool $manuallyRemoved = false): void
+    {
+        $campaignLead = new CampaignLead();
+        $campaignLead->setCampaign($campaign);
+        $campaignLead->setLead($contact);
+        $campaignLead->setDateAdded(new \DateTime());
+        $campaignLead->setManuallyRemoved($manuallyRemoved);
+        $this->em->persist($campaignLead);
     }
 }

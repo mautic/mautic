@@ -48,11 +48,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     use RequestTrait;
 
     /**
-     * @var FieldModel
-     */
-    protected $leadFieldModel;
-
-    /**
      * @var array
      */
     protected $companyFields;
@@ -65,7 +60,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private bool $repoSetup = false;
 
     public function __construct(
-        FieldModel $leadFieldModel,
+        protected FieldModel $leadFieldModel,
         protected EmailValidator $emailValidator,
         protected CompanyDeduper $companyDeduper,
         EntityManager $em,
@@ -78,8 +73,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         CoreParametersHelper $coreParametersHelper,
         private FieldList $fieldList,
     ) {
-        $this->leadFieldModel = $leadFieldModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
@@ -356,20 +349,19 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $this->em->detach($companyLead);
 
                 continue;
-            } else {
-                $companyLead = new CompanyLead();
-                $companyLead->setCompany($companyLeadAdd[$companyId]);
-                $companyLead->setLead($lead);
-                $companyLead->setDateAdded($dateManipulated);
-                $contactAdded     = true;
-                $persistCompany[] = $companyLead;
-                $dispatchEvents[] = $companyId;
+            }
+            $companyLead = new CompanyLead();
+            $companyLead->setCompany($companyLeadAdd[$companyId]);
+            $companyLead->setLead($lead);
+            $companyLead->setDateAdded($dateManipulated);
+            $contactAdded     = true;
+            $persistCompany[] = $companyLead;
+            $dispatchEvents[] = $companyId;
 
-                if (!$companyName) {
-                    // CompanyLeadRepository::saveEntities will set the first company of the batch as primary so
-                    // use the first company name to ensure they match
-                    $companyName = $companyLeadAdd[$companyId]->getName();
-                }
+            if (!$companyName) {
+                // CompanyLeadRepository::saveEntities will set the first company of the batch as primary so
+                // use the first company name to ensure they match
+                $companyName = $companyLeadAdd[$companyId]->getName();
             }
         }
 
@@ -566,7 +558,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             );
         }
 
-        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%', 'onlyNames' => true], $column, $valueColumn);
+        return $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column, $valueColumn);
     }
 
     /**
@@ -664,9 +656,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

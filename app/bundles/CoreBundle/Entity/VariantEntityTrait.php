@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * @template T of VariantEntityInterface
@@ -27,7 +27,7 @@ trait VariantEntityTrait
     private $variantParent;
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = [];
@@ -141,7 +141,7 @@ trait VariantEntityTrait
      */
     public function getVariantSettings(): array
     {
-        return $this->variantSettings;
+        return $this->variantSettings ?? [];
     }
 
     public function getVariantStartDate(): mixed
@@ -170,9 +170,9 @@ trait VariantEntityTrait
 
         if ($isChild) {
             return (null === $parent) ? false : true;
-        } else {
-            return (!empty($parent) || count($children)) ? true : false;
         }
+
+        return (!empty($parent) || count($children)) ? true : false;
     }
 
     /**

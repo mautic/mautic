@@ -24,7 +24,6 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
     private function getCredentials(TimingSafeFormLoginAuthenticator $authenticator, Request $request): array
     {
         $method = new \ReflectionMethod(TimingSafeFormLoginAuthenticator::class, 'getCredentials');
-        $method->setAccessible(true);
 
         return $method->invoke($authenticator, $request);
     }
@@ -42,8 +41,6 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
             ->method('loadUserByIdentifier')
             ->with('testuser')
             ->willReturn($user);
-
-        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $passwordHasherFactory */
         $passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $passwordHasherFactory->expects($this->never())

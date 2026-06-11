@@ -12,12 +12,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 class PluginUpdateEvent extends Event
 {
     /**
-     * @param array<class-string, ClassMetadata> $metadata
+     * @param array<class-string, ClassMetadata>|null $metadata null value is when the plugin does not have Entities (an Entity directory)
      */
     public function __construct(
         private Plugin $plugin,
         private string $oldVersion,
-        private array $metadata,
+        private ?array $metadata,
         private ?Schema $installedSchema,
     ) {
     }
@@ -33,9 +33,9 @@ class PluginUpdateEvent extends Event
     }
 
     /**
-     * @return array<class-string, ClassMetadata>
+     * @return array<class-string, ClassMetadata>|null
      */
-    public function getMetadata(): array
+    public function getMetadata(): ?array
     {
         return $this->metadata;
     }

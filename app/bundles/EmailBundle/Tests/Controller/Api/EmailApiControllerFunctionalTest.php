@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Doctrine\ORM\Exception\ORMException;
@@ -30,7 +32,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['default_signature_text'] = 'Best regards, |FROM_NAME|';
+
         parent::setUp();
+
         $this->loadFixtures([LoadCategoryData::class]);
         $this->setUpMailer();
     }
@@ -143,7 +147,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $response['email'];
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
         Assert::assertSame($payload['name'], $response['name']);
         Assert::assertSame($payload['subject'], $response['subject']);
         Assert::assertSame($payload['customHtml'], $response['customHtml']);
@@ -172,7 +176,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $segmentAId      = $segmentResponse['lists'][0]['id'];
         $segmentBId      = $segmentResponse['lists'][1]['id'];
 
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentAId);
 
         // Create email with the new segment:
@@ -189,7 +193,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $emailId        = $response['email']['id'];
 
-        $this->assertSame(201, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $emailId);
         $this->assertEquals($payload['name'], $response['email']['name']);
         $this->assertEquals($payload['subject'], $response['email']['subject']);
@@ -198,19 +202,22 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($segmentAId, $response['email']['lists'][0]['id']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
         $this->assertFalse($response['email']['publicPreview']);
+        $this->assertFalse($response['email']['sendToDnc']);
 
         // Edit PATCH:
         $patchPayload = [
             'name'          => 'API email renamed',
             'lists'         => [$segmentBId],
             'publicPreview' => true,
+            'sendToDnc'     => true,
         ];
         $this->client->request('PATCH', "/api/emails/{$emailId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($emailId, $response['email']['id']);
+        $this->assertTrue($response['email']['sendToDnc']);
         $this->assertEquals('API email renamed', $response['email']['name']);
         $this->assertEquals($payload['subject'], $response['email']['subject']);
         $this->assertCount(1, $response['email']['lists']);
@@ -228,7 +235,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($emailId, $response['email']['id']);
         $this->assertEquals($payload['name'], $response['email']['name']);
         $this->assertEquals('Email created via API test renamed', $response['email']['subject']);
@@ -238,13 +245,14 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['emailType'], $response['email']['emailType']);
         $this->assertEquals($payload['customHtml'], $response['email']['customHtml']);
         $this->assertEquals($payload['publicPreview'], $response['email']['publicPreview']);
+        $this->assertFalse($response['email']['sendToDnc']);
 
         // Get:
         $this->client->request('GET', "/api/emails/{$emailId}");
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($emailId, $response['email']['id']);
         $this->assertEquals($payload['name'], $response['email']['name']);
         $this->assertEquals($payload['subject'], $response['email']['subject']);
@@ -257,7 +265,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertNull($response['email']['id']);
         $this->assertEquals($payload['name'], $response['email']['name']);
         $this->assertEquals($payload['subject'], $response['email']['subject']);
@@ -270,7 +278,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(404, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(404);
         $this->assertSame(404, $response['errors'][0]['code']);
 
         // Delete also testing segments:
@@ -280,7 +288,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Response should include the two entities that we just deleted
         $this->assertSame(2, count($response['lists']));
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testReplyActionIfNotFound(): void
@@ -292,15 +300,14 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         $this->assertSame('Email Stat with tracking hash tracking_hash_123 was not found', $responseData['errors'][0]['message']);
     }
 
     /**
-     * @dataProvider publishNewPermissionProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('publishNewPermissionProvider')]
     public function testCreateEmailWithoutPublishPermissionWillBeIgnored(array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $user = $this->getUser('sales');
@@ -322,11 +329,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
 
-        Assert::assertSame(
-            Response::HTTP_CREATED,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $createdEmail = json_decode($this->client->getResponse()->getContent(), true)['email'];
         Assert::assertSame($expectedIsPublished, $createdEmail['isPublished']);
@@ -360,10 +363,9 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider publishExistingPermissionProvider
-     *
      * @param string[] $permissions
      */
+    #[DataProvider('publishExistingPermissionProvider')]
     public function testEditEmailWithoutPublishPermissionWillBeIgnored(string $creatorUsername, array $permissions, ?bool $expectedIsPublished, ?string $expectedPublishUp, ?string $expectedPublishDown): void
     {
         $owner = $this->getUser($creatorUsername);
@@ -450,6 +452,27 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    public function testCreateEmailWithoutSendToDncPermission(): void
+    {
+        $user       = $this->getUser('sales');
+        $permission = ['email:emails' => ['create']];
+        $this->setPermission($user->getRole(), $permission);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+        $payload = [
+            'name'       => 'API email',
+            'subject'    => 'Email created via API test',
+            'customHtml' => '<h1>Email content created by an API test</h1>',
+            'sendToDnc'  => true,
+        ];
+        $this->em->clear();
+        $this->client->request('POST', '/api/emails/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        Assert::assertTrue(isset($response['email']['sendToDnc']), print_r($response, true));
+        Assert::assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
+    }
+
     public function testReplyAction(): void
     {
         $trackingHash = 'tracking_hash_123';
@@ -469,7 +492,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', "/api/emails/reply/{$trackingHash}");
         $response = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertSame(['success' => true], json_decode($response->getContent(), true));
 
         // Get the email reply that was just created from the stat API.
@@ -572,7 +595,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals($sendResponse, ['success' => true, 'sentCount' => 1, 'failedRecipients' => 0], $clientResponse->getContent());
 
         $testEmail = function (string $customToken): void {
@@ -596,7 +619,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $sendResponse = json_decode($clientResponse->getContent(), true);
 
@@ -615,7 +638,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertEquals($sendResponse, ['success' => true, 'sentCount' => 1, 'failedRecipients' => 0], $clientResponse->getContent());
 
         $testEmailOwnerAsMailer = function (): void {
@@ -640,7 +663,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $sendResponse = json_decode($clientResponse->getContent(), true);
 
@@ -658,7 +681,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $sendResponse = json_decode($clientResponse->getContent(), true);
 
@@ -684,7 +707,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function setPrivateProperty(object $object, string $property, $value): void
     {
         $reflector = new \ReflectionProperty($object::class, $property);
-        $reflector->setAccessible(true);
         $reflector->setValue($object, $value);
     }
 
