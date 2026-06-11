@@ -8,47 +8,52 @@ Mautic is an open-source marketing automation platform built on **Symfony 7.4** 
 
 ## Essential Commands
 
+### Command Execution Rule
+- Prefer `ddev` wrappers for agent-run PHP, Composer, Symfony console, and PHPUnit commands in this repository.
+- Use forms like `ddev exec php bin/phpunit -c app/phpunit.xml.dist ...`, `ddev exec php bin/console ...`, and `ddev composer ...`.
+- Avoid running `php`, `composer`, `bin/console`, or `bin/phpunit` directly on the host unless the user explicitly asks for that.
+
 ### Development Setup
 ```bash
 # DDEV-based setup (recommended) - auto-installs and configures everything
 ddev start
 
 # Manual setup
-composer install
+ddev composer install
 npm ci && npm run build
-bin/console mautic:install <site-url>
+ddev exec php bin/console mautic:install <site-url>
 ```
 
 ### Testing
 ```bash
 # Run all PHPUnit tests
-composer test
+ddev composer test
 
 # Run specific test file
-bin/phpunit app/bundles/EmailBundle/Tests/Functional/EmailClickTrackingTest.php
+ddev exec php bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Functional/EmailClickTrackingTest.php
 
 # Run specific bundle tests
-bin/phpunit app/bundles/CoreBundle/Tests
+ddev exec php bin/phpunit -c app/phpunit.xml.dist app/bundles/CoreBundle/Tests
 
 # Run specific test method
-bin/phpunit --filter testGuessTimezoneFromOffset
+ddev exec php bin/phpunit -c app/phpunit.xml.dist --filter testGuessTimezoneFromOffset
 
 # E2E acceptance tests (Codeception)
-composer run e2e-test
+ddev composer run e2e-test
 ```
 
 ### Code Quality
 ```bash
-composer phpstan          # Static analysis (level 6)
-composer cs               # Check coding standards (dry-run)
-composer fixcs            # Auto-fix coding standards
-composer rector           # Run Rector refactoring (code + tests)
-bin/console lint:twig app plugins  # Lint Twig templates
+ddev composer phpstan                  # Static analysis (level 6)
+ddev composer cs                       # Check coding standards (dry-run)
+ddev composer fixcs                    # Auto-fix coding standards
+ddev composer rector                   # Run Rector refactoring (code + tests)
+ddev exec php bin/console lint:twig app plugins  # Lint Twig templates
 ```
 
 ### Asset Management
 ```bash
-composer generate-assets  # Regenerate compiled assets
+ddev composer generate-assets  # Regenerate compiled assets
 npm run build            # Build frontend with webpack
 ```
 
@@ -103,12 +108,12 @@ MauticExampleBundle/
 
 Before submitting PRs, run:
 ```bash
-composer test      # PHPUnit tests pass
-composer phpstan   # Static analysis passes
-composer cs        # Coding standards check
+ddev composer test      # PHPUnit tests pass
+ddev composer phpstan   # Static analysis passes
+ddev composer cs        # Coding standards check
 ```
 
-For UI changes, also run `composer run e2e-test`.
+For UI changes, also run `ddev composer run e2e-test`.
 
 ## Configuration
 
