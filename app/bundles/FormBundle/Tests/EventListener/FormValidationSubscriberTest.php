@@ -237,7 +237,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $field = new Field();
         $field->setType('tel');
-        $field->setValidation(['country' => 'United States']);
+        $field->setValidation(['country' => 'US']);
 
         $event = new ValidationEvent($field, '+5511999999999');
         $this->subscriber->onFormValidate($event);
@@ -251,7 +251,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $field = new Field();
         $field->setType('tel');
         $field->setValidation([
-            'country'               => 'United States',
+            'country'               => 'US',
             'country_validationmsg' => 'Use a US phone number.',
         ]);
 
@@ -266,7 +266,40 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $field = new Field();
         $field->setType('tel');
-        $field->setValidation(['country' => 'United States']);
+        $field->setValidation(['country' => 'US']);
+
+        $event = new ValidationEvent($field, '+12025550123');
+        $this->subscriber->onFormValidate($event);
+
+        self::assertTrue($event->isValid());
+    }
+
+    public function testCountryPhoneValidationSkippedForUnknownCountry(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        // A legacy/garbage value that is not a valid ISO region code must NOT
+        // block the submission (and must never crash building the message).
+        $field->setValidation(['country' => 'Atlantis']);
+
+        $event = new ValidationEvent($field, '+5511999999999');
+        $this->subscriber->onFormValidate($event);
+
+        self::assertTrue($event->isValid());
+    }
+
+    public function testCountryPhoneValidationFallsThroughToInternational(): void
+    {
+        $this->translator
+            ->method('trans')
+            ->with('mautic.form.submission.phone.invalid', [], 'validators')
+            ->willReturn('Invalid international phone number.');
+
+        $field = new Field();
+        $field->setType('tel');
+        // Valid for the country, so country validation passes; the international
+        // validator then runs on the same value and must also accept it.
+        $field->setValidation(['country' => 'US', 'international' => 1]);
 
         $event = new ValidationEvent($field, '+12025550123');
         $this->subscriber->onFormValidate($event);

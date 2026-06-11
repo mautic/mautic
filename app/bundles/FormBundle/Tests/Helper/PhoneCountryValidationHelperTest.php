@@ -10,22 +10,13 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\CoversClass(PhoneCountryValidationHelper::class)]
 final class PhoneCountryValidationHelperTest extends TestCase
 {
-    public function testGetsCountriesIndexedByCountryName(): void
+    public function testGetsCountriesKeyedByNameValuedByRegionCode(): void
     {
         $countries = PhoneCountryValidationHelper::getCountries();
 
+        self::assertGreaterThan(50, count($countries));
         self::assertArrayHasKey('United States', $countries);
-        self::assertSame('United States', $countries['United States']);
-    }
-
-    public function testGetsCountryCodeFromName(): void
-    {
-        self::assertSame('US', PhoneCountryValidationHelper::getCountryCodeFromName('United States'));
-    }
-
-    public function testReturnsNullForUnknownCountryName(): void
-    {
-        self::assertNull(PhoneCountryValidationHelper::getCountryCodeFromName('Atlantis'));
+        self::assertSame('US', $countries['United States']);
     }
 
     public function testValidatesPhoneNumberForCountry(): void

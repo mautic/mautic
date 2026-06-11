@@ -29,10 +29,14 @@ final class PhoneCountryValidationHelper
     }
 
     /**
-     * Returns list of available countries for form choices.
-     * Uses libphonenumber's supported regions and maps them to country names.
+     * Returns list of available countries for form choices, keyed by display
+     * name and valued by the stable ISO region code.
      *
-     * @return array<string, string>
+     * The region code is stored as the field value so validation never depends
+     * on the locale-sensitive display name (which differs between the locale
+     * the form was built in and the locale a submission is validated under).
+     *
+     * @return array<string, string> [localized country name => ISO region code]
      */
     public static function getCountries(): array
     {
@@ -43,31 +47,10 @@ final class PhoneCountryValidationHelper
 
         foreach ($regions as $regionCode) {
             if (isset($allCountries[$regionCode])) {
-                $countryName          = $allCountries[$regionCode];
-                $result[$countryName] = $countryName;
+                $result[$allCountries[$regionCode]] = $regionCode;
             }
         }
 
         return $result;
-    }
-
-    /**
-     * Gets the country code (region code) from a country name.
-     *
-     * @return string|null The country code if found, null otherwise
-     */
-    public static function getCountryCodeFromName(string $countryName): ?string
-    {
-        $phoneUtil    = PhoneNumberUtil::getInstance();
-        $regions      = $phoneUtil->getSupportedRegions();
-        $allCountries = Countries::getNames();
-
-        foreach ($regions as $regionCode) {
-            if (isset($allCountries[$regionCode]) && $allCountries[$regionCode] === $countryName) {
-                return $regionCode;
-            }
-        }
-
-        return null;
     }
 }

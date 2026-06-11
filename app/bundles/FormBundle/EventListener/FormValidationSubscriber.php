@@ -12,6 +12,7 @@ use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\PhoneCountryValidationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Intl\Countries;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormValidationSubscriber implements EventSubscriberInterface
@@ -137,14 +138,19 @@ class FormValidationSubscriber implements EventSubscriberInterface
             return false;
         }
 
-        $country     = (string) $validation['country'];
-        $countryCode = PhoneCountryValidationHelper::getCountryCodeFromName($country);
+        $countryCode = (string) $validation['country'];
 
-        if (!$countryCode || PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)) {
+        // Unknown/legacy value (e.g. a display name saved before this stored the ISO code):
+        // skip validation rather than crash or reject every submission.
+        if (!Countries::exists($countryCode)) {
             return false;
         }
 
-        $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => $country], 'validators');
+        if (PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)) {
+            return false;
+        }
+
+        $message = $validation['country_validationmsg'] ?? $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => Countries::getName($countryCode)], 'validators');
         $event->failedValidation($message);
 
         return true;
