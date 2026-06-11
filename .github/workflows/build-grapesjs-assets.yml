@@ -23,8 +23,8 @@ jobs:
     if: github.repository == 'mautic/mautic'
 
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v3
+    - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+    - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3
       with:
         node-version: '16'
     - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
     # Checks if the JS files have been updated as a result of the NPM build,
     # and creates a PR if necessary.
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v3
+      uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
       with:
         commit-message: 'Auto-update GrapesJS generated JS dist files'
         title: 'Update GrapesJS generated JS dist files'
