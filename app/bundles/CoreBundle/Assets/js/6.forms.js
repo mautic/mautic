@@ -94,6 +94,10 @@ Mautic.ajaxifyForm = function (formName) {
     // Handle Enter key for jumping to the next input
     mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
     mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
+        if (mQuery(e.target).hasClass('chosen-search-input')) {
+            return;
+        }
+
         if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
             var inputs = mQuery(this).parents('form').eq(0).find(':input');
             if (inputs[inputs.index(this) + 1] != null) {
