@@ -58,7 +58,7 @@ class FocusRepositoryTest extends MauticMysqlTestCase
 
         Assert::assertCount(1, $rows);
         Assert::assertSame((string) $published->getId(), (string) $rows[0]['id']);
-        Assert::assertSame(self::FILTERS, unserialize($rows[0]['filters']));
+        Assert::assertSame(self::FILTERS, \Mautic\CoreBundle\Helper\Serializer::decode($rows[0]['filters']));
         Assert::assertTrue($repository->hasPublishedWithFilters());
     }
 
