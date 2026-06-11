@@ -29,6 +29,18 @@ class StageRepository extends CommonRepository
     }
 
     /**
+     * @return array<int, array{id: int, name: string, weight: int}>
+     */
+    public function getStageWeights(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.id, s.name, s.weight')
+            ->orderBy('s.weight', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    /**
      * Get array of published actions based on type.
      *
      * @param string $type
