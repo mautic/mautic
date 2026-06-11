@@ -90,11 +90,7 @@ class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $contacts = $response['contacts'];
         self::assertCount(150, $contacts);
-        self::assertSame(
-            201,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
 
         return $contacts;
     }

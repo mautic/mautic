@@ -36,7 +36,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         // set form data
         $form   = $crawler->selectButton('config[buttons][save]')->form();
@@ -55,7 +55,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $values['config']['emailconfig']['mailer_dsn']['options']['list']['0']['value'] = $data['type'];
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         // check the DSN is escaped properly in the config file (both using double percent signs and URL encoded)
         $configParameters = $this->getConfigParameters();
@@ -71,7 +71,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // check values are unescaped properly in the edit form
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $this->assertEquals($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
@@ -91,7 +91,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     {
         // request config edit page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // set form data
         $form = $crawler->selectButton('config[buttons][save]')->form();
@@ -103,7 +103,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // check if there is the given validation error
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($expectedMessage, $crawler->text());
     }
 

@@ -52,11 +52,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $endpoint = sprintf($endpointTemplate, (int) $foreignContact->getId());
         $this->client->request('GET', $endpoint);
 
-        self::assertSame(
-            Response::HTTP_FORBIDDEN,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     /**
@@ -116,7 +112,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         $this->client->request('GET', '/api/contacts?limit=100');
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($legacyCollection);
@@ -132,7 +128,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertNotContains((int) $foreignContact->getId(), $legacyIds);
 
         $this->client->request('GET', '/api/v2/contacts?page=1');
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $v2Collection = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($v2Collection);
@@ -183,7 +179,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=2');
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $firstPage = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($firstPage);
@@ -202,7 +198,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         }
 
         $this->client->request('GET', '/api/v2/contacts?page=2&itemsPerPage=2');
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $secondPage = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($secondPage);
@@ -267,7 +263,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
         $this->client->request('GET', '/api/contacts?start=0&limit=10');
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $legacyCollection = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($legacyCollection);
@@ -283,7 +279,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         self::assertContains((int) $foreignContact->getId(), $legacyIds);
 
         $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $collection = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($collection);
@@ -347,7 +343,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertCount(
@@ -367,7 +363,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertCount(

@@ -581,7 +581,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')->willReturn(new AddressDTO('someone@somewhere.com'));
         $routerMock = $this->createMock(Router::class);
-        $twig       = $this->createMock(Environment::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())

@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Response;
 
 final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
@@ -55,7 +54,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
@@ -117,7 +116,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
@@ -177,7 +176,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertCount(
@@ -197,7 +196,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertCount(
