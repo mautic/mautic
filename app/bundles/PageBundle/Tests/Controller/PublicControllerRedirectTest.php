@@ -58,7 +58,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/page-a');
 
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('redirectUrlProvider')]
@@ -75,7 +75,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         \assert($response instanceof RedirectResponse);
-        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         Assert::assertSame($url, $response->getTargetUrl());
     }
 
@@ -122,7 +122,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         \assert($response instanceof RedirectResponse);
-        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         Assert::assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);

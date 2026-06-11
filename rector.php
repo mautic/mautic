@@ -10,7 +10,6 @@ use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
-use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
@@ -47,8 +46,6 @@ return RectorConfig::configure()
         AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
         TypedPropertyFromStrictSetUpRector::class,
-        RemoveUnusedVariableAssignRector::class,
-        RemoveUselessVarTagRector::class,
         SimplifyUselessVariableRector::class,
         ReturnTypeFromStrictConstantReturnRector::class,
         ReturnTypeFromReturnDirectArrayRector::class,

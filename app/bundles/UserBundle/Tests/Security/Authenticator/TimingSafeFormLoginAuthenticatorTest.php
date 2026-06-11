@@ -41,8 +41,6 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
             ->method('loadUserByIdentifier')
             ->with('testuser')
             ->willReturn($user);
-
-        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $passwordHasherFactory */
         $passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $passwordHasherFactory->expects($this->never())

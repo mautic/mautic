@@ -31,7 +31,7 @@ final class ConfigControllerTest extends MauticMysqlTestCase
     public function testListOfRemoteDomainsVisibility(bool $enabled): void
     {
         $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
         $label   = 'List of allowed remote domains (one per line)';
