@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,6 +19,6 @@ final class AssetDownloadFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/asset/unicorn'); // returns 404 correctly
         $this->client->request(Request::METHOD_GET, '/asset/unicorn'); // returned 500 but it should return 404
 
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 }

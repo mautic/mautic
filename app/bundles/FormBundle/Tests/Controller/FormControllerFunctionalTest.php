@@ -42,7 +42,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenNotFiltered(): void
     {
         $this->client->request('GET', '/s/forms');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -51,7 +51,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/forms?search=has%3Aresults&tmpl=list');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -60,7 +60,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testNewActionForm(): void
     {
         $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -69,7 +69,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testSaveActionForm(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
@@ -79,7 +79,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $form->setValues(
@@ -90,14 +90,14 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         // The form failed to save when saved for the second time with renderStyle=No.
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
     }
 
     public function testNewActionCheckDisplayMessageOptionsForm(): void
     {
         $this->client->request('GET', '/s/forms/new');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
         $this->assertStringContainsString('Hide form', $clientResponse->getContent(), $clientResponse->getContent());
@@ -108,7 +108,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testErrorValidationWithHideFormTypeWithoutMessage(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
 
@@ -124,7 +124,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
         $this->assertStringContainsString('has-error', $divClass, $crawler->html());
     }
@@ -132,7 +132,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
     public function testSuccessWithHideForm(): void
     {
         $crawler = $this->client->request('GET', '/s/forms/new/');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $selectedValue = $crawler->filter('#mauticform_postAction option:selected')->attr('value');
 
@@ -148,7 +148,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
         $this->assertStringNotContainsString('has-error', $divClass, $crawler->html());
     }
@@ -187,9 +187,8 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), json_encode($languageHelper->getLanguageChoices()));
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, json_encode($languageHelper->getLanguageChoices()));
         $form     = $response['form'];
-        $formId   = $form['id'];
 
         $crawler = $this->client->request('GET', '/form/'.$form['id']);
         $this->assertStringContainsString('Merci de patienter...', $crawler->html());
@@ -213,12 +212,12 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('contact: Email', $response->getContent(), 'Email field should not be marked as mapped.');
     }
 
@@ -236,15 +235,15 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $formElement = $crawler->filterXPath('//form[@name="mauticform"]')->form();
         $this->client->submit($formElement);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->client->xmlHttpRequest('GET', sprintf('/s/forms/field/edit/%d?formId=%d', $field->getId(), $form->getId()));
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertJson($response->getContent());
 
         $content = json_decode($response->getContent())->newContent;
@@ -287,11 +286,11 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Verify form creation
-        $crawler = $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
+        $this->client->request('GET', sprintf('/s/forms/edit/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
 
         // Visit the form preview page
-        $crawler = $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
+        $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('First Option', $this->client->getResponse()->getContent());
         $this->assertStringContainsString('Second Option', $this->client->getResponse()->getContent());
@@ -687,7 +686,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($mauticform);
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
         Assert::assertCount(2, $forms);

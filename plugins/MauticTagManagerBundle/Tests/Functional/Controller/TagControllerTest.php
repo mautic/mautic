@@ -54,7 +54,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
         $this->assertStringContainsString('tag2', $clientResponseContent, 'The return must contain tag2');
     }
@@ -68,7 +68,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
         $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain tag2');
     }
@@ -89,7 +89,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
 
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain the tag whose description matches.');
         $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain unrelated tags.');
     }
@@ -98,9 +98,7 @@ class TagControllerTest extends MauticMysqlTestCase
     {
         $tagId = $this->tagRepository->findOneBy([])->getId();
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
     }
 
@@ -120,9 +118,7 @@ class TagControllerTest extends MauticMysqlTestCase
         Assert::assertSame(1, $this->countLeadTagAssociations($tagId));
 
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
-        $clientResponse = $this->client->getResponse();
-
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
         Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
@@ -137,7 +133,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/tags/view/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($tag->getTag(), $clientResponseContent, 'The return must contain tag');
     }
 
@@ -171,7 +167,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Edit tag: '.$tag->getTag(), $clientResponseContent, 'The return must contain \'Edit tag\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
@@ -196,8 +192,7 @@ class TagControllerTest extends MauticMysqlTestCase
     {
         $TagName        = 'Test tag';
         $crawler        = $this->client->request('GET', '/s/tags/new');
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
         $form['tag_entity[tag]']->setValue($TagName);
@@ -210,8 +205,7 @@ class TagControllerTest extends MauticMysqlTestCase
     {
         $TagName        = $this->tagRepository->findOneBy([])->getTag();
         $crawler        = $this->client->request('GET', '/s/tags/new');
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
         $form['tag_entity[tag]']->setValue($TagName);
@@ -225,20 +219,20 @@ class TagControllerTest extends MauticMysqlTestCase
         $tags   = $this->tagRepository->findAll();
         $tagsId = array_map(fn (Tag $tag) => $tag->getId(), $tags);
         $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId));
-        $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
     }
 
     public function testEmptyTagShouldThrowValidationError(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $buttonCrawler  = $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
     }
 

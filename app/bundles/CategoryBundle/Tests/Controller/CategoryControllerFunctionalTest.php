@@ -8,9 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -62,7 +60,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must contain TestTitleCategoryController2');
     }
@@ -76,7 +74,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
     }
@@ -95,7 +93,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $form['category_form[inForm]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         $body           = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('categoryId', $body);
@@ -134,9 +132,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $form['category_form[inForm]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        $clientResponse = $this->client->getResponse();
-        $body           = json_decode($clientResponse->getContent(), true);
+        self::assertResponseIsSuccessful();
+
         $this->assertNotEmpty($crawler->filter('select#category_form_bundle')->count(), 'The "Type" (bundle) field should remain visible after validation failure.');
     }
 
@@ -218,14 +215,14 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
-        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $role = $this->createRole(true);
         $user = $this->createUser($role);
         $this->em->flush();
         $this->client->restart();
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
-        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString(
             'Category for concurrent edit is currently checked out by',
             $this->client->getResponse()->getContent()
@@ -245,7 +242,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString(
             'You do not have access to the requested area',
             $this->client->getResponse()->getContent()

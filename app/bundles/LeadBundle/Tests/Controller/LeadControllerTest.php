@@ -269,9 +269,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
-
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
 
         /** @var Lead $contact */
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
@@ -301,7 +299,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadLeadData::class]);
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=csv');
         $clientResponse = $this->client->getResponse();
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(
             'Contact export scheduled for CSV file type.',
             $clientResponse->getContent()
@@ -479,7 +477,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     {
         $contactA = $this->createContact('contact@a.email');
         $contactB = $this->createContact('contact@b.email');
-        $contactC = $this->createContact('contact@c.email');
+        $this->createContact('contact@c.email');
 
         $companyName = 'Doe Corp';
         $company     = new Company();
@@ -506,7 +504,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
@@ -516,8 +514,8 @@ class LeadControllerTest extends MauticMysqlTestCase
                 'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
         $this->assertQueuedEmailCount(1);
 
         $email = $this->getMailerMessage();
@@ -556,7 +554,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/contacts/email/{$contact->getId()}");
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Send')->form();
         $form->setValues(
@@ -566,8 +564,8 @@ class LeadControllerTest extends MauticMysqlTestCase
                 'lead_quickemail[replyToAddress]' => $replyTo,
             ]
         );
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->client->submit($form);
+        self::assertResponseIsSuccessful();
         $this->assertQueuedEmailCount(1);
 
         $email = $this->getMailerMessage();
@@ -830,9 +828,9 @@ EMAIL;
 
         $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
+        $this->client->submit($form);
 
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
 
         /** @var Lead $contact */
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
@@ -1001,7 +999,7 @@ EMAIL;
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
         $this->assertResponseIsSuccessful();
-        $response = $this->client->getResponse();
+        $this->client->getResponse();
 
         $scores = $contact->getGroupScores();
         $this->assertCount(2, $scores);
@@ -1040,7 +1038,7 @@ EMAIL;
         $this->client->request(Request::METHOD_GET, '/s/companies/merge/'.$companyA->getId());
         $response = $this->client->getResponse();
 
-        Assert::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
 
@@ -1057,7 +1055,7 @@ EMAIL;
         $this->em->clear();
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/contacts/batchDnc');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $crawler = new Crawler(json_decode($this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri());
         $form    = $crawler->selectButton('Save')->form();
         $form->setValues(
@@ -1066,8 +1064,8 @@ EMAIL;
                 'lead_batch_dnc[ids]'    => json_encode([$contact->getId()]),
             ]
         );
-        $crawler = $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
 
         $clientResponse = $this->client->getResponse();
 

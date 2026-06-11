@@ -55,7 +55,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -72,7 +72,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -104,7 +104,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -121,7 +121,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -141,7 +141,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -158,7 +158,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -188,7 +188,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -206,7 +206,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[templates]' => $emailEntity->getId(),
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $messages = self::getMailerMessages();
         Assert::assertCount(1, $messages, 'Expected exactly one email message to be sent');
@@ -238,7 +238,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $content     = json_decode($this->client->getResponse()->getContent())->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());

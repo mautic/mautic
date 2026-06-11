@@ -9,7 +9,6 @@ use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageData;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -86,7 +85,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $leadsBeforeTest   = $this->connection->fetchAllAssociative("SELECT id FROM $leadsTable");
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTracking');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $sql = "SELECT id FROM $leadsTable";
         if (!empty($leadIdsBeforeTest)) {
@@ -112,7 +111,6 @@ class PageControllerTest extends MauticMysqlTestCase
             AND $objectCol = 'page'",
             ['leadId' => $leadId]
         );
-
         $this->assertCount(1, $leadEventLogs);
         $this->assertSame('created_contact', reset($leadEventLogs)['action']);
     }
@@ -139,7 +137,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $leadsBeforeTest   = $this->connection->fetchAllAssociative("SELECT id FROM $leadsTable");
         $leadIdsBeforeTest = array_column($leadsBeforeTest, 'id');
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $sql = "SELECT id FROM $leadsTable";
         if (!empty($leadIdsBeforeTest)) {
             $sanitizedIds = array_map('intval', $leadIdsBeforeTest);
@@ -165,7 +163,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $eventLogsAfterFirstVisit);
         $this->assertSame('created_contact', reset($eventLogsAfterFirstVisit)['action']);
         $this->client->request('GET', '/page-page-landingPageTrackingSecondVisit');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $eventLogsAfterSecondVisit = $this->connection->fetchAllAssociative("
           SELECT $leadIdCol, $actionCol
           FROM $eventLogsTable
@@ -244,8 +242,7 @@ class PageControllerTest extends MauticMysqlTestCase
     public function testNewActionPage(): void
     {
         $this->client->request('GET', '/s/pages/new/');
-        $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
+        $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -254,9 +251,7 @@ class PageControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', 's/pages/results/'.$this->id);
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
-        $model                  = static::getContainer()->get('mautic.page.model.page');
-        $page                   = $model->getEntity($this->id);
+
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -267,10 +262,7 @@ class PageControllerTest extends MauticMysqlTestCase
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export');
-        $content = ob_get_contents();
-        ob_end_clean();
 
         $clientResponse = $this->client->getResponse();
 
@@ -285,10 +277,7 @@ class PageControllerTest extends MauticMysqlTestCase
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/xlsx');
-        $content = ob_get_contents();
-        ob_end_clean();
 
         $clientResponse = $this->client->getResponse();
 
@@ -303,10 +292,7 @@ class PageControllerTest extends MauticMysqlTestCase
     {
         $this->loadFixtures([LoadPageCategoryData::class, LoadPageData::class]);
 
-        ob_start();
         $this->client->request(Request::METHOD_GET, '/s/pages/results/'.$this->id.'/export/html');
-        $content = ob_get_contents();
-        ob_end_clean();
 
         $clientResponse = $this->client->getResponse();
 
@@ -327,7 +313,6 @@ class PageControllerTest extends MauticMysqlTestCase
         $pageModel->saveEntity($parentPage);
 
         $this->client->request(Request::METHOD_GET, '/this_is_my_page');
-        $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
     }
 }

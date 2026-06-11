@@ -29,7 +29,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $contact = (new Lead())->setFirstname('Test');
         static::getContainer()->get('mautic.lead.model.lead')->saveEntity($contact);
 
-        $crawler = $this->client->request('GET', '/s/contacts/notes/'.$contact->getId());
+        $this->client->request('GET', '/s/contacts/notes/'.$contact->getId());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 
@@ -41,7 +41,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $contact = (new Lead())->setFirstname('Test');
         static::getContainer()->get('mautic.lead.model.lead')->saveEntity($contact);
 
-        $crawler = $this->client->request('GET', '/s/contacts/notes/'.$contact->getId().'/new');
+        $this->client->request('GET', '/s/contacts/notes/'.$contact->getId().'/new');
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
 }

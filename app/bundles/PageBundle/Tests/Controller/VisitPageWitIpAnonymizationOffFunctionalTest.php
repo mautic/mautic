@@ -37,7 +37,7 @@ class VisitPageWitIpAnonymizationOffFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
         $pageContent = $this->client->request(Request::METHOD_GET, '/page-page-anonymizaiton-off');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $pageContent->text());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('Test Html', $pageContent->text());
 
         /** @var HitRepository $hitRepository */
