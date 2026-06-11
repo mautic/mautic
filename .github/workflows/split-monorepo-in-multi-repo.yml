@@ -101,7 +101,7 @@ jobs:
                     fetch-depth: 0
 
             # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
-            -   uses: frankdejonge/use-github-token@52127a0c67b09dcb90ebf65493e52099b74ebc78 # 1.0.1
+            -   uses: frankdejonge/use-github-token@15e6289d07c12b3b1603268a628bb74f2e9765f4 # 1.1.0
                 with:
                     authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
                     user_name: 'Mautic CI'
@@ -116,6 +116,6 @@ jobs:
 
             # Sync commits and tags for the configured subtree splits
             -   name: subtree split
-                uses: acrobat/subtree-splitter@b5d4124e9d07ad2606b67c16403d73e8c8ddfb32 # v1.0.0
+                uses: acrobat/subtree-splitter@eb1d1193757c60c5d98df34d679cc02e3f8111fb # v1.1.5
                 with:
                     config-path: .github/workflows/gitsplit/${{ matrix.config }}.json # Reference the location where you saved your config file
