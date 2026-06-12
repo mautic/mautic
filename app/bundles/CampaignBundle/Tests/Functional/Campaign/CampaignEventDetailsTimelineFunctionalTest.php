@@ -82,16 +82,29 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
 
         $translator = static::getContainer()->get('translator');
         \assert($translator instanceof TranslatorInterface);
+        $operator = $translator->trans('mautic.lead.list.form.operator.in');
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
         $this->assertStringContainsString(
-            $translator->trans('mautic.campaign.event.condition.details', ['%path%' => 'yes', '%field%' => 'select_field', '%operator%' => 'in', '%comparisonValue%' => 'v1,v3', '%value%' => 'v1,v3']),
+            $translator->trans('mautic.campaign.event.condition.details', [
+                '%path%'            => 'yes',
+                '%field%'           => 'select_field',
+                '%operator%'        => $operator,
+                '%comparisonValue%' => 'v1,v3',
+                '%value%'           => 'v1,v3',
+            ]),
             $this->client->getResponse()->getContent()
         );
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead2->getId()));
         $this->assertStringContainsString(
-            $translator->trans('mautic.campaign.event.condition.details', ['%path%' => 'no', '%field%' => 'select_field', '%operator%' => 'in', '%comparisonValue%' => 'v2', '%value%' => 'v2']),
+            $translator->trans('mautic.campaign.event.condition.details', [
+                '%path%'            => 'no',
+                '%field%'           => 'select_field',
+                '%operator%'        => $operator,
+                '%comparisonValue%' => 'v1,v3',
+                '%value%'           => 'v1,v3',
+            ]),
             $this->client->getResponse()->getContent()
         );
     }

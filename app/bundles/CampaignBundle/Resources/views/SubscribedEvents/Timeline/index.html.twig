@@ -82,12 +82,14 @@
         <h6 class="mt-lg mb-sm">
             {% set props = eventDetails.properties|default({}) %}
             {% if props.field is defined and props.operator is defined and props.comparisonValue is defined and props.value is defined %}
+                {% set comparisonValue = props.comparisonValue is iterable ? props.comparisonValue|join(',') : props.comparisonValue %}
+                {% set value = props.value is iterable ? props.value|join(',') : props.value %}
                 {{ 'mautic.campaign.event.condition.details'|trans({
                     '%path%': eventDetails.path|default(''),
                     '%field%': props.field ?? '',
                     '%operator%': props.operator ?? '',
-                    '%comparisonValue%': props.comparisonValue ?? '',
-                    '%value%': props.value ?? '',
+                    '%comparisonValue%': comparisonValue ?? '',
+                    '%value%': value ?? '',
                 })|purify }}  
             {% endif %}
         </h6>
