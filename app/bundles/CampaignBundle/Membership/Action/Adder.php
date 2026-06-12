@@ -67,7 +67,7 @@ class Adder
 
         // Contact exited but has been added back to the campaign
         $campaignMember->setManuallyRemoved(false);
-        $campaignMember->setDateLastExited(null);
+        $campaignMember->setDateLastExited();
         $campaignMember->startNewRotation();
 
         $this->saveCampaignMember($campaignMember);
