@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Model;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Tests\Helper\ConditionalFieldOrderTestData;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,70 @@ use Symfony\Component\HttpFoundation\Response;
 class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    public function testConditionalFieldsPreserveOrderAfterDatabaseSave(): void
+    {
+        /** @var FormModel $formModel */
+        $formModel = static::getContainer()->get('mautic.form.model.form');
+
+        // Parent session key must contain 'new' so FormConditionalSubscriber resolves it to a persisted field ID.
+        $sessionFields = ConditionalFieldOrderTestData::createSessionFields([
+            'parentKey'            => 'new_mautic_parent',
+            'withConditions'       => true,
+            'withSelectProperties' => true,
+        ]);
+
+        $form = new Form();
+        $form->setName('Conditional field order test');
+        $form->setAlias('cond_order_'.uniqid());
+        $form->setIsPublished(false);
+
+        $formModel->setFields($form, $sessionFields);
+        $formModel->saveEntity($form);
+
+        $formId = $form->getId();
+        $this->em->clear();
+
+        $reloaded = $formModel->getEntity($formId);
+        self::assertNotNull($reloaded);
+        self::assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($reloaded));
+
+        $resaveSessionFields = [];
+        foreach ($reloaded->getFields() as $field) {
+            $sessionId = 'mautic_re_'.$field->getId();
+            $field->setSessionId($sessionId);
+            $fieldData = $field->convertToArray();
+            unset($fieldData['form']);
+            $fieldData['id']                 = $field->getId();
+            $resaveSessionFields[$sessionId] = $fieldData;
+        }
+
+        $formModel->setFields($reloaded, $resaveSessionFields);
+        $formModel->saveEntity($reloaded);
+        $this->em->clear();
+
+        $savedAgain = $formModel->getEntity($formId);
+        self::assertNotNull($savedAgain);
+        self::assertSame(ConditionalFieldOrderTestData::getExpectedChildLabels(), $this->getConditionalChildLabels($savedAgain));
+
+        $formModel->deleteEntity($savedAgain);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getConditionalChildLabels(Form $form): array
+    {
+        $labels = [];
+
+        foreach ($form->getFields() as $field) {
+            if ($field->getParent()) {
+                $labels[] = $field->getLabel();
+            }
+        }
+
+        return $labels;
+    }
 
     public function testPopulateValuesWithGetParameters(): void
     {

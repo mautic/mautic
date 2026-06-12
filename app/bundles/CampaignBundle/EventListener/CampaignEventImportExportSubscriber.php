@@ -384,7 +384,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
 
                 foreach ($dependentEvents as $dependentEvent) {
                     // Set parent_id to null
-                    $dependentEvent->setParent(null);
+                    $dependentEvent->setParent();
                     $this->entityManager->persist($dependentEvent);
                 }
 

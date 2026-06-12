@@ -46,8 +46,7 @@ class InstallCommand extends Command
             ->addArgument(
                 'site_url',
                 InputArgument::REQUIRED,
-                'Site URL.',
-                null
+                'Site URL.'
             )
             ->addArgument(
                 'step',
@@ -59,106 +58,91 @@ class InstallCommand extends Command
                 '--force',
                 '-f',
                 InputOption::VALUE_NONE,
-                'Do not ask confirmation if recommendations triggered.',
-                null
+                'Do not ask confirmation if recommendations triggered.'
             )
             ->addOption(
                 '--db_driver',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database driver.',
-                null
+                'Database driver.'
             )
             ->addOption(
                 '--db_host',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database host.',
-                null
+                'Database host.'
             )
             ->addOption(
                 '--db_port',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database port.',
-                null
+                'Database port.'
             )
             ->addOption(
                 '--db_name',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database name.',
-                null
+                'Database name.'
             )
             ->addOption(
                 '--db_user',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database user.',
-                null
+                'Database user.'
             )
             ->addOption(
                 '--db_password',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database password.',
-                null
+                'Database password.'
             )
             ->addOption(
                 '--db_table_prefix',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database tables prefix.',
-                null
+                'Database tables prefix.'
             )
             ->addOption(
                 '--db_backup_tables',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Backup database tables if they exist; otherwise drop them. (true|false)',
-                null
+                'Backup database tables if they exist; otherwise drop them. (true|false)'
             )
             ->addOption(
                 '--db_backup_prefix',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Database backup tables prefix.',
-                null
+                'Database backup tables prefix.'
             )
             ->addOption(
                 '--admin_firstname',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin first name.',
-                null
+                'Admin first name.'
             )
             ->addOption(
                 '--admin_lastname',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin last name.',
-                null
+                'Admin last name.'
             )
             ->addOption(
                 '--admin_username',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin username.',
-                null
+                'Admin username.'
             )
             ->addOption(
                 '--admin_email',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin email.',
-                null
+                'Admin email.'
             )
             ->addOption(
                 '--admin_password',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Admin user.',
-                null
+                'Admin user.'
             );
 
         parent::configure();
