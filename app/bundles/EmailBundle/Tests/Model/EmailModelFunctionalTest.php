@@ -271,7 +271,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      * @throws OptimisticLockException
      * @throws ORMException
      */
-    private function emulateEmailStat(Lead $lead, Email $email, bool $isRead): void
+    private function emulateEmailStat(Lead $lead, Email $email, bool $isRead): Stat
     {
         $stat = new Stat();
         $stat->setEmailAddress('test@test.com');
@@ -280,6 +280,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $stat->setEmail($email);
         $stat->setIsRead($isRead);
         $this->em->persist($stat);
+
+        return $stat;
     }
 
     /**
@@ -580,6 +582,34 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->sendEmail($emailToSend, $contact);
         $this->assertEmailIsNotPostponed();
+    }
+
+    public function testGetEmailListStatsDateToIncludesTheWholeDay(): void
+    {
+        $contact  = $this->createContact();
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment([$contact], $segment);
+        $email   = $this->createEmail($segment);
+        $stat    = $this->emulateEmailStat($contact, $email, false);
+        $stat->setDateSent(new \DateTime('2026-05-02 06:31:32'));
+        $this->em->flush();
+
+        $stats = $this->emailModel->getEmailListStats($email, false, new \DateTime('2026-05-01'), new \DateTime('2026-05-02'));
+        $data  = array_filter($stats['datasets'][0]['data'] ?? []);
+        Assert::assertNotEmpty($data, 'The stats should not be empty');
+    }
+
+    public function testGetEmailGeneralStatsDateToIncludesTheWholeDay(): void
+    {
+        $contact = $this->createContact();
+        $email   = $this->createTemplateEmail();
+        $stat    = $this->emulateEmailStat($contact, $email, false);
+        $stat->setDateSent(new \DateTime('2026-03-13 19:01:54'));
+        $this->em->flush();
+
+        $stats = $this->emailModel->getEmailGeneralStats($email, false, null, new \DateTime('2026-03-12'), new \DateTime('2026-03-13'));
+        $data  = array_filter($stats['datasets'][0]['data'] ?? []);
+        Assert::assertNotEmpty($data, 'The stats should not be empty');
     }
 
     private function createContact(): Lead
