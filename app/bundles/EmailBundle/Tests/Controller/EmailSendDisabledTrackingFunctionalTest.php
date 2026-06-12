@@ -49,7 +49,7 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
                         </body></html>';
         $email = $this->createSegmentEmail(
             'test subject',
-            [$segment->getId() => $segment],
+            ['segment-a' => $segment],
             $content
         );
 

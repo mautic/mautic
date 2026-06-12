@@ -20,7 +20,7 @@ class Config
         try {
             $integration = $this->getIntegrationEntity();
 
-            return (bool) $integration->getIsPublished() ?: false;
+            return (bool) $integration->getIsPublished();
         } catch (IntegrationNotFoundException) {
             return false;
         }

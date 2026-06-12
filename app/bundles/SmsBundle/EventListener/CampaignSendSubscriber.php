@@ -4,26 +4,29 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\PendingEvent;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SmsModel $smsModel,
         private TransportChain $transportChain,
+        private TranslatorInterface $translator,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD     => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD           => ['onCampaignBuild', 0],
+            SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION => ['onCampaignTriggerBatchAction', 0],
         ];
     }
 
@@ -35,7 +38,7 @@ class CampaignSendSubscriber implements EventSubscriberInterface
                 [
                     'label'            => 'mautic.campaign.sms.send_text_sms',
                     'description'      => 'mautic.campaign.sms.send_text_sms.tooltip',
-                    'eventName'        => SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'batchEventName'   => SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION,
                     'formType'         => SmsSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig',
@@ -46,40 +49,46 @@ class CampaignSendSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
+    public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {
-        $lead  = $event->getLead();
-        $smsId = (int) $event->getConfig()['sms'];
-        $sms   = $this->smsModel->getEntity($smsId);
+        $smsId = (int) $event->getEvent()->getProperties()['sms'];
+        $sms   = $smsId ? $this->smsModel->getEntity($smsId) : null;
 
         if (!$sms) {
-            $event->setFailed('mautic.sms.campaign.failed.missing_entity');
+            $event->passAllWithError($this->translator->trans('mautic.sms.campaign.failed.missing_entity'));
 
             return;
         }
 
         if (!$sms->isPublished()) {
-            $event->setFailed('mautic.sms.campaign.failed.unpublished');
+            $event->passAllWithError($this->translator->trans('mautic.sms.campaign.failed.unpublished'));
 
             return;
         }
 
-        $result = $this->smsModel->sendSms($sms, $lead, ['channel' => ['campaign.event', $event->getEvent()['id']]])[$lead->getId()];
+        $event->setChannel('sms', $sms->getId());
+        $this->sendSmsInBatches($sms, $event);
+    }
 
-        if ('Authenticate' === $result['status']) {
-            // Don't fail the event but reschedule it for later
-            $event->setResult(false);
+    private function sendSmsInBatches(Sms $sms, PendingEvent $event): void
+    {
+        $contacts = $event->getContacts()->toArray();
+        $result   = $this->smsModel->sendSMS($sms, $contacts, ['channel' => ['campaign.event', $event->getEvent()->getId()]]);
+        $this->processResponse($event, $result);
+    }
 
-            return;
+    /**
+     * @param mixed[] $result
+     */
+    private function processResponse(PendingEvent $event, array $result): void
+    {
+        foreach ($event->getPending() as $log) {
+            if (isset($result[$log->getLead()->getId()])) {
+                $log->appendToMetadata($result);
+                $event->pass($log);
+            }
         }
 
-        if (!empty($result['sent'])) {
-            $event->setChannel('sms', $sms->getId());
-            $event->setResult($result);
-        } else {
-            $result['failed'] = true;
-            $result['reason'] = $result['status'];
-            $event->setResult($result);
-        }
+        $event->failRemaining($this->translator->trans('mautic.sms.campaign.failed.missing_entity'));
     }
 }
