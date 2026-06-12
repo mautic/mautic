@@ -227,11 +227,18 @@ class ContactTracker
             try {
                 $lead = $trackedDevice->getLead();
 
+                if ($lead instanceof \Doctrine\Persistence\Proxy && !$lead->__isInitialized()) {
+                    // Force the proxy to initialize so a deleted contact throws here,
+                    // inside the guard, instead of later in unguarded code
+                    $lead->__load();
+                }
+
                 // Lead associations are not hydrated with custom field values by default
                 $this->hydrateCustomFieldData($lead);
             } catch (EntityNotFoundException) {
                 // The contact was deleted but the device tracking record still references
                 // the old ID. Treat as a new anonymous visitor.
+                $lead = null;
                 $this->logger->debug('CONTACT: Tracked device references a deleted contact, treating as new visitor.');
             }
         }
