@@ -22,10 +22,8 @@ final class Version20211020092759 extends PreUpAssertionMigration
                 $platform  = $this->connection->getDatabasePlatform();
 
                 // Check index limit
-                $indexes = DatabasePlatform::listTableIndexes(
-                    $this->connection,
-                    $tableName
-                );
+                $indexes = $this->getIndexes($tableName);
+
                 if (count($indexes) >= DatabasePlatform::getMaxIndexAllowed($platform)) {
                     return true;
                 }

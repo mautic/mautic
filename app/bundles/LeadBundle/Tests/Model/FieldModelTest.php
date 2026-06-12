@@ -388,13 +388,11 @@ class FieldModelTest extends MauticMysqlTestCase
      */
     private function getUniqueIdentifierIndexColumns(string $table, string $object = 'lead'): array
     {
-        $fullTable = MAUTIC_TABLE_PREFIX.$table;
         $indexName = MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search';
+        $fullTable = MAUTIC_TABLE_PREFIX.$table;
 
-        $indexes = DatabasePlatform::listTableIndexes(
-            $this->connection,
-            $fullTable
-        );
+        $sm      = $this->connection->createSchemaManager();
+        $indexes = $sm->listTableIndexes($fullTable);
 
         foreach ($indexes as $index) {
             if (strtolower($index->getName()) === strtolower($indexName)) {

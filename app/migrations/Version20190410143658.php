@@ -7,7 +7,6 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 class Version20190410143658 extends AbstractMauticMigration
 {
@@ -59,10 +58,7 @@ class Version20190410143658 extends AbstractMauticMigration
      */
     private function findSingleLeadIdIndexes(string $tableName): array
     {
-        $indexes = DatabasePlatform::listTableIndexes(
-            $this->connection,
-            $tableName
-        );
+        $indexes = $this->getIndexes($tableName);
 
         $toDrop = [];
         foreach ($indexes as $index) {

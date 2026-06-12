@@ -208,15 +208,11 @@ class IndexSchemaHelper
     }
 
     /**
-     * Custom reliable index listing for PostgreSQL (fallback to Doctrine for other platforms)
-     * This bypasses the buggy Doctrine introspection in older DBAL versions (below 4.0)
-     * (the deprecated getListTableIndexesSQL misses indexes due to flawed joins/filters).
-     *
      * @return Index[]
      */
     public function getTableIndexes(string $fullTableName): array
     {
-        return DatabasePlatform::listTableIndexes($this->db, $fullTableName);
+        return $this->sm->listTableIndexes($fullTableName);
     }
 
     /**

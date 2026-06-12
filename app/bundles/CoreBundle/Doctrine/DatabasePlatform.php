@@ -12,7 +12,6 @@ use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
-use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Exception\RecordNotFoundException;
@@ -1266,80 +1265,6 @@ class DatabasePlatform
     public static function allowsTextInIndex(?AbstractPlatform $platform): bool
     {
         return self::isPostgreSQL($platform);
-    }
-
-    /**
-     * Returns list of indexes for a table in a platform-agnostic way.
-     *
-     * Custom reliable index listing for PostgreSQL (fallback to Doctrine for other platforms)
-     * This bypasses the buggy Doctrine introspection in older DBAL versions (below 4.0)
-     * (the deprecated getListTableIndexesSQL misses indexes due to flawed joins/filters).
-     *
-     * @return Index[]
-     */
-    public static function listTableIndexes(
-        Connection $connection,
-        string $fullTableName,
-    ): array {
-        $platform = $connection->getDatabasePlatform();
-
-        if (!self::isPostgreSQL($platform)) {
-            // Let Doctrine handle MySQL/MariaDB and other platforms
-            $schemaManager = $connection->createSchemaManager();
-
-            return $schemaManager->listTableIndexes($fullTableName);
-        }
-
-        // Reliable custom query for PostgreSQL
-        // Use this till we apply doctrine-dbal-pgsql-platform-indexes.patch
-        $sql = "
-            SELECT
-                i.relname AS index_name,
-                array_agg(a.attname ORDER BY c.ordinality) AS columns,
-                ix.indisunique AS is_unique,
-                ix.indisprimary AS is_primary,
-                t.relkind AS relation_kind
-            FROM
-                pg_class t
-                JOIN pg_namespace ns ON ns.oid = t.relnamespace
-                LEFT JOIN pg_index ix ON t.oid = ix.indrelid
-                LEFT JOIN pg_class i ON ix.indexrelid = i.oid
-                LEFT JOIN unnest(ix.indkey) WITH ORDINALITY AS c(attnum, ordinality) ON true
-                LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = c.attnum
-            WHERE
-                t.relkind IN ('r', 'i', 'm', 'p')
-                AND t.relname = :table
-                AND ns.nspname = CURRENT_SCHEMA()
-            GROUP BY
-                i.relname, t.relkind, ix.indisunique, ix.indisprimary, i.oid
-            ORDER BY
-                i.relname;
-        ";
-
-        $stmt = $connection->prepare($sql);
-        $stmt->bindValue('table', $fullTableName);
-        $results = $stmt->executeQuery()->fetchAllAssociative();
-
-        $indexes = [];
-        foreach ($results as $row) {
-            $columns = $row['columns'];
-
-            // Handle both native PHP array and string representation {col1,col2}
-            if (is_string($columns)) {
-                $columnsStr = trim($columns, '{}');
-                $columns    = explode(',', $columnsStr);
-                $columns    = array_map(fn ($part) => trim($part, '"'), $columns);
-            }
-
-            $indexes[] = new Index(
-                $row['index_name'],
-                $columns,
-                (bool) $row['is_unique'],
-                (bool) $row['is_primary']
-            );
-        }
-
-        return $indexes;
     }
 
     /**

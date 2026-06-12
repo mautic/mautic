@@ -1,0 +1,35 @@
+diff --git a/src/Driver/PDO/PgSQL/Driver.php b/src/Driver/PDO/PgSQL/Driver.php
+index 1c586d69d1..f775c5919f 100644
+--- a/src/Driver/PDO/PgSQL/Driver.php
++++ b/src/Driver/PDO/PgSQL/Driver.php
+@@ -7,9 +7,12 @@ use Doctrine\DBAL\Driver\PDO\Connection;
+ use Doctrine\DBAL\Driver\PDO\Exception;
+ use Doctrine\Deprecations\Deprecation;
+ use PDO;
++use Pdo\Pgsql;
+ use PDOException;
+ use SensitiveParameter;
+ 
++use const PHP_VERSION_ID;
++
+ final class Driver extends AbstractPostgreSQLDriver
+ {
+     /**
+@@ -41,11 +44,14 @@ final class Driver extends AbstractPostgreSQLDriver
+             throw Exception::new($exception);
+         }
+ 
++        $disablePreparesAttr = PHP_VERSION_ID >= 80400
++            ? Pgsql::ATTR_DISABLE_PREPARES
++            : PDO::PGSQL_ATTR_DISABLE_PREPARES;
+         if (
+-            ! isset($driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES])
+-            || $driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES] === true
++            ! isset($driverOptions[$disablePreparesAttr])
++            || $driverOptions[$disablePreparesAttr] === true
+         ) {
+-            $pdo->setAttribute(PDO::PGSQL_ATTR_DISABLE_PREPARES, true);
++            $pdo->setAttribute($disablePreparesAttr, true);
+         }
+ 
+         $connection = new Connection($pdo);

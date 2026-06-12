@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
@@ -41,7 +43,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     protected string $prefix;
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws AbortMigration
      *
      * @todo remove this method to make it absctract for Mautic 6
@@ -71,12 +73,9 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $this->prefix    = (string) $container->get(CoreParametersHelper::class)->get('db_table_prefix', '');
     }
 
-    public function indexExists(string $tableName, string $indexName): bool
+    protected function indexExists(string $tableName, string $indexName): bool
     {
-        $indexes = DatabasePlatform::listTableIndexes(
-            $this->connection,
-            $tableName
-        );
+        $indexes = $this->getIndexes($tableName);
 
         $lowerIndexName = strtolower($indexName);
         foreach ($indexes as $index) {
@@ -88,7 +87,23 @@ abstract class AbstractMauticMigration extends AbstractMigration
         return false;
     }
 
-    public function dropIndex(string $tableName, string $indexName, bool $ifExists = true): void
+    /**
+     * Lists the indexes for a given table returning an array of Index instances.
+     *
+     * Keys of the portable indexes list are all lower-cased.
+     *
+     * @param string $tableName the name of the table
+     *
+     * @return Index[]
+     *
+     * @throws Exception
+     */
+    protected function getIndexes(string $tableName): array
+    {
+        return $this->sm->listTableIndexes($tableName);
+    }
+
+    protected function dropIndex(string $tableName, string $indexName, bool $ifExists = true): void
     {
         $this->addSql(
             DatabasePlatform::getDropIndexSql(
@@ -104,7 +119,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     /**
      * @param array<string> $columns
      */
-    public function createIndex(string $tableName, string $indexName, array $columns, bool $unique = false, bool $ifNotExists = true): void
+    protected function createIndex(string $tableName, string $indexName, array $columns, bool $unique = false, bool $ifNotExists = true): void
     {
         $this->addSql(
             DatabasePlatform::getCreateIndexSql(
@@ -168,7 +183,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
                     $indexes = $schemaManager->listTableIndexes($table);
 
-                    /** @var \Doctrine\DBAL\Schema\Index $i */
+                    /** @var Index $i */
                     foreach ($indexes as $i) {
                         $name   = strtolower($i->getName());
                         $isIdx  = stripos($name, 'idx');

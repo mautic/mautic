@@ -1,0 +1,50 @@
+diff --git a/src/Platforms/PostgreSQLPlatform.php b/src/Platforms/PostgreSQLPlatform.php
+index 9e6648cbda..5e92f8db0c 100644
+--- a/src/Platforms/PostgreSQLPlatform.php
++++ b/src/Platforms/PostgreSQLPlatform.php
+@@ -403,16 +403,35 @@ SQL
+      */
+     public function getListTableIndexesSQL($table, $database = null)
+     {
+-        return 'SELECT quote_ident(relname) as relname, pg_index.indisunique, pg_index.indisprimary,
+-                       pg_index.indkey, pg_index.indrelid,
+-                       pg_get_expr(indpred, indrelid) AS where
+-                 FROM pg_class, pg_index
+-                 WHERE oid IN (
+-                    SELECT indexrelid
+-                    FROM pg_index si, pg_class sc, pg_namespace sn
+-                    WHERE ' . $this->getTableWhereClause($table, 'sc', 'sn') . '
+-                    AND sc.oid=si.indrelid AND sc.relnamespace = sn.oid
+-                 ) AND pg_index.indexrelid = oid';
++        // Modernized query that properly expands indkey, includes all indexes (unique + non-unique),
++        // handles partial indexes via pg_get_expr, and avoids missing rows from old joins.
++        return sprintf(
++            <<<'SQL'
++SELECT
++    quote_ident(i.relname) AS relname,
++    ix.indisunique,
++    ix.indisprimary,
++    pg_get_expr(ix.indpred, ix.indrelid) AS "where",
++    array_to_string(array_agg(quote_ident(a.attname) ORDER BY c.ordinality), ',') AS indkey_names
++FROM
++    pg_class t
++    JOIN pg_namespace n ON n.oid = t.relnamespace
++    JOIN pg_index ix ON t.oid = ix.indrelid
++    JOIN pg_class i ON i.oid = ix.indexrelid
++    LEFT JOIN LATERAL unnest(ix.indkey) WITH ORDINALITY AS c(attnum, ordinality) ON true
++    LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = c.attnum
++WHERE
++    %s
++    AND t.relkind IN ('r', 'm', 'p')  -- regular tables, materialized views, partitioned tables
++    AND i.relkind = 'i'               -- only indexes
++GROUP BY
++    i.relname, ix.indisunique, ix.indisprimary, ix.indpred, ix.indrelid
++ORDER BY
++    i.relname
++SQL
++            ,
++            $this->getTableWhereClause($table->getName(), 't', 'n')
++        );
+     }
+ 
+     /**
