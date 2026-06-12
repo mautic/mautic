@@ -6,13 +6,14 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use Psr\Log\LoggerInterface;
 use Twilio\Exceptions\ConfigurationException;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Client;
 
-class TwilioTransport implements TransportInterface
+class TwilioTransport implements TransportInterface, MMSTransportInterface
 {
     private ?Client $client = null;
 
@@ -29,6 +30,25 @@ class TwilioTransport implements TransportInterface
      */
     public function sendSms(Lead $lead, $content)
     {
+        return $this->sendMessage($lead, $content);
+    }
+
+    /**
+     * @param array<mixed> $media
+     */
+    public function sendMms(Lead $lead, string $content, array $media): bool|string
+    {
+        return $this->sendMessage($lead, $content, $media);
+    }
+
+    /**
+     * @param string       $content
+     * @param array<mixed> $media
+     *
+     * @return bool|string
+     */
+    private function sendMessage(Lead $lead, $content, array $media = [])
+    {
         $number = $lead->getLeadPhoneNumber();
 
         if (null === $number) {
@@ -41,7 +61,7 @@ class TwilioTransport implements TransportInterface
 
             $this->client->messages->create(
                 $this->sanitizeNumber($number),
-                $this->createPayload($messagingServiceSid, $content)
+                $this->createPayload($messagingServiceSid, $content, $media)
             );
 
             return true;
@@ -86,14 +106,22 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
+     * @param mixed[] $media
+     *
      * @return mixed[]
      */
-    private function createPayload(string $messagingServiceSid, string $content): array
+    private function createPayload(string $messagingServiceSid, string $content, array $media): array
     {
-        return [
+        $payload = [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
+
+        if ($media) {
+            $payload['mediaUrl'] = $media;
+        }
+
+        return $payload;
     }
 
     /**
