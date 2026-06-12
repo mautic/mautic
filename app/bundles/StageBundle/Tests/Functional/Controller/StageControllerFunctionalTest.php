@@ -64,9 +64,15 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $primaryStageId = $primaryStage->getId();
-        $mergedStageId  = $mergedStage->getId();
-        $contactId      = $contact->getId();
+        $primaryStageId      = $primaryStage->getId();
+        $mergedStageId       = $mergedStage->getId();
+        $contactId           = $contact->getId();
+        $duplicateLogContact = new Lead();
+        $duplicateLogContact->setEmail('stage-merge-duplicate-log-test@example.com');
+        $duplicateLogContact->setStage($mergedStage);
+        $this->em->persist($duplicateLogContact);
+        $this->em->flush();
+        $duplicateLogContactId = $duplicateLogContact->getId();
 
         $connection = $this->em->getConnection();
         $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
@@ -80,6 +86,16 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
             'event_name'  => 'Stage changed',
             'action_name' => 'Merged stage',
             'date_added'  => '2026-01-01 00:00:00',
+        ]);
+        $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
+            'stage_id'   => $primaryStageId,
+            'lead_id'    => $duplicateLogContactId,
+            'date_fired' => '2026-01-01 00:00:00',
+        ]);
+        $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
+            'stage_id'   => $mergedStageId,
+            'lead_id'    => $duplicateLogContactId,
+            'date_fired' => '2026-01-02 00:00:00',
         ]);
 
         /** @var StageModel $stageModel */
@@ -96,6 +112,10 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(1, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
             [$primaryStageId, $contactId]
+        ));
+        Assert::assertSame(1, (int) $connection->fetchOne(
+            self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'stage_lead_action_log WHERE stage_id = ? AND lead_id = ?',
+            [$primaryStageId, $duplicateLogContactId]
         ));
         Assert::assertSame(1, (int) $connection->fetchOne(
             self::COUNT_SQL_PREFIX.MAUTIC_TABLE_PREFIX.'lead_stages_change_log WHERE stage_id = ? AND lead_id = ?',

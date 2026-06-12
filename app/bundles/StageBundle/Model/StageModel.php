@@ -2,6 +2,7 @@
 
 namespace Mautic\StageBundle\Model;
 
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -183,13 +184,13 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             return $mainStage;
         }
 
-        $this->em->beginTransaction();
-
-        try {
+        $this->em->wrapInTransaction(function () use ($mainStageId, $secStage, $secStageId): void {
             $this->em->getConnection()->createQueryBuilder()
                 ->update(MAUTIC_TABLE_PREFIX.'leads')
-                ->set('stage_id', (string) $mainStageId)
-                ->where('stage_id = '.(int) $secStageId)
+                ->set('stage_id', ':mainStageId')
+                ->where('stage_id = :secStageId')
+                ->setParameter('mainStageId', $mainStageId, ParameterType::INTEGER)
+                ->setParameter('secStageId', $secStageId, ParameterType::INTEGER)
                 ->executeStatement();
 
             /** @var StagesChangeLogRepository $changeLogRepo */
@@ -201,13 +202,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
             $leadStageLogRepo->updateStage($secStageId, $mainStageId);
 
             $this->deleteEntity($secStage);
-
-            $this->em->commit();
-        } catch (\Exception $e) {
-            $this->em->rollback();
-            $this->logger->error('STAGE: Error during merge: '.$e->getMessage());
-            throw $e;
-        }
+        });
 
         return $mainStage;
     }

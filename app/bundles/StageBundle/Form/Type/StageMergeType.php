@@ -19,11 +19,13 @@ final class StageMergeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $stageChoices = $this->getStageChoices($options['stages']);
+
         $builder->add(
             'stage_to_merge',
             ChoiceType::class,
             [
-                'choices'     => $options['stages'],
+                'choices'     => $stageChoices,
                 'multiple'    => false,
                 'label'       => 'mautic.stage.to.merge.into',
                 'required'    => true,
@@ -33,7 +35,7 @@ final class StageMergeType extends AbstractType
                         ['message' => 'mautic.core.value.required']
                     ),
                     new Choice([
-                        'choices' => array_values($options['stages']),
+                        'choices' => array_values($stageChoices),
                         'message' => 'mautic.core.value.invalid',
                     ]),
                 ],
@@ -57,5 +59,22 @@ final class StageMergeType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['stages']);
+        $resolver->setAllowedTypes('stages', 'array');
+    }
+
+    /**
+     * @param array<int, array{id: int|string, name: string}> $stages
+     *
+     * @return array<string, int|string>
+     */
+    private function getStageChoices(array $stages): array
+    {
+        $choices = [];
+
+        foreach ($stages as $stage) {
+            $choices[$stage['name']] = $stage['id'];
+        }
+
+        return $choices;
     }
 }

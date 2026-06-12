@@ -7,19 +7,15 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageMergeType;
 use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class StageController extends AbstractFormController
 {
-    private const PERMISSION_VIEW    = 'stage:stages:view';
-    private const PERMISSION_CREATE  = 'stage:stages:create';
-    private const PERMISSION_EDIT    = 'stage:stages:edit';
-    private const PERMISSION_DELETE  = 'stage:stages:delete';
-    private const PERMISSION_PUBLISH = 'stage:stages:publish';
-
     /**
      * @param int $page
      *
@@ -30,16 +26,16 @@ final class StageController extends AbstractFormController
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-                self::PERMISSION_VIEW,
-                self::PERMISSION_CREATE,
-                self::PERMISSION_EDIT,
-                self::PERMISSION_DELETE,
-                self::PERMISSION_PUBLISH,
+                StagePermissions::PERMISSION_VIEW,
+                StagePermissions::PERMISSION_CREATE,
+                StagePermissions::PERMISSION_EDIT,
+                StagePermissions::PERMISSION_DELETE,
+                StagePermissions::PERMISSION_PUBLISH,
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions[self::PERMISSION_VIEW]) {
+        if (!$permissions[StagePermissions::PERMISSION_VIEW]) {
             return $this->accessDenied();
         }
 
@@ -129,7 +125,7 @@ final class StageController extends AbstractFormController
             $entity = $model->getEntity();
         }
 
-        if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
+        if (!$this->security->isGranted(StagePermissions::PERMISSION_CREATE)) {
             return $this->accessDenied();
         }
 
@@ -283,7 +279,7 @@ final class StageController extends AbstractFormController
                     ]
                 )
             );
-        } elseif (!$this->security->isGranted(self::PERMISSION_EDIT)) {
+        } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -402,7 +398,7 @@ final class StageController extends AbstractFormController
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
+            if (!$this->security->isGranted(StagePermissions::PERMISSION_CREATE)) {
                 return $this->accessDenied();
             }
 
@@ -420,10 +416,8 @@ final class StageController extends AbstractFormController
      *
      * @return array<string, mixed>|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function mergeAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function mergeAction(Request $request, FormFactoryInterface $formFactory, StageModel $model, $objectId)
     {
-        $model = $this->getModel('stage');
-        \assert($model instanceof StageModel);
         $secondaryStage = $model->getEntity($objectId);
         $page           = $request->getSession()->get('mautic.stage.page', 1);
 
@@ -448,7 +442,7 @@ final class StageController extends AbstractFormController
                     ]],
                 ])
             );
-        } elseif (!$this->security->isGranted(self::PERMISSION_EDIT)) {
+        } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
             $response = $this->accessDenied();
         }
 
@@ -456,12 +450,7 @@ final class StageController extends AbstractFormController
             return $response;
         }
 
-        $stages       = $model->getRepository()->getStages(false, (string) $secondaryStage->getId());
-
-        $stageChoices = [];
-        foreach ($stages as $stage) {
-            $stageChoices[$stage['name']] = $stage['id'];
-        }
+        $stages = $model->getRepository()->getStages(false, (string) $secondaryStage->getId());
 
         $action = $this->generateUrl('mautic_stage_action', ['objectAction' => 'merge', 'objectId' => $secondaryStage->getId()]);
 
@@ -469,7 +458,7 @@ final class StageController extends AbstractFormController
             StageMergeType::class,
             [],
             [
-                'stages' => $stageChoices,
+                'stages' => $stages,
                 'action' => $action,
             ]
         );
@@ -537,7 +526,7 @@ final class StageController extends AbstractFormController
                     'msg'     => 'mautic.stage.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
-            } elseif (!$this->security->isGranted(self::PERMISSION_DELETE)) {
+            } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'stage');
@@ -601,7 +590,7 @@ final class StageController extends AbstractFormController
                         'msg'     => 'mautic.stage.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (!$this->security->isGranted(self::PERMISSION_DELETE)) {
+                } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);
@@ -639,7 +628,7 @@ final class StageController extends AbstractFormController
      *
      * @param array<string, mixed> $postActionVars
      */
-    private function handleMergeFormSubmission(Request $request, \Symfony\Component\Form\FormInterface $form, StageModel $model, Stage $secondaryStage, array $postActionVars, int $page): Response
+    private function handleMergeFormSubmission(Request $request, FormInterface $form, StageModel $model, Stage $secondaryStage, array $postActionVars, int $page): Response
     {
         $result = null;
 

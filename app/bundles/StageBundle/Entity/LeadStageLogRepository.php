@@ -2,6 +2,8 @@
 
 namespace Mautic\StageBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -9,40 +11,44 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 final class LeadStageLogRepository extends CommonRepository
 {
-    private const LEAD_ID_FIELD = 'lead_id = ';
-
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
     public function updateLead($fromLeadId, $toLeadId): void
     {
+        $connection = $this->_em->getConnection();
+        $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
+
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $stageIds = $connection->createQueryBuilder()
             ->select('pl.stage_id')
-            ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
-            ->where('pl.'.self::LEAD_ID_FIELD.$toLeadId)
+            ->from($table, 'pl')
+            ->where('pl.lead_id = :toLeadId')
+            ->setParameter('toLeadId', $toLeadId, ParameterType::INTEGER)
             ->executeQuery()
-            ->fetchAllAssociative();
+            ->fetchFirstColumn();
 
-        $actions = [];
-        foreach ($results as $r) {
-            $actions[] = $r['stage_id'];
-        }
+        $q = $connection->createQueryBuilder();
+        $q->update($table)
+            ->set('lead_id', ':toLeadId')
+            ->where('lead_id = :fromLeadId')
+            ->setParameter('fromLeadId', $fromLeadId, ParameterType::INTEGER)
+            ->setParameter('toLeadId', $toLeadId, ParameterType::INTEGER);
 
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-            ->set('lead_id', (string) $toLeadId)
-            ->where(self::LEAD_ID_FIELD.(int) $fromLeadId);
-
-        if (!empty($actions)) {
+        if (!empty($stageIds)) {
             $q->andWhere(
-                $q->expr()->notIn('stage_id', $actions)
+                $q->expr()->notIn('stage_id', ':stageIds')
+            )->setParameter(
+                'stageIds',
+                array_map('intval', $stageIds),
+                ArrayParameterType::INTEGER
             )->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
-            $this->_em->getConnection()->createQueryBuilder()
-                ->delete(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-                ->where(self::LEAD_ID_FIELD.(int) $fromLeadId)
+            $connection->createQueryBuilder()
+                ->delete($table)
+                ->where('lead_id = :fromLeadId')
+                ->setParameter('fromLeadId', $fromLeadId, ParameterType::INTEGER)
                 ->executeStatement();
         } else {
             $q->executeStatement();
@@ -51,38 +57,32 @@ final class LeadStageLogRepository extends CommonRepository
 
     public function updateStage(int $fromStageId, int $toStageId): void
     {
-        $records = $this->_em->getConnection()->createQueryBuilder()
-            ->select('pl.lead_id, pl.ip_id, pl.date_fired')
-            ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
-            ->where('pl.stage_id = '.(int) $fromStageId)
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $connection = $this->_em->getConnection();
+        $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
 
-        if (!empty($records)) {
-            foreach ($records as $record) {
-                $existingRecord = $this->_em->getConnection()->createQueryBuilder()
-                    ->select('pl.stage_id')
-                    ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
-                    ->where('pl.stage_id = '.(int) $toStageId)
-                    ->andWhere('pl.'.self::LEAD_ID_FIELD.(int) $record['lead_id'])
-                    ->executeQuery()
-                    ->fetchOne();
+        // Lead and stage are a composite key, so delete source rows that would duplicate an existing target row.
+        $connection->executeStatement(
+            sprintf(
+                'DELETE source_log FROM %s source_log INNER JOIN %s target_log ON target_log.lead_id = source_log.lead_id AND target_log.stage_id = :toStageId WHERE source_log.stage_id = :fromStageId',
+                $table,
+                $table
+            ),
+            [
+                'fromStageId' => $fromStageId,
+                'toStageId'   => $toStageId,
+            ],
+            [
+                'fromStageId' => ParameterType::INTEGER,
+                'toStageId'   => ParameterType::INTEGER,
+            ]
+        );
 
-                if ($existingRecord) {
-                    $this->_em->getConnection()->createQueryBuilder()
-                        ->delete(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-                        ->where('stage_id = '.(int) $fromStageId)
-                        ->andWhere(self::LEAD_ID_FIELD.(int) $record['lead_id'])
-                        ->executeStatement();
-                } else {
-                    $this->_em->getConnection()->createQueryBuilder()
-                        ->update(MAUTIC_TABLE_PREFIX.'stage_lead_action_log')
-                        ->set('stage_id', (int) $toStageId)
-                        ->where('stage_id = '.(int) $fromStageId)
-                        ->andWhere(self::LEAD_ID_FIELD.(int) $record['lead_id'])
-                        ->executeStatement();
-                }
-            }
-        }
+        $connection->createQueryBuilder()
+            ->update($table)
+            ->set('stage_id', ':toStageId')
+            ->where('stage_id = :fromStageId')
+            ->setParameter('fromStageId', $fromStageId, ParameterType::INTEGER)
+            ->setParameter('toStageId', $toStageId, ParameterType::INTEGER)
+            ->executeStatement();
     }
 }
