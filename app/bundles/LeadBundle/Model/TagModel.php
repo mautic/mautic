@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -149,17 +150,11 @@ class TagModel extends FormModel
         $connection = $this->em->getConnection();
 
         $connection->executeStatement(
-            sprintf('UPDATE %slead_tags_xref t1
-         LEFT JOIN %slead_tags_xref t2
-            ON t2.lead_id = t1.lead_id
-           AND t2.tag_id = :primaryTagId
-         SET t1.tag_id = :primaryTagId
-         WHERE t1.tag_id = :secondaryTagId
-           AND t2.lead_id IS NULL', MAUTIC_TABLE_PREFIX, MAUTIC_TABLE_PREFIX),
-            [
-                'primaryTagId'   => (int) $primaryTag->getId(),
-                'secondaryTagId' => (int) $secondaryTag->getId(),
-            ],
+            DatabasePlatform::getUpdateLeadTagAssociationSql(
+                $connection->getDatabasePlatform(),
+                $primaryTag,
+                $secondaryTag
+            )
         );
 
         $connection->executeStatement(

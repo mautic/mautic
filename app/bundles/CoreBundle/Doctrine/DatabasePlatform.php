@@ -16,6 +16,7 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Exception\RecordNotFoundException;
+use Mautic\LeadBundle\Entity\Tag;
 
 /**
  * Central abstraction point for database platform differences (MySQL vs PostgreSQL).
@@ -920,6 +921,44 @@ class DatabasePlatform
             $tableName,
             $batchSize
         );
+    }
+
+    /* ===================================================================
+     * TagModel helpers
+     * =================================================================== */
+
+    /**
+     * Returns SQL for replacing secondary tag associations with primary tag.
+     *
+     * Equivalent to MySQL's UPDATE IGNORE on the lead_tags_xref table.
+     * Skips rows that would violate the unique (lead_id, tag_id) constraint.
+     */
+    public static function getUpdateLeadTagAssociationSql(
+        ?AbstractPlatform $platform,
+        Tag $primaryTag,
+        Tag $secondaryTag,
+    ): string {
+        $primaryId   = (int) $primaryTag->getId();
+        $secondaryId = (int) $secondaryTag->getId();
+
+        if (self::isPostgreSQL($platform)) {
+            // PostgreSQL version
+            return sprintf(
+                'UPDATE %slead_tags_xref t1
+                 SET tag_id = %d
+                 WHERE tag_id = %d
+                   AND NOT EXISTS (
+                       SELECT 1
+                       FROM %slead_tags_xref t2
+                       WHERE t2.lead_id = t1.lead_id
+                         AND t2.tag_id = %d
+                   )',
+                MAUTIC_TABLE_PREFIX, $primaryId, $secondaryId, MAUTIC_TABLE_PREFIX, $primaryId
+            );
+        }
+
+        // MySQL / MariaDB version
+        return sprintf('UPDATE IGNORE %slead_tags_xref SET tag_id = %d WHERE tag_id = %d', MAUTIC_TABLE_PREFIX, $primaryId, $secondaryId);
     }
 
     /* ===================================================================
