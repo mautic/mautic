@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9ab9668aac5800be33690a32db8ebb29",
+    "content-hash": "bdac23f6fdcdac1d60759634efa5b5aa",
     "packages": [
         {
             "name": "api-platform/core",
@@ -6187,7 +6187,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "b70e758fdb639acb280da575c03dd0653d01f8f5"
+                "reference": "45268f4c3613830c585ecc9c48855a9c0421b945"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6275,6 +6275,7 @@
                 "symfony/translation": "~7.4.0",
                 "symfony/twig-bundle": "~7.4.0",
                 "symfony/validator": "~7.4.0",
+                "twig/string-extra": "^3.21",
                 "twilio/sdk": "^5.25",
                 "wikimedia/less.php": "^5.5"
             },
@@ -16166,11 +16167,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.33",
+            "version": "2.2.2",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9e800e6bee7d5bd02784d4c6069b48032d16224f",
-                "reference": "9e800e6bee7d5bd02784d4c6069b48032d16224f",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e5cc34d491a90e79c216d824f60fe21fd4d93bd6",
+                "reference": "e5cc34d491a90e79c216d824f60fe21fd4d93bd6",
                 "shasum": ""
             },
             "require": {
@@ -16192,6 +16193,17 @@
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ondřej Mirtes"
+                },
+                {
+                    "name": "Markus Staab"
+                },
+                {
+                    "name": "Vincent Langlet"
+                }
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
             "keywords": [
@@ -16215,7 +16227,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-05T10:24:31+00:00"
+            "time": "2026-06-05T09:00:01+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -17421,21 +17433,21 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.2.0",
+            "version": "2.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "3c5a641c39f2def0c93d36df118fb2e75cfc2aae"
+                "reference": "cbd86024be5014d3c14d9f0b3f7aae8ecbffd62c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/3c5a641c39f2def0c93d36df118fb2e75cfc2aae",
-                "reference": "3c5a641c39f2def0c93d36df118fb2e75cfc2aae",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/cbd86024be5014d3c14d9f0b3f7aae8ecbffd62c",
+                "reference": "cbd86024be5014d3c14d9f0b3f7aae8ecbffd62c",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4|^8.0",
-                "phpstan/phpstan": "^2.1.26"
+                "phpstan/phpstan": "^2.1.56"
             },
             "conflict": {
                 "rector/rector-doctrine": "*",
@@ -17469,7 +17481,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.2.0"
+                "source": "https://github.com/rectorphp/rector/tree/2.4.5"
             },
             "funding": [
                 {
@@ -17477,7 +17489,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-10-06T12:18:16+00:00"
+            "time": "2026-05-26T21:03:22+00:00"
         },
         {
             "name": "sebastian/cli-parser",

@@ -8,6 +8,7 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
@@ -70,6 +71,12 @@ return RectorConfig::configure()
 
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
+
+        // Rector 2.4.5 false positive: setFromForSingleMessage() and setReplyToForSingleMessage()
+        // are both called from send(), but dead code analysis incorrectly treats them as unused
+        RemoveUnusedPrivateMethodRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
+        ],
 
         RemoveUnusedPrivatePropertyRector::class => [
             // entities
