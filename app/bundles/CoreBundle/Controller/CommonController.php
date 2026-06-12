@@ -600,7 +600,7 @@ class CommonController extends AbstractController implements MauticController
             $request = $this->getCurrentRequest();
         }
 
-        $afterId = $request->get('mauticLastNotificationId', null);
+        $afterId = $request->get('mauticLastNotificationId');
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
