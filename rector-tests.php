@@ -7,7 +7,6 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\PHPUnit\PHPUnit100\Rector\Class_\ParentTestClassConstructorRector;
 use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector;
-use Rector\PHPUnit\PHPUnit60\Rector\MethodCall\GetMockBuilderGetMockToCreateMockRector;
 use Rector\PHPUnit\PHPUnit80\Rector\MethodCall\SpecificAssertContainsRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Symfony\Symfony43\Rector\MethodCall\WebTestCaseAssertIsSuccessfulRector;
@@ -28,7 +27,6 @@ return RectorConfig::configure()
     ])
     ->withRules([
         SpecificAssertContainsRector::class,
-        GetMockBuilderGetMockToCreateMockRector::class,
         AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         RemoveUnusedVariableAssignRector::class,
         WebTestCaseAssertResponseCodeRector::class,

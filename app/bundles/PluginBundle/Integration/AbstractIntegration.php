@@ -1693,7 +1693,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        /** @var LeadModel $leadModel */
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];

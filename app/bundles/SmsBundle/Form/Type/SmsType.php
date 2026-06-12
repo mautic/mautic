@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -78,6 +79,43 @@ class SmsType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'label' => 'mautic.core.form.available',
         ]);
+
+        $builder->add(
+            'isMms',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.sms.form.is_mms',
+                'data'  => (bool) $options['data']->getIsMms(),
+                'attr'  => [
+                    'onchange' => 'Mautic.toggleIsMms()',
+                ],
+            ]
+        );
+
+        $mediaFields = function (FormEvent $event) {
+            $form        = $event->getForm();
+            $data        = $event->getData();
+            $mediaChoice = $data instanceof Sms ? $data->getMedia() : ($data['media'] ?? []);
+            if ($form->has('media')) {
+                $form->remove('media');
+            }
+            $form->add(
+                'media',
+                ChoiceType::class,
+                [
+                    'label'             => 'mautic.sms.form.media',
+                    'choices'           => array_combine($mediaChoice, $mediaChoice),
+                    'expanded'          => true,
+                    'multiple'          => true,
+                    'required'          => false,
+                ]
+            );
+        };
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, $mediaFields);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $mediaFields);
+
+        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         // add lead lists
         $transformer = new IdToEntityModelTransformer($this->em, \Mautic\LeadBundle\Entity\LeadList::class, 'id', true);

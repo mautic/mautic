@@ -147,8 +147,6 @@ class ChartQuery extends AbstractChart
                 $dateTo   = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                }
-                if ($this->isTimeUnit) {
                     $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 }
                 $query->andWhere($tablePrefix.'.'.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
