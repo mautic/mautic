@@ -70,6 +70,7 @@ class ImportController extends FormController
 
         $this->importModel = $model;
 
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -144,7 +145,7 @@ class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
 
         if ($import && $import->getId()) {
             $import->setStatus($import::STOPPED)
@@ -167,7 +168,7 @@ class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
 
         if ($import) {
             $import->setStatus($import::QUEUED);
@@ -274,7 +275,7 @@ class ImportController extends FormController
                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.inprogress', true);
                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.progresschecks', 1);
 
-                    $import = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id', null));
+                    $import = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id'));
 
                     if (!$import->getDateStarted()) {
                         $import->setDateStarted(new \DateTime());

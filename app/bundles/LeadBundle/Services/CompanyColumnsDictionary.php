@@ -27,7 +27,6 @@ final class CompanyColumnsDictionary
      */
     public function getColumns(): array
     {
-        /** @var mixed $rawColumns */
         $rawColumns = $this->coreParametersHelper->get('company_columns', []);
         if (!\is_array($rawColumns)) {
             $rawColumns = [];
