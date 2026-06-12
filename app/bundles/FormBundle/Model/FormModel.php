@@ -10,6 +10,7 @@ use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -62,6 +63,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         private ColumnSchemaHelper $columnSchemaHelper,
         private TableSchemaHelper $tableSchemaHelper,
         private MappedObjectCollectorInterface $mappedObjectCollector,
+        private PathsHelper $pathsHelper,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -445,7 +447,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if ($entity->getRenderStyle()) {
             $styleAsset = "themes/{$theme}/assets/style.css";
-            if (is_file(MAUTIC_ROOT_DIR.'/'.$styleAsset)) {
+            $stylePath  = $this->pathsHelper->getThemesPath()."/{$theme}/assets/style.css";
+
+            if (is_file($stylePath)) {
                 $style = $styleAsset;
             } else {
                 $style = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleToRender), []);

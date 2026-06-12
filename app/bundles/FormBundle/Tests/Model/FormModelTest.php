@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -119,6 +120,11 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $primaryCompanyHelper;
 
     /**
+     * @var MockObject&PathsHelper
+     */
+    private MockObject $pathsHelper;
+
+    /**
      * @var MockObject&MappedObjectCollectorInterface
      */
     private MockObject $mappedObjectCollector;
@@ -148,6 +154,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $this->tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
         $this->mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
+        $this->pathsHelper           = $this->createMock(PathsHelper::class);
 
         $this->entityManager->expects($this
             ->any())
@@ -172,6 +179,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->columnSchemaHelper,
             $this->tableSchemaHelper,
             $this->mappedObjectCollector,
+            $this->pathsHelper,
             $this->entityManager,
             $this->createMock(CorePermissions::class),
             $this->dispatcher,
@@ -550,6 +558,9 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $this->themeHelper->method('checkForTwigTemplate')
             ->willReturnArgument(0);
+
+        $this->pathsHelper->method('getThemesPath')
+            ->willReturn(\dirname(__DIR__, 5).'/themes');
 
         $this->themeHelper->expects($this->any())
             ->method('renderThemeTemplate')
