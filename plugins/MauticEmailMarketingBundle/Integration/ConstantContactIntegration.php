@@ -86,7 +86,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
             $leadFields[$f] = [
                 'label'    => $this->translator->trans('mautic.constantcontact.field.'.$f),
                 'type'     => 'string',
-                'required' => ('email' == $f) ? true : false,
+                'required' => 'email' == $f,
             ];
         }
 

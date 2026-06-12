@@ -221,7 +221,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => !empty($options['data']['id']) && !str_contains($options['data']['id'], 'new'),
                     'required' => false,
                 ]
             );

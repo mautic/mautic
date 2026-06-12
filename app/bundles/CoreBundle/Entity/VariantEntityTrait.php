@@ -172,7 +172,7 @@ trait VariantEntityTrait
             return (null === $parent) ? false : true;
         }
 
-        return (!empty($parent) || count($children)) ? true : false;
+        return !empty($parent) || count($children);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Mautic\SmsBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
@@ -44,17 +45,16 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         // 3. Mock transport
         $transportMock = $this->createMock(TransportChain::class);
         $transportMock->expects($this->once())
-            ->method('sendSms')
+            ->method('sendBatchSms')
             ->with(
                 $this->anything(),
-                $this->callback(function (string $message) use ($expectedMessage) {
-                    $this->assertSame($expectedMessage, $message);
+                $this->callback(function (string $template) use ($expectedMessage) {
+                    $this->assertSame($expectedMessage, $template);
 
                     return true;
-                }),
-                $this->anything()
+                })
             )
-            ->willReturn(true);
+            ->willReturn(new RecipientCollection($sms));
 
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
@@ -105,23 +105,55 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // 5. Mock transport
-        $expectedMessages = ['Hello', 'Bonjour', 'Bonjour'];
-        $callIndex        = 0;
+        $expectedBatches = [
+            [
+                'message'    => 'Hello',
+                'count'      => 1,
+                'recipients' => [
+                    '123456789' => 'Hello',
+                ],
+            ],
+            [
+                'message'    => 'Bonjour',
+                'count'      => 2,
+                'recipients' => [
+                    '234567891' => 'Bonjour',
+                    '345678912' => 'Bonjour',
+                ],
+            ],
+        ];
+        $callIndex = 0;
 
         $transportMock = $this->createMock(TransportChain::class);
-        $transportMock->expects($this->exactly(3))
-            ->method('sendSms')
+        $transportMock->expects($this->exactly(2))
+            ->method('sendBatchSms')
             ->with(
-                $this->anything(),
-                $this->callback(function (string $message) use (&$callIndex, $expectedMessages) {
-                    $this->assertSame($expectedMessages[$callIndex], $message);
-                    ++$callIndex;
+                $this->callback(function (RecipientCollection $collection) use (&$callIndex, $expectedBatches): bool {
+                    $recipientMessages = [];
+
+                    foreach ($collection as $recipient) {
+                        $recipientMessages[$recipient->getLead()->getMobile()] = $recipient->getFinalMessage();
+                    }
+
+                    $this->assertCount($expectedBatches[$callIndex]['count'], $collection);
+                    $this->assertSame($expectedBatches[$callIndex]['recipients'], $recipientMessages);
 
                     return true;
                 }),
-                $this->anything()
+                $this->callback(function (string $message) use (&$callIndex, $expectedBatches) {
+                    $this->assertSame($expectedBatches[$callIndex]['message'], $message);
+                    ++$callIndex;
+
+                    return true;
+                })
             )
-            ->willReturn(true);
+            ->willReturnCallback(function (RecipientCollection $collection): RecipientCollection {
+                foreach ($collection as $recipient) {
+                    $recipient->setResult(true);
+                }
+
+                return $collection;
+            });
 
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
