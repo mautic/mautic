@@ -148,8 +148,18 @@ class TagModel extends FormModel
     {
         $connection = $this->em->getConnection();
 
+        // PostgreSQL: No IGNORE clause for UPDATE. use NOT EXISTS subquery
+        // This works identically on both databases
         $connection->executeStatement(
-            sprintf('UPDATE IGNORE %slead_tags_xref SET tag_id = :primaryTagId WHERE tag_id = :secondaryTagId', MAUTIC_TABLE_PREFIX),
+            sprintf('UPDATE %slead_tags_xref
+                SET tag_id = :primaryId
+                WHERE tag_id = :secondaryId
+                    AND NOT EXISTS (
+                        SELECT 1
+                      FROM %slead_tags_xref x2
+                      WHERE x2.lead_id = %slead_tags_xref.lead_id
+                    AND x2.tag_id = :primaryId
+                  )', MAUTIC_TABLE_PREFIX, MAUTIC_TABLE_PREFIX, MAUTIC_TABLE_PREFIX),
             [
                 'primaryTagId'   => (int) $primaryTag->getId(),
                 'secondaryTagId' => (int) $secondaryTag->getId(),
