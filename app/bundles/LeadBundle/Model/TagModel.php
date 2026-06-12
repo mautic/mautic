@@ -152,13 +152,13 @@ class TagModel extends FormModel
         // This works identically on both databases
         $connection->executeStatement(
             sprintf('UPDATE %slead_tags_xref
-                SET tag_id = :primaryId
-                WHERE tag_id = :secondaryId
+                SET tag_id = :primaryTagId
+                WHERE tag_id = :secondaryTagId
                     AND NOT EXISTS (
                         SELECT 1
                       FROM %slead_tags_xref x2
                       WHERE x2.lead_id = %slead_tags_xref.lead_id
-                    AND x2.tag_id = :primaryId
+                    AND x2.tag_id = :primaryTagId
                   )', MAUTIC_TABLE_PREFIX, MAUTIC_TABLE_PREFIX, MAUTIC_TABLE_PREFIX),
             [
                 'primaryTagId'   => (int) $primaryTag->getId(),
