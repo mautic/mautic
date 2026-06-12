@@ -128,14 +128,27 @@ class FieldController extends CommonFormController
                         $formField['isRequired'] = !empty($formField['properties']['captcha']);
                     }
 
-                    // Add it to the next to last assuming the last is the submit button
+                    // Add field before the submit button
                     if (count($fields)) {
-                        $lastField = end($fields);
-                        $lastKey   = key($fields);
-                        array_pop($fields);
+                        $submitKey   = null;
+                        $submitField = null;
 
-                        $fields[$keyId]   = $formField;
-                        $fields[$lastKey] = $lastField;
+                        foreach ($fields as $key => $field) {
+                            if (isset($field['type']) && 'button' === $field['type']) {
+                                $submitKey   = $key;
+                                $submitField = $field;
+                                break;
+                            }
+                        }
+
+                        if ($submitKey) {
+                            // Remove submit button, add new field, re-add submit button at the end
+                            unset($fields[$submitKey]);
+                            $fields[$keyId]     = $formField;
+                            $fields[$submitKey] = $submitField;
+                        } else {
+                            $fields[$keyId] = $formField;
+                        }
                     } else {
                         $fields[$keyId] = $formField;
                     }
