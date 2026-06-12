@@ -1042,7 +1042,7 @@ class PageController extends FormController
         $start = ($page <= 1) ? 0 : (($page - 1) * $limit);
 
         // Set order direction to desc if not set
-        if (!$session->get('mautic.pageresult.'.$objectId.'.orderbydir', null)) {
+        if (!$session->get('mautic.pageresult.'.$objectId.'.orderbydir')) {
             $session->set('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
         }
 
