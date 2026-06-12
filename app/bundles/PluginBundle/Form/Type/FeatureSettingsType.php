@@ -50,7 +50,7 @@ class FeatureSettingsType extends AbstractType
             $settings    = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => (1 == $page && 'POST' !== strtoupper($method)) ? true : false,
+                'ignore_field_cache' => 1 == $page && 'POST' !== strtoupper($method),
             ];
 
             try {

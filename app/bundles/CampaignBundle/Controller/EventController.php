@@ -51,6 +51,7 @@ class EventController extends CommonFormController
         CorePermissions $security,
         private CampaignModel $campaignModel,
     ) {
+        // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -178,7 +179,7 @@ class EventController extends CommonFormController
             'route'         => false,
         ];
 
-        if (1 === $success && !empty($modifiedEvents)) {
+        if (1 === $success) {
             $passthroughVars['modifiedEvents'] = $modifiedEvents;
         }
 
