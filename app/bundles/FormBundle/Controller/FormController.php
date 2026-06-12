@@ -51,6 +51,7 @@ class FormController extends CommonFormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -792,7 +793,7 @@ class FormController extends CommonFormController
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
-                    fn ($a, $b): int => $a['order'] <=> $b['order']
+                    fn ($a, $b): int => $a['order'] <=> $b['order'] ?: $a['id'] <=> $b['id']
                 );
             }
 

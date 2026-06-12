@@ -44,6 +44,7 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -100,7 +101,7 @@ class ResultController extends CommonFormController
         $start = $pageHelper->getStart();
 
         // Set order direction to desc if not set
-        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir', null)) {
+        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir')) {
             $session->set('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         }
 

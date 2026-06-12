@@ -73,15 +73,13 @@ final class ResumeStuckCampaignCommand extends Command
                 '--min-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Fix contacts starting at a specific contact ID.',
-                null
+                'Fix contacts starting at a specific contact ID.'
             )
             ->addOption(
                 '--max-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Fix contacts up to a specific contact ID.',
-                null
+                'Fix contacts up to a specific contact ID.'
             )
             ->addOption(
                 '--batch-limit',
