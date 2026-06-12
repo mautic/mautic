@@ -222,24 +222,34 @@ Mautic.deleteTab = function(deleteBtn) {
                 localStorage.removeItem(storageKeys[index]);
             });
         }
-    }
+    };
+
+    const formatUuid = (randomValues) => {
+        randomValues[6] = (randomValues[6] & 0x0f) | 0x40;
+        randomValues[8] = (randomValues[8] & 0x3f) | 0x80;
+
+        const hexValues = Array.from(randomValues, (value) => value.toString(16).padStart(2, '0'));
+
+        return [
+            hexValues.slice(0, 4).join(''),
+            hexValues.slice(4, 6).join(''),
+            hexValues.slice(6, 8).join(''),
+            hexValues.slice(8, 10).join(''),
+            hexValues.slice(10).join(''),
+        ].join('-');
+    };
 
     // Generate a unique ID (UUID v4)
     const generateStorageId = (index) => {
-        let result;
-
-        if (window.crypto && window.crypto.randomUUID) {
-            result = window.crypto.randomUUID(); // Modern browsers
-        } else {
-            // Fallback for older browsers (e.g., IE11)
-            result = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
+        const result = globalThis.crypto?.randomUUID?.();
+        if (result) {
+            return `${result}_${index}`;
         }
 
-        return result + '_' + index;
+        const randomValues = new Uint8Array(16);
+        globalThis.crypto.getRandomValues(randomValues);
+
+        return `${formatUuid(randomValues)}_${index}`;
     };
 
     /**
@@ -248,8 +258,8 @@ Mautic.deleteTab = function(deleteBtn) {
      * @returns {string}
      */
     const tabId = function (index) {
-        return MAUTIC_TAB_KEY + '-' + window.location.pathname + '-' + index;
-    }
+        return `${MAUTIC_TAB_KEY}-${globalThis.location.pathname}-${index}`;
+    };
 
     // Generate new tab ID if one was already used.
     channel.addEventListener('message', (event) => {
@@ -290,7 +300,7 @@ Mautic.deleteTab = function(deleteBtn) {
     });
 
     // Cleanup localStorage on refresh or tab close.
-    window.addEventListener('beforeunload', (e) => {
+    globalThis.addEventListener('beforeunload', () => {
         tabStorage.cleanLocalStorage();
 
         channel.close();
