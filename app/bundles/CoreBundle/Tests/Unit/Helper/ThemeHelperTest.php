@@ -22,8 +22,6 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-use ZipArchive;
-
 class ThemeHelperTest extends TestCase
 {
     /**
@@ -166,8 +164,8 @@ class ThemeHelperTest extends TestCase
         $fs      = new Filesystem();
         $zipPath = __DIR__.'/resource/themes/form-style-only.zip';
 
-        $archive = new ZipArchive();
-        $result  = $archive->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $archive = new \ZipArchive();
+        $result  = $archive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         self::assertTrue(true === $result, 'Expected test archive to be created successfully.');
 
         $archive->addEmptyDir('html');
