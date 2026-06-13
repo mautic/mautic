@@ -343,10 +343,14 @@ class ThemeHelper implements ThemeHelperInterface
             throw new \Exception($this->getExtractError($archive));
         }
 
-        $requiredFiles      = ['config.json', 'html/message.html.twig'];
-        $foundRequiredFiles = [];
-        $allowedFiles       = [];
-        $allowedExtensions  = $this->coreParametersHelper->get('theme_import_allowed_extensions');
+        $requiredFiles         = ['config.json', 'html/message.html.twig'];
+        $foundRequiredFiles    = [];
+        $allowedFiles          = [];
+        $allowedExtensions     = $this->coreParametersHelper->get('theme_import_allowed_extensions');
+        $formStyleOverrides    = [
+            'html/MauticFormBundle/Builder/_style.html.twig',
+            'html/MauticFormBundle/Builder/style.html.twig',
+        ];
 
         $config = [];
         for ($i = 0; $i < $zipper->numFiles; ++$i) {
@@ -372,9 +376,20 @@ class ThemeHelper implements ThemeHelperInterface
             }
         }
 
+        $hasFormStyleOverride = !empty(array_intersect($formStyleOverrides, $allowedFiles));
+
         if (!empty($config['features'])) {
+            if (in_array('form', $config['features'], true) && $hasFormStyleOverride) {
+                $requiredFiles = array_values(array_diff($requiredFiles, ['html/message.html.twig']));
+            }
+
             foreach ($config['features'] as $feature) {
                 $featureFile     = sprintf('html/%s.html.twig', strtolower($feature));
+
+                if ('form' === $feature && $hasFormStyleOverride) {
+                    continue;
+                }
+
                 $requiredFiles[] = $featureFile;
 
                 if (in_array($featureFile, $allowedFiles)) {

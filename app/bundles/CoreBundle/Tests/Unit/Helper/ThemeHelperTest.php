@@ -22,6 +22,7 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use ZipArchive;
 
 class ThemeHelperTest extends TestCase
 {
@@ -158,6 +159,42 @@ class ThemeHelperTest extends TestCase
         $this->assertFileExists(__DIR__.'/resource/themes/good-tmp');
 
         $fs->remove(__DIR__.'/resource/themes/good-tmp');
+    }
+
+    public function testFormStyleOnlyThemeIsInstalled(): void
+    {
+        $fs      = new Filesystem();
+        $zipPath = __DIR__.'/resource/themes/form-style-only.zip';
+
+        $archive = new ZipArchive();
+        $result  = $archive->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        self::assertTrue(true === $result, 'Expected test archive to be created successfully.');
+
+        $archive->addEmptyDir('html');
+        $archive->addEmptyDir('html/MauticFormBundle');
+        $archive->addEmptyDir('html/MauticFormBundle/Builder');
+        $archive->addFromString('config.json', json_encode([
+            'name'     => 'form-style-only',
+            'author'   => 'Test theme',
+            'features' => ['form'],
+        ], JSON_THROW_ON_ERROR));
+        $archive->addFromString('html/MauticFormBundle/Builder/_style.html.twig', '.test-form-style-only { color: red; }');
+        $archive->close();
+
+        $this->pathsHelper->method('getSystemPath')
+            ->with('themes', true)
+            ->willReturn(__DIR__.'/resource/themes');
+
+        try {
+            $this->themeHelper->install($zipPath);
+
+            $this->assertFileExists(__DIR__.'/resource/themes/form-style-only');
+        } finally {
+            $fs->remove(__DIR__.'/resource/themes/form-style-only');
+            if (file_exists($zipPath)) {
+                unlink($zipPath);
+            }
+        }
     }
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
