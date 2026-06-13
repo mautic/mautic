@@ -14,8 +14,8 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
-use Twig\Extension\SandboxExtension;
 use Twig\Error\RuntimeError;
+use Twig\Extension\SandboxExtension;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class ThemeHelper implements ThemeHelperInterface
@@ -440,6 +440,13 @@ class ThemeHelper implements ThemeHelperInterface
                 ) {
                 }
 
+                /**
+                 * @template TRuntime of object
+                 *
+                 * @param class-string<TRuntime> $class
+                 *
+                 * @return TRuntime|null
+                 */
                 public function load(string $class): ?object
                 {
                     try {
