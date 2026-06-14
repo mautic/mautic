@@ -559,12 +559,14 @@ class CampaignSubscriber implements EventSubscriberInterface
                     );
 
                     $log = $event->getLogEntry();
-                    $log->setMetadata([
-                        'comparisonValue' => $fieldValue,
-                        'operator'        => $operators[$event->getConfig()['operator']]['expr'],
-                        'value'           => $value,
-                        'field'           => $field,
-                    ]);
+                    if (null !== $log) {
+                        $log->setMetadata([
+                            'comparisonValue' => $fieldValue,
+                            'operator'        => $operators[$event->getConfig()['operator']]['expr'],
+                            'value'           => $value,
+                            'field'           => $field,
+                        ]);
+                    }
                 }
             }
         } elseif ($event->checkContext('lead.dnc')) {
