@@ -51,6 +51,7 @@ final class OAuthExceptionListener implements EventSubscriberInterface
         ));
     }
 
+    /** @phpstan-assert-if-true OAuth2ServerException $exception */
     private function isRedirectUriMismatch(\Throwable $exception): bool
     {
         return $exception instanceof OAuth2ServerException

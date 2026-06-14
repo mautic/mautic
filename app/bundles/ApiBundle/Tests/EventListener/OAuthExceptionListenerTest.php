@@ -29,7 +29,7 @@ final class OAuthExceptionListenerTest extends TestCase
         $event = $this->createExceptionEvent(
             Request::create('/oauth/v2/authorize', 'GET'),
             new OAuth2ServerException(
-                Response::HTTP_BAD_REQUEST,
+                (string) Response::HTTP_BAD_REQUEST,
                 'redirect_uri_mismatch',
                 'The redirect URI provided does not match registered URI(s).'
             )
@@ -50,12 +50,12 @@ final class OAuthExceptionListenerTest extends TestCase
         self::assertSame('Change it in the settings.', $payload['action']);
     }
 
-    public function testConverts500TooBadRequestForRedirectUriMismatch(): void
+    public function testConverts500ToBadRequestForRedirectUriMismatch(): void
     {
         $event = $this->createExceptionEvent(
             Request::create('/oauth/v2/authorize', 'GET'),
             new OAuth2ServerException(
-                Response::HTTP_INTERNAL_SERVER_ERROR,
+                (string) Response::HTTP_INTERNAL_SERVER_ERROR,
                 'redirect_uri_mismatch',
                 'The redirect URI provided does not match registered URI(s).'
             )
@@ -71,7 +71,7 @@ final class OAuthExceptionListenerTest extends TestCase
     {
         $event = $this->createExceptionEvent(
             Request::create('/api/contacts', 'GET'),
-            new OAuth2ServerException(Response::HTTP_BAD_REQUEST, 'redirect_uri_mismatch')
+            new OAuth2ServerException((string) Response::HTTP_BAD_REQUEST, 'redirect_uri_mismatch')
         );
 
         (new OAuthExceptionListener($this->createTranslator()))->onKernelException($event);
@@ -83,7 +83,7 @@ final class OAuthExceptionListenerTest extends TestCase
     {
         $event = $this->createExceptionEvent(
             Request::create('/oauth/v2/authorize', 'GET'),
-            new OAuth2ServerException(Response::HTTP_BAD_REQUEST, 'invalid_request')
+            new OAuth2ServerException((string) Response::HTTP_BAD_REQUEST, 'invalid_request')
         );
 
         (new OAuthExceptionListener($this->createTranslator()))->onKernelException($event);
@@ -124,6 +124,9 @@ final class OAuthExceptionListenerTest extends TestCase
                 'mautic.api.oauth.error.redirect_uri_mismatch.action' => 'Change it in the settings.',
             ];
 
+            /**
+             * @param array<string, string> $parameters
+             */
             public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
             {
                 return self::TRANSLATIONS[$id] ?? $id;
