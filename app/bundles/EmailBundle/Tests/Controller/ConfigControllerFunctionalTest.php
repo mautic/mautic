@@ -22,6 +22,28 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         );
     }
 
+    public function testEmailColumnsSaveSubmittedOrder(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $form   = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $values['config']['leadconfig']['contact_columns']    = ['name', 'email', 'id'];
+        $values['config']['emailconfig']['email_columns']     = ['name', 'subject', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'];
+        $values['config']['companyconfig']['company_columns'] = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
+
+        $this->client->request($form->getMethod(), $form->getUri(), $values);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertSame(
+            ['name', 'subject', 'category', 'template', 'stats', 'dateAdded', 'dateModified', 'createdByUser', 'id'],
+            $configParameters['email_columns']
+        );
+    }
+
     public function testValuesAreEscapedProperly(): void
     {
         $data = [

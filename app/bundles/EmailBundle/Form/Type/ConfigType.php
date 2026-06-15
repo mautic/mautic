@@ -450,6 +450,7 @@ class ConfigType extends AbstractType
                         ['message' => 'mautic.core.value.required']
                     ),
                 ],
+                'data'        => $orderColumns,
             ] + $extraOptions;
 
             $form->add(
@@ -464,7 +465,7 @@ class ConfigType extends AbstractType
             function (FormEvent $event) use ($buildEmailColumnsField): void {
                 $data    = $event->getData();
                 $columns = empty($data['email_columns']) ? $this->getDefaultEmailColumns() : $data['email_columns'];
-                $buildEmailColumnsField($event->getForm(), $columns, ['data' => $columns]);
+                $buildEmailColumnsField($event->getForm(), $columns);
             }
         );
 
