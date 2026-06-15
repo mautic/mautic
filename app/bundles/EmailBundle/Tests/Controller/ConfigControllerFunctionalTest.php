@@ -12,7 +12,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     public function testEmailColumnsArePreselectedByDefault(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('config[buttons][save]')->form();
 

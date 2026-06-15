@@ -31,7 +31,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-name'));
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-id'));
         $this->assertCount(0, $crawler->filter('.email-list thead tr th.col-email-category'));
@@ -63,7 +63,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$matchingEmail->getId().'"]'));
         $this->assertCount(0, $crawler->filter('a[href="/s/emails/view/'.$otherEmail->getId().'"]'));
         $this->assertSame(
@@ -73,7 +73,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$matchingEmail->getId().'"]'));
         $this->assertCount(0, $crawler->filter('a[href="/s/emails/view/'.$otherEmail->getId().'"]'));
     }
@@ -85,7 +85,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails', ['filters' => 'not-json']);
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$matchingEmail->getId().'"]'));
         $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$otherEmail->getId().'"]'));
         $this->assertSame([], $this->client->getRequest()->getSession()->get('mautic.email.list_filters'));
@@ -103,7 +103,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $crawler = $this->client->request(
+        $this->client->request(
             Request::METHOD_GET,
             '/s/emails',
             [
@@ -115,7 +115,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
             ]
         );
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame(
             [
                 'category' => [(string) $category->getId()],
@@ -144,9 +144,9 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->client->setServerParameter('PHP_AUTH_USER', $ownerUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $this->client->request(Request::METHOD_GET, '/s/emails');
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
         $this->assertStringContainsString("var LoginUserName                   = 'sales'", $content);
         $this->assertStringNotContainsString('Other Email', $content);
@@ -185,7 +185,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
 
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-name'));
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-category'));
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-template'));
