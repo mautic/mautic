@@ -31,7 +31,7 @@
                         {% if fields[g] is not empty %}
                             <li class="list-group-item {% if loop.first %}active{% endif %}">
                                 <a href="#company-{{ g }}" class="list-group-item-heading steps" data-toggle="tab">
-                                    {{ ('mautic.lead.field.group.'~g)|trans }}
+                                    {{ translatedGroups[g] ?? ('mautic.lead.field.group.'~g)|trans }}
                                 </a>
                             </li>
                         {% endif %}
@@ -47,6 +47,7 @@
                     'form': form,
                     'groups': groups,
                     'fields': fields,
+                    'translatedGroups': translatedGroups ?? {},
                 }) }}
             </div>
         </div>

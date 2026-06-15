@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Form\Type\CompanyMergeType;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -285,19 +286,21 @@ class CompanyController extends FormController
             }
         }
 
-        $fields = $model->organizeFieldsByGroup($fields);
-        $groups = array_keys($fields);
-        sort($groups);
+        $fieldGroupModel = $this->getModel('lead.field_group');
+        \assert($fieldGroupModel instanceof FieldGroupModel);
+        $fields   = $fieldGroupModel->sortGroupedFields($model->organizeFieldsByGroup($fields), 'company');
+        $groups   = array_keys($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'fields' => $fields,
-                    'groups' => $groups,
+                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'           => $entity,
+                    'form'             => $form->createView(),
+                    'fields'           => $fields,
+                    'groups'           => $groups,
+                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('company'),
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
@@ -475,19 +478,21 @@ class CompanyController extends FormController
             $model->lockEntity($entity);
         }
 
-        $fields = $model->organizeFieldsByGroup($fields);
-        $groups = array_keys($fields);
-        sort($groups);
+        $fieldGroupModel = $this->getModel('lead.field_group');
+        \assert($fieldGroupModel instanceof FieldGroupModel);
+        $fields   = $fieldGroupModel->sortGroupedFields($model->organizeFieldsByGroup($fields), 'company');
+        $groups   = array_keys($fields);
         $template = '@MauticLead/Company/form_'.($request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'fields' => $fields,
-                    'groups' => $groups,
+                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'           => $entity,
+                    'form'             => $form->createView(),
+                    'fields'           => $fields,
+                    'groups'           => $groups,
+                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('company'),
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
@@ -511,7 +516,7 @@ class CompanyController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction($objectId)
+    public function viewAction($objectId, FieldGroupModel $fieldGroupModel)
     {
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
@@ -573,13 +578,15 @@ class CompanyController extends FormController
             return $this->accessDenied();
         }
 
-        $fields = $company->getFields();
+        $translatedGroups = $fieldGroupModel->getTranslatedGroups('company');
+        $fields           = $fieldGroupModel->sortGroupedFields($company->getFields(), 'company');
 
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'company'           => $company,
                     'fields'            => $fields,
+                    'translatedGroups'  => $translatedGroups,
                     'permissions'       => $permissions,
                     'security'          => $this->security,
                 ],

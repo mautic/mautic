@@ -37,6 +37,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
+use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -336,7 +337,7 @@ class LeadController extends FormController
      *
      * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, FieldGroupModel $fieldGroupModel, $objectId)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -396,7 +397,7 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $fields            = $lead->getFields();
+        $fields            = $fieldGroupModel->sortGroupedFields($lead->getFields(), 'lead');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
@@ -455,6 +456,7 @@ class LeadController extends FormController
                     'doNotContact'           => end($dnc),
                     'doNotContactSms'        => end($dncSms),
                     'pointGroups'            => $pointGroupModel->getEntities(),
+                    'translatedGroups'       => $fieldGroupModel->getTranslatedGroups('lead'),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('lead:export:enable', 'MATCH_ONE'),
                     // 'leadNotes'         => $this->forward(
                     //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
@@ -486,7 +488,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage, FieldGroupModel $fieldGroupModel)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -635,9 +637,10 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'   => $form->createView(),
-                    'lead'   => $lead,
-                    'fields' => $model->organizeFieldsByGroup($fields),
+                    'form'             => $form->createView(),
+                    'lead'             => $lead,
+                    'fields'           => $fieldGroupModel->sortGroupedFields($model->organizeFieldsByGroup($fields), 'lead'),
+                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('lead'),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [
@@ -661,7 +664,7 @@ class LeadController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, FieldGroupModel $fieldGroupModel, $objectId, $ignorePost = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -822,9 +825,10 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'   => $form->createView(),
-                    'lead'   => $lead,
-                    'fields' => $lead->getFields(), // pass in the lead fields as they are already organized by ['group']['alias']
+                    'form'             => $form->createView(),
+                    'lead'             => $lead,
+                    'fields'           => $fieldGroupModel->sortGroupedFields($lead->getFields(), 'lead'), // already organized by ['group']['alias'], reordered by group order
+                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('lead'),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [

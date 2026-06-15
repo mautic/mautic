@@ -42,6 +42,14 @@ return [
                 'path'       => '/contacts/fields/{objectAction}/{objectId}',
                 'controller' => 'Mautic\LeadBundle\Controller\FieldController::executeAction',
             ],
+            'mautic_lead_field_group_index' => [
+                'path'       => '/contacts/field-groups/{page}',
+                'controller' => 'Mautic\LeadBundle\Controller\FieldGroupController::indexAction',
+            ],
+            'mautic_lead_field_group_action' => [
+                'path'       => '/contacts/field-groups/{objectAction}/{objectId}',
+                'controller' => 'Mautic\LeadBundle\Controller\FieldGroupController::executeAction',
+            ],
             'mautic_contact_index' => [
                 'path'       => '/contacts/{page}',
                 'controller' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
@@ -265,6 +273,12 @@ return [
                     'object' => 'contact',
                 ],
             ],
+            'mautic_api_fieldgroupsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'fieldGroups',
+                'path'            => '/field-groups',
+                'controller'      => Mautic\LeadBundle\Controller\Api\FieldGroupApiController::class,
+            ],
             'mautic_api_notesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'notes',
@@ -317,6 +331,13 @@ return [
                     'route'     => 'mautic_contactfield_index',
                     'access'    => 'lead:fields:full',
                     'priority'  => 19,
+                ],
+                'mautic.lead.field_group.menu.index' => [
+                    'id'        => 'mautic_lead_field_group',
+                    'iconClass' => 'ri-list-check-2',
+                    'route'     => 'mautic_lead_field_group_index',
+                    'access'    => 'admin',
+                    'priority'  => 18,
                 ],
             ],
         ],

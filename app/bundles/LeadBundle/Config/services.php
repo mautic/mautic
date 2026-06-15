@@ -31,6 +31,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
     $services->alias('mautic.lead.model.lead', Mautic\LeadBundle\Model\LeadModel::class);
+    $services->alias('mautic.lead.model.field_group', Mautic\LeadBundle\Model\FieldGroupModel::class);
     $services->get(Mautic\LeadBundle\Entity\CompanyRepository::class)
         ->call('setUniqueIdentifiersOperator', ['%mautic.company_unique_identifiers_operator%']);
     $services->get(Mautic\LeadBundle\Entity\LeadRepository::class)
