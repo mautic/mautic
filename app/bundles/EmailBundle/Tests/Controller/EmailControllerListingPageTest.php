@@ -14,6 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerListingPageTest extends MauticMysqlTestCase
 {
+    private const EMAIL_INDEX_PATH            = '/s/emails';
+    private const EMAIL_VIEW_SELECTOR_PREFIX  = 'a[href="/s/emails/view/';
+    private const DEFAULT_EMAIL_NAME          = 'Email A';
+
     protected function setUp(): void
     {
         $this->configParams['email_columns'] = match ($this->name()) {
@@ -29,7 +33,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
     {
         $this->createEmail();
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
 
         $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-name'));
@@ -57,37 +61,37 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(
             Request::METHOD_GET,
-            '/s/emails',
+            self::EMAIL_INDEX_PATH,
             [
                 'filters' => json_encode(['list:'.$segment->getId()]),
             ]
         );
 
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$matchingEmail->getId().'"]'));
-        $this->assertCount(0, $crawler->filter('a[href="/s/emails/view/'.$otherEmail->getId().'"]'));
+        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$matchingEmail->getId().'"]'));
+        $this->assertCount(0, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$otherEmail->getId().'"]'));
         $this->assertSame(
             ['list' => [(string) $segment->getId()]],
             $this->client->getRequest()->getSession()->get('mautic.email.list_filters')
         );
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
 
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$matchingEmail->getId().'"]'));
-        $this->assertCount(0, $crawler->filter('a[href="/s/emails/view/'.$otherEmail->getId().'"]'));
+        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$matchingEmail->getId().'"]'));
+        $this->assertCount(0, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$otherEmail->getId().'"]'));
     }
 
     public function testEmailListingIgnoresInvalidUpdatedFiltersPayload(): void
     {
-        $matchingEmail = $this->createEmail('Email A');
+        $matchingEmail = $this->createEmail(self::DEFAULT_EMAIL_NAME);
         $otherEmail    = $this->createEmail('Email B');
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails', ['filters' => 'not-json']);
+        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH, ['filters' => 'not-json']);
 
         $this->assertResponseIsSuccessful();
-        $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$matchingEmail->getId().'"]'));
-        $this->assertCount(1, $crawler->filter('a[href="/s/emails/view/'.$otherEmail->getId().'"]'));
+        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$matchingEmail->getId().'"]'));
+        $this->assertCount(1, $crawler->filter(self::EMAIL_VIEW_SELECTOR_PREFIX.$otherEmail->getId().'"]'));
         $this->assertSame([], $this->client->getRequest()->getSession()->get('mautic.email.list_filters'));
     }
 
@@ -105,7 +109,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_GET,
-            '/s/emails',
+            self::EMAIL_INDEX_PATH,
             [
                 'filters' => json_encode([
                     'category:'.$category->getId(),
@@ -144,7 +148,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->client->setServerParameter('PHP_AUTH_USER', $ownerUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $this->client->request(Request::METHOD_GET, '/s/emails');
+        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
 
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
@@ -157,25 +161,25 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         $this->createEmail();
         $this->client->followRedirects(false);
 
-        $this->client->request(Request::METHOD_GET, '/s/emails/2');
+        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH.'/2');
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('/s/emails/1'));
+        $this->assertTrue($this->client->getResponse()->isRedirect(self::EMAIL_INDEX_PATH.'/1'));
         $this->assertSame(1, $this->client->getRequest()->getSession()->get('mautic.email.page'));
     }
 
     public function testEmailListingRedirectsToCalculatedLastPageWhenMoreThanOnePageExists(): void
     {
-        $this->createEmail('Email A');
+        $this->createEmail(self::DEFAULT_EMAIL_NAME);
         $this->createEmail('Email B');
 
-        $this->client->request(Request::METHOD_GET, '/s/emails');
+        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
         $this->client->getRequest()->getSession()->set('mautic.email.limit', 1);
         $this->client->getRequest()->getSession()->save();
         $this->client->followRedirects(false);
 
-        $this->client->request(Request::METHOD_GET, '/s/emails/3');
+        $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH.'/3');
 
-        $this->assertTrue($this->client->getResponse()->isRedirect('/s/emails/2'));
+        $this->assertTrue($this->client->getResponse()->isRedirect(self::EMAIL_INDEX_PATH.'/2'));
         $this->assertSame(2, $this->client->getRequest()->getSession()->get('mautic.email.page'));
     }
 
@@ -183,7 +187,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
     {
         $this->createEmail();
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $crawler = $this->client->request(Request::METHOD_GET, self::EMAIL_INDEX_PATH);
 
         $this->assertResponseIsSuccessful();
         $this->assertCount(1, $crawler->filter('.email-list thead tr th.col-email-name'));
@@ -222,7 +226,7 @@ final class EmailControllerListingPageTest extends MauticMysqlTestCase
         return $category;
     }
 
-    private function createEmail(string $name = 'Email A', ?LeadList $segment = null, string $emailType = 'list', ?string $template = null): Email
+    private function createEmail(string $name = self::DEFAULT_EMAIL_NAME, ?LeadList $segment = null, string $emailType = 'list', ?string $template = null): Email
     {
         $email = new Email();
         $email->setName($name);
