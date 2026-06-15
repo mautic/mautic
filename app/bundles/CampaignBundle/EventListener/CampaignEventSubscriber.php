@@ -63,6 +63,15 @@ class CampaignEventSubscriber implements EventSubscriberInterface
         $campaign = $event->getCampaign();
         $changes  = $campaign->getChanges();
 
+        // isPublished set to true for new / edit
+        if (
+            ($campaign->isNew() || array_key_exists('isPublished', $changes))
+            && $campaign->getIsPublished()
+            && !$campaign->getPublishUp()
+        ) {
+            $campaign->setPublishUp(new \DateTime());
+        }
+
         if (array_key_exists('isPublished', $changes)) {
             [$actual, $inMemory] = $changes['isPublished'];
 

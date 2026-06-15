@@ -31,6 +31,11 @@
             <div class="phone-preview__message phone-preview__message--from">
                 <span class="phone-preview__message-content">{{ sms.getMessage() }}</span>
             </div>
+            {% for image in sms.getMedia() %}
+                <div class="phone-preview__message phone-preview__message--from phone-preview__message--media">
+                    <span class="phone-preview__message-content"><img src="{{ image }}" alt="{{ 'mautic.sms.preview.input.placeholder'|trans }}"></span>
+                </div>
+            {% endfor %}
             <div class="phone-preview__message phone-preview__message--to">{{ 'mautic.sms.preview.demo.message'|trans }}</div>
         </div>
 

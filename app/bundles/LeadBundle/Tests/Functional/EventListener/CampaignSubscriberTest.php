@@ -95,17 +95,17 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
     public static function dataEventProperties(): iterable
     {
         yield [
-            ['type' => 'datetime', 'alias' => 'date_field'],
+            ['type'  => 'datetime', 'alias' => 'date_field'],
             ['field' => 'date_field', 'operator' => 'empty'],
             true,
         ];
         yield [
-            ['type' => 'datetime', 'alias' => 'date_field_another'],
+            ['type'  => 'datetime', 'alias' => 'date_field_another'],
             ['field' => 'date_field_another', 'operator' => '!empty'],
             false,
         ];
         yield [
-            ['type' => 'text', 'alias' => 'test_text_field'],
+            ['type'  => 'text', 'alias' => 'test_text_field'],
             ['field' => 'firstname', 'operator' => 'empty'],
             false,
         ];
@@ -150,6 +150,44 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
         $this->assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore classConstant.deprecatedClass
         $this->assertSame($expected, $result->getResult());
+    }
+
+    public function testOnCampaignTriggerConditionReturnsCorrectResultsForContactAddedContext(): void
+    {
+        $field = ['type' => 'text', 'alias' => 'test_text_field'];
+        $this->makeField($field);
+        $lead = $this->createTestLead($field);
+
+        // Create a campaign.
+        $campaign = new Campaign();
+        $campaign->setName('My campaign');
+        $campaign->setIsPublished(true);
+        $campaign->setDateAdded(new \DateTime());
+        $this->em->persist($campaign);
+
+        // Create an event for campaign.
+        $entityEvent = new Event();
+        $entityEvent->setCampaign($campaign);
+        $entityEvent->setName('Test Condition');
+        $entityEvent->setEventType('condition');
+        $entityEvent->setType('lead.attached');
+        $entityEvent->setProperties(['timestamp' => 'campaign_start_date', 'operator' => 'gt', 'triggerInterval' => '10', 'triggerIntervalUnit' => 'i']);
+
+        $this->em->persist($entityEvent);
+        $this->em->flush();
+
+        $eventProperties = [
+            'lead'            => $lead,
+            'event'           => $entityEvent,
+            'eventDetails'    => [],
+            'systemTriggered' => false,
+            'eventSettings'   => [],
+        ];
+
+        $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore-line classConstant.deprecatedClass
+        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        $this->assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore-line classConstant.deprecatedClass
+        $this->assertFalse($result->getResult());
     }
 
     /**
