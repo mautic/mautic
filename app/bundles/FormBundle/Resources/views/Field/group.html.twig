@@ -262,6 +262,10 @@
       {% endif %}
     {% endif %}
 
+    {% if field.defaultValue is defined and field.defaultValue is not empty and listValue == field.defaultValue %}
+      {% set listInputAttributes = listInputAttributes|merge({'checked': 'checked'}) %}
+    {% endif %}
+
     {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
 
     <input {% for attrName, attrValue in listInputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
