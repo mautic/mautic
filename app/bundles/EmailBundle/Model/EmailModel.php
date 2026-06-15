@@ -380,6 +380,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             case 'post_delete':
                 $name = EmailEvents::EMAIL_POST_DELETE;
                 break;
+            case 'on_toggle_publish':
+                $name = EmailEvents::EMAIL_ON_TOGGLE_PUBLISH;
+                break;
             default:
                 return null;
         }
