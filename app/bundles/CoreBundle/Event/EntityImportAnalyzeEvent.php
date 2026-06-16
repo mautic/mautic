@@ -44,8 +44,8 @@ final class EntityImportAnalyzeEvent extends Event
     /**
      * @return array<string, mixed>
      */
-    public function getSummary(): ?array
+    public function getSummary(): array
     {
-        return $this->summary ?? null;
+        return $this->summary;
     }
 }

@@ -5,31 +5,25 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Tests\TestEntityCreationTrait;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
 final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    protected function markCompanyEmailAsUnique(): void
-    {
-        $fieldRepository   = $this->em->getRepository(LeadField::class);
-        $companyEmailField = $fieldRepository->findOneBy(['alias' => 'companyemail']);
-        \assert($companyEmailField instanceof LeadField);
-        $companyEmailField->setIsUniqueIdentifer(true);
-        $this->em->persist($companyEmailField);
-        $this->em->flush();
-    }
+    use TestEntityCreationTrait;
 
     protected function setUp(): void
     {
         // Disable API just for specific test.
-        $this->configParams['api_enabled']                         = 'testDisabledApi' !== $this->name();
-        $this->configParams['company_unique_identifiers_operator'] = 'AND';
+        $this->configParams['api_enabled']                               = 'testDisabledApi' !== $this->name();
+        $this->configParams['company_unique_identifiers_operator']       = 'AND';
+        $this->configParams['update_company_mapping_data_in_background'] = !str_ends_with($this->name(), 'InHttpRequest');
 
         parent::setUp();
     }
@@ -54,7 +48,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -79,7 +73,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -100,7 +94,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/companies/batch/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -164,7 +158,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertSame($expectedStatusCode, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
 
         if (Response::HTTP_CREATED === $expectedStatusCode) {
             $responseData = json_decode($response->getContent(), true);
@@ -174,10 +168,10 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('score', $responseData);
 
             // Verify the company was actually created in the database
-            $companyRepository = $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class);
+            $companyRepository = $this->em->getRepository(Company::class);
             $company           = $companyRepository->find($responseData['id']);
 
-            $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+            $this->assertInstanceOf(Company::class, $company);
             $this->assertSame($companyData['name'] ?? null, $company->getName());
             $this->assertSame($companyData['score'] ?? 0, $company->getScore());
             $this->assertSame($companyData['city'] ?? null, $company->getCity());
@@ -276,5 +270,171 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
                 $this->assertEquals($value, $company['fields']['all'][$alias]);
             }
         }
+    }
+
+    public function testDeleteCompanyInBackground(): void
+    {
+        $company = $this->createCompany();
+        $this->client->request('DELETE', sprintf('/api/companies/%d/delete', $company->getId()));
+
+        $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+
+        $company = $this->getCompanyRepository()->find($company->getId());
+        $this->asserttrue($company->isDeleted());
+    }
+
+    public function testDeleteCompanyInHttpRequest(): void
+    {
+        $company   = $this->createCompany();
+        $companyId = $company->getId();
+        $this->client->request('DELETE', sprintf('/api/companies/%d/delete', $company->getId()));
+
+        $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $company = $this->getCompanyRepository()->find($companyId);
+        $this->assertNull($company);
+    }
+
+    public function testDeleteCompaniesInBatchInHttpRequest(): void
+    {
+        $company1   = $this->createCompany();
+        $company2   = $this->createCompany();
+
+        $companyId1 = $company1->getId();
+        $companyId2 = $company2->getId();
+
+        $payload = [
+            $companyId1,
+            $companyId2,
+        ];
+
+        $this->client->request('DELETE', sprintf('/api/companies/batch/delete?ids=%s', implode(',', $payload)));
+
+        $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $company1 = $this->getCompanyRepository()->find($companyId1);
+        $this->assertNull($company1);
+        $company2 = $this->getCompanyRepository()->find($companyId2);
+        $this->assertNull($company2);
+    }
+
+    public function testDeleteCompaniesInBatch(): void
+    {
+        $company1   = $this->createCompany();
+        $company2   = $this->createCompany();
+
+        $payload = [
+            $company1->getId(),
+            $company2->getId(),
+        ];
+
+        $this->client->request('DELETE', sprintf('/api/companies/batch/delete?ids=%s', implode(',', $payload)));
+
+        $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $company1 = $this->getCompanyRepository()->find($company1->getId());
+        $this->asserttrue($company1->isDeleted());
+        $company2 = $this->getCompanyRepository()->find($company2->getId());
+        $this->asserttrue($company2->isDeleted());
+    }
+
+    public function testEditCompaniesInBatchInHttpRequest(): void
+    {
+        $company1   = $this->createCompany();
+        $company2   = $this->createCompany();
+        $company1Id = $company1->getId();
+        $company2Id = $company2->getId();
+
+        $contact1   = $this->createContact();
+        $contact2   = $this->createContact();
+        $contact1Id = $contact1->getId();
+        $contact2Id = $contact2->getId();
+
+        $this->attachContactToCompany($contact1, $company1, true);
+        $this->attachContactToCompany($contact2, $company2, true);
+        $this->attachContactToCompany($contact2, $company1);
+
+        $company1UpdatedName = 'Company 1 Updated';
+        $company2UpdatedName = 'Company 2 Updated';
+        $payload             = [
+            [
+                'id'          => $company1->getId(),
+                'companyname' => $company1UpdatedName,
+            ],
+            [
+                'id'          => $company2->getId(),
+                'companyname' => $company2UpdatedName,
+            ],
+        ];
+
+        $this->client->request('PATCH', '/api/companies/batch/edit', $payload);
+        $this->client->getResponse();
+        $this->em->clear();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($company1UpdatedName, $this->getCompanyRepository()->find($company1Id)->getName());
+        $this->assertSame($company2UpdatedName, $this->getCompanyRepository()->find($company2Id)->getName());
+
+        $contactRepo = $this->getContactRepository();
+        $this->assertSame($company1UpdatedName, $contactRepo->getEntity($contact1Id)->getCompany());
+        $this->assertSame($company2UpdatedName, $contactRepo->getEntity($contact2Id)->getCompany());
+    }
+
+    public function testEditCompanyInHttpRequest(): void
+    {
+        $company1   = $this->createCompany();
+        $company2   = $this->createCompany();
+        $company1Id = $company1->getId();
+
+        $contact1   = $this->createContact();
+        $contact2   = $this->createContact();
+        $contact1Id = $contact1->getId();
+
+        $this->attachContactToCompany($contact1, $company1, true);
+        $this->attachContactToCompany($contact2, $company2, true);
+        $this->attachContactToCompany($contact2, $company1);
+
+        $company1UpdatedName = 'Company 1 Updated';
+        $payload             = [
+            'id'          => $company1->getId(),
+            'companyname' => $company1UpdatedName,
+        ];
+
+        $this->client->request('PATCH', sprintf('/api/companies/%d/edit', $company1Id), $payload);
+        $this->client->getResponse();
+        $this->em->clear();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($company1UpdatedName, $this->getCompanyRepository()->find($company1Id)->getName());
+
+        $contactRepo = $this->getContactRepository();
+        $this->assertSame($company1UpdatedName, $contactRepo->getEntity($contact1Id)->getCompany());
+    }
+
+    /**
+     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    protected function markCompanyEmailAsUnique(): void
+    {
+        $fieldRepository   = $this->em->getRepository(LeadField::class);
+        $companyEmailField = $fieldRepository->findOneBy(['alias' => 'companyemail']);
+        \assert($companyEmailField instanceof LeadField);
+        $companyEmailField->setIsUniqueIdentifer(true);
+        $this->em->persist($companyEmailField);
+        $this->em->flush();
+    }
+
+    private function getCompanyRepository(): CompanyRepository
+    {
+        /** @var CompanyRepository */
+        return $this->em->getRepository(Company::class);
+    }
+
+    private function getContactRepository(): LeadRepository
+    {
+        /** @var LeadRepository */
+        return $this->em->getRepository(Lead::class);
     }
 }

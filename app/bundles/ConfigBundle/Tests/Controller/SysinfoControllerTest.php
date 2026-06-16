@@ -19,7 +19,7 @@ class SysinfoControllerTest extends MauticMysqlTestCase
 
         // Request sysinfo page
         $crawler = $this->client->request(Request::METHOD_GET, '/s/sysinfo');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $dbVersion       = $crawler->filterXPath("//td[@id='dbinfo-version']")->text();
         $dbDriver        = $crawler->filterXPath("//td[@id='dbinfo-driver']")->text();

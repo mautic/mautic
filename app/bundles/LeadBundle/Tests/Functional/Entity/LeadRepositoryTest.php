@@ -39,8 +39,6 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     {
         $contactRepo = $this->em->getRepository(Lead::class);
 
-        $ipRepo = $this->em->getRepository(IpAddress::class);
-
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();
         $contact->addIpAddress($ip);
