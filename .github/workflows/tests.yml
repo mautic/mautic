@@ -231,23 +231,41 @@ jobs:
 
       - name: Install PostgreSQL ${{ matrix.postgres-versions }} client
         run: |
-          # 1. Extract major version
+      - name: Install PostgreSQL client
+        run: |
+          # 1. Extract major version number (e.g., '19beta1-alpine' -> '19')
           VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
-
-          # 2. Check if the input contains "beta" to enable testing repos
-          IS_BETA=""
-          if [[ "${{ matrix.postgres-versions }}" == *"beta"* ]]; then
-             IS_BETA="main-testing $VERSION"
-          fi
 
           sudo apt-get update
           sudo apt-get install -y curl ca-certificates gnupg lsb-release
-          curl https://postgresql.org | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
 
-          # 3. Add both the standard repo AND the testing repo block if needed
-          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main $IS_BETA" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          # 2. Securely pull and dearmor the official PGDG signing key
+          sudo mkdir -p /usr/share/keyrings
+          curl -fSL https://postgresql.org | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
 
+          # 3. Add the standard production repo first to test viability
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://postgresql.org $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
+
+          # 4. Check if the package exists in the stable 'main' tracking repo
+          if ! apt-cache show "postgresql-client-$VERSION" > /dev/null 2>&1; then
+            echo "Package postgresql-client-$VERSION not found in main. Switching to development snapshots..."
+
+            # Reconfigure for development/pre-release snapshots
+            echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://postgresql.org $(lsb_release -cs)-pgdg-snapshot main $VERSION" | sudo tee /etc/apt/sources.list.d/pgdg.list
+
+            # Elevate PGDG priority over Ubuntu default packages to force snapshot usage
+            sudo tee /etc/apt/preferences.d/pgdg.pref <<EOF
+          Package: *
+          Pin: release o=apt.postgresql.org
+          Pin-Priority: 800
+          EOF
+
+            # Final index update for the snapshot repository
+            sudo apt-get update
+          fi
+
+          # 5. Install the package
           sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y postgresql-client-$VERSION
 
       - name: Prepare PostgreSQL environment

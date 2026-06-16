@@ -305,9 +305,10 @@ class ImportModel extends FormModel
              *    value as SplTempFileObject; the two previously returned different
              *    values.
              */
-            $string = $file->fgets(); // $file->current() relies on old caching in PHP8.6+
+            $string = $file->fgets(); // reads the current line AND safely advances the pointer for both 8.5 and 8.6
 
-            if (false === $string) {
+            // If we hit the end of the file and read nothing, exit
+            if (false === $string || ('' === $string && $file->eof())) {
                 break;
             }
 
