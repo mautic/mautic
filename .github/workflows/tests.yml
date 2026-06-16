@@ -242,7 +242,7 @@ jobs:
           curl -fSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
 
           # 3. Add the standard production repo first to test viability
-          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
 
           # 4. Check if the package exists in the stable 'main' tracking repo
@@ -250,7 +250,7 @@ jobs:
             echo "Package postgresql-client-$VERSION not found in main. Switching to development snapshots..."
 
             # Reconfigure for development/pre-release snapshots
-            echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org $(lsb_release -cs)-pgdg-snapshot main $VERSION" | sudo tee /etc/apt/sources.list.d/pgdg.list
+            echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg-snapshot main $VERSION" | sudo tee /etc/apt/sources.list.d/pgdg.list
 
             # Elevate PGDG priority over Ubuntu default packages to force snapshot usage
             sudo tee /etc/apt/preferences.d/pgdg.pref <<EOF
