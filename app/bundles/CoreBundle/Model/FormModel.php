@@ -21,8 +21,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class FormModel extends AbstractCommonModel
 {
-    public ?int $deletedId = null; // Fix for: Creation of dynamic property is deprecated
-
     /**
      * Lock an entity to prevent multiple people from editing.
      *

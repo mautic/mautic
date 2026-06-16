@@ -13,6 +13,8 @@ class Submission
 {
     public const TABLE_NAME = 'form_submissions';
 
+    public ?int $deletedId = null; // Creation of dynamic property is deprecated
+
     /**
      * @var string
      */

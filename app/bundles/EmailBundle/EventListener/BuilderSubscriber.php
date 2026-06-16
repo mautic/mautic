@@ -175,7 +175,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         }
 
         // We will replace tokens in unsubscribe text too
-        $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
+        $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]) ?? '';
         $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
         $unsubscribeText = str_replace('|URL|', $unsubscribeLink, $unsubscribeText);
         $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
@@ -187,7 +187,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
-        // Fix for: str_replace(): Passing null to parameter #2 ($replace) of type array|string is deprecated
+
         $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]) ?? '';
         $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
         $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
