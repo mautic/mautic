@@ -31,10 +31,10 @@ jobs:
           - php-versions: '8.5'
             db-types: 'mariadb:11.4'
           - php-versions: '8.6'
-            db-types: 'mysql:9.2' # MySQL 9.7 LTS 'mysql:9.7'
+            db-types: 'mysql:9.2' # 'mysql:9.7'
             experimental: true
           - php-versions: '8.6'
-            db-types: 'mariadb:12.3' # Pre-release/RC of MariaDB 13.0 'mariadb:13.0-rc'
+            db-types: 'mariadb:13.0-rc' # 'mariadb:12.3'
             experimental: true
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -231,13 +231,22 @@ jobs:
 
       - name: Install PostgreSQL ${{ matrix.postgres-versions }} client
         run: |
-          # Extracts the first two digits (e.g., '19') from '19beta1-alpine'
-          VERSION=$(echo "${{ matrix.postgres-versions }}" | grep -oE '^[0-9]+')
-          
+          # 1. Extract major version
+          VERSION=$(echo "${{ matrix.postgres-versions }}" | sed -E 's/([0-9.]+).*/\1/' | cut -d. -f1)
+
+          # 2. Check if the input contains "beta" to enable testing repos
+          IS_BETA=""
+          if [[ "${{ matrix.postgres-versions }}" == *"beta"* ]]; then
+             IS_BETA="main-testing $VERSION"
+          fi
+
           sudo apt-get update
           sudo apt-get install -y curl ca-certificates gnupg lsb-release
-          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
-          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          curl https://postgresql.org | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
+
+          # 3. Add both the standard repo AND the testing repo block if needed
+          echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main $IS_BETA" | sudo tee /etc/apt/sources.list.d/pgdg.list
+
           sudo apt-get update
           sudo apt-get install -o Dpkg::Options::="--force-overwrite" -y postgresql-client-$VERSION
 
