@@ -239,14 +239,14 @@
 
 {{- include('@MauticCore/Helper/modal.html.twig', {
     'id'            : 'InstallationInProgressModal',
-    'header'        : 'Installing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
+    'header'        : 'marketplace.package.install.modal.header'|trans({'%packagename%': packageDetail.packageBase.getHumanPackageName()|escape}),
     'size'          : 'md',
     'footerButtons' : false,
 }) -}}
 
 {{- include('@MauticCore/Helper/modal.html.twig', {
     'id'            : 'RemovalInProgressModal',
-    'header'        : 'Removing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
+    'header'        : 'marketplace.package.remove.modal.header'|trans({'%packagename%': packageDetail.packageBase.getHumanPackageName()|escape}),
     'size'          : 'md',
     'footerButtons' : false,
 }) -}}

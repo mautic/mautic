@@ -108,7 +108,7 @@
                               {{ include('@MauticCore/Helper/details.html.twig', {'entity': entity}) }}
                               <tr>
                                   <td width="20%"><span class="fw-b textTitle">{{ 'mautic.dynamicContent.slot.campaign'|trans }}</span></td>
-                                  <td>{{ entity.isCampaignBased ? 'Yes' : 'No' }}</td>
+                                  <td>{{ entity.isCampaignBased ? 'mautic.core.yes'|trans : 'mautic.core.no'|trans }}</td>
                               </tr>
                               {% if not entity.isCampaignBased %}
                                 <tr>

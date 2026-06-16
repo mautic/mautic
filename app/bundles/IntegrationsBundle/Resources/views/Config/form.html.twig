@@ -146,7 +146,7 @@
 {{ include('@MauticCore/Helper/nav_tabs.html.twig', {
     'tabs': tabs,
     'variant': 'line',
-    'selectedIndex': activeTab == 'details-container' ? 0 : (activeTab starts with 'field-mapping-') ? loop.index + 1 : 1
+    'selectedIndex': activeTab == 'details-container' ? 0 : (activeTab starts with 'field-mapping-') ? 2 : 1
 }) }}
 
 {{ form_end(form) }}
