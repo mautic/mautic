@@ -322,10 +322,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             unset($smsEvent, $tokenEvent);
         }
 
-        if (!$recipientCollections) {
-            return $results;
-        }
-
         foreach ($recipientCollections as $recipientCollection) {
             $translatedSms = $recipientCollection->getSms();
             $media         = $translatedSms->getMedia();

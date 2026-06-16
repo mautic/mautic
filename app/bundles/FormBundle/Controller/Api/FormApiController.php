@@ -167,10 +167,8 @@ class FormApiController extends CommonApiController
                 if (empty($fieldParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity();
                 } else {
-                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
                     $requestFieldIds[] = $fieldParams['id'];
                 }

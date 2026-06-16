@@ -383,7 +383,7 @@ class SubmissionModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setAction(null);
+            $submissionEvent->setAction();
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);

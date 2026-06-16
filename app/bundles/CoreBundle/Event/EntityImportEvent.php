@@ -104,10 +104,10 @@ final class EntityImportEvent extends Event
     }
 
     /**
-     * @return mixed|null
+     * @return array<string, array<string, mixed>>
      */
-    public function getStatus(): mixed
+    public function getStatus(): array
     {
-        return $this->status ?? null;
+        return $this->status;
     }
 }
