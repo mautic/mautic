@@ -101,6 +101,17 @@ class CampaignEventSubscriberTest extends TestCase
         $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
     }
 
+    public function testNewPublishedCampaignGetsPublishUpWithoutSeconds(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setIsPublished(true);
+
+        $this->fixture->onCampaignPreSave(new CampaignEvent($campaign));
+
+        self::assertNotNull($campaign->getPublishUp());
+        self::assertSame('00', $campaign->getPublishUp()->format('s'));
+    }
+
     public function testFailedEventGeneratesANotification(): void
     {
         $this->leadEventLogRepositoryMock->expects($this->once())
