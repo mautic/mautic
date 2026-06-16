@@ -609,7 +609,7 @@ justify-content: center;">
                                 {%- do form.lead_channels.subscribed_channels.setRendered(true) %}
                                 <tr>
                                     <td>
-                                        <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
+                                        <div id="frequency_{{ channel.value }}" class="text-left row">
                                             {% if showContactFrequency %}
                                                 <div class="col-md-6" data-contact-frequency="1">
                                                     <label class="text-secondary">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
