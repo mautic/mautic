@@ -187,7 +187,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         if (!$webviewText) {
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
-        $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]);
+        // Fix for: str_replace(): Passing null to parameter #2 ($replace) of type array|string is deprecated
+        $webviewLink = $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]) ?? '';
         $webviewText = str_replace('|URL|', $webviewLink, $webviewText);
         $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
