@@ -310,6 +310,10 @@ class ImportModel extends FormModel
             $string = $file->current();
             $file->next();
 
+            if (false === $string) {
+                break;
+            }
+
             $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
             $import->setLastLineImported($lineNumber);
 
