@@ -97,7 +97,6 @@ class PointInsightType extends AbstractType
                 ],
                 'required'    => true,
                 'placeholder' => 'mautic.core.form.chooseone',
-                'data'        => 'compare_point_groups',
             ]
         );
 
@@ -117,7 +116,6 @@ class PointInsightType extends AbstractType
                 ],
                 'required'    => true,
                 'placeholder' => 'mautic.core.form.chooseone',
-                'data'        => 'set_custom_field',
             ]
         );
 

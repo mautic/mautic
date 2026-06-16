@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -62,20 +63,20 @@ class PointInsight extends FormEntity
 
         $builder->addIdColumns();
 
-        $builder->createField('insightType', 'string')
+        $builder->createField('insightType', Types::STRING)
             ->columnName('insight_type')
             ->build();
 
-        $builder->createField('insightAction', 'string')
+        $builder->createField('insightAction', Types::STRING)
             ->columnName('insight_action')
             ->build();
 
-        $builder->createField('customField', 'string')
+        $builder->createField('customField', Types::STRING)
             ->columnName('custom_field')
             ->nullable()
             ->build();
 
-        $builder->createField('pointGroups', 'array')
+        $builder->createField('pointGroups', Types::ARRAY)
             ->columnName('point_groups')
             ->build();
 
