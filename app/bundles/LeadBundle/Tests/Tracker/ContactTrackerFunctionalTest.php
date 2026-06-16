@@ -46,11 +46,12 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        // A returning visitor whose cookie still references the deleted contact ID
-        // should be treated as a new anonymous visitor instead of throwing EntityNotFoundException
+        // A returning visitor whose cookie still references the deleted contact ID must NOT
+        // throw EntityNotFoundException; they are handled as a brand-new anonymous visitor.
         $result = $this->trackContactByDevice($device);
 
-        Assert::assertNull($result, 'Expected null (new anonymous visitor) when tracked device references a deleted contact.');
+        Assert::assertInstanceOf(Lead::class, $result, 'Expected a fresh anonymous visitor contact when the tracked device references a deleted contact.');
+        Assert::assertNotSame($contactId, $result->getId(), 'A deleted contact must not be re-tracked.');
     }
 
     public function testReset(): void
