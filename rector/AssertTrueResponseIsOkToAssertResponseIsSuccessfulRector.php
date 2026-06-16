@@ -84,7 +84,7 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
         return new StaticCall(new Name('self'), 'assertResponseIsSuccessful', $args);
     }
 
-    private function resolveAssertionType(Node $node): ?string
+    private function resolveAssertionType(MethodCall|StaticCall $node): ?string
     {
         if ($this->isName($node->name, 'assertTrue')) {
             return 'assertTrue';
@@ -100,7 +100,7 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
     /**
      * @return Arg[]|null
      */
-    private function resolveReplacementArgs(Node $node, string $assertionType): ?array
+    private function resolveReplacementArgs(MethodCall|StaticCall $node, string $assertionType): ?array
     {
         if ('assertTrue' === $assertionType) {
             if (!isset($node->args[0]) || !$this->isBrowserKitResponseOkCheck($node->args[0], $node)) {
@@ -253,6 +253,6 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
         $classReflection = ScopeFetcher::fetch($node)->getClassReflection();
 
         return null !== $classReflection
-            && $classReflection->is('Symfony\Bundle\FrameworkBundle\Test\WebTestCase');
+            && $classReflection->is(\Symfony\Bundle\FrameworkBundle\Test\WebTestCase::class);
     }
 }
