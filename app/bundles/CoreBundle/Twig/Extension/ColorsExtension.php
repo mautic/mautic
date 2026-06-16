@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class ColorsExtension extends AbstractExtension
+final class ColorsExtension extends AbstractExtension
 {
     public function getFunctions(): array
     {
