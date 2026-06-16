@@ -30,9 +30,7 @@ class PointInsightApiController extends CommonApiController
      */
     protected $model;
 
-    /**
-     * @phpstan-ignore-next-line
-     */
+    /** @phpstan-ignore-next-line the parent class uses the deprecated MauticFactory */
     public function __construct(
         CorePermissions $security,
         Translator $translator,
