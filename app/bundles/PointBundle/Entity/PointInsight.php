@@ -76,7 +76,7 @@ class PointInsight extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('pointGroups', Types::ARRAY)
+        $builder->createField('pointGroups', Types::JSON)
             ->columnName('point_groups')
             ->build();
 

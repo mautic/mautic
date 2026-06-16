@@ -37,7 +37,7 @@ final class Version20260616075543 extends PreUpAssertionMigration
             `insight_type`        VARCHAR(191) NOT NULL,
             `insight_action`      VARCHAR(191) NOT NULL,
             `custom_field`        VARCHAR(191) DEFAULT NULL,
-            `point_groups`        LONGTEXT NOT NULL COMMENT '(DC2Type:array)',
+            `point_groups`        LONGTEXT NOT NULL COMMENT '(DC2Type:json)',
             INDEX IDX_9894AA2612469DE2 (`category_id`),
             PRIMARY KEY(`id`)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC");
