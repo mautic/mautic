@@ -30,6 +30,12 @@ jobs:
             db-types: 'mysql:9.2'
           - php-versions: '8.5'
             db-types: 'mariadb:11.4'
+          - php-versions: '8.6'
+            db-types: 'mysql:9.7' # MySQL 9.7 LTS
+            experimental: true
+          - php-versions: '8.6'
+            db-types: 'mariadb:13.0-rc' # Pre-release/RC of MariaDB 13.0
+            experimental: true
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -100,8 +106,12 @@ jobs:
 
     - name: Install dependencies
       uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+      with:
+        # Conditionally appends ignore platform rules ONLY for PHP 8.6 dev runs
+        composer-options: ${{ matrix.php-versions == '8.6' && '--ignore-platform-reqs' || '' }}
 
     - name: Run tests - database = ${{ matrix.db-types }}
+      continue-on-error: ${{ matrix.experimental == true }}
       run: |
         rm -rf var/cache
         export DB_DRIVER="pdo_mysql"
@@ -159,6 +169,9 @@ jobs:
             postgres-versions: '16'
           - php-versions: '8.5'
             postgres-versions: '18'
+          - php-versions: '8.6'
+            postgres-versions: '19beta1-alpine'
+            experimental: true
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
 
@@ -241,6 +254,9 @@ jobs:
       - name: Install dependencies
         # composer install cache - https://github.com/ramsey/composer-install
         uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+        with:
+          # Conditionally appends ignore platform rules ONLY for PHP 8.6 dev runs
+          composer-options: ${{ matrix.php-versions == '8.6' && '--ignore-platform-reqs' || '' }}
 
       - name: Configure env for postgress
         run: |
@@ -260,6 +276,7 @@ jobs:
           echo "SAML_PORT=${{ job.services.saml.ports[8080] }}" >> .env.test
 
       - name: Run tests - database = postgres:${{ matrix.postgres-versions }}
+        continue-on-error: ${{ matrix.experimental == true }}
         env:
           DB_DRIVER: pdo_pgsql
           DB_CHARSET: UTF8
