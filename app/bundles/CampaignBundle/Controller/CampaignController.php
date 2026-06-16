@@ -601,7 +601,7 @@ class CampaignController extends AbstractStandardFormController
             $clone->setTempId($tempEventId);
 
             // Just wipe out the parent as it'll be generated when the cloned entity is saved
-            $clone->setParent(null);
+            $clone->setParent();
 
             if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $clone->getType()) {
                 // Update properties to point to the new temp ID

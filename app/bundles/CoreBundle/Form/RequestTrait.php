@@ -6,6 +6,8 @@ use Mautic\CoreBundle\Form\Type\BooleanType;
 use Mautic\CoreBundle\Form\Type\CountryType;
 use Mautic\CoreBundle\Form\Type\LocaleType;
 use Mautic\CoreBundle\Form\Type\MultiselectType;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\RegionType;
 use Mautic\CoreBundle\Form\Type\SelectType;
 use Mautic\CoreBundle\Form\Type\TimezoneType;
@@ -113,6 +115,8 @@ trait RequestTrait
                 case DateTimeType::class:
                 case DateType::class:
                 case TimeType::class:
+                case PublishUpDateType::class:
+                case PublishDownDateType::class:
                     // Prevent zero based date placeholders
                     $dateTest = (int) str_replace(['/', '-', ' '], '', $params[$name]);
 
@@ -133,6 +137,8 @@ trait RequestTrait
 
                     switch ($type::class) {
                         case DateTimeType::class:
+                        case PublishUpDateType::class:
+                        case PublishDownDateType::class:
                             $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
                             break;
                         case DateType::class:

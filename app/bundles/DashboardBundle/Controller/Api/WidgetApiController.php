@@ -73,10 +73,10 @@ class WidgetApiController extends CommonApiController
     public function getDataAction(Request $request, $type)
     {
         $start      = microtime(true);
-        $timezone   = InputHelper::clean($request->get('timezone', null));
-        $from       = InputHelper::clean($request->get('dateFrom', null));
-        $to         = InputHelper::clean($request->get('dateTo', null));
-        $dataFormat = InputHelper::clean($request->get('dataFormat', null));
+        $timezone   = InputHelper::clean($request->get('timezone'));
+        $from       = InputHelper::clean($request->get('dateFrom'));
+        $to         = InputHelper::clean($request->get('dateTo'));
+        $dataFormat = InputHelper::clean($request->get('dataFormat'));
         $unit       = InputHelper::clean($request->get('timeUnit', 'Y'));
         $dataset    = InputHelper::clean($request->query->all()['dataset'] ?? $request->request->all()['dataset'] ?? []);
         $response   = ['success' => 0];
@@ -97,10 +97,10 @@ class WidgetApiController extends CommonApiController
 
         $params = [
             'timeUnit'   => InputHelper::clean($request->get('timeUnit', 'Y')),
-            'dateFormat' => InputHelper::clean($request->get('dateFormat', null)),
+            'dateFormat' => InputHelper::clean($request->get('dateFormat')),
             'dateFrom'   => $fromDate,
             'dateTo'     => $toDate,
-            'limit'      => (int) $request->get('limit', null),
+            'limit'      => (int) $request->get('limit'),
             'filter'     => InputHelper::clean($request->query->all()['filter'] ?? $request->request->all()['filter'] ?? []),
             'dataset'    => $dataset,
         ];

@@ -63,6 +63,9 @@ npm run build            # Build frontend with webpack
 Each bundle follows this pattern:
 ```
 MauticExampleBundle/
+├── Assets/           # Frontend assets (auto-discovered)
+│   ├── css/          # Bundle-specific stylesheets
+│   └── js/           # Bundle-specific JavaScript
 ├── Command/          # Console commands
 ├── Config/           # Bundle config (services in config.php)
 ├── Controller/       # Controllers (extend CommonController)
