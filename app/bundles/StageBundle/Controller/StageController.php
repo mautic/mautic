@@ -309,7 +309,7 @@ class StageController extends AbstractFormController
         );
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -405,7 +405,7 @@ class StageController extends AbstractFormController
         $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
+        if (null !== $entity) {
             if (!$this->security->isGranted('stage:stages:create')) {
                 return $this->accessDenied();
             }
