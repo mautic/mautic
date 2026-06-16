@@ -7,13 +7,12 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
-use Mautic\UserBundle\Entity\Role;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use ApiTestUserTrait;
+
     public function testApiUserWithNotesPermissionsCanGetAndCreateNotes(): void
     {
         $contact = new Lead();
@@ -31,7 +30,7 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $apiUser = $this->createApiUserWithPermissions([
             'lead:leads' => ['viewown', 'viewother'],
             'lead:notes' => ['viewown', 'viewother', 'create', 'editown', 'editother', 'deleteown', 'deleteother'],
-        ]);
+        ], 'Note API Role');
         $this->authenticateApiUser($apiUser);
 
         $this->client->request('GET', '/api/notes/'.(string) $note->getId());
@@ -69,7 +68,7 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $apiUser = $this->createApiUserWithPermissions([
             'lead:leads' => ['viewown', 'viewother'],
             'lead:notes' => ['viewown', 'viewother'],
-        ]);
+        ], 'Note API Role');
         $this->authenticateApiUser($apiUser);
 
         $this->client->request('POST', '/api/notes/new', [
@@ -79,43 +78,5 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $response->getContent());
-    }
-
-    /**
-     * @param array<string, string[]> $permissions
-     */
-    private function createApiUserWithPermissions(array $permissions): User
-    {
-        $role = new Role();
-        $role->setName('Note API Role '.uniqid('', true));
-        $this->em->persist($role);
-        $this->em->flush();
-
-        $roleModel = static::getContainer()->get('mautic.user.model.role');
-        $roleModel->setRolePermissions($role, $permissions);
-        $this->em->persist($role);
-
-        $user = new User();
-        $user->setFirstName('Note');
-        $user->setLastName('Api');
-        $user->setUsername('note.api.'.uniqid());
-        $user->setEmail('note.api.'.uniqid().'@example.com');
-        $user->setRole($role);
-
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
-        $user->setPassword($hasher->hash('Maut1cR0cks!'));
-
-        $this->em->persist($user);
-        $this->em->flush();
-
-        return $user;
-    }
-
-    private function authenticateApiUser(User $user): void
-    {
-        $this->loginUser($user);
-        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
-        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
     }
 }
