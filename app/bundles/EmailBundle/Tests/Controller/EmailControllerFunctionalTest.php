@@ -90,8 +90,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful('Return code must be 200.');
+        $this->assertResponseIsSuccessful();
     }
 
     public function testIndexActionFiltersEmailsBySegmentAliasQuickFilter(): void
@@ -600,7 +599,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[isPublished]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
         Assert::assertCount(2, $emails);
@@ -756,7 +755,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[isPublished]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
         Assert::assertCount(2, $emails);
@@ -792,7 +791,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[isPublished]']->setValue('1');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $errString = sprintf('The Dynamic Content slot &#039;%s&#039; is not of type &#039;text&#039;.', $dwc->getSlotName());
         if (TypeList::TEXT === $type) {
             $this->assertStringNotContainsString($errString, $this->client->getResponse()->getContent());
@@ -896,7 +895,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             'batchLimit' => $batchLimit,
         ]);
 
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
         $this->assertQueuedEmailCount(2);
     }
@@ -904,7 +903,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testPublishPermissionOnNewEmailForAdminUser(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]:not([disabled="disabled"][checked])');
         $isPublishedInput   = $crawler->filter('input[name="emailform[isPublished]"][value="1"][checked]:not([disabled="disabled"])');
         $publishUpInput     = $crawler->filter('input[name="emailform[publishUp]"]:not([disabled="disabled"])');
@@ -921,7 +920,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[template]']->setValue('blank');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
         Assert::assertTrue($email->getIsPublished());
@@ -1002,7 +1001,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
         $this->em->flush();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]:not([disabled="disabled"][checked])');
         $isPublishedInput   = $crawler->filter('input[name="emailform[isPublished]"][value="1"][checked]:not([disabled="disabled"])');
         $publishUpInput     = $crawler->filter('input[name="emailform[publishUp]"]:not([disabled="disabled"])');
@@ -1135,7 +1134,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest('GET', '/s/ajax', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful();
 
         $response = json_decode($clientResponse->getContent(), true);
 
@@ -1365,7 +1364,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $longName = str_repeat('a', Email::MAX_NAME_SUBJECT_LENGTH + 1); // 191 characters
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('emailform[buttons][save]')->form();
         $form['emailform[name]']->setValue($longName);
@@ -1472,7 +1471,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $longSubject = str_repeat('b', Email::MAX_NAME_SUBJECT_LENGTH + 1); // 191 characters
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('emailform[buttons][save]')->form();
         $form['emailform[name]']->setValue('Valid Name');
@@ -1495,7 +1494,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $longName = str_repeat('a', Email::MAX_NAME_SUBJECT_LENGTH + 1); // 191 characters
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('emailform[buttons][save]')->form();
         $form['emailform[name]']->setValue($longName);

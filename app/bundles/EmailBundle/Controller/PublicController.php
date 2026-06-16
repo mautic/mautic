@@ -652,7 +652,7 @@ class PublicController extends CommonFormController
             $mailer->setFrom($from, '');
 
             // Set Content
-            $body = htmlspecialchars(filter_var($query['body'], FILTER_FLAG_STRIP_HIGH));
+            $body = htmlspecialchars(filter_var($query['body'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
             $mailer->setBody($body);
             $mailer->parsePlainText($body);
 
@@ -660,7 +660,7 @@ class PublicController extends CommonFormController
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 
-            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_FLAG_STRIP_HIGH));
+            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
             $mailer->setSubject($subject);
 
             return $mailer->createEmailStat();

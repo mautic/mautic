@@ -206,7 +206,7 @@ class FormType extends AbstractType
         ]);
 
         $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
-        $required   = (in_array($postAction, ['redirect', 'message', 'hideform'])) ? true : false;
+        $required   = in_array($postAction, ['redirect', 'message', 'hideform']);
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
             'label_attr' => ['class' => 'control-label'],

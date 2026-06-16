@@ -35,7 +35,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         // get table with id=reportTable
         $crawlerTable = $crawler->filter('#reportTable');
         // remove first line of table (column names)
@@ -74,7 +74,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         // get table with id=reportTable
         $crawlerTable = $crawler->filter('#reportTable');
@@ -99,7 +99,7 @@ final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $focus1 = $this->createFocusItem('FocusItem1', 'doesAbc', 'link', 'modal');
         $focus2 = $this->createFocusItem('FocusItem2', 'doesAbcd', 'link', 'modal');
-        $focus3 = $this->createFocusItem('FocusItem3', 'doesAbcde', 'link', 'modal');
+        $this->createFocusItem('FocusItem3', 'doesAbcde', 'link', 'modal');
         $this->em->flush();
 
         $date = new \DateTime();

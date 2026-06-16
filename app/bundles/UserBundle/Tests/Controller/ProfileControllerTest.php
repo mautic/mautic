@@ -32,7 +32,7 @@ class ProfileControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, 's/account');
 
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('user[plainPassword][password]', $clientResponse->getContent());
         $this->assertStringNotContainsString('user[plainPassword][confirm]', $clientResponse->getContent());
     }
@@ -47,7 +47,7 @@ class ProfileControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, 's/account');
 
         $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('user[plainPassword][password]', $clientResponse->getContent());
         $this->assertStringContainsString('user[plainPassword][confirm]', $clientResponse->getContent());
     }

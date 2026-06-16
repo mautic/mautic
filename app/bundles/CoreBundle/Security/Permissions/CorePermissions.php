@@ -258,7 +258,7 @@ class CorePermissions implements ResetInterface
             return in_array(0, $permissions) ? false : true;
         } elseif ('MATCH_ONE' == $mode) {
             // grant if any of the permissions were granted
-            return in_array(1, $permissions) ? true : false;
+            return in_array(1, $permissions);
         } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
         }
