@@ -391,8 +391,12 @@ class FieldModelTest extends MauticMysqlTestCase
         $indexName = MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search';
         $fullTable = MAUTIC_TABLE_PREFIX.$table;
 
-        $sm      = $this->connection->createSchemaManager();
-        $indexes = $sm->listTableIndexes($fullTable);
+        // $sm      = $this->connection->createSchemaManager();
+        // $indexes = $sm->listTableIndexes($fullTable);
+        $indexes = DatabasePlatform::listTableIndexes(
+            $this->connection,
+            $fullTable
+        );
 
         foreach ($indexes as $index) {
             if (strtolower($index->getName()) === strtolower($indexName)) {

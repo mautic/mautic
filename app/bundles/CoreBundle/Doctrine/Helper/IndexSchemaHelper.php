@@ -212,7 +212,8 @@ class IndexSchemaHelper
      */
     public function getTableIndexes(string $fullTableName): array
     {
-        return $this->sm->listTableIndexes($fullTableName);
+        // return $this->sm->listTableIndexes($fullTableName);
+        return DatabasePlatform::listTableIndexes($this->db, $fullTableName);
     }
 
     /**

@@ -100,14 +100,15 @@ abstract class AbstractMauticMigration extends AbstractMigration
      */
     protected function getIndexes(string $tableName): array
     {
-        return $this->sm->listTableIndexes($tableName);
+        // return $this->sm->listTableIndexes($tableName);
+        return DatabasePlatform::listTableIndexes($this->connection, $tableName);
     }
 
     protected function dropIndex(string $tableName, string $indexName, bool $ifExists = true): void
     {
         $this->addSql(
             DatabasePlatform::getDropIndexSql(
-                $this->connection->getDatabasePlatform(),
+                $this->platform,
                 $tableName,
                 $indexName,
                 false,
@@ -123,7 +124,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     {
         $this->addSql(
             DatabasePlatform::getCreateIndexSql(
-                $this->connection->getDatabasePlatform(),
+                $this->platform,
                 $tableName,
                 $indexName,
                 $columns,
