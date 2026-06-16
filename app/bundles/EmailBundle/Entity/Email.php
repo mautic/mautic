@@ -83,6 +83,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public const TABLE_NAME = 'emails';
 
+    private const SETTINGS_PREFIX = 'settings_';
+
     /**
      * @var int
      */
@@ -307,6 +309,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private bool $isDuplicate = false;
 
+    /**
+     * @var mixed[]|null
+     */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private ?array $settings = null;
+
     public function __clone()
     {
         $this->isCloned          = true;
@@ -444,6 +452,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->mappedBy('email')
             ->fetchExtraLazy()
             ->cascadeAll()
+            ->build();
+
+        $builder->createField('settings', Types::JSON)
+            ->columnName('settings')
+            ->nullable()
             ->build();
 
         static::addUuidField($builder);
@@ -601,6 +614,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'dynamicContent',
                     'lists',
                     'headers',
+                    'settings',
                 ]
             )
             ->build();
@@ -1525,5 +1539,56 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setIsDuplicate(bool $isDuplicate): void
     {
         $this->isDuplicate = $isDuplicate;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getSettings(): array
+    {
+        return $this->settings ?? [];
+    }
+
+    /**
+     * @param array<mixed> $settings
+     */
+    public function setSettings(array $settings): Email
+    {
+        $this->isChanged('settings', $settings);
+        $this->settings = $settings;
+
+        return $this;
+    }
+
+    public function __get(string $name): mixed
+    {
+        if (!$this->isSettingsKey($name)) {
+            return null;
+        }
+
+        return $this->getSettings()[$this->translateSettingsKey($name)] ?? null;
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        if (!$this->isSettingsKey($name)) {
+            return;
+        }
+
+        $settings         = $this->getSettings();
+        $field            = $this->translateSettingsKey($name);
+        $settings[$field] = $value;
+
+        $this->setSettings($settings);
+    }
+
+    private function isSettingsKey(string $name): bool
+    {
+        return str_starts_with($name, self::SETTINGS_PREFIX);
+    }
+
+    private function translateSettingsKey(string $name): string
+    {
+        return str_replace(self::SETTINGS_PREFIX, '', $name);
     }
 }
