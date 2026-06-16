@@ -9,10 +9,6 @@ use Twig\TwigFunction;
 
 class ColorsExtension extends AbstractExtension
 {
-    public function __construct()
-    {
-    }
-
     public function getFunctions(): array
     {
         return [
