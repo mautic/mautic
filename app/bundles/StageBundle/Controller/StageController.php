@@ -48,28 +48,17 @@ class StageController extends AbstractFormController
         $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
         $stageModel = $this->getModel('stage');
         \assert($stageModel instanceof StageModel);
-        $stagesPaginator = $stageModel->getEntities(
+        [$stageEntities, $contactCounts, $count] = $stageModel->getEntitiesWithContactCounts(
             [
-                'start'            => $start,
-                'limit'            => $limit,
-                'filter'           => $filter,
-                'orderBy'          => $orderBy,
-                'orderByDir'       => $orderByDir,
-                'withContactCount' => true,
+                'start'      => $start,
+                'limit'      => $limit,
+                'filter'     => $filter,
+                'orderBy'    => $orderBy,
+                'orderByDir' => $orderByDir,
             ]
         );
 
-        $stageEntities = [];
-        $contactCounts = [];
-        foreach ($stagesPaginator as $row) {
-            $stage                          = is_array($row) ? $row[0] : $row;
-            $stageEntities[]                = $stage;
-            $contactCounts[$stage->getId()] = is_array($row) && isset($row['contactCount']) ? (int) $row['contactCount'] : 0;
-        }
-
         $request->getSession()->set('mautic.stage.filter', $search);
-
-        $count = count($stagesPaginator);
         if ($count && $count < ($start + 1)) {
             $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
