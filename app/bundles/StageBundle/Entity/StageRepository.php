@@ -8,7 +8,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Stage>
  */
-final class StageRepository extends CommonRepository
+class StageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 

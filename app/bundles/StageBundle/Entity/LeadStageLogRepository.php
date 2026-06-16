@@ -9,12 +9,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadStageLog>
  */
-final class LeadStageLogRepository extends CommonRepository
+class LeadStageLogRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(string $fromLeadId, string $toLeadId): void
     {
         $connection = $this->_em->getConnection();
         $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
@@ -24,7 +24,7 @@ final class LeadStageLogRepository extends CommonRepository
             ->select('pl.stage_id')
             ->from($table, 'pl')
             ->where('pl.lead_id = :toLeadId')
-            ->setParameter('toLeadId', $toLeadId, ParameterType::INTEGER)
+            ->setParameter('toLeadId', $toLeadId)
             ->executeQuery()
             ->fetchFirstColumn();
 
@@ -32,15 +32,15 @@ final class LeadStageLogRepository extends CommonRepository
         $q->update($table)
             ->set('lead_id', ':toLeadId')
             ->where('lead_id = :fromLeadId')
-            ->setParameter('fromLeadId', $fromLeadId, ParameterType::INTEGER)
-            ->setParameter('toLeadId', $toLeadId, ParameterType::INTEGER);
+            ->setParameter('fromLeadId', $fromLeadId)
+            ->setParameter('toLeadId', $toLeadId);
 
         if (!empty($stageIds)) {
             $q->andWhere(
                 $q->expr()->notIn('stage_id', ':stageIds')
             )->setParameter(
                 'stageIds',
-                array_map('intval', $stageIds),
+                $stageIds,
                 ArrayParameterType::INTEGER
             )->executeStatement();
 
@@ -48,7 +48,7 @@ final class LeadStageLogRepository extends CommonRepository
             $connection->createQueryBuilder()
                 ->delete($table)
                 ->where('lead_id = :fromLeadId')
-                ->setParameter('fromLeadId', $fromLeadId, ParameterType::INTEGER)
+                ->setParameter('fromLeadId', $fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();
