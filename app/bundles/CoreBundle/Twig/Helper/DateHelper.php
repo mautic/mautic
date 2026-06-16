@@ -288,7 +288,7 @@ final class DateHelper
      *
      * @param \DateTime|string $datetime
      */
-    public function toTextShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    public function toTextShort(\DateTime|string $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         if (empty($datetime)) {
             return '';

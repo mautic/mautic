@@ -26,12 +26,13 @@
           {% endif %}
         >
         <h3 class="type-heading-01 mb-sm">
-          {{ event.eventLabelHref is defined and event.eventLabelHref is not empty
-            ? '<a href="' ~ event.eventLabelHref ~ '" target="_new">' ~ (event.eventLabel|purify) ~ '</a>'
-            : event.eventLabel|purify
-          |raw }}
+          {% if event.eventLabelHref is defined and event.eventLabelHref is not empty %}
+            <a href="{{ event.eventLabelHref }}" target="_blank" rel="noopener noreferrer">{{ event.eventLabel|purify }}</a>
+          {% else %}
+            {{ event.eventLabel|purify }}
+          {% endif %}
         </h3>
-          {% if event.eventDescription is defined %}
+          {% if event.eventDescription|default('') is not empty %}
             <div class="panel-meta">
               <span class="event-description">{{ event.eventDescription }}</span>
             </div>
