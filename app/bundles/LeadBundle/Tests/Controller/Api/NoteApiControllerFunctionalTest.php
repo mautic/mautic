@@ -37,7 +37,7 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/api/notes/'.(string) $note->getId());
         $getResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_OK, $getResponse->getStatusCode(), $getResponse->getContent());
+        $this->assertResponseIsSuccessful($getResponse->getContent());
         $getPayload = json_decode($getResponse->getContent(), true);
         $this->assertSame($note->getId(), $getPayload['note']['id']);
         $this->assertSame('Existing API note', $getPayload['note']['text']);
@@ -48,7 +48,7 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $createResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $createResponse->getStatusCode(), $createResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, $createResponse->getContent());
         $createPayload = json_decode($createResponse->getContent(), true);
         $this->assertSame('Created from API', $createPayload['note']['text']);
 
@@ -78,7 +78,7 @@ class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $response = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $response->getContent());
     }
 
     /**

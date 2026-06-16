@@ -1399,7 +1399,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/api/contacts/'.$contact->getId().'/notes');
 
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseIsSuccessful($response->getContent());
     }
 
     public function testGetContactNotesActionReturnsForbiddenWithoutNoteViewPermissions(): void
@@ -1424,7 +1424,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/api/contacts/'.$contact->getId().'/notes');
 
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode(), $response->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $response->getContent());
     }
 
     /**

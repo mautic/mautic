@@ -35,13 +35,13 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId());
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
     }
 
     public function testIndexActionIsDeniedForMissingLeadId(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/0');
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
     }
 
     public function testIndexActionShowsEmptyPaneWithoutNotesViewPermission(): void
@@ -53,13 +53,13 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId());
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $this->assertStringContainsString('alert alert-warning', $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('btn-leadnote-add', $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('Test note', $this->client->getResponse()->getContent());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$contact->getId());
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $this->assertSame('0', trim($crawler->filter('#NoteCount')->text()));
     }
 
@@ -72,7 +72,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId().'/new');
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
     }
 
     public function testNewActionIsDeniedWithoutNotesCreatePermission(): void
@@ -84,7 +84,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId().'/new');
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
     }
 
     public function testEditActionIsSuccessful(): void
@@ -97,7 +97,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/edit/%d', $contact->getId(), $note->getId()));
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
     }
 
     public function testEditActionIsDeniedWithoutNotesEditPermission(): void
@@ -110,7 +110,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/edit/%d', $contact->getId(), $note->getId()));
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
     }
 
     public function testDeleteActionIsSuccessful(): void
@@ -124,7 +124,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/delete/%d', $contact->getId(), $noteId));
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $this->assertNull($this->em->getRepository(LeadNote::class)->find($noteId));
     }
 
@@ -138,7 +138,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/delete/%d', $contact->getId(), $note->getId()));
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
     }
 
     public function testDeleteActionReturnsNotFoundWhenNoteDoesNotExist(): void
@@ -150,7 +150,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/delete/999999', $contact->getId()));
-        $this->assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getContent());
     }
 
     public function testExecuteNoteActionWithInvalidActionIsDenied(): void
@@ -162,7 +162,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($user);
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/not-real-action/0', $contact->getId()));
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
     }
 
     public function testUserCanEditOwnNoteOnOthersContactWithEditOwnPermission(): void
@@ -200,7 +200,7 @@ final class NoteControllerTest extends MauticMysqlTestCase
         $this->loginAs($userB);
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/notes/'.$contact->getId());
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $this->assertStringContainsString('Owned by B', (string) $this->client->getResponse()->getContent());
         $this->assertStringNotContainsString('Owned by A', (string) $this->client->getResponse()->getContent());
         $this->assertStringContainsString(
@@ -213,13 +213,13 @@ final class NoteControllerTest extends MauticMysqlTestCase
         );
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/edit/%d', $contact->getId(), $note->getId()));
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $this->client->request(Request::METHOD_GET, sprintf('/s/contacts/notes/%d/edit/%d', $contact->getId(), $adminOwnedNote->getId()));
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getContent());
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/view/'.$contact->getId());
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
         $this->assertSame('1', trim($crawler->filter('#NoteCount')->text()));
     }
 
