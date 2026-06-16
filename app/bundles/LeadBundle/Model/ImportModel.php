@@ -280,8 +280,21 @@ class ImportModel extends FormModel
 
         $file->seek($lastImportedLine);
 
-        // PHP 8.6+ compatibility
-        $file->setFlags(\SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
+        /*
+         * PHP 8.6 Backward Incompatible Changes
+         *
+         * 1. SplFileObject::next() now advances the stream when no prior current()
+         *    call has cached a line. A subsequent current() call returns the new
+         *    line rather than the previous one.
+         * 2. SplFileObject::fgets() no longer caches the returned line for
+         *    subsequent current() calls. current() now re-reads from the current
+         *    stream position instead of returning the line fgets() just returned.
+         * 3. SplFileObject::next() past EOF no longer increments key() without
+         *    bound. SplFileObject::seek() past EOF now produces the same key()
+         *    value as SplTempFileObject; the two previously returned different
+         *    values.
+         */
+        $file->current();   // ensure line is cached (no-op / harmless on <=8.5)
 
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
@@ -294,25 +307,8 @@ class ImportModel extends FormModel
         });
 
         while ($batchSize && !$file->eof()) {
-            /*
-             * PHP 8.6 Backward Incompatible Changes
-             *
-             * 1. SplFileObject::next() now advances the stream when no prior current()
-             *    call has cached a line. A subsequent current() call returns the new
-             *    line rather than the previous one.
-             * 2. SplFileObject::fgets() no longer caches the returned line for
-             *    subsequent current() calls. current() now re-reads from the current
-             *    stream position instead of returning the line fgets() just returned.
-             * 3. SplFileObject::next() past EOF no longer increments key() without
-             *    bound. SplFileObject::seek() past EOF now produces the same key()
-             *    value as SplTempFileObject; the two previously returned different
-             *    values.
-             */
-            $string = $file->fgets(); // reads the current line AND safely advances the pointer for both 8.5 and 8.6
-
-            if (false === $string || '' === trim($string)) {
-                break;
-            }
+            $string = $file->current();
+            $file->next();
 
             $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
             $import->setLastLineImported($lineNumber);
