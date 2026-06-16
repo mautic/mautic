@@ -229,8 +229,6 @@ jobs:
           coverage: pcov
           ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~", zend.assertions=1
 
-      - name: Install PostgreSQL ${{ matrix.postgres-versions }} client
-        run: |
       - name: Install PostgreSQL client
         run: |
           # 1. Extract major version number (e.g., '19beta1-alpine' -> '19')
@@ -241,7 +239,7 @@ jobs:
 
           # 2. Securely pull and dearmor the official PGDG signing key
           sudo mkdir -p /usr/share/keyrings
-          curl -fSL https://postgresql.org | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
+          curl -fSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql-archive-keyring.gpg > /dev/null
 
           # 3. Add the standard production repo first to test viability
           echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://postgresql.org $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list

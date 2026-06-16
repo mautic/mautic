@@ -280,6 +280,9 @@ class ImportModel extends FormModel
 
         $file->seek($lastImportedLine);
 
+        // PHP 8.6+ compatibility
+        $file->setFlags(\SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY | \SplFileObject::DROP_NEW_LINE);
+
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
@@ -307,8 +310,7 @@ class ImportModel extends FormModel
              */
             $string = $file->fgets(); // reads the current line AND safely advances the pointer for both 8.5 and 8.6
 
-            // If we hit the end of the file and read nothing, exit
-            if (false === $string || ('' === $string && $file->eof())) {
+            if (false === $string || '' === trim($string)) {
                 break;
             }
 
