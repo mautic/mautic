@@ -253,7 +253,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('companyId', $companyId, ParameterType::INTEGER)
             ->setMaxResults(self::BATCH_SIZE);
 
-        while ($pairs = $q->executeQuery()->fetchAssociative()) {
+        while ($pairs = $q->executeQuery()->fetchAllAssociative()) {
             $deleteQb = $conn->createQueryBuilder();
 
             $deleteQb
@@ -293,7 +293,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('isPrimary', false, ParameterType::BOOLEAN)
             ->setMaxResults(self::DELETE_BATCH_SIZE);
 
-        while ($pairs = $q->executeQuery()->fetchAssociative()) {
+        while ($pairs = $q->executeQuery()->fetchAllAssociative()) {
             $deleteQb = $conn->createQueryBuilder();
 
             $deleteQb
