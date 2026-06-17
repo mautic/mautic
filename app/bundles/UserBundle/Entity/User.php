@@ -264,6 +264,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
                 'fields'           => ['email'],
                 'message'          => 'mautic.user.user.email.unique',
                 'repositoryMethod' => 'checkUniqueUsernameEmail',
+                'groups'           => ['User', 'SecondPass'],
             ]
         ));
 
@@ -844,5 +845,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public function getCacheNamespacesToDelete(): array
     {
         return [self::CACHE_NAMESPACE];
+    }
+
+    public static function createFromInvite(UserInvite $invite): self
+    {
+        $user = new self();
+        $user->setEmail($invite->getEmail());
+        $user->setRole($invite->getRole());
+
+        return $user;
     }
 }
