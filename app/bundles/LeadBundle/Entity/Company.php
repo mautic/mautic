@@ -47,8 +47,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     use CustomFieldEntityTrait;
     use ProjectTrait;
 
-    public const FIELD_ALIAS = 'company';
-    public const TABLE_NAME  = 'companies';
+    public const FIELD_ALIAS          = 'company';
+    public const TABLE_NAME           = 'companies';
+    public const TAGS_XREF_TABLE_NAME = 'companies_tags_xref';
 
     /**
      * @var int
@@ -147,7 +148,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var Collection<string, Tag>
      */
     #[Groups(['company:read', 'company:write'])]
-    private $tags;
+    private Collection $tags;
 
     public function __construct()
     {
@@ -223,7 +224,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         );
 
         $builder->createManyToMany('tags', Tag::class)
-            ->setJoinTable('companies_tags_xref')
+            ->setJoinTable(self::TAGS_XREF_TABLE_NAME)
             ->addInverseJoinColumn('tag_id', 'id', false)
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->setOrderBy(['tag' => 'ASC'])
@@ -327,9 +328,17 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
         if ($current && !$val) {
             $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-        } elseif (!$current && $val) {
+
+            return;
+        }
+
+        if (!$current && $val) {
             $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-        } elseif ($current && $current->getId() != $val->getId()) {
+
+            return;
+        }
+
+        if ($current && $current->getId() != $val->getId()) {
             $this->changes['owner'] = [
                 $current->getName().'('.$current->getId().')',
                 $val->getName().'('.$val->getId().')',

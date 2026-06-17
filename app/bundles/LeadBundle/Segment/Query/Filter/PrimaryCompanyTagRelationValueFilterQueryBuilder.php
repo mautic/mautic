@@ -9,6 +9,9 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
+/**
+ * Base implementation reused by any-company tag filters that only relax the relation scope.
+ */
 class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     private const LEAD_ID_COLUMN = '.lead_id';

@@ -69,9 +69,10 @@ class BatchControllerTest extends MauticMysqlTestCase
 
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $lead1     = $leadModel->getEntity($this->leads[0]->getId());
-        $this->assertContains($this->tags[0], $lead1->getTags()->toArray());
-        $this->assertContains($this->tags[1], $lead1->getTags()->toArray());
-        $this->assertNotContains($this->tags[2], $lead1->getTags()->toArray());
+        $tagIds    = $this->getTagIds($lead1);
+        $this->assertContains($this->tags[0]->getId(), $tagIds);
+        $this->assertContains($this->tags[1]->getId(), $tagIds);
+        $this->assertNotContains($this->tags[2]->getId(), $tagIds);
     }
 
     public function testAddAndRemoveBatchSetAction(): void
@@ -91,9 +92,10 @@ class BatchControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('1 contact affected', $this->client->getResponse()->getContent());
-        $lead1 = $leadModel->getEntity($this->leads[0]->getId());
-        $this->assertNotContains($this->tags[1], $lead1->getTags()->toArray());
-        $this->assertContains($this->tags[2], $lead1->getTags()->toArray());
+        $lead1  = $leadModel->getEntity($this->leads[0]->getId());
+        $tagIds = $this->getTagIds($lead1);
+        $this->assertNotContains($this->tags[1]->getId(), $tagIds);
+        $this->assertContains($this->tags[2]->getId(), $tagIds);
     }
 
     public function testAddTagBatchSetActionForCompany(): void
@@ -112,9 +114,10 @@ class BatchControllerTest extends MauticMysqlTestCase
 
         $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $company1     = $companyModel->getEntity($this->companies[0]->getId());
-        $this->assertContains($this->tags[0], $company1->getTags()->toArray());
-        $this->assertContains($this->tags[1], $company1->getTags()->toArray());
-        $this->assertNotContains($this->tags[2], $company1->getTags()->toArray());
+        $tagIds       = $this->getTagIds($company1);
+        $this->assertContains($this->tags[0]->getId(), $tagIds);
+        $this->assertContains($this->tags[1]->getId(), $tagIds);
+        $this->assertNotContains($this->tags[2]->getId(), $tagIds);
     }
 
     /**
@@ -182,5 +185,16 @@ class BatchControllerTest extends MauticMysqlTestCase
         $this->companies[] = $company;
 
         return $this->companies;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private function getTagIds(Lead|Company $entity): array
+    {
+        return array_map(
+            static fn (Tag $tag): int => (int) $tag->getId(),
+            $entity->getTags()->toArray()
+        );
     }
 }

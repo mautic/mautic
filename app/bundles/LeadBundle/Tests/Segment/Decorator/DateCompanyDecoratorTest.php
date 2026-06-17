@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQuer
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class DateCompanyDecoratorTest extends TestCase
+final class DateCompanyDecoratorTest extends TestCase
 {
     public function testGetQueryTypeReturnsAnyCompanyServiceForCompanyAllObject(): void
     {

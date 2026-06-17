@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -135,10 +136,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $this->em->getRepository(CompanyLead::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\TagRepository
-     */
-    public function getTagRepository()
+    public function getTagRepository(): TagRepository
     {
         return $this->em->getRepository(Tag::class);
     }

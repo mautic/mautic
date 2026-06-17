@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyRelationValueFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\AnyCompanyTagRelationValueFilterQueryBuilder;
@@ -35,7 +36,7 @@ class CompanyDecorator extends BaseDecorator
     public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate): string
     {
         if (self::COMPANY_TAGS_FILTER === $contactSegmentFilterCrate->getField()) {
-            return MAUTIC_TABLE_PREFIX.'companies_tags_xref';
+            return MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME;
         }
 
         return parent::getTable($contactSegmentFilterCrate);

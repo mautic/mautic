@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BatchTagController extends AbstractFormController
 {
+    private const OBJECT_TYPE_COMPANY = 'company';
+    private const OBJECT_TYPE_LEAD    = 'lead';
+
     public function indexAction(Request $request): Response
     {
         $objectType = $this->getObjectType($request);
@@ -76,7 +79,7 @@ class BatchTagController extends AbstractFormController
      */
     private function applyBatchTags(string $objectType, array $ids, array $tagsToAdd, array $tagsToRemove, TagModel $tagModel): void
     {
-        if ('company' === $objectType) {
+        if (self::OBJECT_TYPE_COMPANY === $objectType) {
             if (!empty($tagsToAdd)) {
                 $tagModel->getRepository()->addTagsToCompanies($ids, $tagsToAdd);
             }
@@ -88,19 +91,21 @@ class BatchTagController extends AbstractFormController
             $this->addFlashMessage('mautic.company.batch_companies_affected', [
                 '%count%' => count($ids),
             ]);
-        } else {
-            if (!empty($tagsToAdd)) {
-                $tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
-            }
 
-            if (!empty($tagsToRemove)) {
-                $tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
-            }
-
-            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
-                '%count%' => count($ids),
-            ]);
+            return;
         }
+
+        if (!empty($tagsToAdd)) {
+            $tagModel->getRepository()->addTagsToLeads($ids, $tagsToAdd);
+        }
+
+        if (!empty($tagsToRemove)) {
+            $tagModel->getRepository()->removeTagsFromLeads($ids, $tagsToRemove);
+        }
+
+        $this->addFlashMessage('mautic.lead.batch_leads_affected', [
+            '%count%' => count($ids),
+        ]);
     }
 
     private function getBatchModalResponse(?string $flashMessage = null): JsonResponse
@@ -117,6 +122,6 @@ class BatchTagController extends AbstractFormController
 
     private function getObjectType(Request $request): string
     {
-        return 'company' === $request->query->get('objectType') ? 'company' : 'lead';
+        return self::OBJECT_TYPE_COMPANY === $request->query->get('objectType') ? self::OBJECT_TYPE_COMPANY : self::OBJECT_TYPE_LEAD;
     }
 }

@@ -10,6 +10,9 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
+/**
+ * Base implementation reused by any-company filters that only relax the relation scope.
+ */
 class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValueFilterQueryBuilder
 {
     public static function getServiceId(): string

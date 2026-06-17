@@ -40,6 +40,8 @@ class Tag implements UuidInterface
 {
     use UuidTrait;
 
+    public const TABLE_NAME = 'lead_tags';
+
     /**
      * @var int
      */
@@ -68,7 +70,7 @@ class Tag implements UuidInterface
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('lead_tags')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(TagRepository::class)
             ->addIndex(['tag'], 'lead_tag_search');
 

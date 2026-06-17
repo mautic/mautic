@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\PrimaryCompanyRelationValueFilterQueryBuilder;
 use PHPUnit\Framework\Assert;
 
-class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTestCase
+final class PrimaryCompanyRelationValueFilterQueryBuilderTest extends AbstractRelationValueFilterQueryBuilderTestCase
 {
     private PrimaryCompanyRelationValueFilterQueryBuilder $queryBuilder;
 

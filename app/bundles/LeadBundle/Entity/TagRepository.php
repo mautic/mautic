@@ -10,6 +10,10 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class TagRepository extends CommonRepository
 {
+    private const LEAD_TABLE_NAME           = 'leads';
+    private const LEAD_TAGS_XREF_TABLE_NAME = 'lead_tags_xref';
+    private const TAG_ACTION_ADD            = 'add';
+
     /**
      * Delete an entity through the repository.
      *
@@ -27,8 +31,20 @@ class TagRepository extends CommonRepository
 
     private function deleteLeadAssociations(int $tagId): void
     {
-        $this->_em->getConnection()->createQueryBuilder()
-            ->delete(MAUTIC_TABLE_PREFIX.'lead_tags_xref')
+        $connection = $this->_em->getConnection();
+
+        $connection->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.self::LEAD_TAGS_XREF_TABLE_NAME)
+            ->where('tag_id = :tagId')
+            ->setParameter('tagId', $tagId)
+            ->executeStatement();
+
+        if (!$connection->createSchemaManager()->tablesExist([MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME])) {
+            return;
+        }
+
+        $connection->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME)
             ->where('tag_id = :tagId')
             ->setParameter('tagId', $tagId)
             ->executeStatement();
@@ -42,11 +58,11 @@ class TagRepository extends CommonRepository
         $connection   = $this->_em->getConnection();
         $queryBuilder = $connection->createQueryBuilder();
 
-        $queryBuilder->delete(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
-            ->where('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref x WHERE x.tag_id = t.id)');
+        $queryBuilder->delete(MAUTIC_TABLE_PREFIX.Tag::TABLE_NAME, 't')
+            ->where('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.self::LEAD_TAGS_XREF_TABLE_NAME.' x WHERE x.tag_id = t.id)');
 
-        if ($connection->createSchemaManager()->tablesExist([MAUTIC_TABLE_PREFIX.'companies_tags_xref'])) {
-            $queryBuilder->andWhere('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'companies_tags_xref cx WHERE cx.tag_id = t.id)');
+        if ($connection->createSchemaManager()->tablesExist([MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME])) {
+            $queryBuilder->andWhere('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME.' cx WHERE cx.tag_id = t.id)');
         }
 
         $queryBuilder->executeStatement();
@@ -98,9 +114,9 @@ class TagRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
-            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+            ->from(MAUTIC_TABLE_PREFIX.self::LEAD_TABLE_NAME, 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX.self::LEAD_TAGS_XREF_TABLE_NAME, 'x', 'l.id = x.lead_id')
+            ->join('l', MAUTIC_TABLE_PREFIX.Tag::TABLE_NAME, 't', 'x.tag_id = t.id')
             ->where(
                 $q->expr()->and(
                     $q->expr()->in('t.tag', ':tags'),
@@ -230,55 +246,158 @@ class TagRepository extends CommonRepository
             return $result;
         }
 
-        $batchSize = 100;
-        $persisted = 0;
+        $this->_em->flush();
 
-        foreach ($entityIds as $entityId) {
-            $entity = $this->findTaggableEntity((int) $entityId, $entityClass);
-
-            if (null === $entity) {
-                continue;
-            }
-
-            foreach ($tags as $tag) {
-                $this->updateEntityTag($entity, $tag, $addOrRemove);
-                $result[(int) $entityId][$tag->getId()] = true;
-            }
-
-            $this->_em->persist($entity);
-
-            if (0 === ++$persisted % $batchSize) {
-                $this->_em->flush();
-            }
+        $entityIds = $this->getExistingEntityIds($entityIds, $entityClass);
+        if (empty($entityIds)) {
+            return $result;
         }
 
-        if ($persisted > 0) {
-            $this->_em->flush();
+        $tagIds = array_map(static fn (Tag $tag): int => (int) $tag->getId(), $tags);
+        if (self::TAG_ACTION_ADD === $addOrRemove) {
+            $this->insertTagRelations($entityClass, $entityIds, $tagIds);
+        } else {
+            $this->deleteTagRelations($entityClass, $entityIds, $tagIds);
+        }
+
+        $this->_em->clear();
+
+        foreach ($entityIds as $entityId) {
+            foreach ($tagIds as $tagId) {
+                $result[$entityId][$tagId] = true;
+            }
         }
 
         return $result;
     }
 
-    private function findTaggableEntity(int $entityId, string $entityClass): Lead|Company|null
+    /**
+     * @param array<int> $entityIds
+     *
+     * @return array<int>
+     */
+    private function getExistingEntityIds(array $entityIds, string $entityClass): array
     {
-        $entity = null;
-
-        if (Lead::class === $entityClass) {
-            $entity = $this->_em->find(Lead::class, $entityId);
-        } elseif (Company::class === $entityClass) {
-            $entity = $this->_em->find(Company::class, $entityId);
+        $entityIds = array_values(array_unique(array_map('intval', $entityIds)));
+        if (empty($entityIds)) {
+            return [];
         }
 
-        return $entity instanceof Lead || $entity instanceof Company ? $entity : null;
+        $tableName = $this->getTaggableEntityTableName($entityClass);
+
+        $ids = $this->_em->getConnection()->createQueryBuilder()
+            ->select('id')
+            ->from(MAUTIC_TABLE_PREFIX.$tableName)
+            ->where('id IN (:entityIds)')
+            ->setParameter('entityIds', $entityIds, ArrayParameterType::INTEGER)
+            ->executeQuery()
+            ->fetchFirstColumn();
+
+        return array_map('intval', $ids);
     }
 
-    private function updateEntityTag(Lead|Company $entity, Tag $tag, string $addOrRemove): void
+    private function getTaggableEntityTableName(string $entityClass): string
     {
-        if ('add' === $addOrRemove) {
-            $entity->addTag($tag);
-        } else {
-            $entity->removeTag($tag);
+        return match ($entityClass) {
+            Lead::class    => self::LEAD_TABLE_NAME,
+            Company::class => Company::TABLE_NAME,
+            default        => throw new \InvalidArgumentException(sprintf('Unsupported taggable entity "%s".', $entityClass)),
+        };
+    }
+
+    /**
+     * @param array<int> $entityIds
+     * @param array<int> $tagIds
+     */
+    private function insertTagRelations(string $entityClass, array $entityIds, array $tagIds): void
+    {
+        $connection        = $this->_em->getConnection();
+        $relationConfig    = $this->getTagRelationConfig($entityClass);
+        $existingRelations = $this->getExistingTagRelations($relationConfig['table'], $relationConfig['entityColumn'], $entityIds, $tagIds);
+
+        $connection->transactional(function () use ($connection, $relationConfig, $entityIds, $tagIds, $existingRelations): void {
+            foreach ($entityIds as $entityId) {
+                foreach ($tagIds as $tagId) {
+                    if (isset($existingRelations[$this->getTagRelationKey($entityId, $tagId)])) {
+                        continue;
+                    }
+
+                    $connection->insert(
+                        MAUTIC_TABLE_PREFIX.$relationConfig['table'],
+                        [
+                            $relationConfig['entityColumn'] => $entityId,
+                            'tag_id'                        => $tagId,
+                        ]
+                    );
+                }
+            }
+        });
+    }
+
+    /**
+     * @param array<int> $entityIds
+     * @param array<int> $tagIds
+     */
+    private function deleteTagRelations(string $entityClass, array $entityIds, array $tagIds): void
+    {
+        $relationConfig = $this->getTagRelationConfig($entityClass);
+
+        $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.$relationConfig['table'])
+            ->where($relationConfig['entityColumn'].' IN (:entityIds)')
+            ->andWhere('tag_id IN (:tagIds)')
+            ->setParameter('entityIds', $entityIds, ArrayParameterType::INTEGER)
+            ->setParameter('tagIds', $tagIds, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
+     * @param array<int> $entityIds
+     * @param array<int> $tagIds
+     *
+     * @return array<string, true>
+     */
+    private function getExistingTagRelations(string $relationTable, string $entityColumn, array $entityIds, array $tagIds): array
+    {
+        $rows = $this->_em->getConnection()->createQueryBuilder()
+            ->select($entityColumn, 'tag_id')
+            ->from(MAUTIC_TABLE_PREFIX.$relationTable)
+            ->where($entityColumn.' IN (:entityIds)')
+            ->andWhere('tag_id IN (:tagIds)')
+            ->setParameter('entityIds', $entityIds, ArrayParameterType::INTEGER)
+            ->setParameter('tagIds', $tagIds, ArrayParameterType::INTEGER)
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $relations = [];
+        foreach ($rows as $row) {
+            $relations[$this->getTagRelationKey((int) $row[$entityColumn], (int) $row['tag_id'])] = true;
         }
+
+        return $relations;
+    }
+
+    /**
+     * @return array{table: string, entityColumn: string}
+     */
+    private function getTagRelationConfig(string $entityClass): array
+    {
+        return match ($entityClass) {
+            Lead::class => [
+                'table'        => self::LEAD_TAGS_XREF_TABLE_NAME,
+                'entityColumn' => 'lead_id',
+            ],
+            Company::class => [
+                'table'        => Company::TAGS_XREF_TABLE_NAME,
+                'entityColumn' => 'company_id',
+            ],
+            default => throw new \InvalidArgumentException(sprintf('Unsupported taggable entity "%s".', $entityClass)),
+        };
+    }
+
+    private function getTagRelationKey(int $entityId, int $tagId): string
+    {
+        return $entityId.':'.$tagId;
     }
 
     /**
@@ -300,7 +419,7 @@ class TagRepository extends CommonRepository
 
         $qb         = $this->_em->getConnection()->createQueryBuilder();
         $tagsIdName = $qb->select('lt.id,lt.tag')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 'lt')
+            ->from(MAUTIC_TABLE_PREFIX.Tag::TABLE_NAME, 'lt')
             ->where('lt.id IN (:tag)')
             ->setParameter('tag', $tagIds, ArrayParameterType::INTEGER)
             ->executeQuery()->fetchAllKeyValue();

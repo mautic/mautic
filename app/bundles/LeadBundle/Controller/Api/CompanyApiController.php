@@ -61,7 +61,10 @@ class CompanyApiController extends CommonApiController
         return $this->model->getEntity();
     }
 
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action): array
     {
         if (isset($parameters['tags'])) {
             unset($parameters['tags']);
@@ -78,7 +81,7 @@ class CompanyApiController extends CommonApiController
      * @param Company &$entity
      * @param string  $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
         if (isset($this->entityRequestParameters['tags'])) {
             $this->model->modifyTags($entity, $this->entityRequestParameters['tags'], null, false);
