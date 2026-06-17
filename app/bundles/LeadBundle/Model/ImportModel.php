@@ -318,6 +318,11 @@ class ImportModel extends FormModel
                 $config['escape']
             );
 
+            // fgetcsv returns false on error or EOF
+            if (false === $data) {
+                break;
+            }
+
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
@@ -336,9 +341,7 @@ class ImportModel extends FormModel
 
             if ($this->isEmptyCsvRow($data)) {
                 $errorMessage = 'mautic.lead.import.error.line_empty';
-            }
-
-            if ($this->hasMoreValuesThanColumns($data, $headerCount)) {
+            } elseif ($this->hasMoreValuesThanColumns($data, $headerCount)) {
                 $errorMessage = 'mautic.lead.import.error.header_mismatch';
             }
 
