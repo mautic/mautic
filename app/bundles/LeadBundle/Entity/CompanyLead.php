@@ -7,6 +7,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class CompanyLead
 {
+    public const TABLE_NAME = 'companies_leads';
+
     /**
      * @var Company
      **/
@@ -31,7 +33,7 @@ class CompanyLead
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('companies_leads')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CompanyLeadRepository::class);
 
         $builder->createManyToOne('company', 'Company')

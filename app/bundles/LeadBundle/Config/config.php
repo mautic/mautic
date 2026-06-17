@@ -928,5 +928,6 @@ return [
         'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
         'update_segment_contact_count_in_background'                                            => false,
         'clear_export_files_after_days'                                                         => 7,
+        'update_company_mapping_data_in_background'                                             => false,
     ],
 ];
