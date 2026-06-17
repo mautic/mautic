@@ -294,7 +294,6 @@ class ImportModel extends FormModel
          *    value as SplTempFileObject; the two previously returned different
          *    values.
          */
-        $file->current();
 
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
@@ -307,9 +306,18 @@ class ImportModel extends FormModel
         });
 
         while ($batchSize && !$file->eof()) {
+            /*
             $string = $file->current();
             $file->next();
             $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
+            */
+            // Read the next line using fgetcsv – this automatically advances the pointer
+            $data = $file->fgetcsv(
+                $config['delimiter'],
+                $config['enclosure'],
+                $config['escape']
+            );
+
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
