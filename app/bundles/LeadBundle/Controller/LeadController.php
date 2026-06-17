@@ -488,7 +488,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage, FieldGroupModel $fieldGroupModel)
+    public function newAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, TokenStorageInterface $tokenStorage)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -637,10 +637,9 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'             => $form->createView(),
-                    'lead'             => $lead,
-                    'fields'           => $fieldGroupModel->sortGroupedFields($model->organizeFieldsByGroup($fields), 'lead'),
-                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('lead'),
+                    'form'   => $form->createView(),
+                    'lead'   => $lead,
+                    'fields' => $model->organizeFieldsByGroup($fields),
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [
@@ -664,7 +663,7 @@ class LeadController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, FieldGroupModel $fieldGroupModel, $objectId, $ignorePost = false)
+    public function editAction(Request $request, UserHelper $userHelper, AvatarHelper $avatarHelper, $objectId, $ignorePost = false)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -825,10 +824,9 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'             => $form->createView(),
-                    'lead'             => $lead,
-                    'fields'           => $fieldGroupModel->sortGroupedFields($lead->getFields(), 'lead'), // already organized by ['group']['alias'], reordered by group order
-                    'translatedGroups' => $fieldGroupModel->getTranslatedGroups('lead'),
+                    'form'   => $form->createView(),
+                    'lead'   => $lead,
+                    'fields' => $lead->getFields(), // already organized by ['group']['alias']
                 ],
                 'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [

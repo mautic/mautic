@@ -134,8 +134,7 @@ class FieldGroup extends FormEntity
     {
         $slug = strtolower(trim($name));
         $slug = preg_replace('/\s+/', '_', $slug) ?? $slug;
-        $slug = preg_replace('/[^a-z0-9_]/', '', $slug) ?? $slug;
 
-        return $slug;
+        return preg_replace('/[^a-z0-9_]/', '', $slug) ?? $slug;
     }
 }

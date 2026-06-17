@@ -9,7 +9,10 @@ use Mautic\LeadBundle\Entity\FieldGroupRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * @implements DataTransformerInterface<FieldGroup|null, int|null>
+ * Maps the model value (an integer order) to/from the group entity shown in the
+ * "Group order" dropdown.
+ *
+ * @implements DataTransformerInterface<int|null, FieldGroup|null>
  */
 class FieldGroupToOrderTransformer implements DataTransformerInterface
 {
@@ -26,25 +29,21 @@ class FieldGroupToOrderTransformer implements DataTransformerInterface
      * Orders are kept contiguous (1..n) by FieldGroupModel::reorderGroupsByEntity,
      * so the next group is reliably found at order + 1.
      */
-    public function transform(mixed $order): mixed
+    public function transform(mixed $order): ?FieldGroup
     {
         if (!$order) {
             return null;
         }
 
-        return $this->fieldGroupRepository->findOneBy(['order' => $order + 1]);
+        return $this->fieldGroupRepository->findOneBy(['order' => (int) $order + 1]);
     }
 
     /**
      * Selected "appear before" group -> its order (the target slot). Null (no
      * selection) means place last; FieldGroupModel appends in that case.
      */
-    public function reverseTransform(mixed $group): mixed
+    public function reverseTransform(mixed $group): ?int
     {
-        if (null === $group) {
-            return null;
-        }
-
-        return $group->getOrder();
+        return $group instanceof FieldGroup ? $group->getOrder() : null;
     }
 }

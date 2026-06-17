@@ -49,20 +49,12 @@
                                     'default'   : true,
                                 }
                             ) }}
-                            {{ include(
-                                '@MauticCore/Helper/tableheader.html.twig',
-                                {
-                                    'text'  : 'mautic.lead.field_group.header.alias',
-                                    'class' : 'col-fieldgroup-alias visible-md visible-lg',
-                                }
-                            ) }}
-                            {{ include(
-                                '@MauticCore/Helper/tableheader.html.twig',
-                                {
-                                    'text'  : 'mautic.lead.field_group.header.field_count',
-                                    'class' : 'col-fieldgroup-count visible-md visible-lg text-center',
-                                }
-                            ) }}
+                            <th class="col-fieldgroup-alias visible-md visible-lg" scope="col">
+                                <span>{{ 'mautic.lead.field_group.header.alias'|trans }}</span>
+                            </th>
+                            <th class="col-fieldgroup-count visible-md visible-lg text-center" scope="col">
+                                <span>{{ 'mautic.lead.field_group.header.field_count'|trans }}</span>
+                            </th>
                             {{ include(
                                 '@MauticCore/Helper/tableheader.html.twig',
                                 {

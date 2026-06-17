@@ -20,6 +20,8 @@
 {% endblock %}
 
 {% block content %}
+  {% set fields = fieldGroupSortedFields(fields, 'lead') %}
+  {% set translatedGroups = fieldGroupLabels('lead') %}
   {% set groups = fields|keys %}{# order follows the configured group order #}
   {% set img = leadGetAvatar(lead) %}
   {{ form_start(form) }}

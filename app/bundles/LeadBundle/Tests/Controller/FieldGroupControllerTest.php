@@ -17,8 +17,9 @@ class FieldGroupControllerTest extends MauticMysqlTestCase
     // cleanup transaction; disable rollback so each test gets a fresh schema.
     protected $useCleanupRollback = false;
 
-    private const INDEX_URL  = '/s/contacts/field-groups';
-    private const ACTION_URL = '/s/contacts/field-groups/%s/%s';
+    private const INDEX_URL       = '/s/contacts/field-groups';
+    private const ACTION_URL      = '/s/contacts/field-groups/%s/%s';
+    private const SAVE_AND_CLOSE  = 'Save & Close';
 
     private FieldGroupModel $fieldGroupModel;
 
@@ -77,7 +78,7 @@ class FieldGroupControllerTest extends MauticMysqlTestCase
     public function testNewActionCreatesGroupAndAutoGeneratesAlias(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, sprintf(self::ACTION_URL, 'new', ''));
-        $form    = $crawler->selectButton('Save & Close')->form();
+        $form    = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
         $form['field_group[name]']->setValue('Sales Group');
         $form['field_group[description]']->setValue('A group for sales fields');
         $this->client->submit($form);
@@ -105,7 +106,7 @@ class FieldGroupControllerTest extends MauticMysqlTestCase
         $this->assertSame('original_name', $originalAlias);
 
         $crawler = $this->client->request(Request::METHOD_GET, sprintf(self::ACTION_URL, 'edit', $group->getId()));
-        $form    = $crawler->selectButton('Save & Close')->form();
+        $form    = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
         $form['field_group[name]']->setValue('Completely Renamed');
         $this->client->submit($form);
 
@@ -204,7 +205,7 @@ class FieldGroupControllerTest extends MauticMysqlTestCase
 
         // Edit Gamma and place it before Alpha via the "Group order" dropdown.
         $crawler = $this->client->request(Request::METHOD_GET, sprintf(self::ACTION_URL, 'edit', $gamma->getId()));
-        $form    = $crawler->selectButton('Save & Close')->form();
+        $form    = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
         $form['field_group[order]']->setValue((string) $alpha->getId());
         $this->client->submit($form);
 
