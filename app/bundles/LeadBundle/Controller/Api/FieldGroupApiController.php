@@ -25,7 +25,8 @@ class FieldGroupApiController extends CommonApiController
     #[Required]
     public function setFieldGroupModel(FieldGroupModel $fieldGroupModel): void
     {
-        $this->model = $fieldGroupModel;
+        $this->model          = $fieldGroupModel;
+        $this->permissionBase = $fieldGroupModel->getPermissionBase();
     }
 
     /**
