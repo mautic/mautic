@@ -563,8 +563,8 @@ input[type=radio][disabled] {
     align-self: center
 }
 </style>
-<div style="min-height: 100vh; 
-display: flex; 
+<div style="min-height: 100vh;
+display: flex;
 flex-direction: column;
 padding: 0 15px;
 justify-content: center;">
@@ -618,7 +618,7 @@ justify-content: center;">
                                                     {{ form_widget(form.lead_channels['frequency_time_' ~ channel.value]) }}
                                                 </div>
                                             {% endif %}
-                                            {%  if showContactPauseDates %}
+                                            {% if showContactPauseDates %}
                                                 <div class="col-md-6" data-contact-pause-dates="1">
                                                     <label class="text-secondary">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                                                     {{ form_widget(form.lead_channels['contact_pause_start_date_' ~ channel.value]) }}
