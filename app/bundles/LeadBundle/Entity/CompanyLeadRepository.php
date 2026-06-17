@@ -248,7 +248,7 @@ class CompanyLeadRepository extends CommonRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $q    = $conn->createQueryBuilder();
-        $q->select('id')
+        $q->select('company_id', 'lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads')
             ->where($q->expr()->eq('company_id', ':companyId'))
             ->setParameter('companyId', $companyId, ParameterType::INTEGER)
@@ -256,13 +256,21 @@ class CompanyLeadRepository extends CommonRepository
 
         $deleteQb = $conn->createQueryBuilder();
 
-        while ($ids = $q->executeQuery()->fetchFirstColumn()) {
+        while ($pairs = $q->executeQuery()->fetchFirstColumn()) {
+            if (empty($pairs)) {
+                break;
+            }
             $deleteQb
                 ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
                 ->where(
-                    $deleteQb->expr()->in('id', ':ids')
+                    $deleteQb->expr()->in(
+                        '(company_id, lead_id)',
+                        array_map(
+                            static fn ($pair) => '('.(int) $pair['company_id'].', '.(int) $pair['lead_id'].')',
+                            $pairs
+                        )
+                    )
                 )
-                ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
                 ->executeStatement();
         }
     }
@@ -293,7 +301,7 @@ class CompanyLeadRepository extends CommonRepository
         } while ($row);
         */
         $q = $conn->createQueryBuilder();
-        $q->select('id')
+        $q->select('company_id', 'lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads')
             ->where($q->expr()->eq('is_primary', ':isPrimary'))
             ->setParameter('isPrimary', false, ParameterType::BOOLEAN)
@@ -301,17 +309,22 @@ class CompanyLeadRepository extends CommonRepository
 
         $deleteQb = $conn->createQueryBuilder();
 
-        while ($ids = $q->executeQuery()->fetchFirstColumn()) {
-            if (empty($ids)) {
+        while ($pairs = $q->executeQuery()->fetchFirstColumn()) {
+            if (empty($pairs)) {
                 break;
             }
 
             $deleteQb
                 ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
                 ->where(
-                    $deleteQb->expr()->in('id', ':ids')
+                    $deleteQb->expr()->in(
+                        '(company_id, lead_id)',
+                        array_map(
+                            static fn ($pair) => '('.(int) $pair['company_id'].', '.(int) $pair['lead_id'].')',
+                            $pairs
+                        )
+                    )
                 )
-                ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
                 ->executeStatement();
         }
     }
