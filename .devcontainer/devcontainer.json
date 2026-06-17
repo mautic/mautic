@@ -24,6 +24,6 @@
         }
     },
     "postCreateCommand": "echo hello",
-    "postAttachCommand": "ddev start",
-    "updateContentCommand": "ddev start"
+    "postAttachCommand": "ddev start -y",
+    "updateContentCommand": "ddev start -y"
 }
