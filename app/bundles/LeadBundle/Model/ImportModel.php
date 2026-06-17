@@ -306,22 +306,9 @@ class ImportModel extends FormModel
         });
 
         while ($batchSize && !$file->eof()) {
-            /*
             $string = $file->current();
             $file->next();
             $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
-            */
-            // Read the next line using fgetcsv – this automatically advances the pointer
-            $data = $file->fgetcsv(
-                $config['delimiter'],
-                $config['enclosure'],
-                $config['escape']
-            );
-
-            // fgetcsv returns false on error or EOF
-            if (false === $data) {
-                break;
-            }
 
             $import->setLastLineImported($lineNumber);
 
@@ -341,7 +328,8 @@ class ImportModel extends FormModel
 
             if ($this->isEmptyCsvRow($data)) {
                 $errorMessage = 'mautic.lead.import.error.line_empty';
-            } elseif ($this->hasMoreValuesThanColumns($data, $headerCount)) {
+            }
+            if ($this->hasMoreValuesThanColumns($data, $headerCount)) {
                 $errorMessage = 'mautic.lead.import.error.header_mismatch';
             }
 
