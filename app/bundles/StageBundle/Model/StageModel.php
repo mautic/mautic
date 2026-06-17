@@ -183,16 +183,16 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
      * Fetch stage entities together with per-stage contact counts.
      *
      * Returns a tuple: Stage objects for the current page, a map of
-     * stage ID → contact count, and the total item count across all pages.
+     * stage ID to contact count, and the total item count across all pages.
      *
      * @param array<string, mixed> $args
      *
-     * @return array{0: Stage[], 1: array<int, int>, 2: int}
+     * @return array{0: array<int, Stage>, 1: array<int, int>, 2: int}
      */
     public function getEntitiesWithContactCounts(array $args = []): array
     {
         $args['withContactCount'] = true;
-        $paginator               = $this->getEntities($args);
+        $paginator                = $this->getEntities($args);
 
         $entities      = [];
         $contactCounts = [];

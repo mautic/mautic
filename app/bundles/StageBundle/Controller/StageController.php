@@ -13,12 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StageController extends AbstractFormController
 {
-    /**
-     * @param int $page
-     *
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, StageModel $stageModel, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -40,14 +35,12 @@ class StageController extends AbstractFormController
 
         $pageHelper = $pageHelperFactory->make('mautic.stage', $page);
 
-        $limit      = $pageHelper->getLimit();
-        $start      = $pageHelper->getStart();
-        $search     = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
-        $filter     = ['string' => $search, 'force' => []];
-        $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
-        $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
-        $stageModel = $this->getModel('stage');
-        \assert($stageModel instanceof StageModel);
+        $limit                                   = $pageHelper->getLimit();
+        $start                                   = $pageHelper->getStart();
+        $search                                  = $request->get('search', $request->getSession()->get('mautic.stage.filter', ''));
+        $filter                                  = ['string' => $search, 'force' => []];
+        $orderBy                                 = $request->getSession()->get('mautic.stage.orderby', 's.name');
+        $orderByDir                              = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
         [$stageEntities, $contactCounts, $count] = $stageModel->getEntitiesWithContactCounts(
             [
                 'start'      => $start,
