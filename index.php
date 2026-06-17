@@ -3,7 +3,7 @@
 define('MAUTIC_ROOT_DIR', __DIR__);
 define('ELFINDER_IMG_PARENT_URL', 'media/bundles/fmelfinder');
 
-// Fix for hosts that do not have date.timezone set, it will be reset based on users settings
+// Fix for hosts that do not have date.timezone set, it will be reset based on users settings - dummy change
 date_default_timezone_set('UTC');
 
 require 'app/config/bootstrap.php';
