@@ -728,6 +728,13 @@ class CommonRepository extends ServiceEntityRepository
               ->setParameter('true', true, 'boolean');
         }
 
+        // Non Deleted Only
+        if ($reflection->hasMethod('getDeleted')) {
+            $q->andWhere(
+                $q->expr()->isNull($prefix.'deleted')
+            );
+        }
+
         if ($limit) {
             $q->setMaxResults((int) $limit);
         }
@@ -1469,24 +1476,11 @@ class CommonRepository extends ServiceEntityRepository
         if (isset($args['ids'])) {
             $ids   = array_map('intval', $args['ids']);
             $param = $this->generateRandomParameterName();
-            if ($q instanceof QueryBuilder) {
-                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                $queryExpression->add(
-                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
-                );
-                $queryParameters[$param] = $ids;
-            } else {
-                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                $queryExpression->add(
-                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
-                );
-                $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
-            }
-        } elseif (!empty($args['ownedBy'])) {
             // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $queryExpression->add(
-                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], (string) $args['ownedBy'][1])
+                $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
             );
+            $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
         }
 
         if (!empty($filter)) {
@@ -1699,7 +1693,9 @@ class CommonRepository extends ServiceEntityRepository
     protected function getIdsExpr(&$q, $filter)
     {
         if ($ids = array_map('intval', explode(',', $filter->string))) {
-            return $q->expr()->in($this->getTableAlias().'.id', $ids);
+            $q->setParameter('idsExpr', $ids, ArrayParameterType::INTEGER);
+
+            return $q->expr()->in($this->getTableAlias().'.id', ':idsExpr');
         }
 
         return false;
