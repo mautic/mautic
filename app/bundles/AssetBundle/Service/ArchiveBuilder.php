@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 final class ArchiveBuilder
 {
     /**
-     * @param array<Asset> $assets
+     * @param array<int, Asset> $assets
      */
     public function buildArchive(array $assets): string
     {
@@ -53,7 +53,7 @@ final class ArchiveBuilder
     }
 
     /**
-     * @param array<Asset> $assets
+     * @param array<int, Asset> $assets
      */
     private function addAssetsToArchive(\ZipArchive $zipArchive, array $assets): void
     {
@@ -107,7 +107,7 @@ final class ArchiveBuilder
     }
 
     /**
-     * @param array<string> $usedNames
+     * @param array<int, string> $usedNames
      */
     private function generateFilename(Asset $asset, array &$usedNames): string
     {
@@ -123,7 +123,7 @@ final class ArchiveBuilder
     }
 
     /**
-     * @param array<string> $usedNames
+     * @param array<int, string> $usedNames
      */
     private function ensureUniqueFilename(string $filename, array $usedNames): string
     {

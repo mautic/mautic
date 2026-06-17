@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Service;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
@@ -19,9 +20,9 @@ final class BatchFileCollector
     }
 
     /**
-     * @param array<int> $ids
+     * @param array<int, int> $ids
      *
-     * @return array<Asset>
+     * @return array<int, Asset>
      */
     public function collectDownloadableAssets(array $ids): array
     {
@@ -31,7 +32,7 @@ final class BatchFileCollector
             $asset = $this->assetModel->getEntity($id);
 
             if (null === $asset) {
-                throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.not_found');
+                throw new BatchDownloadException('mautic.asset.asset.batch_download.error.not_found');
             }
 
             if (!$this->security->hasEntityAccess(
@@ -39,7 +40,7 @@ final class BatchFileCollector
                 'asset:assets:viewother',
                 $asset->getCreatedBy()
             )) {
-                throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.permission');
+                throw new BatchDownloadException('mautic.asset.asset.batch_download.error.permission');
             }
 
             if ($asset->isLocal()) {
@@ -47,7 +48,7 @@ final class BatchFileCollector
                 $absolutePath = $asset->getAbsolutePath();
 
                 if (empty($absolutePath) || !is_file($absolutePath) || !is_readable($absolutePath)) {
-                    throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.unavailable');
+                    throw new BatchDownloadException('mautic.asset.asset.batch_download.error.unavailable');
                 }
             }
 
@@ -55,7 +56,7 @@ final class BatchFileCollector
         }
 
         if (empty($downloadableAssets)) {
-            throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.none_available');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.none_available');
         }
 
         return $downloadableAssets;

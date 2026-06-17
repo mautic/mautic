@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Service;
 
+use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -25,30 +26,39 @@ final class BatchDownloadRequestValidator
     }
 
     /**
-     * @return array<int>
+     * @return array<int, int>
      */
     public function validateAndExtractIds(Request $request): array
     {
         $idsPayload = $request->get('ids', '');
 
         if ('' === $idsPayload) {
-            throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.no_selection');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
 
-        $ids = json_decode((string) $idsPayload, true);
+        try {
+            $ids = json_decode((string) $idsPayload, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
+        }
 
         if (!is_array($ids) || empty($ids)) {
-            throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.no_selection');
+            throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
 
         $validIds = [];
 
         foreach ($ids as $id) {
-            if (!is_scalar($id)) {
-                throw new \InvalidArgumentException('mautic.asset.asset.batch_download.error.no_selection');
+            if (!is_int($id) && (!is_string($id) || !ctype_digit($id))) {
+                throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
             }
 
-            $validIds[] = (int) $id;
+            $validId = (int) $id;
+            if ($validId <= 0) {
+                throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
+            }
+
+            $validIds[] = $validId;
         }
 
         return $validIds;

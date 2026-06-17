@@ -668,21 +668,19 @@ class AssetController extends FormController
         ArchiveBuilder $archiveBuilder,
         BatchDownloadResponder $responder,
     ): Response {
-        if ($requestValidator->validatePermissions()) {
-            try {
-                $ids                = $requestValidator->validateAndExtractIds($request);
-                $downloadableAssets = $fileCollector->collectDownloadableAssets($ids);
-                $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
-
-                $response = $responder->createResponse($zipPath);
-            } catch (BatchDownloadException|\InvalidArgumentException $e) {
-                $response = $this->createBatchDownloadErrorResponse($e->getMessage());
-            }
-        } else {
-            $response = $this->accessDenied();
+        if (!$requestValidator->validatePermissions()) {
+            return $this->accessDenied();
         }
 
-        return $response;
+        try {
+            $ids                = $requestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $fileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
+
+            return $responder->createResponse($zipPath);
+        } catch (BatchDownloadException $e) {
+            return $this->createBatchDownloadErrorResponse($e->getMessage());
+        }
     }
 
     /**
