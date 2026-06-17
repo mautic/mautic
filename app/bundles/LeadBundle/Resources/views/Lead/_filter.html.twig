@@ -125,6 +125,17 @@
               'class': 'btn btn-ghost btn-sm btn-nospin',
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
+              'href': path('mautic_contact_action', {'objectAction': 'batchFindReplace'}),
+              'data-header': 'mautic.core.find_replace'|trans,
+          },
+          'btnText': 'mautic.core.find_replace'|trans,
+          'iconClass': 'ri-find-replace-line',
+      },
+      {
+          'attr': {
+              'class': 'btn btn-ghost btn-sm btn-nospin',
+              'data-toggle': 'ajaxmodal',
+              'data-target': '#MauticSharedModal',
               'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
               'data-header': 'mautic.lead.batch.dnc'|trans,
           },
@@ -172,9 +183,7 @@
             'tooltip': 'mautic.lead.lead.searchcommand.dnc.description',
             'icon': 'ri-prohibited-line'
         }
-    ],
-    toolbarOptionsLabel: 'mautic.lead.import_export',
-    toolbarOptionsIcon: 'ri-arrow-up-down-fill ri-1x'
+    ]
 }) -}}
 <div class="btn-group ml-5 sr-only ">
     <span data-toggle="tooltip" title="{{ 'mautic.lead.tooltip.list'|trans }}" data-placement="left">
