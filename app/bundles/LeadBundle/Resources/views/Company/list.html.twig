@@ -18,12 +18,11 @@
 
 {% block headerTitle %}{{ 'mautic.companies.menu.root'|trans }}{% endblock %}
 
-
-
 {% block content %}
   {% if isIndex %}
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
       {%- set pageButtons = [] %}
+      {%- set bulkActionsCustom = [] %}
 {% if permissions['lead:leads:create'] %}
     {% set pageButtons = pageButtons|merge([
         {
@@ -42,6 +41,21 @@
         }
     ]) %}
 {% endif %}
+{% if permissions['lead:leads:editown'] or permissions['lead:leads:editother'] %}
+    {% set bulkActionsCustom = bulkActionsCustom|merge([
+        {
+            'attr': {
+                'class': 'btn btn-ghost btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'href': path('mautic_company_action', {'objectAction': 'batchFindReplace'}),
+                'data-header': 'mautic.core.find_replace'|trans,
+            },
+            'btnText': 'mautic.core.find_replace'|trans,
+            'iconClass': 'ri-find-replace-line',
+        },
+    ]) %}
+{% endif %}
 
 {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
     'searchValue': searchValue,
@@ -57,6 +71,7 @@
         'templateButtons': {
             'delete': permissions['lead:leads:deleteother']
         },
+        'customButtons': bulkActionsCustom,
     },
     'quickFilters': [
         {
@@ -65,9 +80,7 @@
             'tooltip': 'mautic.core.searchcommand.ismine.description',
             'icon': 'ri-user-line'
         }
-    ],
-    toolbarOptionsLabel: 'mautic.lead.import_export',
-    toolbarOptionsIcon: 'ri-arrow-up-down-fill ri-1x'
+    ]
 }) -}}
     <div class="page-list">
   {% endif %}
