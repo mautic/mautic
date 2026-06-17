@@ -214,3 +214,21 @@ input[type="radio"].mauticform-radiogrp-radio {
 .mauticform-pagebreak-wrapper .mauticform-button-wrapper {
     display: inline;
 }
+.mauticform-rating .mauticform-rating-row {
+    direction: rtl;
+    display: inline-flex;
+}
+.mauticform-rating .mauticform-rating-radio {
+    display: none;
+}
+.mauticform-rating .mauticform-rating-label {
+    font-size: 1.5em;
+    color: var(--base-color, #ccc);
+    cursor: pointer;
+    padding: 0 2px;
+}
+.mauticform-rating .mauticform-rating-radio:checked ~ label.mauticform-rating-label,
+.mauticform-rating .mauticform-rating-label:hover,
+.mauticform-rating .mauticform-rating-label:hover ~ label.mauticform-rating-label {
+    color: var(--star-color, #f5b301);
+}
