@@ -248,6 +248,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($responseData['clearCloneStorage']);
         $this->assertNotEquals($eventId, $responseData['eventId']);
         $this->assertNotEmpty($responseData['eventHtml']);
+        $this->assertArrayHasKey('modifiedEvents', $responseData);
+        $this->assertNotEmpty($responseData['modifiedEvents']);
     }
 
     public function testEmailSendTypeDefaultSetting(): void
