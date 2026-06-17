@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
@@ -12,6 +13,7 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 class CompanyLeadRepository extends CommonRepository
 {
     public const DELETE_BATCH_SIZE = 1000;
+    public const BATCH_SIZE        = 5000;
 
     /**
      * @param CompanyLead[] $entities
@@ -39,8 +41,9 @@ class CompanyLeadRepository extends CommonRepository
                     ->set('is_primary', 0);
 
                 $qb->where(
-                    $qb->expr()->in('lead_id', $contacts)
-                )->executeStatement();
+                    $qb->expr()->in('lead_id', ':leadIds')
+                )->setParameter('leadIds', $contacts, ArrayParameterType::INTEGER)
+                    ->executeStatement();
             }
         }
 
@@ -160,7 +163,10 @@ class CompanyLeadRepository extends CommonRepository
         $q->select('cl.company_id, comp.companyname, comp.companycity, comp.companycountry')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'comp.id = cl.company_id')
-            ->where('cl.lead_id = :leadId')
+            ->where(
+                $q->expr()->eq('cl.lead_id', ':leadId'),
+                $q->expr()->isNull('comp.deleted')
+            )
             ->setParameter('leadId', $leadId);
         $q->orderBy('cl.date_added', 'DESC');
 
@@ -209,22 +215,45 @@ class CompanyLeadRepository extends CommonRepository
         if ($company->isNew() || empty($company->getChanges()['fields']['companyname'])) {
             return;
         }
+        $this->updateCompanyNameOnLeads($company);
+    }
+
+    public function updateCompanyNameOnLeads(Company $company): void
+    {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('cl.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl');
-        $q->where($q->expr()->eq('cl.company_id', ':companyId'))
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = cl.lead_id')
+            ->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter('companyId', $company->getId())
-            ->andWhere('cl.is_primary = 1');
-        $leadIds = $q->executeQuery()->fetchOne();
-        if (!empty($leadIds)) {
-            $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX.'leads')
-            ->set('company', ':company')
+            ->andWhere($q->expr()->neq('l.company', ':company'))
             ->setParameter('company', $company->getName())
-            ->where(
-                $q->expr()->in('id', $leadIds)
-            )->executeStatement();
+            ->andWhere('cl.is_primary = 1')
+            ->setMaxResults(self::BATCH_SIZE);
+        while ($leadIds = $q->executeQuery()->fetchFirstColumn()) {
+            $this->getEntityManager()->getConnection()->createQueryBuilder()
+                ->update(MAUTIC_TABLE_PREFIX.'leads')
+                ->set('company', ':company')
+                ->setParameter('company', $company->getName())
+                ->where(
+                    $q->expr()->in('id', ':leadIds')
+                )
+                ->setParameter('leadIds', $leadIds, ArrayParameterType::INTEGER)
+                ->executeStatement();
         }
+    }
+
+    public function deleteCompanyLeads(int $companyId): void
+    {
+        $tableName  = MAUTIC_TABLE_PREFIX.'companies_leads';
+        $statement  = $this->getEntityManager()
+            ->getConnection()
+            ->prepare("DELETE FROM {$tableName} WHERE company_id = :companyId LIMIT ".self::BATCH_SIZE);
+        $statement->bindValue('companyId', $companyId, ParameterType::INTEGER);
+
+        do {
+            $affected = $statement->executeStatement();
+        } while ($affected);
     }
 
     public function removeContactPrimaryCompany(int $leadId): void
