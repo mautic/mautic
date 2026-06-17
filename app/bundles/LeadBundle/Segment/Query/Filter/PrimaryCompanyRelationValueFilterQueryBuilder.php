@@ -10,6 +10,9 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
+/**
+ * Base class for company relation filters that differ only by relation scope.
+ */
 class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValueFilterQueryBuilder
 {
     public static function getServiceId(): string
@@ -90,7 +93,7 @@ class PrimaryCompanyRelationValueFilterQueryBuilder extends ComplexRelationValue
         }
     }
 
-    protected function applyCompanyFilterExpression(
+    private function applyCompanyFilterExpression(
         QueryBuilder $subQueryBuilder,
         ContactSegmentFilter $filter,
         string $filterOperator,

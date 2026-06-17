@@ -24,25 +24,13 @@ final class FilterOperatorSubscriberTest extends TestCase
 {
     private OperatorOptions $operatorOptions;
 
-    /**
-     * @var MockObject|LeadFieldRepository
-     */
-    private MockObject $leadFieldRepository;
+    private LeadFieldRepository&MockObject $leadFieldRepository;
 
-    /**
-     * @var MockObject|TypeOperatorProviderInterface
-     */
-    private MockObject $typeOperatorProvider;
+    private TypeOperatorProviderInterface&MockObject $typeOperatorProvider;
 
-    /**
-     * @var MockObject|FieldChoicesProviderInterface
-     */
-    private MockObject $fieldChoicesProvider;
+    private FieldChoicesProviderInterface&MockObject $fieldChoicesProvider;
 
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
+    private TranslatorInterface&MockObject $translator;
 
     private FilterOperatorSubscriber $subscriber;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
@@ -13,36 +15,22 @@ use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
+final class DecoratorFactoryTest extends TestCase
 {
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $eventDispatcherMock;
+    private EventDispatcherInterface&MockObject $eventDispatcherMock;
 
     private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
 
-    /**
-     * @var MockObject|BaseDecorator
-     */
-    private MockObject $baseDecorator;
+    private BaseDecorator&MockObject $baseDecorator;
 
-    /**
-     * @var MockObject|CustomMappedDecorator
-     */
-    private MockObject $customMappedDecorator;
+    private CustomMappedDecorator&MockObject $customMappedDecorator;
 
-    /**
-     * @var MockObject|CompanyDecorator
-     */
-    private MockObject $companyDecorator;
+    private CompanyDecorator&MockObject $companyDecorator;
 
-    /**
-     * @var MockObject|DateOptionFactory
-     */
-    private MockObject $dateOptionFactory;
+    private DateOptionFactory&MockObject $dateOptionFactory;
 
     private DecoratorFactory $decoratorFactory;
 

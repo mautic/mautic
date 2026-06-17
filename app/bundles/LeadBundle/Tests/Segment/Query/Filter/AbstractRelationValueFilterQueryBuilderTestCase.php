@@ -17,20 +17,11 @@ abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
 {
     use MockedConnectionTrait;
 
-    /**
-     * @var MockObject|RandomParameterName
-     */
-    protected MockObject $randomParameter;
+    protected RandomParameterName&MockObject $randomParameter;
 
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    protected MockObject $dispatcher;
+    protected EventDispatcherInterface&MockObject $dispatcher;
 
-    /**
-     * @var Connection&MockObject
-     */
-    protected MockObject $connectionMock;
+    protected Connection&MockObject $connectionMock;
 
     protected function setUp(): void
     {
@@ -49,7 +40,7 @@ abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
     }
 
     /**
-     * @param array<mixed> $batch
+     * @param array<string, mixed> $batch
      */
     protected function createFilter(string $operator, mixed $value, array $batch = []): ContactSegmentFilter
     {

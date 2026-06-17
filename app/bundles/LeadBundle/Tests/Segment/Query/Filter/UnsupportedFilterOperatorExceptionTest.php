@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorEx
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class UnsupportedFilterOperatorExceptionTest extends TestCase
+final class UnsupportedFilterOperatorExceptionTest extends TestCase
 {
     public function testFromOperatorBuildsUnsupportedOperatorException(): void
     {
