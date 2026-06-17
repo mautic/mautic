@@ -294,7 +294,6 @@ class ImportModel extends FormModel
          *    value as SplTempFileObject; the two previously returned different
          *    values.
          */
-        $file->current();   // ensure line is cached (no-op / harmless on <=8.5)
 
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);

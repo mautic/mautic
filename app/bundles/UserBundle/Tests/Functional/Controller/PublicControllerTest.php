@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PublicControllerTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
     private const PASSWORD_RESET_URI = '/passwordreset';
 
     protected function setUp(): void
@@ -102,7 +103,7 @@ class PublicControllerTest extends MauticMysqlTestCase
 
     public function testInviteShowsErrorWhenInvitedEmailAlreadyExists(): void
     {
-        $user = $this->em->getRepository(User::class)->find(1);
+        $user = $this->getUser(self::ADMIN_USER);
         \assert($user instanceof User);
 
         [, $token] = $this->createInvite($user->getEmail(), 'existing-user-invite-token');
@@ -136,5 +137,12 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return [$invite, $token.'.'.$tokenVerifier];
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }

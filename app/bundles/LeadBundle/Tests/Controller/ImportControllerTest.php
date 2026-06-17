@@ -29,6 +29,8 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ImportControllerTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
     protected $useCleanupRollback = false;
 
     private const IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
@@ -467,7 +469,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function assertNotificationMessageContains(string $expectedSubstring): void
     {
-        $this->assertNotificationMessageContainsForUser(1, $expectedSubstring);
+        $user = $this->getUser(self::ADMIN_USER);
+        $this->assertNotificationMessageContainsForUser($user->getId(), $expectedSubstring);
     }
 
     private function assertNotificationMessageContainsForUser(int $userId, string $expectedSubstring): void
@@ -615,5 +618,12 @@ final class ImportControllerTest extends MauticMysqlTestCase
             }
         }));
         $mappingForm['lead_field_import[company]']->setValue(end($values));
+    }
+
+    private function getUser(string $username): User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
     }
 }
