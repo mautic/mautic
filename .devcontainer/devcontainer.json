@@ -25,5 +25,5 @@
     },
     "postCreateCommand": "echo hello",
     "postAttachCommand": "ddev start -y",
-    "updateContentCommand": "ddev start -y"
+    "updateContentCommand": "ddev start -y --skip-hooks"
 }
