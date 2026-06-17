@@ -14,7 +14,7 @@ class LeadStageLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead(string $fromLeadId, string $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $connection = $this->_em->getConnection();
         $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
