@@ -63,6 +63,30 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
     }
 
+    public function testIndexIncludesInviteForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    public function testInviteActionShowsForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/invite');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    public function testInviteActionReturnsInvalidForm(): void
+    {
+        $this->client->request('POST', '/s/users/invite');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('name="user_invite"', $this->client->getResponse()->getContent());
+    }
+
     /**
      * @param array<string, string> $data
      */

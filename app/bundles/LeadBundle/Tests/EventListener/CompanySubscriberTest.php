@@ -3,26 +3,41 @@
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 
 class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $auditLogModel  = $this->createMock(AuditLogModel::class);
-        $entityManager  = $this->createMock(EntityManager::class);
-        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel, $entityManager);
+        $ipLookupHelper        = $this->createMock(IpLookupHelper::class);
+        $auditLogModel         = $this->createMock(AuditLogModel::class);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $coreParameters        = $this->createMock(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
+        $companyModel          = $this->createMock(CompanyModel::class);
+        $subscriber            = new CompanySubscriber(
+            $ipLookupHelper,
+            $auditLogModel,
+            $entityManager,
+            $coreParameters,
+            $companyLeadRepository,
+            $companyModel
+        );
 
         $this->assertEquals(
             [
+                LeadEvents::COMPANY_PRE_SAVE    => ['onCompanyPreSave', 0],
                 LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
                 LeadEvents::COMPANY_POST_DELETE => ['onCompanyDelete', 0],
+                LeadEvents::COMPANY_SOFT_DELETE => ['onCompanySoftDelete', 0],
             ],
             $subscriber->getSubscribedEvents()
         );
@@ -59,8 +74,18 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $entityManager  = $this->createMock(EntityManager::class);
-        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel, $entityManager);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $coreParameters        = $this->createMock(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
+        $companyModel          = $this->createMock(CompanyModel::class);
+        $subscriber            = new CompanySubscriber(
+            $ipLookupHelper,
+            $auditLogModel,
+            $entityManager,
+            $coreParameters,
+            $companyLeadRepository,
+            $companyModel,
+        );
 
         $company            = $this->createMock(Company::class);
         $company->deletedId = $companyId;
@@ -106,8 +131,18 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $entityManager  = $this->createMock(EntityManager::class);
-        $subscriber     = new CompanySubscriber($ipLookupHelper, $auditLogModel, $entityManager);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $coreParameters        = $this->createMock(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
+        $companyModel          = $this->createMock(CompanyModel::class);
+        $subscriber            = new CompanySubscriber(
+            $ipLookupHelper,
+            $auditLogModel,
+            $entityManager,
+            $coreParameters,
+            $companyLeadRepository,
+            $companyModel,
+        );
 
         $company = $this->createMock(Company::class);
         $company->expects($this->once())

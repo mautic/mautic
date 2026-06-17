@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -84,7 +85,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');
-        $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
 
         parent::saveEntity($entity, $unlock);
     }
@@ -100,7 +100,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Update leads primary company name
         foreach ($entities as $entity) {
             $this->setEntityDefaultValues($entity, 'company');
-            $this->getCompanyLeadRepository()->updateLeadsPrimaryCompanyName($entity);
         }
         parent::saveEntities($entities, $unlock);
     }
@@ -126,7 +125,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\CompanyLeadRepository
+     * @return CompanyLeadRepository
      */
     public function getCompanyLeadRepository()
     {
@@ -953,7 +952,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         $primaryCompanyName = '';
         $companyLead        = null;
-        $newPrimaryCompany  = null;
 
         // Find another company to make primary if applicable
         $leadCompanies = $this->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
@@ -979,12 +977,65 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             ->setDateModified(new \DateTime());
         $this->em->getRepository(Lead::class)->saveEntity($lead);
 
-        if (null !== $newPrimaryCompany) {
-            $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);
-        }
-
         if (null !== $companyLead) {
             $this->getCompanyLeadRepository()->detachEntity($companyLead);
+        }
+    }
+
+    /**
+     * @param Company $entity
+     */
+    public function deleteEntity($entity): void
+    {
+        $this->dispatchEvent('pre_delete', $entity);
+        $entity->setDeleted(new \DateTime());
+        $this->getRepository()->saveEntity($entity);
+
+        $event = new CompanyEvent($entity);
+        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SOFT_DELETE);
+    }
+
+    /**
+     * @param array<int> $ids
+     *
+     * @return array<int,Company>
+     */
+    public function deleteEntities($ids): array
+    {
+        $entities = [];
+        foreach ($ids as $companyId) {
+            $company = $this->getEntity($companyId);
+            if ($company) {
+                $entities[$companyId] = $company;
+                $this->deleteEntity($company);
+            }
+        }
+
+        return $entities;
+    }
+
+    public function permanentDeleteCompany(Company $company): void
+    {
+        $company->deletedId = $company->getId();
+        $this->getRepository()->deleteEntity($company);
+        $this->dispatchEvent('post_delete', $company);
+    }
+
+    public function changePrimaryCompanyToLatest(int $companyId): void
+    {
+        while ($companyLeads = $this->getCompanyLeadRepository()->findBy(['company' => $companyId, 'primary' => 1], [], CompanyLeadRepository::BATCH_SIZE, 0)) {
+            foreach ($companyLeads as $companyLead) {
+                $this->removeLeadFromCompany($companyLead->getCompany(), $companyLead->getlead());
+            }
+        }
+    }
+
+    public function deleteCompanyPermanently(int $companyId): void
+    {
+        $company = $this->getRepository()->find($companyId);
+
+        if ($company) {
+            $this->permanentDeleteCompany($company);
         }
     }
 
