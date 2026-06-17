@@ -99,7 +99,7 @@ class ContactStep extends \AcceptanceTester
     /**
      * Select an option from the dropdown menu for multiple selected contacts.
      */
-    public function selectOptionFromDropDownForMultipleSelections($option)
+    public function selectOptionFromDropDownForMultipleSelections($option): void
     {
         $I = $this;
         // Click the dropdown button for bulk actions
@@ -125,12 +125,19 @@ class ContactStep extends \AcceptanceTester
     /**
      * Select an option from the dropdown menu (beside the Quick Add, +New button) on the contacts page.
      *
-     * @param int $option the option to select (1-> Export to CSV, 2-> Export to Excel, 3-> Import, 4-> Import History)
+     * @param int|string $option the option index or label to select
      */
-    public function selectOptionFromDropDownContactsPage($option): void
+    public function selectOptionFromDropDownContactsPage(int|string $option): void
     {
         $I = $this;
         $I->click("//*[@id='page-list-actions']");
+
+        if (is_string($option) && !ctype_digit($option)) {
+            $I->click("//button[@id='page-list-actions']/following-sibling::ul/li/a[contains(normalize-space(), \"$option\")]");
+
+            return;
+        }
+
         $I->click("//*[@id='page-list-wrapper']/div[1]/div/div[2]/ul/li[$option]/a");
     }
 

@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -150,6 +151,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     #[Groups(['company:read', 'company:write'])]
     private Collection $tags;
 
+    #[Groups(['company:read', 'company:write'])]
+    private ?\DateTimeInterface $deleted = null;
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
@@ -203,6 +207,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $builder->createField('score', 'integer')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -706,6 +712,24 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public function setTags(mixed $tags): self
     {
         $this->tags = $tags instanceof Collection ? $tags : new ArrayCollection((array) $tags);
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
+    }
+
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): self
+    {
+        $this->isChanged('companydeleted', $deleted);
+        $this->deleted = $deleted;
 
         return $this;
     }
