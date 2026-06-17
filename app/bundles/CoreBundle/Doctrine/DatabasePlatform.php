@@ -854,39 +854,6 @@ class DatabasePlatform
     }
 
     /**
-     * Returns SQL to delete secondary company-lead relations in batches.
-     *
-     * PostgreSQL needs a subquery with LIMIT because it does not support LIMIT directly on DELETE with multi-column matching.
-     * MySQL supports simple DELETE ... WHERE ... LIMIT.
-     */
-    public static function getRemoveSecondaryCompaniesSql(
-        AbstractPlatform $platform,
-        string $tableName,
-        int $batchSize,
-    ): string {
-        if (self::isPostgreSQL($platform)) {
-            return sprintf(
-                'DELETE FROM %s
-                WHERE (company_id, lead_id) IN (
-                    SELECT company_id, lead_id
-                    FROM %s
-                    WHERE is_primary = FALSE
-                    LIMIT %d
-                )',
-                $tableName,
-                $tableName,
-                $batchSize
-            );
-        }
-
-        return sprintf(
-            'DELETE FROM %s WHERE is_primary = FALSE LIMIT %d',
-            $tableName,
-            $batchSize
-        );
-    }
-
-    /**
      * Returns batched DELETE query for removing leads from a specific list (lead_lists_leads table).
      *
      * PostgreSQL requires ctid hack because it does not support LIMIT on DELETE with a simple WHERE.

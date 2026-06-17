@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-// use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
@@ -254,12 +253,9 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('companyId', $companyId, ParameterType::INTEGER)
             ->setMaxResults(self::BATCH_SIZE);
 
-        $deleteQb = $conn->createQueryBuilder();
+        while ($pairs = $q->executeQuery()->fetchAssociative()) {
+            $deleteQb = $conn->createQueryBuilder();
 
-        while ($pairs = $q->executeQuery()->fetchFirstColumn()) {
-            if (empty($pairs)) {
-                break;
-            }
             $deleteQb
                 ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
                 ->where(
@@ -289,17 +285,7 @@ class CompanyLeadRepository extends CommonRepository
     public function removeAllSecondaryCompanies(): void
     {
         $conn = $this->getEntityManager()->getConnection();
-        /*
-        do {
-            $sql = DatabasePlatform::getRemoveSecondaryCompaniesSql(
-                $conn->getDatabasePlatform(),
-                MAUTIC_TABLE_PREFIX.'companies_leads',
-                self::DELETE_BATCH_SIZE
-            );
 
-            $row = $conn->executeStatement($sql);
-        } while ($row);
-        */
         $q = $conn->createQueryBuilder();
         $q->select('company_id', 'lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'companies_leads')
@@ -307,12 +293,8 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('isPrimary', false, ParameterType::BOOLEAN)
             ->setMaxResults(self::DELETE_BATCH_SIZE);
 
-        $deleteQb = $conn->createQueryBuilder();
-
-        while ($pairs = $q->executeQuery()->fetchFirstColumn()) {
-            if (empty($pairs)) {
-                break;
-            }
+        while ($pairs = $q->executeQuery()->fetchAssociative()) {
+            $deleteQb = $conn->createQueryBuilder();
 
             $deleteQb
                 ->delete(MAUTIC_TABLE_PREFIX.'companies_leads')
