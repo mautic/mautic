@@ -22,6 +22,7 @@ use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+
 class ThemeHelperTest extends TestCase
 {
     /**
