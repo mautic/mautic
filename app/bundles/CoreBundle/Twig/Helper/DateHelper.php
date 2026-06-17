@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -9,23 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DateHelper
 {
     /**
-     * @var string[]
+     * @var array<string, string>
      */
     private array $formats;
 
     private DateTimeHelper $helper;
 
-    /**
-     * @param string $dateFullFormat
-     * @param string $dateShortFormat
-     * @param string $dateOnlyFormat
-     * @param string $timeOnlyFormat
-     */
     public function __construct(
-        $dateFullFormat,
-        $dateShortFormat,
-        $dateOnlyFormat,
-        $timeOnlyFormat,
+        string $dateFullFormat,
+        string $dateShortFormat,
+        string $dateOnlyFormat,
+        string $timeOnlyFormat,
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
     ) {
@@ -39,15 +35,7 @@ final class DateHelper
         $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
     }
 
-    /**
-     * @param string           $type
-     * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
-     *
-     * @return string
-     */
-    private function format($type, $datetime, $timezone, $fromFormat)
+    private function format(string $type, mixed $datetime, string $timezone, ?string $fromFormat): string
     {
         if (empty($datetime)) {
             return '';
@@ -62,13 +50,9 @@ final class DateHelper
     /**
      * Returns full date. eg. October 8, 2014 21:19.
      *
-     * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toFull($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFull(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('datetime', $datetime, $timezone, $fromFormat);
     }
@@ -76,13 +60,9 @@ final class DateHelper
     /**
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
-     * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 
@@ -94,13 +74,9 @@ final class DateHelper
     /**
      * Returns short date format eg Sun, Oct 8.
      *
-     * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toShort($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toShort(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('short', $datetime, $timezone, $fromFormat);
     }
@@ -108,13 +84,9 @@ final class DateHelper
     /**
      * Returns date only e.g. 2014-08-09.
      *
-     * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toDate(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('date', $datetime, $timezone, $fromFormat);
     }
@@ -122,13 +94,9 @@ final class DateHelper
     /**
      * Returns time only e.g. 21:19.
      *
-     * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
-     *
-     * @return string
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toTime($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toTime(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->format('time', $datetime, $timezone, $fromFormat);
     }
@@ -136,12 +104,9 @@ final class DateHelper
     /**
      * Returns date/time like Today, 10:00 AM.
      *
-     * @param string|int<min, -1>|int<1, max>|\DateTime $datetime
-     * @param string                                    $timezone
-     * @param string                                    $fromFormat
-     * @param bool                                      $forceDateForNonText If true, return as full date/time rather than "29 days ago"
+     * @param string|int<min, -1>|int<1, max>|\DateTimeInterface $datetime
      */
-    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
+    public function toText(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';
@@ -192,34 +157,22 @@ final class DateHelper
         return implode(' ', $formated);
     }
 
-    /**
-     * @return string
-     */
-    public function getFullFormat()
+    public function getFullFormat(): string
     {
         return $this->formats['datetime'];
     }
 
-    /**
-     * @return string
-     */
-    public function getDateFormat()
+    public function getDateFormat(): string
     {
         return $this->formats['date'];
     }
 
-    /**
-     * @return string
-     */
-    public function getTimeFormat()
+    public function getTimeFormat(): string
     {
         return $this->formats['time'];
     }
 
-    /**
-     * @return string
-     */
-    public function getShortFormat()
+    public function getShortFormat(): string
     {
         return $this->formats['short'];
     }
@@ -232,9 +185,9 @@ final class DateHelper
     /**
      * Returns a humanized date string like "X hours ago" or "in X hours".
      *
-     * @param \DateTime|string $datetime
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toHumanized($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    public function toHumanized(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         if (empty($datetime)) {
             return '';
@@ -286,9 +239,9 @@ final class DateHelper
     /**
      * Returns short text date like "Today", "Yesterday", or formatted date.
      *
-     * @param \DateTime|string $datetime
+     * @param \DateTimeInterface|string $datetime
      */
-    public function toTextShort(\DateTime|string $datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    public function toTextShort(mixed $datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s'): string
     {
         if (empty($datetime)) {
             return '';

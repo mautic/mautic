@@ -28,10 +28,10 @@
   .panel {
     position: relative;
     z-index: 1;
-    padding: 8px 12px;
+    padding: var(--spacing-03) var(--spacing-04);
     box-shadow: none;
     border-color: var(--layer);
-    margin-bottom: 10px;
+    margin-bottom: var(--spacing-03);
     max-width: 300px;
     background-color: var(--layer);
   }
@@ -80,7 +80,7 @@
       position: absolute;
       z-index: 5;
       left: 50%;
-      margin-top: 5px;
+      margin-top: var(--spacing-02);
       margin-left: -10px;
       width: 28px;
       aspect-ratio: 1/1;
@@ -228,14 +228,14 @@
 
       > .featured {
         width: 85%;
-        margin-left: 40px;
+        margin-left: var(--spacing-08);
         margin-right: 0;
       }
 
       > .wrapper {
         width: 85%;
         float: left;
-        margin-left: 40px;
+        margin-left: var(--spacing-08);
 
         &:nth-of-type(odd),
         &:nth-of-type(even) {
@@ -297,7 +297,7 @@
     &.timeline-right {
       .events {
         > .wrapper {
-          margin-left: 40px;
+          margin-left: var(--spacing-08);
         }
       }
     }

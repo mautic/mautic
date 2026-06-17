@@ -1,30 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateHelperTest extends \PHPUnit\Framework\TestCase
+final class DateHelperTest extends TestCase
 {
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
+    private TranslatorInterface&MockObject $translator;
 
     private DateHelper $helper;
 
-    /**
-     * @var string
-     */
-    private static $oldTimezone;
+    private static string $oldTimezone;
 
-    /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
+    private CoreParametersHelper&MockObject $coreParametersHelper;
 
     private const TEN_MINUTES_AGO    = '-10 minutes';
     private const TEN_MINUTES_IN     = '+10 minutes';
@@ -60,7 +55,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Setup translator mock for humanized dates
         $this->translator->method('trans')
-            ->willReturnCallback(function ($key, $parameters = []) {
+            ->willReturnCallback(function (string $key, array $parameters = []): string {
                 switch ($key) {
                     case 'mautic.core.date.years.ago':
                         return $parameters['%count%'].' year(s) ago';
@@ -137,8 +132,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         // Create a DateTime object for "now"
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
 
-        // Create a mock for DateTimeHelper
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn('today');
@@ -146,14 +140,12 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getLocalDateTime')
             ->willReturn($now);
 
-        // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $result = $this->helper->toText($now);
 
-        // Assertions
-        $this->assertEquals('Today', $result);
+        $this->assertSame('Today', $result);
         $this->assertStringStartsWith('Today', $result);
         $this->assertStringEndsWith('Today', $result);
     }
@@ -163,7 +155,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
-        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+        $this->assertSame('February 21, 2021 7:00 pm', $result);
     }
 
     public function testToHumanized(): void
@@ -171,11 +163,11 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('UTC');
 
         // Test empty datetime
-        $this->assertEquals('', $this->helper->toHumanized(''));
+        $this->assertSame('', $this->helper->toHumanized(''));
 
         // Test "just now" - should be within a minute
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->assertEquals('just now', $this->helper->toHumanized($now));
+        $this->assertSame('just now', $this->helper->toHumanized($now));
 
         // Test minutes ago - use 10 minutes to avoid timing issues
         $tenMinutesAgo = new \DateTime(self::TEN_MINUTES_AGO, new \DateTimeZone('UTC'));
@@ -185,19 +177,19 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Test hours ago
         $twoHoursAgo = new \DateTime('-2 hours', new \DateTimeZone('UTC'));
-        $this->assertEquals('2 hour(s) ago', $this->helper->toHumanized($twoHoursAgo));
+        $this->assertSame('2 hour(s) ago', $this->helper->toHumanized($twoHoursAgo));
 
         // Test days ago
         $threeDaysAgo = new \DateTime('-3 days', new \DateTimeZone('UTC'));
-        $this->assertEquals('3 day(s) ago', $this->helper->toHumanized($threeDaysAgo));
+        $this->assertSame('3 day(s) ago', $this->helper->toHumanized($threeDaysAgo));
 
         // Test months ago
         $fourMonthsAgo = new \DateTime('-4 months', new \DateTimeZone('UTC'));
-        $this->assertEquals('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo));
+        $this->assertSame('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo));
 
         // Test years ago
         $oneYearAgo = new \DateTime('-1 year', new \DateTimeZone('UTC'));
-        $this->assertEquals('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
+        $this->assertSame('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
 
         // Test minutes in future - use 10 minutes to avoid timing issues
         $tenMinutesIn = new \DateTime(self::TEN_MINUTES_IN, new \DateTimeZone('UTC'));
@@ -303,43 +295,37 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->setDefaultLocalTimezone('UTC');
 
-        // Create a mock for DateTimeHelper to return 'today'
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn('today');
 
-        // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $now    = new \DateTime('now', new \DateTimeZone('UTC'));
         $result = $this->helper->toTextShort($now);
 
-        $this->assertEquals('Today', $result);
+        $this->assertSame('Today', $result);
     }
 
     public function testToTextShortWithOlderDate(): void
     {
         $this->setDefaultLocalTimezone('UTC');
 
-        // Create a mock for DateTimeHelper to return false (not today/yesterday)
-        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock = $this->createMock(DateTimeHelper::class);
         $dateTimeHelperMock->expects($this->once())
             ->method('getTextDate')
             ->willReturn(false);
-        // Mock toLocalString() which is called by format() when getTextDate returns false
         $dateTimeHelperMock->method('toLocalString')
             ->willReturn('December 31, 2023');
 
-        // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $olderDate = '2023-12-31 23:59:59';
         $result    = $this->helper->toTextShort($olderDate, 'UTC', 'Y-m-d H:i:s');
 
-        // Should return formatted date
         $this->assertStringContainsString('2023', $result);
         $this->assertStringContainsString('December', $result);
     }
@@ -347,7 +333,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     public function testToTextShortWithEmptyDateTime(): void
     {
         $result = $this->helper->toTextShort('');
-        $this->assertEquals('', $result);
+        $this->assertSame('', $result);
     }
 
     private function setDefaultLocalTimezone(string $timezone): void

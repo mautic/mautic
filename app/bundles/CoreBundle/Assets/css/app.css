@@ -8157,10 +8157,10 @@ lesshat-selector { -lh-property: 0 ;
 .timeline .panel {
   position: relative;
   z-index: 1;
-  padding: 8px 12px;
+  padding: var(--spacing-03) var(--spacing-04);
   box-shadow: none;
   border-color: var(--layer);
-  margin-bottom: 10px;
+  margin-bottom: var(--spacing-03);
   max-width: 300px;
   background-color: var(--layer);
 }
@@ -8204,7 +8204,7 @@ lesshat-selector { -lh-property: 0 ;
   position: absolute;
   z-index: 5;
   left: 50%;
-  margin-top: 5px;
+  margin-top: var(--spacing-02);
   margin-left: -10px;
   width: 28px;
   aspect-ratio: 1/1;
@@ -8316,13 +8316,13 @@ lesshat-selector { -lh-property: 0 ;
 }
 .timeline.timeline-right .events > .featured {
   width: 85%;
-  margin-left: 40px;
+  margin-left: var(--spacing-08);
   margin-right: 0;
 }
 .timeline.timeline-right .events > .wrapper {
   width: 85%;
   float: left;
-  margin-left: 40px;
+  margin-left: var(--spacing-08);
 }
 .timeline.timeline-right .events > .wrapper:nth-of-type(odd),
 .timeline.timeline-right .events > .wrapper:nth-of-type(even) {
@@ -8366,7 +8366,7 @@ lesshat-selector { -lh-property: 0 ;
     margin-top: -41px;
   }
   .timeline.timeline-right .events > .wrapper {
-    margin-left: 40px;
+    margin-left: var(--spacing-08);
   }
 }
 .va-t {

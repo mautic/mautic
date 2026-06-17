@@ -517,7 +517,7 @@
                                     '%link%': '<a href="'~campaignUrl~'" data-toggle="ajax">'~event.campaign_name~'</a>',
                                 })|purify }}
                                 {% if errors is not empty %}
-                                    <i class="ri-alert-line text-danger" data-toggle="tooltip" title="{{ errors|purify }}"></i>
+                                    <i class="ri-alert-line text-danger" data-toggle="tooltip" title="{{ errors|striptags|e('html_attr') }}"></i>
                                 {% endif %}
                             {% endset %}
                             {% set timelineEvent = {
