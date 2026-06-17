@@ -1,5 +1,6 @@
 <?php
 
+
 define('MAUTIC_ROOT_DIR', __DIR__);
 define('ELFINDER_IMG_PARENT_URL', 'media/bundles/fmelfinder');
 
