@@ -23,5 +23,7 @@
             "label": "Mautic (HTTPS)"
         }
     },
-    "postCreateCommand": "chmod +x .devcontainer/setup-project.sh && .devcontainer/setup-project.sh"
+    "postCreateCommand": "echo hello",
+    "postAttachCommand": "ddev start",
+    "updateContentCommand": "ddev start"
 }
