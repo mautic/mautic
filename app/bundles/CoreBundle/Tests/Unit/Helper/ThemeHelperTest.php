@@ -167,7 +167,7 @@ class ThemeHelperTest extends TestCase
 
         $archive = new \ZipArchive();
         $result  = $archive->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-        self::assertTrue(true === $result, 'Expected test archive to be created successfully.');
+        self::assertTrue($result === true, 'Expected test archive to be created successfully.');
 
         $archive->addEmptyDir('html');
         $archive->addEmptyDir('html/MauticFormBundle');
