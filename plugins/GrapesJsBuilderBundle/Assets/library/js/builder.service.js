@@ -14,6 +14,7 @@ import grapesjsckeditor from './plugins/grapesjs.ckeditor';
 import grapesjstypography from './plugins/grapesjs.typography';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
+import grapesjsImageLink from './plugins/grapesjs-image-link';
 import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
@@ -1049,6 +1050,7 @@ export default class BuilderService {
         grapesjspostcss,
         grapesjstuiimageeditor,
         grapesjsstylebg,
+        grapesjsImageLink,
         ...BuilderService.getPluginNames('page'), // grapesjs-custom-plugins: load custom plugins by their name
       ],
       pluginsOpts: {
@@ -1245,7 +1247,7 @@ export default class BuilderService {
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
-      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, grapesjsckeditor, ...BuilderService.getPluginNames('email-html')],
+      plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, grapesjsckeditor, grapesjsImageLink, ...BuilderService.getPluginNames('email-html')],
       pluginsOpts: {
         grapesjsnewsletter: {
           useCustomTheme: false,
