@@ -177,7 +177,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getFrequencyNumber()
     {
@@ -199,7 +199,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFrequencyTime()
     {

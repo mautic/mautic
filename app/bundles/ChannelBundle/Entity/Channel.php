@@ -22,10 +22,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
         new Post(security: "is_granted('channel:messages:create')"),
-        new Get(security: "is_granted('channel:messages:viewown')"),
-        new Put(security: "is_granted('channel:messages:editown')"),
-        new Patch(security: "is_granted('channel:messages:editother')"),
-        new Delete(security: "is_granted('channel:messages:deleteown')"),
+        new Get(security: "is_granted('channel:messages:viewown', object)"),
+        new Put(security: "is_granted('channel:messages:editown', object)"),
+        new Patch(security: "is_granted('channel:messages:editother', object)"),
+        new Delete(security: "is_granted('channel:messages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['channel:read'],
@@ -104,6 +104,7 @@ class Channel extends CommonEntity implements UuidInterface
         $builder->createManyToOne('message', Message::class)
                 ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
                 ->inversedBy('channels')
+                ->isOwnershipParent()
                 ->build();
 
         static::addUuidField($builder);
@@ -134,7 +135,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -142,7 +143,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannel()
     {
@@ -162,7 +163,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getChannelId()
     {
@@ -186,7 +187,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannelName()
     {
@@ -206,7 +207,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return Message
+     * @return Message|null
      */
     public function getMessage()
     {
@@ -259,5 +260,10 @@ class Channel extends CommonEntity implements UuidInterface
         $this->isEnabled = $isEnabled;
 
         return $this;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getMessage()->getCreatedBy();
     }
 }

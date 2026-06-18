@@ -338,7 +338,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getOriginalFile()
     {
@@ -770,7 +770,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
     public function getProperties()
     {

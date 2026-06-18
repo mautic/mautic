@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -31,7 +31,7 @@ class EmailSubscriber implements EventSubscriberInterface
         private AuditLogModel $auditLogModel,
         private EmailModel $emailModel,
         private TranslatorInterface $translator,
-        private EntityManager $entityManager,
+        private EntityManagerInterface $entityManager,
         private EmailDraftModel $emailDraftModel,
     ) {
     }

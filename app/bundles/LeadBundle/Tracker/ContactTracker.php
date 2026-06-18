@@ -94,7 +94,7 @@ class ContactTracker
         }
 
         // Take note of previously tracked in order to dispatched change event
-        $previouslyTrackedContact = (is_null($this->trackedContact)) ? null : $this->trackedContact;
+        $previouslyTrackedContact = $this->trackedContact ?? null;
         $previouslyTrackedId      = $this->getTrackingId();
 
         // Set the newly tracked contact
@@ -200,6 +200,10 @@ class ContactTracker
 
         if ($contact = $event->getContact()) {
             return $contact;
+        }
+
+        if ($event->isSkipContactLastActiveLogged()) {
+            $this->contactLastActiveLogged = true;
         }
 
         if ($lead = $this->getContactByTrackedDevice()) {

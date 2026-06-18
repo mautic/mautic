@@ -19,35 +19,35 @@ class ReportApiControllerTest extends MauticMysqlTestCase
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', []);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testGetReportSuccessByCorrectAccessIsAdmin(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', [], false, true);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testGetReportSuccessByNoCorrectAccessToViewOther(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewother']]);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testReportFailByNoCorrectAccessToViewOwn(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']]);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testReportSuccessViewOwnBySameUser(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']], true);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     /**

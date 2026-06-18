@@ -75,10 +75,11 @@ class SamlTest extends MauticMysqlTestCase
 
         // Fill in email in the fields Email, First Name and Last name (we are testing, so no problem that the actual values are not correct)
         $configForm->setValues([
-            'config[leadconfig][contact_columns]'              => ['name', 'email', 'id'],
-            'config[userconfig][saml_idp_email_attribute]'     => $attributeName,
-            'config[userconfig][saml_idp_firstname_attribute]' => $attributeName,
-            'config[userconfig][saml_idp_lastname_attribute]'  => $attributeName,
+            'config[leadconfig][contact_columns]'               => ['name', 'email', 'id'],
+            'config[companyconfig][company_columns]'            => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+            'config[userconfig][saml_idp_email_attribute]'      => $attributeName,
+            'config[userconfig][saml_idp_firstname_attribute]'  => $attributeName,
+            'config[userconfig][saml_idp_lastname_attribute]'   => $attributeName,
         ]);
         $this->client->submit($configForm);
         $clientResponse = $this->client->getResponse();
@@ -101,16 +102,16 @@ class SamlTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         // The request is going straight to discovery, thus sparing one redirect, that otherwise would be done anyway.
         // @see \LightSaml\SpBundle\Controller\DefaultController::loginAction if 'idp' is empty.
-        Assert::assertSame('/saml/discovery', $clientResponse->headers->get('Location'));
+        self::assertResponseRedirects('/saml/discovery');
         $this->client->followRedirect();
 
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('/s/saml/login?idp=http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php', $clientResponse->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
+        self::assertResponseRedirects('/s/saml/login?idp=http://'.$host.':'.$port.'/simplesaml/saml2/idp/metadata.php');
         $this->client->followRedirect();
 
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
         Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/saml2/idp/SSOService.php?SAMLRequest=', $clientResponse->headers->get('Location'));
 
         // Here need to replicate the browser. The default client will not work, because the test must request an external service.
@@ -163,13 +164,13 @@ class SamlTest extends MauticMysqlTestCase
             $form->getPhpValues(),
         );
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('https://localhost/s/dashboard', $clientResponse->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
+        self::assertResponseRedirects('https://localhost/s/dashboard');
 
         $this->client->followRedirect();
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame('/s/dashboard', $clientResponse->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $clientResponse->getContent());
+        self::assertResponseRedirects('/s/dashboard');
 
         $this->client->followRedirect();
         $clientResponse = $this->client->getResponse();

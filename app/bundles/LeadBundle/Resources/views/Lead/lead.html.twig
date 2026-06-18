@@ -495,9 +495,9 @@
         </div>
         <!--/ form HTML -->
 
-            <hr class="hr-w-2" style="width:50%">
+        <hr class="hr-w-2" style="width:50%">
 
-            <div class="panel shd-none bdr-rds-0 bdr-w-0">
+        <div class="panel shd-none bdr-rds-0 bdr-w-0">
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
@@ -535,32 +535,33 @@
             </div>
 
         <div class="pa-sm">
-            {% if lead.tags|length <= 8 %}
-                {# Use tile--base for 8 or fewer tags #}
-                {% set tagContent %}
+            
+            {% set maxVisibleTagsCount = 8 %}
+            {% set tagCount = lead.tags|length %}
+            {% set isExpandable = tagCount > maxVisibleTagsCount %}
+            
+            {% set tagHeader %}
                 <div class="d-flex jc-space-between">
                     <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
                     <i class="ri-hashtag" aria-hidden="true"></i>
                 </div>
-                <div class="d-flex fw-wrap gap-xs mt-xs">
-                    {% if lead.tags|length > 0 %}
-                        {% for tag in lead.tags %}
-                            <div id="tagLabel{{ tag.id }}">
-                                {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
-                                    'label': tag.tag|purify,
-                                    'attributes': {
-                                        'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
-                                        'data-toggle': 'ajax',
-                                    },
-                                    'color': 'blue',
-                                    'type': 'dismissible',
-                                    'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
-                                }]} %}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-helper">{{ 'mautic.lead.tags.no_results'|trans }}</p>
-                    {% endif %}
+            {% endset %}
+            
+            {% if not isExpandable %}
+                
+                {% set tagContent %}
+                    {{ tagHeader }}
+                    
+                    <div class="d-flex fw-wrap gap-xs mt-xs">
+                        {% if tagCount > 0 %}
+                            {% for tag in lead.tags %}
+                                {{ _self.render_tag(tag, lead.id) }}
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-helper">
+                                {{ 'mautic.lead.tags.no_results'|trans }}
+                            </p>
+                        {% endif %}
                     </div>
                 {% endset %}
                 
@@ -568,50 +569,27 @@
                     'type': 'base',
                     'content': tagContent
                 } %}
+            
             {% else %}
                 {# Use tile--expandable-interactive for more than 8 tags #}
-                {% set firstEightTags = lead.tags|slice(0, 8) %}
-                {% set remainingTags = lead.tags|slice(8) %}
+                {% set firstEightTags = lead.tags|slice(0, maxVisibleTagsCount) %}
+                {% set remainingTags = lead.tags|slice(maxVisibleTagsCount) %}
                 
                 {% set aboveContent %}
-                <div class="d-flex jc-space-between">
-                    <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
-                    <i class="ri-hashtag" aria-hidden="true"></i>
-                </div>
+                    {{ tagHeader }}
+                    
                     <div class="d-flex fw-wrap gap-xs">
-                    {% for tag in firstEightTags %}
-                        <div id="tagLabel{{ tag.id }}">
-                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
-                                'label': tag.tag|purify,
-                                'attributes': {
-                                    'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
-                                    'data-toggle': 'ajax',
-                                },
-                                'color': 'blue',
-                                'type': 'dismissible',
-                                'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
-                            }]} %}
-                        </div>
-                    {% endfor %}
+                        {% for tag in firstEightTags %}
+                            {{ _self.render_tag(tag, lead.id) }}
+                        {% endfor %}
                     </div>
                 {% endset %}
                 
                 {% set belowContent %}
-                <div class="d-flex fw-wrap gap-xs mt-xs">
-                    {% for tag in remainingTags %}
-                        <div id="tagLabel{{ tag.id }}">
-                            {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
-                                'label': tag.tag|purify,
-                                'attributes': {
-                                    'href': path('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': tag.id}),
-                                    'data-toggle': 'ajax',
-                                },
-                                'color': 'blue',
-                                'type': 'dismissible',
-                                'dismissible_onclick': 'Mautic.removeTagFromLead(this, ' ~ lead.id ~ ', ' ~ tag.id ~ ', event);'
-                            }]} %}
-                        </div>
-                    {% endfor %}
+                    <div class="d-flex fw-wrap gap-xs mt-xs">
+                        {% for tag in remainingTags %}
+                            {{ _self.render_tag(tag, lead.id) }}
+                        {% endfor %}
                     </div>
                 {% endset %}
                 
@@ -620,8 +598,10 @@
                     'aboveFoldContent': aboveContent,
                     'belowFoldContent': belowContent
                 } %}
+            
             {% endif %}
         </div>
+
         <div class="pa-sm panel-companies layout--size-0">
             {% if companies is defined and companies|length > 0 %}
                 {% set companiesList = [] %}
@@ -757,3 +737,22 @@
 </div>
 <!--/ end: box layout -->
 {% endblock %}
+
+{% macro render_tag(tag, leadId) %}
+    <div id="tagLabel{{ tag.id }}">
+        {% include '@MauticCore/Helper/_tag.html.twig' with {'tags': [{
+            'label': tag.tag|purify,
+            'attributes': {
+                'href': path('mautic_tagmanager_action', {
+                    'objectAction': 'view',
+                    'objectId': tag.id
+                }),
+                'data-toggle': 'ajax',
+            },
+            'color': 'blue',
+            'type': 'dismissible',
+            'dismissible_onclick':
+            'Mautic.removeTagFromLead(this, ' ~ leadId ~ ', ' ~ tag.id ~ ', event);'
+        }]} %}
+    </div>
+{% endmacro %}

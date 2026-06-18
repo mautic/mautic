@@ -7,7 +7,10 @@ namespace Mautic\LeadBundle\Tests\Deduplicate;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
 final class ContactMergerFunctionalTest extends MauticMysqlTestCase
@@ -131,5 +134,48 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $jane = $model->getEntity($jane->getId());
 
         $this->assertEquals(56, $jane->getPoints());
+    }
+
+    public function testMergedContactKeepsCompanyAssociations(): void
+    {
+        $model = static::getContainer()->get('mautic.lead.model.lead');
+        \assert($model instanceof LeadModel);
+
+        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        \assert($companyModel instanceof CompanyModel);
+
+        $merger = static::getContainer()->get('mautic.lead.merger');
+        \assert($merger instanceof ContactMerger);
+
+        $companyLeadRepository = static::getContainer()->get('mautic.lead.repository.company_lead');
+        \assert($companyLeadRepository instanceof CompanyLeadRepository);
+
+        // Jane is a known contact associated with a primary company
+        $jane = new Lead();
+        $jane->setFirstname('Jane')
+            ->setLastname('Smith')
+            ->setEmail('jane.smith@test.com');
+        $model->saveEntity($jane);
+
+        $company = new Company();
+        $company->setName('Acme Corp');
+        $companyModel->saveEntity($company);
+        $companyModel->addLeadToCompany($company, $jane);
+
+        $janeCompanies = $companyLeadRepository->getCompaniesByLeadId($jane->getId());
+        $this->assertCount(1, $janeCompanies);
+        $this->assertEquals(1, $janeCompanies[0]['is_primary']);
+
+        // Jane visits in a new session; the anonymous visitor wins the merge
+        $visitor = new Lead();
+        $model->saveEntity($visitor);
+
+        $winner = $merger->merge($visitor, $jane);
+
+        // The winner must keep Jane's company association including the primary flag
+        $winnerCompanies = $companyLeadRepository->getCompaniesByLeadId($winner->getId());
+        $this->assertCount(1, $winnerCompanies);
+        $this->assertEquals($company->getId(), $winnerCompanies[0]['company_id']);
+        $this->assertEquals(1, $winnerCompanies[0]['is_primary']);
     }
 }

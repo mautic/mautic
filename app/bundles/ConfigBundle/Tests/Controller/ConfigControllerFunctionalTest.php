@@ -46,10 +46,11 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'         => 'https://mautic-community.local', // required
-                'config[coreconfig][do_not_track_ips]' => $trackIps,
-                'config[pageconfig][google_analytics]' => $googleAnalytics,
-                'config[leadconfig][contact_columns]'  => ['name', 'email', 'id'],
+                'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
+                'config[coreconfig][do_not_track_ips]'   => $trackIps,
+                'config[pageconfig][google_analytics]'   => $googleAnalytics,
+                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
             ]
         );
 
@@ -164,7 +165,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form           = $buttonCrawler->form();
 
         // Fetch available option for 404_page field
-        $availableOptions = $form['config[coreconfig][404_page]']->availableOptionValues();
+        /** @var ChoiceFormField $page404Field */
+        $page404Field     = $form['config[coreconfig][404_page]'];
+        $availableOptions = $page404Field->availableOptionValues();
 
         // page 2 should not be available in option list because it is unpublished
         $this->assertEquals(['', $page1, $page3], $availableOptions);
@@ -172,9 +175,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         // page 3 for 404_page
         $form->setValues(
             [
-                'config[coreconfig][site_url]'        => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]' => ['name', 'email', 'id'],
-                'config[coreconfig][404_page]'        => $page3,
+                'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]' => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[coreconfig][404_page]'           => $page3,
             ]
         );
 
@@ -209,12 +213,13 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $form->setValues(
             [
-                'config[coreconfig][site_url]'                                       => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'                                => ['name', 'email', 'id'],
-                'config[notification_config][campaign_send_notification_to_author]'  => $send_notification_to_author,
-                'config[notification_config][campaign_notification_email_addresses]' => $campaign_notification_email_addresses,
-                'config[notification_config][webhook_send_notification_to_author]'   => $send_notification_to_author,
-                'config[notification_config][webhook_notification_email_addresses]'  => $webhook_notification_email_addresses,
+                'config[coreconfig][site_url]'                                         => 'https://mautic-community.local', // required
+                'config[leadconfig][contact_columns]'                                  => ['name', 'email', 'id'],
+                'config[companyconfig][company_columns]'                               => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
+                'config[notification_config][campaign_send_notification_to_author]'    => $send_notification_to_author,
+                'config[notification_config][campaign_notification_email_addresses]'   => $campaign_notification_email_addresses,
+                'config[notification_config][webhook_send_notification_to_author]'     => $send_notification_to_author,
+                'config[notification_config][webhook_notification_email_addresses]'    => $webhook_notification_email_addresses,
             ]
         );
 

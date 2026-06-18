@@ -123,7 +123,7 @@ class DoNotContact
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -179,7 +179,7 @@ class DoNotContact
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getComments()
     {
