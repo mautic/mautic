@@ -314,9 +314,20 @@ class ImportModel extends FormModel
             $val = strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
-        // Process the file line-by-line using fgets to capture raw lines
-        while ($batchSize && ($string = fgets($handle)) !== false) {
-            $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
+        // Exactly mimics SplFileObject's read-ahead behavior
+        // Prime the engine by fetching the first row, just like SplFileObject initially does
+        $string = fgets($handle);
+
+        // Keep looping as long as we have a batch size and either have data OR haven't registered EOF yet
+        while ($batchSize && (false !== $string || !feof($handle))) {
+            // Treat a false string at the end of the file as an empty string line (mimicking SplFileObject)
+            $currentLineContent = (false === $string) ? '' : $string;
+
+            // Fetch the NEXT line ahead of time, exactly like $file->next() did
+            $string = fgets($handle);
+
+            // Parse the current line content
+            $data = CsvHelper::strGetCsv($currentLineContent, $config['delimiter'], $config['enclosure'], $config['escape']);
 
             $import->setLastLineImported($lineNumber);
 
