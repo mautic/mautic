@@ -130,9 +130,7 @@ class FieldGroupModel extends FormModel
 
         parent::saveEntity($entity, $unlock);
 
-        if ($entity instanceof FieldGroup) {
-            $this->reorderGroupsByEntity($entity);
-        }
+        $this->reorderGroupsByEntity($entity);
     }
 
     /**
