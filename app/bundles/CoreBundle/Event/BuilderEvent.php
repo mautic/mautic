@@ -215,6 +215,8 @@ class BuilderEvent extends Event
     /**
      * Add tokens from a BuilderTokenHelper.
      *
+     * @deprecated use BuilderTokenHelper::getFormattedTokens and $this->addTokens
+     *
      * @param string $labelColumn
      * @param string $valueColumn
      * @param bool   $convertToLinks If true, the tokens will be converted to links
@@ -239,6 +241,8 @@ class BuilderEvent extends Event
 
     /**
      * Get tokens from a BuilderTokenHelper.
+     *
+     * @deprecated use BuilderTokenHelper::getFormattedTokens
      *
      * @return array|void
      */

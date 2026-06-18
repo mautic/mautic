@@ -94,7 +94,7 @@ class ContactTracker
         }
 
         // Take note of previously tracked in order to dispatched change event
-        $previouslyTrackedContact = (is_null($this->trackedContact)) ? null : $this->trackedContact;
+        $previouslyTrackedContact = $this->trackedContact ?? null;
         $previouslyTrackedId      = $this->getTrackingId();
 
         // Set the newly tracked contact
@@ -202,6 +202,10 @@ class ContactTracker
             return $contact;
         }
 
+        if ($event->isSkipContactLastActiveLogged()) {
+            $this->contactLastActiveLogged = true;
+        }
+
         if ($lead = $this->getContactByTrackedDevice()) {
             return $lead;
         }
@@ -216,9 +220,8 @@ class ContactTracker
     {
         $lead = null;
 
-        // Return null for leads that are from a non-trackable IP, prevent anonymous lead with a non-trackable IP to be tracked
-        $ip = $this->ipLookupHelper->getIpAddress();
-        if ($ip && !$ip->isTrackable()) {
+        // Return null for leads that are from a non-trackable request (IP, bot, privacy signal, prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return $lead;
         }
 
@@ -249,8 +252,8 @@ class ContactTracker
     {
         $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
-        if ($ip && !$ip->isTrackable()) {
-            // Don't save leads that are from a non-trackable IP by default
+        // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks)
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return $this->createNewContact($ip, false);
         }
 

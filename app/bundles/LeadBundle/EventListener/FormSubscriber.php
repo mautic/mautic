@@ -87,32 +87,29 @@ class FormSubscriber implements EventSubscriberInterface
         ]);
 
         $event->addSubmitAction('lead.changetags', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.changetags',
-            'description'       => 'mautic.lead.lead.events.changetags_descr',
-            'formType'          => ModifyLeadTagsType::class,
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticLead/Action/tags.html.twig',
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.changetags',
+            'description' => 'mautic.lead.lead.events.changetags_descr',
+            'formType'    => ModifyLeadTagsType::class,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'    => '@MauticLead/Action/tags.html.twig',
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.addutmtags',
-            'description'       => 'mautic.lead.lead.events.addutmtags_descr',
-            'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.addutmtags',
+            'description' => 'mautic.lead.lead.events.addutmtags_descr',
+            'formType'    => ActionAddUtmTagsType::class,
+            'formTheme'   => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.remove_do_not_contact', [
-            'group'             => 'mautic.lead.lead.submitaction',
-            'label'             => 'mautic.lead.lead.events.removedonotcontact',
-            'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
-            'formType'          => ActionRemoveDoNotContact::class,
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'group'       => 'mautic.lead.lead.submitaction',
+            'label'       => 'mautic.lead.lead.events.removedonotcontact',
+            'description' => 'mautic.lead.lead.events.removedonotcontact_descr',
+            'formType'    => ActionRemoveDoNotContact::class,
+            'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
         $event->addSubmitAction('lead.scorecontactscompanies', [

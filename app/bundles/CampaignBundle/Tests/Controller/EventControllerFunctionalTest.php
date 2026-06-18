@@ -65,6 +65,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('condition', $responseData['eventType']);
         $this->assertSame('campaignEvent', $responseData['mauticContent']);
         $this->assertSame(1, $responseData['closeModal']);
+        Assert::assertTrue($responseData['formSubmitted'], $response->getContent());
     }
 
     /**
@@ -247,6 +248,8 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($responseData['clearCloneStorage']);
         $this->assertNotEquals($eventId, $responseData['eventId']);
         $this->assertNotEmpty($responseData['eventHtml']);
+        $this->assertArrayHasKey('modifiedEvents', $responseData);
+        $this->assertNotEmpty($responseData['modifiedEvents']);
     }
 
     public function testEmailSendTypeDefaultSetting(): void
@@ -312,6 +315,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             $event1->getName(),
             $response['event']['name']
         );
+        Assert::assertFalse($response['formSubmitted'], $this->client->getResponse()->getContent());
     }
 
     public function testEventsAreDeleted(): void

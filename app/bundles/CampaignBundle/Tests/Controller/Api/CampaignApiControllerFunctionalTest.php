@@ -299,7 +299,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testExportCampaignAction(): void
     {
-        $entities = $this->createTestEntities();
+        $this->createTestEntities();
 
         // Create the campaign
         $campaign = new Campaign();
@@ -437,12 +437,17 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
+        $systemTempDir = sys_get_temp_dir();
         // Create temporary zip file
         $zip     = new \ZipArchive();
-        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_zip_test').'.zip';
+        $zipPath = tempnam($systemTempDir, 'mautic_zip_test').'.zip';
+
+        $asset = tempnam($systemTempDir, 'mautic_import_asset');
+        file_put_contents($asset, 'The test file');
 
         if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
             $zip->addFromString('campaign.json', json_encode(FixtureHelper::getPayload(), JSON_PRETTY_PRINT));
+            $zip->addFile($asset, 'assets/'.basename($asset));
             $zip->close();
         } else {
             $this->fail('Failed to create test ZIP file.');
@@ -461,6 +466,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Clean up file
         unlink($zipPath);
+        unlink($asset);
 
         if (201 !== $response->getStatusCode()) {
             $this->fail('Import failed with error: '.$response->getContent());
@@ -508,7 +514,34 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('No JSON content found and exactly one ZIP file must be uploaded.', $response->getContent());
+        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', $response->getContent());
+    }
+
+    public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        $campaign = new Campaign();
+        $campaign->setName('Campaign with ISO publish up');
+        $campaign->setPublishUp(new \DateTime('2026-01-15 12:30:00'));
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, sprintf('/api/campaigns/%d', $campaign->getId()));
+        $getResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($getResponse->getContent());
+
+        $campaignData = json_decode($getResponse->getContent(), true)['campaign'];
+        Assert::assertIsString($campaignData['publishUp']);
+
+        $this->client->request(Request::METHOD_PATCH, sprintf('/api/campaigns/%d/edit', $campaign->getId()), [
+            'publishUp' => $campaignData['publishUp'],
+        ]);
+
+        $editResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($editResponse->getContent());
     }
 
     private function createTemporaryFile(string $extension): string

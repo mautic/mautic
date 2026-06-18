@@ -22,6 +22,7 @@
         'date': 'ri-calendar-line',
         'datetime': 'ri-calendar-schedule-line',
         'companyLookup': 'ri-building-line',
+        'rating': 'ri-star-line',
         'file': 'ri-file-upload-line'
     } %}
 
@@ -172,6 +173,20 @@
                 {
                     label: 'mautic.form.field.type.tel.international',
                     icon: 'ri-earth-fill',
+                    icon_only: true,
+                    color: 'blue'
+                }
+            ]
+        } %}
+    {% endif %}
+
+    {% if field.validation.blockfreeemail is defined and field.validation.blockfreeemail == 1 %}
+    <!-- Blocked free email providers -->
+        {% include '@MauticCore/Helper/_tag.html.twig' with {
+            tags: [
+                {
+                    label: 'mautic.form.field.type.email.blocked_free_providers',
+                    icon: 'ri-mail-forbid-fill',
                     icon_only: true,
                     color: 'blue'
                 }

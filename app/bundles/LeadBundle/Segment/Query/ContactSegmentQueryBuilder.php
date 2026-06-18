@@ -50,7 +50,6 @@ class ContactSegmentQueryBuilder
             $connection->ensureConnectedToReplica();
         }
 
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($connection);
 
         $leadsTableAlias = $changeAlias ? $this->generateRandomParameterName() : Lead::DEFAULT_ALIAS;

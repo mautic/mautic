@@ -121,6 +121,10 @@ return [
                     'objectId' => '\d+',
                 ],
             ],
+            'mautic_company_graph'     => [
+                'path'       => '/company/graph/{objectId}',
+                'controller' => 'Mautic\LeadBundle\Controller\CompanyController::graphAction',
+            ],
             'mautic_company_action' => [
                 'path'       => '/companies/{objectAction}/{objectId}',
                 'controller' => 'Mautic\LeadBundle\Controller\CompanyController::executeAction',
@@ -439,6 +443,7 @@ return [
                     'mautic.lead.repository.merged_records',
                     'event_dispatcher',
                     'monolog.logger.mautic',
+                    'mautic.lead.repository.company_lead',
                 ],
             ],
             'mautic.lead.deduper' => [
@@ -892,6 +897,7 @@ return [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
         'contact_api_count_cache_ttl'         => 5, // in seconds, set null to disable.
+        'delete_segment_in_background'        => false,
         'segment_api_count_cache_ttl'         => 43200, // 12 hours in seconds
         'contact_columns'                     => [
             '0' => 'name',
@@ -901,6 +907,14 @@ return [
             '4' => 'points',
             '5' => 'last_active',
             '6' => 'id',
+        ],
+        'company_columns'                     => [
+            '0' => 'companyname',
+            '1' => 'companyemail',
+            '2' => 'companywebsite',
+            '3' => 'score',
+            '4' => 'leadcount',
+            '5' => 'id',
         ],
         Mautic\LeadBundle\Field\Settings\BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND  => false,
         'company_unique_identifiers_operator'                                                   => Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
@@ -915,5 +929,6 @@ return [
         'import_leads_dir'                                                                      => '%kernel.project_dir%/var/import',
         'update_segment_contact_count_in_background'                                            => false,
         'clear_export_files_after_days'                                                         => 7,
+        'update_company_mapping_data_in_background'                                             => false,
     ],
 ];

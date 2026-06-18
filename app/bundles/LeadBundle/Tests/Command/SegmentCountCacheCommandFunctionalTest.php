@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -38,8 +37,7 @@ class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
         // Delete 1 contact.
         $contact = $contacts[0];
         $this->client->request(Request::METHOD_POST, '/s/contacts/delete/'.$contact->getId());
-        $clientResponse = $this->client->getResponse();
-        self::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         // Run segment count cache command again.
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);

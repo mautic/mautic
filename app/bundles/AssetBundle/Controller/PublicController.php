@@ -10,7 +10,6 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,48 +22,59 @@ class PublicController extends AbstractFormController
      *
      * This method performs the initial validation of the slug, retrieves the
      *  corresponding Asset entity, and then delegates further response logic
-     *  (such as redirects, streaming, or access denial) to `createAssetResponse()`.
+     * (such as streaming or access denial) to `createAssetResponse()`.
      *
      * @throws ORMException
      */
     public function downloadAction(
         Request $request,
-        CoreParametersHelper $parametersHelper,
         AssetModel $model,
         string $slug,
     ): Response {
         try {
-            $entity = $model->getRepository()->findByIdAndAlias($slug);
-        } catch (NonUniqueResultException|EntityNotFoundException|\InvalidArgumentException) {
+            $entity = $model->getRepository()->findOneByUuid($slug);
+        } catch (NonUniqueResultException|EntityNotFoundException) {
+            /**
+             * Legacy slug lookup fallback.
+             * - `{id}:{alias}` and
+             * - `{id}:`.
+             */
+            $entity = $model->getEntityBySlugs($slug);
+        }
+
+        if (!$entity instanceof Asset) {
             return $this->notFound();
         }
 
-        return $this->createAssetResponse($request, $parametersHelper, $model, $entity);
+        return $this->createAssetResponse($request, $model, $entity);
     }
 
     /**
-     * Determines and returns the appropriate response based on the given Asset entity.
+     * Determines and returns the appropriate response for a resolved Asset entity.
      *
-     * Logic:
-     * - If entity is missing → return 404
-     * - If access is not allowed → track and return 401
-     * - If remote asset → track and redirect to remote URL
-     * - If local asset → track and stream file
+     * Flow:
+     * - If access is not allowed → track download attempt and return 401
+     * - If the asset is remote → track and redirect
+     * - If the asset is local → track and return a file response
      *
      * @throws ORMException
      */
-    private function createAssetResponse(Request $request, CoreParametersHelper $parametersHelper, AssetModel $model, ?Asset $entity): Response
-    {
+    private function createAssetResponse(
+        Request $request,
+        AssetModel $model,
+        Asset $entity,
+    ): Response {
         if (!$this->isAccessAllowed($entity)) {
             $model->trackDownload($entity, $request, 401);
-            $response = $this->accessDenied();
-        } elseif ($entity->isRemote()) {
-            $response = $this->remoteRedirectResponse($model, $entity, $request);
-        } else {
-            $response = $this->localDownloadResponse($model, $entity, $request, $parametersHelper);
+
+            return $this->accessDenied();
         }
 
-        return $response;
+        if ($entity->isRemote()) {
+            return $this->remoteRedirectResponse($model, $entity, $request);
+        }
+
+        return $this->localDownloadResponse($model, $entity, $request);
     }
 
     /**
@@ -92,22 +102,23 @@ class PublicController extends AbstractFormController
     }
 
     /**
-     * Tracks the download and builds a streamed response for a locally hosted file.
+     * Tracks the download and builds a response for a locally hosted asset.
      *
      * Includes:
-     * - Setting correct content-type headers
-     * - Optionally forcing download via content-disposition
-     * - Applying robot meta-headers if required
-     * - Handling missing or unreadable file exceptions with a 404
+     * - Resolve the local file path
+     * - Track successful or failed download attempts
+     * - Set appropriate content-type headers
+     * - Optionally force download via Content-Disposition
+     * - Apply robot meta headers when required
+     * - Return 404 if the file cannot be read
      */
     private function localDownloadResponse(
         AssetModel $model,
         Asset $entity,
         Request $request,
-        CoreParametersHelper $parametersHelper,
     ): Response {
         try {
-            $entity->setUploadDir($parametersHelper->get('upload_dir'));
+            $entity->setUploadDir($this->coreParametersHelper->get('upload_dir'));
             $contents = $entity->getFileContents();
             $model->trackDownload($entity, $request);
         } catch (FileNotFoundException) {

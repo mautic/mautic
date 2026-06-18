@@ -56,7 +56,7 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
             'REMOTE_ADDR'     => $ipAddress,
         ];
         $this->client->request(Request::METHOD_GET, '/email/'.$stat->getTrackingHash().'.gif', [], [], $server);
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $updatedStat = $this->em->getRepository(Stat::class)->findOneBy(['id'=>$statId]);
         $this->assertSame($isRead, $updatedStat->getIsRead());
@@ -78,10 +78,11 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
         yield 'Time and IP' => ['test_hash_bot_ratio_3', '+80 second', 'Mozilla/5.0', self::BOT_BLOCKED_IP, false];
         yield 'Permanently blocked IP' => ['test_hash_bot_ratio_4', '-80 second', 'Mozilla/5.0', self::DO_NOT_TRACK_IP, false];
         yield 'Bot Blocked IP address only' => ['test_hash_bot_ratio_5', '-80 second', 'Mozilla/5.0', self::BOT_BLOCKED_IP, true];
-        yield 'Bot Blocked User Agent only' => ['test_hash_bot_ratio_6', '-80 second', 'AHC/2.1', self::IP_NOT_IN_ANY_BLOCK_LIST, true];
+        yield 'Bot Blocked User Agent only' => ['test_hash_bot_ratio_6', '-80 second', 'Mozilla/5.0 (compatible; Codewisebot/2.0; +http://www.nosite.com/somebot.htm)', self::IP_NOT_IN_ANY_BLOCK_LIST, true];
         yield 'Time Only' => ['test_hash_bot_ratio_7', '+80 second', 'Mozilla/5.0', self::IP_NOT_IN_ANY_BLOCK_LIST, true];
         yield 'Time and Bot User Agent and Bot IP' => ['test_hash_bot_ratio_8', '+80 second', 'AHC/2.1', self::BOT_BLOCKED_IP, false];
         yield 'Bot User Agent and Bot IP' => ['test_hash_bot_ratio_9', '-80 second', 'AHC/2.1', self::BOT_BLOCKED_IP, false];
         yield 'Permanently blocked User Agent' => ['test_hash_bot_ratio_10', '-80 second', 'MSNBOT', self::IP_NOT_IN_ANY_BLOCK_LIST2, false];
+        yield 'Gmail UI open is tracked even when Matomo flags user agent' => ['test_hash_bot_ratio_11', '-80 second', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) GmailImageProxy', self::IP_NOT_IN_ANY_BLOCK_LIST, true];
     }
 }

@@ -6,7 +6,8 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Exception;
+use Mautic\ApiBundle\Model\ApiEntityLockTrait;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -76,12 +77,13 @@ use Symfony\Contracts\EventDispatcher\Event;
  *
  * @implements AjaxLookupModelInterface<Email>
  */
-class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface, ApiLockAwareInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
     use BuilderModelTrait;
     use FilterTrait;
+    use ApiEntityLockTrait;
 
     /**
      * @var bool
@@ -154,6 +156,47 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function getPermissionBase(): string
     {
         return 'email:emails';
+    }
+
+    /**
+     * @return list<Email>
+     */
+    public function cloneEmailWithTranslationsAndVariants(Email $email): array
+    {
+        $clonedEmails = [];
+
+        $clonedParent = $this->cloneEmailForRelatedClone($email);
+        $this->saveEntity($clonedParent);
+        $clonedEmails[] = $clonedParent;
+
+        foreach ($email->getTranslationChildren() as $translation) {
+            \assert($translation instanceof Email);
+
+            $clonedTranslation = $this->cloneEmailForRelatedClone($translation);
+            $clonedTranslation->setTranslationParent($clonedParent);
+            $this->saveEntity($clonedTranslation);
+            $clonedEmails[] = $clonedTranslation;
+        }
+
+        foreach ($email->getVariantChildren() as $variant) {
+            \assert($variant instanceof Email);
+
+            $clonedVariant = $this->cloneEmailForRelatedClone($variant);
+            $clonedVariant->setVariantParent($clonedParent);
+            $this->saveEntity($clonedVariant);
+            $clonedEmails[] = $clonedVariant;
+
+            foreach ($variant->getTranslationChildren() as $variantTranslation) {
+                \assert($variantTranslation instanceof Email);
+
+                $clonedVariantTranslation = $this->cloneEmailForRelatedClone($variantTranslation);
+                $clonedVariantTranslation->setTranslationParent($clonedVariant);
+                $this->saveEntity($clonedVariantTranslation);
+                $clonedEmails[] = $clonedVariantTranslation;
+            }
+        }
+
+        return $clonedEmails;
     }
 
     /**
@@ -337,6 +380,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             case 'post_delete':
                 $name = EmailEvents::EMAIL_POST_DELETE;
                 break;
+            case 'on_toggle_publish':
+                $name = EmailEvents::EMAIL_ON_TOGGLE_PUBLISH;
+                break;
             default:
                 return null;
         }
@@ -350,9 +396,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -379,10 +425,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        if (!$ipAddress->isTrackable()) {
+        if (!$this->ipLookupHelper->isRequestTrackable()) {
             return;
         }
+
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         $readDateTime = new DateTimeHelper($hitDateTime);
         $userAgent    = $request->server->get('HTTP_USER_AGENT');
@@ -650,6 +697,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailListStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
+        $dateTo = $dateTo ? (clone $dateTo)->setTime(23, 59, 59) : null;
+
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
         }
@@ -849,6 +898,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
     {
+        $dateTo = (clone $dateTo)->setTime(23, 59, 59);
+
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
         }
@@ -898,9 +949,30 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get an array of tracked links.
      */
-    public function getEmailClickStats($emailId): array
+    public function getEmailClickStats($emailId, ?string $orderBy = null, ?string $orderByDir = null): array
     {
-        return $this->pageTrackableModel->getTrackableList('email', $emailId);
+        $stats = $this->pageTrackableModel->getTrackableList('email', $emailId);
+
+        if ('t.hits' !== $orderBy) {
+            return $stats;
+        }
+
+        $direction = 'DESC' === strtoupper((string) $orderByDir) ? -1 : 1;
+
+        usort(
+            $stats,
+            static function (array $first, array $second) use ($direction): int {
+                $comparison = (int) $first['hits'] <=> (int) $second['hits'];
+
+                if (0 === $comparison) {
+                    $comparison = strcmp((string) $first['url'], (string) $second['url']);
+                }
+
+                return $comparison * $direction;
+            }
+        );
+
+        return $stats;
     }
 
     /**
@@ -1284,9 +1356,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
-        $emailType           = ArrayHelper::getValue('email_type', $options, '');
-        $isMarketing         = (in_array($emailType, [MailHelper::EMAIL_TYPE_MARKETING]) || !empty($listId));
-        $emailAttempts       = ArrayHelper::getValue('email_attempts', $options, 3);
         $emailPriority       = ArrayHelper::getValue('email_priority', $options, MessageQueue::PRIORITY_NORMAL);
         $messageQueue        = ArrayHelper::getValue('resend_message_queue', $options);
         $returnErrorMessages = ArrayHelper::getValue('return_errors', $options, false);
@@ -1318,7 +1387,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         }
 
-        /** @var EmailRepository $emailRepo */
         $emailRepo = $this->getRepository();
 
         // get email settings such as templates, weights, etc
@@ -1337,7 +1405,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if (!$email->getSendToDnc() && count($sendTo)) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
 
@@ -1346,7 +1414,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 'email',
                 $email->getId(),
                 $campaignEventId,
-                $emailAttempts,
+                ArrayHelper::getValue('email_attempts', $options, 3),
                 $emailPriority,
                 $messageQueue
             );
@@ -1428,7 +1496,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $emailType)
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
@@ -1863,19 +1931,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $flag    = ArrayHelper::pickValue('flag', $filter, false);
         $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
-        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter, null))) {
+        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter))) {
             $fetchOptions->setCompanyId((int) $companyId);
         }
 
-        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter, null))) {
+        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter))) {
             $fetchOptions->setCampaignId((int) $campaignId);
         }
 
-        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter, null))) {
+        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter))) {
             $fetchOptions->setSegmentId((int) $segmentId);
         }
 
-        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter, null))) {
+        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter))) {
             $fetchOptions->setEmailIds([(int) $emailId]);
         }
 
@@ -2110,7 +2178,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
                 foreach ($emails as $email) {
                     if (empty($options['name_is_key'])) {
-                        $results[$email['language']][$email['id']] = $email['name'];
+                        $results[$email['language']][$email['id']] = sprintf('%s (%s)', $email['name'], $email['id']);
                     } else {
                         $results[$email['language']][$email['name']] = $email['id'];
                     }
@@ -2123,35 +2191,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         return $results;
-    }
-
-    /**
-     * @param string|array<string> $filter
-     * @param array<string,mixed>  $options
-     *
-     * @return array<string,array<string,string>>
-     */
-    public function getLookupResultsWithIdName(
-        string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = [],
-    ): array {
-        $results    = $this->getLookupResults($type, $filter, $limit, $start, $options);
-        $newResults = [];
-
-        foreach ($results as $language => $emails) {
-            if (!isset($options['name_is_key']) || empty($options['name_is_key'])) {
-                foreach ($emails as $name => $id) {
-                    $newResults[$language][$name] = sprintf('%s (%s)', $id, $name);
-                }
-            } else {
-                foreach ($emails as $id => $name) {
-                    $newResults[$language][$id] = sprintf('%s (%s)', $name, $id);
-                }
-            }
-        }
-        // sort by language
-        ksort($newResults);
-
-        return $newResults;
     }
 
     /**
@@ -2315,6 +2354,27 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function isUpdatingTranslationChildren(): bool
     {
         return $this->updatingTranslationChildren;
+    }
+
+    private function cloneEmailForRelatedClone(Email $email): Email
+    {
+        $clonedEmail = clone $email;
+        $clonedEmail->setEmailType($email->getEmailType());
+        $clonedEmail->setName($this->getRelatedCloneName($email->getName()));
+
+        return $clonedEmail;
+    }
+
+    private function getRelatedCloneName(?string $name): ?string
+    {
+        if (null === $name) {
+            return null;
+        }
+
+        $suffix    = $this->translator->trans('mautic.email.clone.copy_suffix');
+        $maxLength = Email::MAX_NAME_SUBJECT_LENGTH - mb_strlen($suffix);
+
+        return mb_substr($name, 0, $maxLength).$suffix;
     }
 
     /**

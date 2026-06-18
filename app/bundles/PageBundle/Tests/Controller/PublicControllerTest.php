@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
-use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Controller\PublicController;
@@ -66,8 +65,6 @@ class PublicControllerTest extends TestCase
 
     private MockObject&PageModel $pageModel;
 
-    private MockObject&PrimaryCompanyHelper $primaryCompanyHelper;
-
     private MockObject&ContactRequestHelper $contactRequestHelper;
 
     private MockObject&RouterInterface $router;
@@ -83,7 +80,6 @@ class PublicControllerTest extends TestCase
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->ipAddress            = $this->createMock(IpAddress::class);
         $this->pageModel            = $this->createMock(PageModel::class);
-        $this->primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
         $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
         $this->router               = $this->createMock(RouterInterface::class);
 
@@ -323,7 +319,6 @@ class PublicControllerTest extends TestCase
         $response = $controller->redirectAction(
             $this->request,
             $this->contactRequestHelper,
-            $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
             $this->redirectModel,
@@ -404,7 +399,6 @@ class PublicControllerTest extends TestCase
         $response = $controller->redirectAction(
             $this->request,
             $this->contactRequestHelper,
-            $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
             $this->redirectModel,
@@ -418,18 +412,18 @@ class PublicControllerTest extends TestCase
     public static function provideRedirectUrls(): \Generator
     {
         yield 'No query parameters' => [
-            'https://some.test.url/asset/1:examplefilejpg',
-            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+            'redirectUrl' => 'https://some.test.url/asset/1:examplefilejpg',
+            'targetUrl'   => 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
         ];
 
         yield 'With query parameter' => [
-            'https://some.test.url/asset/1:examplefilejpg?param=value',
-            'https://some.test.url/asset/1:examplefilejpg?param=value&ct=dummy_click_through',
+            'redirectUrl' => 'https://some.test.url/asset/1:examplefilejpg?param=value',
+            'targetUrl'   => 'https://some.test.url/asset/1:examplefilejpg?param=value&ct=dummy_click_through',
         ];
 
         yield 'With click-through parameter' => [
-            'https://some.test.url/asset/1:examplefilejpg?ct=parameter',
-            'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
+            'redirectUrl' => 'https://some.test.url/asset/1:examplefilejpg?ct=parameter',
+            'targetUrl'   => 'https://some.test.url/asset/1:examplefilejpg?ct=dummy_click_through',
         ];
     }
 

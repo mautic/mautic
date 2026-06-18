@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
@@ -67,7 +68,7 @@ class FormSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
-        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+        if (!array_key_exists($form->getLanguage() ?? '', $this->languageHelper->getSupportedLanguages())) {
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }
@@ -103,9 +104,8 @@ class FormSubscriber implements EventSubscriberInterface
             'formTypeCleanMasks' => [
                 'message' => 'raw',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticForm/Action/form_email.html.twig',
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'  => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [
@@ -119,8 +119,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
 

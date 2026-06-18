@@ -7,12 +7,6 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/ClientController.php
 
 		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: app/bundles/ApiBundle/Controller/ClientController.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:createEntityForm\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -568,15 +562,6 @@ parameters:
 			path: app/bundles/AssetBundle/Controller/AssetController.php
 
 		-
-			message: '''
-				#^Class Mautic\\AssetBundle\\Controller\\PublicController extends deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: app/bundles/AssetBundle/Controller/PublicController.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Component\\HttpFoundation\\File\\File\:\:getClientOriginalName\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -607,18 +592,6 @@ parameters:
 			path: app/bundles/AssetBundle/Entity/Asset.php
 
 		-
-			message: '#^Method Mautic\\AssetBundle\\Entity\\Asset\:\:getFileInfo\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Method Mautic\\AssetBundle\\Entity\\Asset\:\:getFileInfo\(\) should return array but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
 			message: '#^Method Mautic\\AssetBundle\\Entity\\Asset\:\:getMaxSize\(\) should return string but returns int\.$#'
 			identifier: return.type
 			count: 1
@@ -631,19 +604,7 @@ parameters:
 			path: app/bundles/AssetBundle/Entity/Asset.php
 
 		-
-			message: '#^Parameter \#1 \$path of method Mautic\\AssetBundle\\Entity\\Asset\:\:setPath\(\) expects string, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Parameter \#1 \$remotePath of method Mautic\\AssetBundle\\Entity\\Asset\:\:setRemotePath\(\) expects string, null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/AssetBundle/Entity/Asset.php
@@ -956,12 +917,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\AssetBundle\\Model\\AssetModel\:\:createForm\(\) has parameter \$options with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/AssetBundle/Model/AssetModel.php
-
-		-
-			message: '#^Method Mautic\\AssetBundle\\Model\\AssetModel\:\:generateUrl\(\) has parameter \$clickthrough with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/AssetBundle/Model/AssetModel.php
@@ -1657,15 +1612,6 @@ parameters:
 			'''
 			identifier: method.deprecated
 			count: 4
-			path: app/bundles/CampaignBundle/Controller/EventController.php
-
-		-
-			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
-			count: 1
 			path: app/bundles/CampaignBundle/Controller/EventController.php
 
 		-
@@ -2731,12 +2677,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Event/PendingEvent.php
 
 		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
-			count: 1
-			path: app/bundles/CampaignBundle/Event/PendingEvent.php
-
-		-
 			message: '''
 				#^Call to deprecated method getConfig\(\) of class Mautic\\CampaignBundle\\EventCollector\\Accessor\\Event\\AbstractEventAccessor\:
 				pre 2\.13\.0 support; to be removed in 3\.0$#
@@ -3220,12 +3160,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Executioner/ScheduledExecutioner.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Executioner\\ScheduledExecutioner\:\:executeScheduled\(\) has parameter \$eventId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/ScheduledExecutioner.php
-
-		-
 			message: '#^Property Mautic\\CampaignBundle\\Executioner\\ScheduledExecutioner\:\:\$scheduledEvents type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -3658,18 +3592,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Security/Permissions/CampaignPermissions.php
 
 		-
-			message: '#^Property Mautic\\CampaignBundle\\Tests\\CampaignTestAbstract\:\:\$mockId has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/CampaignTestAbstract.php
-
-		-
-			message: '#^Property Mautic\\CampaignBundle\\Tests\\CampaignTestAbstract\:\:\$mockName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/CampaignTestAbstract.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Tests\\Command\\AbstractCampaignCommand\:\:createEvent\(\) has parameter \$property with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -3955,20 +3877,8 @@ parameters:
 			path: app/bundles/CategoryBundle/Security/Permissions/CategoryPermissions.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:cloneAction\(\) has invalid return type Mautic\\CoreBundle\\Controller\\Response\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:cloneAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:contactsAction\(\) has invalid return type Mautic\\ChannelBundle\\Controller\\JsonResponse\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/ChannelBundle/Controller/MessageController.php
 
@@ -3991,20 +3901,8 @@ parameters:
 			path: app/bundles/ChannelBundle/Controller/MessageController.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:editAction\(\) has invalid return type Mautic\\CoreBundle\\Controller\\Response\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:editAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Controller/MessageController.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Controller\\MessageController\:\:editAction\(\) should return Mautic\\CoreBundle\\Controller\\Response\|Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/ChannelBundle/Controller/MessageController.php
 
@@ -4736,15 +4634,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
-			count: 1
-			path: app/bundles/ConfigBundle/Controller/SysinfoController.php
-
-		-
-			message: '''
 				#^Class Mautic\\ConfigBundle\\Controller\\SysinfoController extends deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
@@ -5122,12 +5011,6 @@ parameters:
 			path: app/bundles/CoreBundle/Command/ModeratedCommand.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Command\\ModeratedCommand\:\:\$checkFile has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Command/ModeratedCommand.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Command\\ModeratedCommand\:\:\$lockExpiration has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -5147,12 +5030,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\CoreBundle\\Command\\ModeratedCommand\:\:\$moderationMode has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Command/ModeratedCommand.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Command\\ModeratedCommand\:\:\$moderationTable has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Command/ModeratedCommand.php
@@ -5491,12 +5368,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/ExceptionController.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$imageMimes has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Controller/FileController.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Controller\\FileController\:\:\$response has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -5734,12 +5605,6 @@ parameters:
 			path: app/bundles/CoreBundle/DependencyInjection/Builder/Metadata/EntityMetadata.php
 
 		-
-			message: '#^Argument of an invalid type string supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 1
-			path: app/bundles/CoreBundle/DependencyInjection/Compiler/ServicePass.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Doctrine\\AbstractMauticMigration\:\:findPropertyName\(\) has parameter \$suffix with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5837,12 +5702,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\CoreBundle\\Doctrine\\GeneratedColumn\\GeneratedColumns\:\:\$dateColumnIndex type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/GeneratedColumn/GeneratedColumns.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Doctrine\\GeneratedColumn\\GeneratedColumns\:\:\$generatedColumns type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Doctrine/GeneratedColumn/GeneratedColumns.php
@@ -6756,12 +6615,6 @@ parameters:
 		-
 			message: '#^Function prof_flag\(\) has parameter \$str with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
 			count: 1
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 
@@ -7894,18 +7747,6 @@ parameters:
 			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncodingValidator.php
 
 		-
-			message: '#^Call to method getPathname\(\) on an unknown class Mautic\\CoreBundle\\Form\\Validator\\Constraints\\LeadField\.$#'
-			identifier: class.notFound
-			count: 3
-			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncodingValidator.php
-
-		-
-			message: '#^Parameter \$field of method Mautic\\CoreBundle\\Form\\Validator\\Constraints\\FileEncodingValidator\:\:validate\(\) has invalid type Mautic\\CoreBundle\\Form\\Validator\\Constraints\\LeadField\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Form/Validator/Constraints/FileEncodingValidator.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\AbstractFormFieldHelper\:\:formatList\(\) has parameter \$choices with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8170,24 +8011,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/CacheStorageHelper.php
 
 		-
-			message: '#^Binary operation "\*" between string and 12 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Chart/AbstractChart.php
-
-		-
-			message: '#^Binary operation "\+" between string and 1 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 2
-			path: app/bundles/CoreBundle/Helper/Chart/AbstractChart.php
-
-		-
-			message: '#^Binary operation "/" between string and 7 results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Chart/AbstractChart.php
-
-		-
 			message: '#^Property Mautic\\CoreBundle\\Helper\\Chart\\AbstractChart\:\:\$colors type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -8448,18 +8271,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\DataExporterHelper\:\:getDataForExport\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/DataExporterHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\DataExporterHelper\:\:getDataForExport\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/DataExporterHelper.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\DataExporterHelper\:\:getDataForExport\(\) should return array but returns null\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/CoreBundle/Helper/DataExporterHelper.php
 
@@ -9058,18 +8869,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/TrackingPixelHelper.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\Update\\Exception\\CouldNotFetchLatestVersionException\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Update/Exception/CouldNotFetchLatestVersionException.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\Update\\Exception\\UpdatePackageNotFoundException\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Update/Exception/UpdatePackageNotFoundException.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\Update\\Github\\Release\:\:__construct\(\) has parameter \$release with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -9406,12 +9205,6 @@ parameters:
 			path: app/bundles/CoreBundle/Loader/TranslationLoader.php
 
 		-
-			message: '#^Call to method dispatch\(\) on an unknown class Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Menu/MenuBuilder.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Menu\\MenuBuilder\:\:__call\(\) has parameter \$arguments with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9426,18 +9219,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Menu\\MenuBuilder\:\:buildMenu\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Menu/MenuBuilder.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Menu\\MenuBuilder\:\:\$dispatcher \(Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher\) does not accept Symfony\\Component\\EventDispatcher\\EventDispatcherInterface\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/CoreBundle/Menu/MenuBuilder.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Menu\\MenuBuilder\:\:\$dispatcher has unknown class Symfony\\Component\\EventDispatcher\\ContainerAwareEventDispatcher as its type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/CoreBundle/Menu/MenuBuilder.php
 
@@ -9593,12 +9374,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\CoreBundle\\Model\\IteratorExportDataModel\:\:\$callback has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Model/IteratorExportDataModel.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Model\\IteratorExportDataModel\:\:\$data has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/CoreBundle/Model/IteratorExportDataModel.php
@@ -10222,24 +9997,6 @@ parameters:
 			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
 
 		-
-			message: '#^Call to method validate\(\) on an unknown class Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\Mautic\\CoreBundle\\Form\\Validator\\Constraints\\CircularDependencyValidator\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:configureValidator\(\) has invalid return type Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\Mautic\\CoreBundle\\Form\\Validator\\Constraints\\CircularDependencyValidator\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:configureValidator\(\) should return Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\Mautic\\CoreBundle\\Form\\Validator\\Constraints\\CircularDependencyValidator but returns Mautic\\CoreBundle\\Form\\Validator\\Constraints\\CircularDependencyValidator\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:testValidateOnInvalid\(\) has parameter \$currentSegmentId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10828,12 +10585,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:editAction\(\) has invalid return type Mautic\\DynamicContentBundle\\Controller\\RedirectResponse\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:editAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10872,18 +10623,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:newAction\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
-			message: '#^Parameter \#1 \$unit of method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:getHitsLineChartData\(\) expects Mautic\\DynamicContentBundle\\Model\\char, null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
 
@@ -11149,12 +10888,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^Call to an undefined method DOMNode\:\:getAttribute\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\EventListener\\DynamicContentSubscriber\:\:matchFilterForLead\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -11343,18 +11076,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:setSlotContentForLead\(\) has parameter \$slot with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: '#^Parameter \#1 \$unit of class Mautic\\CoreBundle\\Helper\\Chart\\LineChart constructor expects string\|null, Mautic\\DynamicContentBundle\\Model\\char given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: '#^Parameter \$unit of method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:getHitsLineChartData\(\) has invalid type Mautic\\DynamicContentBundle\\Model\\char\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
@@ -13309,24 +13030,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/StatsCollectionHelper.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\UrlMatcher\:\:hasMatch\(\) has parameter \$urlToFind with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/UrlMatcher.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\UrlMatcher\:\:hasMatch\(\) has parameter \$urlsToCheckAgainst with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Helper/UrlMatcher.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Helper\\UrlMatcher\:\:sanitizeUrl\(\) has parameter \$url with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Helper/UrlMatcher.php
-
-		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Entity\\VariantEntityInterface\:\:getChanges\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -15149,15 +14852,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
-			count: 1
-			path: app/bundles/FormBundle/Controller/FieldController.php
-
-		-
-			message: '''
 				#^Class Mautic\\FormBundle\\Controller\\FieldController extends deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
@@ -15174,15 +14868,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormInterface\:\:isClicked\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/FormBundle/Controller/FormController.php
-
-		-
-			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
 			count: 1
 			path: app/bundles/FormBundle/Controller/FormController.php
 
@@ -15235,20 +14920,8 @@ parameters:
 			path: app/bundles/FormBundle/Controller/PublicController.php
 
 		-
-			message: '#^Parameter \#2 \$urldecode of static method Mautic\\CoreBundle\\Helper\\InputHelper\:\:url\(\) expects bool, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/Controller/PublicController.php
-
-		-
 			message: '#^Property Mautic\\FormBundle\\Controller\\PublicController\:\:\$tokens type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Controller/PublicController.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
 			count: 1
 			path: app/bundles/FormBundle/Controller/PublicController.php
 
@@ -15258,15 +14931,6 @@ parameters:
 				2\.3 \- to be removed in 3\.0; extend AbstractStandardFormController instead$#
 			'''
 			identifier: method.deprecated
-			count: 1
-			path: app/bundles/FormBundle/Controller/ResultController.php
-
-		-
-			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
 			count: 1
 			path: app/bundles/FormBundle/Controller/ResultController.php
 
@@ -15528,12 +15192,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\FormBundle\\Entity\\FormRepository\:\:getDefaultOrder\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Entity/FormRepository.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Entity\\FormRepository\:\:getFormList\(\) has parameter \$formType with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/FormBundle/Entity/FormRepository.php
 
@@ -16459,12 +16117,6 @@ parameters:
 			path: app/bundles/FormBundle/Model/FormModel.php
 
 		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: app/bundles/FormBundle/Model/FormModel.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Model\\SubmissionModel\:\:createLeadFromSubmit\(\) has parameter \$leadFieldMatches with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -16916,12 +16568,6 @@ parameters:
 			identifier: parameter.phpDocType
 			count: 1
 			path: app/bundles/InstallBundle/Controller/InstallController.php
-
-		-
-			message: '#^Property Mautic\\InstallBundle\\Exception\\AlreadyInstalledException\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/InstallBundle/Exception/AlreadyInstalledException.php
 
 		-
 			message: '#^Method Mautic\\InstallBundle\\Helper\\SchemaHelper\:\:__construct\(\) has parameter \$dbParams with no value type specified in iterable type array\.$#'
@@ -17572,12 +17218,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Exception/InvalidProviderException.php
 
 		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Exception\\PluginNotConfiguredException\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/IntegrationsBundle/Exception/PluginNotConfiguredException.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Facade\\EncryptionService\:\:decrypt\(\) has parameter \$keys with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -18070,12 +17710,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/OwnerProvider.php
 
 		-
-			message: '#^Call to method dispatch\(\) on an unknown class Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouEventDispatcherInterfaceter\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/RouteHelper.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouteHelper\:\:getLinkCsv\(\) has parameter \$ids with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18090,18 +17724,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouteHelper\:\:getRoutes\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/RouteHelper.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouteHelper\:\:\$dispatcher \(Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouEventDispatcherInterfaceter\) does not accept Symfony\\Component\\EventDispatcher\\EventDispatcherInterface\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/RouteHelper.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouteHelper\:\:\$dispatcher has unknown class Mautic\\IntegrationsBundle\\Sync\\Notification\\Helper\\RouEventDispatcherInterfaceter as its type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/Notification/Helper/RouteHelper.php
 
@@ -18145,12 +17767,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Helper/FieldHelper.php
 
 		-
-			message: '#^Call to method dispatch\(\) on an unknown class Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\EventDispatcher\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Helper/FieldHelper.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\FieldHelper\:\:getFieldChangeObject\(\) has parameter \$fieldChange with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18165,18 +17781,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\FieldHelper\:\:getSyncFields\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Helper/FieldHelper.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\FieldHelper\:\:\$eventDispatcher \(Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\EventDispatcher\) does not accept Symfony\\Component\\EventDispatcher\\EventDispatcherInterface\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Helper/FieldHelper.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\FieldHelper\:\:\$eventDispatcher has unknown class Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Helper\\EventDispatcher as its type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/SyncDataExchange/Helper/FieldHelper.php
 
@@ -18596,24 +18200,6 @@ parameters:
 			identifier: return.phpDocType
 			count: 1
 			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Call to method getName\(\) on an unknown class Mautic\\IntegrationsBundle\\Tests\\Unit\\Entity\\Parameter\.$#'
-			identifier: class.notFound
-			count: 2
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Entity/ObjectMappingRepositoryTest.php
-
-		-
-			message: '#^Call to method getValue\(\) on an unknown class Mautic\\IntegrationsBundle\\Tests\\Unit\\Entity\\Parameter\.$#'
-			identifier: class.notFound
-			count: 2
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Entity/ObjectMappingRepositoryTest.php
-
-		-
-			message: '#^PHPDoc tag @var for variable \$parameter contains unknown class Mautic\\IntegrationsBundle\\Tests\\Unit\\Entity\\Parameter\.$#'
-			identifier: class.notFound
-			count: 2
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Entity/ObjectMappingRepositoryTest.php
 
 		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\EventListener\\LeadSubscriberTest\:\:handleRecordFieldChanges\(\) has parameter \$fieldChanges with no value type specified in iterable type array\.$#'
@@ -19610,21 +19196,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Controller/FieldController.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/FieldController.php
-
-		-
-			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ImportController.php
 
 		-
 			message: '''
@@ -21079,12 +20650,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
 
 		-
-			message: '#^Ternary operator condition is always false\.$#'
-			identifier: ternary.alwaysFalse
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
 			message: '''
 				#^Fetching deprecated class constant ARRAY of class Doctrine\\DBAL\\Types\\Types\:
 				Use \{@link Types\:\:JSON\} instead\.$#
@@ -21147,12 +20712,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\DoNotContactRepository\:\:getTimelineStats\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Entity/DoNotContactRepository.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
 			count: 1
 			path: app/bundles/LeadBundle/Entity/DoNotContactRepository.php
 
@@ -21704,15 +21263,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Lead.php
-
-		-
-			message: '''
-				#^Call to deprecated method addLead\(\) of class Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:
-				Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadCategory.php
 
 		-
 			message: '''
@@ -22399,12 +21949,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:getLeadByEmail\(\) should return array\|null but empty return statement found\.$#'
-			identifier: return.empty
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:getLeadOwner\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -23081,12 +22625,6 @@ parameters:
 
 		-
 			message: '#^Property Mautic\\LeadBundle\\Event\\LeadTimelineEvent\:\:\$events type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Event/LeadTimelineEvent.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Event\\LeadTimelineEvent\:\:\$filters type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Event/LeadTimelineEvent.php
@@ -23966,12 +23504,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/CompanyType.php
 
 		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Form/Type/CompanyType.php
-
-		-
 			message: '''
 				#^Call to deprecated method getFieldList\(\) of class Mautic\\LeadBundle\\Model\\FieldModel\:
 				Use FieldList\:\:getFieldList method instead$#
@@ -23999,12 +23531,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/LeadType.php
 
 		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Form/Type/LeadType.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\UpdateCompanyActionType\:\:getFormFields\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -24017,12 +23543,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Type/UpdateCompanyActionType.php
 
 		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Form/Type/UpdateCompanyActionType.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\UpdateLeadActionType\:\:getFormFields\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -24032,12 +23552,6 @@ parameters:
 			message: '#^Method Mautic\\LeadBundle\\Form\\Type\\UpdateLeadActionType\:\:getFormFields\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: app/bundles/LeadBundle/Form/Type/UpdateLeadActionType.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
 			path: app/bundles/LeadBundle/Form/Type/UpdateLeadActionType.php
 
 		-
@@ -24127,12 +23641,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Helper\\CustomFieldHelper\:\:fieldValueTransfomer\(\) has parameter \$field with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Helper/CustomFieldHelper.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Helper/CustomFieldHelper.php
 
@@ -24815,12 +24323,6 @@ parameters:
 			'''
 			identifier: method.deprecated
 			count: 2
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 1
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
@@ -25757,12 +25259,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/DateOptionAbstract.php
 
 		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 2
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/DateOptionFactory.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\DateOptionParameters\:\:__construct\(\) has parameter \$relativeDateStrings with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -25875,12 +25371,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Decorator/Date/Other/DateRelativeInterval.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Decorator/Date/TimezoneResolver.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Segment\\Decorator\\Date\\Week\\DateWeekAbstract\:\:getValueForBetweenRange\(\) return type has no value type specified in iterable type array\.$#'
@@ -26807,90 +26297,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/DateOptionFactoryTest.php
 
 		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Day/DateDayTodayTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Day/DateDayTomorrowTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Day/DateDayYesterdayTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Month/DateMonthLastTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Month/DateMonthNextTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Month/DateMonthThisTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Other/DateAnniversaryTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 5
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Other/DateRelativeIntervalTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 4
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Week/DateWeekLastTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 4
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Week/DateWeekNextTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 4
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Week/DateWeekThisTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Year/DateYearLastTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Year/DateYearNextTest.php
-
-		-
-			message: '#^Parameter \#2 \$fromFormat of class Mautic\\CoreBundle\\Helper\\DateTimeHelper constructor expects string, null given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/Year/DateYearThisTest.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Tests\\StandardImportTestHelper\:\:initImportEntity\(\) has parameter \$methods with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -27182,12 +26588,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
 
 		-
-			message: '#^Parameter \#1 \$unit of method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getHitsLineChartData\(\) expects Mautic\\NotificationBundle\\Model\\char, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/MobileNotificationController.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Controller\\NotificationController\:\:cloneAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -27244,12 +26644,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Controller\\NotificationController\:\:viewAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Controller/NotificationController.php
-
-		-
-			message: '#^Parameter \#1 \$unit of method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getHitsLineChartData\(\) expects Mautic\\NotificationBundle\\Model\\char, null given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/NotificationBundle/Controller/NotificationController.php
 
@@ -27518,18 +26912,6 @@ parameters:
 			path: app/bundles/NotificationBundle/EventListener/CampaignConditionSubscriber.php
 
 		-
-			message: '#^Property Mautic\\NotificationBundle\\Exception\\MissingApiKeyException\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/NotificationBundle/Exception/MissingApiKeyException.php
-
-		-
-			message: '#^Property Mautic\\NotificationBundle\\Exception\\MissingAppIDException\:\:\$message has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/NotificationBundle/Exception/MissingAppIDException.php
-
-		-
 			message: '#^Cannot call method getId\(\) on array\.$#'
 			identifier: method.nonObject
 			count: 1
@@ -27546,12 +26928,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/NotificationBundle/Helper/NotificationHelper.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 2
-			path: app/bundles/NotificationBundle/Integration/OneSignalIntegration.php
 
 		-
 			message: '''
@@ -27571,12 +26947,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Integration\\OneSignalIntegration\:\:getSupportedFeatures\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/NotificationBundle/Integration/OneSignalIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method Mautic\\NotificationBundle\\Integration\\OneSignalIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/NotificationBundle/Integration/OneSignalIntegration.php
 
@@ -27653,18 +27023,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Model/NotificationModel.php
 
 		-
-			message: '#^Parameter \#1 \$unit of class Mautic\\CoreBundle\\Helper\\Chart\\LineChart constructor expects string\|null, Mautic\\NotificationBundle\\Model\\char given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/NotificationBundle/Model/NotificationModel.php
-
-		-
-			message: '#^Parameter \$unit of method Mautic\\NotificationBundle\\Model\\NotificationModel\:\:getHitsLineChartData\(\) has invalid type Mautic\\NotificationBundle\\Model\\char\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/NotificationBundle/Model/NotificationModel.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Security\\Permissions\\NotificationPermissions\:\:__construct\(\) has parameter \$params with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -27728,21 +27086,9 @@ parameters:
 			path: app/bundles/PageBundle/Controller/PageController.php
 
 		-
-			message: '#^Parameter \#1 \$unit of method Mautic\\PageBundle\\Model\\PageModel\:\:getHitsLineChartData\(\) expects Mautic\\PageBundle\\Model\\char, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Controller\\PublicController\:\:redirectAction\(\) has parameter \$redirectId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: app/bundles/PageBundle/Controller/PublicController.php
-
-		-
-			message: '#^Offset ''weight_deficit'' does not exist on array\{weight\: \(float\|int\), hits\: mixed\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 4
 			path: app/bundles/PageBundle/Controller/PublicController.php
 
 		-
@@ -27888,12 +27234,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Entity\\HitRepository\:\:getHitCountForSource\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Entity/HitRepository.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Entity\\HitRepository\:\:getLatestHit\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PageBundle/Entity/HitRepository.php
@@ -28601,12 +27941,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:cleanQuery\(\) has parameter \$query with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -28817,18 +28151,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
-			message: '#^Parameter \#1 \$unit of class Mautic\\CoreBundle\\Helper\\Chart\\LineChart constructor expects string\|null, Mautic\\PageBundle\\Model\\char given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Parameter \$unit of method Mautic\\PageBundle\\Model\\PageModel\:\:getHitsLineChartData\(\) has invalid type Mautic\\PageBundle\\Model\\char\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1
@@ -28881,12 +28203,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PageBundle/Model/RedirectModel.php
-
-		-
-			message: '#^If condition is always false\.$#'
-			identifier: if.alwaysFalse
-			count: 6
-			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
 			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:createTrackableEntity\(\) has parameter \$channel with no type specified\.$#'
@@ -29039,12 +28355,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:httpBuildUrl\(\) has parameter \$parts with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:isContactFieldToken\(\) has parameter \$token with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -29105,18 +28415,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
-			message: '#^Offset ''path'' on array\{\}\|array\{scheme\?\: mixed, host\?\: mixed\} in isset\(\) does not exist\.$#'
-			identifier: isset.offset
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: '#^Offset ''query'' on array\{\}\|array\{scheme\?\: mixed, host\?\: mixed, path\?\: mixed\} in isset\(\) does not exist\.$#'
-			identifier: isset.offset
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
 			message: '#^Property Mautic\\PageBundle\\Model\\TrackableModel\:\:\$contactFieldUrlTokens type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -29137,18 +28435,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\PageBundle\\Model\\TrackableModel\:\:\$doNotTrack type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: '#^Result of && is always false\.$#'
-			identifier: booleanAnd.alwaysFalse
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: '#^Right side of && is always false\.$#'
-			identifier: booleanAnd.rightAlwaysFalse
 			count: 1
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
@@ -29283,12 +28569,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PageBundle/Tests/Model/TrackableModelTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\PageTestAbstract\:\:getPageModel\(\) has parameter \$transliterationEnabled with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/PageTestAbstract.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
@@ -30950,12 +30230,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Parameter \$builder of method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Property Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:\$commandParameters type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -31002,12 +30276,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractSsoFormIntegration.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 2
-			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
 
 		-
 			message: '''
@@ -31063,12 +30331,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractSsoServiceIntegration\:\:ssoAuthCallback\(\) has parameter \$settings with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method Mautic\\PluginBundle\\Integration\\AbstractSsoServiceIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/PluginBundle/Integration/AbstractSsoServiceIntegration.php
 
@@ -32951,12 +32213,6 @@ parameters:
 			path: app/bundles/SmsBundle/Controller/SmsController.php
 
 		-
-			message: '#^Parameter \#1 \$unit of method Mautic\\SmsBundle\\Model\\SmsModel\:\:getHitsLineChartData\(\) expects Mautic\\SmsBundle\\Model\\char, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/SmsBundle/Controller/SmsController.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -33122,15 +32378,6 @@ parameters:
 			path: app/bundles/SmsBundle/Entity/StatRepository.php
 
 		-
-			message: '''
-				#^Parameter \$event of method Mautic\\SmsBundle\\EventListener\\CampaignSendSubscriber\:\:onCampaignTriggerAction\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/SmsBundle/EventListener/CampaignSendSubscriber.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\EventListener\\LeadSubscriber\:\:addSmsEvents\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -33233,18 +32480,6 @@ parameters:
 			path: app/bundles/SmsBundle/EventListener/ReplySubscriber.php
 
 		-
-			message: '#^Call to method getId\(\) on an unknown class Mautic\\SmsBundle\\Helper\\Lead\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/SmsBundle/Helper/ContactHelper.php
-
-		-
-			message: '#^PHPDoc tag @var for variable \$contacts contains unknown class Mautic\\SmsBundle\\Helper\\Lead\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/SmsBundle/Helper/ContactHelper.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Helper\\SmsHelper\:\:unsubscribe\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -33255,18 +32490,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/Helper/SmsHelper.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 3
-			path: app/bundles/SmsBundle/Integration/TwilioIntegration.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\SmsBundle\\Integration\\FormBuilder\.$#'
-			identifier: class.notFound
-			count: 3
-			path: app/bundles/SmsBundle/Integration/TwilioIntegration.php
 
 		-
 			message: '''
@@ -33286,18 +32509,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\SmsBundle\\Integration\\TwilioIntegration\:\:getSecretKeys\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/SmsBundle/Integration/TwilioIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method Mautic\\SmsBundle\\Integration\\TwilioIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 1
-			path: app/bundles/SmsBundle/Integration/TwilioIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method Mautic\\SmsBundle\\Integration\\TwilioIntegration\:\:appendToForm\(\) has invalid type Mautic\\SmsBundle\\Integration\\FormBuilder\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/SmsBundle/Integration/TwilioIntegration.php
 
@@ -33404,20 +32615,8 @@ parameters:
 			path: app/bundles/SmsBundle/Model/SmsModel.php
 
 		-
-			message: '#^Method Mautic\\SmsBundle\\Model\\SmsModel\:\:sendSms\(\) has parameter \$sendTo with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Model/SmsModel.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Model\\SmsModel\:\:sendSms\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/SmsBundle/Model/SmsModel.php
-
-		-
-			message: '#^Parameter \#1 \$unit of class Mautic\\CoreBundle\\Helper\\Chart\\LineChart constructor expects string\|null, Mautic\\SmsBundle\\Model\\char given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/SmsBundle/Model/SmsModel.php
 
@@ -33427,12 +32626,6 @@ parameters:
 				This helper is deprecated in favor of CacheBundle$#
 			'''
 			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/SmsBundle/Model/SmsModel.php
-
-		-
-			message: '#^Parameter \$unit of method Mautic\\SmsBundle\\Model\\SmsModel\:\:getHitsLineChartData\(\) has invalid type Mautic\\SmsBundle\\Model\\char\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/SmsBundle/Model/SmsModel.php
 
@@ -33465,15 +32658,6 @@ parameters:
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/SmsBundle/Sms/TransportChain.php
-
-		-
-			message: '''
-				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: new.deprecated
-			count: 2
-			path: app/bundles/SmsBundle/Tests/EventListener/CampaignSendSubscriberTest.php
 
 		-
 			message: '#^Property Mautic\\SmsBundle\\Tests\\EventListener\\SmsSubscriberTest\:\:\$messageText has no type specified\.$#'
@@ -33617,12 +32801,6 @@ parameters:
 			path: app/bundles/StageBundle/Entity/StageRepository.php
 
 		-
-			message: '#^Method Mautic\\StageBundle\\Entity\\StageRepository\:\:findByIdOrName\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/StageBundle/Entity/StageRepository.php
-
-		-
 			message: '#^Method Mautic\\StageBundle\\Entity\\StageRepository\:\:getCompletedLeadActions\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -33751,18 +32929,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\StageBundle\\Model\\StageModel\:\:getUserStages\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/StageBundle/Model/StageModel.php
-
-		-
-			message: '#^Parameter \#1 \$unit of class Mautic\\CoreBundle\\Helper\\Chart\\LineChart constructor expects string\|null, Mautic\\StageBundle\\Model\\char given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/StageBundle/Model/StageModel.php
-
-		-
-			message: '#^Parameter \$unit of method Mautic\\StageBundle\\Model\\StageModel\:\:getStageLineChartData\(\) has invalid type Mautic\\StageBundle\\Model\\char\.$#'
-			identifier: class.notFound
 			count: 1
 			path: app/bundles/StageBundle/Model/StageModel.php
 
@@ -34111,12 +33277,6 @@ parameters:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
 			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: app/bundles/UserBundle/Controller/UserController.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
 			count: 1
 			path: app/bundles/UserBundle/Controller/UserController.php
 
@@ -34582,15 +33742,6 @@ parameters:
 				2\.3 \- to be removed in 3\.0; extend AbstractStandardFormController instead$#
 			'''
 			identifier: method.deprecated
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/WebhookController.php
-
-		-
-			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
-				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
-			'''
-			identifier: staticMethod.deprecatedClass
 			count: 1
 			path: app/bundles/WebhookBundle/Controller/WebhookController.php
 
@@ -35168,18 +34319,6 @@ parameters:
 			path: plugins/MauticClearbitBundle/EventListener/ButtonSubscriber.php
 
 		-
-			message: '#^Call to method getId\(\) on an unknown class MauticPlugin\\MauticClearbitBundle\\Helper\\User\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 2
-			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -35212,12 +34351,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Helper\\LookupHelper\:\:validateRequest\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^PHPDoc tag @var for variable \$user contains unknown class MauticPlugin\\MauticClearbitBundle\\Helper\\User\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticClearbitBundle/Helper/LookupHelper.php
 
@@ -35360,12 +34493,6 @@ parameters:
 			path: plugins/MauticCloudStorageBundle/Integration/AmazonS3Integration.php
 
 		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCloudStorageBundle/Integration/CloudStorageIntegration.php
-
-		-
 			message: '''
 				#^Class MauticPlugin\\MauticCloudStorageBundle\\Integration\\CloudStorageIntegration extends deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
 				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
@@ -35383,12 +34510,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCloudStorageBundle\\Integration\\CloudStorageIntegration\:\:getSupportedFeatures\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCloudStorageBundle/Integration/CloudStorageIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method MauticPlugin\\MauticCloudStorageBundle\\Integration\\CloudStorageIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticCloudStorageBundle/Integration/CloudStorageIntegration.php
 
@@ -35954,20 +35075,8 @@ parameters:
 			path: plugins/MauticCrmBundle/Api/SugarcrmApi.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SugarcrmApi\:\:getEmailBySugarUserId\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Api/SugarcrmApi.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SugarcrmApi\:\:getEmailBySugarUserId\(\) has parameter \$query with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Api/SugarcrmApi.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\SugarcrmApi\:\:getIdBySugarEmail\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticCrmBundle/Api/SugarcrmApi.php
 
@@ -36234,24 +35343,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: plugins/MauticCrmBundle/EventListener/LeadListSubscriber.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$event with type MauticPlugin\\MauticCrmBundle\\EventListener\\ListChangeEvent is not subtype of native type Mautic\\LeadBundle\\Event\\ListPreProcessListEvent\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: plugins/MauticCrmBundle/EventListener/LeadListSubscriber.php
-
-		-
-			message: '#^Parameter \$event of method MauticPlugin\\MauticCrmBundle\\EventListener\\LeadListSubscriber\:\:onLeadListProcessList\(\) has invalid type MauticPlugin\\MauticCrmBundle\\EventListener\\ListChangeEvent\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/EventListener/LeadListSubscriber.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 4
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no type specified\.$#'
@@ -36566,23 +35657,8 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
 		-
-			message: '#^Parameter \$builder of method MauticPlugin\\MauticCrmBundle\\Integration\\ConnectwiseIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
-
-		-
 			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeads\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '''
-				#^Call to method __construct\(\) of deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: staticMethod.deprecatedClass
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
@@ -36601,12 +35677,6 @@ parameters:
 				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
 			'''
 			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:createLead\(\) invoked with 2 parameters, 0 required\.$#'
-			identifier: arguments.count
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
@@ -36947,15 +36017,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '''
-				#^Parameter \$cacheStorageHelper of method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:__construct\(\) has typehint with deprecated class Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:
-				This helper is deprecated in favor of CacheBundle$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Property MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:\$auth has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -37001,12 +36062,6 @@ parameters:
 			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:updateLeads\(\)\.$#'
 			identifier: method.notFound
 			count: 2
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:createLead\(\) invoked with 2 parameters, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
 			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
 
 		-
@@ -38609,30 +37664,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 6
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Call to method createLeadActivity\(\) on an unknown class MauticPlugin\\MauticCrmBundle\\Integration\\SugarApi\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Call to method syncLeadsToSugar\(\) on an unknown class MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmApi\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:createLead\(\) invoked with 2 parameters, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -39077,18 +38108,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^PHPDoc tag @var for variable \$apiHelper contains unknown class MauticPlugin\\MauticCrmBundle\\Integration\\SugarApi\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^PHPDoc tag @var for variable \$apiHelper contains unknown class MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmApi\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Parameter \#1 \$internalEntityId of method Mautic\\PluginBundle\\Entity\\IntegrationEntity\:\:setInternalEntityId\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -39098,12 +38117,6 @@ parameters:
 			message: '#^Parameter \#1 \$internalEntityId of method Mautic\\PluginBundle\\Entity\\IntegrationEntity\:\:setInternalEntityId\(\) expects int, string\|null given\.$#'
 			identifier: argument.type
 			count: 2
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
@@ -39136,18 +38149,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeadFields\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class MauticPlugin\\MauticCrmBundle\\Integration\\FormBuilder\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
-
-		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
 
@@ -39196,18 +38197,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\VtigerIntegration\:\:getSupportedFeatures\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method MauticPlugin\\MauticCrmBundle\\Integration\\VtigerIntegration\:\:appendToForm\(\) has invalid type MauticPlugin\\MauticCrmBundle\\Integration\\FormBuilder\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method MauticPlugin\\MauticCrmBundle\\Integration\\VtigerIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
 
@@ -40427,18 +39416,6 @@ parameters:
 			path: plugins/MauticFocusBundle/Form/Type/FocusListType.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\IframeAvailabilityChecker\:\:checkHeaders\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticFocusBundle/Helper/IframeAvailabilityChecker.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\IframeAvailabilityChecker\:\:headerContains\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticFocusBundle/Helper/IframeAvailabilityChecker.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\TokenHelper\:\:findFocusTokens\(\) has parameter \$content with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -40601,18 +39578,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/EventListener/ButtonSubscriber.php
 
 		-
-			message: '#^Call to method getId\(\) on an unknown class MauticPlugin\\MauticFullContactBundle\\Helper\\User\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 2
-			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -40639,12 +39604,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:validateRequest\(\) has parameter \$oid with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^PHPDoc tag @var for variable \$user contains unknown class MauticPlugin\\MauticFullContactBundle\\Helper\\User\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
 
@@ -40829,12 +39788,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Icon.php
 
 		-
-			message: '#^Default value of the parameter \#3 \$casing \(string\) of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:normalizer\(\) is incompatible with type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:enrichment\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -40859,12 +39812,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:normalizer\(\) has invalid return type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:normalizer\(\) has parameter \$includeZeroPopulation with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -40873,12 +39820,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:normalizer\(\) has parameter \$place with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
-
-		-
-			message: '#^Parameter \$casing of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Location\:\:normalizer\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
 
@@ -40895,50 +39836,8 @@ parameters:
 			path: plugins/MauticFullContactBundle/Services/FullContact_Location.php
 
 		-
-			message: '#^Default value of the parameter \#2 \$casing \(string\) of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:normalizer\(\) is incompatible with type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Default value of the parameter \#2 \$type \(string\) of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:deducer\(\) is incompatible with type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Default value of the parameter \#3 \$casing \(string\) of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:deducer\(\) is incompatible with type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Default value of the parameter \#3 \$casing \(string\) of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:similarity\(\) is incompatible with type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: parameter.defaultValue
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Invalid array key type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: array.invalidKey
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:deducer\(\) has invalid return type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:deducer\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:normalizer\(\) has invalid return type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
 
@@ -40957,12 +39856,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:parser\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:similarity\(\) has invalid return type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
 
@@ -40987,48 +39880,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:stats\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$casing of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:deducer\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$casing of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:normalizer\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$casing of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:similarity\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$name of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:normalizer\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$name1 of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:similarity\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$name2 of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:similarity\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
-
-		-
-			message: '#^Parameter \$type of method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Name\:\:deducer\(\) has invalid type MauticPlugin\\MauticFullContactBundle\\Services\\type\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Name.php
 
@@ -41231,12 +40082,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:contactsAction\(\) has invalid return type MauticPlugin\\MauticSocialBundle\\Controller\\JsonResponse\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:contactsAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -41281,12 +40126,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:updateAuditLog\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:viewAction\(\) has invalid return type MauticPlugin\\MauticSocialBundle\\Controller\\JsonResponse\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 
@@ -41534,18 +40373,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Entity/TweetStat.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Entity\\TweetStat\:\:setResponseDetails\(\) has invalid return type MauticPlugin\\MauticSocialBundle\\Entity\\Stat\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticSocialBundle/Entity/TweetStat.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Entity\\TweetStat\:\:setResponseDetails\(\) should return MauticPlugin\\MauticSocialBundle\\Entity\\Stat but returns \$this\(MauticPlugin\\MauticSocialBundle\\Entity\\TweetStat\)\.$#'
-			identifier: return.type
-			count: 1
-			path: plugins/MauticSocialBundle/Entity/TweetStat.php
-
-		-
 			message: '#^PHPDoc tag @param for parameter \$lead with type mixed is not subtype of native type Mautic\\LeadBundle\\Entity\\Lead\|null\.$#'
 			identifier: parameter.phpDocType
 			count: 1
@@ -41554,18 +40381,6 @@ parameters:
 		-
 			message: '#^PHPDoc tag @param for parameter \$tweet with type mixed is not subtype of native type MauticPlugin\\MauticSocialBundle\\Entity\\Tweet\|null\.$#'
 			identifier: parameter.phpDocType
-			count: 1
-			path: plugins/MauticSocialBundle/Entity/TweetStat.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticSocialBundle\\Entity\\TweetStat\:\:\$dateSent has unknown class MauticPlugin\\MauticSocialBundle\\Entity\\DateTime as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticSocialBundle/Entity/TweetStat.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticSocialBundle\\Entity\\TweetStat\:\:\$responseDetails type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: plugins/MauticSocialBundle/Entity/TweetStat.php
 
@@ -41783,12 +40598,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
 
 		-
-			message: '#^Variable \$activity in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\InstagramIntegration\:\:getApiUrl\(\) has parameter \$endpoint with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -41852,12 +40661,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Integration/SocialIntegration.php
 
 		-
-			message: '#^Call to method add\(\) on an unknown class Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/SocialIntegration.php
-
-		-
 			message: '''
 				#^Class MauticPlugin\\MauticSocialBundle\\Integration\\SocialIntegration extends deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
 				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
@@ -41911,12 +40714,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\SocialIntegration\:\:getRequiredKeyFields\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticSocialBundle/Integration/SocialIntegration.php
-
-		-
-			message: '#^Parameter \$builder of method MauticPlugin\\MauticSocialBundle\\Integration\\SocialIntegration\:\:appendToForm\(\) has invalid type Mautic\\PluginBundle\\Integration\\Form\.$#'
-			identifier: class.notFound
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/SocialIntegration.php
 
@@ -42077,32 +40874,8 @@ parameters:
 			path: plugins/MauticTagManagerBundle/Controller/TagController.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController\:\:createTagModifyResponse\(\) has parameter \$postActionVars with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController\:\:deleteAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController\:\:getPostActionVars\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticTagManagerBundle\\Controller\\TagController\:\:viewAction\(\) has parameter \$objectId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticTagManagerBundle/Controller/TagController.php
-
-		-
-			message: '#^Negated boolean expression is always true\.$#'
-			identifier: booleanNot.alwaysTrue
 			count: 1
 			path: plugins/MauticTagManagerBundle/Controller/TagController.php
 
@@ -42162,18 +40935,3 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: plugins/MauticTagManagerBundle/Security/Permissions/TagManagerPermissions.php
-
-		-
-			message: '''
-				#^Call to deprecated method getFilterExpressionFunctions\(\) of class MauticPlugin\\StripeBundle\\EventListener\\SegmentFiltersChoicesGenerateSubscriber\:
-				to be removed in Mautic 3\. Use FilterOperatorProvider\:\:getAllOperators\(\) instead\.$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: plugins/StripeBundle/EventListener/SegmentFiltersChoicesGenerateSubscriber.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\StripeBundle\\Model\\WebhookModel\:\:getTableAlias\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/StripeBundle/Model/WebhookModel.php

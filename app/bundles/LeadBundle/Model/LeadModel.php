@@ -388,9 +388,9 @@ class LeadModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -681,7 +681,7 @@ class LeadModel extends FormModel
                     }
 
                     $isEmpty = (null == $newValue || '' == $newValue);
-                    if ($curValue !== $newValue && (!$isEmpty || ($isEmpty && $overwriteWithBlank))) {
+                    if ($curValue !== $newValue && (!$isEmpty || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $lead->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -1520,7 +1520,11 @@ class LeadModel extends FormModel
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
 
-                if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
+                if (
+                    'email' === $leadField['type']
+                    && isset($fieldData[$leadField['alias']])
+                    && '' !== $fieldData[$leadField['alias']]
+                ) {
                     try {
                         $this->emailValidator->validate($fieldData[$leadField['alias']], false);
                     } catch (\Exception $exception) {
@@ -2492,7 +2496,7 @@ class LeadModel extends FormModel
                 }
                 $allowedValues = is_array($field['properties'])
                     ? $field['properties']
-                    : unserialize($field['properties']);
+                    : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
 
                 $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 

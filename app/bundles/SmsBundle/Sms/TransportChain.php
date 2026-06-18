@@ -4,13 +4,15 @@ namespace Mautic\SmsBundle\Sms;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\SmsBundle\Collection\RecipientCollection;
 use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
+use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 
 class TransportChain
 {
     /**
-     * @var TransportInterface[]
+     * @var array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
     private array $transports;
 
@@ -68,6 +70,61 @@ class TransportChain
     }
 
     /**
+     * @param RecipientCollection<SmsRecipientDTO> $collection
+     *
+     * @return RecipientCollection<SmsRecipientDTO>
+     *
+     * @throws PrimaryTransportNotEnabledException
+     */
+    public function sendBatchSms(RecipientCollection $collection, string $template): RecipientCollection
+    {
+        $primaryTransport = $this->getPrimaryTransport();
+
+        // If the transport support sending of bulk sms
+        if ($primaryTransport instanceof BulkTransportInterface) {
+            return $primaryTransport->sendBatchSms($collection, $template);
+        }
+
+        return $this->sendMessage($collection);
+    }
+
+    /**
+     * @param RecipientCollection<SmsRecipientDTO> $collection
+     * @param array<mixed>                         $media
+     *
+     * @return RecipientCollection<SmsRecipientDTO>
+     */
+    public function sendMMS(RecipientCollection $collection, array $media = []): RecipientCollection
+    {
+        return $this->sendMessage($collection, $media);
+    }
+
+    /**
+     * @param RecipientCollection<SmsRecipientDTO> $collection
+     * @param array<mixed>                         $media
+     *
+     * @return RecipientCollection<SmsRecipientDTO>
+     */
+    private function sendMessage(RecipientCollection $collection, array $media = []): RecipientCollection
+    {
+        // loops through contacts
+        foreach ($collection as $recipient) {
+            $content          = $recipient->getFinalMessage();
+            $primaryTransport = $this->getPrimaryTransport();
+
+            // As of now media is only supported by twilio
+            if ($media && $primaryTransport instanceof MMSTransportInterface) {
+                $status = $primaryTransport->sendMms($recipient->getLead(), $content, $media);
+            } else {
+                $status  = $this->sendSms($recipient->getLead(), $content);
+            }
+            $recipient->setResult($status);
+        }
+
+        return $collection;
+    }
+
+    /**
      * @param string $content
      *
      * @return mixed
@@ -82,7 +139,7 @@ class TransportChain
     /**
      * Get all transports registered in service container.
      *
-     * @return TransportInterface[]
+     * @return array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
     public function getTransports()
     {

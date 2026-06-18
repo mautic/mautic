@@ -31,10 +31,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/segments', security: "is_granted('lead:lists:viewown')"),
         new Post(uriTemplate: '/segments', security: "is_granted('lead:lists:create')"),
-        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown')"),
-        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown')"),
-        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother')"),
-        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown')"),
+        new Get(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:viewown', object)"),
+        new Put(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editown', object)"),
+        new Patch(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:editother', object)"),
+        new Delete(uriTemplate: '/segments/{id}', security: "is_granted('lead:lists:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['segment:read'],
@@ -126,6 +126,9 @@ class LeadList extends FormEntity implements UuidInterface
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private $lastBuiltTime;
 
+    #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    private ?\DateTimeInterface $deleted = null;
+
     public function __construct()
     {
         $this->leads = new ArrayCollection();
@@ -138,7 +141,8 @@ class LeadList extends FormEntity implements UuidInterface
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(LeadListRepository::class)
-            ->addIndex(['alias'], 'lead_list_alias');
+            ->addIndex(['alias'], 'lead_list_alias')
+            ->addIndex(['deleted'], 'segment_deleted');
 
         $builder->addIdColumns();
 
@@ -176,6 +180,8 @@ class LeadList extends FormEntity implements UuidInterface
             ->build();
 
         self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
+        $builder->addNullableField('deleted', 'datetime');
+
         static::addUuidField($builder);
     }
 
@@ -228,6 +234,11 @@ class LeadList extends FormEntity implements UuidInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -505,6 +516,16 @@ class LeadList extends FormEntity implements UuidInterface
         $this->lastBuiltTime = $lastBuiltTime;
     }
 
+    public function setDeleted(?\DateTimeInterface $deletedDate): void
+    {
+        $this->deleted = $deletedDate;
+    }
+
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
     /**
      * @param mixed[] $filters
      *
@@ -518,5 +539,10 @@ class LeadList extends FormEntity implements UuidInterface
         }
 
         return $filters;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
     }
 }

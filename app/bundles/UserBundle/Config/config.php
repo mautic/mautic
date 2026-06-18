@@ -109,6 +109,10 @@ return [
                 'path'       => '/passwordresetconfirm',
                 'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetConfirmAction',
             ],
+            'mautic_user_invite_register' => [
+                'path'       => '/invite/{token}',
+                'controller' => 'Mautic\UserBundle\Controller\PublicController::inviteAction',
+            ],
             'lightsaml_sp.metadata' => [
                 'path'       => '/saml/metadata.xml',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::metadataAction',
@@ -136,15 +140,6 @@ return [
                 'class'     => Doctrine\ORM\EntityManager::class,
                 'arguments' => Mautic\UserBundle\Entity\Permission::class,
                 'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.user.provider' => [
-                'class'     => Mautic\UserBundle\Security\Provider\UserProvider::class,
-                'arguments' => [
-                    'mautic.user.repository',
-                    'mautic.permission.repository',
-                    'event_dispatcher',
-                    'security.password_hasher',
-                ],
             ],
             'mautic.security.authentication_handler' => [
                 'class'     => Mautic\UserBundle\Security\Authentication\AuthenticationHandler::class,

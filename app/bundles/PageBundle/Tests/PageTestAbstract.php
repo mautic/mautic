@@ -32,6 +32,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class PageTestAbstract extends TestCase
 {
@@ -59,16 +61,14 @@ class PageTestAbstract extends TestCase
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
     }
 
-    /**
-     * @return PageModel
-     */
-    protected function getPageModel($transliterationEnabled = true)
+    protected function getPageModel(bool $transliterationEnabled = true, bool $validatePageHitRequiredData = true): PageModel
     {
         $cookieHelper = $this->createMock(CookieHelper::class);
 
         $this->router = $this->createMock(Router::class);
 
         $this->ipLookupHelper = $this->createMock(IpLookupHelper::class);
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
 
         $leadModel = $this->createMock(LeadModel::class);
 
@@ -115,13 +115,25 @@ class PageTestAbstract extends TestCase
             );
 
         $coreParametersHelper->expects($this->any())
-                ->method('get')
-                ->with('transliterate_page_title')
-                ->willReturn($transliterationEnabled);
+            ->method('get')
+            ->with($this->anything())
+            ->willReturnCallback(function ($parameter) use ($transliterationEnabled, $validatePageHitRequiredData) {
+                if ('transliterate_page_title' === $parameter) {
+                    return $transliterationEnabled;
+                }
+
+                if ('validate_page_hit_required_data' === $parameter) {
+                    return $validatePageHitRequiredData;
+                }
+            });
 
         $deviceTrackerMock           = $this->createMock(DeviceTracker::class);
         $statRepositoryMock          = $this->createMock(StatRepository::class);
         $botRatioHelperMock          = $this->createMock(BotRatioHelper::class);
+        $validatorMock               = $this->createMock(ValidatorInterface::class);
+
+        $validatorMock->method('validate')
+            ->willReturn(new ConstraintViolationList());
 
         $pageModel = new PageModel(
             $cookieHelper,
@@ -144,7 +156,8 @@ class PageTestAbstract extends TestCase
             $userHelper,
             $this->createMock(LoggerInterface::class),
             $statRepositoryMock,
-            $botRatioHelperMock
+            $botRatioHelperMock,
+            $validatorMock
         );
 
         return $pageModel;

@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Result;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -948,11 +947,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->companyModelMock->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->companyRepositoryMock);
-
-        $mockStmt = $this->getMockBuilder(Result::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['fetchAllAssociative'])
-            ->getMock();
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getQueryBuilder')
