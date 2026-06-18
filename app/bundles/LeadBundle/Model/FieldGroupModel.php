@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\FieldGroup;
 use Mautic\LeadBundle\Entity\FieldGroupRepository;
@@ -210,6 +211,25 @@ class FieldGroupModel extends FormModel
     public function getFieldCountPerGroup(): array
     {
         return $this->getRepository()->getFieldCountPerGroup();
+    }
+
+    /**
+     * Backstop guard for the single-entity and API delete paths: a group that
+     * still has fields assigned cannot be deleted, otherwise those fields would
+     * be orphaned (lead_fields.field_group references the alias with no FK).
+     * The GUI single delete also pre-checks via canDelete(); the API catches
+     * DeleteEntityDependencyException and returns a clean error. Batch delete is
+     * guarded in FieldGroupController::batchDeleteAction().
+     *
+     * @param FieldGroup $entity
+     */
+    public function deleteEntity($entity): void
+    {
+        if ($entity instanceof FieldGroup && !$this->canDelete($entity)) {
+            throw new DeleteEntityDependencyException([$this->translator->trans('mautic.lead.field_group.error.has_fields', [], 'flashes')]);
+        }
+
+        parent::deleteEntity($entity);
     }
 
     public function canDelete(FieldGroup $entity): bool
