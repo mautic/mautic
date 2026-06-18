@@ -31,10 +31,7 @@ class Stat
      */
     private $list;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -246,18 +243,12 @@ class Stat
         return (int) $this->id;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param mixed $ip
-     */
-    public function setIpAddress(IpAddress $ip): void
+    public function setIpAddress(?IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -286,9 +277,6 @@ class Stat
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(?Lead $lead = null): void
     {
         $this->lead = $lead;
