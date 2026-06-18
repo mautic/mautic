@@ -923,6 +923,71 @@ class MailHelperTest extends TestCase
         $this->assertNull($helper::validateEmail($email)); /** @phpstan-ignore-line as it's testing a deprecated method */
     }
 
+    public function testGenerateBounceEmailUsesConfiguredMonitoringAddress(): void
+    {
+        $this->mailbox->expects($this->once())
+            ->method('isConfigured')
+            ->with('EmailBundle', 'bounces')
+            ->willReturn(true);
+        $this->mailbox->expects($this->once())
+            ->method('getMailboxSettings')
+            ->willReturn(['address' => 'bounces@example.com']);
+
+        $helper = $this->mockEmptyMailHelper();
+
+        $this->assertSame('bounces+bounce_stat123@example.com', $helper->generateBounceEmail('stat123'));
+    }
+
+    /**
+     * @param mixed[] $settings
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidMonitoringAddressSettings')]
+    public function testGenerateBounceEmailReturnsFalseForInvalidMonitoringAddress(array $settings): void
+    {
+        $this->mailbox->expects($this->once())
+            ->method('isConfigured')
+            ->with('EmailBundle', 'bounces')
+            ->willReturn(true);
+        $this->mailbox->expects($this->once())
+            ->method('getMailboxSettings')
+            ->willReturn($settings);
+
+        $helper = $this->mockEmptyMailHelper();
+
+        $this->assertFalse($helper->generateBounceEmail('stat123'));
+    }
+
+    /**
+     * @param mixed[] $settings
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidMonitoringAddressSettings')]
+    public function testGenerateUnsubscribeEmailReturnsFalseForInvalidMonitoringAddress(array $settings): void
+    {
+        $this->mailbox->expects($this->once())
+            ->method('isConfigured')
+            ->with('EmailBundle', 'unsubscribes')
+            ->willReturn(true);
+        $this->mailbox->expects($this->once())
+            ->method('getMailboxSettings')
+            ->willReturn($settings);
+
+        $helper = $this->mockEmptyMailHelper();
+
+        $this->assertFalse($helper->generateUnsubscribeEmail('stat123'));
+    }
+
+    /**
+     * @return iterable<string, array{0: mixed[]}>
+     */
+    public static function provideInvalidMonitoringAddressSettings(): iterable
+    {
+        yield 'blank address' => [['address' => '']];
+        yield 'missing address' => [[]];
+        yield 'missing domain' => [['address' => 'bounces@']];
+        yield 'missing local part' => [['address' => '@example.com']];
+        yield 'not an email address' => [['address' => 'not-an-email-address']];
+    }
+
     public function testValidateValidEmails(): void
     {
         $helper    = $this->mockEmptyMailHelper();

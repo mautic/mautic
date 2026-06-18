@@ -1787,8 +1787,12 @@ class MailHelper
         $monitoredEmail = false;
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+            if (!($addressParts = $this->getMonitoredEmailAddressParts($settings))) {
+                return false;
+            }
+
             // Append the bounce notation
-            [$email, $domain] = explode('@', $settings['address']);
+            [$email, $domain] = $addressParts;
             $email .= '+bounce';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1809,8 +1813,12 @@ class MailHelper
         $monitoredEmail = false;
 
         if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+            if (!($addressParts = $this->getMonitoredEmailAddressParts($settings))) {
+                return false;
+            }
+
             // Append the bounce notation
-            [$email, $domain] = explode('@', $settings['address']);
+            [$email, $domain] = $addressParts;
             $email .= '+unsubscribe';
             if ($idHash || $this->idHash) {
                 $email .= '_'.($idHash ?: $this->idHash);
@@ -1819,6 +1827,20 @@ class MailHelper
         }
 
         return $monitoredEmail;
+    }
+
+    /**
+     * @param mixed[] $settings
+     *
+     * @return array{0: string, 1: string}|false
+     */
+    private function getMonitoredEmailAddressParts(array $settings): array|false
+    {
+        if (empty($settings['address']) || !is_string($settings['address']) || !filter_var($settings['address'], FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+
+        return explode('@', $settings['address'], 2);
     }
 
     /**
