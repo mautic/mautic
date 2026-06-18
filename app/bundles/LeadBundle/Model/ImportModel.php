@@ -262,24 +262,6 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress, $limit = 0): bool
     {
-        try {
-            $file = new \SplFileObject($import->getFilePath());
-        } catch (\Exception $e) {
-            $import->setStatusInfo('SplFileObject cannot read the file. '.$e->getMessage());
-            $import->setStatus(Import::FAILED);
-            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
-
-            return false;
-        }
-
-        $lastImportedLine = $import->getLastLineImported();
-        $headers          = $import->getHeaders();
-        $headerCount      = count($headers);
-        $config           = $import->getParserConfig();
-        $counter          = 0;
-
-        $file->seek($lastImportedLine);
-
         /*
          * PHP 8.6 Backward Incompatible Changes
          *
@@ -295,6 +277,33 @@ class ImportModel extends FormModel
          *    values.
          */
 
+        // Open the file handle natively (migrate from SplFileObject)
+        // Equivalent of new \SplFileObject($import->getFilePath());
+        $handle = @fopen($import->getFilePath(), 'r');
+        if (false === $handle) {
+            $lastError    = error_get_last();
+            $errorMessage = $lastError ? $lastError['message'] : 'Unknown error';
+
+            $import->setStatusInfo('Cannot read the file. '.$errorMessage);
+            $import->setStatus(Import::FAILED);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
+
+            return false;
+        }
+
+        $lastImportedLine = $import->getLastLineImported();
+        $headers          = $import->getHeaders();
+        $headerCount      = count($headers);
+        $config           = $import->getParserConfig();
+        $counter          = 0;
+
+        // Perform raw seeking line by line
+        // Equivalent of SplFileObject->seek($lastImportedLine);
+        $currentLineIndex = 0;
+        while ($currentLineIndex < $lastImportedLine && false !== fgets($handle)) {
+            ++$currentLineIndex;
+        }
+
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
@@ -305,9 +314,8 @@ class ImportModel extends FormModel
             $val = strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
-        while ($batchSize && !$file->eof()) {
-            $string = $file->current();
-            $file->next();
+        // Process the file line-by-line using fgets to capture raw lines
+        while ($batchSize && ($string = fgets($handle)) !== false) {
             $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
 
             $import->setLastLineImported($lineNumber);
@@ -431,7 +439,7 @@ class ImportModel extends FormModel
         }
 
         // Close the file
-        $file = null;
+        fclose($handle);
 
         return true;
     }
