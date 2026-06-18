@@ -709,12 +709,6 @@ parameters:
 			path: app/bundles/AssetBundle/Entity/Download.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$email with type mixed is not subtype of native type Mautic\\EmailBundle\\Entity\\Email\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Download.php
-
-		-
 			message: '#^Property Mautic\\AssetBundle\\Entity\\Download\:\:\$trackingId \(string\) does not accept int\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -3079,12 +3073,6 @@ parameters:
 			message: '#^Method Mautic\\CampaignBundle\\Executioner\\EventExecutioner\:\:recordLogsAsFailedForEvent\(\) has parameter \$reason with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: app/bundles/CampaignBundle/Executioner/EventExecutioner.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$counter with type Mautic\\CampaignBundle\\Executioner\\Result\\Counter\|null is not subtype of native type Mautic\\CampaignBundle\\Executioner\\Result\\Counter\.$#'
-			identifier: parameter.phpDocType
-			count: 2
 			path: app/bundles/CampaignBundle/Executioner/EventExecutioner.php
 
 		-
@@ -11836,12 +11824,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/Stat.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$ip with type Mautic\\CoreBundle\\Entity\\IpAddress\|null is not subtype of native type Mautic\\CoreBundle\\Entity\\IpAddress\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Stat.php
-
-		-
 			message: '#^Property Mautic\\EmailBundle\\Entity\\Stat\:\:\$openDetails type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -11852,18 +11834,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/Entity/Stat.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$device with type mixed is not subtype of native type Mautic\\LeadBundle\\Entity\\LeadDevice\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/EmailBundle/Entity/StatDevice.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$ip with type mixed is not subtype of native type Mautic\\CoreBundle\\Entity\\IpAddress\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/EmailBundle/Entity/StatDevice.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\StatDeviceRepository\:\:getDeviceStats\(\) has parameter \$emailIds with no type specified\.$#'
@@ -16560,12 +16530,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\InstallBundle\\Controller\\InstallController\:\:handleInstallerErrors\(\) has parameter \$messages with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/InstallBundle/Controller/InstallController.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$index with type int is incompatible with native type float\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: app/bundles/InstallBundle/Controller/InstallController.php
 
@@ -26777,18 +26741,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Entity/Stat.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$ip with type mixed is not subtype of native type Mautic\\CoreBundle\\Entity\\IpAddress\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/NotificationBundle/Entity/Stat.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$lead with type mixed is not subtype of native type Mautic\\LeadBundle\\Entity\\Lead\|null\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/NotificationBundle/Entity/Stat.php
-
-		-
 			message: '#^Property Mautic\\NotificationBundle\\Entity\\Stat\:\:\$clickDetails type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -27115,12 +27067,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PageBundle\\Entity\\Hit\:\:setQuery\(\) has parameter \$query with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Entity/Hit.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$email with type mixed is not subtype of native type Mautic\\EmailBundle\\Entity\\Email\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: app/bundles/PageBundle/Entity/Hit.php
 
@@ -33377,12 +33323,6 @@ parameters:
 			path: app/bundles/UserBundle/Entity/User.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$preferences with type mixed is not subtype of native type array\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: app/bundles/UserBundle/Entity/User.php
-
-		-
 			message: '#^Property Mautic\\UserBundle\\Entity\\User\:\:\$activePermissions has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -34293,12 +34233,6 @@ parameters:
 			identifier: return.type
 			count: 2
 			path: plugins/MauticClearbitBundle/Controller/ClearbitController.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$user with type Mautic\\UserBundle\\Entity\\User\|null is not subtype of native type Mautic\\UserBundle\\Entity\\User\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: plugins/MauticClearbitBundle/Controller/PublicController.php
 
 		-
 			message: '#^PHPDoc tag @var for variable \$result has no value type specified in iterable type array\.$#'
@@ -39548,12 +39482,6 @@ parameters:
 			path: plugins/MauticFullContactBundle/Controller/PublicController.php
 
 		-
-			message: '#^PHPDoc tag @param for parameter \$user with type Mautic\\UserBundle\\Entity\\User\|null is not subtype of native type Mautic\\UserBundle\\Entity\\User\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: plugins/MauticFullContactBundle/Controller/PublicController.php
-
-		-
 			message: '#^PHPDoc tag @var for variable \$organizations has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -40369,18 +40297,6 @@ parameters:
 				Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id$#
 			'''
 			identifier: method.deprecated
-			count: 1
-			path: plugins/MauticSocialBundle/Entity/TweetStat.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$lead with type mixed is not subtype of native type Mautic\\LeadBundle\\Entity\\Lead\|null\.$#'
-			identifier: parameter.phpDocType
-			count: 1
-			path: plugins/MauticSocialBundle/Entity/TweetStat.php
-
-		-
-			message: '#^PHPDoc tag @param for parameter \$tweet with type mixed is not subtype of native type MauticPlugin\\MauticSocialBundle\\Entity\\Tweet\|null\.$#'
-			identifier: parameter.phpDocType
 			count: 1
 			path: plugins/MauticSocialBundle/Entity/TweetStat.php
 

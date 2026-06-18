@@ -89,11 +89,8 @@ class Download
     #[Groups(['download:read', 'download:write'])]
     private $sourceId;
 
-    /**
-     * @var Email|null
-     */
     #[Groups(['download:read', 'download:write'])]
-    private $email;
+    private ?Email $email = null;
 
     private ?string $utmCampaign = null;
 
@@ -348,18 +345,12 @@ class Download
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail(Email $email): void
+    public function setEmail(?Email $email): void
     {
         $this->email = $email;
     }
