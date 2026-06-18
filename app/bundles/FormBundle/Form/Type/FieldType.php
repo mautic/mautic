@@ -142,6 +142,7 @@ class FieldType extends AbstractType
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
                 case 'boolean':
+                case 'rating':
                     $addDefaultValue = false;
                     break;
                 case 'slider':
@@ -590,6 +591,16 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldGroupType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'rating':
+                    $builder->add(
+                        'properties',
+                        FormFieldRatingType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,

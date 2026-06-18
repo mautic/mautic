@@ -136,10 +136,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $activePermissions;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     #[Groups(['user:read', 'user:write'])]
-    private $preferences = [];
+    private array $preferences = [];
 
     /**
      * @var string|null
@@ -264,6 +264,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
                 'fields'           => ['email'],
                 'message'          => 'mautic.user.user.email.unique',
                 'repositoryMethod' => 'checkUniqueUsernameEmail',
+                'groups'           => ['User', 'SecondPass'],
             ]
         ));
 
@@ -778,15 +779,15 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function getPreferences()
+    public function getPreferences(): array
     {
         return $this->preferences;
     }
 
     /**
-     * @param mixed $preferences
+     * @param mixed[] $preferences
      */
     public function setPreferences(array $preferences): void
     {
@@ -844,5 +845,14 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public function getCacheNamespacesToDelete(): array
     {
         return [self::CACHE_NAMESPACE];
+    }
+
+    public static function createFromInvite(UserInvite $invite): self
+    {
+        $user = new self();
+        $user->setEmail($invite->getEmail());
+        $user->setRole($invite->getRole());
+
+        return $user;
     }
 }

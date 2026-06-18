@@ -13,6 +13,7 @@ use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\Form\Type\FormFieldBooleanType;
+use Mautic\FormBundle\Form\Type\FormFieldRatingType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -69,6 +70,7 @@ class FieldTypeTest extends TypeTestCase
                     $this->mappedFieldCollector
                 ),
                 FormFieldBooleanType::class => new FormFieldBooleanType(),
+                FormFieldRatingType::class => new FormFieldRatingType($this->translator),
             ], []),
         ];
     }
@@ -161,5 +163,29 @@ class FieldTypeTest extends TypeTestCase
         $this->assertSame('Accept', $form->get('properties')->get('yes')->getData());
         $this->assertSame('', $form->get('properties')->get('no')->getData());
         $this->assertSame('boolean', $form->get('mappedField')->getData());
+    }
+
+    public function testRatingFieldUsesRatingPropertiesAndNoDefaultValue(): void
+    {
+        $formData = [
+            'type'       => 'rating',
+            'formId'     => 1,
+            'properties' => [
+                'star_count' => 7,
+                'symbol'     => '◆',
+                'star_color' => '#112233',
+                'base_color' => '#ddeeff',
+            ],
+        ];
+
+        $form = $this->factory->create(FieldType::class, $formData);
+
+        $this->assertFalse($form->has('defaultValue'));
+        $this->assertTrue($form->has('properties'));
+        $this->assertTrue($form->get('properties')->has('star_count'));
+        $this->assertSame(7, $form->get('properties')->get('star_count')->getData());
+        $this->assertSame('◆', $form->get('properties')->get('symbol')->getData());
+        $this->assertSame('#112233', $form->get('properties')->get('star_color')->getData());
+        $this->assertSame('#ddeeff', $form->get('properties')->get('base_color')->getData());
     }
 }
