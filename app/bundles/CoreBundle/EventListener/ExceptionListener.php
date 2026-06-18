@@ -122,7 +122,6 @@ class ExceptionListener extends ErrorListener
             }
 
             $prev = new \ReflectionProperty('Exception', 'previous');
-            $prev->setAccessible(true);
             $prev->setValue($wrapper, $exception);
 
             throw $e;

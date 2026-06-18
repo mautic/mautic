@@ -35,10 +35,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/contacts', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/contacts', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/contacts/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['contact:read'],
@@ -769,9 +769,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             return $socialIdentity;
         } elseif (count($ips = $this->getIpAddresses())) {
             return $ips->first()->getIpAddress();
-        } else {
-            return 'mautic.lead.lead.anonymous';
         }
+
+        return 'mautic.lead.lead.anonymous';
     }
 
     /**
@@ -1075,10 +1075,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             if ($id->getPushID() === $identifier) {
                 if ($id->isEnabled() === $enabled) {
                     return $this;
-                } else {
-                    $entity = $id;
-                    $this->removePushID($id);
                 }
+                $entity = $id;
+                $this->removePushID($id);
             }
         }
 
@@ -1189,7 +1188,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get internal storage.
      *
-     * @return mixed
+     * @return array<mixed>
      */
     public function getInternal()
     {
@@ -1207,7 +1206,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get social cache.
      *
-     * @return mixed
+     * @return array<mixed>
      */
     public function getSocialCache()
     {
@@ -1215,7 +1214,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getColor()
     {
@@ -1303,7 +1302,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return Collection<int, LeadNote>
      */
     public function getNotes()
     {
@@ -1319,7 +1318,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPreferredProfileImage()
     {
@@ -1327,7 +1326,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateIdentified()
     {
@@ -1344,7 +1343,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastActive()
     {
@@ -1390,7 +1389,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get tags.
      *
-     * @return mixed
+     * @return Collection<string, Tag>
      */
     public function getTags()
     {
@@ -1412,7 +1411,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get utm tags.
      *
-     * @return mixed
+     * @return Collection<int, UtmTag>
      */
     public function getUtmTags()
     {
@@ -1807,7 +1806,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTimezone()
     {
@@ -1893,7 +1892,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Returns array of rules with preferred channels first.
      *
-     * @return mixed
+     * @return array<mixed>
      */
     public function getChannelRules()
     {
@@ -1981,19 +1980,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                         }
 
                         return ($a['frequency_number'] > $b['frequency_number']) ? -1 : 1;
-                    } else {
-                        $convertToMonth = fn ($number, $unit) => match ($unit) {
-                            FrequencyRule::TIME_MONTH => (int) $number,
-                            FrequencyRule::TIME_WEEK  => $number * 4,
-                            FrequencyRule::TIME_DAY   => $number * 30,
-                            default                   => $number,
-                        };
-
-                        $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
-                        $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
-
-                        return $bFrequency <=> $aFrequency;
                     }
+                    $convertToMonth = fn ($number, $unit) => match ($unit) {
+                        FrequencyRule::TIME_MONTH => (int) $number,
+                        FrequencyRule::TIME_WEEK  => $number * 4,
+                        FrequencyRule::TIME_DAY   => $number * 30,
+                        default                   => $number,
+                    };
+
+                    $aFrequency = $convertToMonth($a['frequency_number'], $a['frequency_time']);
+                    $bFrequency = $convertToMonth($b['frequency_number'], $b['frequency_time']);
+
+                    return $bFrequency <=> $aFrequency;
                 }
 
                 return ($a['preferred_channel'] > $b['preferred_channel']) ? -1 : 1;

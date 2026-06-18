@@ -151,7 +151,7 @@ class Category extends FormEntity implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -176,7 +176,7 @@ class Category extends FormEntity implements UuidInterface
     /**
      * Get title.
      *
-     * @return string
+     * @return string|null
      */
     public function getTitle()
     {
@@ -201,7 +201,7 @@ class Category extends FormEntity implements UuidInterface
     /**
      * Get alias.
      *
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -226,7 +226,7 @@ class Category extends FormEntity implements UuidInterface
     /**
      * Get description.
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -245,7 +245,7 @@ class Category extends FormEntity implements UuidInterface
     /**
      * Get color.
      *
-     * @return string
+     * @return string|null
      */
     public function getColor()
     {
@@ -266,7 +266,7 @@ class Category extends FormEntity implements UuidInterface
     /**
      * Get bundle.
      *
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {

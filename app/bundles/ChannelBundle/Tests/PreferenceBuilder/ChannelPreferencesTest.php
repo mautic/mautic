@@ -36,10 +36,7 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organized->first()->getMetadata()['log'], 2);
     }
 
-    /**
-     * @return ChannelPreferences
-     */
-    private function getChannelPreference($channel, Event $event)
+    private function getChannelPreference(string $channel, Event $event): ChannelPreferences
     {
         return new ChannelPreferences($event);
     }

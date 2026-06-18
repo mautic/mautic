@@ -30,6 +30,11 @@ return [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
                 'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
             ],
+            'grapesjsbuilder_editor_state' => [
+                'path'       => '/grapesjsbuilder/{objectType}/{objectId}/editor-state',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::editorStateAction',
+                'methods'    => ['GET'],
+            ],
         ],
         'public' => [],
         'api'    => [],

@@ -33,6 +33,7 @@ class SysinfoController extends FormController
         RequestStack $requestStack,
         CorePermissions $security,
     ) {
+        // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 

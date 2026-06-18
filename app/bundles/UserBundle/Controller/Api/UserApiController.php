@@ -120,12 +120,11 @@ class UserApiController extends CommonApiController
             ) {
                 // PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
-            } else {
-                $entity = $this->model->getEntity();
-                if (isset($parameters['plainPassword']['password'])) {
-                    $submittedPassword = $parameters['plainPassword']['password'];
-                    $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
-                }
+            }
+            $entity = $this->model->getEntity();
+            if (isset($parameters['plainPassword']['password'])) {
+                $submittedPassword = $parameters['plainPassword']['password'];
+                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
             }
         } else {
             // Changing passwords via API is forbidden
@@ -213,8 +212,8 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $request->query->get('filter', null);
-        $limit  = (int) $request->query->get('limit', null);
+        $filter = $request->query->get('filter');
+        $limit  = (int) $request->query->get('limit');
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

@@ -167,10 +167,8 @@ class FormApiController extends CommonApiController
                 if (empty($fieldParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity();
                 } else {
-                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
                     $requestFieldIds[] = $fieldParams['id'];
                 }
@@ -209,9 +207,8 @@ class FormApiController extends CommonApiController
                     $msg = $this->translator->trans('mautic.form.field.alias.unique', ['%alias%' => $fieldEntityArray['alias']], 'validators');
 
                     return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
-                } else {
-                    $requestUsedAliases[] = $fieldEntityArray['alias'];
                 }
+                $requestUsedAliases[] = $fieldEntityArray['alias'];
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);

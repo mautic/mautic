@@ -109,7 +109,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -133,7 +133,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -149,7 +149,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {
@@ -157,7 +157,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection<int, Integration>
      */
     public function getIntegrations()
     {
@@ -165,7 +165,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDescription()
     {
@@ -203,7 +203,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getVersion()
     {
@@ -219,7 +219,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsMissing()
     {
@@ -235,7 +235,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getAuthor()
     {

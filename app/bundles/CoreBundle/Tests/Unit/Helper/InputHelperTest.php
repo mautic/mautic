@@ -123,7 +123,7 @@ class InputHelperTest extends TestCase
         $tests = [
             'custom test' => 'custom test',
             'čusťom test' => 'custom test',
-            null          => '',
+            ''            => '',
         ];
         foreach ($tests as $input=>$expected) {
             $this->assertEquals(InputHelper::transliterate($input), $expected);
@@ -138,6 +138,7 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
+    /** @return iterable<array{0: string, 1: string, 2: string, 3?: bool}> */
     public static function urlProvider(): iterable
     {
         yield [

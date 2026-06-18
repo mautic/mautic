@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -15,9 +14,6 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @IgnoreAnnotation("covers")
- */
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -135,7 +131,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $errorResponse  = json_decode($clientResponse->getContent(), true);
 
         Assert::assertArrayHasKey('errors', $errorResponse);
-        Assert::assertSame($errorResponse['errors'][0]['code'], $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame($errorResponse['errors'][0]['code']);
         Assert::assertSame($expectedMessage, $errorResponse['errors'][0]['message']);
     }
 
@@ -220,7 +216,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Call endpoint
         $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('contact', $responseJson);
@@ -332,7 +328,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Call endpoint
         $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('contact', $responseJson);
@@ -391,6 +387,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         yield 'empty string value' => [''];
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
     {
         // Test creating a new field
@@ -419,6 +416,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         return $response['field']['id'];
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertGetResponse(array $payload, int $id): void
     {
         // Test get and that the field was published
@@ -434,6 +432,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
         $typeSafePayload = $this->generateTypeSafePayload($payload);
@@ -455,6 +454,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
@@ -478,6 +478,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @return array<string, mixed> */
     private function getCreatePayload(string $alias): array
     {
         return [
@@ -499,6 +500,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    /** @return array<string, mixed> */
     private function getEditPayload(int $id): array
     {
         return [

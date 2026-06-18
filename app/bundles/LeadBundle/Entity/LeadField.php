@@ -30,10 +30,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('lead:leads:viewown')"),
         new Post(security: "is_granted('lead:leads:create')"),
-        new Get(security: "is_granted('lead:leads:viewown')"),
-        new Put(security: "is_granted('lead:leads:editown')"),
-        new Patch(security: "is_granted('lead:leads:editother')"),
-        new Delete(security: "is_granted('lead:leads:deleteown')"),
+        new Get(security: "is_granted('lead:leads:viewown', object)"),
+        new Put(security: "is_granted('lead:leads:editown', object)"),
+        new Patch(security: "is_granted('lead:leads:editother', object)"),
+        new Delete(security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['leadfield:read'],
@@ -485,7 +485,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get defaultValue.
      *
-     * @return string
+     * @return string|null
      */
     public function getDefaultValue()
     {
@@ -600,7 +600,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get object.
      *
-     * @return string
+     * @return string|null
      */
     public function getObject()
     {
@@ -647,7 +647,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get order.
      *
-     * @return int
+     * @return int|null
      */
     public function getOrder()
     {
@@ -721,7 +721,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get the unique identifer state of the field.
      *
-     * @return bool
+     * @return bool|null
      */
     public function getIsUniqueIdentifer()
     {
@@ -829,7 +829,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getGroup()
     {
@@ -845,7 +845,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsPubliclyUpdatable()
     {

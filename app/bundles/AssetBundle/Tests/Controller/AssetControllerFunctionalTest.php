@@ -29,16 +29,113 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
     {
         $this->configParams['validate_remote_domains'] = false;
         $this->configParams['site_url']                = 'https://site.tld';
+        $this->configParams['allowed_extensions']      = ['jpg', 'zip', 'txt'];
 
-        if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
+        if (in_array($this->name(), ['testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled', 'testCreateAndEditRemoteImageAssetWithQueryString'], true)) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = [
                 'first-allowed.tld',
                 'second-allowed.tld',
+                'fastly.picsum.photos',
             ];
         }
 
         parent::setUp();
+    }
+
+    public function testCreateAndEditRemoteImageAssetWithQueryString(): void
+    {
+        $title   = 'Remote image asset with query string';
+        $fileUrl = 'https://fastly.picsum.photos/id/13/2500/1667.jpg?hmac=SoX9UoHhN8HyklRA4A3vcCWJMVtiBXUg0W4ljWTor7s';
+
+        $crawlerCreate = $this->client->request('GET', '/s/assets/new');
+        $createForm    = $crawlerCreate->selectButton('Save')->form();
+        $createForm->setValues([
+            'asset[title]'           => $title,
+            'asset[storageLocation]' => 'remote',
+            'asset[remotePath]'      => $fileUrl,
+        ]);
+
+        $crawlerAfterSubmit = $this->client->submit($createForm);
+        $this->assertResponseIsSuccessful();
+        Assert::assertCount(0, $crawlerAfterSubmit->filter('div.has-error'), 'Expected no validation errors for valid remote image URL with query string');
+
+        $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $title]);
+        Assert::assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
+
+        $crawlerEdit = $this->client->request('GET', '/s/assets/edit/'.$asset->getId());
+        $editForm    = $crawlerEdit->selectButton('Save')->form();
+
+        $crawlerAfterEdit = $this->client->submit($editForm);
+        $this->assertResponseIsSuccessful();
+        Assert::assertCount(0, $crawlerAfterEdit->filter('div.has-error'), 'Expected no validation errors when re-saving edited remote asset URL with query string');
+
+        $this->em->clear();
+        $editedAsset = $this->em->find(Asset::class, $asset->getId());
+        Assert::assertInstanceOf(Asset::class, $editedAsset);
+        Assert::assertSame('remote', $editedAsset->getStorageLocation());
+        Assert::assertSame($fileUrl, $editedAsset->getRemotePath());
+        Assert::assertSame('jpg', strtolower((string) $editedAsset->getExtension()));
+    }
+
+    public function testCreateNewLocalZipAssetCanBeSaved(): void
+    {
+        $tmpId         = uniqid('tmp_', true);
+        $zipName       = 'ticket-15111.zip';
+        $assetTitle    = 'Local ZIP asset '.uniqid();
+        $tmpUploadFile = tempnam(sys_get_temp_dir(), 'asset_zip_');
+
+        if (false === $tmpUploadFile) {
+            self::fail('Unable to create temporary file for ZIP upload test.');
+        }
+
+        $zipArchive = new \ZipArchive();
+        $zipArchive->open($tmpUploadFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zipArchive->addFromString('readme.txt', 'ZIP upload test content');
+        $zipArchive->close();
+
+        $uploadedFile = new UploadedFile($tmpUploadFile, $zipName, 'application/zip', null, true);
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/_uploader/asset/upload',
+            ['tempId' => $tmpId],
+            ['file'   => $uploadedFile]
+        );
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_OK);
+        $uploadResponse = json_decode((string) $this->client->getResponse()->getContent(), true);
+        Assert::assertIsArray($uploadResponse);
+        Assert::assertArrayNotHasKey('error', $uploadResponse, (string) $this->client->getResponse()->getContent());
+        Assert::assertArrayHasKey('tmpFileName', $uploadResponse, (string) $this->client->getResponse()->getContent());
+
+        $response = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+        $this->assertResponseIsSuccessful();
+
+        $form                               = $response->filter('form[name="asset"]')->form();
+        $data                               = $form->getPhpValues();
+        $data['asset']['tempId']            = $tmpId;
+        $data['asset']['tempName']          = $uploadResponse['tmpFileName'];
+        $data['asset']['originalFileName']  = $zipName;
+        $data['asset']['storageLocation']   = 'local';
+        $data['asset']['title']             = $assetTitle;
+        $data['asset']['description']       = 'Regression test for ZIP upload save flow';
+
+        $this->client->submit($form, $data);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString(
+            'Upload failed as the file extension, zip',
+            (string) $this->client->getResponse()->getContent()
+        );
+
+        $asset = $this->em->getRepository(Asset::class)->findOneBy(['title' => $assetTitle]);
+        Assert::assertInstanceOf(Asset::class, $asset);
+        Assert::assertSame('zip', strtolower((string) $asset->getExtension()));
+
+        if (file_exists($tmpUploadFile)) {
+            unlink($tmpUploadFile);
+        }
     }
 
     /**
@@ -85,7 +182,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
@@ -103,7 +200,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
     }
@@ -120,13 +217,12 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $content);
+        $this->assertResponseIsSuccessful($content);
         $this->assertNotEquals($this->expectedPngContent, $content);
-        PageControllerTest::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
-        $assetSlug = $this->asset->getId().':'.$this->asset->getAlias();
         PageControllerTest::assertStringContainsString(
-            '/asset/'.$assetSlug,
+            '/asset/'.$this->asset->getSlug(),
             $content,
             'The return must contain the assert slug'
         );
@@ -160,7 +256,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
-        Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame($expectedStatusCode);
     }
 
     /**
@@ -334,7 +430,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $data['asset']['description']      = 'description';
         $this->client->submit($form, $data);
         preg_match_all('/Upload failed as the file extension, php/', $this->client->getResponse()->getContent(), $matches);
-        $this->assertCount(2, $matches[0]);
+        $this->assertCount(1, $matches[0]);
         $this->assertStringContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
     }
 

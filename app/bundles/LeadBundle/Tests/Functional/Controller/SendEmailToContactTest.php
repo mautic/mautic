@@ -55,7 +55,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -72,7 +72,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -104,7 +104,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -121,7 +121,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -141,7 +141,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -158,7 +158,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -188,7 +188,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -206,7 +206,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[templates]' => $emailEntity->getId(),
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $messages = self::getMailerMessages();
         Assert::assertCount(1, $messages, 'Expected exactly one email message to be sent');
@@ -226,5 +226,57 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         Assert::assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe'));
         Assert::assertFalse($rawMessage->getHeaders()->has('List-Unsubscribe-Post'));
+    }
+
+    public function testEmailSendWhenSubjectOrBodyIsMissing(): void
+    {
+        $lead = new Lead();
+        $lead->setEmail('lead@email.com');
+        $lead->setFirstname('Lead1');
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
+        $this->assertResponseIsSuccessful();
+
+        $content     = json_decode($this->client->getResponse()->getContent())->newContent;
+        $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
+        $form        = $crawler->filter('form')->form();
+
+        $subjectErrorMessage = 'A subject is required.';
+        $bodyErrorMessage    = 'A message is required.';
+
+        $form->setValues([
+            'lead_quickemail[fromname]'  => 'Admin',
+            'lead_quickemail[from]'      => 'admin@yoursite.com',
+            'lead_quickemail[body]'      => '<html><body><p>Hello</p></body></html>',
+        ]);
+        $this->client->submit($form);
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($subjectErrorMessage, $responseContent, 'The missing subject line should show an error');
+        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error about the email body');
+
+        $form->setValues([
+            'lead_quickemail[fromname]'  => 'Admin',
+            'lead_quickemail[from]'      => 'admin@yoursite.com',
+            'lead_quickemail[subject]'   => 'Subject',
+            'lead_quickemail[body]'      => '<html><body></body></html>',
+        ]);
+        $this->client->submit($form);
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($bodyErrorMessage, $responseContent, 'The missing body should show an error');
+        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error about the subject line');
+
+        $form->setValues([
+            'lead_quickemail[fromname]'  => 'Admin',
+            'lead_quickemail[from]'      => 'admin@yoursite.com',
+            'lead_quickemail[subject]'   => 'Subject',
+            'lead_quickemail[body]'      => '<html><body><p>Hello</p></body></html>',
+        ]);
+        $this->client->submit($form);
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error after adding the subject line');
+        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error after adding the body');
     }
 }

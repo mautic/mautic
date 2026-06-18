@@ -129,7 +129,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Inject the mock DateTimeHelper into DateHelper
         $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
 
         $result = $this->helper->toText($now);
@@ -177,15 +176,64 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
     }
 
+    public function testToTextShortWithToday(): void
+    {
+        $this->setDefaultLocalTimezone('UTC');
+
+        // Create a mock for DateTimeHelper to return 'today'
+        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock->expects($this->once())
+            ->method('getTextDate')
+            ->willReturn('today');
+
+        // Inject the mock DateTimeHelper into DateHelper
+        $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
+        $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
+
+        $now    = new \DateTime('now', new \DateTimeZone('UTC'));
+        $result = $this->helper->toTextShort($now);
+
+        $this->assertEquals('Today', $result);
+    }
+
+    public function testToTextShortWithOlderDate(): void
+    {
+        $this->setDefaultLocalTimezone('UTC');
+
+        // Create a mock for DateTimeHelper to return false (not today/yesterday)
+        $dateTimeHelperMock = $this->createMock(\Mautic\CoreBundle\Helper\DateTimeHelper::class);
+        $dateTimeHelperMock->expects($this->once())
+            ->method('getTextDate')
+            ->willReturn(false);
+        // Mock toLocalString() which is called by format() when getTextDate returns false
+        $dateTimeHelperMock->method('toLocalString')
+            ->willReturn('December 31, 2023');
+
+        // Inject the mock DateTimeHelper into DateHelper
+        $reflectionProperty = new \ReflectionProperty(DateHelper::class, 'helper');
+        $reflectionProperty->setValue($this->helper, $dateTimeHelperMock);
+
+        $olderDate = '2023-12-31 23:59:59';
+        $result    = $this->helper->toTextShort($olderDate, 'UTC', 'Y-m-d H:i:s');
+
+        // Should return formatted date
+        $this->assertStringContainsString('2023', $result);
+        $this->assertStringContainsString('December', $result);
+    }
+
+    public function testToTextShortWithEmptyDateTime(): void
+    {
+        $result = $this->helper->toTextShort('');
+        $this->assertEquals('', $result);
+    }
+
     private function setDefaultLocalTimezone(string $timezone): void
     {
-        $reflectedClass    = new \ReflectionClass($this->helper);
-        $reflectedProperty = $reflectedClass->getProperty('helper');
-        $reflectedProperty->setAccessible(true);
+        $reflectedClass     = new \ReflectionClass($this->helper);
+        $reflectedProperty  = $reflectedClass->getProperty('helper');
         $dateTimeHelper     = $reflectedProperty->getValue($this->helper);
         $reflectedClass     = new \ReflectionClass($dateTimeHelper);
         $reflectedProperty2 = $reflectedClass->getProperty('defaultLocalTimezone');
-        $reflectedProperty2->setAccessible(true);
         $reflectedProperty2->setValue($dateTimeHelper, $timezone);
     }
 }

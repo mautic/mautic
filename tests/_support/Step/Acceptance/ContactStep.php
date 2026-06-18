@@ -73,17 +73,51 @@ class ContactStep extends \AcceptanceTester
     }
 
     /**
+     * Select a contact by visible name from the contact list.
+     */
+    public function selectContactByNameFromList(string $contactName): void
+    {
+        $I     = $this;
+        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a/div[1][normalize-space()=\"$contactName\"]]/td[1]/div/span/input";
+        $I->waitForElementClickable($xpath, 10);
+        $I->checkOption($xpath);
+        $I->seeCheckboxIsChecked($xpath);
+    }
+
+    /**
+     * Select a contact by lead ID from the contact list.
+     */
+    public function selectContactByLeadIdFromList(int $leadId): void
+    {
+        $I     = $this;
+        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a[contains(@href, '/contacts/view/$leadId')]]/td[1]/div/span/input";
+        $I->waitForElementClickable($xpath, 10);
+        $I->checkOption($xpath);
+        $I->seeCheckboxIsChecked($xpath);
+    }
+
+    /**
      * Select an option from the dropdown menu for multiple selected contacts.
      */
-    public function selectOptionFromDropDownForMultipleSelections($option)
+    public function selectOptionFromDropDownForMultipleSelections($option): void
     {
         $I = $this;
         // Click the dropdown button for bulk actions
         $xpathDropdownButton = '//button[@id="core-options"]';
         $I->waitForElementClickable($xpathDropdownButton, 10);
         $I->click($xpathDropdownButton);
-        // Select the desired option from the dropdown menu
-        $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li[$option]";
+
+        // Select the desired option from the dropdown menu by label when provided.
+        if (is_string($option) && !ctype_digit($option)) {
+            $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li/a[contains(normalize-space(), \"$option\")]";
+            $I->waitForElementClickable($xpathOption, 10);
+            $I->click($xpathOption);
+
+            return;
+        }
+
+        $position    = (int) $option;
+        $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li[$position]";
         $I->waitForElementClickable($xpathOption, 10);
         $I->click($xpathOption);
     }
@@ -91,12 +125,19 @@ class ContactStep extends \AcceptanceTester
     /**
      * Select an option from the dropdown menu (beside the Quick Add, +New button) on the contacts page.
      *
-     * @param int $option the option to select (1-> Export to CSV, 2-> Export to Excel, 3-> Import, 4-> Import History)
+     * @param int|string $option the option index or label to select
      */
-    public function selectOptionFromDropDownContactsPage($option): void
+    public function selectOptionFromDropDownContactsPage(int|string $option): void
     {
         $I = $this;
         $I->click("//*[@id='page-list-actions']");
+
+        if (is_string($option) && !ctype_digit($option)) {
+            $I->click("//button[@id='page-list-actions']/following-sibling::ul/li/a[contains(normalize-space(), \"$option\")]");
+
+            return;
+        }
+
         $I->click("//*[@id='page-list-wrapper']/div[1]/div/div[2]/ul/li[$option]/a");
     }
 

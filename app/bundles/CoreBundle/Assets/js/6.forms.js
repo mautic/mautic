@@ -94,6 +94,10 @@ Mautic.ajaxifyForm = function (formName) {
     // Handle Enter key for jumping to the next input
     mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
     mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
+        if (mQuery(e.target).hasClass('chosen-search-input')) {
+            return;
+        }
+
         if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
             var inputs = mQuery(this).parents('form').eq(0).find(':input');
             if (inputs[inputs.index(this) + 1] != null) {
@@ -125,6 +129,16 @@ Mautic.ajaxifyForm = function (formName) {
     mQuery(form).on('submit.ajaxform', (function (e) {
         e.preventDefault();
         var form = mQuery(this);
+
+        // Sync CKEditor content (including source mode) before AJAX submission
+        if (typeof ckEditors !== 'undefined' && ckEditors.size > 0) {
+            form.find('textarea.editor').each(function() {
+                var editor = ckEditors.get(this);
+                if (editor && typeof editor.updateSourceElement === 'function') {
+                    editor.updateSourceElement();
+                }
+            });
+        }
 
         if (MauticVars.formSubmitInProgress) {
             return false;
@@ -518,6 +532,7 @@ Mautic.updateEntitySelect = function (response) {
 
         newOption.prop('selected', true);
         mQueryParent(el).trigger("chosen:updated");
+        mQueryParent(el).val(response.id).trigger("change");
     }
 
     if (window.opener) {
@@ -543,7 +558,7 @@ Mautic.toggleYesNo = function(element) {
         $textEl = $toggle.find('.toggle__text'),
         isYes = $yesInput.is(':checked');
 
-    if ($yesInput.is(':disabled')) {
+    if ($toggle.hasClass('toggle--disabled') || $toggle.hasClass('toggle--readonly')) {
         return;
     }
 
@@ -574,6 +589,12 @@ Mautic.updatePublishingToggle = function(element) {
         $publishDown = $form.find('input[name$="[publishDown]"]'),
         hasPublishUp = $publishUp.length && $publishUp.val().trim() !== '',
         hasPublishDown = $publishDown.length && $publishDown.val().trim() !== '';
+
+    // Toggle schedule options notice for Segment Emails based on isPublished state
+    const $scheduleOptionsNotice = $form.find('#scheduleOptionsNotice');
+    if ($scheduleOptionsNotice.length) {
+        $scheduleOptionsNotice.toggle(isYes);
+    }
 
     // Inner function to toggle publish fields and datepicker buttons
     function togglePublishFields(enable) {

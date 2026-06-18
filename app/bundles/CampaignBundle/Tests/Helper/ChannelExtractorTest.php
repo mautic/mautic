@@ -60,7 +60,7 @@ class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
     public function testChannelIdIsIgnoredIfPropertiesAreEmpty(): void
     {
         $event = new Event();
-        $event->setProperties(null);
+        $event->setProperties([]);
         $config = $this->createMock(AbstractEventAccessor::class);
         $config->expects($this->once())
             ->method('getChannel')

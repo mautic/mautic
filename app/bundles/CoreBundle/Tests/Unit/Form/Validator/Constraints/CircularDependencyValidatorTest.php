@@ -59,12 +59,9 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * Configure a CircularDependencyValidator.
      *
-     * @param string $expectedMessage  the expected message on a validation violation, if any
-     * @param int    $currentSegmentId
-     *
-     * @return Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator
+     * @param string $expectedMessage the expected message on a validation violation, if any
      */
-    private function configureValidator($expectedMessage, $currentSegmentId)
+    private function configureValidator(?string $expectedMessage, int $currentSegmentId): CircularDependencyValidator
     {
         $filters = [
             [
@@ -152,15 +149,18 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Verify a constraint message.
+     *
+     * @param array<int, array<string, mixed>> $filters
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('validateDataProvider')]
-    public function testValidateOnInvalid($message, $currentSegmentId, $filters): void
+    public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
             ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
     }
 
-    public static function validateDataProvider()
+    /** @return array<int, array{0: ?string, 1: int, 2: array<int, array<string, mixed>>}> */
+    public static function validateDataProvider(): array
     {
         $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
 

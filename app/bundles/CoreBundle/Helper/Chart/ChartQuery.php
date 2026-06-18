@@ -57,7 +57,7 @@ class ChartQuery extends AbstractChart
     /**
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
      *
-     * @see \Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait::getTimeUnitFromDateRange()
+     * @see DateRangeUnitTrait::getTimeUnitFromDateRange()
      *
      * @param string|null $unit
      */
@@ -147,8 +147,6 @@ class ChartQuery extends AbstractChart
                 $dateTo   = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
-                }
-                if ($this->isTimeUnit) {
                     $dateTo->setTimeZone(new \DateTimeZone('UTC'));
                 }
                 $query->andWhere($tablePrefix.'.'.$dateColumn.' BETWEEN :dateFrom AND :dateTo');

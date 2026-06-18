@@ -25,10 +25,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('user:roles:viewown')"),
         new Post(security: "is_granted('user:roles:create')"),
-        new Get(security: "is_granted('user:roles:viewown')"),
-        new Put(security: "is_granted('user:roles:editown')"),
-        new Patch(security: "is_granted('user:roles:editother')"),
-        new Delete(security: "is_granted('user:roles:deleteown')"),
+        new Get(security: "is_granted('user:roles:viewown', object)"),
+        new Put(security: "is_granted('user:roles:editown', object)"),
+        new Patch(security: "is_granted('user:roles:editother', object)"),
+        new Delete(security: "is_granted('user:roles:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['role:read'],
@@ -152,7 +152,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -177,7 +177,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -209,7 +209,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * Get permissions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<int, Permission>
      */
     public function getPermissions()
     {
@@ -234,7 +234,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * Get description.
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -288,7 +288,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * Get rawPermissions.
      *
-     * @return array
+     * @return array|null
      */
     public function getRawPermissions()
     {
@@ -318,7 +318,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     /**
      * Get users.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<int, User>
      */
     public function getUsers()
     {

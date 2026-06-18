@@ -31,6 +31,8 @@ final class ImportControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    private const IMPORT_CANCELED_MESSAGE = 'Import canceled for file test.csv';
+
     public function testImportWithoutFile(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
@@ -78,41 +80,25 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html());
 
-        /** @var ImportRepository $importRepository */
-        $importRepository = $this->em->getRepository(Import::class);
-
-        /** @var Import $importEntity */
-        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
-
         $fields = ['email' => 'email', 'firstname' => 'firstname', 'lastname' => 'lastname'];
 
-        Assert::assertNotNull($importEntity);
-        Assert::assertSame(2, $importEntity->getLineCount());
-        Assert::assertSame(Import::QUEUED, $importEntity->getStatus());
-        Assert::assertSame('lead', $importEntity->getObject());
-        Assert::assertSame($fields, $importEntity->getProperties()['fields']);
-        Assert::assertSame(array_values($fields), $importEntity->getProperties()['headers']);
+        $this->assertImportLifecycle(
+            'contacts.csv',
+            $fields,
+            array_values($fields),
+            2,
+            1,
+            1,
+            function () use ($expectedName): void {
+                /** @var LeadRepository $leadRepository */
+                $leadRepository = $this->em->getRepository(Lead::class);
 
-        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
-
-        $this->em->clear();
-
-        /** @var Import $importEntity */
-        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
-
-        Assert::assertNotNull($importEntity);
-        Assert::assertSame(2, $importEntity->getLineCount());
-        Assert::assertSame(1, $importEntity->getInsertedCount());
-        Assert::assertSame(1, $importEntity->getUpdatedCount());
-        Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
-
-        /** @var LeadRepository $importRepository */
-        $leadRepository = $this->em->getRepository(Lead::class);
-
-        /** @var Lead[] $contacts */
-        $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
-        Assert::assertSame($expectedName, $contacts[0]->getFirstname());
-        Assert::assertCount(2, $contacts);
+                /** @var Lead[] $contacts */
+                $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
+                Assert::assertSame($expectedName, $contacts[0]->getFirstname());
+                Assert::assertCount(2, $contacts);
+            }
+        );
     }
 
     public function testContactPermissionsAreFollowedDuringImport(): void
@@ -223,7 +209,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $crawler     = $this->client->submit($mappingForm);
 
         Assert::assertStringContainsString(
-            'Import process was successfully created. But it will not be processed as you do not have permission to publish.',
+            'The import process was successfully created. But it will not be processed as you do not have permission to publish.',
             $crawler->html()
         );
 
@@ -278,6 +264,55 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString($expectedString, $applicationTester->getDisplay());
     }
 
+    public function testCancelActionNotificationLogic(): void
+    {
+        $import = $this->createQueuedImport();
+
+        $this->addCancellationNotification($import);
+        $this->assertNotificationMessageContains($this->getImportCanceledMessage($import));
+    }
+
+    public function testCancelActionNotificationLogicWithoutImport(): void
+    {
+        $this->addCancellationNotification();
+        $this->assertNotificationMessageContains(self::IMPORT_CANCELED_MESSAGE);
+    }
+
+    public function testCancelActionNotifiesImportOwnerWhenAnotherUserCancels(): void
+    {
+        $ownerRole = $this->createRole(true);
+        $owner     = $this->createUser($ownerRole, 'person.one', 'person.one@email.com', 'Person', 'One');
+
+        $cancellerRole = $this->createRole(true);
+        $canceller     = $this->createUser($cancellerRole, 'person.two', 'person.two@email.com', 'Person', 'Two');
+
+        $this->em->flush();
+
+        $import = $this->createQueuedImport($owner);
+
+        $this->loginUser($canceller);
+        $this->client->setServerParameter('PHP_AUTH_USER', $canceller->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $this->client->request(Request::METHOD_GET, '/');
+        $session = $this->client->getRequest()->getSession();
+        $session->set('mautic.lead.import.id', $import->getId());
+        $session->set('mautic.lead.import.file', 'test.csv');
+        $session->save();
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts/import/cancel/0');
+
+        Assert::assertTrue($this->client->getResponse()->isSuccessful(), $this->client->getResponse()->getContent());
+        $this->assertNotificationMessageContainsForUser(
+            (int) $owner->getId(),
+            $this->getImportCanceledMessage($import, ' by Person Two')
+        );
+        $this->assertNotificationMessageDoesNotContainForUser(
+            (int) $canceller->getId(),
+            $this->getImportCanceledMessage($import, ' by Person Two')
+        );
+    }
+
     public function testImportWithSkipIfExistsFlagTrue(): void
     {
         $this->createBooleanField();
@@ -307,44 +342,33 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         Assert::assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html(), $crawler->html());
 
-        $this->em->clear();
+        $fields = [
+            'email'                => 'email',
+            'firstname'            => 'firstname',
+            'lastname'             => 'lastname',
+            'company'              => 'companyname',
+            'custom_boolean_field' => 'custom_boolean_field',
+        ];
 
-        /** @var ImportRepository $importRepository */
-        $importRepository = $this->em->getRepository(Import::class);
+        $this->assertImportLifecycle(
+            'contacts-with-custom-field.csv',
+            $fields,
+            array_keys($fields),
+            2,
+            1,
+            1,
+            function (): void {
+                /** @var LeadRepository $leadRepository */
+                $leadRepository = $this->em->getRepository(Lead::class);
 
-        /** @var Import $importEntity */
-        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-with-custom-field.csv']);
-
-        $fields = ['email' => 'email', 'firstname' => 'firstname', 'lastname' => 'lastname', 'company' => 'companyname', 'custom_boolean_field' => 'custom_boolean_field'];
-
-        Assert::assertNotNull($importEntity);
-        Assert::assertSame(2, $importEntity->getLineCount());
-        Assert::assertSame('lead', $importEntity->getObject());
-        Assert::assertEquals($fields, $importEntity->getProperties()['fields']);
-        Assert::assertEquals(array_keys($fields), $importEntity->getProperties()['headers']);
-
-        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
-
-        $this->em->clear();
-
-        /** @var Import $importEntity */
-        $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts-with-custom-field.csv']);
-
-        Assert::assertNotNull($importEntity);
-        Assert::assertSame(2, $importEntity->getLineCount());
-        Assert::assertSame(1, $importEntity->getInsertedCount());
-        Assert::assertSame(1, $importEntity->getUpdatedCount());
-        Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
-
-        /** @var LeadRepository $importRepository */
-        $leadRepository = $this->em->getRepository(Lead::class);
-
-        /** @var Lead[] $contacts */
-        $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
-        Assert::assertSame('Johny', $contacts[0]->getFirstname());
-        Assert::assertSame('Company A', $contacts[0]->getCompany());
-        Assert::assertSame('Company B', $contacts[1]->getCompany());
-        Assert::assertCount(2, $contacts);
+                /** @var Lead[] $contacts */
+                $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
+                Assert::assertSame('Johny', $contacts[0]->getFirstname());
+                Assert::assertSame('Company A', $contacts[0]->getCompany());
+                Assert::assertSame('Company B', $contacts[1]->getCompany());
+                Assert::assertCount(2, $contacts);
+            }
+        );
     }
 
     private function setPhoneFieldIsRequired(bool $required): void
@@ -357,6 +381,118 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $phoneField->setIsRequired($required);
         $fieldRepository->saveEntity($phoneField);
+    }
+
+    /**
+     * Re-usable import assertions to keep duplicate test flows short.
+     *
+     * @param array<string, string> $fields
+     * @param string[]              $headers
+     */
+    private function assertImportLifecycle(
+        string $originalFile,
+        array $fields,
+        array $headers,
+        int $lineCount,
+        int $insertedCount,
+        int $updatedCount,
+        ?callable $afterAssertions = null,
+    ): void {
+        /** @var ImportRepository $importRepository */
+        $importRepository = $this->em->getRepository(Import::class);
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => $originalFile]);
+
+        Assert::assertNotNull($importEntity);
+        Assert::assertSame($lineCount, $importEntity->getLineCount());
+        Assert::assertSame(Import::QUEUED, $importEntity->getStatus());
+        Assert::assertSame('lead', $importEntity->getObject());
+        Assert::assertEquals($fields, $importEntity->getProperties()['fields']);
+        Assert::assertEquals($headers, $importEntity->getProperties()['headers']);
+
+        $this->testSymfonyCommand(ImportCommand::COMMAND_NAME);
+
+        $this->em->clear();
+
+        /** @var Import $importEntity */
+        $importEntity = $importRepository->findOneBy(['originalFile' => $originalFile]);
+
+        Assert::assertNotNull($importEntity);
+        Assert::assertSame($lineCount, $importEntity->getLineCount());
+        Assert::assertSame($insertedCount, $importEntity->getInsertedCount());
+        Assert::assertSame($updatedCount, $importEntity->getUpdatedCount());
+        Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
+
+        if (null !== $afterAssertions) {
+            $afterAssertions();
+        }
+    }
+
+    private function createQueuedImport(?User $createdBy = null): Import
+    {
+        $import = new Import();
+        $import->setObject('lead')
+               ->setOriginalFile('test.csv')
+               ->setStatus(Import::QUEUED)
+               ->setIsPublished(true)
+               ->setDir('/tmp')
+               ->setFile('test.csv');
+        if ($createdBy) {
+            $import->setCreatedBy($createdBy);
+        }
+        $this->em->persist($import);
+        $this->em->flush();
+
+        return $import;
+    }
+
+    private function addCancellationNotification(?Import $import = null): void
+    {
+        $notificationModel = static::getContainer()->get('mautic.core.model.notification');
+        $translator        = static::getContainer()->get('translator');
+
+        $fileName = basename('/tmp/test.csv');
+        $message  = $import && $import->getId()
+            ? $translator->trans('mautic.lead.import.canceled.with_id', ['%file%' => $fileName, '%id%' => $import->getId()])
+            : $translator->trans('mautic.lead.import.canceled', ['%file%' => $fileName]);
+
+        $notificationModel->addNotification($message, 'warning');
+    }
+
+    private function getImportCanceledMessage(Import $import, string $suffix = ''): string
+    {
+        return self::IMPORT_CANCELED_MESSAGE.' (ID '.$import->getId().')'.$suffix;
+    }
+
+    private function assertNotificationMessageContains(string $expectedSubstring): void
+    {
+        $this->assertNotificationMessageContainsForUser(1, $expectedSubstring);
+    }
+
+    private function assertNotificationMessageContainsForUser(int $userId, string $expectedSubstring): void
+    {
+        $notificationRepo = $this->em->getRepository(\Mautic\CoreBundle\Entity\Notification::class);
+        $notifications    = $notificationRepo->getNotifications($userId);
+        $found            = false;
+        foreach ($notifications as $notification) {
+            if (str_contains($notification['message'], $expectedSubstring)) {
+                $found = true;
+                Assert::assertSame('warning', $notification['type']);
+                break;
+            }
+        }
+        Assert::assertTrue($found, sprintf('Notification containing "%s" was not found', $expectedSubstring));
+    }
+
+    private function assertNotificationMessageDoesNotContainForUser(int $userId, string $expectedSubstring): void
+    {
+        $notificationRepo = $this->em->getRepository(\Mautic\CoreBundle\Entity\Notification::class);
+        $notifications    = $notificationRepo->getNotifications($userId);
+
+        foreach ($notifications as $notification) {
+            Assert::assertStringNotContainsString($expectedSubstring, $notification['message']);
+        }
     }
 
     private function createLead(?string $email = null, string $firstName = ''): Lead
@@ -396,13 +532,18 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->em->persist($permission);
     }
 
-    private function createUser(Role $role): User
-    {
+    private function createUser(
+        Role $role,
+        string $username = 'john.doe',
+        string $email = 'john.doe@email.com',
+        string $firstName = 'John',
+        string $lastName = 'Doe',
+    ): User {
         $user = new User();
-        $user->setFirstName('John');
-        $user->setLastName('Doe');
-        $user->setUsername('john.doe');
-        $user->setEmail('john.doe@email.com');
+        $user->setFirstName($firstName);
+        $user->setLastName($lastName);
+        $user->setUsername($username);
+        $user->setEmail($email);
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
         \assert($hasher instanceof PasswordHasherInterface);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));

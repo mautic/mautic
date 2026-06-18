@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -110,6 +111,7 @@ class CommonApiController extends FetchCommonApiController
                 $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
                     ['%id%'   => $entity->getId()], 'validators');
                 $this->setBatchError($key, $msg, $e->getCode(), $errors, $entities, $entity);
+                $errors[$key]['details'] = $e->getErrors();
                 continue;
             }
 
@@ -150,7 +152,7 @@ class CommonApiController extends FetchCommonApiController
             $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
                 ['%id%'   => $entity->getId()], 'validators');
 
-            return $this->returnError($msg, $e->getCode());
+            return $this->returnError($msg, $e->getCode(), $e->getErrors());
         }
         $this->preSerializeEntity($entity);
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK);
@@ -477,6 +479,37 @@ class CommonApiController extends FetchCommonApiController
             $parameters        = array_merge($defaultProperties, $parameters);
         }
 
+        if ($this->model instanceof ApiLockAwareInterface
+            && $entity->getId()
+            && $this->model->isApiLocked($entity)
+        ) {
+            $date = $entity->getCheckedOut();
+
+            // Use model name getter for entity display name
+            $nameGetter = $this->model->getNameGetter();
+
+            $name = method_exists($entity, $nameGetter)
+                ? $entity->{$nameGetter}()
+                : '';
+
+            return $this->returnError(
+                $this->translator->trans(
+                    'mautic.api.error.entity.locked',
+                    [
+                        '%name%' => $name,
+                        '%user%' => $entity->getCheckedOutByUser(),
+                        '%date%' => $date->format($this->coreParametersHelper->get('date_format_dateonly')),
+                        '%time%' => $date->format($this->coreParametersHelper->get('date_format_timeonly')),
+                    ]
+                ),
+                Response::HTTP_CONFLICT,
+                [
+                    'checkedOutBy'     => $entity->getCheckedOutByUser(),
+                    'checkedOut'       => $entity->getCheckedOut()->format('Y-m-d H:i:s T'),
+                ]
+            );
+        }
+
         // Check if user has access to publish
         if (
             (
@@ -556,9 +589,8 @@ class CommonApiController extends FetchCommonApiController
 
             if ($this->inBatchMode) {
                 return $entity;
-            } else {
-                $view = $this->view([$this->entityNameOne => $entity], $statusCode, $headers);
             }
+            $view = $this->view([$this->entityNameOne => $entity], $statusCode, $headers);
 
             $this->setSerializationContext($view);
         } else {
