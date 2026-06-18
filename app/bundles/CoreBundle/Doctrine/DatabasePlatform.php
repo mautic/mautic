@@ -473,14 +473,14 @@ class DatabasePlatform
         $left = $hitPrefix.'date_left';
 
         if (self::isPostgreSQL($platform)) {
-            return "CASE WHEN {$left} IS NOT NULL
-                    THEN TO_CHAR(({$left} - {$hit}), 'HH24:MI:SS')
-                    ELSE '' END";
+            $thenExpr = "TO_CHAR(({$left} - {$hit}), 'HH24:MI:SS')";
+        } else {
+            $thenExpr = 'SEC_TO_TIME('.self::getDateDiffInSeconds($platform, $left, $hit).')';
         }
 
-        $secondsExpr = self::getDateDiffInSeconds($platform, $left, $hit);
-
-        return "IF({$left} IS NOT NULL, SEC_TO_TIME({$secondsExpr}), '')";
+        return "CASE WHEN {$left} IS NOT NULL
+                    THEN {$thenExpr}
+                    ELSE '' END";
     }
 
     /* ===================================================================
