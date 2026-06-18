@@ -99,9 +99,29 @@ class FieldGroupController extends AbstractStandardFormController
         return parent::deleteStandard($request, $objectId);
     }
 
-    /** @return JsonResponse|RedirectResponse */
+    /**
+     * Filters out any selected group that still has fields (mirrors deleteAction's
+     * guard) so a bulk delete can never orphan fields, then deletes the rest.
+     *
+     * @return JsonResponse|RedirectResponse
+     */
     public function batchDeleteAction(Request $request)
     {
+        /** @var FieldGroupModel $model */
+        $model     = $this->getModel('lead.field_group');
+        $ids       = json_decode($request->query->get('ids', '[]')) ?: [];
+        $deletable = array_values(array_filter($ids, function ($id) use ($model): bool {
+            $entity = $model->getEntity((int) $id);
+
+            return null === $entity || $model->canDelete($entity);
+        }));
+
+        if (count($deletable) !== count($ids)) {
+            $this->addFlashMessage('mautic.lead.field_group.error.has_fields', [], 'error');
+        }
+
+        $request->query->set('ids', json_encode($deletable));
+
         return parent::batchDeleteStandard($request);
     }
 
