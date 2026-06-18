@@ -6,12 +6,10 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\LeadBundle\Model\FieldGroupModel;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FieldGroupController extends AbstractStandardFormController
+final class FieldGroupController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {
@@ -44,37 +42,25 @@ class FieldGroupController extends AbstractStandardFormController
         return 'ASC';
     }
 
-    /** @param int $page */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         return parent::indexStandard($request, $page);
     }
 
-    /** @return JsonResponse|Response */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
 
-    /**
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
-     */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
      * Deletes the entity; aborts if the group still has fields assigned.
-     *
-     * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, int $objectId): Response
     {
         /** @var FieldGroupModel $model */
         $model  = $this->getModel('lead.field_group');
@@ -102,10 +88,8 @@ class FieldGroupController extends AbstractStandardFormController
     /**
      * Filters out any selected group that still has fields (mirrors deleteAction's
      * guard) so a bulk delete can never orphan fields, then deletes the rest.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         /** @var FieldGroupModel $model */
         $model     = $this->getModel('lead.field_group');

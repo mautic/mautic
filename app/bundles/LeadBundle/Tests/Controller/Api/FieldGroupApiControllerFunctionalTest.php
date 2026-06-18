@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -9,7 +11,7 @@ use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Response;
 
-class FieldGroupApiControllerFunctionalTest extends MauticMysqlTestCase
+final class FieldGroupApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     // The delete-guard test creates a LeadField (schema change), which commits
     // the cleanup transaction; disable rollback so each test gets a fresh schema.

@@ -13,7 +13,7 @@ use Twig\TwigFunction;
  * views and forms can render group tabs in the configured order with translated
  * names without bloating the controllers.
  */
-class FieldGroupExtension extends AbstractExtension
+final class FieldGroupExtension extends AbstractExtension
 {
     /** @var array<string, array<string, string>> */
     private array $labelCache = [];

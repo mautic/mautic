@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\FieldGroupRepository;
  * Unicode) name. Mirrors FieldAliasHelper. The alias is immutable, so existing
  * groups are never re-aliased.
  */
-class FieldGroupAliasHelper
+final class FieldGroupAliasHelper
 {
     public function __construct(
         private FieldGroupRepository $fieldGroupRepository,

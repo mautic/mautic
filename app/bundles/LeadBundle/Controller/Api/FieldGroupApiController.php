@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -10,7 +12,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonApiController<FieldGroup>
  */
-class FieldGroupApiController extends CommonApiController
+final class FieldGroupApiController extends CommonApiController
 {
     /** @var class-string<FieldGroup> */
     protected $entityClass = FieldGroup::class;

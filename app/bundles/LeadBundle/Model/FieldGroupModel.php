@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<FieldGroup>
  */
-class FieldGroupModel extends FormModel
+final class FieldGroupModel extends FormModel
 {
     private FieldGroupAliasHelper $aliasHelper;
 

@@ -14,7 +14,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  *
  * @implements DataTransformerInterface<int|null, FieldGroup|null>
  */
-class FieldGroupToOrderTransformer implements DataTransformerInterface
+final class FieldGroupToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
         private FieldGroupRepository $fieldGroupRepository,

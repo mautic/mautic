@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<FieldGroup>
  */
-class FieldGroupRepository extends CommonRepository
+final class FieldGroupRepository extends CommonRepository
 {
     public function getTableAlias(): string
     {

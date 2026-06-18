@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  * Fired when the field group list is built for a view.
  * Listeners may add or modify groups via setGroups().
  */
-class FieldGroupListEvent extends Event
+final class FieldGroupListEvent extends Event
 {
     /**
      * @param array<string, string> $groups [alias => displayName]

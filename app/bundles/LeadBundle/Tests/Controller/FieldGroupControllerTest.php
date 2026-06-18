@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\FieldGroupModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldGroupControllerTest extends MauticMysqlTestCase
+final class FieldGroupControllerTest extends MauticMysqlTestCase
 {
     // Tests create custom LeadFields (schema changes), which commit the
     // cleanup transaction; disable rollback so each test gets a fresh schema.
