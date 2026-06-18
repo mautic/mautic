@@ -443,6 +443,7 @@ return [
                     'mautic.lead.repository.merged_records',
                     'event_dispatcher',
                     'monolog.logger.mautic',
+                    'mautic.lead.repository.company_lead',
                 ],
             ],
             'mautic.lead.deduper' => [
