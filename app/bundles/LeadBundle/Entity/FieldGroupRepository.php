@@ -59,6 +59,18 @@ class FieldGroupRepository extends CommonRepository
     }
 
     /**
+     * Returns all existing group aliases (used to keep generated aliases unique).
+     *
+     * @return string[]
+     */
+    public function getAliases(): array
+    {
+        return $this->_em->getConnection()->fetchFirstColumn(
+            'SELECT alias FROM '.MAUTIC_TABLE_PREFIX.'lead_field_groups'
+        );
+    }
+
+    /**
      * Returns the highest field_order currently used (0 when there are no groups).
      */
     public function getMaxOrder(): int

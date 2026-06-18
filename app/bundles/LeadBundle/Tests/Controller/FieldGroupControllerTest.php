@@ -199,6 +199,31 @@ class FieldGroupControllerTest extends MauticMysqlTestCase
         );
     }
 
+    public function testUnicodeNameIsTransliteratedToAsciiAlias(): void
+    {
+        $group = $this->createFieldGroup('Café Zürich');
+
+        $this->assertSame('cafe_zurich', $group->getAlias());
+    }
+
+    public function testNonLatinNameStillGetsValidNonEmptyAlias(): void
+    {
+        $group = $this->createFieldGroup('日本語');
+
+        $alias = $group->getAlias();
+        $this->assertNotEmpty($alias, 'A non-Latin name must still yield a usable alias.');
+        $this->assertMatchesRegularExpression('/^[a-z0-9_]+$/', $alias);
+    }
+
+    public function testAliasCollisionGetsNumericSuffix(): void
+    {
+        $first  = $this->createFieldGroup('Café'); // -> cafe
+        $second = $this->createFieldGroup('Cafe'); // -> cafe_1 (transliterates to the same base)
+
+        $this->assertSame('cafe', $first->getAlias());
+        $this->assertSame('cafe_1', $second->getAlias());
+    }
+
     public function testNewGroupsGetIncrementingOrder(): void
     {
         $alpha = $this->createFieldGroup('Alpha');

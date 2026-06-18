@@ -10,15 +10,25 @@ use Mautic\LeadBundle\Entity\FieldGroup;
 use Mautic\LeadBundle\Entity\FieldGroupRepository;
 use Mautic\LeadBundle\Event\FieldGroupListEvent;
 use Mautic\LeadBundle\Form\Type\FieldGroupType;
+use Mautic\LeadBundle\Helper\FieldGroupAliasHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<FieldGroup>
  */
 class FieldGroupModel extends FormModel
 {
+    private FieldGroupAliasHelper $aliasHelper;
+
+    #[Required]
+    public function setAliasHelper(FieldGroupAliasHelper $aliasHelper): void
+    {
+        $this->aliasHelper = $aliasHelper;
+    }
+
     public function getRepository(): FieldGroupRepository
     {
         $repo = $this->em->getRepository(FieldGroup::class);
@@ -109,8 +119,13 @@ class FieldGroupModel extends FormModel
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        if ($entity instanceof FieldGroup && !$entity->getId() && !$entity->getOrder()) {
-            $entity->setOrder($this->getRepository()->getMaxOrder() + 1);
+        if ($entity instanceof FieldGroup) {
+            // Generate a unique ASCII alias from the (possibly Unicode) name on create.
+            $this->aliasHelper->makeAliasUnique($entity);
+
+            if (!$entity->getId() && !$entity->getOrder()) {
+                $entity->setOrder($this->getRepository()->getMaxOrder() + 1);
+            }
         }
 
         parent::saveEntity($entity, $unlock);

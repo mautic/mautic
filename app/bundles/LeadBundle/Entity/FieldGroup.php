@@ -63,7 +63,7 @@ class FieldGroup extends FormEntity
         ]));
 
         $metadata->addPropertyConstraint('name', new Assert\Regex([
-            'pattern' => '/^[a-zA-Z0-9\s]+$/',
+            'pattern' => '/^[\p{L}\p{N}\p{S}\s]+$/u', 
             'match'   => true,
             'message' => 'mautic.lead.field_group.name.help',
         ]));
@@ -91,16 +91,20 @@ class FieldGroup extends FormEntity
         $this->isChanged('name', $name);
         $this->name = $name;
 
-        if (null === $this->alias && null !== $name) {
-            $this->alias = self::slugify($name);
-        }
-
         return $this;
     }
 
     public function getAlias(): ?string
     {
         return $this->alias;
+    }
+
+    public function setAlias(?string $alias): self
+    {
+        $this->isChanged('alias', $alias);
+        $this->alias = $alias;
+
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -128,13 +132,5 @@ class FieldGroup extends FormEntity
         $this->order = $order;
 
         return $this;
-    }
-
-    public static function slugify(string $name): string
-    {
-        $slug = strtolower(trim($name));
-        $slug = preg_replace('/\s+/', '_', $slug) ?? $slug;
-
-        return preg_replace('/[^a-z0-9_]/', '', $slug) ?? $slug;
     }
 }
