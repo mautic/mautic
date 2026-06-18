@@ -376,17 +376,19 @@ class ThemeHelper implements ThemeHelperInterface
             }
         }
 
-        $hasFormStyleOverride = !empty(array_intersect($formStyleOverrides, $allowedFiles));
+        $features                = $config['features'] ?? [];
+        $hasFormStyleOverride    = !empty(array_intersect($formStyleOverrides, $allowedFiles));
+        $isFormStyleOnlyTheme    = ['form'] === $features;
 
-        if (!empty($config['features'])) {
-            if (in_array('form', $config['features'], true) && $hasFormStyleOverride) {
+        if (!empty($features)) {
+            if ($isFormStyleOnlyTheme && $hasFormStyleOverride) {
                 $requiredFiles = array_values(array_diff($requiredFiles, ['html/message.html.twig']));
             }
 
-            foreach ($config['features'] as $feature) {
+            foreach ($features as $feature) {
                 $featureFile     = sprintf('html/%s.html.twig', strtolower($feature));
 
-                if ('form' === $feature && $hasFormStyleOverride) {
+                if ('form' === $feature && $isFormStyleOnlyTheme && $hasFormStyleOverride) {
                     continue;
                 }
 
