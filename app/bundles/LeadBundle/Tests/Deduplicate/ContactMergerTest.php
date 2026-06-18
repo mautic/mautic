@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
@@ -42,6 +45,8 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $logger;
 
+    private \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository $companyLeadRepo;
+
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
@@ -49,6 +54,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
         $this->dispatcher      = $this->createMock(EventDispatcher::class);
         $this->logger          = $this->createMock(Logger::class);
+        $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
         $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
     }
@@ -744,6 +750,121 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeFieldData($winner, $loser);
     }
 
+    public function testMergeCompaniesMovesLoserCompaniesToWinner(): void
+    {
+        $winner = new Lead();
+        $winner->setId(1);
+        $loser = new Lead();
+        $loser->setId(2);
+
+        $company = $this->getCompany(11);
+
+        $loserCompanyLead = new CompanyLead();
+        $loserCompanyLead->setCompany($company);
+        $loserCompanyLead->setLead($loser);
+        $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $loserCompanyLead->setPrimary(true);
+
+        $this->companyLeadRepo->method('findBy')
+            ->willReturnMap([
+                [['lead' => $loser], null, null, null, [$loserCompanyLead]],
+                [['lead' => $winner], null, null, null, []],
+            ]);
+
+        $this->companyLeadRepo->expects($this->once())
+            ->method('saveEntities')
+            ->with($this->callback(function (array $companyLeads) use ($winner, $company): bool {
+                $this->assertCount(1, $companyLeads);
+                $this->assertSame($winner, $companyLeads[0]->getLead());
+                $this->assertSame($company, $companyLeads[0]->getCompany());
+                // The winner had no primary company so it inherits the loser's
+                $this->assertTrue($companyLeads[0]->getPrimary());
+
+                return true;
+            }), false);
+
+        $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    public function testMergeCompaniesKeepsWinnerPrimaryCompany(): void
+    {
+        $winner = new Lead();
+        $winner->setId(1);
+        $loser = new Lead();
+        $loser->setId(2);
+
+        $winnerCompanyLead = new CompanyLead();
+        $winnerCompanyLead->setCompany($this->getCompany(11));
+        $winnerCompanyLead->setLead($winner);
+        $winnerCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $winnerCompanyLead->setPrimary(true);
+
+        $loserCompanyLead = new CompanyLead();
+        $loserCompanyLead->setCompany($this->getCompany(22));
+        $loserCompanyLead->setLead($loser);
+        $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $loserCompanyLead->setPrimary(true);
+
+        $this->companyLeadRepo->method('findBy')
+            ->willReturnMap([
+                [['lead' => $loser], null, null, null, [$loserCompanyLead]],
+                [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
+            ]);
+
+        $this->companyLeadRepo->expects($this->once())
+            ->method('saveEntities')
+            ->with($this->callback(function (array $companyLeads): bool {
+                $this->assertCount(1, $companyLeads);
+                // The winner already has a primary company so the loser's company is added as non-primary
+                $this->assertFalse((bool) $companyLeads[0]->getPrimary());
+
+                return true;
+            }), false);
+
+        $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    public function testMergeCompaniesSkipsCompaniesTheWinnerAlreadyHas(): void
+    {
+        $winner = new Lead();
+        $winner->setId(1);
+        $loser = new Lead();
+        $loser->setId(2);
+
+        $company = $this->getCompany(11);
+
+        $winnerCompanyLead = new CompanyLead();
+        $winnerCompanyLead->setCompany($company);
+        $winnerCompanyLead->setLead($winner);
+        $winnerCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $winnerCompanyLead->setPrimary(true);
+
+        $loserCompanyLead = new CompanyLead();
+        $loserCompanyLead->setCompany($company);
+        $loserCompanyLead->setLead($loser);
+        $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
+
+        $this->companyLeadRepo->method('findBy')
+            ->willReturnMap([
+                [['lead' => $loser], null, null, null, [$loserCompanyLead]],
+                [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
+            ]);
+
+        $this->companyLeadRepo->expects($this->never())
+            ->method('saveEntities');
+
+        $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    private function getCompany(int $id): Company
+    {
+        $company    = new Company();
+        $reflection = new \ReflectionProperty(Company::class, 'id');
+        $reflection->setValue($company, $id);
+
+        return $company;
+    }
+
     /**
      * @return ContactMerger
      */
@@ -753,7 +874,8 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
             $this->leadModel,
             $this->mergeRecordRepo,
             $this->dispatcher,
-            $this->logger
+            $this->logger,
+            $this->companyLeadRepo
         );
     }
 }

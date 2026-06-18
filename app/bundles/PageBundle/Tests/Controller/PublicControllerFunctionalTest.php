@@ -35,7 +35,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $encodedPayload = urlencode($payload);
         $this->client->request(Request::METHOD_GET, "/xss-test?tags={$encodedPayload}");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $tagRepository = $this->em->getRepository(Tag::class);
         $tags          = $tagRepository->findAll();

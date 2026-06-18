@@ -374,6 +374,7 @@ return [
                     'mautic.model.factory',
                     'database_connection',
                     'mautic.helper.user',
+                    'translator',
                 ],
             ],
             'mautic.helper.maxmind_do_not_sell_download' => [
@@ -1334,6 +1335,9 @@ return [
         'debug'                               => false,
         'anonymize_ip_address_in_background'  => false,
         'rss_notification_url'                => '',
+        'motd_url'                            => 'https://mautic.github.io/motd/motd.json',
+        'motd_cache_path'                     => '%mautic.cache_path%/motd.json',
+        'motd_cache_ttl'                      => 3600,
         'translations_list_url'               => 'https://language-packs.mautic.com/manifest.json',
         'translations_fetch_url'              => 'https://language-packs.mautic.com/',
         'stats_update_url'                    => 'https://updates.mautic.org/stats/send', // set to empty in config file to disable

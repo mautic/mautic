@@ -81,9 +81,11 @@ class SegmentSubscriberTest extends TestCase
                     ['onSegmentPostDelete', 0],
                     ['clearSegmentCountCache', 0],
                 ],
+                LeadEvents::LIST_PRE_DELETE   => [
+                    ['onSegmentPreDelete', 0],
+                ],
                 LeadEvents::LIST_PRE_UNPUBLISH => [
-                    ['validateSegmentFilters', 0],
-                    ['validateSegmentsUsedInCampaigns', 0],
+                    ['onSegmentPreUnpublish', 0],
                 ],
             ],
             $subscriber->getSubscribedEvents()

@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -26,10 +27,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(uriTemplate: '/companies', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/companies', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['company:read'],
@@ -141,6 +142,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     #[Groups(['company:read', 'company:write'])]
     private $description;
 
+    #[Groups(['company:read', 'company:write'])]
+    private ?\DateTimeInterface $deleted = null;
+
     public function __construct()
     {
         $this->initializeProjects();
@@ -193,6 +197,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $builder->createField('score', 'integer')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -620,6 +626,24 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         $this->isChanged('companydescription', $description);
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
+    }
+
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): self
+    {
+        $this->isChanged('companydeleted', $deleted);
+        $this->deleted = $deleted;
 
         return $this;
     }

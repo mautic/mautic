@@ -37,16 +37,15 @@ class InstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $packageName = $input->getArgument('package');
-        $dryRun      = true === $input->getOption('dry-run') ? true : false;
+        $dryRun      = true === $input->getOption('dry-run');
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);
         } catch (ApiException $e) {
             if (404 === $e->getCode()) {
                 throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.');
-            } else {
-                throw new \Exception('Error while trying to get package details: '.$e->getMessage());
             }
+            throw new \Exception('Error while trying to get package details: '.$e->getMessage());
         }
 
         if (empty($package->packageBase->type) || 'mautic-plugin' !== $package->packageBase->type) {

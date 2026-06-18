@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -57,6 +58,18 @@ class FilterType extends AbstractType
 
             if ($operators && !$operator) {
                 $operator = array_key_first($operators);
+            }
+
+            // Keep legacy operators available for existing saved segments, but not for new filters.
+            // @see https://github.com/mautic/mautic/pull/16012
+            $legacyOperators  = [OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL];
+            $isLegacyOperator = null !== $operator && in_array($operator, $legacyOperators, true);
+
+            if ($isLegacyOperator && !in_array($operator, $operators, true)) {
+                $deprecatedOperatorTypes = $this->listModel->getOperatorsForFieldType([
+                    'include' => $legacyOperators,
+                ]);
+                $operators += array_filter($deprecatedOperatorTypes, static fn ($v) => $v === $operator);
             }
 
             $form->add(

@@ -32,11 +32,10 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;
-        } else {
-            $redirectUrl = $request->getSession()->get('_security.main.target_path', $this->router->generate('mautic_dashboard_index'));
-
-            return new RedirectResponse($redirectUrl);
         }
+        $redirectUrl = $request->getSession()->get('_security.main.target_path', $this->router->generate('mautic_dashboard_index'));
+
+        return new RedirectResponse($redirectUrl);
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
@@ -52,10 +51,9 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;
-        } else {
-            $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
-
-            return new RedirectResponse($this->router->generate('login'));
         }
+        $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
+
+        return new RedirectResponse($this->router->generate('login'));
     }
 }

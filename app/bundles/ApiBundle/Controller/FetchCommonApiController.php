@@ -654,7 +654,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             if (isset($statement['internal'])) {
                 unset($where[$key]);
             } elseif (in_array($statement['expr'], ['andX', 'orX'])) {
-                $this->sanitizeWhereClauseArrayFromRequest($statement['val']);
+                $this->sanitizeWhereClauseArrayFromRequest($where[$key]['val']);
             }
         }
     }

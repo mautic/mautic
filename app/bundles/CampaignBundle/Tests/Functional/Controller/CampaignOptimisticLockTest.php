@@ -70,6 +70,8 @@ class CampaignOptimisticLockTest extends MauticMysqlTestCase
 
         $campaign = new Campaign();
         $campaign->setName('Test campaign');
+        $campaign->setIsPublished(true);
+        $campaign->setPublishUp(new \DateTime());
         $campaign->addList($leadList);
         $this->em->persist($campaign);
 

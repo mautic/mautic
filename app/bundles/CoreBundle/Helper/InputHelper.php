@@ -149,9 +149,9 @@ class InputHelper
             return $value;
         } elseif (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
-        } else {
-            return self::getFilter()->clean($value, $mask);
         }
+
+        return self::getFilter()->clean($value, $mask);
     }
 
     /**

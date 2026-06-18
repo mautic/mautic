@@ -14,6 +14,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $excludes = [
         'node_modules',
+        'vendor',
     ];
 
     $services->load('MauticPlugin\\GrapesJsBuilderBundle\\', '../')

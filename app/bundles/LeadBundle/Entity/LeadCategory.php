@@ -19,10 +19,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(uriTemplate: '/contactcategories', security: "is_granted('lead:leads:viewown')"),
         new Post(uriTemplate: '/contactcategories', security: "is_granted('lead:leads:create')"),
-        new Get(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:viewown')"),
-        new Put(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:editown')"),
-        new Patch(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:editother')"),
-        new Delete(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:deleteown')"),
+        new Get(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/contactcategories/{id}', security: "is_granted('lead:leads:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['leadcategory:read'],
@@ -85,7 +85,10 @@ class LeadCategory
             ->addJoinColumn('category_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addLead(false, 'CASCADE', false);
+        $builder->createManyToOne('lead', Lead::class)
+            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
+            ->build();
 
         $builder->addDateAdded();
 
@@ -200,5 +203,10 @@ class LeadCategory
     public function wasManuallyAdded()
     {
         return $this->manuallyAdded;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getLead()?->getPermissionUser();
     }
 }

@@ -265,7 +265,7 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         $form       = $crawler->selectButton('Save')->form();
         $newCrawler = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // Verify the validation error message is displayed
         Assert::assertStringContainsString(
