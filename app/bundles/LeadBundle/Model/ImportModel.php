@@ -319,21 +319,17 @@ class ImportModel extends FormModel
         $string = fgets($handle);
 
         // Keep looping as long as we have a batch size and either have data OR haven't registered EOF yet
-        while ($batchSize && (false !== $string || !feof($handle))) {
-            // Treat a false string at the end of the file as an empty string line (mimicking SplFileObject)
-            $currentLineContent = (false === $string) ? '' : $string;
-
-            // Fetch the NEXT line ahead of time, exactly like $file->next() did
-            $string = fgets($handle);
-
+        while ($batchSize && false !== $string) {
             // Parse the current line content
-            $data = CsvHelper::strGetCsv($currentLineContent, $config['delimiter'], $config['enclosure'], $config['escape']);
+            $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
 
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
             if (1 === $lineNumber) {
                 ++$lineNumber;
+                // Emulate $file->next() at the end of SplFileObject's header check phase
+                $string = fgets($handle);
                 continue;
             }
 
@@ -355,6 +351,8 @@ class ImportModel extends FormModel
             if (!$errorMessage) {
                 $data = $this->trimArrayValues($data);
                 if (!array_filter($data)) {
+                    // Advance pointer before jumping to next iteration
+                    $string = fgets($handle);
                     continue;
                 }
 
@@ -441,6 +439,14 @@ class ImportModel extends FormModel
             if ($limit && $counter >= $limit) {
                 break;
             }
+
+            // ==========================================
+            // THIS EMULATES $file->next()
+            // ==========================================
+            // We fetch the next line right here at the absolute bottom of the loop cycle.
+            // If this reads an EOF or empty trailing row, the top condition doesn't see it
+            // until the current iteration completes fully and logs its final $lineNumber step.
+            $string = fgets($handle);
         }
 
         $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
