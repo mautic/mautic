@@ -924,11 +924,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int    $limit
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param int                 $limit
+     * @param ?\DateTimeInterface $dateFrom
+     * @param ?\DateTimeInterface $dateTo
+     * @param bool                $canViewOthers
+     * @param int[]               $segments
      *
-     * @return array
+     * @return mixed[]
      */
     public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments)
     {
@@ -951,10 +953,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if (!empty($segments)) {
             $q->andWhere('ll.id IN ('.$segmentlist.')');
         }
-        if (!empty($dateFrom)) {
+        if ($dateFrom instanceof \DateTimeInterface) {
             $q->andWhere("l.date_added >= '".$dateFrom->format('Y-m-d')."'");
         }
-        if (!empty($dateTo)) {
+        if ($dateTo instanceof \DateTimeInterface) {
             $q->andWhere("l.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
         }
         if (!$canViewOthers) {
@@ -973,10 +975,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $qAll->andWhere('ll.created_by = :userId')
                     ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
-            if (!empty($dateFrom)) {
+            if ($dateFrom instanceof \DateTimeInterface) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
             }
-            if (!empty($dateTo)) {
+            if ($dateTo instanceof \DateTimeInterface) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
             $resultsAll = $qAll->executeQuery()->fetchAllAssociative();

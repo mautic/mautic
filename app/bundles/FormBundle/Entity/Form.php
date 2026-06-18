@@ -410,7 +410,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -431,7 +431,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -452,7 +452,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription($truncate = false, $length = 45)
     {
@@ -478,7 +478,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCachedHtml()
     {
@@ -555,7 +555,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -576,7 +576,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -683,7 +683,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -750,7 +750,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -766,7 +766,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -782,7 +782,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getInKioskMode()
     {
@@ -806,7 +806,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function isInKioskMode()
     {
@@ -816,7 +816,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getFormType()
     {
@@ -872,7 +872,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFormAttributes()
     {
@@ -971,7 +971,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getProgressiveProfilingLimit()
     {

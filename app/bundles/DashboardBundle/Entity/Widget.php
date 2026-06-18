@@ -108,7 +108,7 @@ class Widget extends FormEntity
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -133,7 +133,7 @@ class Widget extends FormEntity
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -158,7 +158,7 @@ class Widget extends FormEntity
     /**
      * Get type.
      *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -183,7 +183,7 @@ class Widget extends FormEntity
     /**
      * Get width.
      *
-     * @return int
+     * @return int|null
      */
     public function getWidth()
     {
@@ -208,7 +208,7 @@ class Widget extends FormEntity
     /**
      * Get cache timeout.
      *
-     * @return int (minutes)
+     * @return int|null (minutes)
      */
     public function getCacheTimeout()
     {
@@ -233,7 +233,7 @@ class Widget extends FormEntity
     /**
      * Get height.
      *
-     * @return int
+     * @return int|null
      */
     public function getHeight()
     {
@@ -258,7 +258,7 @@ class Widget extends FormEntity
     /**
      * Get ordering.
      *
-     * @return int
+     * @return int|null
      */
     public function getOrdering()
     {
@@ -306,7 +306,7 @@ class Widget extends FormEntity
     /**
      * Get template.
      *
-     * @return string
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -353,7 +353,7 @@ class Widget extends FormEntity
     /**
      * Get errorMessage.
      *
-     * @return string
+     * @return string|null
      */
     public function getErrorMessage()
     {
