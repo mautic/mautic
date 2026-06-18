@@ -162,7 +162,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     {
         $urlParts = parse_url($url);
 
-        if (!is_array($urlParts) && !isset($urlParts['scheme'], $urlParts['host'])) {
+        if (!is_array($urlParts) || !isset($urlParts['scheme'], $urlParts['host'])) {
             return $url;
         }
 
@@ -188,6 +188,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             }
 
             $url .= '?'.http_build_query($query);
+        }
+
+        if (!isset($urlParts['fragment'])) {
+            return $url;
         }
 
         return $url.('#'.$urlParts['fragment']);
