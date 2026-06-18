@@ -3,10 +3,18 @@
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\FieldGroup;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldGroupModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class FieldGroupApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    // The delete-guard test creates a LeadField (schema change), which commits
+    // the cleanup transaction; disable rollback so each test gets a fresh schema.
+    protected $useCleanupRollback = false;
+
     public function testFieldGroupWorkflow(): void
     {
         // Create
@@ -51,6 +59,48 @@ class FieldGroupApiControllerFunctionalTest extends MauticMysqlTestCase
         // Confirm gone
         $this->client->request('GET', "/api/field-groups/{$groupId}");
         $this->assertResponseStatusCodeSame(404);
+    }
+
+    /**
+     * A group that still has fields must NOT be deletable through the REST API;
+     * deleting it would orphan the lead_fields rows that reference its alias.
+     * Expected post-fix: 409 Conflict, group and field left intact.
+     */
+    public function testApiDeleteIsBlockedWhenGroupHasFields(): void
+    {
+        /** @var FieldGroupModel $fieldGroupModel */
+        $fieldGroupModel = self::getContainer()->get('mautic.lead.model.field_group');
+        $group           = new FieldGroup();
+        $group->setName('Api Guarded');
+        $fieldGroupModel->saveEntity($group);
+        $groupId = $group->getId();
+
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        $field      = new LeadField();
+        $field->setLabel('Api Guard Field');
+        $field->setAlias('api_guard_field');
+        $field->setType('text');
+        $field->setObject('lead');
+        $field->setGroup($group->getAlias());
+        $fieldModel->saveEntity($field);
+
+        $this->client->request('DELETE', "/api/field-groups/{$groupId}/delete");
+        $this->assertResponseStatusCodeSame(
+            Response::HTTP_CONFLICT,
+            'Deleting a group that still has fields must be rejected with 409.'
+        );
+
+        // The group and its field must survive the rejected delete.
+        $this->em->clear();
+        $this->assertNotNull(
+            $fieldGroupModel->getRepository()->find($groupId),
+            'A group with fields must not be deleted via the API.'
+        );
+        $this->assertNotNull(
+            $fieldModel->getRepository()->findOneBy(['alias' => 'api_guard_field']),
+            'The assigned field must remain intact.'
+        );
     }
 
     public function testCreateRequiresName(): void

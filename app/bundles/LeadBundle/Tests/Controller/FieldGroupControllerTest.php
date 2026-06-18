@@ -170,6 +170,35 @@ class FieldGroupControllerTest extends MauticMysqlTestCase
         $this->assertNull($this->fieldGroupModel->getRepository()->find($ids[1]));
     }
 
+    /**
+     * Batch delete must skip groups that still have fields (it currently
+     * delegates straight to batchDeleteStandard, which bypasses canDelete()).
+     * Expected post-fix: the empty group is removed, the one with fields is kept.
+     */
+    public function testBatchDeleteActionSkipsGroupsWithFields(): void
+    {
+        $empty     = $this->createFieldGroup('Batch Empty');
+        $withField = $this->createFieldGroup('Batch With Fields');
+        $this->createLeadFieldInGroup('batch_guard_field', $withField->getAlias());
+
+        $emptyId     = $empty->getId();
+        $withFieldId = $withField->getId();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            self::INDEX_URL.'/batchDelete?ids='.json_encode([$emptyId, $withFieldId])
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $repo = $this->fieldGroupModel->getRepository();
+        $this->assertNull($repo->find($emptyId), 'Empty group should be batch-deleted.');
+        $this->assertNotNull(
+            $repo->find($withFieldId),
+            'A group that still has fields must not be batch-deleted.'
+        );
+    }
+
     public function testNewGroupsGetIncrementingOrder(): void
     {
         $alpha = $this->createFieldGroup('Alpha');
