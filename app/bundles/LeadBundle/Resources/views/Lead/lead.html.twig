@@ -94,7 +94,7 @@
         {% endif %}
     {% endif %}
 
-    {% if securityIsGranted('campaign:campaigns:view') %}
+    {% if securityIsGranted('campaign:campaigns:edit') %}
         {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'ajaxmodal',
