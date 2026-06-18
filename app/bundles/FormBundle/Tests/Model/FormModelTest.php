@@ -9,10 +9,12 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Collection\MappedObjectCollection;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -34,6 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
+use Twig\Loader\LoaderInterface;
 
 class FormModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -118,6 +121,11 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $primaryCompanyHelper;
 
     /**
+     * @var MockObject&PathsHelper
+     */
+    private MockObject $pathsHelper;
+
+    /**
      * @var MockObject&MappedObjectCollectorInterface
      */
     private MockObject $mappedObjectCollector;
@@ -147,6 +155,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $this->tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
         $this->mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
+        $this->pathsHelper           = $this->createMock(PathsHelper::class);
 
         $this->entityManager->expects($this
             ->any())
@@ -171,6 +180,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->columnSchemaHelper,
             $this->tableSchemaHelper,
             $this->mappedObjectCollector,
+            $this->pathsHelper,
             $this->entityManager,
             $this->createMock(CorePermissions::class),
             $this->dispatcher,
@@ -273,6 +283,16 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     {
         $components = $this->formModel->getCustomComponents();
         $this->assertArrayHasKey('validators', $components);
+    }
+
+    public function testGenerateHtmlUsesThemeStyleAssetWhenItExists(): void
+    {
+        $this->assertGenerateHtmlUsesStyle('cards', 'themes/cards/assets/style.css');
+    }
+
+    public function testGenerateHtmlFallsBackToTwigStyleWhenThemeStyleAssetDoesNotExist(): void
+    {
+        $this->assertGenerateHtmlUsesStyle('legacy-theme', '<style>.mauticform_wrapper { color: red; }</style>');
     }
 
     public function testGetEntityForNotFoundContactField(): void
@@ -539,6 +559,44 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->formModel->getEntity(5);
 
         return $formField;
+    }
+
+    private function assertGenerateHtmlUsesStyle(string $theme, string $expectedStyle): void
+    {
+        $form = new Form();
+        $form->setTemplate($theme);
+        $form->setRenderStyle(true);
+
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->method('exists')
+            ->willReturn(false);
+
+        $this->twigMock->method('getLoader')
+            ->willReturn($loader);
+
+        $this->mappedObjectCollector->method('buildCollection')
+            ->willReturn(new MappedObjectCollection());
+
+        $this->themeHelper->method('checkForTwigTemplate')
+            ->willReturnArgument(0);
+
+        $this->pathsHelper->method('getThemesPath')
+            ->willReturn(\dirname(__DIR__, 5).'/themes');
+
+        $this->themeHelper->expects($this->any())
+            ->method('renderThemeTemplate')
+            ->willReturnCallback(function (string $template, array $parameters = []) use ($expectedStyle): string {
+                if ('@MauticForm/Builder/_style.html.twig' === $template) {
+                    return $expectedStyle;
+                }
+
+                $this->assertSame('@MauticForm/Builder/form.html.twig', $template);
+                $this->assertSame($expectedStyle, $parameters['style']);
+
+                return '<form></form>';
+            });
+
+        $this->assertSame('<form></form>', $this->formModel->generateHtml($form, false));
     }
 
     public function testGetContactFieldPropertiesListWhenFieldNotFound(): void

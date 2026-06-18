@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -64,6 +65,7 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $columnSchemaHelper,
             $tableSchemaHelper,
             $mappedObjectCollector,
+            $this->createMock(PathsHelper::class),
             $entityManager,
             $this->createMock(CorePermissions::class),
             $dispatcher,
