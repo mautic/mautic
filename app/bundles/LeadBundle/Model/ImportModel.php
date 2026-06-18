@@ -262,19 +262,38 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress, $limit = 0): bool
     {
-        /*
-         * PHP 8.6 Backward Incompatible Changes
+        /**
+         * PHP 8.6 Backward Incompatible Changes.
          *
-         * 1. SplFileObject::next() now advances the stream when no prior current()
-         *    call has cached a line. A subsequent current() call returns the new
-         *    line rather than the previous one.
-         * 2. SplFileObject::fgets() no longer caches the returned line for
-         *    subsequent current() calls. current() now re-reads from the current
-         *    stream position instead of returning the line fgets() just returned.
-         * 3. SplFileObject::next() past EOF no longer increments key() without
-         *    bound. SplFileObject::seek() past EOF now produces the same key()
-         *    value as SplTempFileObject; the two previously returned different
-         *    values.
+         * 1. SplFileObject::next() now advances the stream when no prior current() call has cached a line.
+         *    A subsequent current() call returns the new line rather than the previous one.
+         * 2. SplFileObject::fgets() no longer caches the returned line for subsequent current() calls.
+         *    current() now re-reads from the current stream position instead of returning the line
+         *    fgets() just returned.
+         * 3. SplFileObject::next() past EOF no longer increments key() without bound.
+         *    SplFileObject::seek() past EOF now produces the same key() value as SplTempFileObject;
+         *    the two previously returned different values.
+         *
+         * MIGRATION NOTE: REPLACING SplFileObject WITH NATIVE STREAM OPERATIONS (PHP 8.6+ COMPATIBILITY)
+         *
+         * PURPOSE:
+         * This method removes SplFileObject to bypass severe backward incompatible changes introduced
+         * in PHP 8.6 regarding internal stream cache invalidation, key() tracking, and next() movements.
+         *
+         * FUNCTIONALITY REPLICATION:
+         * To match the exact row metrics and line counters tracked by the legacy engine down to a single
+         * row, this native loop layout specifically emulates SplFileObject's deferred EOF validation behavior:
+         *
+         * - The "Phantom Loop" Lifecycle: In pre-PHP 8.6 SplFileObject loops using `current()` and `next()`,
+         *   advancing the pointer past the last valid line or past a trailing newline (\n) did not terminate
+         *   the loop instantly. The loop would always execute exactly one final "phantom" cycle where
+         *   current() evaluated to an empty string. This final cycle successfully incremented $lineNumber
+         *   and triggered isEmptyCsvRow() handling before the top-level loop condition could catch the EOF.
+         *
+         * - State-Locked Emulation ($eofProcessed): Because a native while(fgets) loop immediately terminates
+         *   on false, it introduces an off-by-one shortfall. This updated architecture leverages a state flag
+         *   ($eofProcessed) to explicitly grant the engine exactly one final execution pass when fgets($handle)
+         *   transitions to false. This guarantees 1:1 behavioral synchronization for historical file tracking.
          */
 
         // Open the file handle natively (migrate from SplFileObject)
@@ -314,22 +333,31 @@ class ImportModel extends FormModel
             $val = strtolower(InputHelper::alphanum($val, false, '_'));
         });
 
+        // Track whether we have processed the final EOF phantom loop yet
+        $eofProcessed = false;
+
         // Exactly mimics SplFileObject's read-ahead behavior
         // Prime the engine by fetching the first row, just like SplFileObject initially does
         $string = fgets($handle);
 
-        // Keep looping as long as we have a batch size and either have data OR haven't registered EOF yet
-        while ($batchSize && false !== $string) {
+        // Keep looping as long as we have a batch size and haven't registered EOF yet
+        while ($batchSize && !$eofProcessed) {
+            // Treat the final EOF transition string as an empty string (matching SplFileObject::current())
+            $currentLineContent = (false === $string) ? '' : $string;
+
             // Parse the current line content
-            $data = CsvHelper::strGetCsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
+            $data = CsvHelper::strGetCsv($currentLineContent, $config['delimiter'], $config['enclosure'], $config['escape']);
 
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
             if (1 === $lineNumber) {
                 ++$lineNumber;
-                // Emulate $file->next() at the end of SplFileObject's header check phase
+                // Emulate $file->next() at the end of the header block
                 $string = fgets($handle);
+                if (false === $string) {
+                    $eofProcessed = true;
+                }
                 continue;
             }
 
@@ -351,8 +379,11 @@ class ImportModel extends FormModel
             if (!$errorMessage) {
                 $data = $this->trimArrayValues($data);
                 if (!array_filter($data)) {
-                    // Advance pointer before jumping to next iteration
+                    // Emulate $file->next() before continuing
                     $string = fgets($handle);
+                    if (false === $string) {
+                        $eofProcessed = true;
+                    }
                     continue;
                 }
 
@@ -440,13 +471,22 @@ class ImportModel extends FormModel
                 break;
             }
 
-            // ==========================================
-            // THIS EMULATES $file->next()
-            // ==========================================
-            // We fetch the next line right here at the absolute bottom of the loop cycle.
-            // If this reads an EOF or empty trailing row, the top condition doesn't see it
-            // until the current iteration completes fully and logs its final $lineNumber step.
-            $string = fgets($handle);
+            // ========================================================
+            // ADVANCE POINTER & SET STATE LOCK FLAG
+            // ========================================================
+            if (false === $string) {
+                // If we are already running on a false value, this path marks the
+                // end of our allowed single "phantom loop". Lock it to exit on next pass.
+                $eofProcessed = true;
+            } else {
+                // Advance the file pointer just like $file->next()
+                $string = fgets($handle);
+                // if ($string === false) {
+                //    // We just hit the end of the file stream. Do NOT exit yet!
+                //    // Let this pass finish so the top condition runs exactly one more time.
+                //    // If the file had a trailing newline, this matches SplFileObject.
+                // }
+            }
         }
 
         $isPublished = (bool) $this->getRepository()->getValue($import->getId(), 'is_published');
