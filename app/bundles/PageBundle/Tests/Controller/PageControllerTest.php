@@ -174,10 +174,8 @@ class PageControllerTest extends MauticMysqlTestCase
         }
     }
 
-    /**
-     * Create a page for testing.
-     */
-    protected function createTestPage($pageParams = []): Page
+    /** @param array<string, mixed> $pageParams */
+    protected function createTestPage(array $pageParams = []): Page
     {
         $page        = new Page();
         $title       = $pageParams['title'] ?? 'Page:Page:LandingPageTracking';

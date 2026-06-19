@@ -3,31 +3,21 @@
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\ContactFinder\ScheduledContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 
 class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
+    private MockObject&LeadRepository $leadRepository;
 
     protected function setUp(): void
     {
         $this->leadRepository = $this->createMock(LeadRepository::class);
-
-        $this->campaignRepository = $this->createMock(CampaignRepository::class);
     }
 
     public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs(): void

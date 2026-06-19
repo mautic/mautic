@@ -517,24 +517,6 @@ parameters:
 			path: app/bundles/ApiBundle/Serializer/Exclusion/FieldInclusionStrategy.php
 
 		-
-			message: '#^Method Mautic\\ApiBundle\\Tests\\Controller\\CommonApiControllerTest\:\:getResultFromProtectedMethod\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/ApiBundle/Tests/Controller/CommonApiControllerTest.php
-
-		-
-			message: '#^Method Mautic\\ApiBundle\\Tests\\Controller\\CommonApiControllerTest\:\:getResultFromProtectedMethod\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ApiBundle/Tests/Controller/CommonApiControllerTest.php
-
-		-
-			message: '#^Method Mautic\\ApiBundle\\Tests\\Controller\\CommonApiControllerTest\:\:getResultFromProtectedMethod\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ApiBundle/Tests/Controller/CommonApiControllerTest.php
-
-		-
 			message: '''
 				#^Class Mautic\\AssetBundle\\Controller\\AssetController extends deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
@@ -582,12 +564,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\AssetBundle\\Entity\\Asset\:\:convertBytesToUnit\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Method Mautic\\AssetBundle\\Entity\\Asset\:\:getFile\(\) should return Symfony\\Component\\HttpFoundation\\File\\UploadedFile but returns Symfony\\Component\\HttpFoundation\\File\\File\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/AssetBundle/Entity/Asset.php
 
@@ -703,12 +679,6 @@ parameters:
 			path: app/bundles/AssetBundle/Entity/Download.php
 
 		-
-			message: '#^Method Mautic\\AssetBundle\\Entity\\Download\:\:getTrackingId\(\) should return int but returns string\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Download.php
-
-		-
 			message: '#^Property Mautic\\AssetBundle\\Entity\\Download\:\:\$trackingId \(string\) does not accept int\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -811,12 +781,6 @@ parameters:
 			path: app/bundles/AssetBundle/EventListener/BuilderSubscriber.php
 
 		-
-			message: '#^Cannot call method getId\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/AssetBundle/EventListener/CampaignSubscriber.php
-
-		-
 			message: '#^Method Mautic\\AssetBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerDecision\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -860,12 +824,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/AssetBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Variable \$ids in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/AssetBundle/EventListener/DetermineWinnerSubscriber.php
 
 		-
 			message: '#^Parameter \#2 \$maxUploadSizeMB of method Mautic\\CoreBundle\\Validator\\FileUploadValidator\:\:checkFileSize\(\) expects string, float given\.$#'
@@ -1456,18 +1414,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getCampaignSessionId\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getCampaignSessionId\(\) has parameter \$objectId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getIndexItems\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1590,12 +1536,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\CampaignBundle\\Controller\\CampaignController\:\:\$sessionId has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
-			message: '#^Variable \$sessionId in empty\(\) is never defined\.$#'
-			identifier: empty.variable
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/CampaignController.php
 
@@ -3604,123 +3544,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Tests/Command/AbstractCampaignCommand.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Tests\\Command\\TriggerCampaignCommandTest\:\:getNonActionPathTakenCount\(\) has parameter \$logs with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Tests\\Command\\TriggerCampaignCommandTest\:\:getTagCounts\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Command/TriggerCampaignCommandTest.php
-
-		-
-			message: '#^Parameter \#2 \$value of method Doctrine\\DBAL\\Query\\QueryBuilder\:\:set\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Command/ValidateEventCommandTest.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Tests\\Event\\CampaignBuilderEventTest\:\:initEvent\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Event/CampaignBuilderEventTest.php
-
-		-
-			message: '#^Property Mautic\\CampaignBundle\\Tests\\EventCollector\\Accessor\\EventAccessorTest\:\:\$events type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/EventCollector/Accessor/EventAccessorTest.php
-
-		-
-			message: '#^Property Mautic\\CampaignBundle\\Tests\\Executioner\\ContactFinder\\ScheduledContactFinderTest\:\:\$campaignRepository is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/ContactFinder/ScheduledContactFinderTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:
-				2\.13\.0 to be removed in 3\.0; BC support for old listeners$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/ActionDispatcherTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:
-				2\.13\.0 to be removed in 3\.0; BC support for old listeners$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/DecisionDispatcherTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 12
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
-
-		-
-			message: '''
-				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:
-				2\.13\.0 to be removed in 3\.0; BC support for old listeners$#
-			'''
-			identifier: new.deprecated
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
-
-		-
-			message: '''
-				#^Return type of method Mautic\\CampaignBundle\\Tests\\Executioner\\Dispatcher\\LegacyEventDispatcherTest\:\:getLegacyEventDispatcher\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:
-				2\.13\.0 to be removed in 3\.0; BC support for old listeners$#
-			'''
-			identifier: return.deprecatedClass
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Dispatcher/LegacyEventDispatcherTest.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Tests\\Executioner\\InactiveExecutionerTest\:\:getExecutioner\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/InactiveExecutionerTest.php
-
-		-
-			message: '#^Parameter \#1 \$triggerRestrictedStartHour of method Mautic\\CampaignBundle\\Entity\\Event\:\:setTriggerRestrictedStartHour\(\) expects DateTime\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Scheduler/EventSchedulerTest.php
-
-		-
-			message: '#^Parameter \#1 \$triggerRestrictedStopHour of method Mautic\\CampaignBundle\\Entity\\Event\:\:setTriggerRestrictedStopHour\(\) expects DateTime\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Executioner/Scheduler/EventSchedulerTest.php
-
-		-
-			message: '#^Parameter \#1 \$properties of method Mautic\\CampaignBundle\\Entity\\Event\:\:setProperties\(\) expects array, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Helper/ChannelExtractorTest.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Tests\\Membership\\EventDispatcherTest\:\:getDispatcher\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Membership/EventDispatcherTest.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Tests\\Membership\\MembershipManagerTest\:\:getManager\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Tests/Membership/MembershipManagerTest.php
-
-		-
 			message: '#^Method Mautic\\CategoryBundle\\Controller\\CategoryController\:\:deleteAction\(\) has parameter \$bundle with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4541,48 +4364,6 @@ parameters:
 
 		-
 			message: '''
-				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Executioner\\Dispatcher\\LegacyEventDispatcher\:
-				2\.13\.0 to be removed in 3\.0; BC support for old listeners$#
-			'''
-			identifier: new.deprecated
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: '''
-				#^Parameter \$event of method Mautic\\ChannelBundle\\Tests\\EventListener\\CampaignSubscriberTest\:\:sendMarketingMessageSms\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: parameter.deprecatedClass
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Tests\\Model\\MessageQueueModelTest\:\:prepareRescheduleMessageIntervalTest\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/Model/MessageQueueModelTest.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Tests\\PreferenceBuilder\\ChannelPreferencesTest\:\:getChannelPreference\(\) has parameter \$channel with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/PreferenceBuilder/ChannelPreferencesTest.php
-
-		-
-			message: '#^Variable \$emailLogs in PHPDoc tag @var does not match assigned variable \$email\.$#'
-			identifier: varTag.differentVariable
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/PreferenceBuilder/PreferenceBuilderTest.php
-
-		-
-			message: '#^Variable \$smsLogs in PHPDoc tag @var does not match assigned variable \$sms\.$#'
-			identifier: varTag.differentVariable
-			count: 1
-			path: app/bundles/ChannelBundle/Tests/PreferenceBuilder/PreferenceBuilderTest.php
-
-		-
-			message: '''
 				#^Class Mautic\\ConfigBundle\\Controller\\ConfigController extends deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
@@ -4906,60 +4687,6 @@ parameters:
 			path: app/bundles/ConfigBundle/Service/ConfigChangeLogger.php
 
 		-
-			message: '#^Cannot call method availableOptionValues\(\) on array\<array\<Symfony\\Component\\DomCrawler\\Field\\FormField\>\|Symfony\\Component\\DomCrawler\\Field\\FormField\>\|Symfony\\Component\\DomCrawler\\Field\\FormField\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Controller/ConfigControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\ConfigBundle\\Tests\\Controller\\ConfigControllerFunctionalTest\:\:getConfigParameters\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Controller/ConfigControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\ConfigBundle\\Tests\\Event\\ConfigBuilderEventTest\:\:initEvent\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Event/ConfigBuilderEventTest.php
-
-		-
-			message: '#^Method Mautic\\ConfigBundle\\Tests\\Form\\Helper\\RestrictionHelperTest\:\:getExtensions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Form/Helper/RestrictionHelperTest.php
-
-		-
-			message: '#^Property Mautic\\ConfigBundle\\Tests\\Form\\Helper\\RestrictionHelperTest\:\:\$forms has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Form/Helper/RestrictionHelperTest.php
-
-		-
-			message: '#^Property Mautic\\ConfigBundle\\Tests\\Form\\Helper\\RestrictionHelperTest\:\:\$restrictedFields type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Form/Helper/RestrictionHelperTest.php
-
-		-
-			message: '#^Property Mautic\\ConfigBundle\\Tests\\Mapper\\ConfigMapperTest\:\:\$config has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Mapper/ConfigMapperTest.php
-
-		-
-			message: '#^Property Mautic\\ConfigBundle\\Tests\\Mapper\\ConfigMapperTest\:\:\$forms has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Mapper/ConfigMapperTest.php
-
-		-
-			message: '#^Property Mautic\\ConfigBundle\\Tests\\Mapper\\Helper\\RestrictionHelperTest\:\:\$restrictedFields type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ConfigBundle/Tests/Mapper/Helper/RestrictionHelperTest.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Cache\\MiddlewareCacheWarmer\:\:addMiddlewares\(\) has parameter \$middlewares with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -5212,12 +4939,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/Api/StatsApiController.php
 
 		-
-			message: '#^Variable \$themeZip in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/CoreBundle/Controller/Api/ThemeApiController.php
-
-		-
 			message: '#^Call to an undefined method Twig\\Environment\:\:get\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -5421,12 +5142,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Controller\\ThemeController\:\:getIndexPostActionVars\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Controller/ThemeController.php
-
-		-
-			message: '#^Variable \$fileData in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
 			count: 1
 			path: app/bundles/CoreBundle/Controller/ThemeController.php
 
@@ -6473,12 +6188,6 @@ parameters:
 			identifier: argument.templateType
 			count: 2
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Entity\\FormEntity\:\:getCheckedOutBy\(\) should return Mautic\\UserBundle\\Entity\\User but returns int\|null\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CoreBundle/Entity/FormEntity.php
 
 		-
 			message: '#^Property Mautic\\CoreBundle\\Entity\\FormEntity\:\:\$changes type has no value type specified in iterable type array\.$#'
@@ -7631,24 +7340,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
-
-		-
-			message: '#^Cannot call method getCreatedBy\(\) on class\-string\|object\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/CoreBundle/Form/Type/AbstractFormStandardType.php
-
-		-
-			message: '#^Cannot call method getId\(\) on class\-string\|object\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/CoreBundle/Form/Type/AbstractFormStandardType.php
-
-		-
-			message: '#^Cannot call method isPublished\(\) on class\-string\|object\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/CoreBundle/Form/Type/AbstractFormStandardType.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Form\\Type\\ConfigType\:\:getIpServicesChoices\(\) return type has no value type specified in iterable type array\.$#'
@@ -9883,306 +9574,6 @@ parameters:
 			path: app/bundles/CoreBundle/Test/MauticMysqlTestCase.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Functional\\Controller\\FileControllerTest\:\:\$uploadedFilePath has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Functional/Controller/FileControllerTest.php
-
-		-
-			message: '#^Service "fm_elfinder\.configurator" is private\.$#'
-			identifier: symfonyContainer.privateService
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Functional/Service/LocalFileAdapterServiceTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Command\\MaxMindDoNotSellPurgeCommandTest\:\:buildMockEntityManager\(\) has parameter \$dataToReturn with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Command/MaxMindDoNotSellPurgeCommandTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\CoreBundle\\Controller\\AbstractFormController\:\:returnIsFormCancelled\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: app/bundles/CoreBundle/Tests/Unit/Controller/AbstractFormControllerTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\DependencyInjection\\Builder\\BundleMetadataBuilderTest\:\:\$paths type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/DependencyInjection/Builder/BundleMetadataBuilderTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Entity\\CommonRepositoryTest\:\:callBuildWhereClauseFromArray\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Entity/CommonRepositoryTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Entity\\CommonRepositoryTest\:\:callBuildWhereClauseFromArray\(\) has parameter \$args with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Entity/CommonRepositoryTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Entity\\CommonRepositoryTest\:\:callBuildWhereClauseFromArray\(\) has parameter \$qb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Entity/CommonRepositoryTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Entity\\CommonRepositoryTest\:\:callProtectedMethod\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Entity/CommonRepositoryTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\EventListener\\CommonStatsSubscriberTest\:\:setProperty\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/EventListener/CommonStatsSubscriberTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\EventListener\\CommonStatsSubscriberTest\:\:setProperty\(\) has parameter \$property with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/EventListener/CommonStatsSubscriberTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\EventListener\\CommonStatsSubscriberTest\:\:setProperty\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/EventListener/CommonStatsSubscriberTest.php
-
-		-
-			message: '#^Parameter \#1 \$id of class Symfony\\Component\\Security\\Csrf\\CsrfToken constructor expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/EventListener/RequestSubscriberTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Type\\ConfigTypeTest\:\:getConfigFormType\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Form\\Type\\ConfigTypeTest\:\:\$formBuilder is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Form\\Type\\ConfigTypeTest\:\:\$formType has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Form\\Type\\ConfigTypeTest\:\:\$formType is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Type/ConfigTypeTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:testValidateOnInvalid\(\) has parameter \$currentSegmentId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:testValidateOnInvalid\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:testValidateOnInvalid\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Form\\Validator\\Constraints\\CircularDependencyValidatorTest\:\:validateDataProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Form/Validator/Constraints/CircularDependencyValidatorTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Helper\\Chart\\DateRangeUnitTraitTest\:\:\$trait has invalid type Mautic\\CoreBundle\\Helper\\Chart\\DateRangeUnitTrait\.$#'
-			identifier: property.trait
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/Chart/DateRangeUnitTraitTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\FileHelperTest\:\:bytesToMegabytesProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/FileHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\FileHelperTest\:\:megabytesToBytesProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/FileHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\FileHelperTest\:\:phpSizeToBytesProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/FileHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\InputHelperTest\:\:urlProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/InputHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\IpLookupHelperTest\:\:getIpHelper\(\) has parameter \$mockCoreParametersHelper with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/IpLookupHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\IpLookupHelperTest\:\:getIpHelper\(\) has parameter \$request with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/IpLookupHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\PageHelperTest\:\:pageProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/PageHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\PageHelperTest\:\:startProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/PageHelperTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Helper\\PathsHelperTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/PathsHelperTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Helper\\PathsHelperTest\:\:\$logsDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/PathsHelperTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\Helper\\PathsHelperTest\:\:\$rootDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/PathsHelperTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\TestResources\\WakeupCall\:\:hello\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/TestResources/WakeupCall.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Helper\\Update\\Github\\ReleaseParserTest\:\:getReleases\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Helper/Update/Github/ReleaseParserTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\ExtemeIpLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/ExtemeIpLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\GeobytesLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/GeobytesLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\GeoipsLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/GeoipsLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\IpinfodbLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/IpinfodbLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\IpstackLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/IpstackLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\MaxMindDoNotSellListTest\:\:\$badData has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxMindDoNotSellListTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\MaxMindDoNotSellListTest\:\:\$badFilePath has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxMindDoNotSellListTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\MaxMindDoNotSellListTest\:\:\$goodData has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxMindDoNotSellListTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\MaxMindDoNotSellListTest\:\:\$goodFilePath has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxMindDoNotSellListTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\MaxmindLookupTest\:\:checkDetails\(\) has parameter \$details with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxmindLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\MaxmindLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/MaxmindLookupTest.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Tests\\Unit\\IpLookup\\TelizeLookupTest\:\:\$cacheDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/IpLookup/TelizeLookupTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Monolog\\Handler\\FileLogHandlerTest\:\:getProperty\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Monolog/Handler/FileLogHandlerTest.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Tests\\Unit\\Security\\Permissions\\CorePermissionsTest\:\:mockBundleArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Security/Permissions/CorePermissionsTest.php
-
-		-
-			message: '#^Parameter \#2 \$maxUploadSizeMB of method Mautic\\CoreBundle\\Validator\\FileUploadValidator\:\:checkFileSize\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/CoreBundle/Tests/Unit/Validator/FileUploadValidatorTest.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Twig\\Extension\\ButtonExtension\:\:reset\(\) has parameter \$item with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10345,12 +9736,6 @@ parameters:
 			message: '#^Negated boolean expression is always false\.$#'
 			identifier: booleanNot.alwaysFalse
 			count: 2
-			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
-
-		-
-			message: '#^Parameter \#1 \$cacheTimeout of method Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:setCacheTimeout\(\) expects string, int given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
 
 		-
@@ -10520,24 +9905,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/DashboardBundle/Model/DashboardModel.php
-
-		-
-			message: '#^Parameter \#1 \$height of method Mautic\\DashboardBundle\\Entity\\Widget\:\:setHeight\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DashboardBundle/Tests/Entity/WidgetTest.php
-
-		-
-			message: '#^Parameter \#1 \$ordering of method Mautic\\DashboardBundle\\Entity\\Widget\:\:setOrdering\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DashboardBundle/Tests/Entity/WidgetTest.php
-
-		-
-			message: '#^Parameter \#1 \$width of method Mautic\\DashboardBundle\\Entity\\Widget\:\:setWidth\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DashboardBundle/Tests/Entity/WidgetTest.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentApiController\:\:getAction\(\) has parameter \$objectAlias with no type specified\.$#'
@@ -10876,18 +10243,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\EventListener\\DynamicContentSubscriber\:\:matchFilterForLead\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\EventListener\\DynamicContentSubscriber\:\:matchFilterForLead\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/DynamicContentBundle/EventListener/DynamicContentSubscriber.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Form\\Type\\DwcEntryFiltersType\:\:buildFiltersForm\(\) has parameter \$currentListId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -10943,18 +10298,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Helper\\DynamicContentHelper\:\:getDynamicContentSlotForLead\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Helper\\DynamicContentHelper\:\:matchFilterForLead\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
-
-		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Helper\\DynamicContentHelper\:\:matchFilterForLead\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
@@ -12392,24 +11735,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/EventListener/ReportSubscriber.php
-
-		-
-			message: '#^Variable \$joins in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/ReportSubscriber.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\EventListener\\TokenSubscriber\:\:matchFilterForLead\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/TokenSubscriber.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\EventListener\\TokenSubscriber\:\:matchFilterForLead\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/TokenSubscriber.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Exception\\MailboxException\:\:__construct\(\) has parameter \$code with no type specified\.$#'
@@ -14557,90 +13882,6 @@ parameters:
 			path: app/bundles/EmailBundle/Stats/StatHelperContainer.php
 
 		-
-			message: '#^You should use assertCount\(\$expectedCount, \$variable\) instead of assertSame\(\$expectedCount, count\(\$variable\)\)\.$#'
-			identifier: phpunit.assertCount
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Controller/Api/EmailApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\Entity\\StatTest\:\:addOpenDetailsTestProvider\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Entity/StatTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\EventListener\\CampaignSubscriberTest\:\:\$config is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\EventListener\\CampaignSubscriberTest\:\:\$config type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\EventListener\\EmailToUserSubscriberTest\:\:\$config type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/EmailToUserSubscriberTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\EventListener\\MatchFilterForLeadTraitTest\:\:dateMatchTestProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\EventListener\\MatchFilterForLeadTraitTestable\:\:match\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\EventListener\\MatchFilterForLeadTraitTestable\:\:match\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\EventListener\\MatchFilterForLeadTraitTestable\:\:matchFilterForLead\(\) has parameter \$filter with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\EventListener\\MatchFilterForLeadTraitTestable\:\:matchFilterForLead\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/MatchFilterForLeadTraitTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\EventListener\\ReportSubscriberTest\:\:\$queryBuilder \(Doctrine\\DBAL\\Query\\QueryBuilder&PHPUnit\\Framework\\MockObject\\MockObject\) does not accept Doctrine\\DBAL\\Query\\QueryBuilder\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/EmailBundle/Tests/EventListener/ReportSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\Form\\Type\\FormSubmitActionUserEmailTypeTest\:\:\$entityManager is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Form/Type/FormSubmitActionUserEmailTypeTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\Form\\Type\\FormSubmitActionUserEmailTypeTest\:\:\$stageModel is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Form/Type/FormSubmitActionUserEmailTypeTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\Form\\Type\\FormSubmitActionUserEmailTypeTest\:\:\$translator is unused\.$#'
-			identifier: property.unused
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Form/Type/FormSubmitActionUserEmailTypeTest.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Tests\\Helper\\Transport\\BatchTransport\:\:getMetadatas\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -14681,63 +13922,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: app/bundles/EmailBundle/Tests/Helper/Transport/BcInterfaceTokenTransport.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:
-				This helper is deprecated in favor of CacheBundle$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\Model\\EmailModelTest\:\:getEmailListStats\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\MonitoredEmail\\Accessor\\ConfigAccessorTest\:\:\$config has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Accessor/ConfigAccessorTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\MonitoredEmail\\FetcherTest\:\:\$mailboxes has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/FetcherTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\MonitoredEmail\\Organizer\\MailboxContainerTest\:\:\$config has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Organizer/MailboxContainerTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\MonitoredEmail\\Organizer\\MailboxOrganizerTest\:\:getConfigs\(\) has parameter \$mailboxes with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Organizer/MailboxOrganizerTest.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Tests\\MonitoredEmail\\Organizer\\MailboxOrganizerTest\:\:getConfigs\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Organizer/MailboxOrganizerTest.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\Tests\\MonitoredEmail\\Organizer\\MailboxOrganizerTest\:\:\$mailboxes has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/Tests/MonitoredEmail/Organizer/MailboxOrganizerTest.php
-
-		-
-			message: '#^Parameter \#1 \$emailsInString of method Mautic\\EmailBundle\\Validator\\MultipleEmailsValidValidator\:\:validate\(\) expects string, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/EmailBundle/Tests/Validator/MultipleEmailsValidValidatorTest.php
 
 		-
 			message: '''
@@ -15571,12 +14755,6 @@ parameters:
 			path: app/bundles/FormBundle/Event/ValidationEvent.php
 
 		-
-			message: '#^Cannot call method getId\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/FormBundle/EventListener/CampaignSubscriber.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerCondition\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -15641,12 +14819,6 @@ parameters:
 			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Variable \$ids in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DetermineWinnerSubscriber.php
 
 		-
 			message: '#^Method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:getEmailsFromString\(\) has parameter \$emailString with no type specified\.$#'
@@ -15867,12 +15039,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\FormBundle\\Helper\\FormUploader\:\:fixRotationJPG\(\) has parameter \$filename with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Helper/FormUploader.php
-
-		-
-			message: '#^Variable \$ort1 in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
 			count: 1
 			path: app/bundles/FormBundle/Helper/FormUploader.php
 
@@ -16241,111 +15407,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/FormBundle/Security/Permissions/FormPermissions.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Entity\\FormTest\:\:setNoIndexDataProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Tests/Entity/FormTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Entity\\FormTest\:\:testSetNoIndex\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Tests/Entity/FormTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Entity\\FormTest\:\:testSetNoIndex\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Entity/FormTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Entity\\FormTest\:\:testSetNoIndex\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Entity/FormTest.php
-
-		-
-			message: '''
-				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: new.deprecated
-			count: 1
-			path: app/bundles/FormBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:fieldProvider\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:testPopulateField\(\) has parameter \$expectedValue with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:testPopulateField\(\) has parameter \$field with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:testPopulateField\(\) has parameter \$formHtml with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:testPopulateField\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Tests\\Helper\\FormFieldHelperTest\:\:testPopulateField\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Tests/Helper/FormFieldHelperTest.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\Model\\FormUploaderTest\:\:\$formId1 has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/Model/FormUploaderTest.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\Model\\FormUploaderTest\:\:\$formId2 has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/Model/FormUploaderTest.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\Model\\FormUploaderTest\:\:\$uploadDir has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/FormBundle/Tests/Model/FormUploaderTest.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\ProgressiveProfiling\\DisplayManagerTest\:\:\$displayCounter is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/FormBundle/Tests/ProgressiveProfiling/DisplayManagerTest.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\ProgressiveProfiling\\DisplayManagerTest\:\:\$viewOnlyFields is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/FormBundle/Tests/ProgressiveProfiling/DisplayManagerTest.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\Tests\\ProgressiveProfiling\\DisplayManagerTest\:\:\$viewOnlyFields type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Tests/ProgressiveProfiling/DisplayManagerTest.php
 
 		-
 			message: '#^Property Mautic\\FormBundle\\Validator\\Constraint\\FileExtensionConstraint\:\:\$message has no type specified\.$#'
@@ -18019,12 +17080,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/VariableExpresser/VariableExpresserHelper.php
 
 		-
-			message: '#^Unreachable statement \- code above always terminates\.$#'
-			identifier: deadCode.unreachable
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Functional/Services/SyncService/SyncServiceTest.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Functional\\Services\\SyncService\\TestExamples\\Integration\\ExampleIntegration\:\:getConfiguredFieldMapping\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -18071,147 +17126,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/IntegrationsBundle/Tests/Functional/Services/SyncService/TestExamples/Sync/SyncDataExchange/ExampleSyncDataExchange.php
-
-		-
-			message: '''
-				#^Anonymous class extends deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:
-				This helper is deprecated in favor of CacheBundle$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
-
-		-
-			message: '''
-				#^Return type of method Mautic\\IntegrationsBundle\\Tests\\Unit\\AbstractIntegrationTest\:\:buildAbstractIntegrationDouble\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: return.deprecatedClass
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/AbstractIntegrationTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CredentialsInterface\:\:getCode\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2ThreeLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CredentialsInterface\:\:getRedirectUri\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2ThreeLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CredentialsInterface\:\:getScope\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2ThreeLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Auth\\Provider\\Oauth2ThreeLegged\\HttpFactoryTest\:\:getProperty\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2ThreeLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Auth\\Provider\\Oauth2ThreeLegged\\HttpFactoryTest\:\:getProperty\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2ThreeLegged/HttpFactoryTest.php
-
-		-
-			message: '#^PHPDoc tag @return with type Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CodeInterface\|Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CredentialsInterface\|Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\RedirectUriInterface\|Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\ScopeInterface is not subtype of native type Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2ThreeLegged\\Credentials\\CredentialsInterface\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2ThreeLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2TwoLegged\\Credentials\\PasswordCredentialsGrantInterface\:\:getScope\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2TwoLegged\\Credentials\\PasswordCredentialsGrantInterface\:\:getState\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Auth\\Provider\\Oauth2TwoLegged\\HttpFactoryTest\:\:getProperty\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Auth\\Provider\\Oauth2TwoLegged\\HttpFactoryTest\:\:getProperty\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-
-		-
-			message: '#^PHPDoc tag @return with type Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2TwoLegged\\Credentials\\PasswordCredentialsGrantInterface\|Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2TwoLegged\\Credentials\\ScopeInterface\|Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2TwoLegged\\Credentials\\StateInterface is not subtype of native type Mautic\\IntegrationsBundle\\Auth\\Provider\\Oauth2TwoLegged\\Credentials\\PasswordCredentialsGrantInterface\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\EventListener\\LeadSubscriberTest\:\:handleRecordFieldChanges\(\) has parameter \$fieldChanges with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/EventListener/LeadSubscriberTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\IntegrationsBundle\\Mapping\\MappedFieldInfoInterface\:\:expects\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Helper/FieldMergerHelperTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Helper\\FieldMergerHelperTest\:\:getCurrentFieldMappings\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Helper/FieldMergerHelperTest.php
-
-		-
-			message: '#^Variable \$field1 in PHPDoc tag @var does not match assigned variable \$field4\.$#'
-			identifier: varTag.differentVariable
-			count: 2
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Helper/FieldMergerHelperTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Sync\\DAO\\Mapping\\MappingManualDAOTest\:\:getMappingManualDAO\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/DAO/Mapping/MappingManualDAOTest.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Tests\\Unit\\Sync\\DAO\\Mapping\\MappingManualDAOTest\:\:\$integrationName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/DAO/Mapping/MappingManualDAOTest.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Tests\\Unit\\Sync\\DAO\\Mapping\\MappingManualDAOTest\:\:\$integrationObjectName has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/DAO/Mapping/MappingManualDAOTest.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Unit\\Sync\\SyncDataExchange\\Internal\\ReportBuilder\\FieldBuilderTest\:\:getFieldBuilder\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/IntegrationsBundle/Tests/Unit/Sync/SyncDataExchange/Internal/ReportBuilder/FieldBuilderTest.php
 
 		-
 			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\UtmTag\:\:setUtmTag\(\)\.$#'
@@ -18940,12 +17854,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/AuditlogController.php
 
 		-
-			message: '#^Cannot call method getId\(\) on null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
-
-		-
 			message: '''
 				#^Class Mautic\\LeadBundle\\Controller\\CompanyController extends deprecated class Mautic\\CoreBundle\\Controller\\FormController\:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
@@ -19230,12 +18138,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\Lead\:\:getCompanies\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Cannot call method getId\(\) on null\.$#'
-			identifier: method.nonObject
 			count: 1
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
@@ -20689,12 +19591,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/FrequencyRule.php
 
 		-
-			message: '#^Property Mautic\\LeadBundle\\Entity\\FrequencyRule\:\:\$preferredChannel \(bool\) does not accept default value of type int\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: app/bundles/LeadBundle/Entity/FrequencyRule.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\FrequencyRuleRepository\:\:getAppliedFrequencyRules\(\) has parameter \$leadIds with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -20786,12 +19682,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\Import\:\:getParserConfig\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Entity/Import.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\Import\:\:getProperties\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Entity/Import.php
@@ -21432,12 +20322,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadFieldRepository\:\:getFieldsByType\(\) has parameter \$type with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
-
-		-
-			message: '#^Parameter \#1 \$field of method Mautic\\LeadBundle\\Entity\\LeadFieldRepository\:\:getPropertyByField\(\) expects string, int given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
 
@@ -23531,12 +22415,6 @@ parameters:
 			path: app/bundles/LeadBundle/Form/Validator/Constraints/FieldAliasKeywordValidator.php
 
 		-
-			message: '#^Variable \$oldValue in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/LeadBundle/Form/Validator/Constraints/FieldAliasKeywordValidator.php
-
-		-
 			message: '#^Property Mautic\\LeadBundle\\Form\\Validator\\Constraints\\SegmentInUse\:\:\$message has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -24707,12 +23585,6 @@ parameters:
 			path: app/bundles/LeadBundle/Model/ListModel.php
 
 		-
-			message: '#^Cannot call method format\(\) on string\.$#'
-			identifier: method.nonObject
-			count: 4
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
 			message: '#^Dead catch \- Mautic\\LeadBundle\\Segment\\Exception\\FieldNotFoundException is never thrown in the try block\.$#'
 			identifier: catch.neverThrown
 			count: 1
@@ -24816,24 +23688,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\ListModel\:\:getLifeCycleSegmentChartData\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\ListModel\:\:getLifeCycleSegments\(\) has parameter \$canViewOthers with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\ListModel\:\:getLifeCycleSegments\(\) has parameter \$segments with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\ListModel\:\:getLifeCycleSegments\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Model/ListModel.php
@@ -25781,96 +24635,6 @@ parameters:
 			path: app/bundles/LeadBundle/Services/ContactColumnsDictionary.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\AjaxControllerFunctionalTest\:\:getMembersForCampaign\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/AjaxControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerFunctionalTest\:\:assertCreateResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerFunctionalTest\:\:assertDeleteResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerFunctionalTest\:\:assertGetResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerFunctionalTest\:\:assertPatchResponse\(\) has parameter \$payload with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerFunctionalTest\:\:getCreatePayload\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerFunctionalTest\:\:getEditPayload\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerTest\:\:getResultFromProtectedMethod\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerTest\:\:getResultFromProtectedMethod\(\) has parameter \$args with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerTest\:\:getResultFromProtectedMethod\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Controller\\Api\\FieldApiControllerTest\:\:\$defaultWhere has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/FieldApiControllerTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\Api\\ListApiControllerFunctionalTest\:\:saveSegment\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/Api/ListApiControllerFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\LeadControllerTest\:\:getLeadLists\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/LeadControllerTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\LeadControllerTest\:\:getMembersForCampaign\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/LeadControllerTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Controller\\ListControllerFunctionalTest\:\:saveSegment\(\) has parameter \$filters with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Controller/ListControllerFunctionalTest.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Tests\\DataFixtures\\ORM\\LoadPageHitData\:\:createHit\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -25893,372 +24657,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Tests/DataFixtures/ORM/LoadSegmentsData.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Entity\\CustomFieldRepositoryTraitTest\:\:\$baseColumns has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/CustomFieldRepositoryTraitTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Entity\\CustomFieldRepositoryTraitTest\:\:\$fieldGroups has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/CustomFieldRepositoryTraitTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Entity\\CustomFieldRepositoryTraitTest\:\:\$fieldValues has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/CustomFieldRepositoryTraitTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Entity\\CustomFieldRepositoryTraitTest\:\:\$fields has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/CustomFieldRepositoryTraitTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Entity\\CustomFieldRepositoryTraitTest\:\:\$fixedFields has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/CustomFieldRepositoryTraitTest.php
-
-		-
-			message: '#^Parameter \#1 \$comments of method Mautic\\LeadBundle\\Entity\\DoNotContact\:\:setComments\(\) expects string, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/DoNotContactTest.php
-
-		-
-			message: '#^Parameter \#3 \$defaultFrequencyNumber of method Mautic\\LeadBundle\\Entity\\FrequencyRuleRepository\:\:getAppliedFrequencyRules\(\) expects string\|null, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/FrequencyRuleRepositoryTest.php
-
-		-
-			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with false will always evaluate to false\.$#'
-			identifier: method.impossibleType
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/ImportTest.php
-
-		-
-			message: '#^Instanceof between null and DateInterval will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/ImportTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\ImportTest\:\:fakeImportStartDate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/ImportTest.php
-
-		-
-			message: '#^Parameter \#2 \$field of method Mautic\\LeadBundle\\Entity\\LeadFieldRepository\:\:compareDateValue\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/LeadBundle/Tests/Entity/LeadFieldRepositoryTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:setIsGlobalDataProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:setIsPreferenceCenterDataProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:testSetIsGlobal\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:testSetIsGlobal\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:testSetIsGlobal\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:testSetIsPreferenceCenter\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:testSetIsPreferenceCenter\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadListTest\:\:testSetIsPreferenceCenter\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadListTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\Lead\:\:getTest\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\Lead\:\:setNotes\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\Lead\:\:setTest\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadTest\:\:adjustPointsTest\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadTest\:\:adjustPointsTest\(\) has parameter \$points with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Entity\\LeadTest\:\:getLeadChangedArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Parameter \#1 \$preferredChannel of method Mautic\\LeadBundle\\Entity\\FrequencyRule\:\:setPreferredChannel\(\) expects bool, int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Parameter \#2 \$operator of method Mautic\\LeadBundle\\Entity\\Lead\:\:adjustPoints\(\) expects string, true given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '#^Parameter \#4 \$operator of method Mautic\\LeadBundle\\Tests\\Entity\\LeadTest\:\:adjustPointsTest\(\) expects bool, string given\.$#'
-			identifier: argument.type
-			count: 6
-			path: app/bundles/LeadBundle/Tests/Entity/LeadTest.php
-
-		-
-			message: '''
-				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: new.deprecated
-			count: 2
-			path: app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
-
-		-
-			message: '''
-				#^Instantiation of deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
-				2\.13\.0; to be removed in 3\.0$#
-			'''
-			identifier: new.deprecated
-			count: 5
-			path: app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\CampaignSubscriberTest\:\:\$configFrom type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\EventListener\\OwnerSubscriberTest\:\:getMockMailer\(\) has parameter \$lead with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/OwnerSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\OwnerSubscriberTest\:\:\$contacts has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/OwnerSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\ReportSubscriberTest\:\:\$companyColumns type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/ReportSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\ReportSubscriberTest\:\:\$leadColumns type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/ReportSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\ReportSubscriberTest\:\:\$leadFilters type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/ReportSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\EventListener\\ReportSubscriberTest\:\:\$reportMock is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/ReportSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Helper\\TokenHelperTest\:\:\$lead has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Helper/TokenHelperTest.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Model\\CompanyModel\:\:method\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\CompanyModelTest\:\:getCompanyDeduperForImport\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\CompanyModelTest\:\:getCompanyModelForImport\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Model\\CompanyModelTest\:\:\$companyDeduper is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Model\\CompanyModelTest\:\:\$emailValidator is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Model\\CompanyModelTest\:\:\$leadFieldModel is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Model\\CompanyModelTest\:\:\$session is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/CompanyModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\LeadListModelTest\:\:segmentTestDataProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/LeadListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\LeadListModelTest\:\:testSegmentsCanBeDeletedCorrecty\(\) has parameter \$arg with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/LeadListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\LeadListModelTest\:\:testSegmentsCanBeDeletedCorrecty\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/LeadListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\LeadListModelTest\:\:testSegmentsCanBeDeletedCorrecty\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/LeadListModelTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Model\\LeadListModelTest\:\:\$fixture has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/LeadListModelTest.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\Tests\\Model\\LeadModelFunctionalTest\:\:\$pointsAdded has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/LeadModelFunctionalTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\ListModelTest\:\:prepareMockForTestGetSourcesLists\(\) has parameter \$getLookupResultsReturn with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/ListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\ListModelTest\:\:sourceTypeTestDataProvider\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/ListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\ListModelTest\:\:testGetSourceLists\(\) has parameter \$expected with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/ListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Model\\ListModelTest\:\:testGetSourceLists\(\) has parameter \$getLookupResultsReturn with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Model/ListModelTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Report\\FieldsBuilderTest\:\:getFields\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Report/FieldsBuilderTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Segment\\ContactSegmentFilterCrateTest\:\:specialFieldsToConvertToEmptyProvider\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/ContactSegmentFilterCrateTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Segment\\ContactSegmentFilterCrateTest\:\:testSpecialFieldsToConvertToEmpty\(\) has parameter \$field with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/ContactSegmentFilterCrateTest.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Tests\\Segment\\ContactSegmentFilterCrateTest\:\:testSpecialFieldsToConvertToNotEmpty\(\) has parameter \$field with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/ContactSegmentFilterCrateTest.php
-
-		-
-			message: '#^Parameter \#1 \$filterName of method Mautic\\LeadBundle\\Tests\\Segment\\Decorator\\Date\\DateOptionFactoryTest\:\:getFilterDecorator\(\) expects string, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Tests/Segment/Decorator/Date/DateOptionFactoryTest.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Tests\\StandardImportTestHelper\:\:initImportEntity\(\) has parameter \$methods with no value type specified in iterable type array\.$#'
@@ -26862,12 +25260,6 @@ parameters:
 			identifier: parameter.deprecatedClass
 			count: 1
 			path: app/bundles/NotificationBundle/EventListener/CampaignConditionSubscriber.php
-
-		-
-			message: '#^Cannot call method getId\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/NotificationBundle/Helper/NotificationHelper.php
 
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Helper\\NotificationHelper\:\:getHeaderScript\(\) has no return type specified\.$#'
@@ -27680,30 +26072,6 @@ parameters:
 			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
 
 		-
-			message: '#^Cannot call method getDeviceStat\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: app/bundles/PageBundle/EventListener/CampaignSubscriber.php
-
-		-
-			message: '#^Cannot call method getPage\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/PageBundle/EventListener/CampaignSubscriber.php
-
-		-
-			message: '#^Cannot call method getReferer\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/PageBundle/EventListener/CampaignSubscriber.php
-
-		-
-			message: '#^Cannot call method getUrl\(\) on array\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: app/bundles/PageBundle/EventListener/CampaignSubscriber.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\EventListener\\CampaignSubscriber\:\:onCampaignTriggerAction\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -28415,108 +26783,6 @@ parameters:
 			path: app/bundles/PageBundle/Security/Permissions/PagePermissions.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Controller\\PageControllerTest\:\:createTestPage\(\) has parameter \$pageParams with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Controller/PageControllerTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Controller\\PublicControllerTest\:\:getVariantContent\(\) has parameter \$aCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Controller/PublicControllerTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Controller\\PublicControllerTest\:\:getVariantContent\(\) has parameter \$bCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Controller/PublicControllerTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Controller\\PublicControllerTest\:\:getVariantContent\(\) has parameter \$cCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Controller/PublicControllerTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:setIsPreferenceCenterDataProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:setNoIndexDataProvider\(\) return type has no value type specified in iterable type iterable\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:testSetIsPreferenceCenter\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:testSetIsPreferenceCenter\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:testSetIsPreferenceCenter\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:testSetNoIndex\(\) has parameter \$changes with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:testSetNoIndex\(\) has parameter \$expected with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Entity\\PageTest\:\:testSetNoIndex\(\) has parameter \$value with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Entity/PageTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Model\\PageModelTest\:\:assertUtmQuery\(\) has parameter \$query with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Model/PageModelTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Model\\PageModelTest\:\:getQueryParams\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Model/PageModelTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Model\\TrackableModelTest\:\:getModel\(\) has parameter \$doNotTrack with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Model/TrackableModelTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Model\\TrackableModelTest\:\:getModel\(\) has parameter \$urlFieldsForPlaintext with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/Tests/Model/TrackableModelTest.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Tests\\Model\\TrackableModelTest\:\:getTrackableEntity\(\) has parameter \$url with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Tests/Model/TrackableModelTest.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -29184,18 +27450,6 @@ parameters:
 			identifier: classConstant.deprecatedClass
 			count: 1
 			path: app/bundles/PluginBundle/Form/Type/DetailsType.php
-
-		-
-			message: '#^Variable \$fields in empty\(\) is never defined\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/FeatureSettingsType.php
-
-		-
-			message: '#^Variable \$integrationCompanyFields in empty\(\) is never defined\.$#'
-			identifier: empty.variable
-			count: 1
-			path: app/bundles/PluginBundle/Form/Type/FeatureSettingsType.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Form\\Type\\FieldsType\:\:buildFieldView\(\) has no return type specified\.$#'
@@ -30407,30 +28661,6 @@ parameters:
 			path: app/bundles/PluginBundle/Security/Permissions/PluginPermissions.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Tests\\ConfigFormTest\:\:getIntegrationObject\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Tests/ConfigFormTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 4
-			path: app/bundles/PluginBundle/Tests/Form/Type/DetailsTypeTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 6
-			path: app/bundles/PluginBundle/Tests/Form/Type/IntegrationsListTypeTest.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Tests\\Helper\\PluginBundleBaseStub\:\:onPluginInstall\(\) has parameter \$installedSchema with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -30453,57 +28683,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Tests/Helper/PluginBundleBaseStub.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\PluginBundle\\Entity\\Plugin\:\:isMissing\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Tests\\Helper\\ReloadHelperTest\:\:createSampleHappierPlugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Tests\\Helper\\ReloadHelperTest\:\:createSampleZapierPlugin\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '#^Property Mautic\\PluginBundle\\Tests\\Helper\\ReloadHelperTest\:\:\$sampleAllPlugins type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '#^Property Mautic\\PluginBundle\\Tests\\Helper\\ReloadHelperTest\:\:\$sampleMetaData type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '#^Property Mautic\\PluginBundle\\Tests\\Helper\\ReloadHelperTest\:\:\$sampleSchemas type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Helper/ReloadHelperTest.php
-
-		-
-			message: '#^Anonymous class extends @final class GuzzleHttp\\Client\.$#'
-			identifier: class.extendsFinalByPhpDoc
-			count: 1
-			path: app/bundles/PluginBundle/Tests/Integration/AbstractIntegrationTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 2
-			path: app/bundles/PluginBundle/Tests/Integration/AbstractIntegrationTest.php
 
 		-
 			message: '''
@@ -31289,19 +29468,7 @@ parameters:
 			path: app/bundles/ReportBundle/Entity/Report.php
 
 		-
-			message: '#^Method Mautic\\ReportBundle\\Entity\\Report\:\:getColumns\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ReportBundle/Entity/Report.php
-
-		-
 			message: '#^Method Mautic\\ReportBundle\\Entity\\Report\:\:getFilterValues\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ReportBundle/Entity/Report.php
-
-		-
-			message: '#^Method Mautic\\ReportBundle\\Entity\\Report\:\:getFilters\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/ReportBundle/Entity/Report.php
@@ -31321,18 +29488,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\ReportBundle\\Entity\\Report\:\:getSelectAndAggregatorColumns\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ReportBundle/Entity/Report.php
-
-		-
-			message: '#^Method Mautic\\ReportBundle\\Entity\\Report\:\:getSettings\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ReportBundle/Entity/Report.php
-
-		-
-			message: '#^Method Mautic\\ReportBundle\\Entity\\Report\:\:getSystem\(\) should return int but returns bool\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/ReportBundle/Entity/Report.php
 
@@ -31991,12 +30146,6 @@ parameters:
 			path: app/bundles/ReportBundle/Security/Permissions/ReportPermissions.php
 
 		-
-			message: '#^Parameter \#1 \$reportId of class Mautic\\ReportBundle\\Scheduler\\Option\\ExportOption constructor expects int\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/ReportBundle/Tests/Scheduler/Option/ExportOptionTest.php
-
-		-
 			message: '#^PHPDoc tag @throws with type Mautic\\CampaignBundle\\Executioner\\Exception\\NoContactsFoundException\|Mautic\\SmsBundle\\Broadcast\\LimitQuotaException is not subtype of Throwable$#'
 			identifier: throws.notThrowable
 			count: 1
@@ -32218,18 +30367,6 @@ parameters:
 				Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id$#
 			'''
 			identifier: method.deprecated
-			count: 1
-			path: app/bundles/SmsBundle/Entity/Stat.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Entity\\Stat\:\:getDetails\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/SmsBundle/Entity/Stat.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Entity\\Stat\:\:getTokens\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/SmsBundle/Entity/Stat.php
 
@@ -32604,42 +30741,6 @@ parameters:
 			identifier: arguments.count
 			count: 1
 			path: app/bundles/SmsBundle/Sms/TransportChain.php
-
-		-
-			message: '#^Property Mautic\\SmsBundle\\Tests\\EventListener\\SmsSubscriberTest\:\:\$messageText has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/SmsBundle/Tests/EventListener/SmsSubscriberTest.php
-
-		-
-			message: '#^Property Mautic\\SmsBundle\\Tests\\EventListener\\SmsSubscriberTest\:\:\$messageUrl has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/SmsBundle/Tests/EventListener/SmsSubscriberTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration\:
-				To be removed in Mautic 6\.0\. Please use the IntegrationsBundle instead, which is meant to be a drop\-in replacement for AbstractIntegration\.$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/SmsBundle/Tests/Integration/Twilio/ConfigurationTest.php
-
-		-
-			message: '''
-				#^Fetching class constant class of deprecated class Mautic\\CoreBundle\\Helper\\CacheStorageHelper\:
-				This helper is deprecated in favor of CacheBundle$#
-			'''
-			identifier: classConstant.deprecatedClass
-			count: 1
-			path: app/bundles/SmsBundle/Tests/Model/SmsModelTest.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Tests\\Sms\\TransportChainTest\:\:invokeMethod\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/SmsBundle/Tests/Sms/TransportChainTest.php
 
 		-
 			message: '#^Method Mautic\\StageBundle\\Controller\\Api\\StageApiController\:\:checkAllAccess\(\) has parameter \$action with no type specified\.$#'
@@ -33083,60 +31184,6 @@ parameters:
 			path: app/bundles/StatsBundle/Event/Options/FetchOptions.php
 
 		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\DayStatTest\:\:\$day has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/DayStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\DayStatTest\:\:\$hour has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/DayStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\DayStatTest\:\:\$hourStat has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/DayStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\MonthStatTest\:\:\$day has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/MonthStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\MonthStatTest\:\:\$dayStat has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/MonthStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\MonthStatTest\:\:\$month has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/MonthStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\YearStatTest\:\:\$month has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/YearStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\YearStatTest\:\:\$monthStat has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/YearStatTest.php
-
-		-
-			message: '#^Property Mautic\\StatsBundle\\Tests\\Aggregate\\Collection\\Stats\\YearStatTest\:\:\$year has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/StatsBundle/Tests/Aggregate/Collection/Stats/YearStatTest.php
-
-		-
 			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\RoleApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -33317,20 +31364,8 @@ parameters:
 			path: app/bundles/UserBundle/Entity/User.php
 
 		-
-			message: '#^Method Mautic\\UserBundle\\Entity\\User\:\:setPreferences\(\) has parameter \$preferences with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/UserBundle/Entity/User.php
-
-		-
 			message: '#^Property Mautic\\UserBundle\\Entity\\User\:\:\$activePermissions has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: app/bundles/UserBundle/Entity/User.php
-
-		-
-			message: '#^Property Mautic\\UserBundle\\Entity\\User\:\:\$preferences type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/UserBundle/Entity/User.php
 
@@ -34142,12 +32177,6 @@ parameters:
 			path: app/bundles/WebhookBundle/Security/Permissions/WebhookPermissions.php
 
 		-
-			message: '#^Method Mautic\\WebhookBundle\\Tests\\Functional\\WebhookFunctionalTest\:\:createContacts\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/WebhookBundle/Tests/Functional/WebhookFunctionalTest.php
-
-		-
 			message: '''
 				#^Call to deprecated method checkForMjmlTemplate\(\) of class MauticPlugin\\GrapesJsBuilderBundle\\Controller\\GrapesJsController\:
 				deprecated since version 5\.0 \- use mjml directly in email\.html\.twig$#
@@ -34203,12 +32232,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: plugins/GrapesJsBuilderBundle/Model/GrapesJsBuilderModel.php
-
-		-
-			message: '#^Anonymous class extends @final class Doctrine\\ORM\\EntityManager\.$#'
-			identifier: class.extendsFinalByPhpDoc
-			count: 2
-			path: plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticClearbitBundle\\Controller\\ClearbitController\:\:batchLookupCompanyAction\(\) should return Symfony\\Component\\HttpFoundation\\JsonResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
@@ -37556,24 +35579,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Variable \$mauticCompanyFieldString in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Variable \$objectFields in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Variable \$personIds in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getEmailBySugarUserId\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -38075,12 +36080,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
 
 		-
-			message: '#^Variable \$sugarObjects in empty\(\) always exists and is not falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeadFields\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -38499,354 +36498,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticCrmBundle/Services/TransportInterface.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Api\\ConnectwiseApiTest\:\:generateData\(\) has parameter \$maxPages with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/ConnectwiseApiTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Api\\ConnectwiseApiTest\:\:generateData\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/ConnectwiseApiTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Api\\ConnectwiseApiTest\:\:reset\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/ConnectwiseApiTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Api\\ConnectwiseApiTest\:\:\$generatedRecords type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/ConnectwiseApiTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Api\\Zoho\\MapperTest\:\:\$availableFields type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/Zoho/MapperTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Api\\Zoho\\MapperTest\:\:\$contacts type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/Zoho/MapperTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Api\\Zoho\\MapperTest\:\:\$mappedFields type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Api/Zoho/MapperTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\DynamicsApiTest\:\:\$api is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/DynamicsApiTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\ConnectwiseIntegrationTest\:\:generateData\(\) has parameter \$maxPages with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/ConnectwiseIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\ConnectwiseIntegrationTest\:\:generateData\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/ConnectwiseIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\ConnectwiseIntegrationTest\:\:reset\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/ConnectwiseIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\ConnectwiseIntegrationTest\:\:\$generatedRecords type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/ConnectwiseIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:addSpecialCases\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:addSpecialCases\(\) has parameter \$id with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:addSpecialCases\(\) has parameter \$records with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToCreate\(\) has parameter \$limit with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToCreate\(\) has parameter \$max with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToCreate\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToUpdate\(\) has parameter \$limit with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToUpdate\(\) has parameter \$max with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToUpdate\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToUpdate\(\) has parameter \$specificObject with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getLeadsToUpdate\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getMauticContacts\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getMaxInvocations\(\) has parameter \$name with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getParentPrivateProperties\(\) has parameter \$instance with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getParentPrivateProperties\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getPersistedIntegrationEntities\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getReturnedSfEntities\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceCompositeResponse\(\) has parameter \$data with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceCompositeResponse\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceDNCHistory\(\) has parameter \$object with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceDNCHistory\(\) has parameter \$priority with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceDNCHistory\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceIntegration\(\) has parameter \$updateObject with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceObjects\(\) has parameter \$emails with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceObjects\(\) has parameter \$maxContacts with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceObjects\(\) has parameter \$maxLeads with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:getSalesforceObjects\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToCreate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToUpdate\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToUpdate\(\) has parameter \$max with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToUpdate\(\) has parameter \$maxSfContacts with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToUpdate\(\) has parameter \$maxSfLeads with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToUpdate\(\) has parameter \$specificObject with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setMocks\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Parameter \#1 \$mockRepository of method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToCreate\(\) expects PHPUnit\\Framework\\MockObject\\MockObject, Mautic\\PluginBundle\\Entity\\IntegrationEntityRepository given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Parameter \#1 \$mockRepository of method MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:setLeadsToUpdate\(\) expects PHPUnit\\Framework\\MockObject\\MockObject, Mautic\\PluginBundle\\Entity\\IntegrationEntityRepository given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$leadsUpdatedCounter type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$mauticContacts type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$maxInvocations type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$persistedIntegrationEntities type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$returnedSfEntities type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$sfMockMethods type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$sfMockResetMethods type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$sfMockResetObjects type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Property MauticPlugin\\MauticCrmBundle\\Tests\\Integration\\SalesforceIntegrationTest\:\:\$sfObjects type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between false and mixed will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: plugins/MauticCrmBundle/Tests/Integration/SalesforceIntegrationTest.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticEmailMarketingBundle\\Api\\ConstantContactApi\:\:request\(\) has no return type specified\.$#'

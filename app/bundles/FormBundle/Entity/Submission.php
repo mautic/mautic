@@ -155,7 +155,7 @@ class Submission
     /**
      * Get dateSubmitted.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSubmitted()
     {
@@ -179,7 +179,7 @@ class Submission
     /**
      * Get referer.
      *
-     * @return string
+     * @return string|null
      */
     public function getReferer()
     {
@@ -201,7 +201,7 @@ class Submission
     /**
      * Get form.
      *
-     * @return Form
+     * @return Form|null
      */
     public function getForm()
     {
@@ -221,7 +221,7 @@ class Submission
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -265,7 +265,7 @@ class Submission
     /**
      * Get page.
      *
-     * @return Page
+     * @return Page|null
      */
     public function getPage()
     {
@@ -273,7 +273,7 @@ class Submission
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -291,7 +291,7 @@ class Submission
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTrackingId()
     {

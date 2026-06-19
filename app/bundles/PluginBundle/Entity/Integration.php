@@ -85,7 +85,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -113,7 +113,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getName()
     {
@@ -135,7 +135,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsPublished()
     {
@@ -162,7 +162,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getSupportedFeatures()
     {
@@ -184,7 +184,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getApiKeys()
     {
@@ -204,7 +204,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getFeatureSettings()
     {

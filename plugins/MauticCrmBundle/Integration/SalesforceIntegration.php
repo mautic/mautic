@@ -1518,20 +1518,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!empty($lead->getEmail())) {
             $pushPeople = [];
             $pushObject = null;
-            if (!empty($personIds)) {
-                // Give precendence to Contact CampaignMembers
-                if (!empty($personIds['Contact'])) {
-                    $pushObject      = 'Contact';
-                    $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
-                    $pushPeople      = $personIds[$pushObject];
-                }
 
-                if (empty($campaignMembers) && !empty($personIds['Lead'])) {
-                    $pushObject      = 'Lead';
-                    $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
-                    $pushPeople      = $personIds[$pushObject];
-                }
-            } // pushLead should have handled this
+            // Give precendence to Contact CampaignMembers
+            if (!empty($personIds['Contact'])) {
+                $pushObject      = 'Contact';
+                $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
+                $pushPeople      = $personIds[$pushObject];
+            }
+
+            if (empty($campaignMembers) && !empty($personIds['Lead'])) {
+                $pushObject      = 'Lead';
+                $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
+                $pushPeople      = $personIds[$pushObject];
+            }
 
             foreach ($pushPeople as $memberId) {
                 $campaignMappingId = '-'.$campaignId;
@@ -1764,7 +1763,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 }
                                 if ($company) {
                                     $sfCompany = $this->pushCompany($company);
-                                    if (!empty($sfCompany)) {
+                                    if ($sfCompany) {
                                         $entity['company'] = key($sfCompany);
                                     }
                                 }
@@ -1809,7 +1808,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $this->amendLeadDataBeforePush($body);
 
-            if (!empty($body)) {
+            if ($body) {
                 $url = '/services/data/v38.0/sobjects/'.$object;
                 if ($objectId) {
                     $url .= '/'.$objectId;
@@ -2664,8 +2663,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => [$sfObject]]]);
 
         // get company fields from Mautic that have been mapped
-        $mauticCompanyFieldString = implode(', l.', $config['companyFields']);
-        $mauticCompanyFieldString = 'l.'.$mauticCompanyFieldString;
+        $mauticCompanyFieldString = 'l.'.implode(', l.', $config['companyFields']);
 
         $fieldKeys          = array_keys($config['companyFields']);
         $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, $sfObject);
@@ -2686,10 +2684,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'fields' => $fields,
             'string' => $string,
         ];
-
-        if (empty($objectFields)) {
-            return [0, 0, 0, 0];
-        }
 
         $originalLimit = $limit;
         $progress      = false;
@@ -2758,7 +2752,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // If there is still room - grab Mautic companies to create if the Lead object is enabled
             $sfEntityRecords = [];
-            if (($limit > 0) && !empty($mauticCompanyFieldString)) {
+            if ($limit > 0) {
                 $this->getMauticEntitesToCreate(
                     $checkCompaniesInSF,
                     $mauticCompanyFieldString,

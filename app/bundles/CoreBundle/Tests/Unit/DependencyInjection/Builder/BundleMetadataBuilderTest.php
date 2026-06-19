@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BundleMetadataBuilderTest extends TestCase
 {
+    /** @var array<string, string> */
     private array $paths;
 
     protected function setUp(): void

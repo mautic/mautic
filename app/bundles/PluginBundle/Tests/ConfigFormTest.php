@@ -114,7 +114,7 @@ class ConfigFormTest extends KernelTestCase
         }
     }
 
-    public function getIntegrationObject()
+    public function getIntegrationObject(): IntegrationHelper
     {
         // create an integration object
         $pathsHelper          = $this->createMock(PathsHelper::class);
