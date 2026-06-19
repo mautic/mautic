@@ -40,10 +40,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
         new Post(security: "is_granted('dynamiccontent:dynamiccontents:create')"),
-        new Get(security: "is_granted('dynamiccontent:dynamiccontents:viewown')"),
-        new Put(security: "is_granted('dynamiccontent:dynamiccontents:editown')"),
-        new Patch(security: "is_granted('dynamiccontent:dynamiccontents:editother')"),
-        new Delete(security: "is_granted('dynamiccontent:dynamiccontents:deleteown')"),
+        new Get(security: "is_granted('dynamiccontent:dynamiccontents:viewown', object)"),
+        new Put(security: "is_granted('dynamiccontent:dynamiccontents:editown', object)"),
+        new Patch(security: "is_granted('dynamiccontent:dynamiccontents:editother', object)"),
+        new Delete(security: "is_granted('dynamiccontent:dynamiccontents:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['dynamicContent:read'],
@@ -332,7 +332,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -353,7 +353,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -385,7 +385,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return Category
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -406,7 +406,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -427,7 +427,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -448,7 +448,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getContent()
     {
@@ -471,7 +471,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @param bool $includeVariants
      *
-     * @return mixed
+     * @return int
      */
     public function getSentCount($includeVariants = false)
     {
@@ -518,7 +518,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSlotName()
     {
@@ -560,7 +560,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getUtmTags()
     {

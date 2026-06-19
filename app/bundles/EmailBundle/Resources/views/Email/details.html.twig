@@ -115,6 +115,33 @@
         'btnText'   : 'mautic.email.heatmap.click_heatmap'
     } %}
     {% set customButtons = customButtons|merge([heatmapButton]) %}
+
+    {% if permissions['email:emails:create']
+        and not email.isTranslation(true)
+        and not email.isVariant(true)
+        and (email.hasTranslations() or email.hasVariants())
+    %}
+        {% set cloneWithRelationsButton = {
+            'attr' : {
+                'class'                 : 'btn btn-ghost btn-sm btn-nospin',
+                'data-toggle'           : 'confirmation',
+                'data-message'          : 'mautic.email.form.confirmclone_with_relations'|trans({
+                    '%name%' : email.name
+                })|e,
+                'data-confirm-text'     : 'mautic.email.clone_with_relations'|trans|e,
+                'data-confirm-callback' : 'executeAction',
+                'data-cancel-text'      : 'mautic.core.form.cancel'|trans|e,
+                'href'                  : path('mautic_email_action', {
+                    'objectAction' : 'cloneWithTranslations',
+                    'objectId'     : email.getId()
+                }),
+            },
+            'iconClass' : 'ri-file-copy-2-line',
+            'btnText'   : 'mautic.email.clone_with_relations'|trans,
+            'priority'  : 0,
+        } %}
+        {% set customButtons = customButtons|merge([cloneWithRelationsButton]) %}
+    {% endif %}
 {% endif %}
 
 {# Only show A/B test button if not already a translation of an a/b test #}
@@ -315,6 +342,18 @@
                                   </td>
                                   <td>{{ email.readCount }}</td>
                               </tr>
+                              {% if emailType == 'list' and email.lists|length > 0 %}
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                                  </td>
+                                  <td>
+                                      {% for list in email.lists %}
+                                          <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">{{ list.name|purify }}</a>{% if not loop.last %}, {% endif %}
+                                      {% endfor %}
+                                  </td>
+                              </tr>
+                              {% endif %}
                               </tbody>
                           </table>
                       </div>
@@ -462,6 +501,8 @@
                       'trackables'  : trackables,
                       'entity'      : email,
                       'channel'     : 'email',
+                      'clickCountsSortable' : true,
+                      'clickCountsSorting'  : clickCountsSorting,
                   }) -}}
               </div>
 

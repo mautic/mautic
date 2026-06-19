@@ -53,7 +53,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->makeRequest(['search' => 'Company', 'formId' => $form->getId()]);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         Assert::assertSame(
             [
                 [

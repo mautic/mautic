@@ -106,6 +106,9 @@ final class CampaignSubscriberTest extends TestCase
                 Assert::assertSame(123, $id);
 
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 123;
@@ -175,6 +178,9 @@ final class CampaignSubscriberTest extends TestCase
                 Assert::assertSame(123, $id);
 
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 123;
@@ -210,6 +216,9 @@ final class CampaignSubscriberTest extends TestCase
             public function getStage(): Stage
             {
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 123;
@@ -248,6 +257,9 @@ final class CampaignSubscriberTest extends TestCase
                 Assert::assertSame(123, $id);
 
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 123;
@@ -289,6 +301,9 @@ final class CampaignSubscriberTest extends TestCase
             public function getStage(): Stage
             {
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 444;
@@ -329,6 +344,9 @@ final class CampaignSubscriberTest extends TestCase
                 Assert::assertSame(123, $id);
 
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 123;
@@ -371,6 +389,9 @@ final class CampaignSubscriberTest extends TestCase
             public function getStage(): Stage
             {
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 444;
@@ -415,6 +436,9 @@ final class CampaignSubscriberTest extends TestCase
                 Assert::assertSame(123, $id);
 
                 $stage = new class extends Stage {
+                    /**
+                     * @return int
+                     */
                     public function getId()
                     {
                         return 123;

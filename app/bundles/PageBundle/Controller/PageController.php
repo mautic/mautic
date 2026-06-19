@@ -870,14 +870,17 @@ class PageController extends FormController
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
-        return $this->render($logicalName, [
-            'isNew'       => $isNew,
-            'formFactory' => $this->formFactory,
-            'content'     => $entity->getContent(),
-            'page'        => $entity,
-            'template'    => $template,
-            'basePath'    => $request->getBasePath(),
-        ]);
+        return new Response($themeHelper->renderThemeTemplate(
+            $logicalName,
+            [
+                'isNew'       => $isNew,
+                'formFactory' => $this->formFactory,
+                'content'     => $entity->getContent(),
+                'page'        => $entity,
+                'template'    => $template,
+                'basePath'    => $request->getBasePath(),
+            ]
+        ));
     }
 
     /**
@@ -1039,7 +1042,7 @@ class PageController extends FormController
         $start = ($page <= 1) ? 0 : (($page - 1) * $limit);
 
         // Set order direction to desc if not set
-        if (!$session->get('mautic.pageresult.'.$objectId.'.orderbydir', null)) {
+        if (!$session->get('mautic.pageresult.'.$objectId.'.orderbydir')) {
             $session->set('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
         }
 

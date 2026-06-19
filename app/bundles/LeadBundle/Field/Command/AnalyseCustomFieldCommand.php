@@ -74,8 +74,8 @@ class AnalyseCustomFieldCommand extends Command
 
         $rows = [];
         foreach ($analysisDetails as $analysisDetail) {
-            $maxLength        = (int) $analysisDetail['max_length'] ?: 0;
-            $columnLength     = (int) $analysisDetail['char_length_limit'] ?: 0;
+            $maxLength        = (int) $analysisDetail['max_length'];
+            $columnLength     = (int) $analysisDetail['char_length_limit'];
             $suggestedMaxSize = $this->getSuggestedMaxSize($columnLength, $maxLength);
 
             $label  = $analysisDetail['label'];

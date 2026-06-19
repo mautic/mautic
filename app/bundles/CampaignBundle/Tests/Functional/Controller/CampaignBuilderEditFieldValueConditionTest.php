@@ -53,7 +53,7 @@ final class CampaignBuilderEditFieldValueConditionTest extends MauticMysqlTestCa
         ];
 
         $this->client->request(Request::METHOD_POST, sprintf('/s/campaigns/events/edit/%s', $campaignCondition->getId()), $payload, [], $this->createAjaxHeaders());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // version should be incremented as campaign's "modified by user" is updated
         $this->refreshAndSubmitForm($campaign, ++$version);
@@ -95,7 +95,7 @@ final class CampaignBuilderEditFieldValueConditionTest extends MauticMysqlTestCa
         $response = $this->client->getResponse();
 
         // This is the core assertion - the request should succeed (no HTTP 500)
-        Assert::assertTrue($response->isOk(), 'EventController should handle scalar to array value conversion without HTTP 500');
+        self::assertResponseIsSuccessful();
 
         // Additional verification: ensure response is valid JSON
         Assert::assertJson($response->getContent());

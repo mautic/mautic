@@ -22,6 +22,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Tests\Helper\ConditionalFieldOrderTestData;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -181,6 +182,23 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetContentSanitizesSubmissionLimitMessage(): void
+    {
+        $form = new Form();
+        $form->setSubmissionLimit(1);
+        $form->setSubmissionCount(1);
+        $form->setSubmissionLimitMessage('<script>alert(1)</script><img src=x onerror="alert(2)"><strong>Limit reached</strong>');
+
+        $content = $this->formModel->getContent($form);
+
+        $this->assertStringContainsString('mautic-form-message', $content);
+        // Executable XSS vectors must be stripped.
+        $this->assertStringNotContainsString('<script', $content);
+        $this->assertStringNotContainsString('onerror', $content);
+        // Safe inline formatting is preserved (strict_html allowlist).
+        $this->assertStringContainsString('<strong>Limit reached</strong>', $content);
+    }
+
     public function testSetFields(): void
     {
         $form   = new Form();
@@ -216,7 +234,27 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(4, $childField->getOrder());
         $this->assertSame('text', $newChildField->getType());
         $this->assertSame('new_child', $newChildField->getAlias());
-        $this->assertSame(4, $newChildField->getOrder());
+        $this->assertSame(5, $newChildField->getOrder());
+    }
+
+    public function testSetFieldsAssignsUniqueSequentialOrderToConditionalFields(): void
+    {
+        $fields = ConditionalFieldOrderTestData::createSessionFields();
+        $form   = new Form();
+        $this->formModel->setFields($form, $fields);
+
+        $ordersByAlias = [];
+        foreach ($form->getFields() as $field) {
+            $ordersByAlias[$field->getAlias()] = $field->getOrder();
+        }
+
+        $this->assertSame([
+            'yes_no'     => 1,
+            'question_a' => 2,
+            'question_b' => 3,
+            'question_c' => 4,
+        ], $ordersByAlias);
+        $this->assertCount(count($ordersByAlias), array_unique($ordersByAlias));
     }
 
     public function testGetComponentsFields(): void
