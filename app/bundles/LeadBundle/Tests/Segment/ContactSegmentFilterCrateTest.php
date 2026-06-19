@@ -210,7 +210,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
-    public function testSpecialFieldsToConvertToNotEmpty($field): void
+    public function testSpecialFieldsToConvertToNotEmpty(string $field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -236,7 +236,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
-    public function testSpecialFieldsToConvertToEmpty($field): void
+    public function testSpecialFieldsToConvertToEmpty(string $field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -261,7 +261,8 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    public static function specialFieldsToConvertToEmptyProvider()
+    /** @return array<int, array{0: string}> */
+    public static function specialFieldsToConvertToEmptyProvider(): array
     {
         return [
             ['page_id'],

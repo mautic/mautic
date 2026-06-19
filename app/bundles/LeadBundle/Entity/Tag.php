@@ -94,7 +94,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -120,7 +120,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {

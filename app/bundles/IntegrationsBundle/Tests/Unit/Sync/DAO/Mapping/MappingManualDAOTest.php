@@ -11,15 +11,15 @@ use PHPUnit\Framework\TestCase;
 
 class MappingManualDAOTest extends TestCase
 {
-    private $integrationName       = 'Test';
+    private string $integrationName       = 'Test';
 
-    private $integrationObjectName = 'Contact';
+    private string $integrationObjectName = 'Contact';
 
     public function testMappedIntegrationNamesAreReturnedBasedOnInternalObjectName(): void
     {
         $this->assertEquals(
             [$this->integrationObjectName],
-            $this->getMappingManualDAO()->getIntegrationObjectNames(Contact::NAME)
+            $this->getMappingManualDAO()->getIntegrationObjectNames()
         );
     }
 
@@ -27,7 +27,7 @@ class MappingManualDAOTest extends TestCase
     {
         $this->assertEquals(
             [Contact::NAME],
-            $this->getMappingManualDAO()->getInternalObjectNames($this->integrationObjectName)
+            $this->getMappingManualDAO()->getInternalObjectNames()
         );
     }
 
@@ -95,7 +95,7 @@ class MappingManualDAOTest extends TestCase
         );
     }
 
-    private function getMappingManualDAO()
+    private function getMappingManualDAO(): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($this->integrationName);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $this->integrationObjectName);

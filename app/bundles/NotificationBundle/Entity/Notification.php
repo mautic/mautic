@@ -359,7 +359,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getName()
     {
@@ -399,7 +399,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -407,7 +407,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\CategoryBundle\Entity\Category|null
      */
     public function getCategory()
     {
@@ -426,7 +426,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getHeading()
     {
@@ -443,7 +443,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getButton()
     {
@@ -457,7 +457,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getMessage()
     {
@@ -493,7 +493,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUrl()
     {
@@ -510,7 +510,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getReadCount()
     {
@@ -528,7 +528,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -547,7 +547,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -581,7 +581,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection<int, LeadList>
      */
     public function getLists()
     {
@@ -609,7 +609,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection<int, Stat>
      */
     public function getStats()
     {
@@ -617,7 +617,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getNotificationType()
     {

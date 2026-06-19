@@ -102,7 +102,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -126,7 +126,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     /**
      * Get bundle.
      *
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {
@@ -150,7 +150,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     /**
      * Get bitwise.
      *
-     * @return int
+     * @return int|null
      */
     public function getBitwise()
     {
@@ -172,7 +172,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     /**
      * Get role.
      *
-     * @return Role
+     * @return Role|null
      */
     public function getRole()
     {
@@ -196,7 +196,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {

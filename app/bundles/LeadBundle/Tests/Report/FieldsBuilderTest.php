@@ -362,10 +362,8 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $columns);
     }
 
-    /**
-     * @return array
-     */
-    private function getFields()
+    /** @return array<int, Field> */
+    private function getFields(): array
     {
         $titleField = new Field();
         $titleField->setLabel('Title');

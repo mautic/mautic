@@ -24,6 +24,9 @@ class ExportOptionTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        new ExportOption('string');
+        /** @var mixed $invalidReportId */
+        $invalidReportId = 'string';
+
+        new ExportOption($invalidReportId);
     }
 }
