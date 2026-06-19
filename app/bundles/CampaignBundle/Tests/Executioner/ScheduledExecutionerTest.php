@@ -285,11 +285,11 @@ class ScheduledExecutionerTest extends TestCase
             ->method('getScheduledCounts')
             ->willReturn([1 => 2]);
 
-        $callCount = 0;
+        $callCount            = 0;
         $capturedMinContactId = null;
         $this->repository->expects($this->exactly(2))
             ->method('getScheduled')
-            ->willReturnCallback(function ($eventId, $now, ContactLimiter $limiter) use ($logs, &$callCount, &$capturedMinContactId) {
+            ->willReturnCallback(function ($_eventId, $_now, ContactLimiter $limiter) use ($logs, &$callCount, &$capturedMinContactId) {
                 ++$callCount;
                 if (1 === $callCount) {
                     return $logs;
