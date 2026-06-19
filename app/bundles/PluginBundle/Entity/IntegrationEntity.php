@@ -103,7 +103,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -111,7 +111,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegration()
     {
@@ -131,7 +131,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegrationEntity()
     {
@@ -151,7 +151,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegrationEntityId()
     {
@@ -171,7 +171,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -191,7 +191,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getLastSyncDate()
     {
@@ -211,7 +211,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInternalEntity()
     {
@@ -231,7 +231,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getInternalEntityId()
     {

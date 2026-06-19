@@ -28,7 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
-    private MockObject&CacheStorageHelper $cacheStorageHelper;
+    /** @var MockObject&CacheStorageHelper */
+    private MockObject $cacheStorageHelper;
 
     private MockObject&EntityManagerInterface $entityManger;
 
@@ -59,6 +60,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->pageTrackableModel   = $this->createMock(TrackableModel::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->transport            = $this->createMock(TransportChain::class);
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->cacheStorageHelper   = $this->createMock(CacheStorageHelper::class);
         $this->entityManger         = $this->createMock(EntityManagerInterface::class);
         $this->security             = $this->createMock(CorePermissions::class);

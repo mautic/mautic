@@ -21,7 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class FieldApiControllerTest extends TestCase
 {
-    private $defaultWhere = [
+    /** @var array<int, array<string, mixed>> */
+    private array $defaultWhere = [
         [
             'col'  => 'object',
             'expr' => 'eq',
@@ -53,7 +54,10 @@ class FieldApiControllerTest extends TestCase
         $this->assertEquals(array_merge($where, $this->defaultWhere), $result);
     }
 
-    protected function getResultFromProtectedMethod($method, array $args, Request $request)
+    /**
+     * @param array<int, mixed> $args
+     */
+    protected function getResultFromProtectedMethod(string $method, array $args, Request $request): mixed
     {
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getCurrentRequest')

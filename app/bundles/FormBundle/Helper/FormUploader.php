@@ -130,24 +130,22 @@ class FormUploader
         if (empty($exif['Orientation'])) {
             return;
         }
-        $ort  = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
-        $ort1 = $ort;
-        if (!empty($ort1)) {
-            $image = imagecreatefromjpeg($filename);
-            $ort   = $ort1;
-            switch ($ort) {
-                case 3:
-                    $image = imagerotate($image, 180, 0);
-                    break;
+        $ort   = $exif['Orientation']; /* STORES ORIENTATION FROM IMAGE */
+        $ort1  = $ort;
+        $image = imagecreatefromjpeg($filename);
+        $ort   = $ort1;
+        switch ($ort) {
+            case 3:
+                $image = imagerotate($image, 180, 0);
+                break;
 
-                case 6:
-                    $image = imagerotate($image, -90, 0);
-                    break;
+            case 6:
+                $image = imagerotate($image, -90, 0);
+                break;
 
-                case 8:
-                    $image = imagerotate($image, 90, 0);
-                    break;
-            }
+            case 8:
+                $image = imagerotate($image, 90, 0);
+                break;
         }
         imagejpeg($image, $filename, 90);
     }

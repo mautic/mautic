@@ -45,10 +45,7 @@ class FrequencyRule extends CommonEntity
      */
     private $channel;
 
-    /**
-     * @var bool
-     */
-    private $preferredChannel = 0;
+    private bool $preferredChannel = false;
 
     /**
      * @var \DateTimeInterface
@@ -177,7 +174,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getFrequencyNumber()
     {
@@ -199,7 +196,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFrequencyTime()
     {

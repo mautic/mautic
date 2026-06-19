@@ -10,7 +10,8 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 #[\PHPUnit\Framework\Attributes\CoversClass(MailboxContainer::class)]
 class MailboxContainerTest extends \PHPUnit\Framework\TestCase
 {
-    protected $config = [
+    /** @var array<string, string> */
+    protected array $config = [
         'imap_path' => 'path',
         'user'      => 'user',
         'host'      => 'host',

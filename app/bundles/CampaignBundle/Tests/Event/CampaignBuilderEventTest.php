@@ -127,7 +127,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
         }
     }
 
-    protected function initEvent()
+    protected function initEvent(): CampaignBuilderEvent
     {
         $translator = $this->createMock(Translator::class);
 

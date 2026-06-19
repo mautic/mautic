@@ -3,48 +3,18 @@
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\HttpFoundation\Session\Session;
+use PHPUnit\Framework\MockObject\MockObject;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\AbstractFormFieldHelper::class)]
 class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldModel;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Session
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $session;
-
-    /**
-     * @var EmailValidator|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $emailValidator;
-
-    /**
-     * @var CompanyDeduper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $companyDeduper;
-
-    public function setUp(): void
-    {
-        $this->leadFieldModel = $this->createMock(FieldModel::class);
-        $this->session        = $this->createMock(Session::class);
-        $this->emailValidator = $this->createMock(EmailValidator::class);
-        $this->companyDeduper = $this->createMock(CompanyDeduper::class);
-    }
-
     #[\PHPUnit\Framework\Attributes\TestDox('Ensure that an array value is flattened before saving')]
     public function testArrayValueIsFlattenedBeforeSave(): void
     {
-        /** @var CompanyModel $companyModel */
+        /** @var CompanyModel&MockObject $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods([])
@@ -140,7 +110,8 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel->importCompany([], [], null, false, false);
     }
 
-    private function getCompanyModelForImport()
+    /** @return CompanyModel&MockObject */
+    private function getCompanyModelForImport(): CompanyModel
     {
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
@@ -162,7 +133,8 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         return $companyModel;
     }
 
-    private function getCompanyDeduperForImport(Company $duplicatedCompany)
+    /** @return CompanyDeduper&MockObject */
+    private function getCompanyDeduperForImport(Company $duplicatedCompany): CompanyDeduper
     {
         $companyDeduper = $this->createMock(CompanyDeduper::class);
 
@@ -187,7 +159,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
     public function testExtractCompanyDataFromImport(): void
     {
-        /** @var CompanyModel $companyModel */
+        /** @var CompanyModel&MockObject $companyModel */
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['fetchCompanyFields'])

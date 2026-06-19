@@ -77,7 +77,7 @@ class Event
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -85,7 +85,7 @@ class Event
     }
 
     /**
-     * @return Webhook
+     * @return Webhook|null
      */
     public function getWebhook()
     {
@@ -103,7 +103,7 @@ class Event
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getEventType()
     {
