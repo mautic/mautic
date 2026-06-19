@@ -1548,33 +1548,40 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
         mQuery(el).off('keydown.globalSearchNav');
 
         mQuery(el).on('keydown.globalSearchNav', function (e) {
+            const key = Mautic.getEventKey(e);
+
+            if (Mautic.isEscapeKey(key)) {
+                mQuery('#gsearchModal').modal('hide');
+                return;
+            }
+
             const items = mQuery('#globalSearchResults .gsearch--results-item');
             if (!items.length) return;
 
-            const key = Mautic.getEventKey(e);
             switch (true) {
                 case Mautic.isArrowDownKey(key):
-                case Mautic.isTabKey(key):
+                case Mautic.isTabKey(key) && !e.shiftKey:
                     e.preventDefault();
                     activeIndex = (activeIndex + 1) % items.length;
                     break;
 
                 case Mautic.isArrowUpKey(key):
+                case Mautic.isTabKey(key) && e.shiftKey:
                     e.preventDefault();
-                    activeIndex = (activeIndex - 1 + items.length) % items.length;
+                    activeIndex = activeIndex <= 0 ? items.length - 1 : activeIndex - 1;
                     break;
 
                 case Mautic.isEnterKey(key): {
+                    if (activeIndex < 0 || activeIndex >= items.length) {
+                        return;
+                    }
+
                     const link = items.eq(activeIndex).find('a').get(0);
                     if (link) {
                         link.click();
                     }
                     return;
                 }
-
-                case Mautic.isEscapeKey(key):
-                    mQuery('#gsearchModal').modal('hide');
-                    return;
 
                 default:
                     return;
