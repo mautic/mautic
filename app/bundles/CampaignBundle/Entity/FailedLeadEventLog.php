@@ -102,7 +102,7 @@ class FailedLeadEventLog
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getReason()
     {

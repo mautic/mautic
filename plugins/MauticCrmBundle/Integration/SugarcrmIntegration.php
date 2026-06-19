@@ -280,7 +280,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         };
 
         try {
-            if (!empty($sugarObjects) and is_array($sugarObjects)) {
+            if (is_array($sugarObjects)) {
                 foreach ($sugarObjects as $sObject) {
                     if ('Accounts' === $sObject) {
                         // Match Sugar object to Mautic's

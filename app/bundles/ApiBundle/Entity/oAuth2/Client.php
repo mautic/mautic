@@ -186,7 +186,7 @@ class Client extends BaseClient
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection
      */
     public function getAuthCodes()
     {
@@ -221,7 +221,7 @@ class Client extends BaseClient
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<int, User>
      */
     public function getUsers()
     {

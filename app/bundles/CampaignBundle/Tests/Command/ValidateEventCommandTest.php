@@ -72,7 +72,7 @@ class ValidateEventCommandTest extends AbstractCampaignCommand
 
         // Remove a contact from the campaign
         $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_leads')
-            ->set('manually_removed', 1)
+            ->set('manually_removed', '1')
             ->where('lead_id = 1')
             ->executeStatement();
 

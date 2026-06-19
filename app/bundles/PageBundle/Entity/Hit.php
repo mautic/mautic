@@ -717,7 +717,7 @@ class Hit
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {

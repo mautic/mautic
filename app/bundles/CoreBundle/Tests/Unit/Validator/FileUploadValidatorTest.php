@@ -62,7 +62,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator = new FileUploadValidator($translatorMock);
 
         $fileSize        = 5_242_880; // 5MB
-        $maxUploadSizeMB = 6;
+        $maxUploadSizeMB = '6';
         $sizeErrorMsg    = 'My message';
 
         $fileUploadValidator->checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg);
@@ -79,7 +79,7 @@ class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
         $fileUploadValidator = new FileUploadValidator($translatorMock);
 
         $fileSize        = 5_242_880; // 5MB
-        $maxUploadSizeMB = 4;
+        $maxUploadSizeMB = '4';
         $sizeErrorMsg    = 'My message';
 
         $this->expectException(FileInvalidException::class);
