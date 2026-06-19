@@ -357,7 +357,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -376,7 +376,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -534,7 +534,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -542,7 +542,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -640,7 +640,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return mixed
+     * @return array<string, mixed>
      */
     public function getCanvasSettings()
     {

@@ -157,7 +157,7 @@ class Stat
     }
 
     /**
-     * @return DynamicContent
+     * @return DynamicContent|null
      */
     public function getDynamicContent()
     {
@@ -170,7 +170,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -186,7 +186,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -202,7 +202,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSentCount()
     {
@@ -250,7 +250,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSource()
     {
@@ -266,7 +266,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSourceId()
     {

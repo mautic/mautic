@@ -98,7 +98,7 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface
      */
     public function getDateOpened()
     {
@@ -114,7 +114,7 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return LeadDevice|null
      */
     public function getDevice()
     {

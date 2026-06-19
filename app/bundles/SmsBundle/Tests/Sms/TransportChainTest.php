@@ -25,15 +25,15 @@ final class TransportChainTest extends MauticMysqlTestCase
     /**
      * Call protected/private method of a class.
      *
-     * @param object &$object    Instantiated object that we will run method on
-     * @param string $methodName Method name to call
-     * @param array  $parameters array of parameters to pass into method
+     * @param object            $object     Instantiated object that we will run method on
+     * @param string            $methodName Method name to call
+     * @param array<int, mixed> $parameters array of parameters to pass into method
      *
      * @return mixed method return
      *
      * @throws \ReflectionException
      */
-    public function invokeMethod(&$object, $methodName, array $parameters = [])
+    public function invokeMethod(object $object, string $methodName, array $parameters = []): mixed
     {
         $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);

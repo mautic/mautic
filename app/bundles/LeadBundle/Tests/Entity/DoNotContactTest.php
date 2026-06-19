@@ -9,7 +9,7 @@ class DoNotContactTest extends \PHPUnit\Framework\TestCase
     public function testDoNotContactComments(): void
     {
         $doNotContact = new DoNotContact();
-        $doNotContact->setComments(null);
+        $doNotContact->setComments('');
         $this->assertSame('', $doNotContact->getComments());
 
         $comment      = '<script>alert(\'x\')</script>';

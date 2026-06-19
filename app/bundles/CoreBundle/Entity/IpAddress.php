@@ -99,7 +99,7 @@ class IpAddress
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -117,7 +117,7 @@ class IpAddress
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIpAddress()
     {
