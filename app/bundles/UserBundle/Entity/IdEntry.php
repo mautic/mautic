@@ -45,7 +45,7 @@ class IdEntry
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getEntityId()
     {
@@ -83,7 +83,7 @@ class IdEntry
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getId()
     {

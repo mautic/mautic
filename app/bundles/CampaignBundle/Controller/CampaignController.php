@@ -814,6 +814,9 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * @param string          $action
+     * @param string|int|null $objectId
+     *
      * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
@@ -822,9 +825,10 @@ class CampaignController extends AbstractStandardFormController
             return $this->sessionId;
         }
 
+        $sessionId = null;
         if ($objectId) {
             $sessionId = $objectId;
-        } elseif ('new' === $action && empty($sessionId)) {
+        } elseif ('new' === $action) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->requestStack->getCurrentRequest()->request->has('campaign')) {
                 $campaign  = $this->requestStack->getCurrentRequest()->request->all()['campaign'] ?? [];
