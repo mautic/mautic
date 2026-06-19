@@ -70,7 +70,7 @@ class FieldTypeTest extends TypeTestCase
                     $this->mappedFieldCollector
                 ),
                 FormFieldBooleanType::class => new FormFieldBooleanType(),
-                FormFieldRatingType::class => new FormFieldRatingType($this->translator),
+                FormFieldRatingType::class  => new FormFieldRatingType($this->translator),
             ], []),
         ];
     }
