@@ -23,7 +23,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
         $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
 
-        $multipleEmailsValidValidator->validate(null, $constraintMock);
+        $multipleEmailsValidValidator->validate('', $constraintMock);
     }
 
     public function testValidEmails(): void

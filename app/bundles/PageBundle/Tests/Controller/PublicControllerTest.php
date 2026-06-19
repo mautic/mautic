@@ -127,10 +127,7 @@ class PublicControllerTest extends TestCase
         $this->assertEquals('pageA', $this->getVariantContent(6, 3, 3));
     }
 
-    /**
-     * @return string
-     */
-    private function getVariantContent($aCount, $bCount, $cCount)
+    private function getVariantContent(int $aCount, int $bCount, int $cCount): string
     {
         $pageEntityB = $this->createMock(Page::class);
         $pageEntityB->method('getId')

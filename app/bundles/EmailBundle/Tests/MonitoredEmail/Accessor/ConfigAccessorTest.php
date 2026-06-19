@@ -6,7 +6,8 @@ use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
 class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    protected $config = [
+    /** @var array<string, string> */
+    protected array $config = [
         'imap_path' => 'path',
         'user'      => 'user',
         'host'      => 'host',

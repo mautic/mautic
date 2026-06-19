@@ -191,7 +191,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
     }
 
-    private function getExecutioner()
+    private function getExecutioner(): InactiveExecutioner
     {
         return new InactiveExecutioner(
             $this->inactiveContactFinder,

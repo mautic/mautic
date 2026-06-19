@@ -81,7 +81,8 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
-    protected function getResultFromProtectedMethod($method, array $args)
+    /** @param array<int, mixed> $args */
+    protected function getResultFromProtectedMethod(string $method, array $args): mixed
     {
         $controller = new CommonApiController(
             $this->createMock(CorePermissions::class),
@@ -98,9 +99,9 @@ class CommonApiControllerTest extends CampaignTestAbstract
         );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
-        $method               = $controllerReflection->getMethod($method);
+        $methodReflection     = $controllerReflection->getMethod($method);
 
-        return $method->invokeArgs($controller, $args);
+        return $methodReflection->invokeArgs($controller, $args);
     }
 
     /**

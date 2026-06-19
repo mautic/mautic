@@ -287,7 +287,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         // Response should include the two entities that we just deleted
-        $this->assertSame(2, count($response['lists']));
+        $this->assertCount(2, $response['lists']);
         $this->assertResponseIsSuccessful();
     }
 
