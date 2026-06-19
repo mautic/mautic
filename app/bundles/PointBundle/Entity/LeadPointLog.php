@@ -52,7 +52,7 @@ class LeadPointLog
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateFired()
     {
@@ -84,7 +84,7 @@ class LeadPointLog
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead|null
      */
     public function getLead()
     {
@@ -100,7 +100,7 @@ class LeadPointLog
     }
 
     /**
-     * @return mixed
+     * @return Point|null
      */
     public function getPoint()
     {

@@ -21,7 +21,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
-use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
@@ -125,11 +124,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $pointsChangeLogRepositoryMock;
 
     /**
-     * @var MockObject&Report
-     */
-    private MockObject $reportMock;
-
-    /**
      * @var MockObject&ReportDataEvent
      */
     private MockObject $reportDataEventMock;
@@ -138,10 +132,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&DncReportService $dncReportService;
 
-    /**
-     * @var array
-     */
-    private $leadColumns = [
+    /** @var array<string, array<string, string>> */
+    private array $leadColumns = [
         'xx.yy' => [
             'label' => '',
             'type'  => 'bool',
@@ -149,20 +141,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /**
-     * @var array
-     */
-    private $leadFilters = [
+    /** @var array<string, array<string, string>> */
+    private array $leadFilters = [
         'filter' => [
             'label' => 'second',
             'type'  => 'text',
         ],
     ];
 
-    /**
-     * @var array
-     */
-    private $companyColumns = [
+    /** @var array<string, array<string, string>> */
+    private array $companyColumns = [
         'comp.name' => [
             'label' => 'company_name',
             'type'  => 'text',
@@ -191,7 +179,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
         $this->companyRepositoryMock            = $this->createMock(CompanyRepository::class);
         $this->pointsChangeLogRepositoryMock    = $this->createMock(PointsChangeLogRepository::class);
-        $this->reportMock                       = $this->createMock(Report::class);
         $this->dncReportService                 = $this->createMock(DncReportService::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
