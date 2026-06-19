@@ -16,10 +16,13 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     private ReloadHelper $helper;
 
+    /** @var array<string, array<string, mixed>> */
     private array $sampleAllPlugins = [];
 
+    /** @var array<string, array<string, ClassMetadata>> */
     private array $sampleMetaData = [];
 
+    /** @var array<string, Schema> */
     private array $sampleSchemas = [];
 
     /**
@@ -80,7 +83,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(1, count($disabledPlugins));
         $this->assertEquals('Happier Integration', $disabledPlugins['MauticHappierBundle']->getName());
-        $this->assertTrue($disabledPlugins['MauticHappierBundle']->isMissing());
+        $this->assertTrue((bool) $disabledPlugins['MauticHappierBundle']->getIsMissing());
     }
 
     public function testEnableFoundPlugins(): void
@@ -95,7 +98,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(1, count($enabledPlugins));
         $this->assertEquals('Zapier Integration', $enabledPlugins['MauticZapierBundle']->getName());
-        $this->assertFalse($enabledPlugins['MauticZapierBundle']->isMissing());
+        $this->assertFalse((bool) $enabledPlugins['MauticZapierBundle']->getIsMissing());
     }
 
     public function testUpdatePlugins(): void
@@ -144,15 +147,15 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('MauticZapierBundle', $installedPlugins['MauticZapierBundle']->getBundle());
         $this->assertEquals('Mautic', $installedPlugins['MauticZapierBundle']->getAuthor());
         $this->assertEquals('Zapier lets you connect Mautic with 1100+ other apps', $installedPlugins['MauticZapierBundle']->getDescription());
-        $this->assertFalse($installedPlugins['MauticZapierBundle']->isMissing());
+        $this->assertFalse((bool) $installedPlugins['MauticZapierBundle']->getIsMissing());
     }
 
-    private function createSampleZapierPlugin()
+    private function createSampleZapierPlugin(): Plugin
     {
         $plugin = new Plugin();
         $plugin->setName('Zapier Integration');
         $plugin->setDescription('Zapier lets you connect Mautic with 1100+ other apps');
-        $plugin->isMissing(false);
+        $plugin->setIsMissing(false);
         $plugin->setBundle('MauticZapierBundle');
         $plugin->setVersion('1.0');
         $plugin->setAuthor('Mautic');
@@ -160,12 +163,12 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         return $plugin;
     }
 
-    private function createSampleHappierPlugin()
+    private function createSampleHappierPlugin(): Plugin
     {
         $plugin = new Plugin();
         $plugin->setName('Happier Integration');
         $plugin->setDescription('Happier lets you connect Mautic with 1100+ other apps');
-        $plugin->isMissing(false);
+        $plugin->setIsMissing(false);
         $plugin->setBundle('MauticHappierBundle');
         $plugin->setVersion('1.0');
         $plugin->setAuthor('Mautic');

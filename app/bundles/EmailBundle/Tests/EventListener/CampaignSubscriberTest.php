@@ -20,19 +20,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
-     */
-    private $config = [
-        'useremail' => [
-            'email' => 0,
-        ],
-        'user_id'  => [6, 7],
-        'to_owner' => true,
-        'to'       => 'hello@there.com, bob@bobek.cz',
-        'bcc'      => 'hidden@translation.in',
-    ];
-
-    /**
      * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $emailModel;

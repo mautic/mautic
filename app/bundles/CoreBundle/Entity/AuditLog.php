@@ -128,7 +128,7 @@ class AuditLog
     /**
      * Get userId.
      *
-     * @return int
+     * @return int|null
      */
     public function getUserId()
     {
@@ -152,7 +152,7 @@ class AuditLog
     /**
      * Get object.
      *
-     * @return string
+     * @return string|null
      */
     public function getObject()
     {
@@ -198,7 +198,7 @@ class AuditLog
     /**
      * Get action.
      *
-     * @return string
+     * @return string|null
      */
     public function getAction()
     {
@@ -244,7 +244,7 @@ class AuditLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -268,7 +268,7 @@ class AuditLog
     /**
      * Get ipAddress.
      *
-     * @return string
+     * @return string|null
      */
     public function getIpAddress()
     {
@@ -292,7 +292,7 @@ class AuditLog
     /**
      * Get bundle.
      *
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {
@@ -316,7 +316,7 @@ class AuditLog
     /**
      * Get userName.
      *
-     * @return string
+     * @return string|null
      */
     public function getUserName()
     {

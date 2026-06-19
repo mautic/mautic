@@ -371,7 +371,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getScore()
     {

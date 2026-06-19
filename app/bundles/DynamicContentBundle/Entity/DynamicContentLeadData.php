@@ -63,7 +63,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -71,7 +71,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -91,7 +91,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return DynamicContent
+     * @return DynamicContent|null
      */
     public function getDynamicContent()
     {
@@ -111,7 +111,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -131,7 +131,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDataAdded()
     {
@@ -151,7 +151,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSlot()
     {
