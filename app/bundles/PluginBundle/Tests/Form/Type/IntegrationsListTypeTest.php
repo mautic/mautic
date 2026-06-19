@@ -45,11 +45,13 @@ class IntegrationsListTypeTest extends TestCase
             ->method('getPlugin')
             ->willReturn($plugin);
 
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
         $integrationInstance1->expects(self::once())
             ->method('getIntegrationSettings')
             ->willReturn($integration1);
 
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance2 = $this->createMock(AbstractIntegration::class);
         $integrationInstance2->expects(self::once())
             ->method('getIntegrationSettings')
@@ -67,7 +69,10 @@ class IntegrationsListTypeTest extends TestCase
             ->with(null, 'features', true)
             ->willReturn(['integration1' => $integrationInstance1, 'integration2' => $integrationInstance2]);
         $integrationHelper->method('getIntegrationObject')
-            ->willReturn($this->createMock(AbstractIntegration::class));
+            ->willReturn(
+                /** @phpstan-ignore classConstant.deprecatedClass */
+                $this->createMock(AbstractIntegration::class)
+            );
 
         $callsForm = 0;
 
@@ -173,11 +178,13 @@ class IntegrationsListTypeTest extends TestCase
             ->method('getPlugin')
             ->willReturn($plugin);
 
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
         $integrationInstance1->expects(self::once())
             ->method('getIntegrationSettings')
             ->willReturn($integration1);
 
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance2 = $this->createMock(AbstractIntegration::class);
         $integrationInstance2->expects(self::once())
             ->method('getIntegrationSettings')
@@ -195,7 +202,10 @@ class IntegrationsListTypeTest extends TestCase
             ->with(null, 'features', true)
             ->willReturn(['integration1' => $integrationInstance1, 'integration2' => $integrationInstance2]);
         $integrationHelper->method('getIntegrationObject')
-            ->willReturn($this->createMock(AbstractIntegration::class));
+            ->willReturn(
+                /** @phpstan-ignore classConstant.deprecatedClass */
+                $this->createMock(AbstractIntegration::class)
+            );
 
         $callsForm = 0;
         $form      = $this->createMock(FormInterface::class);

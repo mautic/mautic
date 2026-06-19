@@ -1,11 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -20,7 +20,6 @@ use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -77,54 +76,37 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /**
-     * @var MockObject&FromEmailHelper
-     */
-    private $fromEmaiHelper;
+    private MockObject&FromEmailHelper $fromEmaiHelper;
 
-    /**
-     * @var MockObject&CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private MockObject&CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var MockObject&Mailbox
-     */
-    private $mailbox;
+    private MockObject&Mailbox $mailbox;
 
-    /**
-     * @var MockObject&LoggerInterface
-     */
-    private MockObject $loggerMock;
+    private MockObject&LoggerInterface $loggerMock;
 
     private MailHashHelper $mailHashHelper;
 
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
+    private MockObject&TranslatorInterface $translator;
 
-    /**
-     * @var MockObject|MailHelper
-     */
-    private $mailHelper;
+    private MockObject&MailHelper $mailHelper;
 
-    /**
-     * @var MockObject|DoNotContact
-     */
-    private $dncModel;
+    private MockObject&DoNotContact $dncModel;
 
-    /**
-     * @var MockObject|EmailStatModel
-     */
-    private $emailStatModel;
+    private MockObject&EmailStatModel $emailStatModel;
 
-    /**
-     * @var MockObject&Environment
-     */
-    private MockObject $twig;
+    private MockObject&Environment $twig;
 
     private MockObject&SMimeHelper $sMimeHelper;
+
+    private MockObject&EventDispatcherInterface $dispatcher;
+
+    private MockObject&PathsHelper $pathsHelper;
+
+    private MockObject&AssetModel $assetModel;
+
+    private MockObject&TrackableModel $trackableModel;
+
+    private MockObject&RedirectModel $redirectModel;
 
     private StatHelper $statHelper;
 
@@ -143,6 +125,11 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->twig                 = $this->createMock(Environment::class);
         $this->sMimeHelper          = $this->createMock(SMimeHelper::class);
+        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $this->assetModel           = $this->createMock(AssetModel::class);
+        $this->trackableModel       = $this->createMock(TrackableModel::class);
+        $this->redirectModel        = $this->createMock(RedirectModel::class);
 
         $this->sMimeHelper->method('signContent')
             ->willReturnCallback(fn (MauticMessage $message) => $message);
@@ -242,7 +229,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
         $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -283,15 +270,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $routerMock,
                 $this->twig,
                 $themeHelper,
-                $this->createMock(PathsHelper::class),
-                $this->createMock(EventDispatcherInterface::class),
+                $this->pathsHelper,
+                $this->dispatcher,
                 $requestStack,
                 $entityManager,
-                $this->createMock(ModelFactory::class),
-                $this->createMock(AssetModel::class),
-                $this->createMock(TrackableModel::class),
-                $this->createMock(RedirectModel::class),
+                $this->assetModel,
+                $this->trackableModel,
+                $this->redirectModel,
                 $this->sMimeHelper,
+                $this->emailStatModel,
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -387,15 +374,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $copyRepoMock   = $this->createMock(CopyRepository::class);
-        $emailModelMock = $this->createMock(EmailModel::class);
-        $emailModelMock->method('getCopyRepository')
-            ->willReturn($copyRepoMock);
-
-        $modelFactory = $this->createMock(ModelFactory::class);
-        $modelFactory->method('getModel')
-            ->with(EmailModel::class)
-            ->willReturn($emailModelMock);
+        $copyRepoMock  = $this->createMock(CopyRepository::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getRepository')->willReturn($copyRepoMock);
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
@@ -418,12 +399,12 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $this->createMock(PathsHelper::class),
                 $mockDispatcher,
                 new RequestStack(),
-                $this->createMock(EntityManager::class),
-                $modelFactory,
+                $entityManager,
                 $this->createMock(AssetModel::class),
                 $this->createMock(TrackableModel::class),
                 $this->createMock(RedirectModel::class),
                 $this->sMimeHelper,
+                $this->emailStatModel,
             ])
             ->onlyMethods([])
             ->getMock();
@@ -466,7 +447,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
         $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -504,15 +485,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $routerMock,
                 $this->twig,
                 $themeHelper,
-                $this->createMock(PathsHelper::class),
-                $this->createMock(EventDispatcherInterface::class),
+                $this->pathsHelper,
+                $this->dispatcher,
                 $requestStack,
                 $entityManager,
-                $this->createMock(ModelFactory::class),
-                $this->createMock(AssetModel::class),
-                $this->createMock(TrackableModel::class),
-                $this->createMock(RedirectModel::class),
+                $this->assetModel,
+                $this->trackableModel,
+                $this->redirectModel,
                 $this->sMimeHelper,
+                $this->emailStatModel,
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -525,8 +506,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $stat->setEmail($emailMock);
 
                     $leadMock = $this->createMock(Lead::class);
-                    $leadMock->method('getId')
-                        ->willReturn(1);
+                    $leadMock->method('getId')->willReturn(1);
 
                     $stat->setLead($leadMock);
 
@@ -586,7 +566,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $emailMock->method('getId')->willReturn(1);
         $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
         $emailMock->method('getSubject')->willReturn(''); // The subject must be empty for the email to fail.
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
@@ -601,7 +581,6 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->fromEmaiHelper->method('getFromAddressConsideringOwner')->willReturn(new AddressDTO('someone@somewhere.com'));
         $routerMock = $this->createMock(Router::class);
-        $twig       = $this->createMock(Environment::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
@@ -625,15 +604,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                 $routerMock,
                 $this->twig,
                 $themeHelper,
-                $this->createMock(PathsHelper::class),
-                $this->createMock(EventDispatcherInterface::class),
+                $this->pathsHelper,
+                $this->dispatcher,
                 $requestStack,
                 $entityManager,
-                $this->createMock(ModelFactory::class),
-                $this->createMock(AssetModel::class),
-                $this->createMock(TrackableModel::class),
-                $this->createMock(RedirectModel::class),
+                $this->assetModel,
+                $this->trackableModel,
+                $this->redirectModel,
                 $this->sMimeHelper,
+                $this->emailStatModel,
             ])
             ->onlyMethods(['createEmailStat'])
             ->getMock();
@@ -738,15 +717,15 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             $router,
             $twig,
             $themeHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->pathsHelper,
+            $this->dispatcher,
             $requestStack,
             $entityManager,
-            $this->createMock(ModelFactory::class),
-            $this->createMock(AssetModel::class),
-            $this->createMock(TrackableModel::class),
-            $this->createMock(RedirectModel::class),
+            $this->assetModel,
+            $this->trackableModel,
+            $this->redirectModel,
             $this->sMimeHelper,
+            $this->emailStatModel,
         );
         $dncModel       = $this->createMock(DoNotContact::class);
         $translator     = $this->createMock(TranslatorInterface::class);

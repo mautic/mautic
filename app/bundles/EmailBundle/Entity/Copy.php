@@ -92,7 +92,7 @@ class Copy
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getBody()
     {
@@ -112,7 +112,7 @@ class Copy
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getSubject()
     {

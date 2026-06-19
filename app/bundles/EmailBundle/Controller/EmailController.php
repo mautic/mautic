@@ -264,9 +264,10 @@ class EmailController extends FormController
         $security = $this->security;
 
         /** @var Email $email */
-        $email = $model->getEntity($objectId);
+        $email   = $model->getEntity($objectId);
+        $session = $request->getSession();
         // set the page we came from
-        $page = $request->getSession()->get('mautic.email.page', 1);
+        $page = $session->get('mautic.email.page', 1);
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
@@ -369,37 +370,80 @@ class EmailController extends FormController
         \assert($auditLog instanceof AuditLogModel);
         $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
-        // Get click through stats
-        $trackableLinks  = $model->getEmailClickStats($email->getId());
-        $draftPreviewUrl = null;
-        if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
-            $draftPreviewUrl = $this->generateUrl(
-                'mautic_email_preview',
-                [
-                    'objectId'   => $email->getId(),
-                    'objectType' => 'draft',
-                ]
-            );
+        if (!$session->has('mautic.email.clicks.orderby')) {
+            $session->set('mautic.email.clicks.orderby', 'r.url');
+            $session->set('mautic.email.clicks.orderbydir', 'DESC');
         }
+        $this->setListFilters('email.clicks');
 
-        $variants = [
-            'parent'             => $parent,
-            'children'           => $children,
-            'properties'         => $properties,
-            'criteria'           => $criteria['criteria'],
-        ];
-
-        $translations = [
-            'parent'   => $translationParent,
-            'children' => $translationChildren,
-        ];
-
-        $plainTextHelper = new PlainTextHelper();
-        $plainTextHelper->setHtml($email->getCustomHtml());
-        $emailPreview = $plainTextHelper->getPreview();
-
-        return $this->delegateView(
+        $clickCountsBaseUrl = $this->generateUrl(
+            'mautic_email_action',
             [
+                'objectAction' => 'view',
+                'objectId'     => $email->getId(),
+            ]
+        );
+        $clickCountsSorting = [
+            'sessionVar' => 'email.clicks',
+            'orderBy'    => 't.hits',
+            'target'     => '#clicks-container',
+            'tmpl'       => 'click_counts',
+            'baseUrl'    => $clickCountsBaseUrl,
+        ];
+
+        // Get click through stats
+        $trackableLinks = $model->getEmailClickStats(
+            $email->getId(),
+            $session->get('mautic.email.clicks.orderby', 'r.url'),
+            $session->get('mautic.email.clicks.orderbydir', 'DESC')
+        );
+
+        if ('click_counts' === $request->get('tmpl')) {
+            $view = [
+                'viewParameters' => [
+                    'trackables'          => $trackableLinks,
+                    'entity'              => $email,
+                    'channel'             => 'email',
+                    'clickCountsSortable' => true,
+                    'clickCountsSorting'  => $clickCountsSorting,
+                    'tmpl'                => 'click_counts',
+                ],
+                'contentTemplate' => '@MauticPage/Trackable/click_counts.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_email_index',
+                    'mauticContent' => 'email',
+                    'route'         => $clickCountsBaseUrl,
+                ],
+            ];
+        } else {
+            $draftPreviewUrl = null;
+            if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
+                $draftPreviewUrl = $this->generateUrl(
+                    'mautic_email_preview',
+                    [
+                        'objectId'   => $email->getId(),
+                        'objectType' => 'draft',
+                    ]
+                );
+            }
+
+            $variants = [
+                'parent'             => $parent,
+                'children'           => $children,
+                'properties'         => $properties,
+                'criteria'           => $criteria['criteria'],
+            ];
+
+            $translations = [
+                'parent'   => $translationParent,
+                'children' => $translationChildren,
+            ];
+
+            $plainTextHelper = new PlainTextHelper();
+            $plainTextHelper->setHtml($email->getCustomHtml());
+            $emailPreview = $plainTextHelper->getPreview();
+
+            $view = [
                 'returnUrl' => $this->generateUrl(
                     'mautic_email_action',
                     [
@@ -408,14 +452,15 @@ class EmailController extends FormController
                     ]
                 ),
                 'viewParameters' => [
-                    'email'        => $email,
-                    'emailPreview' => $emailPreview,
-                    'trackables'   => $trackableLinks,
-                    'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
-                    'variants'     => $variants,
-                    'translations' => $translations,
-                    'permissions'  => $security->isGranted(
+                    'email'              => $email,
+                    'emailPreview'       => $emailPreview,
+                    'trackables'         => $trackableLinks,
+                    'logs'               => $logs,
+                    'isEmbedded'         => $request->get('isEmbedded') ?: false,
+                    'clickCountsSorting' => $clickCountsSorting,
+                    'variants'           => $variants,
+                    'translations'       => $translations,
+                    'permissions'        => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -462,8 +507,10 @@ class EmailController extends FormController
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
                 ],
-            ]
-        );
+            ];
+        }
+
+        return $this->delegateView($view);
     }
 
     /**
@@ -1061,6 +1108,100 @@ class EmailController extends FormController
     }
 
     /**
+     * Clone an email and its translation/variant family.
+     */
+    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    {
+        $page = $request->getSession()->get('mautic.email.page', 1);
+
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email',
+            ],
+        ];
+
+        if (Request::METHOD_POST !== $request->getMethod()) {
+            return $this->postActionRedirect($postActionVars);
+        }
+
+        $emailEntity = $model->getEntity($objectId);
+
+        if (null === $emailEntity) {
+            $postActionVars['flashes'][] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.email.error.notfound',
+                'msgVars' => ['%id%' => $objectId],
+            ];
+
+            return $this->postActionRedirect($postActionVars);
+        }
+
+        if (!$this->security->isGranted('email:emails:create')
+            || !$this->security->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $emailEntity->getCreatedBy()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        if ($model->isLocked($emailEntity)) {
+            return $this->isLocked($postActionVars, $emailEntity, 'email');
+        }
+
+        if ($emailEntity->isTranslation(true) || $emailEntity->isVariant(true)) {
+            $postActionVars['flashes'][] = [
+                'type' => 'error',
+                'msg'  => 'mautic.email.error.clone_with_relations_parent_only',
+            ];
+
+            return $this->postActionRedirect($postActionVars);
+        }
+
+        try {
+            $clonedEmails = $model->cloneEmailWithTranslationsAndVariants($emailEntity);
+            $clonedParent = $clonedEmails[0];
+
+            $postActionVars['flashes'] = [
+                [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.email.notice.cloned_with_relations',
+                    'msgVars' => [
+                        '%name%'  => $clonedParent->getName(),
+                        '%count%' => count($clonedEmails),
+                    ],
+                ],
+            ];
+
+            $postActionVars['viewParameters'] = [
+                'objectAction' => 'view',
+                'objectId'     => $clonedParent->getId(),
+            ];
+            $postActionVars['returnUrl'] = $this->generateUrl(
+                'mautic_email_action',
+                $postActionVars['viewParameters']
+            );
+            $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
+        } catch (InvalidRenderedHtmlException $e) {
+            $postActionVars['flashes'] = [
+                [
+                    'type' => 'error',
+                    'msg'  => $e->getMessage(),
+                ],
+            ];
+        }
+
+        return $this->postActionRedirect($postActionVars);
+    }
+
+    /**
      * Deletes the entity.
      *
      * @return Response
@@ -1174,7 +1315,7 @@ class EmailController extends FormController
 
         $logicalName = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-        return $this->render(
+        return new Response($themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'    => $isNew,
@@ -1183,7 +1324,7 @@ class EmailController extends FormController
                 'template' => $template,
                 'basePath' => $request->getBasePath(),
             ]
-        );
+        ));
     }
 
     /**

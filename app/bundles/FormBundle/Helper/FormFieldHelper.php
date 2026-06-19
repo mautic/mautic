@@ -62,6 +62,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         ],
         'tel'       => [],
         'text'      => [],
+        'rating'    => [],
         'textarea'  => [],
         'url'       => [
             'filter'      => 'url',
@@ -157,6 +158,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $alias = $field->getAlias();
 
+        $inputClosePattern = '(.*?)\/?>';
+        $escapedFormName   = preg_quote($formName, '/');
+        $escapedAlias      = preg_quote($alias, '/');
+
         // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
         $fieldAttributeReadOnly = fn ($field, $sanitizedValue) => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
 
@@ -174,14 +179,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 } else {
                     $sanitizedValue = $this->sanitizeValue($value);
                 }
-                if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)\/?>/i', $formHtml, $match)) {
+                if (preg_match('/<input(.*?)value="(.*?)"(.*?)id="mauticform_input_'.$escapedFormName.'_'.$escapedAlias.'"'.$inputClosePattern.'/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[3].'value="'.$sanitizedValue.'"'
                         .$match[4].$fieldAttributeReadOnly($field, $sanitizedValue).'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
-                if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
+                if (preg_match('/<textarea(.*?)id="mauticform_input_'.$escapedFormName.'_'.$escapedAlias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
                     $value    = $this->sanitizeValue($value);
                     $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].$fieldAttributeReadOnly($field, $value).'>'.$value.'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
@@ -197,29 +202,41 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 foreach ($value as $val) {
-                    $val = $this->sanitizeValue($val);
-                    if (preg_match(
-                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox_'.$alias.'(.*?)"(.*?)value="'.$val.'"(.*?)\/?>/i',
+                    $val          = $this->sanitizeValue($val);
+                    if (preg_match_all(
+                        '/<input(.*?)id="mauticform_checkboxgrp_checkbox_'.$escapedAlias.'(.*?)"(.*?)value="([^"]*)"'.$inputClosePattern.'/i',
                         $formHtml,
-                        $match
+                        $matches,
+                        PREG_SET_ORDER
                     )) {
-                        $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox_'.$alias.$match[2].'"'.$match[3].'value="'.$val.'"'
-                            .$match[4].' checked />';
-                        $formHtml = str_replace($match[0], $replace, $formHtml);
+                        foreach ($matches as $match) {
+                            if ($match[4] === $val) {
+                                $replace = '<input'.$match[1].'id="mauticform_checkboxgrp_checkbox_'.$alias.$match[2].'"'.$match[3].'value="'.$val.'"'
+                                    .$match[5].' checked />';
+                                $formHtml = str_replace($match[0], $replace, $formHtml);
+                                break;
+                            }
+                        }
                     }
                 }
                 break;
             case 'radiogrp':
-                $value = $this->sanitizeValue($value);
-                if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio_'.$alias.'(.*?)"(.*?)value="'.$value.'"(.*?)\/?>/i', $formHtml, $match)) {
-                    $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio_'.$alias.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
-                        .' checked />';
-                    $formHtml = str_replace($match[0], $replace, $formHtml);
+            case 'rating':
+                $value        = $this->sanitizeValue($value);
+                if (preg_match_all('/<input(.*?)id="mauticform_radiogrp_radio_'.$escapedAlias.'(.*?)"(.*?)value="([^"]*)"'.$inputClosePattern.'/i', $formHtml, $matches, PREG_SET_ORDER)) {
+                    foreach ($matches as $match) {
+                        if ($match[4] === $value) {
+                            $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio_'.$alias.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[5]
+                                .' checked />';
+                            $formHtml = str_replace($match[0], $replace, $formHtml);
+                            break;
+                        }
+                    }
                 }
                 break;
             case 'select':
             case 'country':
-                $regex = '/<select\s*id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)<\/select>/is';
+                $regex           = '/<select\s*id="mauticform_input_'.$escapedFormName.'_'.$escapedAlias.'"(.*?)<\/select>/is';
                 if (preg_match($regex, $formHtml, $match)) {
                     $origText = $match[0];
                     $replace  = str_replace(

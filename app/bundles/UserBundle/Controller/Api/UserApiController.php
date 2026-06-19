@@ -212,8 +212,8 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $request->query->get('filter', null);
-        $limit  = (int) $request->query->get('limit', null);
+        $filter = $request->query->get('filter');
+        $limit  = (int) $request->query->get('limit');
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

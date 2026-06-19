@@ -34,6 +34,7 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         $elFinderLoader = new class(static::getContainer()) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
+                /** @phpstan-ignore symfonyContainer.privateService */
                 parent::__construct($container->get('fm_elfinder.configurator'));
             }
 
@@ -62,8 +63,7 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
             Request::METHOD_POST,
             "efconnect?cmd=mkdir&name=$this->folderName&target=fls1_Lw"
         );
-        $response = $this->client->getResponse();
-        self::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
         /** @var PathsHelper $pathsHelper */
         $pathsHelper = static::getContainer()->get('mautic.helper.paths');
         $folderPath  = "{$pathsHelper->getImagePath()}/$this->folderName";

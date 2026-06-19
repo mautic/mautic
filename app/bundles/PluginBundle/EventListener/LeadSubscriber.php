@@ -35,7 +35,6 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onLeadDelete(LeadEvent $event): bool
     {
-        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
@@ -61,7 +60,6 @@ class LeadSubscriber implements EventSubscriberInterface
     */
     public function onLeadSave(LeadEvent $event): void
     {
-        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         if ($this->isAnyIntegrationEnabled()) {

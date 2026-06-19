@@ -248,7 +248,7 @@ class PointsChangeLog
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {

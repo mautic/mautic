@@ -123,7 +123,7 @@ class DoNotContact
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -179,7 +179,7 @@ class DoNotContact
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getComments()
     {
@@ -187,11 +187,9 @@ class DoNotContact
     }
 
     /**
-     * @param string $comments
-     *
      * @return DoNotContact
      */
-    public function setComments($comments)
+    public function setComments(?string $comments)
     {
         $this->comments = InputHelper::string((string) $comments);
 

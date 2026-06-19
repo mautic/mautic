@@ -54,7 +54,7 @@ class LeadStageLog
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateFired()
     {
@@ -86,7 +86,7 @@ class LeadStageLog
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead|null
      */
     public function getLead()
     {
@@ -102,7 +102,7 @@ class LeadStageLog
     }
 
     /**
-     * @return mixed
+     * @return Stage|null
      */
     public function getStage()
     {

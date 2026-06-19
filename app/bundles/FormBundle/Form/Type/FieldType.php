@@ -141,6 +141,9 @@ class FieldType extends AbstractType
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
                     break;
+                case 'rating':
+                    $addDefaultValue = false;
+                    break;
                 case 'slider':
                     $addIsRequired = false;
                     break;
@@ -218,7 +221,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => !empty($options['data']['id']) && !str_contains($options['data']['id'], 'new'),
                     'required' => false,
                 ]
             );
@@ -587,6 +590,16 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldGroupType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'rating':
+                    $builder->add(
+                        'properties',
+                        FormFieldRatingType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,

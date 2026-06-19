@@ -27,7 +27,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
@@ -51,7 +51,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
@@ -75,7 +75,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
@@ -100,7 +100,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
@@ -141,7 +141,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);

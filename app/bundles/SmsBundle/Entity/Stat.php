@@ -160,7 +160,7 @@ class Stat
     }
 
     /**
-     * @return Sms
+     * @return Sms|null
      */
     public function getSms()
     {
@@ -178,7 +178,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -196,7 +196,7 @@ class Stat
     }
 
     /**
-     * @return LeadList
+     * @return LeadList|null
      */
     public function getList()
     {
@@ -214,7 +214,7 @@ class Stat
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -232,7 +232,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -252,7 +252,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTrackingHash()
     {
@@ -272,7 +272,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSource()
     {
@@ -292,7 +292,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSourceId()
     {
@@ -312,7 +312,7 @@ class Stat
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getTokens()
     {
@@ -342,7 +342,7 @@ class Stat
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isFailed()
     {
@@ -350,7 +350,7 @@ class Stat
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getDetails()
     {

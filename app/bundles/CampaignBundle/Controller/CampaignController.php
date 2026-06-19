@@ -344,7 +344,7 @@ class CampaignController extends AbstractStandardFormController
             $dateTo   = $dateTo->modify('+1 day');
         }
 
-        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId);
+        $hasCampaignLeads = $this->getCampaignModel()->getRepository()->hasCampaignLeads($objectId, (int) $this->coreParametersHelper->get('campaign_event_cache_ttl'));
         $logCounts        = $this->processCampaignLogCounts($objectId, $dateFrom, $dateTo);
 
         $campaignLogCounts          = $logCounts['campaignLogCounts'] ?? [];
@@ -601,7 +601,7 @@ class CampaignController extends AbstractStandardFormController
             $clone->setTempId($tempEventId);
 
             // Just wipe out the parent as it'll be generated when the cloned entity is saved
-            $clone->setParent(null);
+            $clone->setParent();
 
             if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $clone->getType()) {
                 // Update properties to point to the new temp ID
@@ -814,6 +814,9 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
+     * @param string          $action
+     * @param string|int|null $objectId
+     *
      * @return int|string|null
      */
     protected function getCampaignSessionId(Campaign $campaign, $action, $objectId = null)
@@ -822,9 +825,10 @@ class CampaignController extends AbstractStandardFormController
             return $this->sessionId;
         }
 
+        $sessionId = null;
         if ($objectId) {
             $sessionId = $objectId;
-        } elseif ('new' === $action && empty($sessionId)) {
+        } elseif ('new' === $action) {
             $sessionId = 'mautic_'.sha1(uniqid(mt_rand(), true));
             if ($this->requestStack->getCurrentRequest()->request->has('campaign')) {
                 $campaign  = $this->requestStack->getCurrentRequest()->request->all()['campaign'] ?? [];
@@ -1155,10 +1159,11 @@ class CampaignController extends AbstractStandardFormController
             $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateTo);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
+            $cacheTTL = (int) $this->coreParametersHelper->get('campaign_event_cache_ttl');
             /** @var LeadEventLogRepository $eventLogRepo */
             $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
-            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo);
-            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo);
+            $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateTo, null, $cacheTTL);
+            $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, true, false, false, $dateFrom, $dateTo, null, $cacheTTL);
         }
 
         return [

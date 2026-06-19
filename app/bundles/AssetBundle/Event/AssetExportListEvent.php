@@ -36,10 +36,10 @@ final class AssetExportListEvent extends CommonEvent
     }
 
     /**
-     * @return array<string>|null
+     * @return array<string>
      */
-    public function getList(): ?array
+    public function getList(): array
     {
-        return $this->list ?? null;
+        return $this->list;
     }
 }

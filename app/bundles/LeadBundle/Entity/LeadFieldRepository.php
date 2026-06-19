@@ -398,7 +398,7 @@ class LeadFieldRepository extends CommonRepository
      * Compare a form result value with defined date value for defined lead.
      *
      * @param int    $lead  ID
-     * @param int    $field alias
+     * @param string $field alias
      * @param string $value to compare with
      */
     public function compareDateValue($lead, $field, $value): bool

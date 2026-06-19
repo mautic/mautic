@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
-    private $formId1   = 1;
+    private int $formId1   = 1;
 
-    private $formId2   = 2;
+    private int $formId2   = 2;
 
-    private $uploadDir = __DIR__.'/DummyFiles';
+    private string $uploadDir = __DIR__.'/DummyFiles';
 
     #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUploadFiles(): void

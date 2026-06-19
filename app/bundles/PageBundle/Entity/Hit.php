@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\PageBundle\Validator\PageHit;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Hit
 {
@@ -35,10 +37,7 @@ class Hit
      */
     private $redirect;
 
-    /**
-     * @var Email|null
-     */
-    private $email;
+    private ?Email $email = null;
 
     /**
      * @var Lead|null
@@ -287,6 +286,11 @@ class Hit
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new PageHit());
     }
 
     /**
@@ -715,7 +719,7 @@ class Hit
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -773,7 +777,7 @@ class Hit
     }
 
     /**
-     * @return Redirect
+     * @return ?Redirect
      */
     public function getRedirect()
     {
@@ -790,18 +794,12 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail(Email $email): void
+    public function setEmail(?Email $email): void
     {
         $this->email = $email;
     }

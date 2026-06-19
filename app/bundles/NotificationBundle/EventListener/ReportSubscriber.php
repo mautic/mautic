@@ -62,7 +62,8 @@ class ReportSubscriber implements EventSubscriberInterface
                 'alias'   => 'read_ratio',
                 'label'   => 'mautic.mobile_notification.report.read_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100),\'%\')',
+                'formula' => 'ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100)',
+                'suffix'  => '%',
             ],
             $prefix.'sent_count' => [
                 'label' => 'mautic.mobile_notification.report.sent_count',
@@ -84,15 +85,17 @@ class ReportSubscriber implements EventSubscriberInterface
                 'alias'   => 'hits_ratio',
                 'label'   => 'mautic.mobile_notification.report.hits_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                    .'trackable_count)*100),\'%\')',
+                'formula' => 'ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+                    .'trackable_count)*100)',
+                'suffix'  => '%',
             ],
             'unique_ratio' => [
                 'alias'   => 'unique_ratio',
                 'label'   => 'mautic.mobile_notification.report.unique_ratio',
                 'type'    => 'string',
-                'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                    .'trackable_count)*100),\'%\')',
+                'formula' => 'ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+                    .'trackable_count)*100)',
+                'suffix'  => '%',
             ],
         ];
 

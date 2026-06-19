@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\Response;
 
 class AbstractFormControllerTest extends MauticMysqlTestCase
 {
@@ -28,7 +26,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $payload        = $clientResponse->getContent();
 
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        self::assertResponseIsSuccessful();
         $this->assertStringContainsString("Forms\n</h1>", $payload);
     }
 
@@ -50,7 +48,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $payload  = $response->getContent();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Dashboard</h1>', $payload);
     }
 
@@ -72,7 +70,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $payload  = $response->getContent();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Dashboard</h1>', $payload);
     }
 }

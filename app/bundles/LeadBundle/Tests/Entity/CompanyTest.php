@@ -74,7 +74,7 @@ class CompanyTest extends MauticMysqlTestCase
         $errorMessage = 'This value should be between 0 and 2147483647.';
 
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->em->clear();
 
