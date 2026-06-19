@@ -848,6 +848,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
     }
 
+    /** @return array<int, array<string, mixed>> */
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()

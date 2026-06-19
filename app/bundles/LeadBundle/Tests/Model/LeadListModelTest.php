@@ -5,9 +5,11 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ListModel&MockObject */
     protected $fixture;
 
     protected function setUp(): void
@@ -82,15 +84,20 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $this->fixture = $mockListModel;
     }
 
+    /**
+     * @param array<int, mixed> $arg
+     * @param array<int, mixed> $expected
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('segmentTestDataProvider')]
-    public function testSegmentsCanBeDeletedCorrecty(array $arg, array $expected, $message): void
+    public function testSegmentsCanBeDeletedCorrecty(array $arg, array $expected, string $message): void
     {
         $result = $this->fixture->canNotBeDeleted($arg);
 
         $this->assertEquals($expected, $result, $message);
     }
 
-    public static function segmentTestDataProvider()
+    /** @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}> */
+    public static function segmentTestDataProvider(): array
     {
         return [
             [

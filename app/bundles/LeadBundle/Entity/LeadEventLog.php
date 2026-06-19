@@ -169,7 +169,7 @@ class LeadEventLog
     /**
      * Get userId.
      *
-     * @return int
+     * @return int|null
      */
     public function getUserId()
     {
@@ -193,7 +193,7 @@ class LeadEventLog
     /**
      * Get object.
      *
-     * @return string
+     * @return string|null
      */
     public function getObject()
     {
@@ -217,7 +217,7 @@ class LeadEventLog
     /**
      * Get objectId.
      *
-     * @return int
+     * @return int|null
      */
     public function getObjectId()
     {
@@ -241,7 +241,7 @@ class LeadEventLog
     /**
      * Get action.
      *
-     * @return string
+     * @return string|null
      */
     public function getAction()
     {
@@ -278,7 +278,7 @@ class LeadEventLog
     /**
      * Get properties.
      *
-     * @return array
+     * @return array|null
      */
     public function getProperties()
     {
@@ -326,7 +326,7 @@ class LeadEventLog
     /**
      * Get bundle.
      *
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {
@@ -350,7 +350,7 @@ class LeadEventLog
     /**
      * Get userName.
      *
-     * @return string
+     * @return string|null
      */
     public function getUserName()
     {
