@@ -974,17 +974,17 @@ class MailHelperTest extends TestCase
                         );
                         TestCase::assertSame(UrlGeneratorInterface::ABSOLUTE_URL, $referenceType);
 
-                        return 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret;
+                        return 'https://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret;
                     }
 
                     if ('mautic_email_tracker' === $route) {
                         TestCase::assertSame(['idHash' => 'hash'], $parameters);
                         TestCase::assertSame(UrlGeneratorInterface::ABSOLUTE_URL, $referenceType);
 
-                        return 'http://www.somedomain.cz/email/tracker/hash';
+                        return 'https://www.somedomain.cz/email/tracker/hash';
                     }
 
-                    throw new \RuntimeException(sprintf('Unexpected route "%s"', $route));
+                    TestCase::fail(sprintf('Unexpected route "%s"', $route));
                 }
             );
 
@@ -1003,7 +1003,7 @@ class MailHelperTest extends TestCase
 
         $headers = $mailer->getCustomHeaders();
 
-        $this->assertSame('<http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
+        $this->assertSame('<https://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret.'>,<mailto:list@host.com?subject=unsubscribe>', $headers['List-Unsubscribe']);
         $this->assertSame('List-Unsubscribe=One-Click', $headers['List-Unsubscribe-Post']);
     }
 
