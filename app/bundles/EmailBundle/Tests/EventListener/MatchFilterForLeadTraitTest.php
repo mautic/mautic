@@ -233,6 +233,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertEquals($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
+    /** @return iterable<array{0: ?string, 1: string, 2: bool}> */
     public static function dateMatchTestProvider(): iterable
     {
         $date = '2021-05-01';
@@ -691,6 +692,10 @@ class MatchFilterForLeadTraitTestable
         $this->segmentRepository = $segmentRepository;
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $filter
+     * @param array<string, mixed>             $lead
+     */
     public function match(array $filter, array $lead): bool
     {
         return $this->matchFilterForLead($filter, $lead);

@@ -194,7 +194,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateClicked()
     {
@@ -210,7 +210,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -226,7 +226,7 @@ class Stat
     }
 
     /**
-     * @return Notification
+     * @return Notification|null
      */
     public function getNotification()
     {
@@ -254,7 +254,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsClicked()
     {
@@ -270,7 +270,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -283,7 +283,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTrackingHash()
     {
@@ -299,7 +299,7 @@ class Stat
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\LeadList
+     * @return \Mautic\LeadBundle\Entity\LeadList|null
      */
     public function getList()
     {
@@ -315,7 +315,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getRetryCount()
     {
@@ -336,7 +336,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getSource()
     {
@@ -352,7 +352,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getSourceId()
     {
@@ -368,7 +368,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getTokens()
     {
@@ -384,7 +384,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getClickCount()
     {
@@ -424,7 +424,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastClicked()
     {
@@ -442,7 +442,7 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getClickDetails()
     {
@@ -462,7 +462,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateRead()
     {

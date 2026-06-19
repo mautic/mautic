@@ -201,7 +201,7 @@ class ImportTest extends StandardImportTestHelper
      *
      * @param int $runtime in seconds
      */
-    protected function fakeImportStartDate(Import $import, $runtime = 600)
+    protected function fakeImportStartDate(Import $import, int $runtime = 600): void
     {
         $dateEnded   = $import->getDateEnded();
         $dateStarted = new \DateTime($dateEnded->format('Y-m-d H:i:s.u'), $dateEnded->getTimezone());

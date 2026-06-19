@@ -4,37 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
-use Mautic\StageBundle\Model\StageModel;
 use Mautic\UserBundle\Form\Type\UserListType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var MockObject|EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var MockObject|StageModel
-     */
-    private $stageModel;
-
-    /**
-     * @var MockObject|FormBuilderInterface
-     */
-    private MockObject $formBuilder;
+    private MockObject&FormBuilderInterface $formBuilder;
 
     private FormSubmitActionUserEmailType $form;
 

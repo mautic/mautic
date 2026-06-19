@@ -1023,6 +1023,8 @@ class CompanyController extends FormController
         $model            = $this->getModel('lead.company');
         $secondaryCompany = $model->getEntity($objectId);
         $page             = $request->getSession()->get('mautic.lead.page', 1);
+        $primaryCompany   = null;
+        $viewParameters   = [];
 
         // set the return URL
         $returnUrl = $this->generateUrl('mautic_company_index', ['page' => $page]);
@@ -1083,7 +1085,7 @@ class CompanyController extends FormController
                                         [
                                             'type'    => 'error',
                                             'msg'     => 'mautic.company.error.notfound',
-                                            'msgVars' => ['%id%' => $primaryCompany->getId()],
+                                            'msgVars' => ['%id%' => $primaryMergeId],
                                         ],
                                     ],
                                 ]
