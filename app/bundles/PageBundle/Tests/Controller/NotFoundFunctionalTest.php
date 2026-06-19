@@ -31,7 +31,7 @@ final class NotFoundFunctionalTest extends MauticMysqlTestCase
 
         // Test the custom 404 page:
         $crawler = $this->client->request(Request::METHOD_GET, '/page-that-does-not-exist');
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
         Assert::assertStringContainsString('Custom 404 Not Found Page', $crawler->text());
         Assert::assertFalse($this->client->getResponse()->isRedirection(), 'The response should not be a redirect.');
         Assert::assertSame('/page-that-does-not-exist', $this->client->getRequest()->getRequestUri(), 'The request URI should be the same as the original URI.');

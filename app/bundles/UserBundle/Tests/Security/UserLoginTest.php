@@ -42,8 +42,7 @@ class UserLoginTest extends MauticMysqlTestCase
         ]);
         $crawler = $this->client->submit($form);
 
-        $clientResponse = $this->client->getResponse();
-        $this->assertEquals(200, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         // user has logged in
         $title = $crawler->filterXPath('//head/title')->text();

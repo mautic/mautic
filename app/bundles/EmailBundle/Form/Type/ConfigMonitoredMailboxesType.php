@@ -149,7 +149,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 [
                     'label'      => 'mautic.email.config.monitored_email_override_settings',
                     'label_attr' => ['class' => 'control-label'],
-                    'data'       => (array_key_exists('override_settings', $options['data']) && !empty($options['data']['override_settings'])) ? true : false,
+                    'data'       => array_key_exists('override_settings', $options['data']) && !empty($options['data']['override_settings']),
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.email.config.monitored_email_override_settings.tooltip',

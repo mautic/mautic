@@ -63,7 +63,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
 
@@ -75,7 +75,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $form['mauticform[email]']->setValue('testing@ampersand.select');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         // Create some necessary entities.
         $campaignEvent = new Event();
@@ -104,6 +104,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaign);
 
         $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
+        // @phpstan-ignore new.deprecated
         $event   = new CampaignExecutionEvent(
             [
                 'lead'            => $contact,

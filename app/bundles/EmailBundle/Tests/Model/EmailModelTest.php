@@ -240,6 +240,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->sendToContactModel       = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
         $this->deviceTrackerMock        = $this->createMock(DeviceTracker::class);
         $this->redirectRepositoryMock   = $this->createMock(RedirectRepository::class);
+        // @phpstan-ignore classConstant.deprecatedClass
         $this->cacheStorageHelperMock   = $this->createMock(CacheStorageHelper::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
@@ -962,40 +963,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->assertSame(
-            ['EN' => [123 => 'Email 123']],
-            $this->emailModel->getLookupResults('email', '', 0, 0)
-        );
-    }
-
-    public function testGetLookupResultsIdTextWithWithDefaultOptions(): void
-    {
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->emailRepository);
-
-        $this->emailRepository->expects($this->once())
-            ->method('getEmailList')
-            ->with(
-                '',
-                0,
-                0,
-                null,
-                false,
-                null,
-                [],
-                null
-            )
-            ->willReturn([
-                [
-                    'id'       => 123,
-                    'name'     => 'Email 123',
-                    'language' => 'EN',
-                ],
-            ]);
-
-        $this->assertSame(
             ['EN' => [123 => 'Email 123 (123)']],
-            $this->emailModel->getLookupResultsWithIdName('email', '', 0, 0)
+            $this->emailModel->getLookupResults('email', '', 0, 0)
         );
     }
 
@@ -1029,7 +998,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::SEGMENT_B, $result['datasets'][2]['label']);
     }
 
-    private function getEmailListStats(ArrayCollection $lists)
+    /** @return array<string, mixed> */
+    private function getEmailListStats(ArrayCollection $lists): array
     {
         $trackableRepo    = $this->createMock(TrackableRepository::class);
         $doNotContactRepo = $this->createMock(DoNotContactRepository::class);

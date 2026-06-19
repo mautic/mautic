@@ -42,7 +42,8 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($page, $this->pageHelper->countPage($count));
     }
 
-    public static function pageProvider()
+    /** @return array<int, array{0: int, 1: int, 2: int}> */
+    public static function pageProvider(): array
     {
         return [
             [0, 10, 1],
@@ -68,7 +69,8 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($start, $this->pageHelper->countPage($page));
     }
 
-    public static function startProvider()
+    /** @return array<int, array{0: int, 1: int, 2: int}> */
+    public static function startProvider(): array
     {
         return [
             [0, 10, 1],

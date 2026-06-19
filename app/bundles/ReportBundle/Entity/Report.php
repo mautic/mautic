@@ -29,10 +29,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('report:reports:viewown')"),
         new Post(security: "is_granted('report:reports:create')"),
-        new Get(security: "is_granted('report:reports:viewown')"),
-        new Put(security: "is_granted('report:reports:editown')"),
-        new Patch(security: "is_granted('report:reports:editother')"),
-        new Delete(security: "is_granted('report:reports:deleteown')"),
+        new Get(security: "is_granted('report:reports:viewown', object)"),
+        new Put(security: "is_granted('report:reports:editown', object)"),
+        new Patch(security: "is_granted('report:reports:editother', object)"),
+        new Delete(security: "is_granted('report:reports:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['report:read'],
@@ -262,7 +262,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -290,7 +290,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -311,7 +311,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function getSystem()
     {
@@ -334,7 +334,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSource()
     {
@@ -355,7 +355,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getColumns()
     {
@@ -376,7 +376,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>
      */
     public function getFilters()
     {
@@ -427,7 +427,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDescription()
     {
@@ -443,7 +443,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getTableOrder()
     {
@@ -458,7 +458,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getGraphs()
     {
@@ -473,7 +473,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getGroupBy()
     {
@@ -488,7 +488,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return array<array-key, mixed>
      */
     public function getAggregators()
     {
@@ -530,7 +530,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array
+     * @return array<array-key, mixed>|null
      */
     public function getSettings()
     {
@@ -713,7 +713,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     }
 
     /**
-     * @return array<string>
+     * @return array<string, string|null>
      */
     public function getSchedule(): array
     {

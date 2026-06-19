@@ -109,6 +109,10 @@ return [
                 'path'       => '/passwordresetconfirm',
                 'controller' => 'Mautic\UserBundle\Controller\PublicController::passwordResetConfirmAction',
             ],
+            'mautic_user_invite_register' => [
+                'path'       => '/invite/{token}',
+                'controller' => 'Mautic\UserBundle\Controller\PublicController::inviteAction',
+            ],
             'lightsaml_sp.metadata' => [
                 'path'       => '/saml/metadata.xml',
                 'controller' => 'LightSaml\SpBundle\Controller\DefaultController::metadataAction',

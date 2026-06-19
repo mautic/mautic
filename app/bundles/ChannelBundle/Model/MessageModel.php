@@ -16,13 +16,13 @@ use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends FormModel<Message>
@@ -42,7 +42,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
-        Translator $translator,
+        TranslatorInterface $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
@@ -118,12 +118,21 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
                     throw new \InvalidArgumentException('lookupFormType and/or propertiesFormType are required for channel '.$channel);
                 }
 
-                $label = match (true) {
-                    $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),
-                    $this->translator->hasId('mautic.'.$channel)              => $this->translator->trans('mautic.'.$channel),
-                    $this->translator->hasId('mautic.'.$channel.'.'.$channel) => $this->translator->trans('mautic.'.$channel.'.'.$channel),
-                    default                                                   => ucfirst($channel),
-                };
+                $labelKeys = [
+                    'mautic.channel.'.$channel,
+                    'mautic.'.$channel,
+                    'mautic.'.$channel.'.'.$channel,
+                ];
+
+                $label = ucfirst($channel);
+                foreach ($labelKeys as $labelKey) {
+                    $translation = $this->translator->trans($labelKey);
+                    if ($translation !== $labelKey) {
+                        $label = $translation;
+                        break;
+                    }
+                }
+
                 $config['label'] = $label;
 
                 $channels[$channel] = $config;

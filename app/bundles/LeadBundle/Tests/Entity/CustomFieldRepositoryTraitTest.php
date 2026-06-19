@@ -7,7 +7,8 @@ use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
 class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 {
-    private $fields = [
+    /** @var array<string, array<string, mixed>> */
+    private array $fields = [
         'firstname' => [
             'id'       => 2,
             'label'    => 'First Name',
@@ -37,25 +38,29 @@ class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         ],
     ];
 
-    private $fieldValues = [
+    /** @var array<string, string> */
+    private array $fieldValues = [
         'preferred_profile_image' => 'gravatar',
         'firstname'               => 'John',
         'lastname'                => 'Doe',
         'twitter'                 => 'johndoe',
     ];
 
-    protected $fixedFields = [
+    /** @var array<string, string> */
+    protected array $fixedFields = [
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
     ];
 
-    protected $baseColumns = [
+    /** @var array<int, string> */
+    protected array $baseColumns = [
         'preferred_profile_image',
         'firstname',
         'lastname',
     ];
 
-    protected $fieldGroups = [
+    /** @var array<int, string> */
+    protected array $fieldGroups = [
         'core',
         'social',
         'personal',

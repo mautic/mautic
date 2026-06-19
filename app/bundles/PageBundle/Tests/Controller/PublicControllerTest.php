@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
-use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Controller\PublicController;
@@ -66,8 +65,6 @@ class PublicControllerTest extends TestCase
 
     private MockObject&PageModel $pageModel;
 
-    private MockObject&PrimaryCompanyHelper $primaryCompanyHelper;
-
     private MockObject&ContactRequestHelper $contactRequestHelper;
 
     private MockObject&RouterInterface $router;
@@ -83,7 +80,6 @@ class PublicControllerTest extends TestCase
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->ipAddress            = $this->createMock(IpAddress::class);
         $this->pageModel            = $this->createMock(PageModel::class);
-        $this->primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
         $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
         $this->router               = $this->createMock(RouterInterface::class);
 
@@ -131,10 +127,7 @@ class PublicControllerTest extends TestCase
         $this->assertEquals('pageA', $this->getVariantContent(6, 3, 3));
     }
 
-    /**
-     * @return string
-     */
-    private function getVariantContent($aCount, $bCount, $cCount)
+    private function getVariantContent(int $aCount, int $bCount, int $cCount): string
     {
         $pageEntityB = $this->createMock(Page::class);
         $pageEntityB->method('getId')
@@ -323,7 +316,6 @@ class PublicControllerTest extends TestCase
         $response = $controller->redirectAction(
             $this->request,
             $this->contactRequestHelper,
-            $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
             $this->redirectModel,
@@ -404,7 +396,6 @@ class PublicControllerTest extends TestCase
         $response = $controller->redirectAction(
             $this->request,
             $this->contactRequestHelper,
-            $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
             $this->redirectModel,

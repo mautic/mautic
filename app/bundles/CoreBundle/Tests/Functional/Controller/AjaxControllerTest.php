@@ -50,7 +50,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $content      = \json_decode($response->getContent(), true);
         $expectedLink = rtrim($expectedLink, '/').'/'.$entity->getId();
@@ -284,7 +284,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search=user&tmp=list');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
         $this->assertStringContainsString('s/users/edit/'.$user->getId(), $content['newContent']);
@@ -318,7 +318,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
 
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk(), $response->getContent());
+        $this->assertResponseIsSuccessful();
         $content = \json_decode($response->getContent(), true);
         $this->assertArrayHasKey('newContent', $content);
 
@@ -392,7 +392,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $searchString = '';
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
         $this->assertGlobalSearchNotResult($content['newContent']);
@@ -400,7 +400,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $searchString = 'random';
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
         $this->assertGlobalSearchNotResult($content['newContent']);
@@ -434,7 +434,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $searchString = 'john';
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
 
@@ -448,7 +448,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $searchString = 'client';
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search='.$searchString.'&tmp=list');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
 

@@ -299,7 +299,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testExportCampaignAction(): void
     {
-        $entities = $this->createTestEntities();
+        $this->createTestEntities();
 
         // Create the campaign
         $campaign = new Campaign();
@@ -515,6 +515,33 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', $response->getContent());
+    }
+
+    public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->loginUser($user);
+
+        $campaign = new Campaign();
+        $campaign->setName('Campaign with ISO publish up');
+        $campaign->setPublishUp(new \DateTime('2026-01-15 12:30:00'));
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, sprintf('/api/campaigns/%d', $campaign->getId()));
+        $getResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($getResponse->getContent());
+
+        $campaignData = json_decode($getResponse->getContent(), true)['campaign'];
+        Assert::assertIsString($campaignData['publishUp']);
+
+        $this->client->request(Request::METHOD_PATCH, sprintf('/api/campaigns/%d/edit', $campaign->getId()), [
+            'publishUp' => $campaignData['publishUp'],
+        ]);
+
+        $editResponse = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($editResponse->getContent());
     }
 
     private function createTemporaryFile(string $extension): string

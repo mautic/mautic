@@ -75,7 +75,7 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $testData['campaign'];
 
         $this->client->request(Request::METHOD_GET, "/s/campaign/metrics/email-weekdays/{$campaign->getId()}/2024-12-01/2024-12-12");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $content      = $this->client->getResponse()->getContent();
         $crawler      = new Crawler($content);
         $daysJson     = $crawler->filter('canvas')->text(null, false);
@@ -103,7 +103,7 @@ class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $testData['campaign'];
 
         $this->client->request(Request::METHOD_GET, "/s/campaign/metrics/email-hours/{$campaign->getId()}/2024-12-01/2024-12-12");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $content   = $this->client->getResponse()->getContent();
         $crawler   = new Crawler($content);
         $hourJson  = $crawler->filter('canvas')->text(null, false);

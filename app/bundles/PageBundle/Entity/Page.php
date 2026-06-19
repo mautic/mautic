@@ -36,10 +36,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('page:pages:viewown')"),
         new Post(security: "is_granted('page:pages:create')"),
-        new Get(security: "is_granted('page:pages:viewown')"),
-        new Put(security: "is_granted('page:pages:editown')"),
-        new Patch(security: "is_granted('page:pages:editother')"),
-        new Delete(security: "is_granted('page:pages:deleteown')"),
+        new Get(security: "is_granted('page:pages:viewown', object)"),
+        new Put(security: "is_granted('page:pages:editown', object)"),
+        new Patch(security: "is_granted('page:pages:editother', object)"),
+        new Delete(security: "is_granted('page:pages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['page:read'],
@@ -516,7 +516,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get publishUp.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -541,7 +541,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get publishDown.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -616,7 +616,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get metaDescription.
      *
-     * @return string
+     * @return string|null
      */
     public function getMetaDescription()
     {
@@ -640,7 +640,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get headScript.
      *
-     * @return string
+     * @return string|null
      */
     public function getHeadScript()
     {
@@ -664,7 +664,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get footerScript.
      *
-     * @return string
+     * @return string|null
      */
     public function getFooterScript()
     {
@@ -710,7 +710,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get redirectUrl.
      *
-     * @return string
+     * @return string|null
      */
     public function getRedirectUrl()
     {
@@ -733,7 +733,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get category.
      *
-     * @return Category
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -822,7 +822,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get template.
      *
-     * @return string
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -888,7 +888,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCustomHtml()
     {
