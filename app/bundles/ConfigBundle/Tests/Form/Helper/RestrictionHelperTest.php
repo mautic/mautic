@@ -22,6 +22,8 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -43,15 +45,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
 class RestrictionHelperTest extends TypeTestCase
 {
-    /**
-     * @var string
-     */
-    private $displayMode = RestrictionHelper::MODE_REMOVE;
+    private string $displayMode = RestrictionHelper::MODE_REMOVE;
 
-    /**
-     * @var array
-     */
-    private $restrictedFields = [
+    /** @var array<string, mixed> */
+    private array $restrictedFields = [
         'monitored_email' => [
             'EmailBundle_bounces',
             'EmailBundle_unsubscribes' => [
@@ -60,7 +57,8 @@ class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    private $forms = [
+    /** @var array<string, array<string, mixed>> */
+    private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
             'formAlias'  => 'emailconfig',
@@ -197,10 +195,8 @@ class RestrictionHelperTest extends TypeTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    protected function getExtensions()
+    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    protected function getExtensions(): array
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('trans')
@@ -225,11 +221,16 @@ class RestrictionHelperTest extends TypeTestCase
 
         $unsubscriber = $this->createMock(Unsubscribe::class);
         $looper       = $this->createMock(FeedbackLoop::class);
-        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper));
+        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createMock(CoreParametersHelper::class)));
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
         $escapeTransformer = new EscapeTransformer([]);
+
+        $pageRepoMock = $this->createMock(\Mautic\PageBundle\Entity\PageRepository::class);
+        $pageRepoMock->method('getPageList')->willReturn([]);
+        $pageModelMock = $this->createMock(PageModel::class);
+        $pageModelMock->method('getRepository')->willReturn($pageRepoMock);
 
         return [
             // register the type instances with the PreloadedExtension
@@ -245,6 +246,7 @@ class RestrictionHelperTest extends TypeTestCase
                     new ButtonGroupType(),
                     new EmailConfigType($translator),
                     new DsnType($this->createMock(DsnTransformerFactory::class), $this->createMock(CoreParametersHelper::class)),
+                    new PreferenceCenterListType($pageModelMock, $this->createMock(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
                     new ConfigType($restrictionHelper, $escapeTransformer),

@@ -45,7 +45,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $response = json_decode($clientResponse->getContent(), true);
         $form     = $response['form'];
         $formId   = $form['id'];
@@ -59,10 +59,10 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
             'mauticform[file_field]' => $file,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->client->request(Request::METHOD_GET, "/forms/results/file/{$fieldId}/filename/{$fileName}");
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $field = $fieldModel->getEntity($fieldId);
         unlink($fileName);
@@ -97,7 +97,7 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $response = json_decode($clientResponse->getContent(), true);
         $form     = $response['form'];
         $formId   = $form['id'];
@@ -139,17 +139,12 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/forms/new', $formPayload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $response = json_decode($clientResponse->getContent(), true);
         $form     = $response['form'];
         $formId   = $form['id'];
-
         $crawler  = $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
-        $response = $this->client->getResponse();
-
-        if (!$response->isOk()) {
-            $this->fail('Response is not OK. Status: '.$response->getStatusCode().', Content: '.$response->getContent());
-        }
+        self::assertResponseIsSuccessful();
 
         $editButton = $crawler->filter('a[href*="/s/forms/edit/'.$formId.'"]');
         $this->assertCount(1, $editButton, 'Edit button should be present on form results page');
@@ -159,9 +154,9 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
     {
         $data = 'data:image/png;base64,AAAFBfj42Pj4';
 
-        [$type, $data]     = explode(';', $data);
-        [, $data]          = explode(',', $data);
-        $data              = base64_decode($data);
+        [, $data] = explode(';', $data);
+        [, $data] = explode(',', $data);
+        $data     = base64_decode($data);
 
         file_put_contents($filename, $data);
     }

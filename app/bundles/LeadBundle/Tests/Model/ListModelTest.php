@@ -86,6 +86,10 @@ class ListModelTest extends TestCase
         );
     }
 
+    /**
+     * @param array<int, mixed> $getLookupResultsReturn
+     * @param array<int, mixed> $expected
+     */
     #[DataProvider('sourceTypeTestDataProvider')]
     public function testGetSourceLists(array $getLookupResultsReturn, ?string $sourceType, array $expected): void
     {
@@ -94,6 +98,7 @@ class ListModelTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /** @param array<int, mixed> $getLookupResultsReturn */
     private function prepareMockForTestGetSourcesLists(array $getLookupResultsReturn): void
     {
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
@@ -127,6 +132,7 @@ class ListModelTest extends TestCase
         $this->fixture = $mockListModel;
     }
 
+    /** @return array<int, array{0: array<int, mixed>, 1: string|null, 2: array<string|int, mixed>}> */
     public static function sourceTypeTestDataProvider(): array
     {
         return [

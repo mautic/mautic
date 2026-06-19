@@ -43,8 +43,8 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->client->followRedirects(true);
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode(), $response->getContent());
-        Assert::assertSame('https://localhost/oauth/v2/authorize_login', $response->headers->get('Location'));
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND, $response->getContent());
+        self::assertResponseRedirects('https://localhost/oauth/v2/authorize_login');
     }
 
     public static function provideMethods(): \Generator

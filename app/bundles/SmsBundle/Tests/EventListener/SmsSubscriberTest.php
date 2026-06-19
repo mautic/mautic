@@ -17,9 +17,9 @@ class SmsSubscriberTest extends TestCase
 {
     private CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
-    private $messageText = 'custom http://mautic.com text';
+    private string $messageText = 'custom http://mautic.com text';
 
-    private $messageUrl = 'http://mautic.com';
+    private string $messageUrl = 'http://mautic.com';
 
     protected function setUp(): void
     {

@@ -83,7 +83,7 @@ class ListLead
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {

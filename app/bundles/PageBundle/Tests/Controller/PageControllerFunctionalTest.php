@@ -35,7 +35,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $page->getAlias()));
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Test Html', $response->getContent());
     }
 

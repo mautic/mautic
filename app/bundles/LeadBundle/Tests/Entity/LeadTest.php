@@ -66,7 +66,7 @@ class LeadTest extends TestCase
 
         foreach ($frequencyRules as $channel => $rule) {
             $frequencyRule = (new FrequencyRule())
-                ->setPreferredChannel($rule['preferredChannel'])
+                ->setPreferredChannel((bool) $rule['preferredChannel'])
                 ->setFrequencyNumber($rule['frequencyNumber'])
                 ->setFrequencyTime($rule['frequencyTime'])
                 ->setChannel($channel)
@@ -126,11 +126,11 @@ class LeadTest extends TestCase
         $lead->setFields($fields);
 
         // This should not killover with a segmentation fault due to a loop
-        $lead->setNotes('hello');
+        $lead->setNotes('hello'); // @phpstan-ignore method.notFound
 
         // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
-        $lead->setTest('hello');
-        $this->assertEquals('hello', $lead->getTest());
+        $lead->setTest('hello'); // @phpstan-ignore method.notFound
+        $this->assertEquals('hello', $lead->getTest()); // @phpstan-ignore method.notFound
     }
 
     public function testDataIsCleanedCorrectly(): void
@@ -317,11 +317,11 @@ class LeadTest extends TestCase
     }
 
     /**
-     * @param bool $operator
+     * @param array<string|int, mixed> $expected
      */
-    private function adjustPointsTest($points, $expected, Lead $lead, $operator = false): void
+    private function adjustPointsTest(int $points, array $expected, Lead $lead, string|false $operator = false): void
     {
-        if ($operator) {
+        if (false !== $operator) {
             $lead->adjustPoints($points, $operator);
         } else {
             $lead->adjustPoints($points);
@@ -331,12 +331,9 @@ class LeadTest extends TestCase
     }
 
     /**
-     * @param int $oldValue
-     * @param int $newValue
-     *
-     * @return array
+     * @return array{points: array{0: int, 1: int}}
      */
-    private function getLeadChangedArray($oldValue = 0, $newValue = 0)
+    private function getLeadChangedArray(int $oldValue = 0, int $newValue = 0): array
     {
         return [
             'points' => [

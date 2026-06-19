@@ -338,7 +338,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getOriginalFile()
     {
@@ -530,6 +530,8 @@ class Import extends FormEntity
 
     /**
      * Modify the entity for the end of import.
+     *
+     * @phpstan-impure
      */
     public function end($removeFile = true): self
     {
@@ -770,7 +772,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
     public function getProperties()
     {

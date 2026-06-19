@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata
     operations: [
         new GetCollection(security: "is_granted('channel:messages:viewown')"),
         new Post(security: "is_granted('channel:messages:create')"),
-        new Get(security: "is_granted('channel:messages:viewown')"),
-        new Put(security: "is_granted('channel:messages:editown')"),
-        new Patch(security: "is_granted('channel:messages:editother')"),
-        new Delete(security: "is_granted('channel:messages:deleteown')"),
+        new Get(security: "is_granted('channel:messages:viewown', object)"),
+        new Put(security: "is_granted('channel:messages:editown', object)"),
+        new Patch(security: "is_granted('channel:messages:editother', object)"),
+        new Delete(security: "is_granted('channel:messages:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['message:read'],

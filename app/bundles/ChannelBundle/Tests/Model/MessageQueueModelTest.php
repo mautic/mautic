@@ -102,7 +102,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $this->prepareRescheduleMessageIntervalTest($interval);
     }
 
-    protected function prepareRescheduleMessageIntervalTest(\DateInterval $interval)
+    protected function prepareRescheduleMessageIntervalTest(\DateInterval $interval): void
     {
         $oldScheduleDate = $this->message->getScheduledDate();
         $this->messageQueue->reschedule($this->message, $interval);

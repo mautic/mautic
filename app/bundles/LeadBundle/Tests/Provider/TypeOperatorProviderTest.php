@@ -45,19 +45,19 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
             ]);
 
         $this->assertSame(
-            ['equals' => OperatorOptions::EQUAL_TO],
+            ['is equal to' => OperatorOptions::EQUAL_TO],
             $this->provider->getOperatorsIncluding([OperatorOptions::EQUAL_TO])
         );
     }
@@ -68,12 +68,12 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
@@ -91,12 +91,12 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
@@ -126,8 +126,8 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             [
-                'equals'    => OperatorOptions::EQUAL_TO,
-                'not equal' => OperatorOptions::NOT_EQUAL_TO,
+                'is equal to'     => OperatorOptions::EQUAL_TO,
+                'is not equal to' => OperatorOptions::NOT_EQUAL_TO,
             ],
             $this->provider->getOperatorsForFieldType('text')
         );
@@ -139,12 +139,12 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getAllOperators')
             ->willReturn([
                 OperatorOptions::EQUAL_TO => [
-                    'label'        => 'equals',
+                    'label'        => 'is equal to',
                     'expr'         => 'eq',
                     'negagte_expr' => 'neq',
                 ],
                 OperatorOptions::NOT_EQUAL_TO => [
-                    'label'        => 'not equal',
+                    'label'        => 'is not equal to',
                     'expr'         => 'neq',
                     'negagte_expr' => 'eq',
                 ],
@@ -189,9 +189,9 @@ final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             [
-                'equals'      => OperatorOptions::EQUAL_TO,
-                'not equal'   => OperatorOptions::NOT_EQUAL_TO,
-                'starts with' => OperatorOptions::STARTS_WITH,
+                'is equal to'      => OperatorOptions::EQUAL_TO,
+                'is not equal to'  => OperatorOptions::NOT_EQUAL_TO,
+                'starts with'      => OperatorOptions::STARTS_WITH,
             ],
             $this->provider->getOperatorsForField('text', 'email')
         );
