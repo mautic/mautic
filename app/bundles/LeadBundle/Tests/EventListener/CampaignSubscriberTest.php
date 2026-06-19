@@ -29,9 +29,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $configFrom = [
+    private array $configFrom = [
         'id'          => 111,
         'companyname' => 'Mautic',
         'companemail' => 'mautic@mautic.com',
@@ -237,6 +237,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
@@ -274,6 +275,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertSame($expected, $event->getResult());
@@ -317,6 +319,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -361,6 +364,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -405,6 +409,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());

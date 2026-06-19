@@ -186,7 +186,7 @@ class Notification
     }
 
     /**
-     * @return bool|null
+     * @return bool
      */
     public function getIsRead()
     {

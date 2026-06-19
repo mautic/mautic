@@ -167,7 +167,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return array<mixed>
      */
     public function getClientInfo()
     {
@@ -183,7 +183,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDevice()
     {
@@ -199,7 +199,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDeviceBrand()
     {
@@ -212,7 +212,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDeviceModel()
     {
@@ -228,7 +228,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDeviceOsName()
     {
@@ -248,7 +248,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDeviceOsShortName()
     {
@@ -268,7 +268,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDeviceOsVersion()
     {
@@ -288,7 +288,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDeviceOsPlatform()
     {
@@ -373,7 +373,7 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {

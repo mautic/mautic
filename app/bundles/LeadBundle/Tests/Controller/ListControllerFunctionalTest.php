@@ -564,6 +564,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
     }
 
+    /** @param array<int, array<string, mixed>>|null $filters */
     private function saveSegment(string $name, string $alias, ?array $filters = null, ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();

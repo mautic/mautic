@@ -185,7 +185,7 @@ class StagesChangeLog
     /**
      * Get stage.
      *
-     * @return Stage
+     * @return Stage|null
      */
     public function getStage()
     {
