@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 
 final class GroupScoreChangeEvent
@@ -24,6 +25,11 @@ final class GroupScoreChangeEvent
     public function getContact(): Lead
     {
         return $this->groupContactScore->getContact();
+    }
+
+    public function getGroup(): Group
+    {
+        return $this->groupContactScore->getGroup();
     }
 
     public function getNewScore(): int

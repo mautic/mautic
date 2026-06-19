@@ -1188,7 +1188,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get internal storage.
      *
-     * @return mixed
+     * @return array<mixed>
      */
     public function getInternal()
     {
@@ -1206,7 +1206,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get social cache.
      *
-     * @return mixed
+     * @return array<mixed>
      */
     public function getSocialCache()
     {
@@ -1214,7 +1214,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getColor()
     {
@@ -1302,7 +1302,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return Collection<int, LeadNote>
      */
     public function getNotes()
     {
@@ -1318,7 +1318,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPreferredProfileImage()
     {
@@ -1326,7 +1326,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateIdentified()
     {
@@ -1343,7 +1343,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastActive()
     {
@@ -1389,7 +1389,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get tags.
      *
-     * @return mixed
+     * @return Collection<string, Tag>
      */
     public function getTags()
     {
@@ -1411,7 +1411,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get utm tags.
      *
-     * @return mixed
+     * @return Collection<int, UtmTag>
      */
     public function getUtmTags()
     {
@@ -1806,7 +1806,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTimezone()
     {
@@ -1892,7 +1892,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Returns array of rules with preferred channels first.
      *
-     * @return mixed
+     * @return array<mixed>
      */
     public function getChannelRules()
     {

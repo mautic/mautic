@@ -974,7 +974,7 @@ class LeadController extends FormController
                                         [
                                             'type'    => 'error',
                                             'msg'     => 'mautic.lead.lead.error.notfound',
-                                            'msgVars' => ['%id%' => $secLead->getId()],
+                                            'msgVars' => ['%id%' => $secLeadId],
                                         ],
                                     ],
                                 ]

@@ -39,6 +39,7 @@ class StatTest extends TestCase
     /**
      * Data provider for addOpenDetails.
      */
+    /** @return array<string, array{0: int}> */
     public static function addOpenDetailsTestProvider(): array
     {
         return [

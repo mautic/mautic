@@ -334,17 +334,14 @@ class HttpFactoryTest extends TestCase
         return $oauthMiddleware[0];
     }
 
-    private function getProperty(\ReflectionClass $reflection, $object, string $name)
+    private function getProperty(\ReflectionClass $reflection, object $object, string $name): mixed
     {
         $property = $reflection->getProperty($name);
 
         return $property->getValue($object);
     }
 
-    /**
-     * @return CredentialsInterface|CodeInterface|RedirectUriInterface|ScopeInterface
-     */
-    private function getCredentials(): CredentialsInterface
+    private function getCredentials(): CredentialsInterface&CodeInterface&RedirectUriInterface&ScopeInterface
     {
         return new class implements CredentialsInterface, CodeInterface, RedirectUriInterface, ScopeInterface {
             public function getAuthorizationUrl(): string

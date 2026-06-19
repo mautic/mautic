@@ -485,7 +485,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get defaultValue.
      *
-     * @return string
+     * @return string|null
      */
     public function getDefaultValue()
     {
@@ -600,7 +600,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get object.
      *
-     * @return string
+     * @return string|null
      */
     public function getObject()
     {
@@ -647,7 +647,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get order.
      *
-     * @return int
+     * @return int|null
      */
     public function getOrder()
     {
@@ -721,7 +721,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * Get the unique identifer state of the field.
      *
-     * @return bool
+     * @return bool|null
      */
     public function getIsUniqueIdentifer()
     {
@@ -829,7 +829,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getGroup()
     {
@@ -845,7 +845,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getIsPubliclyUpdatable()
     {

@@ -187,19 +187,16 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * Calls a protected method from CommonRepository with provided argumetns.
      *
-     * @param string $method name
-     * @param array  $args   added to the method
-     *
-     * @return mixed result of the method
+     * @param array<int, mixed> $args
      *
      * @throws \ReflectionException
      */
-    private function callProtectedMethod($method, $args)
+    private function callProtectedMethod(string $method, array $args): mixed
     {
         $reflection = new \ReflectionClass(CommonRepository::class);
-        $method     = $reflection->getMethod($method);
+        $methodRef  = $reflection->getMethod($method);
 
-        return $method->invokeArgs($this->repo, $args);
+        return $methodRef->invokeArgs($this->repo, $args);
     }
 
     public function testArgumentCSVArray(): void
@@ -350,7 +347,8 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
     }
 
-    private function callBuildWhereClauseFromArray($qb, $args)
+    /** @param array<int, mixed> $args */
+    private function callBuildWhereClauseFromArray(\Doctrine\DBAL\Query\QueryBuilder $qb, array $args): mixed
     {
         $reflection = new \ReflectionClass(CommonRepository::class);
         $method     = $reflection->getMethod('buildWhereClauseFromArray');
