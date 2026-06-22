@@ -18,7 +18,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     /**
      * Define the widget(s).
      *
-     * @var string
+     * @var array<string, array<string, string>>
      */
     protected $types = [
         'stages.in.time' => [],
