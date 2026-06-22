@@ -13,7 +13,7 @@ return [
         'api'    => [
             'plugin_sendexampleapi_send' => [
                 'path'       => '/emails/{id}/example/send',
-                'controller' => 'MauticPlugin\SendExampleApiBundle\Controller\Api\ExampleSendApiController::sendExampleAction',
+                'controller' => 'MauticPlugin\MauticSendExampleApiBundle\Controller\Api\ExampleSendApiController::sendExampleAction',
                 'method'     => 'POST',
             ],
         ],

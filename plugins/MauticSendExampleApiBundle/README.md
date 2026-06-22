@@ -20,13 +20,14 @@ matches the UI:
 
 ## Installation
 
-1. Copy the `SendExampleApiBundle` folder into your Mautic `plugins/` directory:
+1. Copy the `MauticSendExampleApiBundle` folder into your Mautic `plugins/` directory:
 
    ```
-   plugins/SendExampleApiBundle/
-   ├── SendExampleApiBundle.php
+   plugins/MauticSendExampleApiBundle/
+   ├── MauticSendExampleApiBundle.php
    ├── Config/config.php
-   └── Controller/Api/ExampleSendApiController.php
+   ├── Controller/Api/ExampleSendApiController.php
+   └── Tests/Controller/Api/ExampleSendApiControllerFunctionalTest.php
    ```
 
 2. Clear the cache and reload plugins:

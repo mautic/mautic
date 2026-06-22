@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\SendExampleApiBundle\Controller\Api;
+namespace MauticPlugin\MauticSendExampleApiBundle\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -109,8 +109,12 @@ class ExampleSendApiController extends CommonApiController
             $fields = $fakeContactHelper->prepareFakeContactWithPrimaryCompany();
         }
 
+        // Prefix the subject with [TEST] like the UI action does, but capture the original
+        // first so it can be restored afterwards — an example send must never mutate (and
+        // risk persisting a change to) the stored email.
+        $originalSubject = $entity->getSubject();
         if (empty($post['noSubjectPrefix'])) {
-            $entity->setSubject(sprintf('%s %s', EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX, $entity->getSubject()));
+            $entity->setSubject(sprintf('%s %s', EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX, $originalSubject));
         }
 
         $sent   = [];
@@ -133,6 +137,9 @@ class ExampleSendApiController extends CommonApiController
                 $sent[] = $recipient;
             }
         }
+
+        // Restore the original subject so the prefix is never persisted to the entity.
+        $entity->setSubject($originalSubject);
 
         $view = $this->view(
             [
