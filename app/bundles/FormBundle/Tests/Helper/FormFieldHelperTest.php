@@ -24,17 +24,15 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
-    public function testPopulateField($field, $value, $formHtml, $expectedValue, $message): void
+    public function testPopulateField(Field $field, mixed $value, string &$formHtml, mixed $expectedValue, string $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);
 
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /**
-     * @return array
-     */
-    public static function fieldProvider()
+    /** @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}> */
+    public static function fieldProvider(): array
     {
         return [
             [

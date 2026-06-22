@@ -1166,8 +1166,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->in('l.id', $contactIds)
-            );
+                $qb->expr()->in('l.id', ':ids')
+            )
+            ->setParameter('ids', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 

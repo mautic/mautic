@@ -138,7 +138,7 @@ class FieldBuilderTest extends TestCase
         $this->getFieldBuilder()->buildObjectField('badfield', ['id' => 1, 'email' => 'test@test.com'], new ObjectDAO('Test'), 'Test');
     }
 
-    public function getFieldBuilder()
+    public function getFieldBuilder(): FieldBuilder
     {
         return new FieldBuilder($this->router, $this->fieldHelper, $this->contactObjectHelper);
     }

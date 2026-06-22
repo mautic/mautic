@@ -54,32 +54,24 @@ class ThemeController extends FormController
                         $fileName  = InputHelper::filename($fileData->getClientOriginalName());
                         $themeName = basename($fileName, '.zip');
 
-                        if (!empty($fileData)) {
-                            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-                            if ('zip' === $extension) {
-                                try {
-                                    $fileData->move($dir, $fileName);
-                                    $themeHelper->install($dir.'/'.$fileName);
-                                    $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
-                                } catch (\Exception $e) {
-                                    $form->addError(
-                                        new FormError(
-                                            $this->translator->trans($e->getMessage(), [], 'validators')
-                                        )
-                                    );
-                                }
-                            } else {
+                        if ('zip' === $extension) {
+                            try {
+                                $fileData->move($dir, $fileName);
+                                $themeHelper->install($dir.'/'.$fileName);
+                                $this->addFlashMessage('mautic.core.theme.installed', ['%name%' => $themeName]);
+                            } catch (\Exception $e) {
                                 $form->addError(
                                     new FormError(
-                                        $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
+                                        $this->translator->trans($e->getMessage(), [], 'validators')
                                     )
                                 );
                             }
                         } else {
                             $form->addError(
                                 new FormError(
-                                    $this->translator->trans('mautic.dashboard.upload.filenotfound', [], 'validators')
+                                    $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
                                 )
                             );
                         }

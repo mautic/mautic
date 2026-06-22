@@ -131,7 +131,7 @@ class LeadNote extends FormEntity
     /**
      * Get type.
      *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -167,7 +167,7 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateTime()
     {

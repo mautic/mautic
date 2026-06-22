@@ -102,7 +102,7 @@ class LeadCategory
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -126,7 +126,7 @@ class LeadCategory
     }
 
     /**
-     * @return mixed
+     * @return Lead|null
      */
     public function getLead()
     {
