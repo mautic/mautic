@@ -191,6 +191,7 @@ Mautic.deleteTab = function(deleteBtn) {
     const TAB_DATA = 'mautic-tab-initialized';
 
     const channel = globalThis.BroadcastChannel ? new BroadcastChannel('remember-active-tabs') : null;
+    let fallbackStorageIdCounter = 0;
 
     /**
      * Contains keys to the session or local storage to store #href data for each tab.
@@ -224,11 +225,11 @@ Mautic.deleteTab = function(deleteBtn) {
         }
     };
 
-    // Generate a unique ID (UUID v4)
+    // Generate a unique storage ID.
     const generateStorageId = (index) => {
         const randomUUID = globalThis.crypto?.randomUUID?.();
         if (randomUUID) {
-            return randomUUID + '_' + index;
+            return `${randomUUID}_${index}`;
         }
 
         if (globalThis.crypto?.getRandomValues) {
@@ -240,23 +241,23 @@ Mautic.deleteTab = function(deleteBtn) {
 
             const hexValues = Array.from(randomValues, (value) => value.toString(16).padStart(2, '0'));
 
-            return [
+            const uuid = [
                 hexValues.slice(0, 4).join(''),
                 hexValues.slice(4, 6).join(''),
                 hexValues.slice(6, 8).join(''),
                 hexValues.slice(8, 10).join(''),
                 hexValues.slice(10).join(''),
-            ].join('-') + '_' + index;
+            ].join('-');
+
+            return `${uuid}_${index}`;
         }
 
-        // Fallback for older browsers (e.g., IE11)
-        const youMustUpdateYourBrowser = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
+        fallbackStorageIdCounter += 1;
 
-        return youMustUpdateYourBrowser + '_' + index;
+        const currentTime = Date.now().toString(36);
+        const performanceTime = globalThis.performance?.now?.().toString().replace('.', '-') ?? '0';
+
+        return `${currentTime}-${performanceTime}-${fallbackStorageIdCounter}_${index}`;
     };
 
     /**
