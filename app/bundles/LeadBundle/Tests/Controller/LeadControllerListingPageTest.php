@@ -73,6 +73,22 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
         ];
     }
 
+    public function testContactListingDecodesHtmlEntitiesInCompanyPrimaryIdentifier(): void
+    {
+        $contact = new Lead();
+        $contact->setEmail('jane@doe.example.com');
+        $contact->setCompany('Acme &amp; Sons');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $this->client->request('GET', 's/contacts');
+        $content = (string) $this->client->getResponse()->getContent();
+
+        Assert::assertStringContainsString('Acme &amp; Sons', $content);
+        Assert::assertStringNotContainsString('Acme &amp;amp; Sons', $content);
+    }
+
     /**
      * @param string[] $location
      *
