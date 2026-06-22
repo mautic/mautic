@@ -10821,6 +10821,174 @@ lesshat-selector { -lh-property: 0 ;
     grid-template-columns: repeat(var(--card-group--cards-in-row), 1fr);
   }
 }
+.leadspace[size="super"] .leadspace--heading,
+.leadspace[size="tall"] .leadspace--heading,
+.leadspace[size="medium"] .leadspace--heading {
+  margin-bottom: 48px;
+}
+.leadspace[size="short"] .leadspace--heading {
+  margin-bottom: 32px;
+}
+.leadspace .leadspace__section {
+  min-block-size: unset;
+  position: relative;
+  margin-inline: auto;
+  max-inline-size: 1584px;
+  display: flex;
+  background-color: var(--background, #ffffff);
+}
+.leadspace .leadspace--content__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  block-size: 100%;
+  margin-block-end: 32px;
+}
+.leadspace .background-media {
+  aspect-ratio: 4 / 3;
+  block-size: auto;
+  overflow: clip;
+  filter: contrast(1.2);
+}
+.leadspace .leadspace__overlay {
+  margin-inline: auto;
+  padding-inline: 16px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  inline-size: 100%;
+  max-inline-size: none;
+  padding-block-start: 16px;
+}
+.leadspace .leadspace__gradient {
+  position: absolute;
+  display: none;
+  block-size: 100%;
+  inline-size: calc(100% + 1px);
+  inset-block-start: 0px;
+  inset-inline-start: -1px;
+  padding-block-end: 0px;
+  pointer-events: none;
+  z-index: -1;
+}
+.leadspace .leadspace__gradient__rect {
+  fill: url(#stops);
+}
+.leadspace .leadspace__gradient__stops stop {
+  stop-color: var(--context-color, var(--layer));
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(1) {
+  stop-opacity: 1;
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(2) {
+  stop-opacity: 1;
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(3) {
+  stop-opacity: 0.75;
+}
+.leadspace .leadspace__gradient__stops stop:nth-of-type(4) {
+  stop-opacity: 0;
+}
+.leadspace[size=tall] .leadspace__section {
+  block-size: auto;
+  min-block-size: 560px;
+}
+.leadspace__action {
+  --button-group--item-count: 3;
+  display: grid;
+  grid-auto-rows: 1fr;
+  grid-gap: 16px;
+  grid-template-columns: 1fr;
+}
+.leadspace__container {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+}
+.background-media--container {
+  contain: layout;
+}
+.background-media--mobile-position,
+.background-media--item {
+  block-size: 100%;
+}
+.image__img {
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+@media (min-width: 1200px) {
+  .leadspace .leadspace__context-aware-color {
+    color: var(--context-aware-color);
+    border-color: var(--context-aware-color);
+  }
+  .leadspace .leadspace__context-aware-color,
+  .leadspace .leadspace__context-aware-color:active,
+  .leadspace .leadspace__context-aware-color:hover,
+  .leadspace .leadspace__context-aware-color:focus {
+    background-color: unset;
+  }
+  .leadspace .leadspace__context-aware-color i,
+  .leadspace .leadspace__context-aware-color:active i,
+  .leadspace .leadspace__context-aware-color:hover i,
+  .leadspace .leadspace__context-aware-color:focus i {
+    color: var(--context-aware-color);
+  }
+  .leadspace[size="super"] .leadspace--heading {
+    margin-bottom: 96px;
+  }
+  .leadspace[size="super"] .leadspace__section {
+    min-block-size: 640px;
+  }
+  .leadspace[size="tall"] .leadspace--heading {
+    margin-bottom: 96px;
+  }
+  .leadspace[size="tall"] .leadspace__section {
+    min-block-size: 560px;
+  }
+  .leadspace[size="medium"] .leadspace--heading {
+    margin-bottom: 48px;
+  }
+  .leadspace[size="medium"] .leadspace__section {
+    min-block-size: 480px;
+  }
+  .leadspace[size="short"] .leadspace--heading {
+    margin-bottom: 48px;
+  }
+  .leadspace[size="short"] .leadspace__section {
+    min-block-size: 320px;
+  }
+  .leadspace .background-media {
+    position: absolute;
+    aspect-ratio: auto;
+    block-size: 100%;
+    inset: 0px;
+  }
+  .leadspace .background-media--with-gradient {
+    inline-size: 75%;
+    margin-left: auto;
+  }
+  .leadspace .leadspace__overlay {
+    inset-block-start: 0px;
+    padding-block-start: 32px;
+    padding-inline: 32px;
+  }
+  .leadspace .leadspace__gradient {
+    display: block;
+  }
+  .leadspace .leadspace__section {
+    position: relative;
+    margin-inline: auto;
+    max-inline-size: 1584px;
+  }
+  .leadspace__action {
+    display: inline-grid;
+    grid-template-columns: repeat(var(--button-group--item-count), 1fr);
+  }
+}
 .label-as-badge {
   border-radius: 9px !important;
 }

@@ -28,6 +28,21 @@
                 {{ block('listResults') }}
             </div>
         </div>
+        {% if items|length > 0 and searchValue is empty %}
+        <div class="mt-md">
+            {{ include('@MauticCore/Components/lead-space.html.twig', {
+            variant: 'medium',
+            heading: 'mautic.api.client.contentblock.heading',
+            description: 'mautic.api.client.contentblock.copy',
+            media: {
+                src: 'app/bundles/ApiBundle/Assets/images/google-deepmind-4QVqSh4VvP4-unsplash.jpg'
+            },
+            gradientStyleScheme: 'with-gradient',
+            gradientStyleSchemeColor: '#f1edea',
+            
+        }) }}
+        </div>
+        {% endif %}
     {% else %}
 		{{ block('listResults') }}
 	{% endif %}
@@ -121,23 +136,7 @@
     {% if searchValue is not empty %}
         {{- include('@MauticCore/Helper/noresults.html.twig') -}}
     {% else %}
-        <div class="mt-80 col-md-offset-2 col-lg-offset-3 col-md-8 col-lg-5 height-auto">
-            {% set childContainer %}
-                <div class="mt-32 mb-md">
-                    {% include '@MauticCore/Components/pictogram.html.twig' with {
-                        'pictogram': 'api',
-                        'size': '80'
-                    } %}
-                </div>
-            {% endset %}
-
-            {{ include('@MauticCore/Components/content-block.html.twig', {
-                heading: 'mautic.api.client.contentblock.heading',
-                subheading: 'mautic.api.client.contentblock.subheading',
-                copy: 'mautic.api.client.contentblock.copy',
-                childContainer: childContainer,
-            }) }}
-        </div>
+        {{ include('@MauticApi/Client/List/introduction.html.twig') }}
     {% endif %}
 {% endif %}
 {% endblock %}

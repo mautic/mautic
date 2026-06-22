@@ -1,0 +1,103 @@
+{#
+Variables:
+- variant: short, medium, tall, super
+- heading: string
+- description: string
+- tags: array of tags
+- gradientStyleScheme: with-gradient, without-gradient
+- gradientStyleSchemeColor: hex color
+- media: { src: 'path/to/image', alt: 'image alt text' }
+- buttons: array of buttons    
+#}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div size="{{ variant }}" gradient-style-scheme="{{ gradientStyleScheme }}" {% if gradientStyleSchemeColor is defined %}style="--context-color: {{ gradientStyleSchemeColor }}; --context-aware-color: {{ contrast_color(gradientStyleSchemeColor) }};"{% endif %} {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %} id="leadspace"
+            class="leadspace" type="left">
+            <section part="section" class="leadspace__section">
+                <div part="container" class="leadspace__container">
+                    <div part="overlay" class="leadspace--gradient leadspace__overlay fg-1 pl-32 pr-32 pt-32">
+                        {% if gradientStyleScheme is defined and gradientStyleScheme == 'with-gradient' %}
+                        <svg part="gradient" viewBox="0 0 100 100"
+                            preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" class="leadspace__gradient">
+                            <defs>
+                                <linearGradient id="stops" class="leadspace__gradient__stops" gradientTransform="">
+                                    <stop offset="0%"></stop>
+                                    <stop offset="25%"></stop>
+                                    <stop offset="50%"></stop>
+                                    <stop offset="75%"></stop>
+                                </linearGradient>
+                            </defs>
+                            <rect width="100" height="100" class="leadspace__gradient__rect"></rect>
+                        </svg>
+                        {% endif %}
+                        <div part="content-container" class="leadspace--content__container d-flex fd-column jc-space-between mb-32">
+                            <div part="row row--content" class="leadspace__row">
+                                {% if tags is defined and tags is iterable %}
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {tags: tags} %}
+                                {% endif %}
+                                <div class="row">
+                                    <div class="col-xs-12 col-md-9 col-lg-6">
+                                        <div type-style="display-01" highlight="" role="heading" aria-level="2"
+                                            class="leadspace--heading" slot="heading">
+                                            <div class="{% if variant == 'short' %}type-fluid-heading-05{% else %}type-fluid-display-01{% endif %}{% if gradientStyleSchemeColor is defined %} leadspace__context-aware-color{% endif %}">
+                                                {{ heading|trans }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if variant != 'short' %}
+                            <div part="content" class="leadspace__content">
+                                {% if description is defined %}
+                                <div part="row row--description" class="leadspace__row row">
+                                    <div class="col-lg-5 col-md-9 col-xs-12">
+                                        <p part="description" id="leadspace__desc" class="leadspace__desc type-heading-03 {% if gradientStyleSchemeColor is defined %} leadspace__context-aware-color{% endif %}">
+                                            {{ description|trans }}
+                                        </p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if buttons is defined %}
+                                <div part="action" id="button-group" role="list"
+                                    style="--button-group--item-count: {{ buttons|length }};"
+                                    class="leadspace__action mt-32">
+                                    {% set buttons = buttons|map((button, index) => 
+                                        button|merge({
+                                            'variant': index == 0 ? 'primary' : 'tertiary',
+                                            'size': 'lg',
+                                            'wide': true,
+                                            'attributes': index == 0 ? 
+                                                (button.attributes is defined ? button.attributes : {}) : 
+                                                (button.attributes is defined ? 
+                                                    button.attributes|merge({'class': (button.attributes.class is defined ? button.attributes.class ~ ' ' : '') ~ (gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : '')}) : 
+                                                    {'class': gradientStyleSchemeColor is defined ? 'leadspace__context-aware-color' : ''}
+                                                )
+                                        })
+                                    ) %}
+                                    {% include '@MauticCore/Helper/button.html.twig' with {buttons: buttons} %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if media is defined %}
+                    <div id="background-media" gradient-direction="left-to-right" mobile-position="bottom"
+                        class="background-media {% if gradientStyleScheme is defined and gradientStyleScheme == 'with-gradient' %}background-media--with-gradient{% endif %}">
+                        <div part="container"
+                            class="background-media--container background-media--mobile-position background-media--mobile-position--bottom background-media--image">
+                            <div part="item" class="background-media--item" style="opacity:1">
+                                <picture part="picture">
+                                    <img part="image" class="image__img" src="{{ asset(media.src) }}" {% if media.alt is defined %}alt="{{ media.alt }}"{% endif %}>
+                                </picture>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
