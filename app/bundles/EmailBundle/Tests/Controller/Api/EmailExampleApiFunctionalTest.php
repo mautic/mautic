@@ -16,6 +16,11 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
+    private const RECIPIENT     = self::RECIPIENT;
+    private const RECIPIENT_ONE = self::RECIPIENT_ONE;
+    private const RECIPIENT_TWO = self::RECIPIENT_TWO;
+    private const EMAIL_SUBJECT = self::EMAIL_SUBJECT;
+
     protected $useCleanupRollback = false;
 
     public function testSendExampleWithoutContactFillsFakeData(): void
@@ -30,18 +35,18 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
         $this->client->request(
             Request::METHOD_POST,
             "/api/emails/{$emailId}/example/send",
-            ['recipients' => ['proof@example.com']]
+            ['recipients' => [self::RECIPIENT]]
         );
 
         self::assertResponseStatusCodeSame(200);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertTrue($response['success']);
-        Assert::assertSame(['proof@example.com'], $response['sent']);
+        Assert::assertSame([self::RECIPIENT], $response['sent']);
         Assert::assertSame([], $response['errors']);
 
-        $message = $this->getMailerMessagesByToAddress('proof@example.com')[0];
+        $message = $this->getMailerMessagesByToAddress(self::RECIPIENT)[0];
         \assert($message instanceof MauticMessage);
-        Assert::assertSame('[TEST] Email subject', $message->getSubject());
+        Assert::assertSame('[TEST] '.self::EMAIL_SUBJECT, $message->getSubject());
         // Fake contact data renders field tokens as bracketed labels, like the UI action.
         Assert::assertStringContainsString('Contact email is [Email].', $message->getBody()->toString());
 
@@ -51,7 +56,7 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
         // The stored email must be untouched (subject not prefixed in the DB).
         $this->em->clear();
         $reloaded = $this->em->find(Email::class, $emailId);
-        Assert::assertSame('Email subject', $reloaded->getSubject());
+        Assert::assertSame(self::EMAIL_SUBJECT, $reloaded->getSubject());
     }
 
     public function testSendExampleWithContactUsesContactData(): void
@@ -74,14 +79,14 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
             Request::METHOD_POST,
             "/api/emails/{$emailId}/example/send",
             [
-                'recipients' => ['proof@example.com'],
+                'recipients' => [self::RECIPIENT],
                 'contactId'  => $leadId,
             ]
         );
 
         self::assertResponseStatusCodeSame(200);
 
-        $message = $this->getMailerMessagesByToAddress('proof@example.com')[0];
+        $message = $this->getMailerMessagesByToAddress(self::RECIPIENT)[0];
         \assert($message instanceof MauticMessage);
         Assert::assertStringContainsString(
             'Contact email is john@domain.tld. Company: Mautic, Pune.',
@@ -99,15 +104,15 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
         $this->client->request(
             Request::METHOD_POST,
             "/api/emails/{$emailId}/example/send",
-            ['recipients' => ['one@example.com', 'two@example.com']]
+            ['recipients' => [self::RECIPIENT_ONE, self::RECIPIENT_TWO]]
         );
 
         self::assertResponseStatusCodeSame(200);
         $response = json_decode($this->client->getResponse()->getContent(), true);
         Assert::assertTrue($response['success']);
-        Assert::assertSame(['one@example.com', 'two@example.com'], $response['sent']);
-        Assert::assertCount(1, $this->getMailerMessagesByToAddress('one@example.com'));
-        Assert::assertCount(1, $this->getMailerMessagesByToAddress('two@example.com'));
+        Assert::assertSame([self::RECIPIENT_ONE, self::RECIPIENT_TWO], $response['sent']);
+        Assert::assertCount(1, $this->getMailerMessagesByToAddress(self::RECIPIENT_ONE));
+        Assert::assertCount(1, $this->getMailerMessagesByToAddress(self::RECIPIENT_TWO));
     }
 
     public function testNoSubjectPrefixOptionSkipsThePrefix(): void
@@ -121,15 +126,15 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
             Request::METHOD_POST,
             "/api/emails/{$emailId}/example/send",
             [
-                'recipients'      => ['proof@example.com'],
+                'recipients'      => [self::RECIPIENT],
                 'noSubjectPrefix' => true,
             ]
         );
 
         self::assertResponseStatusCodeSame(200);
-        $message = $this->getMailerMessagesByToAddress('proof@example.com')[0];
+        $message = $this->getMailerMessagesByToAddress(self::RECIPIENT)[0];
         \assert($message instanceof MauticMessage);
-        Assert::assertSame('Email subject', $message->getSubject());
+        Assert::assertSame(self::EMAIL_SUBJECT, $message->getSubject());
     }
 
     public function testMissingRecipientsReturnsBadRequest(): void
@@ -149,7 +154,7 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
         $this->client->request(
             Request::METHOD_POST,
             '/api/emails/999999/example/send',
-            ['recipients' => ['proof@example.com']]
+            ['recipients' => [self::RECIPIENT]]
         );
 
         self::assertResponseStatusCodeSame(404);
@@ -160,7 +165,7 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setDateAdded(new \DateTime());
         $email->setName('Email name');
-        $email->setSubject('Email subject');
+        $email->setSubject(self::EMAIL_SUBJECT);
         $email->setTemplate('Blank');
         $email->setCustomHtml('Contact email is {contactfield=email}');
         $email->setIsPublished($isPublished);
