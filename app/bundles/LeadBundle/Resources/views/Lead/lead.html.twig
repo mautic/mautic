@@ -451,12 +451,8 @@
                 </div>
             {% endif %}
 
-            {% if doNotContact %}
-                {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
-            {% endif %}
-            {% if doNotContactSms %}
-                {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContactSms}) }}
-            {% endif %}
+
+            {% include('@MauticLead/Lead/Modules/lead_status.html.twig') %}
             <div class="panel-heading">
                 <div class="panel-title">
                     {{ 'mautic.lead.field.header.contact'|trans }}
