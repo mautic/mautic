@@ -188,8 +188,9 @@ class StatRepository extends CommonRepository
         $q->select('s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 's')
             ->where(
-                $q->expr()->in('s.email_id', $emailIds)
-            );
+                $q->expr()->in('s.email_id', ':emailIds')
+            )
+            ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
 
         if ($listId) {
             $q->andWhere('s.list_id = :list')
@@ -265,8 +266,8 @@ class StatRepository extends CommonRepository
                 $emailIds = [(int) $emailIds];
             }
             $q->where(
-                $q->expr()->in('s.email_id', $emailIds)
-            );
+                $q->expr()->in('s.email_id', ':emailIds')
+            )->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
         }
 
         if ($listId) {
@@ -292,12 +293,13 @@ class StatRepository extends CommonRepository
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
                     ->andWhere(
                         $q->expr()->and(
-                            $q->expr()->in('list.leadlist_id', array_map('intval', $listId)),
+                            $q->expr()->in('list.leadlist_id', ':subQListIds'),
                             $q->expr()->eq('list.lead_id', 's.lead_id')
                         )
                     );
 
-                $q->andWhere(sprintf('EXISTS (%s)', $subQ->getSQL()));
+                $q->andWhere(sprintf('EXISTS (%s)', $subQ->getSQL()))
+                    ->setParameter('subQListIds', array_map('intval', $listId), ArrayParameterType::INTEGER);
             }
         }
 
@@ -345,9 +347,10 @@ class StatRepository extends CommonRepository
             ->where(
                 $sq->expr()->and(
                     $sq->expr()->eq('e.is_failed', ':false'),
-                    $sq->expr()->in('e.email_id', $inIds)
+                    $sq->expr()->in('e.email_id', ':inIds')
                 )
-            )->setParameter('false', false, 'boolean');
+            )->setParameter('false', false, 'boolean')
+            ->setParameter('inIds', $inIds, ArrayParameterType::INTEGER);
 
         if (null !== $fromDate) {
             // make sure the date is UTC
@@ -408,8 +411,9 @@ class StatRepository extends CommonRepository
                 $emailIds = [(int) $emailIds];
             }
             $q->where(
-                $q->expr()->in('s.email_id', $emailIds)
-            );
+                $q->expr()->in('s.email_id', ':emailIds')
+            )
+            ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
         }
 
         $q->andWhere('open_count > 0');
@@ -563,10 +567,11 @@ class StatRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where(
                 $q->expr()->and(
-                    $q->expr()->in('e.email_id', $emailIds),
+                    $q->expr()->in('e.email_id', ':emailIds'),
                     $q->expr()->eq('e.is_failed', ':false')
                 )
-            )->setParameter('false', false, 'boolean');
+            )->setParameter('false', false, 'boolean')
+            ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
 
         if (null !== $fromDate) {
             // make sure the date is UTC
@@ -615,8 +620,9 @@ class StatRepository extends CommonRepository
 
         $qb->delete(MAUTIC_TABLE_PREFIX.'email_stats')
             ->where(
-                $qb->expr()->in('id', $ids)
+                $qb->expr()->in('id', ':ids')
             )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
             ->executeStatement();
     }
 

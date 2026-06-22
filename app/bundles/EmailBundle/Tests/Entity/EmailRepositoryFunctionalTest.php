@@ -106,6 +106,8 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $leadTwo   = $this->createLead('two');
         $leadThree = $this->createLead('three');
         $leadFour  = $this->createLead('four');
+        $leadFive  = $this->createLead('five');
+        $leadSix   = $this->createLead('six');
 
         // create some categories
         $catOne     = $this->createCategory('one');
@@ -121,7 +123,13 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         // lead to unsubscribe categories
         $this->subscribeCategory($leadOne, false, $catThree);
 
-        $sourceListOne  = $this->createLeadList('Source', $leadOne, $leadTwo, $leadThree, $leadFour);
+        // add some leads in lists for inclusion
+        $sourceListOne  = $this->createLeadList('Source One', $leadOne, $leadTwo, $leadThree);
+        $sourceListTwo  = $this->createLeadList('Source Two', $leadOne, $leadFour, $leadFive, $leadSix);
+
+        // add some leads in lists for exclusion
+        $excludeListOne = $this->createLeadList('Exclude One', $leadTwo, $leadSix);
+        $excludeListTwo = $this->createLeadList('Exclude Two', $leadTwo, $leadThree);
 
         // create an email with included/excluded lists
         $email = new Email();
@@ -129,6 +137,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $email->setSubject('Subject');
         $email->setEmailType('list');
         $email->addList($sourceListOne);
+        $email->addList($sourceListTwo);
+        $email->addExcludedList($excludeListOne);
+        $email->addExcludedList($excludeListTwo);
         $email->setCategory($catThree);
         $this->em->persist($email);
 
@@ -142,7 +153,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $actualLeadIds  = array_map('intval', array_column($result, 'id'));
         sort($actualLeadIds);
 
-        $expectedLeadIds = [$leadTwo->getId(), $leadThree->getId(), $leadFour->getId()];
+        $expectedLeadIds = [$leadFour->getId(), $leadFive->getId()];
         sort($expectedLeadIds);
 
         $this->assertSame($expectedLeadIds, $actualLeadIds);
