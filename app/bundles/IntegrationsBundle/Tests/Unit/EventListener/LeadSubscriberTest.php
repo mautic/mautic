@@ -411,6 +411,7 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
+    /** @param array<string, array{0: mixed, 1: mixed}> $fieldChanges */
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $integrationName     = 'testIntegration';

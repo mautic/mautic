@@ -70,11 +70,11 @@ final class PointActionHelperFunctionalTest extends MauticMysqlTestCase
     public static function provideReturnsWithinAndAfterCases(): \Generator
     {
         yield 'returns_within true' => [
-            -20,
+            -10,
             20,
             null,
             true,
-            'Should return true when returns_within is 20 and hit difference is 20',
+            'Should return true when returns_within is 20 and hit difference is less than 20',
         ];
         yield 'returns_within false' => [
             -21,

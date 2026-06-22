@@ -77,22 +77,19 @@ class TriggerCampaignCommand extends ModeratedCommand
                 '--campaign-id',
                 '-i',
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.',
-                null
+                'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.'
             )
             ->addOption(
                 '--campaign-limit',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Limit number of contacts on a per campaign basis',
-                null
+                'Limit number of contacts on a per campaign basis'
             )
             ->addOption(
                 '--contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events for a specific contact.',
-                null
+                'Trigger events for a specific contact.'
             )
             ->addOption(
                 '--contact-ids',
@@ -104,15 +101,13 @@ class TriggerCampaignCommand extends ModeratedCommand
                 '--min-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events starting at a specific contact ID.',
-                null
+                'Trigger events starting at a specific contact ID.'
             )
             ->addOption(
                 '--max-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events starting up to a specific contact ID.',
-                null
+                'Trigger events starting up to a specific contact ID.'
             )
             ->addOption(
                 '--thread-id',

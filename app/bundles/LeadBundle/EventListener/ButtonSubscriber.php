@@ -28,8 +28,52 @@ class ButtonSubscriber implements EventSubscriberInterface
 
     public function injectViewButtons(CustomButtonEvent $event): void
     {
-        if (!str_contains($event->getRoute(), 'mautic_contact_index')) {
+        $route = $event->getRoute();
+
+        if (str_contains($route, 'mautic_company_index')) {
+            if ($this->security->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
+                $event->addButton(
+                    [
+                        'attr'      => [
+                            'data-toggle' => 'ajaxmodal',
+                            'data-target' => '#MauticSharedModal',
+                            'href'        => $this->router->generate('mautic_company_action', [
+                                'objectAction' => 'batchFindReplace',
+                                'all'          => 1,
+                            ]),
+                            'data-header' => $this->translator->trans('mautic.core.find_replace'),
+                        ],
+                        'btnText'   => $this->translator->trans('mautic.core.find_replace'),
+                        'iconClass' => 'ri-find-replace-line',
+                    ],
+                    ButtonHelper::LOCATION_PAGE_ACTIONS
+                );
+            }
+
             return;
+        }
+
+        if (!str_contains($route, 'mautic_contact_index')) {
+            return;
+        }
+
+        if ($this->security->isGranted(['lead:leads:editown', 'lead:leads:editother'], 'MATCH_ONE')) {
+            $event->addButton(
+                [
+                    'attr'      => [
+                        'data-toggle' => 'ajaxmodal',
+                        'data-target' => '#MauticSharedModal',
+                        'href'        => $this->router->generate('mautic_contact_action', [
+                            'objectAction' => 'batchFindReplace',
+                            'all'          => 1,
+                        ]),
+                        'data-header' => $this->translator->trans('mautic.core.find_replace'),
+                    ],
+                    'btnText'   => $this->translator->trans('mautic.core.find_replace'),
+                    'iconClass' => 'ri-find-replace-line',
+                ],
+                ButtonHelper::LOCATION_PAGE_ACTIONS
+            );
         }
 
         if (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {

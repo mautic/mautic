@@ -34,6 +34,7 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         $elFinderLoader = new class(static::getContainer()) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
+                /** @phpstan-ignore symfonyContainer.privateService */
                 parent::__construct($container->get('fm_elfinder.configurator'));
             }
 

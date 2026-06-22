@@ -225,6 +225,8 @@ class FormModel extends AbstractCommonModel
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
+        $this->dispatchEvent('on_toggle_publish', $entity);
+
         // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);
         $this->getRepository()->saveEntity($entity);

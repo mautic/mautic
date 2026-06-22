@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Form\Type\FindReplaceType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -18,6 +19,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -26,6 +28,8 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Event\ContactExportEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
+use Mautic\LeadBundle\Field\CustomFieldFindReplace;
+use Mautic\LeadBundle\Field\DTO\CustomFieldFindReplaceCriteria;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\ContactGroupPointsType;
 use Mautic\LeadBundle\Form\Type\DncType;
@@ -189,7 +193,7 @@ class LeadController extends FormController
         $lists = $leadListModel->getUserLists();
 
         // check to see if in a single list
-        $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
+        $inSingleList = 1 === substr_count($search, "$listCommand:");
         $list         = [];
         if ($inSingleList) {
             preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
@@ -970,7 +974,7 @@ class LeadController extends FormController
                                         [
                                             'type'    => 'error',
                                             'msg'     => 'mautic.lead.lead.error.notfound',
-                                            'msgVars' => ['%id%' => $secLead->getId()],
+                                            'msgVars' => ['%id%' => $secLeadId],
                                         ],
                                     ],
                                 ]
@@ -1366,7 +1370,7 @@ class LeadController extends FormController
             $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
-                $campaigns[$c['id']]['inCampaign'] = (isset($leadsCampaigns[$c['id']])) ? true : false;
+                $campaigns[$c['id']]['inCampaign'] = isset($leadsCampaigns[$c['id']]);
             }
         } else {
             $campaigns = [];
@@ -1979,6 +1983,190 @@ class LeadController extends FormController
                 ],
             ]
         );
+    }
+
+    /**
+     * Bulk find and replace contact field values.
+     */
+    public function batchFindReplaceAction(Request $request, LeadModel $model, CustomFieldFindReplace $findReplace): JsonResponse|Response
+    {
+        $permissions = $this->security->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:editown',
+                'lead:leads:editother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (
+            (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother'])
+            || (!$permissions['lead:leads:editown'] && !$permissions['lead:leads:editother'])
+        ) {
+            return $this->accessDenied();
+        }
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            return $this->processContactFindReplace($request, $model, $findReplace, $permissions);
+        }
+
+        return $this->createContactFindReplaceFormResponse($request, $findReplace);
+    }
+
+    /**
+     * @param array<string, bool> $permissions
+     */
+    private function processContactFindReplace(Request $request, LeadModel $model, CustomFieldFindReplace $findReplace, array $permissions): JsonResponse
+    {
+        $requestData = $request->request->all();
+        $data        = $requestData['lead_batch_find_replace'] ?? $requestData['find_replace'] ?? [];
+        $ids         = json_decode($data['ids'] ?? '[]', true);
+        $fieldAlias  = $data['field'] ?? null;
+        $updated     = [];
+
+        if (is_string($fieldAlias) && is_array($ids)) {
+            $entities = $this->getContactFindReplaceEntities($request, $model, $data, $ids, $permissions);
+            $updated  = $this->replaceContactFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
+
+            if ($updated) {
+                $model->saveEntities($updated);
+            }
+        }
+
+        $this->addFlashMessage(
+            'mautic.lead.batch_leads_affected',
+            [
+                '%count%' => count($updated),
+            ]
+        );
+
+        return new JsonResponse(
+            [
+                'closeModal' => true,
+                'callback'   => 'refreshFindReplaceList',
+                'flashes'    => $this->getFlashContent(),
+            ]
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<int, mixed>    $ids
+     * @param array<string, bool>  $permissions
+     *
+     * @return iterable<object>
+     */
+    private function getContactFindReplaceEntities(Request $request, LeadModel $model, array $data, array $ids, array $permissions): iterable
+    {
+        if (!empty($data['all'])) {
+            return $model->getEntities([
+                'filter'           => $this->getCurrentContactListFilter($request, $permissions),
+                'ignore_paginator' => true,
+            ]);
+        }
+
+        return $model->getEntities([
+            'filter'           => [
+                'force' => [
+                    [
+                        'column' => 'l.id',
+                        'expr'   => 'in',
+                        'value'  => $ids,
+                    ],
+                ],
+            ],
+            'ignore_paginator' => true,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param iterable<object>     $entities
+     *
+     * @return array<int, Lead>
+     */
+    private function replaceContactFieldValues(CustomFieldFindReplace $findReplace, string $fieldAlias, array $data, iterable $entities, LeadModel $model): array
+    {
+        /** @var array<int, Lead> $updated */
+        $updated = $findReplace->replace(
+            new CustomFieldFindReplaceCriteria('lead', $fieldAlias, $data['find'] ?? null, $data['replace'] ?? null),
+            $entities,
+            function (CustomFieldEntityInterface $lead, array $values) use ($model): void {
+                \assert($lead instanceof Lead);
+                $model->setFieldValues($lead, $values, true, false);
+            },
+            function (CustomFieldEntityInterface $lead): bool {
+                \assert($lead instanceof Lead);
+
+                return $this->security->hasEntityAccess(
+                    'lead:leads:editown',
+                    'lead:leads:editother',
+                    $lead->getPermissionUser()
+                );
+            },
+            function (CustomFieldEntityInterface $lead) use ($model): ?CustomFieldEntityInterface {
+                \assert($lead instanceof Lead);
+
+                return $model->getEntity($lead->getId());
+            }
+        );
+
+        return $updated;
+    }
+
+    private function createContactFindReplaceFormResponse(Request $request, CustomFieldFindReplace $findReplace): Response
+    {
+        $route = $this->generateUrl(
+            'mautic_contact_action',
+            [
+                'objectAction' => 'batchFindReplace',
+            ]
+        );
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form' => $this->formFactory->createNamed('lead_batch_find_replace', FindReplaceType::class, [], [
+                        'action'        => $route,
+                        'all_items'     => $request->query->getBoolean('all'),
+                        'field_choices' => $findReplace->getFieldChoices('lead'),
+                        'field_label'   => 'mautic.lead.batch.find_replace.field',
+                    ])->createView(),
+                ],
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_contact_index',
+                    'mauticContent' => 'leadBatch',
+                    'route'         => $route,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @param array<string,bool> $permissions
+     *
+     * @return array<string,string>
+     */
+    private function getCurrentContactListFilter(Request $request, array $permissions): array
+    {
+        $session    = $request->getSession();
+        $search     = $session->get('mautic.lead.filter', '');
+        $filter     = ['string' => $search, 'force' => ''];
+        $anonymous  = $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $this->translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+
+        if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
+            $filter['force'] .= " !$anonymous";
+        }
+
+        if (!$permissions['lead:leads:viewother']) {
+            $filter['force'] .= " $mine";
+        }
+
+        return $filter;
     }
 
     /**
