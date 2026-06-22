@@ -1481,6 +1481,13 @@ class CommonRepository extends ServiceEntityRepository
                 $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
             );
             $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
+        } elseif (!empty($args['ownedBy'])) {
+            $param = $this->generateRandomParameterName();
+            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
+            $queryExpression->add(
+                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], ':'.$param)
+            );
+            $q->setParameter($param, array_map('strval', $args['ownedBy'][1]), ArrayParameterType::STRING);
         }
 
         if (!empty($filter)) {
@@ -1693,9 +1700,10 @@ class CommonRepository extends ServiceEntityRepository
     protected function getIdsExpr(&$q, $filter)
     {
         if ($ids = array_map('intval', explode(',', $filter->string))) {
-            $q->setParameter('idsExpr', $ids, ArrayParameterType::INTEGER);
+            $parameterName = $this->generateRandomParameterName();
+            $q->setParameter($parameterName, $ids, ArrayParameterType::INTEGER);
 
-            return $q->expr()->in($this->getTableAlias().'.id', ':idsExpr');
+            return $q->expr()->in($this->getTableAlias().'.id', ':'.$parameterName);
         }
 
         return false;

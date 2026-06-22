@@ -78,7 +78,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetReadCount(): void
     {
-        $expectedQuery = 'SELECT count(s.id) as count FROM test_email_stats s WHERE (s.email_id IN (1)) AND (is_read = :true) AND (s.date_read BETWEEN :dateFrom AND :dateTo)';
+        $expectedQuery = 'SELECT count(s.id) as count FROM test_email_stats s WHERE (s.email_id IN (:emailIds)) AND (is_read = :true) AND (s.date_read BETWEEN :dateFrom AND :dateTo)';
         $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with(
@@ -87,6 +87,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
                     'true'     => true,
                     'dateFrom' => '2023-01-01 00:00:00',
                     'dateTo'   => '2023-01-31 23:59:59',
+                    'emailIds' => [1],
                 ]
             )
             ->willReturn($this->result);
