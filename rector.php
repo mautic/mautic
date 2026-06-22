@@ -6,11 +6,8 @@ use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
-use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
-use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
@@ -52,6 +49,7 @@ return RectorConfig::configure()
         ReturnTypeFromReturnDirectArrayRector::class,
         UnserializeToSerializerDecodeRector::class,
     ])
+    ->reportUnusedSkips()
     ->withSkip([
         '*/Test/*',
         '*/Tests/*',
@@ -59,8 +57,6 @@ return RectorConfig::configure()
         ReturnTypeFromReturnDirectArrayRector::class => [
             // require bit test update
             __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
-            // array vs doctrine collection
-            __DIR__.'/app/bundles/CoreBundle/Entity/TranslationEntityTrait.php',
         ],
 
         // Avoiding breaking BC breaks with forced return types in public methods
@@ -72,46 +68,8 @@ return RectorConfig::configure()
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
 
-        // Rector 2.4.5 false positive: setFromForSingleMessage() and setReplyToForSingleMessage()
-        // are both called from send(), but dead code analysis incorrectly treats them as unused
-        RemoveUnusedPrivateMethodRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
-        ],
-
-        RemoveUnusedPrivatePropertyRector::class => [
-            // entities
-            __DIR__.'/app/bundles/UserBundle/Entity',
-            // typo fallback
-            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
-        ],
-
-        RemoveUnusedVariableAssignRector::class => [
-            // unset variable to clear garbage collector
-            __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
-        ],
-
-        TypedPropertyFromStrictConstructorRector::class => [
-            // entities magic
-            __DIR__.'/app/bundles/LeadBundle/Entity',
-
-            // fixed in rector dev-main
-            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
-        ],
-
-        ClassPropertyAssignToConstructorPromotionRector::class => [
-            __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
-            __DIR__.'/app/bundles/ReportBundle/Event/ReportBuilderEvent.php',
-            // false positive
-            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
-        ],
-
         TypedPropertyFromAssignsRector::class => [
             '*/Entity/*',
-        ],
-
-        // Skip the rule file itself
-        UnserializeToSerializerDecodeRector::class => [
-            __DIR__.'/rector',
         ],
 
         // handle later with full PHP 8.0 upgrade
@@ -119,9 +77,6 @@ return RectorConfig::configure()
 
         // handle later, case by case as lot of chnaged code
         RemoveAlwaysTrueIfConditionRector::class => [
-            __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
-            __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
-            __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
             // watch out on this one - the variables are set magically via $$name
             // @see app/bundles/FormBundle/Form/Type/FieldType.php:99
             __DIR__.'/app/bundles/FormBundle/Form/Type/FieldType.php',

@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -111,7 +112,8 @@ class AuditLogRepository extends CommonRepository
             ->where('al.bundle = \'lead\'')
             ->andWhere('al.object = \'lead\'');
         $query
-            ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
+            ->andWhere($query->expr()->in('al.objectId', ':listOfContacts'))
+            ->setParameter('listOfContacts', $listOfContacts, ArrayParameterType::INTEGER);
 
         if (is_array($filters) && !empty($filters['search'])) {
             $query->andWhere('al.details LIKE :search')

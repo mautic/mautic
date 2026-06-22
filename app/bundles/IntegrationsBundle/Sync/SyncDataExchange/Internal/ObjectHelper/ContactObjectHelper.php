@@ -222,8 +222,9 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->in('id', $ids)
-            );
+                $qb->expr()->in('id', ':ids')
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }
