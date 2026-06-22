@@ -55,17 +55,38 @@ class TagRepository extends CommonRepository
      */
     public function deleteOrphans(): void
     {
-        $connection   = $this->_em->getConnection();
-        $queryBuilder = $connection->createQueryBuilder();
+        $connection = $this->_em->getConnection();
+        $qb         = $connection->createQueryBuilder();
+        $havingQb   = $connection->createQueryBuilder();
+        $conditions = [];
 
-        $queryBuilder->delete(MAUTIC_TABLE_PREFIX.Tag::TABLE_NAME, 't')
-            ->where('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.self::LEAD_TAGS_XREF_TABLE_NAME.' x WHERE x.tag_id = t.id)');
+        $havingQb->select('count(x.lead_id) as the_count')
+            ->from(MAUTIC_TABLE_PREFIX.self::LEAD_TAGS_XREF_TABLE_NAME, 'x')
+            ->where('x.tag_id = t.id');
+        $conditions[] = sprintf('(%s)', $havingQb->getSQL()).' = 0';
 
         if ($connection->createSchemaManager()->tablesExist([MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME])) {
-            $queryBuilder->andWhere('NOT EXISTS (SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME.' cx WHERE cx.tag_id = t.id)');
+            $companyHavingQb = $connection->createQueryBuilder();
+            $companyHavingQb->select('count(cx.company_id) as the_count')
+                ->from(MAUTIC_TABLE_PREFIX.Company::TAGS_XREF_TABLE_NAME, 'cx')
+                ->where('cx.tag_id = t.id');
+            $conditions[] = sprintf('(%s)', $companyHavingQb->getSQL()).' = 0';
         }
 
-        $queryBuilder->executeStatement();
+        $qb->select('t.id')
+            ->from(MAUTIC_TABLE_PREFIX.Tag::TABLE_NAME, 't')
+            ->having(implode(' AND ', $conditions));
+        $delete = $qb->executeQuery()->fetchFirstColumn();
+
+        if (count($delete)) {
+            $qb->resetQueryParts();
+            $qb->delete(MAUTIC_TABLE_PREFIX.Tag::TABLE_NAME)
+                ->where(
+                    $qb->expr()->in('id', ':deleteIds')
+                )
+                ->setParameter('deleteIds', $delete, ArrayParameterType::INTEGER)
+                ->executeStatement();
+        }
     }
 
     /**
