@@ -10,7 +10,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 #[\PHPUnit\Framework\Attributes\CoversClass(ConfigMapper::class)]
 class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
-    private $forms = [
+    /** @var array<string, array<string, mixed>> */
+    private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
             'formAlias'  => 'emailconfig',
@@ -89,7 +90,8 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    private $config = [
+    /** @var array<string, mixed> */
+    private array $config = [
         'db_host'         => 'dbhost',
         'db_user'         => 'dbuser',
         'monitored_email' => [

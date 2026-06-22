@@ -135,7 +135,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -143,7 +143,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannel()
     {
@@ -163,7 +163,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getChannelId()
     {
@@ -187,7 +187,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannelName()
     {
@@ -207,7 +207,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return Message
+     * @return Message|null
      */
     public function getMessage()
     {

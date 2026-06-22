@@ -19,6 +19,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
         /**
          * @var MockObject&AbstractIntegration
          */
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
                 $this->dispatcher,
@@ -75,6 +76,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
         /**
          * @var MockObject&AbstractIntegration
          */
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
                 $this->dispatcher,
@@ -99,6 +101,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
 
         $integration->method('makeHttpClient')
             ->willReturn(
+                /** @phpstan-ignore class.extendsFinalByPhpDoc */
                 new class($assertRequest) extends Client {
                     public function __construct(
                         private object $assertRequest,

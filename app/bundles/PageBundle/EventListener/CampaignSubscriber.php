@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\CampaignEventPageHitType;
@@ -116,6 +117,10 @@ class CampaignSubscriber implements EventSubscriberInterface
             return false;
         }
 
+        if (!$eventDetails instanceof Hit) {
+            return $event->setResult(false);
+        }
+
         $deviceRepo = $this->leadModel->getDeviceRepository();
         $result     = false;
 
@@ -160,6 +165,11 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (null == $eventDetails) {
             return true;
         }
+
+        if (!$eventDetails instanceof Hit) {
+            return $event->setResult(false);
+        }
+
         $pageHit = $eventDetails->getPage();
 
         // Check Landing Pages
