@@ -49,14 +49,15 @@ class TagRepository extends CommonRepository
         $qb->select('t.id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
             ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->executeQuery()->fetchAssociative();
+        $delete = $qb->executeQuery()->fetchFirstColumn();
 
         if (count($delete)) {
             $qb->resetQueryParts();
             $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
                 ->where(
-                    $qb->expr()->in('id', $delete)
+                    $qb->expr()->in('id', ':deleteIds')
                 )
+                ->setParameter('deleteIds', $delete, ArrayParameterType::INTEGER)
                 ->executeStatement();
         }
     }
