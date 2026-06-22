@@ -17,7 +17,7 @@ class ObjectChangeDAO
     private ?ObjectMapping $objectMapping = null;
 
     /**
-     * @var FieldDAO[]
+     * @var array<string, FieldDAO[]>
      */
     private array $fieldsByState = [
         ReportFieldDAO::FIELD_CHANGED   => [],
