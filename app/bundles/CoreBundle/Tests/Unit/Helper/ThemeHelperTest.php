@@ -225,6 +225,7 @@ class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
+                    $this->assertSame('mautic.core.theme.missing.files', $key);
                     $this->assertStringContainsString('html/message.html.twig', $parameters['%files%']);
                     $this->assertStringContainsString('html/form.html.twig', $parameters['%files%']);
                     $this->assertStringContainsString('html/email.html.twig', $parameters['%files%']);
