@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
@@ -71,9 +72,10 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.$table)
                   ->where(
                       $qb2->expr()->in(
-                          'id', $ids
+                          'id', ':ids'
                       )
                   )
+                  ->setParameter('ids', array_map('intval', $ids), ArrayParameterType::INTEGER)
                   ->executeStatement();
             }
         }
