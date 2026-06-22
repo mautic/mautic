@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
+use Mautic\LeadBundle\Command\UpdateSegmentsCommand;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Console\Command\Command;
 
@@ -47,7 +47,7 @@ class SegmentStressTest extends MauticMysqlTestCase
         $segmentA   = $this->saveSegment();
         $segmentAId = $segmentA->getId();
         $this->em->clear();
-        $commandTester = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['-i' => $segmentAId]);
+        $commandTester = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['-i' => $segmentAId]);
         self::assertSame(Command::SUCCESS, $commandTester->getStatusCode(), $commandTester->getDisplay());
     }
 

@@ -6,12 +6,15 @@ namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
+use Mautic\LeadBundle\Command\UpdateSegmentsCommand;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,22 +23,22 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Command\Command;
 
-final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
+final class UpdateSegmentsCommandFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    protected $useCleanupRollback = false; // This should be here, because test is changing DDL of the leads table.
+    protected $useCleanupRollback = false;
 
-    public function testFailWhenSegmentDoesNotExist(): void
+    public function testFailWhenLeadSegmentDoesNotExist(): void
     {
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--list-id' => 999999]);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--list-id' => 999999]);
 
         Assert::assertSame(1, $output->getStatusCode());
         Assert::assertStringContainsString('Segment #999999 does not exist', $output->getDisplay());
     }
 
     #[DataProvider('provider')]
-    public function testCommandRebuildingAllSegments(callable $getCommandParams, callable $assert): void
+    public function testCommandRebuildingAllLeadSegments(callable $getCommandParams, callable $assert): void
     {
         $contact = new Lead();
         $contact->setEmail('halusky@bramborak.makovec');
@@ -69,7 +72,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, $getCommandParams($segment));
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, $getCommandParams($segment));
 
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segment->getId());
@@ -200,7 +203,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
@@ -325,7 +328,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
@@ -436,7 +439,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
@@ -544,7 +547,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
@@ -636,7 +639,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
@@ -715,7 +718,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segmentD->getLastBuiltDate());
 
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME);
 
         Assert::assertSame(Command::SUCCESS, $output->getStatusCode());
 
@@ -796,14 +799,11 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
 
-        // Before company segment update, no leads should be in the segment
+        // Before segment update, no leads should be in the segment
         Assert::assertSame(0, $leadListRepository->getLeadCount([$leadSegmentTwo->getId()]));
 
-        // Run company segment update command to add Globo to Company Segment 2
-        $this->testSymfonyCommand('mautic:company-segments:update', ['--bypass-locking' => true]);
-
-        // Run lead segment update command
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
+        // Run unified command - processes company segments first, then lead segments
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--bypass-locking' => true]);
 
         Assert::assertStringContainsString('2 total contact(s) to be added', $output->getDisplay());
 
@@ -848,7 +848,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Run lead segment update command
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--bypass-locking' => true]);
 
         Assert::assertStringContainsString('2 total contact(s) to be added', $output->getDisplay());
 
@@ -899,7 +899,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Run lead segment update command
-        $output = $this->testSymfonyCommand(UpdateLeadListsCommand::NAME, ['--bypass-locking' => true]);
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--bypass-locking' => true]);
 
         Assert::assertStringContainsString('3 total contact(s) to be added', $output->getDisplay());
 
@@ -908,5 +908,334 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         // All 3 leads should be in the segment (they all belong to companies that are in company segments)
         Assert::assertSame(3, $leadListRepository->getLeadCount([$leadSegmentTwo->getId()]));
+    }
+
+    public function testUpdateLeadSegmentsUsingExcludeACompanySegment(): void
+    {
+        $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
+        $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
+
+        $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
+        $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
+        $leadThree = $this->createLead('Mat Doe', emailId: 'leadthree@mautic.com');
+        $leadFour  = $this->createLead('Braw Doe', emailId: 'leadfour@mautic.com');
+
+        $this->createCompanyLead($companyGlobo, $leadOne);
+        $this->createCompanyLead($companyGlobo, $leadTwo);
+        $this->createCompanyLead($companySbt, $leadThree);
+        $this->createCompanyLead($companySbt, $leadFour);
+
+        $totalCompanyLeadsBefore = $this->em->getRepository(CompanyLead::class)->findAll();
+        Assert::assertCount(4, $totalCompanyLeadsBefore);
+
+        $companySegmentOne = $this->createCompanySegment('Test Company Segment 1', 'test_comp_segment');
+        $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
+
+        $resultSegmentCompaniesBefore = $this->em->getRepository(SegmentCompany::class)->findAll();
+        Assert::assertCount(1, $resultSegmentCompaniesBefore);
+
+        $filtersToLeadSegment = [
+            [
+                'glue'       => 'and',
+                'operator'   => '!in',
+                'properties' => [
+                    'filter' => [$companySegmentOne->getId()],
+                ],
+                'field'  => 'company_segments',
+                'type'   => 'company_segments',
+                'object' => 'company_segments',
+            ],
+        ];
+
+        $this->createSegment('test_segment', $filtersToLeadSegment);
+
+        $leadListModel = static::getContainer()->get('mautic.lead.model.list');
+        assert($leadListModel instanceof \Mautic\LeadBundle\Model\ListModel);
+        $leadListTotalBefore = $leadListModel->getListLeadRepository()->findAll();
+        Assert::assertCount(0, $leadListTotalBefore);
+
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--bypass-locking' => true]);
+
+        Assert::assertStringContainsString('2 total contact(s) to be added', $output->getDisplay());
+
+        $leadListTotalAfter = $leadListModel->getListLeadRepository()->findAll();
+        Assert::assertCount(2, $leadListTotalAfter);
+    }
+
+    public function testUpdateCompanySegmentWithCompanySegmentMembershipFilter(): void
+    {
+        $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
+        $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
+        $companyRecord = $this->createCompany('Record', 'contact@record.com');
+
+        $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
+        $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
+        $leadThree = $this->createLead('Mat Doe', emailId: 'leadthree@mautic.com');
+
+        $leadOne->setCompany($companySbt);
+        $leadOne->setPrimaryCompany($companyGlobo);
+
+        $leadTwo->setPrimaryCompany($companyRecord);
+
+        $leadThree->setPrimaryCompany($companyRecord);
+        $leadThree->setCompany($companyGlobo);
+
+        $this->em->persist($leadOne);
+        $this->em->persist($leadTwo);
+        $this->em->persist($leadThree);
+        $this->em->flush();
+
+        $companySegmentOne = $this->createCompanySegment('Test Segment 1', 'test_segment');
+        $this->addCompanyToCompanySegment($companyGlobo, $companySegmentOne);
+        $filters = [
+            'filters' => [
+                'glue'       => 'and',
+                'operator'   => 'in',
+                'properties' => [
+                    'filter' => [$companySegmentOne->getId()],
+                ],
+                'field'  => 'company_segments',
+                'type'   => 'company_segments',
+                'object' => 'company_segments',
+            ],
+        ];
+        $companySegmentTwo            = $this->createCompanySegment('Test Segment 2', 'test_segment2', true, $filters);
+        $resultSegmentCompaniesBefore = $this->em->getRepository(SegmentCompany::class)->findAll();
+
+        Assert::assertCount(1, $resultSegmentCompaniesBefore);
+
+        $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--bypass-locking' => true]);
+
+        $resultSegmentCompaniesAfter = $this->em->getRepository(SegmentCompany::class)->findAll();
+        Assert::assertCount(2, $resultSegmentCompaniesAfter);
+        Assert::assertEquals($resultSegmentCompaniesAfter[0]->getCompany()->getId(), $resultSegmentCompaniesAfter[1]->getCompany()->getId());
+        Assert::assertEquals($resultSegmentCompaniesAfter[1]->getCompanySegment()->getId(), $companySegmentTwo->getId());
+    }
+
+    public function testUpdateCompanySegmentsWithLeadListFilter(): void
+    {
+        $companyWithLeadWithoutSegment = $this->createCompany('noleadsegment', 'contact@globo.com');
+        $companyWithLeadWithSegment1   = $this->createCompany('leadsegment1', 'contact@sbt.com');
+        $companyWithLeadWithSegment2   = $this->createCompany('leadsegment2', 'contact@record.com');
+        $companyWithoutLead            = $this->createCompany('companywithoutlead', 'companywithout@lead.com');
+
+        $contactWithoutSegment = $this->createLead('Nosegment', emailId: 'leadone@mautic.com');
+        $contactWithSegment1   = $this->createLead('Segment1', emailId: 'leadtwo@mautic.com');
+        $contactWithSegment2   = $this->createLead('Segment2', emailId: 'leadthree@mautic.com');
+
+        $leadSegment1 = $this->createSegment('segment_1', []);
+        $leadSegment2 = $this->createSegment('segment_2', []);
+
+        $this->addLeadToSegment($contactWithSegment1, $leadSegment1);
+        $this->addLeadToSegment($contactWithSegment2, $leadSegment2);
+
+        $this->createCompanyLead($companyWithLeadWithoutSegment, $contactWithoutSegment);
+        $this->createCompanyLead($companyWithLeadWithSegment1, $contactWithSegment1);
+        $this->createCompanyLead($companyWithLeadWithSegment2, $contactWithSegment2);
+
+        $this->em->flush();
+
+        $filterSegment1 = [
+            'filters' => [
+                'glue'       => 'and',
+                'operator'   => 'in',
+                'properties' => [
+                    'filter' => [$leadSegment1->getId()],
+                ],
+                'field'  => 'contactsegmentmembership',
+                'type'   => 'leadlist',
+                'object' => 'any_companycontact',
+            ],
+        ];
+        $filterSegment2 = [
+            'filters' => [
+                'glue'       => 'and',
+                'operator'   => 'in',
+                'properties' => [
+                    'filter' => [$leadSegment2->getId()],
+                ],
+                'field'  => 'contactsegmentmembership',
+                'type'   => 'leadlist',
+                'object' => 'any_companycontact',
+            ],
+        ];
+        $filterEmptySegment = [
+            'filters' => [
+                'glue'       => 'and',
+                'operator'   => 'empty',
+                'properties' => [
+                    'filter' => null,
+                ],
+                'field'  => 'contactsegmentmembership',
+                'type'   => 'leadlist',
+                'object' => 'any_companycontact',
+            ],
+        ];
+        $filterNotEmptySegment = [
+            'filters' => [
+                'glue'       => 'and',
+                'operator'   => '!empty',
+                'properties' => [
+                    'filter' => null,
+                ],
+                'field'  => 'contactsegmentmembership',
+                'type'   => 'leadlist',
+                'object' => 'any_companycontact',
+            ],
+        ];
+        $companySegmentLeadList1        = $this->createCompanySegment('Lead List 1 Segment Filter', 'lead_list_1_segment_filter', true, $filterSegment1);
+        $companySegmentLeadList2        = $this->createCompanySegment('Lead List 2 Segment Filter', 'lead_list_2_segment_filter', true, $filterSegment2);
+        $companySegmentEmptyLeadList    = $this->createCompanySegment('Empty Lead Segments', 'empty_lead_segments', true, $filterEmptySegment);
+        $companySegmentNotEmptyLeadList = $this->createCompanySegment('Not Empty Lead Segments', 'not_empty_lead_segments', true, $filterNotEmptySegment);
+
+        $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, ['--bypass-locking' => true]);
+
+        $companiesInSegment1 = $this->em->getRepository(SegmentCompany::class)
+            ->findBy(['companySegment' => $companySegmentLeadList1]);
+        Assert::assertCount(1, $companiesInSegment1);
+        Assert::assertEquals('leadsegment1', $companiesInSegment1[0]->getCompany()->getName());
+
+        $companiesInSegment2 = $this->em->getRepository(SegmentCompany::class)
+            ->findBy(['companySegment' => $companySegmentLeadList2]);
+        Assert::assertCount(1, $companiesInSegment2);
+        Assert::assertEquals('leadsegment2', $companiesInSegment2[0]->getCompany()->getName());
+
+        $companiesInEmptySegment = $this->em->getRepository(SegmentCompany::class)
+            ->findBy(['companySegment' => $companySegmentEmptyLeadList]);
+        $companyNames = array_map(fn ($cs) => $cs->getCompany()->getName(), $companiesInEmptySegment);
+        Assert::assertCount(2, $companiesInEmptySegment);
+        Assert::assertContains('noleadsegment', $companyNames);
+        Assert::assertContains('companywithoutlead', $companyNames);
+
+        $companiesInNotEmptySegment = $this->em->getRepository(SegmentCompany::class)
+            ->findBy(['companySegment' => $companySegmentNotEmptyLeadList]);
+        Assert::assertCount(2, $companiesInNotEmptySegment);
+        $companyNames = array_map(fn ($cs) => $cs->getCompany()->getName(), $companiesInNotEmptySegment);
+        Assert::assertContains('leadsegment1', $companyNames);
+        Assert::assertContains('leadsegment2', $companyNames);
+    }
+
+    #[DataProvider('provideSegmentRebuildScenarios')]
+    public function testSegmentRebuildScope(?string $useOption, bool $expectLeadRebuilt, bool $expectCompanyRebuilt): void
+    {
+        $contact = $this->createLead('Test', emailId: 'test@test.com');
+
+        $leadSegment = $this->createSegment('lead-seg', [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => 'test@test.com',
+                'display'  => null,
+                'operator' => 'eq',
+            ],
+        ]);
+
+        $company = $this->createCompany('TestCo', 'co@test.com');
+        $this->createCompanyLead($company, $contact);
+
+        $companySegment = $this->createCompanySegment('Company Seg', 'company-seg', true, [
+            [
+                'glue'     => 'and',
+                'operator' => '!empty',
+                'field'    => 'companyemail',
+                'type'     => 'email',
+                'object'   => 'company',
+            ],
+        ]);
+
+        $this->em->flush();
+
+        $commandOptions = ['--bypass-locking' => true];
+
+        if ('list-id' === $useOption) {
+            $commandOptions['--list-id'] = $leadSegment->getId();
+        } elseif ('companysegment-id' === $useOption) {
+            $commandOptions['--companysegment-id'] = $companySegment->getId();
+        }
+
+        $output  = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, $commandOptions);
+        $display = $output->getDisplay();
+
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+        $leadCount          = $leadListRepository->getLeadCount([$leadSegment->getId()]);
+        $companiesInSegment = $this->em->getRepository(SegmentCompany::class)
+            ->findBy(['companySegment' => $companySegment]);
+
+        if ($expectLeadRebuilt) {
+            Assert::assertSame(1, $leadCount);
+            Assert::assertStringContainsString('1 total contact(s) to be added', $display);
+        } else {
+            Assert::assertSame(0, $leadCount);
+        }
+
+        if ($expectCompanyRebuilt) {
+            Assert::assertCount(1, $companiesInSegment);
+            Assert::assertStringContainsString('Rebuilding company segments', $display);
+        } else {
+            Assert::assertCount(0, $companiesInSegment);
+            Assert::assertStringNotContainsString('Rebuilding company segments', $display);
+        }
+    }
+
+    public static function provideSegmentRebuildScenarios(): \Generator
+    {
+        yield 'only lead segment with --list-id' => ['useOption' => 'list-id', 'expectLeadRebuilt' => true, 'expectCompanyRebuilt' => false];
+        yield 'only company segment with --companysegment-id' => ['useOption' => 'companysegment-id', 'expectLeadRebuilt' => false, 'expectCompanyRebuilt' => true];
+        yield 'both segment types without id specification' => ['useOption' => null, 'expectLeadRebuilt' => true, 'expectCompanyRebuilt' => true];
+    }
+
+    public function testExcludeCompanySegmentIdSkipsExcludedSegment(): void
+    {
+        $this->createCompany('Company1', 'c1@test.com');
+        $this->createCompany('Company2', 'c2@test.com');
+
+        $companyEmailFilter = [
+            [
+                'glue'     => 'and',
+                'operator' => '!empty',
+                'field'    => 'companyemail',
+                'type'     => 'email',
+                'object'   => 'company',
+            ],
+        ];
+
+        $companySegment1 = $this->createCompanySegment('Segment 1', 'seg-1', true, $companyEmailFilter);
+        $companySegment2 = $this->createCompanySegment('Segment 2', 'seg-2', true, $companyEmailFilter);
+
+        $this->em->flush();
+
+        $output = $this->testSymfonyCommand(UpdateSegmentsCommand::NAME, [
+            '--exclude-companysegment-id' => [$companySegment1->getId()],
+            '--bypass-locking'            => true,
+        ]);
+
+        $display = $output->getDisplay();
+
+        // Segment 2 was rebuilt
+        Assert::assertStringContainsString(
+            sprintf('Rebuilding company segments for segment %d', $companySegment2->getId()),
+            $display
+        );
+
+        // Segment 1 was excluded
+        Assert::assertStringNotContainsString(
+            sprintf('Rebuilding company segments for segment %d', $companySegment1->getId()),
+            $display
+        );
+    }
+
+    private function addLeadToSegment(Lead $lead, LeadList $segment): void
+    {
+        $listLead = new ListLead();
+        $listLead->setLead($lead);
+        $listLead->setList($segment);
+        $listLead->setDateAdded(new \DateTime());
+        $listLead->setManuallyAdded(true);
+        $listLead->setManuallyRemoved(false);
+        $this->em->persist($listLead);
+        $this->em->flush();
     }
 }
