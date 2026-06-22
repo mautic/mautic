@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
@@ -146,8 +147,9 @@ class RoleRepository extends CommonRepository
         }
 
         $q->where(
-            $q->expr()->in('u.role_id', $roleIds)
+            $q->expr()->in('u.role_id', ':ids')
         )
+            ->setParameter('ids', $roleIds, ArrayParameterType::INTEGER)
             ->groupBy('u.role_id');
 
         $result = $q->executeQuery()->fetchAllAssociative();

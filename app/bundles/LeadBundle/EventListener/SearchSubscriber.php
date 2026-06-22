@@ -8,6 +8,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
+use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\EmailBundle\Entity\Email;
@@ -23,6 +24,7 @@ use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
+    use QueryBuilderManipulatorTrait;
     private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
 
     public function __construct(
@@ -227,11 +229,9 @@ class SearchSubscriber implements EventSubscriberInterface
             }
 
             $nq->select('l.id'); // select only id
-            $nsql = $nq->getSQL();
-            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
-            }
-            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
+            $query = $q->expr()->in('l.id', $nq->getSQL());
+
+            $this->copyParams($nq, $q);
             $event->setSubQuery($query);
 
             return;

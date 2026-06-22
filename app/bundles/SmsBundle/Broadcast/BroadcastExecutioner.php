@@ -43,7 +43,6 @@ class BroadcastExecutioner
     }
 
     /**
-     * @throws LimitQuotaException
      * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
      */
     private function send(Sms $sms): void

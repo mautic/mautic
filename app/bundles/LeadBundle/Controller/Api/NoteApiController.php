@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -45,8 +46,10 @@ class NoteApiController extends CommonApiController
     }
 
     /**
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param string                         $action
+     * @param LeadNote             &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
