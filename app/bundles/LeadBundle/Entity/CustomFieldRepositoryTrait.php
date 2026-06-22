@@ -436,7 +436,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something to the entity prior to persisting.
      */
-    protected function preSaveEntity($entity)
+    protected function preSaveEntity(object $entity): void
     {
         // Inherit and use if required
     }

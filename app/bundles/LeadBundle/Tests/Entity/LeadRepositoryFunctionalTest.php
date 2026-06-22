@@ -110,6 +110,47 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param mixed[] $contactIds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetContacts')]
+    public function testGetContacts(array $contactIds, bool $includeLead, int $expectedCount): void
+    {
+        if ($includeLead) {
+            $contactIds[] = $this->lead->getId();
+        }
+
+        /** @var LeadRepository $repo */
+        $repo     = $this->em->getRepository(Lead::class);
+        $contacts = $repo->getContacts($contactIds);
+
+        $this->assertCount($expectedCount, $contacts);
+    }
+
+    /**
+     * @return iterable<string, mixed>
+     */
+    public static function dataForGetContacts(): iterable
+    {
+        yield 'No ids' => [
+            [],
+            false,
+            0,
+        ];
+
+        yield 'Random ids only' => [
+            [99999, 0],
+            false,
+            0,
+        ];
+
+        yield 'Random ids with lead' => [
+            [99999],
+            true,
+            1,
+        ];
+    }
+
+    /**
      * @param string[]|string $emails
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestAjaxGetLeadsByFieldValue')]

@@ -43,30 +43,6 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
-			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:preSaveEntity\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
-
-		-
-			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
-
-		-
-			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
-
-		-
-			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ApiBundle/Controller/CommonApiController.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Controller\\CommonApiController\:\:processBatchForm\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -982,12 +958,6 @@ parameters:
 			path: app/bundles/AssetBundle/Model/AssetModel.php
 
 		-
-			message: '#^PHPDoc tag @throws with type Mautic\\AssetBundle\\Model\\NotFoundHttpException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: app/bundles/AssetBundle/Model/AssetModel.php
-
-		-
 			message: '#^Parameter \#2 \$dateFrom of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string given\.$#'
 			identifier: argument.type
 			count: 1
@@ -1143,18 +1113,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:modifyCampaignEventArray\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
@@ -2863,20 +2821,8 @@ parameters:
 			path: app/bundles/CampaignBundle/EventListener/ConfigSubscriber.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\CampaignBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/CampaignBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Property Mautic\\CampaignBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CampaignBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\CampaignBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/CampaignBundle/EventListener/DashboardSubscriber.php
 
@@ -7030,7 +6976,7 @@ parameters:
 			path: app/bundles/CoreBundle/Event/TokenReplacementEvent.php
 
 		-
-			message: '#^PHPDoc type Mautic\\CoreBundle\\Entity\\CommonEntity\|string of property Mautic\\CoreBundle\\Event\\TokenReplacementEvent\:\:\$entity is not covariant with PHPDoc type object of overridden property Mautic\\CoreBundle\\Event\\CommonEvent\:\:\$entity\.$#'
+			message: '#^PHPDoc type Mautic\\CoreBundle\\Entity\\CommonEntity\|string\|null of property Mautic\\CoreBundle\\Event\\TokenReplacementEvent\:\:\$entity is not covariant with PHPDoc type object of overridden property Mautic\\CoreBundle\\Event\\CommonEvent\:\:\$entity\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: app/bundles/CoreBundle/Event/TokenReplacementEvent.php
@@ -7114,20 +7060,8 @@ parameters:
 			path: app/bundles/CoreBundle/EventListener/CoreSubscriber.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\CoreBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/CoreBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Parameter \#2 \$id of method Mautic\\CoreBundle\\Model\\AuditLogModel\:\:getLogForObject\(\) expects int\|string, null given\.$#'
 			identifier: argument.type
-			count: 1
-			path: app/bundles/CoreBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/CoreBundle/EventListener/DashboardSubscriber.php
 
@@ -8120,12 +8054,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Helper/FileHelper.php
-
-		-
-			message: '#^PHPDoc tag @throws with type Mautic\\CoreBundle\\Helper\\Exception\\IOException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Filesystem.php
 
 		-
 			message: '#^Left side of && is always false\.$#'
@@ -11626,28 +11554,10 @@ parameters:
 			path: app/bundles/EmailBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\EmailBundle\\EventListener\\DashboardBestHoursSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/DashboardBestHoursSubscriber.php
-
-		-
 			message: '#^Property Mautic\\EmailBundle\\EventListener\\DashboardBestHoursSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/EmailBundle/EventListener/DashboardBestHoursSubscriber.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\EventListener\\DashboardBestHoursSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/DashboardBestHoursSubscriber.php
-
-		-
-			message: '#^PHPDoc type string of property Mautic\\EmailBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/DashboardSubscriber.php
 
 		-
 			message: '#^Parameter \#1 \$limit of method Mautic\\EmailBundle\\Model\\EmailModel\:\:getUpcomingEmails\(\) expects int, float given\.$#'
@@ -11658,12 +11568,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\EmailBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\EmailBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/EmailBundle/EventListener/DashboardSubscriber.php
 
@@ -13969,30 +13873,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
 
 		-
-			message: '#^Method Mautic\\FormBundle\\Controller\\Api\\FormApiController\:\:preSaveEntity\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Controller\\Api\\FormApiController\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Controller\\Api\\FormApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Controller\\Api\\FormApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/FormBundle/Controller/Api/FormApiController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -14785,12 +14665,6 @@ parameters:
 			path: app/bundles/FormBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\FormBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmissionReferrers\(\) expects array, bool given\.$#'
 			identifier: argument.type
 			count: 1
@@ -14811,12 +14685,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\FormBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\FormBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
 
@@ -16579,30 +16447,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/NotificationDAO.php
 
 		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\ObjectChangeDAO\:\:getChangedFields\(\) should return array\<Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\> but returns Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/ObjectChangeDAO.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\ObjectChangeDAO\:\:getRequiredFields\(\) should return array\<Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\> but returns Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/ObjectChangeDAO.php
-
-		-
-			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\ObjectChangeDAO\:\:getUnchangedFields\(\) should return array\<Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\> but returns Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/ObjectChangeDAO.php
-
-		-
-			message: '#^Property Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\ObjectChangeDAO\:\:\$fieldsByState \(array\<Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\FieldDAO\>\) does not accept default value of type array\<string, array\>\.$#'
-			identifier: property.defaultValue
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/DAO/Sync/Order/ObjectChangeDAO.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\DAO\\Sync\\Order\\OrderDAO\:\:__construct\(\) has parameter \$options with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -17182,18 +17026,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:checkAllAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -17236,32 +17068,8 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\FieldApiController\:\:getWhereFromRequest\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\FieldApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\FieldApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/FieldApiController.php
 
@@ -17518,18 +17326,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:preSaveEntity\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:removeDncAction\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -17544,12 +17340,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:sanitizeEventFilter\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
-
-		-
-			message: '#^PHPDoc tag @throws with type Mautic\\LeadBundle\\Controller\\InvalidArgumentException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/LeadApiController.php
 
@@ -17651,18 +17441,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\NoteApiController\:\:checkLeadAccess\(\) has parameter \$leadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\NoteApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\NoteApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
@@ -18021,12 +17799,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\CompanyController\:\:viewAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/CompanyController.php
-
-		-
-			message: '#^PHPDoc tag @throws with type Mautic\\LeadBundle\\Controller\\InvalidArgumentException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: app/bundles/LeadBundle/Controller/CompanyController.php
 
@@ -18423,12 +18195,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\LeadController\:\:viewAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^PHPDoc tag @throws with type Mautic\\LeadBundle\\Controller\\InvalidArgumentException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
@@ -18918,12 +18684,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\TimelineController\:\:sanitizeEventFilter\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/TimelineController.php
-
-		-
-			message: '#^PHPDoc tag @throws with type Mautic\\LeadBundle\\Controller\\InvalidArgumentException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: app/bundles/LeadBundle/Controller/TimelineController.php
 
@@ -19439,18 +19199,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:postSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:preSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
@@ -20857,18 +20605,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:preSaveEntity\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:prepareDbalFieldsForSave\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -21722,12 +21458,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\LeadBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Parameter \#3 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getAnonymousVsIdentifiedPieChartData\(\) expects array, bool given\.$#'
 			identifier: argument.type
 			count: 1
@@ -21742,12 +21472,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\LeadBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\LeadBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
@@ -26117,20 +25841,8 @@ parameters:
 			path: app/bundles/PageBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\PageBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/PageBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Property Mautic\\PageBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PageBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\PageBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/PageBundle/EventListener/DashboardSubscriber.php
 
@@ -28760,48 +28472,6 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:createTriggerEventEntityForm\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:getPointTriggerEventTypesAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:preSaveEntity\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\TriggerApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
-			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/TriggerApiController.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Controller\\PointController\:\:cloneAction\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -29174,20 +28844,8 @@ parameters:
 			path: app/bundles/PointBundle/Event/TriggerBuilderEvent.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\PointBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/PointBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Property Mautic\\PointBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PointBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\PointBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/PointBundle/EventListener/DashboardSubscriber.php
 
@@ -29864,20 +29522,8 @@ parameters:
 			path: app/bundles/ReportBundle/Event/ReportQueryEvent.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\ReportBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/ReportBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Property Mautic\\ReportBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/ReportBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\ReportBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\<string, string\>\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/ReportBundle/EventListener/DashboardSubscriber.php
 
@@ -30932,20 +30578,8 @@ parameters:
 			path: app/bundles/StageBundle/Event/StageBuilderEvent.php
 
 		-
-			message: '#^PHPDoc type string of property Mautic\\StageBundle\\EventListener\\DashboardSubscriber\:\:\$types is not covariant with PHPDoc type array of overridden property Mautic\\DashboardBundle\\EventListener\\DashboardSubscriber\:\:\$types\.$#'
-			identifier: property.phpDocType
-			count: 1
-			path: app/bundles/StageBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Property Mautic\\StageBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/StageBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Property Mautic\\StageBundle\\EventListener\\DashboardSubscriber\:\:\$types \(string\) does not accept default value of type array\<string, array\>\.$#'
-			identifier: property.defaultValue
 			count: 1
 			path: app/bundles/StageBundle/EventListener/DashboardSubscriber.php
 
@@ -31182,42 +30816,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/StatsBundle/Event/Options/FetchOptions.php
-
-		-
-			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\RoleApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/RoleApiController.php
-
-		-
-			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\RoleApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/RoleApiController.php
-
-		-
-			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:preSaveEntity\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
-
-		-
-			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
-
-		-
-			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
-
-		-
-			message: '#^Method Mautic\\UserBundle\\Controller\\Api\\UserApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/UserBundle/Controller/Api/UserApiController.php
 
 		-
 			message: '''
@@ -31684,30 +31282,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:getTriggersAction\(\) has no return type specified\.$#'
 			identifier: missingType.return
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:preSaveEntity\(\) has parameter \$action with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:preSaveEntity\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:preSaveEntity\(\) has parameter \$form with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
-
-		-
-			message: '#^Method Mautic\\WebhookBundle\\Controller\\Api\\WebhookApiController\:\:preSaveEntity\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/WebhookBundle/Controller/Api/WebhookApiController.php
 
@@ -37067,12 +36641,6 @@ parameters:
 			path: plugins/MauticFocusBundle/Model/FocusModel.php
 
 		-
-			message: '#^PHPDoc tag @throws with type MauticPlugin\\MauticFocusBundle\\Model\\NotFoundHttpException is not subtype of Throwable$#'
-			identifier: throws.notThrowable
-			count: 1
-			path: plugins/MauticFocusBundle/Model/FocusModel.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFocusBundle\\Security\\Permissions\\FocusPermissions\:\:__construct\(\) has parameter \$params with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -37309,12 +36877,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Services\\FullContact_Batch\:\:sendRequests\(\) has parameter \$requests with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticFullContactBundle/Services/FullContact_Batch.php
-
-		-
-			message: '#^PHPDoc tag @throws with type MauticPlugin\\MauticFullContactBundle\\Exception\\FullContact_Exception_NoCredit\|MauticPlugin\\MauticFullContactBundle\\Exception\\FullContact_Exception_NotImplemented is not subtype of Throwable$#'
-			identifier: throws.notThrowable
 			count: 1
 			path: plugins/MauticFullContactBundle/Services/FullContact_Batch.php
 
