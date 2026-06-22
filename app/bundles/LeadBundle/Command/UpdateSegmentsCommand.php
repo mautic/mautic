@@ -61,8 +61,7 @@ class UpdateSegmentsCommand extends ModeratedCommand
                 '--max-companies',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Set max number of companies to process per company segment for this script execution. Defaults to all.',
-                null
+                'Set max number of companies to process per company segment for this script execution. Defaults to all.'
             )
             ->addOption(
                 '--list-id',
@@ -75,8 +74,7 @@ class UpdateSegmentsCommand extends ModeratedCommand
                 'companysegment-id',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Specific company segment ID to rebuild. Defaults to all.',
-                null
+                'Specific company segment ID to rebuild. Defaults to all.'
             )
             ->addOption(
                 '--timing',

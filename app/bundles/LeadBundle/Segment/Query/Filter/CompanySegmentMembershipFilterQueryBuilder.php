@@ -28,13 +28,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder implements EventSubscriberInterface
 {
-    public function __construct(
-        RandomParameterName $randomParameterNameService,
-        EventDispatcherInterface $dispatcher,
-    ) {
-        parent::__construct($randomParameterNameService, $dispatcher);
-    }
-
     public static function getServiceId(): string
     {
         return self::class;

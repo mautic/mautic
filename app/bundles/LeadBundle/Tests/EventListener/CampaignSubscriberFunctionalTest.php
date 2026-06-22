@@ -1305,7 +1305,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->addContactToCampaign($campaign, $joe);
         $this->addContactToCampaign($campaign, $mary);
 
-        $action = $this->createCampaignAction(
+        $this->createCampaignAction(
             campaign: $campaign,
             name: 'Modify Company Segments',
             type: 'lead.changecompanysegments',

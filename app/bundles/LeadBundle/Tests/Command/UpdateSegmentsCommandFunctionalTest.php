@@ -735,7 +735,7 @@ final class UpdateSegmentsCommandFunctionalTest extends MauticMysqlTestCase
     {
         $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
         $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
-        $companyRecord = $this->createCompany('Record', 'contact@record.com');
+        $this->createCompany('Record', 'contact@record.com');
 
         $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
         $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
@@ -815,7 +815,7 @@ final class UpdateSegmentsCommandFunctionalTest extends MauticMysqlTestCase
     {
         $companyGlobo  = $this->createCompany('Globo', 'contact@globo.com');
         $companySbt    = $this->createCompany('SBT', 'contact@sbt.com');
-        $companyRecord = $this->createCompany('Record', 'contact@record.com');
+        $this->createCompany('Record', 'contact@record.com');
 
         $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
         $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
@@ -866,7 +866,7 @@ final class UpdateSegmentsCommandFunctionalTest extends MauticMysqlTestCase
         $companyRecord = $this->createCompany('Record', 'contact@record.com');
 
         $leadOne   = $this->createLead('John Globo Doe', emailId: 'leadone@mautic.com');
-        $leadTwo   = $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
+        $this->createLead('Brian Doe', emailId: 'leadtwo@mautic.com');
         $leadThree = $this->createLead('Mat Doe', emailId: 'leadthree@mautic.com');
         $leadFour  = $this->createLead('Braw Doe', emailId: 'leadfour@mautic.com');
 
@@ -1017,7 +1017,7 @@ final class UpdateSegmentsCommandFunctionalTest extends MauticMysqlTestCase
         $companyWithLeadWithoutSegment = $this->createCompany('noleadsegment', 'contact@globo.com');
         $companyWithLeadWithSegment1   = $this->createCompany('leadsegment1', 'contact@sbt.com');
         $companyWithLeadWithSegment2   = $this->createCompany('leadsegment2', 'contact@record.com');
-        $companyWithoutLead            = $this->createCompany('companywithoutlead', 'companywithout@lead.com');
+        $this->createCompany('companywithoutlead', 'companywithout@lead.com');
 
         $contactWithoutSegment = $this->createLead('Nosegment', emailId: 'leadone@mautic.com');
         $contactWithSegment1   = $this->createLead('Segment1', emailId: 'leadtwo@mautic.com');

@@ -332,7 +332,7 @@ class CompanySegmentControllerTest extends MauticMysqlTestCase
             ],
         ]);
 
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
         $this->assertResponseIsSuccessful('Clone form submission should succeed.');
 
         // Verify new segment was created in database

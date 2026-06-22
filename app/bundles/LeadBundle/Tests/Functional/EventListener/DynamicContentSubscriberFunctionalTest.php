@@ -51,7 +51,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('VIP Content', $response->getContent());
     }
 
@@ -87,7 +87,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('VIP Content', $response->getContent());
     }
 
@@ -124,7 +124,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Non-VIP Content', $response->getContent());
     }
 
@@ -156,7 +156,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('No Company Segment Content', $response->getContent());
     }
 
@@ -193,7 +193,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('No Company Segment Content', $response->getContent());
     }
 
@@ -231,7 +231,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Has Company Segment Content', $response->getContent());
     }
 
@@ -262,7 +262,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringNotContainsString('Has Company Segment Content', $response->getContent());
     }
 
@@ -301,7 +301,7 @@ class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s?contactId=%d', $page->getAlias(), $lead->getId()));
 
         $response = $this->client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Premium Content', $response->getContent());
     }
 

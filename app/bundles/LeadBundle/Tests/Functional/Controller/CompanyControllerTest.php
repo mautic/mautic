@@ -58,7 +58,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $crawler = $this->client->request('GET', '/s/companies?search=companysegment:non-existent-segment');
+        $this->client->request('GET', '/s/companies?search=companysegment:non-existent-segment');
         $this->assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();

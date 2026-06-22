@@ -582,7 +582,7 @@ class CompanySegmentModel extends FormModel
                     $processedCompanies[] = $company;
 
                     ++$companiesProcessed;
-                    if (null !== $output && $companiesProcessed < $maxCount && isset($progress)) {
+                    if (null !== $output && $companiesProcessed < $maxCount) {
                         $progress->setProgress($companiesProcessed);
                     }
 
@@ -669,7 +669,7 @@ class CompanySegmentModel extends FormModel
                     $this->removeCompany($company, [$companySegment]);
                     $processedCompanies[] = $company;
                     ++$companiesProcessed;
-                    if (null !== $output && isset($progress) && $companiesProcessed < $maxCount) {
+                    if (null !== $output && $companiesProcessed < $maxCount) {
                         $progress->setProgress($companiesProcessed);
                     }
 
@@ -691,7 +691,7 @@ class CompanySegmentModel extends FormModel
                 gc_collect_cycles();
 
                 if ($max > 0 && $companiesProcessed >= $max) {
-                    if (null !== $output && isset($progress)) {
+                    if (null !== $output) {
                         $progress->finish();
                         $output->writeln('');
                     }
@@ -700,7 +700,7 @@ class CompanySegmentModel extends FormModel
                 }
             }
 
-            if (null !== $output && isset($progress)) {
+            if (null !== $output) {
                 $progress->finish();
                 $output->writeln('');
             }
