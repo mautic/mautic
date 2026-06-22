@@ -126,7 +126,8 @@ class ExceptionListener extends ErrorListener
             // Using a subclass name (e.g. \TypeError) here would throw
             // "Property X::$previous does not exist" because private props
             // are not visible through a subclass reflection.
-            $prev = new \ReflectionProperty($wrapper instanceof \Error ? \Error::class : \Exception::class, 'previous');
+            $previousDeclaringClass = $wrapper instanceof \Error ? \Error::class : \Exception::class;
+            $prev                   = new \ReflectionProperty($previousDeclaringClass, 'previous');
             $prev->setValue($wrapper, $exception);
 
             throw $e;
