@@ -23,6 +23,14 @@ return [
                 'path'       => '/points/groups/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\GroupController::executeAction',
             ],
+            'mautic_point.insight_index' => [
+                'path'       => '/points/insights/{page}',
+                'controller' => 'Mautic\PointBundle\Controller\InsightController::indexAction',
+            ],
+            'mautic_point.insight_action' => [
+                'path'       => '/points/insights/{objectAction}/{objectId}',
+                'controller' => 'Mautic\PointBundle\Controller\InsightController::executeAction',
+            ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
                 'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
@@ -82,6 +90,12 @@ return [
                 'controller' => 'Mautic\PointBundle\Controller\Api\PointGroupsApiController::adjustGroupPointsAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_pointinsightsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'insights',
+                'path'            => '/points/insights',
+                'controller'      => Mautic\PointBundle\Controller\Api\PointInsightApiController::class,
+            ],
         ],
     ],
 
@@ -104,6 +118,10 @@ return [
                     'mautic.point.group.menu.index' => [
                         'route'  => 'mautic_point.group_index',
                         'access' => 'point:groups:view',
+                    ],
+                    'mautic.point.insights.menu' => [
+                        'route'  => 'mautic_point.insight_index',
+                        'access' => 'point:insights:view',
                     ],
                 ],
             ],

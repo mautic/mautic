@@ -45,15 +45,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
 class RestrictionHelperTest extends TypeTestCase
 {
-    /**
-     * @var string
-     */
-    private $displayMode = RestrictionHelper::MODE_REMOVE;
+    private string $displayMode = RestrictionHelper::MODE_REMOVE;
 
-    /**
-     * @var array
-     */
-    private $restrictedFields = [
+    /** @var array<string, mixed> */
+    private array $restrictedFields = [
         'monitored_email' => [
             'EmailBundle_bounces',
             'EmailBundle_unsubscribes' => [
@@ -62,7 +57,8 @@ class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    private $forms = [
+    /** @var array<string, array<string, mixed>> */
+    private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
             'formAlias'  => 'emailconfig',
@@ -199,10 +195,8 @@ class RestrictionHelperTest extends TypeTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    protected function getExtensions()
+    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    protected function getExtensions(): array
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('trans')

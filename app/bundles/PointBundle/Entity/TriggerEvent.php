@@ -164,7 +164,7 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getChanges()
     {
@@ -172,7 +172,7 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -234,7 +234,7 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return Trigger
+     * @return Trigger|null
      */
     public function getTrigger()
     {
@@ -255,7 +255,7 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -281,7 +281,7 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -302,7 +302,7 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {

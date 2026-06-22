@@ -69,7 +69,7 @@ class UserToken
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getUser()
     {
@@ -89,7 +89,7 @@ class UserToken
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAuthorizator()
     {
@@ -109,7 +109,7 @@ class UserToken
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSecret()
     {

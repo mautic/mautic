@@ -811,6 +811,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString($expectedDetailMessage2, $allDetails);
     }
 
+    /** @param array<int, array<string, mixed>> $filters */
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();

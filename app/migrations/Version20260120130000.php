@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
-final class Version20260120130000 extends AbstractMigration
+final class Version20260120130000 extends AbstractMauticMigration
 {
     public function getDescription(): string
     {

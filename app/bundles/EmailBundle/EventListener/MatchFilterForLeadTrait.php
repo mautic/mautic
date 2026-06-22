@@ -9,6 +9,10 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait MatchFilterForLeadTrait
 {
+    /**
+     * @param array<int, array<string, mixed>> $filter
+     * @param array<string, mixed>             $lead
+     */
     protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {

@@ -415,7 +415,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getNonActionPathTaken()
     {
@@ -435,7 +435,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @return mixed[]|null
+     * @return mixed[]
      */
     public function getMetadata()
     {
@@ -505,7 +505,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getRotation()
     {

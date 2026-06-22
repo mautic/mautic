@@ -22,10 +22,7 @@ class TweetStat
      */
     private $twitterTweetId;
 
-    /**
-     * @var Tweet|null
-     */
-    private $tweet;
+    private ?Tweet $tweet = null;
 
     /**
      * @var TheLead|null
@@ -196,17 +193,11 @@ class TweetStat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Tweet
-     */
-    public function getTweet()
+    public function getTweet(): ?Tweet
     {
         return $this->tweet;
     }
 
-    /**
-     * @param mixed $tweet
-     */
     public function setTweet(?Tweet $tweet = null): void
     {
         $this->tweet = $tweet;
@@ -220,9 +211,6 @@ class TweetStat
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
     public function setLead(?TheLead $lead = null): void
     {
         $this->lead = $lead;

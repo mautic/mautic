@@ -90,6 +90,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return static::getContainer()->get('kernel')->getLocalConfigFile();
     }
 
+    /** @return array<string, mixed> */
     private function getConfigParameters(): array
     {
         $parameters = [];
@@ -155,7 +156,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form           = $buttonCrawler->form();
 
         // Fetch available option for 404_page field
-        $availableOptions = $form['config[coreconfig][404_page]']->availableOptionValues();
+        $notFoundPageField = $form['config[coreconfig][404_page]'];
+        Assert::assertInstanceOf(ChoiceFormField::class, $notFoundPageField);
+        $availableOptions = $notFoundPageField->availableOptionValues();
 
         // page 2 should not be available in option list because it is unpublished
         $this->assertEquals(['', $page1, $page3], $availableOptions);

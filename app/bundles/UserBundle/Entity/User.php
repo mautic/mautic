@@ -136,10 +136,10 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     private $activePermissions;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     #[Groups(['user:read', 'user:write'])]
-    private $preferences = [];
+    private array $preferences = [];
 
     /**
      * @var string|null
@@ -543,7 +543,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get firstName.
      *
-     * @return string
+     * @return string|null
      */
     public function getFirstName()
     {
@@ -568,7 +568,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get lastName.
      *
-     * @return string
+     * @return string|null
      */
     public function getLastName()
     {
@@ -603,7 +603,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get email.
      *
-     * @return string
+     * @return string|null
      */
     public function getEmail()
     {
@@ -626,7 +626,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get role.
      *
-     * @return Role
+     * @return Role|null
      */
     public function getRole()
     {
@@ -673,7 +673,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get position.
      *
-     * @return string
+     * @return string|null
      */
     public function getPosition()
     {
@@ -698,7 +698,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get timezone.
      *
-     * @return string
+     * @return string|null
      */
     public function getTimezone()
     {
@@ -719,7 +719,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get locale.
      *
-     * @return string
+     * @return string|null
      */
     public function getLocale()
     {
@@ -741,7 +741,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastLogin()
     {
@@ -760,7 +760,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getLastActive()
     {
@@ -779,15 +779,15 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * @return mixed
+     * @return mixed[]
      */
-    public function getPreferences()
+    public function getPreferences(): array
     {
         return $this->preferences;
     }
 
     /**
-     * @param mixed $preferences
+     * @param mixed[] $preferences
      */
     public function setPreferences(array $preferences): void
     {
@@ -812,7 +812,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Get signature.
      *
-     * @return string
+     * @return string|null
      */
     public function getSignature()
     {

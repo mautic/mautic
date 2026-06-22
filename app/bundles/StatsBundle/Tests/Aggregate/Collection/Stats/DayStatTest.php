@@ -8,13 +8,13 @@ use PHPUnit\Framework\TestCase;
 
 class DayStatTest extends TestCase
 {
-    private $day  = '2019-11-07';
+    private string $day = '2019-11-07';
 
-    private $hour = 11;
+    private int $hour = 11;
 
     private DayStat $dayStat;
 
-    private $hourStat;
+    private HourStat $hourStat;
 
     protected function setUp(): void
     {
