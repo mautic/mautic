@@ -115,11 +115,12 @@ class FieldChangeRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
-                    $qb->expr()->in('f.object_id', $objectIds)
+                    $qb->expr()->in('f.object_id', ':objectIds')
                 )
             )
             ->setParameter('integration', $integration)
             ->setParameter('objectType', $objectType)
+            ->setParameter('objectIds', $objectIds, ArrayParameterType::INTEGER)
             // 1. We must sort by f.object_id. Otherwise values stored in PartialObjectReportBuilder::lastProcessedTrackedId will be incorrect.
             // 2. Newer updated fields must override older updated fields
             ->orderBy('f.object_id, f.modified_at', 'ASC');

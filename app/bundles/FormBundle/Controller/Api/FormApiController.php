@@ -125,6 +125,12 @@ class FormApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    /**
+     * @param Form                 &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $fieldModel = $this->getModel('form.field');

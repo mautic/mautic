@@ -97,7 +97,7 @@ trait LeadDetailsTrait
      *
      * @return array
      *
-     * @throws InvalidArgumentException if not an array
+     * @throws \InvalidArgumentException if not an array
      */
     public function sanitizeEventFilter($filters)
     {
