@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticSendExampleApiBundle\Tests\Controller\Api;
+namespace Mautic\EmailBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
@@ -12,7 +12,7 @@ use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-final class ExampleSendApiControllerFunctionalTest extends MauticMysqlTestCase
+final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -91,7 +91,7 @@ final class ExampleSendApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSendExampleToMultipleRecipients(): void
     {
-        $email   = $this->createEmail();
+        $email = $this->createEmail();
         $this->em->flush();
         $emailId = $email->getId();
         $this->em->clear();
@@ -112,7 +112,7 @@ final class ExampleSendApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testNoSubjectPrefixOptionSkipsThePrefix(): void
     {
-        $email   = $this->createEmail();
+        $email = $this->createEmail();
         $this->em->flush();
         $emailId = $email->getId();
         $this->em->clear();
@@ -134,7 +134,7 @@ final class ExampleSendApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMissingRecipientsReturnsBadRequest(): void
     {
-        $email   = $this->createEmail();
+        $email = $this->createEmail();
         $this->em->flush();
         $emailId = $email->getId();
         $this->em->clear();

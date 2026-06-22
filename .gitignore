@@ -116,7 +116,6 @@
 !/plugins/MauticFullContactBundle
 !/plugins/MauticGmailBundle
 !/plugins/MauticOutlookBundle
-!/plugins/MauticSendExampleApiBundle
 !/plugins/MauticSocialBundle
 !/plugins/MauticZapierBundle
 !/plugins/MauticTagManagerBundle
