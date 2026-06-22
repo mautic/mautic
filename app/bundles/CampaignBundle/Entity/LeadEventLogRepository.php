@@ -186,8 +186,9 @@ class LeadEventLogRepository extends CommonRepository
         if (isset($options['eventType'])) {
             if (is_array($options['eventType'])) {
                 $query->andWhere(
-                    $query->expr()->in('e.event_type', array_map([$query->expr(), 'literal'], $options['eventType']))
+                    $query->expr()->in('e.event_type', ':eventTypes')
                 );
+                $query->setParameter('eventTypes', $options['eventType'], ArrayParameterType::STRING);
             } else {
                 $query->andwhere('e.event_type = :eventTypes')
                     ->setParameter('eventTypes', $options['eventType']);
@@ -352,8 +353,10 @@ class LeadEventLogRepository extends CommonRepository
 
         if (!empty($exists)) {
             $q->andWhere(
-                $q->expr()->notIn('event_id', $exists)
-            )->executeStatement();
+                $q->expr()->notIn('event_id', ':ids')
+            )
+                ->setParameter('ids', $exists, ArrayParameterType::INTEGER)
+                ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
@@ -463,12 +466,13 @@ class LeadEventLogRepository extends CommonRepository
             ->innerJoin('e.campaign', 'c')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->in('o.id', $ids),
+                    $q->expr()->in('o.id', ':ids'),
                     $q->expr()->eq('o.isScheduled', 1),
                     $q->expr()->eq('c.isPublished', 1),
                     $q->expr()->isNull('c.deleted')
                 )
-            );
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return new ArrayCollection($q->getQuery()->getResult());
     }
@@ -520,9 +524,10 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('log.event_id', $eventId),
-                    $qb->expr()->in('log.lead_id', $contactIds)
+                    $qb->expr()->in('log.lead_id', ':contactIds')
                 )
-            );
+            )
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
