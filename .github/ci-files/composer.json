@@ -158,6 +158,7 @@
         "web-root": "docroot/"
       }
     },
+    "public-dir": "docroot",
     "installer-paths": {
       "docroot/app": [
         "type:mautic-core"

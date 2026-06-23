@@ -212,7 +212,7 @@ final class ProjectEntityLoaderService
         }
 
         // Sort entity types alphabetically by label
-        uasort($this->entityTypesCache, fn (EntityTypeConfig $a, EntityTypeConfig $b) => strcasecmp($a->label, $b->label));
+        uasort($this->entityTypesCache, fn (EntityTypeConfig $a, EntityTypeConfig $b): int => strcasecmp($a->label, $b->label));
 
         return $this->entityTypesCache;
     }

@@ -300,13 +300,13 @@ class DynamicContentType extends AbstractType
             }
         );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var DynamicContent|null $dynamicContent */
             $dynamicContent = $event->getData();
             $this->addContentField($event->getForm(), $dynamicContent?->getType());
         });
 
-        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $form = $event->getForm();
             $this->addContentField($form->getParent(), $form->getData());
         });

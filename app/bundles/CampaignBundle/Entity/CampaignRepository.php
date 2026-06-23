@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
@@ -133,8 +134,10 @@ class CampaignRepository extends CommonRepository
             ->where($this->getPublishedByDateExpression($q));
 
         $q->andWhere(
-            $q->expr()->in('ll.leadlist_id', $leadLists)
+            $q->expr()->in('ll.leadlist_id', ':leadLists')
         );
+
+        $q->setParameter('leadLists', $leadLists, ArrayParameterType::INTEGER);
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -376,14 +379,15 @@ class CampaignRepository extends CommonRepository
                     $sq->expr()->and(
                         $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
                         $sq->expr()->eq('e.rotation', 'cl.rotation'),
-                        $sq->expr()->in('e.event_id', $pendingEvents)
+                        $sq->expr()->in('e.event_id', ':pendingEvents')
                     )
                 );
             $this->updateQueryFromContactLimiter('e', $sq, $limiter, true);
 
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
+            )
+                ->setParameter('pendingEvents', $pendingEvents, ArrayParameterType::INTEGER);
         }
 
         $result = $q->executeQuery()->fetchAssociative();
@@ -624,7 +628,8 @@ class CampaignRepository extends CommonRepository
         $q->groupBy('c.id');
 
         if (!empty($campaignIds)) {
-            $q->where($q->expr()->in('c.id', $campaignIds));
+            $q->where($q->expr()->in('c.id', ':campaignIds'));
+            $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
 
         return $q->executeQuery()->fetchAllAssociative();

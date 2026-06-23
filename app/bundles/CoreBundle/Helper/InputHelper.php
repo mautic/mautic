@@ -598,7 +598,7 @@ class InputHelper
      */
     public static function stripTags(string $input, array $allowedTags = []): string
     {
-        $allowed = implode('', array_map(fn ($tag) => "<$tag>", $allowedTags));
+        $allowed = implode('', array_map(fn ($tag): string => "<$tag>", $allowedTags));
 
         return strip_tags($input, $allowed);
     }

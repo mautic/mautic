@@ -258,7 +258,7 @@ SQL;
 
         $this->expressionMock->expects(self::once())
             ->method('in')
-            ->with('l.leadlist_id', $listIds)
+            ->with('l.leadlist_id', ':listIds')
             ->willReturnSelf();
 
         $this->expressionMock->expects(self::once())
@@ -266,10 +266,17 @@ SQL;
             ->with('l.manually_removed', ':false')
             ->willReturnSelf();
 
-        $this->queryBuilderMock->expects(self::once())
+        $expectedCalls = [
+            ['listIds', $listIds, ArrayParameterType::INTEGER],
+            ['false', false, 'boolean'],
+        ];
+        $this->queryBuilderMock->expects(self::exactly(2))
             ->method('setParameter')
-            ->with('false', false, 'boolean')
-            ->willReturnSelf();
+            ->willReturnCallback(function (...$parameters) use (&$expectedCalls) {
+                $this->assertSame(array_shift($expectedCalls), $parameters);
+
+                return $this->queryBuilderMock;
+            });
 
         self::assertSame(array_combine($listIds, $counts), $this->repository->getLeadCount($listIds));
     }

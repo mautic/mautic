@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -52,8 +53,9 @@ class StatRepository extends CommonRepository
                 $dynamicContentIds = [(int) $dynamicContentIds];
             }
             $q->where(
-                $q->expr()->in('s.dynamic_content_id', $dynamicContentIds)
-            );
+                $q->expr()->in('s.dynamic_content_id', ':dynamicContentIds')
+            )
+            ->setParameter('dynamicContentIds', $dynamicContentIds, ArrayParameterType::INTEGER);
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();
@@ -72,17 +74,18 @@ class StatRepository extends CommonRepository
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
             ->andWhere(
-                $q->expr()->in('e.dynamic_content_id', $dynamicContentIds)
-            );
+                $q->expr()->in('s.dynamic_content_id', ':dynamicContentIds')
+            )
+            ->setParameter('dynamicContentIds', $dynamicContentIds, ArrayParameterType::INTEGER);
 
         if (null !== $fromDate) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
-                $q->expr()->gte('e.date_sent', $q->expr()->literal($dt->toUtcString()))
+                $q->expr()->gte('s.date_sent', $q->expr()->literal($dt->toUtcString()))
             );
         }
-        $q->groupBy('e.dynamic_content_id');
+        $q->groupBy('s.dynamic_content_id');
 
         // get a total number of sent DC stats first
         $results = $q->executeQuery()->fetchAllAssociative();

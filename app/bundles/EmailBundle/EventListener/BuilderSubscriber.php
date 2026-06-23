@@ -123,7 +123,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         // Add the <title/> tag with email subject value into the <head/> tag if it's missing.
         $content = preg_replace_callback(
             "/<title>(.*?)<\/title>/is",
-            fn ($matches) => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
+            fn ($matches): string => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
             $content,
             -1,
             $fixed

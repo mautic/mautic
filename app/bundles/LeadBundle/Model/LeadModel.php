@@ -1765,7 +1765,7 @@ class LeadModel extends FormModel
             $val = InputHelper::_($val, 'string');
         });
         // Remove any tags that became empty after filtering
-        $tags = array_filter($tags, fn ($tag) => strlen($tag) > 0);
+        $tags = array_filter($tags, fn ($tag): bool => strlen($tag) > 0);
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1805,7 +1805,7 @@ class LeadModel extends FormModel
                 $val = InputHelper::_($val, 'string');
             });
             // Remove any tags that became empty after filtering
-            $removeTags = array_filter($removeTags, fn ($tag) => strlen($tag) > 0);
+            $removeTags = array_filter($removeTags, fn ($tag): bool => strlen($tag) > 0);
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
@@ -2477,7 +2477,7 @@ class LeadModel extends FormModel
         }
         $idFilters = array_values(array_filter(
             $args['filter']['force'],
-            fn ($filter) => is_array($filter) && isset($filter['column']) && 'l.id' === $filter['column']
+            fn ($filter): bool => is_array($filter) && isset($filter['column']) && 'l.id' === $filter['column']
         ));
 
         if (isset($idFilters[0]['value']) && is_array($idFilters[0]['value'])) {
