@@ -23,7 +23,7 @@ class AuthenticationContentEvent extends Event
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }
 
-    public function getRequest(): \Symfony\Component\HttpFoundation\Request
+    public function getRequest(): Request
     {
         return $this->request;
     }

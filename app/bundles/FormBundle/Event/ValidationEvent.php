@@ -20,7 +20,7 @@ class ValidationEvent extends CommonEvent
     ) {
     }
 
-    public function getField(): \Mautic\FormBundle\Entity\Field
+    public function getField(): Field
     {
         return $this->field;
     }

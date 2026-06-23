@@ -41,10 +41,7 @@ class ApiErrorException extends \Exception
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getContact(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getContact(): ?Lead
     {
         return $this->contact;
     }

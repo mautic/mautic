@@ -245,7 +245,7 @@ class StatsEvent extends Event
         return $this->hasResults;
     }
 
-    public function getUser(): \Mautic\UserBundle\Entity\User
+    public function getUser(): User
     {
         return $this->user;
     }

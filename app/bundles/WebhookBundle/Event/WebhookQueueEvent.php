@@ -41,7 +41,7 @@ class WebhookQueueEvent extends CommonEvent
     /**
      * Returns the Webhook entity.
      */
-    public function getWebhook(): \Mautic\WebhookBundle\Entity\Webhook
+    public function getWebhook(): Webhook
     {
         return $this->webhook;
     }

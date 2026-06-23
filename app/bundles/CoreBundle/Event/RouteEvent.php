@@ -28,7 +28,7 @@ class RouteEvent extends Event
         $this->collection->addCollection($this->loader->import($path));
     }
 
-    public function getCollection(): \Symfony\Component\Routing\RouteCollection
+    public function getCollection(): RouteCollection
     {
         return $this->collection;
     }

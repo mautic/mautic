@@ -857,8 +857,6 @@ class MailHelper
 
     /**
      * Return the content identifier.
-     *
-     * @return string
      */
     public function getContentHash(): ?string
     {

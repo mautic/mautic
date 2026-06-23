@@ -15,7 +15,7 @@ class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
         $this->integration = $integration;
     }
 
-    public function getFormBuilder(): \Symfony\Component\Form\FormBuilderInterface
+    public function getFormBuilder(): FormBuilderInterface
     {
         return $this->builder;
     }

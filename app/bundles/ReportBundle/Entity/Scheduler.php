@@ -48,7 +48,7 @@ class Scheduler
         return $this->id;
     }
 
-    public function getReport(): \Mautic\ReportBundle\Entity\Report
+    public function getReport(): Report
     {
         return $this->report;
     }

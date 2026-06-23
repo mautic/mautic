@@ -12,7 +12,7 @@ class LoginEvent extends Event
     ) {
     }
 
-    public function getUser(): \Mautic\UserBundle\Entity\User
+    public function getUser(): User
     {
         return $this->user;
     }

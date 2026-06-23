@@ -13,12 +13,12 @@ class FailedEvent extends \Symfony\Contracts\EventDispatcher\Event
     ) {
     }
 
-    public function getConfig(): \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor
+    public function getConfig(): AbstractEventAccessor
     {
         return $this->config;
     }
 
-    public function getLog(): \Mautic\CampaignBundle\Entity\LeadEventLog
+    public function getLog(): LeadEventLog
     {
         return $this->log;
     }

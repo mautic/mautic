@@ -340,10 +340,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetches the lead being acted on.
-     *
-     * @return Lead
      */
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

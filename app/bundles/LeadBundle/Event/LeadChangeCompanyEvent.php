@@ -32,18 +32,14 @@ class LeadChangeCompanyEvent extends Event
 
     /**
      * Returns the Lead entity.
-     *
-     * @return Lead
      */
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
     /**
      * Returns batch array of leads.
-     *
-     * @return array
      */
     public function getLeads(): ?array
     {

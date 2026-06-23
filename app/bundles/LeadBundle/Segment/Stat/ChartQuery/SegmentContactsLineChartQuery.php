@@ -112,17 +112,11 @@ class SegmentContactsLineChartQuery extends ChartQuery
         return $this->segmentId;
     }
 
-    /**
-     * @return array
-     */
     public function getAddedEventLogStats(): ?array
     {
         return $this->addedEventLogStats;
     }
 
-    /**
-     * @return array
-     */
     public function getRemovedEventLogStats(): ?array
     {
         return $this->removedEventLogStats;

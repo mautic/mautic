@@ -30,7 +30,7 @@ class ApiEntityEvent extends CommonEvent
         return $this->entityRequestParameters;
     }
 
-    public function getRequest(): \Symfony\Component\HttpFoundation\Request
+    public function getRequest(): Request
     {
         return $this->request;
     }

@@ -29,12 +29,12 @@ class ConditionEvent extends CampaignExecutionEvent
         );
     }
 
-    public function getEventConfig(): \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor
+    public function getEventConfig(): AbstractEventAccessor
     {
         return $this->eventConfig;
     }
 
-    public function getLog(): \Mautic\CampaignBundle\Entity\LeadEventLog
+    public function getLog(): LeadEventLog
     {
         return $this->eventLog;
     }

@@ -419,7 +419,7 @@ class CorePermissions implements ResetInterface
         return ($userEntity instanceof User && !$userEntity->isGuest()) ? false : true;
     }
 
-    protected function getTranslator(): \Symfony\Contracts\Translation\TranslatorInterface
+    protected function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }

@@ -48,12 +48,12 @@ class AggregateStatRequestEvent extends Event
         return $this->toDateTime;
     }
 
-    public function getOptions(): \Mautic\StatsBundle\Event\Options\FetchOptions
+    public function getOptions(): FetchOptions
     {
         return $this->options;
     }
 
-    public function getStatCollection(): \Mautic\StatsBundle\Aggregate\Collection\StatCollection
+    public function getStatCollection(): StatCollection
     {
         return $this->statCollection;
     }

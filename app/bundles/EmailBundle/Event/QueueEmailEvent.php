@@ -14,7 +14,7 @@ class QueueEmailEvent extends Event
     ) {
     }
 
-    public function getMessage(): \Mautic\EmailBundle\Mailer\Message\MauticMessage
+    public function getMessage(): MauticMessage
     {
         return $this->message;
     }

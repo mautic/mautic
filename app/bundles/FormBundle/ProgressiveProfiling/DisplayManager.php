@@ -63,7 +63,7 @@ class DisplayManager
         return '' != $this->form->getProgressiveProfilingLimit();
     }
 
-    public function getDisplayCounter(): \Mautic\FormBundle\ProgressiveProfiling\DisplayCounter
+    public function getDisplayCounter(): DisplayCounter
     {
         return $this->displayCounter;
     }

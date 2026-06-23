@@ -17,7 +17,7 @@ class IconEvent extends Event
     ) {
     }
 
-    public function getSecurity(): \Mautic\CoreBundle\Security\Permissions\CorePermissions
+    public function getSecurity(): CorePermissions
     {
         return $this->security;
     }

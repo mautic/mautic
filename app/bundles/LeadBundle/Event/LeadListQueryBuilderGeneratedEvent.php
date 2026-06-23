@@ -14,12 +14,12 @@ class LeadListQueryBuilderGeneratedEvent extends Event
     ) {
     }
 
-    public function getSegment(): \Mautic\LeadBundle\Entity\LeadList
+    public function getSegment(): LeadList
     {
         return $this->segment;
     }
 
-    public function getQueryBuilder(): \Mautic\LeadBundle\Segment\Query\QueryBuilder
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

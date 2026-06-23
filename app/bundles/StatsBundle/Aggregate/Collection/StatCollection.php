@@ -84,12 +84,12 @@ class StatCollection
         return $this;
     }
 
-    public function getStats(): \Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO
+    public function getStats(): StatsDAO
     {
         return $this->stats;
     }
 
-    public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime): \Mautic\StatsBundle\Aggregate\Calculator
+    public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime): Calculator
     {
         if (is_null($this->calculator)) {
             $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);

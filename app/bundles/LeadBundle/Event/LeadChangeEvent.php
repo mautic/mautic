@@ -15,7 +15,7 @@ class LeadChangeEvent extends Event
     ) {
     }
 
-    public function getOldLead(): \Mautic\LeadBundle\Entity\Lead
+    public function getOldLead(): Lead
     {
         return $this->oldLead;
     }
@@ -28,7 +28,7 @@ class LeadChangeEvent extends Event
         return $this->oldTrackingId;
     }
 
-    public function getNewLead(): \Mautic\LeadBundle\Entity\Lead
+    public function getNewLead(): Lead
     {
         return $this->newLead;
     }

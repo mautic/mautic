@@ -16,7 +16,7 @@ class LogoutEvent extends Event
     ) {
     }
 
-    public function getUser(): \Mautic\UserBundle\Entity\User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -37,7 +37,7 @@ class LogoutEvent extends Event
         return $this->session;
     }
 
-    public function getRequest(): \Symfony\Component\HttpFoundation\Request
+    public function getRequest(): Request
     {
         return $this->request;
     }

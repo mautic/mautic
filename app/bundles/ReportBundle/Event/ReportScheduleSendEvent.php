@@ -16,7 +16,7 @@ class ReportScheduleSendEvent extends Event
     ) {
     }
 
-    public function getScheduler(): \Mautic\ReportBundle\Entity\Scheduler
+    public function getScheduler(): Scheduler
     {
         return $this->scheduler;
     }

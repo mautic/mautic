@@ -27,10 +27,8 @@ class PageHitEvent extends CommonEvent
 
     /**
      * Returns the Page entity.
-     *
-     * @return Page
      */
-    public function getPage(): ?\Mautic\PageBundle\Entity\Page
+    public function getPage(): ?Page
     {
         return $this->page;
     }

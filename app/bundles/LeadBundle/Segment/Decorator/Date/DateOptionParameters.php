@@ -61,7 +61,7 @@ class DateOptionParameters
         return $this->shouldUseLastDayOfRange;
     }
 
-    public function getDefaultDate(): \Mautic\CoreBundle\Helper\DateTimeHelper
+    public function getDefaultDate(): DateTimeHelper
     {
         return $this->dateTimeHelper;
     }

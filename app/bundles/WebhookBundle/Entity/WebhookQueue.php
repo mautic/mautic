@@ -62,7 +62,7 @@ class WebhookQueue
         return $this->id;
     }
 
-    public function getWebhook(): ?\Mautic\WebhookBundle\Entity\Webhook
+    public function getWebhook(): ?Webhook
     {
         return $this->webhook;
     }
@@ -131,10 +131,7 @@ class WebhookQueue
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent(): ?\Mautic\WebhookBundle\Entity\Event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }

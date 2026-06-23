@@ -37,7 +37,7 @@ class SmsSendEvent extends CommonEvent
         $this->content = $content;
     }
 
-    public function getLead(): \Mautic\LeadBundle\Entity\Lead
+    public function getLead(): Lead
     {
         return $this->lead;
     }

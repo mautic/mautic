@@ -27,7 +27,7 @@ class RedirectGenerationEvent extends CommonEvent
     /**
      * Get the redirect from the event.
      */
-    public function getRedirect(): \Mautic\PageBundle\Entity\Redirect
+    public function getRedirect(): Redirect
     {
         return $this->redirect;
     }

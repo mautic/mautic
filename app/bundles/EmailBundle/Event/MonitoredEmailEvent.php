@@ -18,7 +18,7 @@ class MonitoredEmailEvent extends Event
     /**
      * Get the FormBuilder for monitored_mailboxes FormType.
      */
-    public function getFormBuilder(): \Symfony\Component\Form\FormBuilderInterface
+    public function getFormBuilder(): FormBuilderInterface
     {
         return $this->formBuilder;
     }

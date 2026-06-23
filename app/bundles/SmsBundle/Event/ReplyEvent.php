@@ -23,7 +23,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
     ) {
     }
 
-    public function getContact(): \Mautic\LeadBundle\Entity\Lead
+    public function getContact(): Lead
     {
         return $this->contact;
     }
@@ -41,7 +41,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
         $this->response = $response;
     }
 
-    public function getResponse(): ?\Symfony\Component\HttpFoundation\Response
+    public function getResponse(): ?Response
     {
         return $this->response;
     }

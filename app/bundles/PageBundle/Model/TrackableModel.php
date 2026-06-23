@@ -83,7 +83,7 @@ class TrackableModel extends AbstractCommonModel
         return $this->em->getRepository(Trackable::class);
     }
 
-    protected function getRedirectModel(): \Mautic\PageBundle\Model\RedirectModel
+    protected function getRedirectModel(): RedirectModel
     {
         return $this->redirectModel;
     }

@@ -19,10 +19,7 @@ class Result
      */
     private $email;
 
-    /**
-     * @return Stat
-     */
-    public function getStat(): ?\Mautic\EmailBundle\Entity\Stat
+    public function getStat(): ?Stat
     {
         return $this->stat;
     }

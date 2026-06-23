@@ -18,15 +18,13 @@ class EmailReplyEvent extends Event
 
     /**
      * Returns the Email entity.
-     *
-     * @return Email
      */
-    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    public function getStat(): \Mautic\EmailBundle\Entity\Stat
+    public function getStat(): Stat
     {
         return $this->stat;
     }

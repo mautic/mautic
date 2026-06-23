@@ -96,7 +96,7 @@ class ChannelBroadcastEvent extends Event
         return true;
     }
 
-    public function getOutput(): \Symfony\Component\Console\Output\OutputInterface
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }

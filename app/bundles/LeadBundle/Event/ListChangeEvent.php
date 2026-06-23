@@ -34,12 +34,12 @@ class ListChangeEvent extends Event
     /**
      * Returns the Lead entity.
      */
-    public function getLead(): \Mautic\LeadBundle\Entity\Lead
+    public function getLead(): Lead
     {
         return $this->lead;
     }
 
-    public function getList(): \Mautic\LeadBundle\Entity\LeadList
+    public function getList(): LeadList
     {
         return $this->list;
     }

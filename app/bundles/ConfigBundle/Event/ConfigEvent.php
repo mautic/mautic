@@ -160,9 +160,6 @@ class ConfigEvent extends CommonEvent
         return base64_encode($content);
     }
 
-    /**
-     * @return array
-     */
     public function getOriginalNormData(): ?array
     {
         return $this->originalNormData;

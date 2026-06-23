@@ -65,7 +65,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->negate;
     }
 
-    public function getQueryBuilder(): \Doctrine\DBAL\Query\QueryBuilder
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

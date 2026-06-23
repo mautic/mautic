@@ -14,7 +14,7 @@ class PointActionEvent extends CommonEvent
     ) {
     }
 
-    public function getPoint(): \Mautic\PointBundle\Entity\Point
+    public function getPoint(): Point
     {
         return $this->point;
     }
@@ -24,7 +24,7 @@ class PointActionEvent extends CommonEvent
         $this->point = $point;
     }
 
-    public function getLead(): \Mautic\LeadBundle\Entity\Lead
+    public function getLead(): Lead
     {
         return $this->lead;
     }

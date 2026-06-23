@@ -99,7 +99,7 @@ class FormController extends AbstractStandardFormController
         return $this->deprecatedTranslationBase;
     }
 
-    protected function getPermissionBase(): ?string
+    protected function getPermissionBase()
     {
         return $this->deprecatedPermissionBase;
     }

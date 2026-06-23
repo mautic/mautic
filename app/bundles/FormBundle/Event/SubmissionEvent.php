@@ -98,7 +98,7 @@ class SubmissionEvent extends CommonEvent
         return $this->server;
     }
 
-    public function getRequest(): \Symfony\Component\HttpFoundation\Request
+    public function getRequest(): Request
     {
         return $this->request;
     }

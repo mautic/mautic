@@ -222,7 +222,7 @@ class DoNotContact implements MauticModelInterface
         return $reasonChannelCombinations;
     }
 
-    public function getDncRepo(): \Mautic\LeadBundle\Entity\DoNotContactRepository
+    public function getDncRepo(): DoNotContactRepository
     {
         return $this->dncRepo;
     }

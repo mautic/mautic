@@ -43,10 +43,7 @@ class ContactIdentificationEvent extends Event
         return $this->identifiedByChannel;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getIdentifiedContact(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getIdentifiedContact(): ?Lead
     {
         return $this->identifiedContact;
     }

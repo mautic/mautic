@@ -71,7 +71,7 @@ class EmailReply
         return $this->id;
     }
 
-    public function getStat(): \Mautic\EmailBundle\Entity\Stat
+    public function getStat(): Stat
     {
         return $this->stat;
     }

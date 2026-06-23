@@ -40,7 +40,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         return $this->operators;
     }
 
-    public function getTranslator(): \Symfony\Contracts\Translation\TranslatorInterface
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }

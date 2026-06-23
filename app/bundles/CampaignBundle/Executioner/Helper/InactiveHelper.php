@@ -99,9 +99,6 @@ class InactiveHelper
         }
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getEarliestInactiveDateTime(): ?\DateTimeInterface
     {
         return $this->earliestInactiveDate;

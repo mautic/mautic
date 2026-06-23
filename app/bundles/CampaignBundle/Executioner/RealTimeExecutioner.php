@@ -54,14 +54,12 @@ class RealTimeExecutioner
      * @param string|null $channel
      * @param int|null    $channelId
      *
-     * @return Responses
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?\Mautic\CampaignBundle\Executioner\Result\Responses
+    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

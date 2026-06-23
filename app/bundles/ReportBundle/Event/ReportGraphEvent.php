@@ -85,7 +85,7 @@ class ReportGraphEvent extends AbstractReportEvent
         return array_keys($this->requestedGraphs);
     }
 
-    public function getQueryBuilder(): \Doctrine\DBAL\Query\QueryBuilder
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

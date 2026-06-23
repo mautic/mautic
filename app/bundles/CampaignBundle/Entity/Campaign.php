@@ -582,7 +582,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return Lead[]|Collection
      */
-    public function getLeads(): \Doctrine\Common\Collections\Collection
+    public function getLeads(): Collection
     {
         return $this->leads;
     }
@@ -590,7 +590,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return ArrayCollection<int, LeadList>
      */
-    public function getLists(): \Doctrine\Common\Collections\Collection
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -616,7 +616,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return ArrayCollection<int, Form>
      */
-    public function getForms(): \Doctrine\Common\Collections\Collection
+    public function getForms(): Collection
     {
         return $this->forms;
     }

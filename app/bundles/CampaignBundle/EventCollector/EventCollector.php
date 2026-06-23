@@ -23,7 +23,7 @@ class EventCollector
     ) {
     }
 
-    public function getEvents(): \Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor
+    public function getEvents(): EventAccessor
     {
         if (empty($this->eventsArray)) {
             $this->buildEventList();

@@ -30,25 +30,20 @@ class CategoryChangeEvent extends Event
         }
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
     /**
      * Returns batch array of leads.
-     *
-     * @return array
      */
     public function getLeads(): ?array
     {
         return $this->leads;
     }
 
-    public function getCategory(): \Mautic\CategoryBundle\Entity\Category
+    public function getCategory(): Category
     {
         return $this->category;
     }

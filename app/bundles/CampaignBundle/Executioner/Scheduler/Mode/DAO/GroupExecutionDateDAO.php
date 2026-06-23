@@ -25,7 +25,7 @@ class GroupExecutionDateDAO
         return $this->executionDate;
     }
 
-    public function getContacts(): \Doctrine\Common\Collections\ArrayCollection
+    public function getContacts(): ArrayCollection
     {
         return $this->contacts;
     }

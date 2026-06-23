@@ -20,7 +20,7 @@ class ReportQueryEvent extends AbstractReportEvent
         $this->totalResults = (int) $totalResults;
     }
 
-    public function getQuery(): \Doctrine\DBAL\Query\QueryBuilder
+    public function getQuery(): QueryBuilder
     {
         return $this->query;
     }

@@ -23,7 +23,7 @@ class PageDisplayEvent extends Event
     /**
      * Returns the Page entity.
      */
-    public function getPage(): \Mautic\PageBundle\Entity\Page
+    public function getPage(): Page
     {
         return $this->page;
     }

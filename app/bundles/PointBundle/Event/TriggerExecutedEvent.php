@@ -16,19 +16,16 @@ class TriggerExecutedEvent extends Event
     ) {
     }
 
-    public function getTriggerEvent(): \Mautic\PointBundle\Entity\TriggerEvent
+    public function getTriggerEvent(): TriggerEventEntity
     {
         return $this->triggerEvent;
     }
 
-    public function getLead(): \Mautic\LeadBundle\Entity\Lead
+    public function getLead(): Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @return bool
-     */
     public function getResult(): ?bool
     {
         return $this->result;

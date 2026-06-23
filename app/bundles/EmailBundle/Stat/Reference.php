@@ -24,9 +24,6 @@ class Reference
         }
     }
 
-    /**
-     * @return int
-     */
     public function getEmailId(): ?int
     {
         return $this->emailId;

@@ -255,9 +255,6 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
     public function getLastSyncDate(): ?\DateTimeInterface
     {
         return $this->lastSyncDate;

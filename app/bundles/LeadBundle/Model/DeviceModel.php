@@ -39,7 +39,7 @@ class DeviceModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    public function getRepository(): \Mautic\LeadBundle\Entity\LeadDeviceRepository
+    public function getRepository(): LeadDeviceRepository
     {
         return $this->leadDeviceRepository;
     }

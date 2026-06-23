@@ -20,7 +20,7 @@ class CampaignTriggerEvent extends Event
     /**
      * Returns the Campaign entity.
      */
-    public function getCampaign(): \Mautic\CampaignBundle\Entity\Campaign
+    public function getCampaign(): Campaign
     {
         return $this->campaign;
     }
