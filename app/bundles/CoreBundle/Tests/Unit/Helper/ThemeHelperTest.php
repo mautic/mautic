@@ -187,7 +187,8 @@ class ThemeHelperTest extends TestCase
         try {
             $this->themeHelper->install($zipPath);
 
-            $this->assertFileExists(__DIR__.'/resource/themes/form-style-only');
+            $this->assertFileExists(__DIR__.'/resource/themes/form-style-only/config.json');
+            $this->assertFileExists(__DIR__.'/resource/themes/form-style-only/html/MauticFormBundle/Builder/_style.html.twig');
         } finally {
             $fs->remove(__DIR__.'/resource/themes/form-style-only');
             if (file_exists($zipPath)) {
