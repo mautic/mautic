@@ -43,7 +43,7 @@ class InputHelper
      *
      * @return InputFilter
      */
-    private static function getFilter($html = false, $strict = false)
+    private static function getFilter($html = false, $strict = false): ?\Joomla\Filter\InputFilter
     {
         if (empty(self::$htmlFilter)) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method

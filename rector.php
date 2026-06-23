@@ -40,7 +40,7 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(22)
+    ->withTypeCoverageLevel(23)
     ->withSkip([
         '*/Test/*',
         '*/Tests/*',
@@ -59,6 +59,7 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
             // some mock bug, investigate
             __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
+            '*/Event/*',
         ],
 
         // lets handle later, once we have more type declaratoins

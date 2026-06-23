@@ -63,10 +63,8 @@ class ImportModel extends FormModel
 
     /**
      * Returns the Import entity which should be processed next.
-     *
-     * @return Import|null
      */
-    public function getImportToProcess()
+    public function getImportToProcess(): ?\Mautic\LeadBundle\Entity\Import
     {
         $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
 

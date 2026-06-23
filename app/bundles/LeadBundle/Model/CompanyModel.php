@@ -803,11 +803,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $fields
      * @param array $data
      *
-     * @return Company|null
      *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false): ?\Mautic\LeadBundle\Entity\Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));

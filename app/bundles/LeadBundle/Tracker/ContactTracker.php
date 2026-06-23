@@ -172,10 +172,7 @@ class ContactTracker
         $this->ipLookupHelper->reset();
     }
 
-    /**
-     * @return Lead|null
-     */
-    private function getSystemContact()
+    private function getSystemContact(): ?\Mautic\LeadBundle\Entity\Lead
     {
         if ($this->useSystemContact() && $this->systemContact) {
             $this->logger->debug('CONTACT: System lead is being used');

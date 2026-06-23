@@ -313,7 +313,7 @@ class EmailSendEvent extends CommonEvent
      *
      * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         if (null !== $this->helper) {
             return $this->helper->getContentHash();
