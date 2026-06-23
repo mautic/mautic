@@ -15,7 +15,7 @@ class CampaignExecutionEvent extends Event
     use ContextTrait;
 
     /**
-     * @var Lead
+     * @var Lead|mixed
      */
     protected $lead;
 
@@ -70,7 +70,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return Lead
+     * @return Lead|mixed
      */
     public function getLead()
     {

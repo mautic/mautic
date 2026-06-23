@@ -844,7 +844,7 @@ class CommonRepository extends ServiceEntityRepository
         $connection = $this->getEntityManager()->getConnection();
         $metadata   = $this->getClassMetadata();
         $identifier = $metadata->getSingleIdentifierFieldName();
-        $makeUpdate = fn (string $column) => "{$column} = VALUES({$column})";
+        $makeUpdate = fn (string $column): string => "{$column} = VALUES({$column})";
         $columns    = [];
         $values     = [];
         $types      = [];

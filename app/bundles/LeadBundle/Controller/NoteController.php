@@ -22,7 +22,7 @@ class NoteController extends FormController
     public function indexAction(Request $request, $leadId = 0, $page = 1)
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -231,7 +231,7 @@ class NoteController extends FormController
         $valid      = false;
 
         if (null === $note || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl(
@@ -319,7 +319,7 @@ class NoteController extends FormController
             !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
             || $model->isLocked($note)
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $model->deleteEntity($note);
@@ -347,6 +347,6 @@ class NoteController extends FormController
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);
         }
 
-        return $this->accessDenied();
+        return $this->notFound();
     }
 }

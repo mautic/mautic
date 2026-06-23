@@ -86,7 +86,7 @@ class DynamicContentHelper
                 continue;
             }
             if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadArray)) {
-                return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
+                return $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc);
             }
         }
 

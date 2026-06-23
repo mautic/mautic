@@ -382,7 +382,7 @@
                   <div class="row">
                       <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
-                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {% set emailStats = [
                                 {
                                     'title': 'mautic.email.stat.sent',
                                     'value': email.getSentCount(true),
@@ -405,14 +405,17 @@
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.getId()}),
                                     'icon': 'ri-mail-send-line'
                                 },
-                                {
+                            ] %}
+                            {% if email.isSegmentEmail() %}
+                                {% set emailStats = emailStats|merge([{
                                     'title': 'mautic.email.stat.pending',
                                     'value': email.getPendingCount(),
                                     'tooltip': 'mautic.email.stat.leadcount.tooltip',
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.getId()}),
                                     'icon': 'ri-more-fill'
-                                }
-                            ]}) }}
+                                }]) %}
+                            {% endif %}
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': emailStats}) }}
                         {% endif %}
                       </div>
                   </div>
