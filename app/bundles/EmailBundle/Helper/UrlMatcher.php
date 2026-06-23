@@ -12,7 +12,13 @@ class UrlMatcher
         $urlToFind = self::sanitizeUrl((string) $urlToFind);
 
         foreach ($urlsToCheckAgainst as $url) {
-            $url = self::sanitizeUrl((string) $url);
+            $url = (string) $url;
+
+            if ('' === $url) {
+                continue;
+            }
+
+            $url = self::sanitizeUrl($url);
 
             if (self::isLegacyWildcardPattern($url) && fnmatch($url, $urlToFind, FNM_CASEFOLD)) {
                 return true;
