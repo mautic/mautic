@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
@@ -17,40 +19,13 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
 
     public function testMaintenanceDataCleanUp(): void
     {
-        $user    = $this->getUser(self::ADMIN_USER);
-        $user_id = $user->getId();
+        $admin = $this->getUser(self::ADMIN_USER);
 
-        // Insert the audit_log and notification
-        $prefix        = self::getContainer()->getParameter('mautic.db_table_prefix');
-        $threeDaysAgo  = (new \DateTime('3 days ago', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
-        $today         = (new \DateTime('+1 min', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+        $threeDaysAgo  = new \DateTime('3 days ago', new \DateTimeZone('UTC'));
+        $today         = new \DateTime('+1 min', new \DateTimeZone('UTC'));
 
-        $connection    = $this->em->getConnection();
-        $connection->executeQuery("INSERT INTO {$prefix}audit_log (user_id, user_name, bundle, object, object_id, action, details, date_added, ip_address)
-            VALUES
-                ({$user_id}, 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ({$user_id}, 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ({$user_id}, 'Admin User', 'campaign', 'campaign', 8, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
-                (0, 'System', 'lead', 'lead', 46, 'create', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                (0, 'System', 'lead', 'lead', 46, 'ipadded', 'a:0:{}', '{$today}', '127.0.0.1'),
-                (0, 'System', 'lead', 'lead', 45, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
-                (0, 'System', 'lead', 'lead', 45, 'ipadded', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ({$user_id}, 'Admin User', 'asset', 'asset', 1, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ({$user_id}, 'Admin User', 'page', 'page', 2, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
-                ({$user_id}, 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$today}', '127.0.0.1'),
-                ({$user_id}, 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1');"
-        );
-
-        $connection->executeQuery("INSERT INTO {$prefix}notifications (user_id, type, header, message, date_added, icon_class, is_read, deduplicate)
-            VALUES
-              ({$user_id}, 'notice', NULL, 'Some data', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
-              ({$user_id}, 'info', 'NULL', 'View details', '{$today}', 'fa-download', 0, NULL),
-              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
-              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$today}', 'fa-info-circle', 0, NULL),
-              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
-              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$today}', 'fa-info-circle', 0, NULL),
-              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL);"
-        );
+        $this->createTestAuditLogs($admin, $threeDaysAgo, $today);
+        $this->createTestNotifications($admin, $threeDaysAgo, $today);
 
         /** @var TranslatorInterface $translator */
         $translator = self::getContainer()->get('translator');
@@ -67,10 +42,78 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(4, $stats[$translator->trans('mautic.maintenance.notifications')]);
     }
 
+    private function createTestAuditLogs(User $admin, \DateTime $threeDaysAgo, \DateTime $today): void
+    {
+        $logs = [
+            // Admin entries (user_id = admin->getId())
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'campaign', 'object' => 'campaign', 'objectId' => 8, 'action' => 'update', 'dateAdded' => $threeDaysAgo],
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'campaign', 'object' => 'campaign', 'objectId' => 8, 'action' => 'update', 'dateAdded' => $threeDaysAgo],
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'campaign', 'object' => 'campaign', 'objectId' => 8, 'action' => 'create', 'dateAdded' => $today],
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'asset',    'object' => 'asset',    'objectId' => 1,  'action' => 'update', 'dateAdded' => $threeDaysAgo],
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'page',     'object' => 'page',     'objectId' => 2,  'action' => 'create', 'dateAdded' => $today],
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'lead',     'object' => 'company',  'objectId' => 5,  'action' => 'update', 'dateAdded' => $today],
+            ['user' => $admin, 'userName' => 'Admin User', 'bundle' => 'lead',     'object' => 'company',  'objectId' => 5,  'action' => 'update', 'dateAdded' => $threeDaysAgo],
+
+            // System entries (user_id = 0)
+            ['user' => null,   'userName' => 'System',     'bundle' => 'lead',     'object' => 'lead',     'objectId' => 46, 'action' => 'create', 'dateAdded' => $threeDaysAgo],
+            ['user' => null,   'userName' => 'System',     'bundle' => 'lead',     'object' => 'lead',     'objectId' => 46, 'action' => 'ipadded', 'dateAdded' => $today],
+            ['user' => null,   'userName' => 'System',     'bundle' => 'lead',     'object' => 'lead',     'objectId' => 45, 'action' => 'create', 'dateAdded' => $today],
+            ['user' => null,   'userName' => 'System',     'bundle' => 'lead',     'object' => 'lead',     'objectId' => 45, 'action' => 'ipadded', 'dateAdded' => $threeDaysAgo],
+        ];
+
+        foreach ($logs as $data) {
+            $log = new AuditLog();
+            $log->setUserName($data['userName']);
+            $log->setBundle($data['bundle']);
+            $log->setObject($data['object']);
+            $log->setObjectId($data['objectId']);
+            $log->setAction($data['action']);
+            $log->setDetails([]);
+            $log->setDateAdded($data['dateAdded']);
+            $log->setIpAddress('127.0.0.1');
+
+            if (null !== $data['user']) {
+                $log->setUserId($data['user']->getId());
+            } else {
+                $log->setUserId(0); // Explicit for system entries
+            }
+
+            $this->em->persist($log);
+        }
+
+        $this->em->flush();
+    }
+
+    private function createTestNotifications(User $admin, \DateTime $threeDaysAgo, \DateTime $today): void
+    {
+        $notifications = [
+            ['type' => 'notice', 'header' => null, 'message' => 'Some data',                  'dateAdded' => $threeDaysAgo, 'iconClass' => 'fa-info-circle'],
+            ['type' => 'info',   'header' => null, 'message' => 'View details',               'dateAdded' => $today, 'iconClass' => 'fa-download'],
+            ['type' => 'notice', 'header' => null, 'message' => 'Membership has been rebuilt.', 'dateAdded' => $threeDaysAgo, 'iconClass' => 'fa-info-circle'],
+            ['type' => 'notice', 'header' => null, 'message' => 'Membership has been rebuilt.', 'dateAdded' => $today, 'iconClass' => 'fa-info-circle'],
+            ['type' => 'notice', 'header' => null, 'message' => 'Membership has been rebuilt.', 'dateAdded' => $threeDaysAgo, 'iconClass' => 'fa-info-circle'],
+            ['type' => 'notice', 'header' => null, 'message' => 'Membership has been rebuilt.', 'dateAdded' => $today, 'iconClass' => 'fa-info-circle'],
+            ['type' => 'notice', 'header' => null, 'message' => 'Membership has been rebuilt.', 'dateAdded' => $threeDaysAgo, 'iconClass' => 'fa-info-circle'],
+        ];
+
+        foreach ($notifications as $data) {
+            $notification = new Notification();
+            $notification->setUser($admin);
+            $notification->setType($data['type']);
+            $notification->setHeader($data['header']);
+            $notification->setMessage($data['message']);
+            $notification->setDateAdded($data['dateAdded']);
+            $notification->setIconClass($data['iconClass']);
+            $notification->setIsRead(false);
+
+            $this->em->persist($notification);
+        }
+
+        $this->em->flush();
+    }
+
     private function getUser(string $username): User
     {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $username]);
+        return $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
     }
 }

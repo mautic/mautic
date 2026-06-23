@@ -377,12 +377,12 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($pageId)) {
             $q->where($q->expr()->in('s.page_id', ':pageIds'))
-                ->setParameter('pageIds', array_map('intval', $pageId), ArrayParameterType::INTEGER)
-                ->groupBy('s.page_id, p.title, p.variant_hits');
+                ->setParameter('pageIds', array_map('intval', $pageId), ArrayParameterType::INTEGER);
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
                 ->setParameter('page', (int) $pageId);
         }
+        $q->groupBy('s.page_id, p.title, p.variant_hits');
 
         if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
