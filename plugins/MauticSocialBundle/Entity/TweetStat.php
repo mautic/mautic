@@ -281,10 +281,7 @@ class TweetStat
         $this->isFailed = $isFailed;
     }
 
-    /**
-     * @return ?bool
-     */
-    public function isFailed()
+    public function isFailed(): ?bool
     {
         return $this->getIsFailed();
     }

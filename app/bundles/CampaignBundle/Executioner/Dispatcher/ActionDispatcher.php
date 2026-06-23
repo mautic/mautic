@@ -47,11 +47,11 @@ class ActionDispatcher
 
             $this->validateProcessedLogs($logs, $success, $failed);
 
-            if ($success) {
+            if (!$success->isEmpty()) {
                 $this->dispatchExecutedEvent($config, $event, $success);
             }
 
-            if ($failed) {
+            if (!$failed->isEmpty()) {
                 $this->dispatchFailedEvent($config, $failed);
             }
 

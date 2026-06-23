@@ -19,7 +19,7 @@ class ContactSegmentFilterDictionary
     /**
      * @var mixed[]
      */
-    private $filters = [];
+    private array $filters = [];
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
@@ -29,7 +29,7 @@ class ContactSegmentFilterDictionary
     /**
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         if (empty($this->filters)) {
             $this->setDefaultFilters();

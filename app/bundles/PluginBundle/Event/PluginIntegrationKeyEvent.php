@@ -15,6 +15,8 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 
     /**
      * Get the keys array.
+     *
+     * @return mixed[]|null
      */
     public function getKeys(): ?array
     {

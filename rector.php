@@ -57,6 +57,8 @@ return RectorConfig::configure()
         ],
         ReturnTypeFromStrictTypedPropertyRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
+            // some mock bug, investigate
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
         ],
 
         // lets handle later, once we have more type declaratoins

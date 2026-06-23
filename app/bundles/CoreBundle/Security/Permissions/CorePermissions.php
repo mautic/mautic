@@ -425,7 +425,7 @@ class CorePermissions implements ResetInterface
     }
 
     /**
-     * @return bool|mixed
+     * @return mixed[]
      */
     protected function getBundles(): array
     {

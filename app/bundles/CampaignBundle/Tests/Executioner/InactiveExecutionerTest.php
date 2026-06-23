@@ -114,7 +114,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->inactiveHelper->expects($this->exactly(2))
             ->method('getEarliestInactiveDateTime')
-            ->willReturn(new \DateTime());
+            ->willReturn(new \DateTimeImmutable());
 
         $this->eventScheduler->expects($this->exactly(2))
             ->method('getSortedExecutionDates')
@@ -182,7 +182,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->inactiveHelper->expects($this->exactly(2))
             ->method('getEarliestInactiveDateTime')
-            ->willReturn(new \DateTime());
+            ->willReturn(new \DateTimeImmutable());
 
         $this->eventScheduler->expects($this->exactly(2))
             ->method('getSortedExecutionDates')

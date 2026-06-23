@@ -39,9 +39,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 
     public function onChange(ListChangeEvent $event): void
     {
-        if (!$contact = $event->getLead()) {
-            return;
-        }
+        $contact = $event->getLead();
 
         $this->writeEntries(
             [$contact],

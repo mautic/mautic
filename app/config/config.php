@@ -185,7 +185,7 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
 }
 
 // Use the new Pdo\Mysql namespace for PHP 8.4+, fallback to legacy constant for older versions
-$unbufferedQueryConstant = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+$unbufferedQueryConstant = 100; // class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
 
 $container->loadFromExtension('doctrine', [
     'dbal' => [

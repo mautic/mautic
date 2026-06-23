@@ -55,7 +55,7 @@ class CampaignLeadChangeEvent extends Event
     /**
      * If this is a batch event, return array of leads.
      *
-     * @return Lead[]|null
+     * @return Lead[]
      */
     public function getLeads(): array
     {

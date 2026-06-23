@@ -79,9 +79,6 @@ class WebhookQueue
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
     public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;

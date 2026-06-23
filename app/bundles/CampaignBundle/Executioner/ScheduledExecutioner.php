@@ -67,8 +67,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     }
 
     /**
-     * @return Counter|mixed
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws CannotProcessEventException
