@@ -37,10 +37,8 @@ class WebhookBuilderEvent extends Event
 
     /**
      * Get webhook events.
-     *
-     * @return array
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         static $sorted = false;
 

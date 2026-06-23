@@ -27,7 +27,7 @@ class Reference
     /**
      * @return int
      */
-    public function getEmailId()
+    public function getEmailId(): ?int
     {
         return $this->emailId;
     }

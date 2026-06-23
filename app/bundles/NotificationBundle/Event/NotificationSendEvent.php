@@ -53,10 +53,7 @@ class NotificationSendEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): \Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

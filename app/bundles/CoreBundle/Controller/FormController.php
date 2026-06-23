@@ -71,18 +71,12 @@ class FormController extends AbstractStandardFormController
         return $this->deprecatedModelName;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getJsLoadMethodPrefix()
+    protected function getJsLoadMethodPrefix(): ?string
     {
         return $this->deprecatedMauticContent;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getRouteBase()
+    protected function getRouteBase(): ?string
     {
         return $this->deprecatedRouteBase;
     }
@@ -95,26 +89,17 @@ class FormController extends AbstractStandardFormController
         return $this->deprecatedSessionBase ?? parent::getSessionBase($objectId);
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getTemplateBase()
+    protected function getTemplateBase(): ?string
     {
         return $this->deprecatedTemplateBase;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getTranslationBase()
+    protected function getTranslationBase(): ?string
     {
         return $this->deprecatedTranslationBase;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getPermissionBase()
+    protected function getPermissionBase(): ?string
     {
         return $this->deprecatedPermissionBase;
     }

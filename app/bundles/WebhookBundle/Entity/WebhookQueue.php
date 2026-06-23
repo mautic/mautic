@@ -57,18 +57,12 @@ class WebhookQueue
             ->build();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?\Mautic\WebhookBundle\Entity\Webhook
     {
         return $this->webhook;
     }
@@ -88,7 +82,7 @@ class WebhookQueue
     /**
      * @return \DateTimeInterface|null
      */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -140,7 +134,7 @@ class WebhookQueue
     /**
      * @return Event|null
      */
-    public function getEvent()
+    public function getEvent(): ?\Mautic\WebhookBundle\Entity\Event
     {
         return $this->event;
     }

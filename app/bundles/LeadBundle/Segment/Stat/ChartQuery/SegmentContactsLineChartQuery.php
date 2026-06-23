@@ -115,7 +115,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     /**
      * @return array
      */
-    public function getAddedEventLogStats()
+    public function getAddedEventLogStats(): ?array
     {
         return $this->addedEventLogStats;
     }
@@ -123,7 +123,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     /**
      * @return array
      */
-    public function getRemovedEventLogStats()
+    public function getRemovedEventLogStats(): ?array
     {
         return $this->removedEventLogStats;
     }

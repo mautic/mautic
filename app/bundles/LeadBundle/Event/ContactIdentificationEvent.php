@@ -19,10 +19,7 @@ class ContactIdentificationEvent extends Event
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getClickthrough()
+    public function getClickthrough(): array
     {
         return $this->clickthrough;
     }
@@ -49,7 +46,7 @@ class ContactIdentificationEvent extends Event
     /**
      * @return Lead
      */
-    public function getIdentifiedContact()
+    public function getIdentifiedContact(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->identifiedContact;
     }

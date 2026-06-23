@@ -167,7 +167,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @return Widget $widget
      */
-    public function getWidget()
+    public function getWidget(): \Mautic\DashboardBundle\Entity\Widget
     {
         return $this->widget;
     }
@@ -320,10 +320,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Get the Translator object.
-     *
-     * @return TranslatorInterface
      */
-    public function getTranslator()
+    public function getTranslator(): \Symfony\Contracts\Translation\TranslatorInterface
     {
         return $this->translator;
     }

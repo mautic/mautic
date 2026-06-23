@@ -620,10 +620,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return ?Page
-     */
-    public function getPage()
+    public function getPage(): ?\Mautic\PageBundle\Entity\Page
     {
         return $this->page;
     }

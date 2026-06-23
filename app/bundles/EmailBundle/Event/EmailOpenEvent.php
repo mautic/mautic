@@ -29,7 +29,7 @@ class EmailOpenEvent extends CommonEvent
      *
      * @return Email
      */
-    public function getEmail()
+    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
     {
         return $this->email;
     }

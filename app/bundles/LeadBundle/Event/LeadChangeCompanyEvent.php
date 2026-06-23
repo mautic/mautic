@@ -35,7 +35,7 @@ class LeadChangeCompanyEvent extends Event
      *
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -45,7 +45,7 @@ class LeadChangeCompanyEvent extends Event
      *
      * @return array
      */
-    public function getLeads()
+    public function getLeads(): ?array
     {
         return $this->leads;
     }

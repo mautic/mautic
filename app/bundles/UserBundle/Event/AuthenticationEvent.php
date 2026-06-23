@@ -107,7 +107,7 @@ class AuthenticationEvent extends Event
      *
      * @return PluginToken
      */
-    public function getToken()
+    public function getToken(): \Symfony\Component\Security\Core\Authentication\Token\TokenInterface
     {
         return $this->token;
     }
@@ -134,7 +134,7 @@ class AuthenticationEvent extends Event
      *
      * @return UserProvider
      */
-    public function getUserProvider()
+    public function getUserProvider(): \Symfony\Component\Security\Core\User\UserProviderInterface
     {
         return $this->userProvider;
     }
@@ -241,10 +241,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the request.
-     *
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): \Symfony\Component\HttpFoundation\Request
     {
         return $this->request;
     }

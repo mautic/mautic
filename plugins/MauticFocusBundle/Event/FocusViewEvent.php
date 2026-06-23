@@ -12,10 +12,7 @@ class FocusViewEvent extends Event
     ) {
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): \MauticPlugin\MauticFocusBundle\Entity\Stat
     {
         return $this->stat;
     }

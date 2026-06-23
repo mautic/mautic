@@ -191,7 +191,7 @@ class CampaignExecutionEvent extends Event
     /**
      * @return LeadEventLog
      */
-    public function getLogEntry()
+    public function getLogEntry(): ?\Mautic\CampaignBundle\Entity\LeadEventLog
     {
         return $this->log;
     }

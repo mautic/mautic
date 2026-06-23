@@ -20,10 +20,7 @@ class DecisionResultsEvent extends Event
     ) {
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getEventConfig()
+    public function getEventConfig(): \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor
     {
         return $this->eventConfig;
     }
@@ -31,15 +28,12 @@ class DecisionResultsEvent extends Event
     /**
      * @return ArrayCollection|LeadEventLog[]
      */
-    public function getLogs()
+    public function getLogs(): \Doctrine\Common\Collections\ArrayCollection
     {
         return $this->eventLogs;
     }
 
-    /**
-     * @return EvaluatedContacts
-     */
-    public function getEvaluatedContacts()
+    public function getEvaluatedContacts(): \Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts
     {
         return $this->evaluatedContacts;
     }

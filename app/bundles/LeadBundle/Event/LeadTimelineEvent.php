@@ -303,10 +303,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetch the order for queries.
-     *
-     * @return array|null
      */
-    public function getEventOrder()
+    public function getEventOrder(): ?array
     {
         return $this->orderBy;
     }
@@ -345,7 +343,7 @@ class LeadTimelineEvent extends Event
      *
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

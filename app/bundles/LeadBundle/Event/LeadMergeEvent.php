@@ -15,10 +15,8 @@ class LeadMergeEvent extends Event
 
     /**
      * Returns the victor (loser merges into the victor).
-     *
-     * @return Lead
      */
-    public function getVictor()
+    public function getVictor(): \Mautic\LeadBundle\Entity\Lead
     {
         return $this->victor;
     }
@@ -26,7 +24,7 @@ class LeadMergeEvent extends Event
     /**
      * Returns the loser (loser merges into the victor).
      */
-    public function getLoser()
+    public function getLoser(): \Mautic\LeadBundle\Entity\Lead
     {
         return $this->loser;
     }

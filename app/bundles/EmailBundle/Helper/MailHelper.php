@@ -860,7 +860,7 @@ class MailHelper
      *
      * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         return $this->contentHash;
     }
@@ -1130,10 +1130,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIdHash()
+    public function getIdHash(): ?string
     {
         return $this->idHash;
     }
@@ -1641,10 +1638,8 @@ class MailHelper
 
     /**
      * Returns if the mailer supports and is in tokenization mode.
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
         return $this->tokenizationEnabled;
     }

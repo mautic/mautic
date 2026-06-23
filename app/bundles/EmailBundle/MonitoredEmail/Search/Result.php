@@ -22,7 +22,7 @@ class Result
     /**
      * @return Stat
      */
-    public function getStat()
+    public function getStat(): ?\Mautic\EmailBundle\Entity\Stat
     {
         return $this->stat;
     }
@@ -44,7 +44,7 @@ class Result
     /**
      * @return Lead[]
      */
-    public function getContacts()
+    public function getContacts(): array
     {
         return $this->contacts;
     }

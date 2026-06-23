@@ -34,18 +34,12 @@ class DecisionEvent extends CampaignExecutionEvent
         );
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getEventConfig()
+    public function getEventConfig(): \Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor
     {
         return $this->eventConfig;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLog()
+    public function getLog(): \Mautic\CampaignBundle\Entity\LeadEventLog
     {
         return $this->eventLog;
     }

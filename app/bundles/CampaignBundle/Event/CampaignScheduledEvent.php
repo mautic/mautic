@@ -110,10 +110,7 @@ class CampaignScheduledEvent extends Event
         return $this->eventSettings;
     }
 
-    /**
-     * @return LeadEventLog|null
-     */
-    public function getLog()
+    public function getLog(): ?\Mautic\CampaignBundle\Entity\LeadEventLog
     {
         return $this->log;
     }

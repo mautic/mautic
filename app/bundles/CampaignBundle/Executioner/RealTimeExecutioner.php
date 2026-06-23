@@ -61,7 +61,7 @@ class RealTimeExecutioner
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null)
+    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?\Mautic\CampaignBundle\Executioner\Result\Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

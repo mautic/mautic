@@ -36,7 +36,7 @@ class DetermineWinnerEvent extends Event
      *                email?: \Mautic\EmailBundle\Entity\Email
      *                }
      */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }
@@ -48,7 +48,7 @@ class DetermineWinnerEvent extends Event
      *                supportTemplate?:string
      *                }
      */
-    public function getAbTestResults()
+    public function getAbTestResults(): ?array
     {
         return $this->abTestResults;
     }

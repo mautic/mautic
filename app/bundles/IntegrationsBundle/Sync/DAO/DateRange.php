@@ -15,7 +15,7 @@ class DateRange
     /**
      * Get the value of fromDate.
      */
-    public function getFromDate()
+    public function getFromDate(): ?\DateTimeInterface
     {
         return $this->fromDate;
     }
@@ -23,7 +23,7 @@ class DateRange
     /**
      * Get the value of toDate.
      */
-    public function getToDate()
+    public function getToDate(): ?\DateTimeInterface
     {
         return $this->toDate;
     }

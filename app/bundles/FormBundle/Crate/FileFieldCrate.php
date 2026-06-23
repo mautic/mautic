@@ -13,18 +13,12 @@ class FileFieldCrate
     ) {
     }
 
-    /**
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
+    public function getUploadedFile(): \Symfony\Component\HttpFoundation\File\UploadedFile
     {
         return $this->uploadedFile;
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): \Mautic\FormBundle\Entity\Field
     {
         return $this->field;
     }

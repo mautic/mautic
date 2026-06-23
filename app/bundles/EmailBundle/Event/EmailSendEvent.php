@@ -212,7 +212,7 @@ class EmailSendEvent extends CommonEvent
      *
      * @return MailHelper
      */
-    public function getHelper()
+    public function getHelper(): ?\Mautic\EmailBundle\Helper\MailHelper
     {
         return $this->helper;
     }

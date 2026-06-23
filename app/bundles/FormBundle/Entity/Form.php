@@ -708,7 +708,7 @@ class Form extends FormEntity implements UuidInterface
     /**
      * @return Collection|Submission[]
      */
-    public function getSubmissions()
+    public function getSubmissions(): \Doctrine\Common\Collections\Collection
     {
         return $this->submissions;
     }

@@ -144,10 +144,8 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
 
     /**
      * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD.
-     *
-     * @return mixed
      */
-    public function getPointActions()
+    public function getPointActions(): array
     {
         if ([] === $this->actions) {
             // build them

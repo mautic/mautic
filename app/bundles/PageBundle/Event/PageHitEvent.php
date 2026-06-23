@@ -30,7 +30,7 @@ class PageHitEvent extends CommonEvent
      *
      * @return Page
      */
-    public function getPage()
+    public function getPage(): ?\Mautic\PageBundle\Entity\Page
     {
         return $this->page;
     }

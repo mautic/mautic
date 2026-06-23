@@ -102,7 +102,7 @@ class InactiveHelper
     /**
      * @return \DateTimeInterface
      */
-    public function getEarliestInactiveDateTime()
+    public function getEarliestInactiveDateTime(): ?\DateTimeInterface
     {
         return $this->earliestInactiveDate;
     }

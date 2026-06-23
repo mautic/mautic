@@ -16,7 +16,7 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
     /**
      * Get the keys array.
      */
-    public function getKeys()
+    public function getKeys(): ?array
     {
         return $this->keys;
     }

@@ -11,10 +11,7 @@ class UpgradeEvent extends Event
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getStatus()
+    public function getStatus(): array
     {
         return $this->status;
     }

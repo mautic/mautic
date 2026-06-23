@@ -36,10 +36,8 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Returns the Campaign entity.
-     *
-     * @return Campaign
      */
-    public function getCampaign()
+    public function getCampaign(): \Mautic\CampaignBundle\Entity\Campaign
     {
         return $this->campaign;
     }
@@ -59,7 +57,7 @@ class CampaignLeadChangeEvent extends Event
      *
      * @return Lead[]|null
      */
-    public function getLeads()
+    public function getLeads(): array
     {
         return $this->leads;
     }

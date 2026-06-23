@@ -52,7 +52,7 @@ class SyncIntegrationsHelper
     /**
      * @return array<int,string>|null
      */
-    public function getEnabledIntegrations()
+    public function getEnabledIntegrations(): array
     {
         if (null !== $this->enabled) {
             return $this->enabled;

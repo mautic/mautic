@@ -33,7 +33,7 @@ class CategoryChangeEvent extends Event
     /**
      * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -43,15 +43,12 @@ class CategoryChangeEvent extends Event
      *
      * @return array
      */
-    public function getLeads()
+    public function getLeads(): ?array
     {
         return $this->leads;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): \Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
