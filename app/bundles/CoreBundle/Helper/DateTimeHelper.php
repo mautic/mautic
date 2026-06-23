@@ -208,8 +208,8 @@ class DateTimeHelper
         $with = clone $this->datetime;
 
         if ($resetTime) {
-            $compare->setTime(0, 0, 0);
-            $with->setTime(0, 0, 0);
+            $compare = $compare->setTime(0, 0, 0);
+            $with    = $with->setTime(0, 0, 0);
         }
 
         $interval = $compare->diff($with);
@@ -233,9 +233,8 @@ class DateTimeHelper
             $dt->add($interval);
 
             return $dt;
-        } else {
-            $this->datetime->add($interval);
         }
+        $this->datetime->add($interval);
     }
 
     /**
@@ -254,9 +253,8 @@ class DateTimeHelper
             $dt->sub($interval);
 
             return $dt;
-        } else {
-            $this->datetime->sub($interval);
         }
+        $this->datetime->sub($interval);
     }
 
     /**
@@ -307,9 +305,8 @@ class DateTimeHelper
             $dt->modify($string);
 
             return $dt;
-        } else {
-            $this->datetime->modify($string);
         }
+        $this->datetime->modify($string);
     }
 
     /**

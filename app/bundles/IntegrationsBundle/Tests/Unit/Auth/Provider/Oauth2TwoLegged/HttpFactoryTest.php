@@ -364,7 +364,6 @@ class HttpFactoryTest extends TestCase
         $handler    = $client->getConfig()['handler']; /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
         $reflection = new \ReflectionClass($handler);
         $property   = $reflection->getProperty('stack');
-        $property->setAccessible(true);
 
         $stack = $property->getValue($handler);
 
@@ -374,18 +373,14 @@ class HttpFactoryTest extends TestCase
         return $oauthMiddleware[0];
     }
 
-    private function getProperty(\ReflectionClass $reflection, $object, string $name)
+    private function getProperty(\ReflectionClass $reflection, object $object, string $name): mixed
     {
         $property = $reflection->getProperty($name);
-        $property->setAccessible(true);
 
         return $property->getValue($object);
     }
 
-    /**
-     * @return PasswordCredentialsGrantInterface|StateInterface|ScopeInterface
-     */
-    private function getCredentials(): PasswordCredentialsGrantInterface
+    private function getCredentials(): PasswordCredentialsGrantInterface&StateInterface&ScopeInterface&CredentialsInterface
     {
         return new class implements PasswordCredentialsGrantInterface, StateInterface, ScopeInterface, CredentialsInterface {
             public function getAuthorizationUrl(): string

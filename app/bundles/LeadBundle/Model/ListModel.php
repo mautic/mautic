@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
+use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -166,16 +171,27 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function deleteEntities($ids): array
     {
-        $entities = [];
-        foreach ($ids as $listId) {
-            $leadList = $this->getEntity($listId);
-            if ($leadList) {
-                $entities[$listId] = $leadList;
-                $this->deleteEntity($leadList);
+        $deleted        = [];
+        $unableToDelete = [];
+
+        foreach ($ids as $id) {
+            $entity = $this->getEntity($id);
+
+            if ($entity) {
+                try {
+                    $this->deleteEntity($entity);
+                    $deleted[$id] = $entity;
+                } catch (DeleteEntityDependencyException) {
+                    $unableToDelete[$id] = $entity;
+                }
             }
         }
 
-        return $entities;
+        if ($unableToDelete) {
+            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
+        }
+
+        return $deleted;
     }
 
     /**
@@ -184,11 +200,16 @@ class ListModel extends FormModel implements GlobalSearchInterface
     public function deleteEntity($entity): void
     {
         $id    = $entity->getId();
-        $this->dispatchEvent('pre_delete', $entity);
+        $event = $this->dispatchEvent('pre_delete', $entity);
+
+        if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
+            throw new DeleteEntityDependencyException($event->getDependencyErrors());
+        }
+
         $this->getRepository()->setSegmentAsDeleted($id);
 
         $entity->deletedId = $id;
-        $this->dispatcher->dispatch(new LeadListEvent($entity), LeadEvents::ON_LIST_DELETE);
+        $this->dispatchEvent('on_list_delete', $entity);
         $entity->setId(null);
     }
 
@@ -260,6 +281,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
             case 'pre_unpublish':
                 $name = LeadEvents::LIST_PRE_UNPUBLISH;
                 break;
+            case 'on_list_delete':
+                $name = LeadEvents::ON_LIST_DELETE;
+                break;
             default:
                 return null;
         }
@@ -272,9 +296,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -900,11 +924,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int    $limit
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param int                 $limit
+     * @param ?\DateTimeInterface $dateFrom
+     * @param ?\DateTimeInterface $dateTo
+     * @param bool                $canViewOthers
+     * @param int[]               $segments
      *
-     * @return array
+     * @return mixed[]
      */
     public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments)
     {
@@ -927,10 +953,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if (!empty($segments)) {
             $q->andWhere('ll.id IN ('.$segmentlist.')');
         }
-        if (!empty($dateFrom)) {
+        if ($dateFrom instanceof \DateTimeInterface) {
             $q->andWhere("l.date_added >= '".$dateFrom->format('Y-m-d')."'");
         }
-        if (!empty($dateTo)) {
+        if ($dateTo instanceof \DateTimeInterface) {
             $q->andWhere("l.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
         }
         if (!$canViewOthers) {
@@ -949,10 +975,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $qAll->andWhere('ll.created_by = :userId')
                     ->setParameter('userId', $this->userHelper->getUser()->getId());
             }
-            if (!empty($dateFrom)) {
+            if ($dateFrom instanceof \DateTimeInterface) {
                 $qAll->andWhere("t.date_added >= '".$dateFrom->format('Y-m-d')."'");
             }
-            if (!empty($dateTo)) {
+            if ($dateTo instanceof \DateTimeInterface) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
             $resultsAll = $qAll->executeQuery()->fetchAllAssociative();
@@ -1337,7 +1363,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $choices['categories'] = [];
                 $categories            = $this->categoryModel->getLookupResults('segment');
                 foreach ($categories as $category) {
-                    $choices['categories'][$category['id']] = $category['title'];
+                    $choices['categories'][$category['alias']] = $category['title'];
                 }
         }
 
@@ -1388,7 +1414,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             } else {
                 $count               = $this->getRepository()->getLeadCount($listId);
                 $leadCounts[$listId] = $count;
-                $this->segmentCountCacheHelper->setSegmentContactCount($listId, $count);
+                $this->segmentCountCacheHelper->setSegmentContactCount($listId, (int) $count);
             }
         }
 

@@ -22,7 +22,7 @@ class AcceptanceTester extends Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
 
-    public function login($name, $password): void
+    public function login(string $name = 'admin', string $password = 'Maut1cR0cks!'): void
     {
         $I = $this;
         // if snapshot exists - skipping login

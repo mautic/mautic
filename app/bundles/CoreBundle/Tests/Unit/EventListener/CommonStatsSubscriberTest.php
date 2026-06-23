@@ -240,11 +240,10 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscirber->onStatsFetch($this->statsEvent);
     }
 
-    private function setProperty($object, $property, $value): void
+    private function setProperty(object $object, string $property, mixed $value): void
     {
         $reflection         = new \ReflectionClass($object);
         $reflectionProperty = $reflection->getProperty($property);
-        $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($object, $value);
     }
 }

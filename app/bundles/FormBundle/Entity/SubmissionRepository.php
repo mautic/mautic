@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -46,13 +47,10 @@ class SubmissionRepository extends CommonRepository
         $form = $args['form'];
 
         // DBAL
-        if (!isset($args['viewOnlyFields'])) {
-            $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
+        $viewOnlyFields = $args['viewOnlyFields'] ?? [];
+        if (empty($viewOnlyFields)) {
+            $viewOnlyFields = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
-        $viewOnlyFields = array_map(
-            fn ($value): string => '"'.$value.'"',
-            $args['viewOnlyFields']
-        );
 
         // Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
@@ -60,11 +58,13 @@ class SubmissionRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'form_fields', 'f')
             ->where('f.form_id = '.$form->getId())
             ->andWhere(
-                $fq->expr()->notIn('f.type', $viewOnlyFields),
+                $fq->expr()->notIn('f.type', ':types'),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
             ->orderBy('f.field_order, f.id', 'ASC')
-            ->setParameter('saveResult', true);
+            ->setParameter('saveResult', true)
+            ->setParameter('types', $viewOnlyFields, ArrayParameterType::STRING);
+
         $results = $fq->executeQuery()->fetchAllAssociative();
 
         $fields = [];
@@ -359,7 +359,8 @@ class SubmissionRepository extends CommonRepository
             ->join('s', MAUTIC_TABLE_PREFIX.'pages', 'p', 's.page_id = p.id');
 
         if (is_array($pageId)) {
-            $q->where($q->expr()->in('s.page_id', $pageId))
+            $q->where($q->expr()->in('s.page_id', ':pageIds'))
+                ->setParameter('pageIds', array_map('intval', $pageId), ArrayParameterType::INTEGER)
                 ->groupBy('s.page_id, p.title, p.variant_hits');
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
@@ -391,7 +392,8 @@ class SubmissionRepository extends CommonRepository
             ->join('h', MAUTIC_TABLE_PREFIX.'emails', 'e', 'h.email_id = e.id');
 
         if (is_array($emailId)) {
-            $q->where($q->expr()->in('e.id', $emailId))
+            $q->where($q->expr()->in('e.id', ':ids'))
+                ->setParameter('ids', array_map('intval', $emailId), ArrayParameterType::INTEGER)
                 ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':id'))
@@ -430,9 +432,10 @@ class SubmissionRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('s.form_id', (int) $formId),
-                    $q->expr()->in('s.id', $ids)
+                    $q->expr()->in('s.id', ':ids')
                 )
-            );
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         $validIds = [];
         $results  = $q->executeQuery()->fetchAllAssociative();
@@ -530,5 +533,66 @@ class SubmissionRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return 'fs';
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function deleteFormResultsTableRecord(Submission $submission): void
+    {
+        $formId     = $submission->getForm()->getId();
+        $formAlias  = $submission->getForm()->getAlias();
+
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete($this->getResultsTableName($formId, $formAlias))
+            ->where('submission_id = :submissionId')
+            ->setParameter('submissionId', $submission->getId());
+
+        $qb->executeStatement();
+    }
+
+    /**
+     * @param array<int,string> $submissionIds
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function batchDeleteFormResultsTableRecord(array $submissionIds): void
+    {
+        if (!empty($submissionIds)) {
+            $entity = $this->getEntity((int) $submissionIds[0]);
+            $form   = $entity->getForm();
+
+            $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $qb->delete($this->getResultsTableName($form->getId(), $form->getAlias()))
+               ->where($qb->expr()->in('submission_id', $submissionIds));
+
+            $qb->executeStatement();
+        }
+    }
+
+    public function getOrphanSubmissionRecords(string $tableName, int $maxResults): DbalQueryBuilder
+    {
+        $submissionTable =  MAUTIC_TABLE_PREFIX.'form_submissions';
+
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('fr.submission_id')
+            ->from($tableName, 'fr')
+            ->leftJoin('fr', $submissionTable, 'fs', 'fs.id = fr.submission_id')
+            ->where('fs.id is null')
+            ->setMaxResults($maxResults);
+    }
+
+    /**
+     * @param array<int,string> $inValidSubmissionIds
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function deleteOrphanSubmissionRecords(string $tableName, array $inValidSubmissionIds): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->delete($tableName)
+            ->where($qb->expr()->in('submission_id', $inValidSubmissionIds))
+            ->executeStatement();
     }
 }

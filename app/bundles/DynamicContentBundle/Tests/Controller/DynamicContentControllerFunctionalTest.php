@@ -34,13 +34,13 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser(self::PERMISSION_CREATE);
         $this->client->request(Request::METHOD_GET, '/s/dwc/new');
 
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
     }
 
     public function testNoNestingValidationNewAction(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $this->submitFormAndAssertNoNestingValidation($crawler);
     }
@@ -50,13 +50,13 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request(Request::METHOD_GET, '/s/dwc/new');
 
-        Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testNoNestingValidationEditAction(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $buttonCrawler = $crawler->selectButton('Save');
         $form          = $buttonCrawler->form();
@@ -66,7 +66,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $crawler = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringNotContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
         Assert::assertStringContainsString('Edit Dynamic Content', $crawler->text());
 
@@ -78,7 +78,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser(self::PERMISSION_DELETE_OWN);
         $this->client->request(Request::METHOD_POST, '/s/dwc/delete');
 
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
     }
 
     public function testForbiddenDeleteAction(): void
@@ -86,7 +86,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request('GET', '/s/dwc/delete');
 
-        Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testDwcWithProject(): void
@@ -227,7 +227,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $crawler = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(self::NO_NESTING_VALIDATION_MESSAGE, $crawler->text());
     }
 }

@@ -15,21 +15,6 @@ return [
                 ],
             ],
         ],
-        'helpers' => [
-            'mautic.helper.notification' => [
-                'class'     => Mautic\NotificationBundle\Helper\NotificationHelper::class,
-                'alias'     => 'notification_helper',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'twig.helper.assets',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.integration',
-                    'router',
-                    'request_stack',
-                    'mautic.lead.model.dnc',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.notification.api' => [
                 'class'     => Mautic\NotificationBundle\Api\OneSignalApi::class,

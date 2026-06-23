@@ -59,7 +59,7 @@ class Log
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -67,7 +67,7 @@ class Log
     }
 
     /**
-     * @return Webhook
+     * @return Webhook|null
      */
     public function getWebhook()
     {
@@ -85,7 +85,7 @@ class Log
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getStatusCode()
     {
@@ -105,7 +105,7 @@ class Log
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -138,7 +138,7 @@ class Log
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     public function getRuntime()
     {

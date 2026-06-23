@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(security: "is_granted('asset:assets:viewown')"),
-        new Get(security: "is_granted('asset:assets:viewown')"),
+        new Get(security: "is_granted('asset:assets:viewown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['download:read'],
@@ -89,11 +89,8 @@ class Download
     #[Groups(['download:read', 'download:write'])]
     private $sourceId;
 
-    /**
-     * @var Email|null
-     */
     #[Groups(['download:read', 'download:write'])]
-    private $email;
+    private ?Email $email = null;
 
     private ?string $utmCampaign = null;
 
@@ -123,6 +120,7 @@ class Download
 
         $builder->createManyToOne('asset', 'Asset')
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addIpAddress(true);
@@ -236,7 +234,7 @@ class Download
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getReferer()
     {
@@ -254,7 +252,7 @@ class Download
     }
 
     /**
-     * @return Asset
+     * @return Asset|null
      */
     public function getAsset()
     {
@@ -272,7 +270,7 @@ class Download
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -292,7 +290,7 @@ class Download
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getTrackingId()
     {
@@ -300,7 +298,7 @@ class Download
     }
 
     /**
-     * @return mixed
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -316,7 +314,7 @@ class Download
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getSource()
     {
@@ -332,7 +330,7 @@ class Download
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSourceId()
     {
@@ -347,18 +345,12 @@ class Download
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail(Email $email): void
+    public function setEmail(?Email $email): void
     {
         $this->email = $email;
     }
@@ -421,5 +413,10 @@ class Download
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getAsset()->getCreatedBy();
     }
 }

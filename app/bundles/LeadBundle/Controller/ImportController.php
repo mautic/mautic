@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
@@ -21,6 +22,8 @@ use Mautic\LeadBundle\Form\Type\LeadImportType;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -70,6 +73,7 @@ class ImportController extends FormController
 
         $this->importModel = $model;
 
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -139,12 +143,12 @@ class ImportController extends FormController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function cancelAction(Request $request): Response
+    public function cancelAction(Request $request, NotificationModel $notificationModel, UserRepository $userRepository): Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
 
         if ($import && $import->getId()) {
             $import->setStatus($import::STOPPED)
@@ -153,6 +157,12 @@ class ImportController extends FormController
         }
 
         $this->resetImport($object);
+
+        $fileName         = basename($fullPath);
+        $notificationUser = $this->getImportNotificationUser($import, $userRepository);
+        $message          = $this->getImportCancellationMessage($fileName, $import, $notificationUser);
+        $notificationModel->addNotification($message, 'warning', false, null, null, null, $notificationUser);
+
         $this->removeImportFile($fullPath);
         $this->logger->log(LogLevel::INFO, "Import for file {$fullPath} was canceled.");
 
@@ -167,7 +177,7 @@ class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
 
         if ($import) {
             $import->setStatus($import::QUEUED);
@@ -274,7 +284,7 @@ class ImportController extends FormController
                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.inprogress', true);
                     $this->requestStack->getSession()->set('mautic.'.$object.'.import.progresschecks', 1);
 
-                    $import = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id', null));
+                    $import = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.'.$object.'.import.id'));
 
                     if (!$import->getDateStarted()) {
                         $import->setDateStarted(new \DateTime());
@@ -298,10 +308,9 @@ class ImportController extends FormController
                     $this->importModel->saveEntity($import);
 
                     break;
-                } else {
-                    ++$checks;
-                    $this->requestStack->getSession()->set('mautic.'.$object.'.import.progresschecks', $checks);
                 }
+                ++$checks;
+                $this->requestStack->getSession()->set('mautic.'.$object.'.import.progresschecks', $checks);
         }
 
         // /Check for a submitted form and process it
@@ -627,6 +636,34 @@ class ImportController extends FormController
 
             $this->logger->log(LogLevel::WARNING, "File {$filepath} was removed.");
         }
+    }
+
+    private function getImportNotificationUser(?Import $import, UserRepository $userRepository): ?User
+    {
+        if (!$import || !$import->getCreatedBy()) {
+            return null;
+        }
+
+        $user = $userRepository->find($import->getCreatedBy());
+
+        return $user instanceof User ? $user : null;
+    }
+
+    private function getImportCancellationMessage(string $fileName, ?Import $import, ?User $notificationUser): string
+    {
+        if (!$import || !$import->getId()) {
+            return $this->translator->trans('mautic.lead.import.canceled', ['%file%' => $fileName]);
+        }
+
+        if ($notificationUser && $this->user && $notificationUser->getId() !== $this->user->getId()) {
+            return $this->translator->trans('mautic.lead.import.canceled.with_id_and_user', [
+                '%file%' => $fileName,
+                '%id%'   => $import->getId(),
+                '%user%' => $this->user->getName(),
+            ]);
+        }
+
+        return $this->translator->trans('mautic.lead.import.canceled.with_id', ['%file%' => $fileName, '%id%' => $import->getId()]);
     }
 
     /**

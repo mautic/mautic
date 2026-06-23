@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileControllerTest extends MauticMysqlTestCase
 {
-    private $uploadedFilePath;
+    private ?string $uploadedFilePath = null;
 
     public function testImageUploadSuccess(): void
     {

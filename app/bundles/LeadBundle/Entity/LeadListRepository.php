@@ -176,38 +176,37 @@ class LeadListRepository extends CommonRepository
             }
 
             return $return;
-        } else {
-            $q = $this->getEntityManager()->createQueryBuilder()
-                ->from(LeadList::class, 'l', 'l.id');
-
-            if ($forList) {
-                $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
-            } else {
-                $q->select('l');
-            }
-
-            $q->leftJoin('l.leads', 'il');
-
-            $q->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('IDENTITY(il.lead)', (int) $lead),
-                    $q->expr()->in('il.manuallyRemoved', ':false')
-                )
-            )
-                ->setParameter('false', false, 'boolean');
-
-            if ($isPublic) {
-                $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
-                    ->setParameter('isPublic', true, 'boolean');
-            }
-
-            if ($isPreferenceCenter) {
-                $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
-                    ->setParameter('isPreferenceCenter', true, 'boolean');
-            }
-
-            return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
         }
+        $q = $this->getEntityManager()->createQueryBuilder()
+            ->from(LeadList::class, 'l', 'l.id');
+
+        if ($forList) {
+            $q->select('partial l.{id, alias, name}, partial il.{lead, list, dateAdded, manuallyAdded, manuallyRemoved}');
+        } else {
+            $q->select('l');
+        }
+
+        $q->leftJoin('l.leads', 'il');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('IDENTITY(il.lead)', (int) $lead),
+                $q->expr()->in('il.manuallyRemoved', ':false')
+            )
+        )
+            ->setParameter('false', false, 'boolean');
+
+        if ($isPublic) {
+            $q->andWhere($q->expr()->eq('l.isGlobal', ':isPublic'))
+                ->setParameter('isPublic', true, 'boolean');
+        }
+
+        if ($isPreferenceCenter) {
+            $q->andWhere($q->expr()->eq('l.isPreferenceCenter', ':isPreferenceCenter'))
+                ->setParameter('isPreferenceCenter', true, 'boolean');
+        }
+
+        return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
     }
 
     /**
@@ -298,7 +297,8 @@ class LeadListRepository extends CommonRepository
             $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
             $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
         } else {
-            $expression = $q->expr()->in('l.leadlist_id', $listIds);
+            $expression = $q->expr()->in('l.leadlist_id', ':listIds');
+            $q->setParameter('listIds', $listIds, ArrayParameterType::INTEGER);
         }
 
         $q->where(
@@ -773,11 +773,11 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = unserialize($property['properties']);
+            $property       = \Mautic\CoreBundle\Helper\Serializer::decode($property['properties']);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
-        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+        return array_map(fn ($segment): array => ['item_id' => (string) $segment], $segmentIds);
     }
 
     /**
@@ -796,8 +796,8 @@ SQL;
 
         foreach ($query->getResult() as $rowFilters) {
             $segmentMembershipFilters = array_filter(
-                unserialize($rowFilters['filters']),
-                fn (array $filter) => 'leadlist' === $filter['type']
+                \Mautic\CoreBundle\Helper\Serializer::decode($rowFilters['filters']),
+                fn (array $filter): bool => 'leadlist' === $filter['type']
             );
 
             foreach ($segmentMembershipFilters as $filter) {
@@ -875,11 +875,11 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = unserialize($property['properties']);
+            $property       = \Mautic\CoreBundle\Helper\Serializer::decode($property['properties']);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
-        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+        return array_map(fn ($segment): array => ['item_id' => (string) $segment], $segmentIds);
     }
 
     /**
@@ -923,6 +923,6 @@ SQL;
             ->executeQuery()
             ->fetchAllNumeric();
 
-        return array_map(fn ($row) => (int) $row[0], $result);
+        return array_map(fn ($row): int => (int) $row[0], $result);
     }
 }

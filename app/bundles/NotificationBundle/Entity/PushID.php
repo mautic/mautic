@@ -60,7 +60,7 @@ class PushID
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -80,7 +80,7 @@ class PushID
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -98,7 +98,7 @@ class PushID
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPushID()
     {
@@ -118,7 +118,7 @@ class PushID
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isEnabled()
     {
@@ -136,7 +136,7 @@ class PushID
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isMobile()
     {

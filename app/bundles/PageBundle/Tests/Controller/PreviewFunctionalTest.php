@@ -32,7 +32,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         // Anonymous visitor is not allowed to access preview if not public
         $this->logoutUser();
         $this->client->request(Request::METHOD_GET, $url);
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
 
         $this->loginUser($user);
 
@@ -49,7 +49,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Anonymous visitor is not allowed to access preview
         $this->client->request(Request::METHOD_GET, $url);
-        self::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testPreviewPageUrlIsValid(): void
@@ -235,7 +235,7 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
     private function assertPageContent(string $url, string $expectedContent): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, $url);
-        self::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
         self::assertSame($expectedContent, $crawler->filter('body')->text());
     }
 

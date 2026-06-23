@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -89,6 +90,7 @@ class DynamicContentType extends AbstractType
         private TranslatorInterface $translator,
         private LeadModel $leadModel,
         private TypeList $typeList,
+        private RelativeDate $relativeDate,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -258,7 +260,7 @@ class DynamicContentType extends AbstractType
             );
         }
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate);
         $builder->add(
             $builder->create(
                 'filters',
@@ -298,13 +300,13 @@ class DynamicContentType extends AbstractType
             }
         );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var DynamicContent|null $dynamicContent */
             $dynamicContent = $event->getData();
             $this->addContentField($event->getForm(), $dynamicContent?->getType());
         });
 
-        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $form = $event->getForm();
             $this->addContentField($form->getParent(), $form->getData());
         });

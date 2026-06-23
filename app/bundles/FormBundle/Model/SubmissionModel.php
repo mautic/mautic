@@ -166,9 +166,9 @@ class SubmissionModel extends CommonFormModel
             $id    = $f->getId();
             $type  = $f->getType();
             $alias = $f->getAlias();
-            $value = $post[$alias] ?? '';
+            $value = $post[$alias ?? ''] ?? '';
 
-            $fieldArray[$id] = [
+            $fieldArray[$id ?? ''] = [
                 'id'    => $id,
                 'type'  => $type,
                 'alias' => $alias,
@@ -383,7 +383,7 @@ class SubmissionModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setAction(null);
+            $submissionEvent->setAction();
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
@@ -406,7 +406,37 @@ class SubmissionModel extends CommonFormModel
     {
         $this->formUploader->deleteUploadedFiles($submission);
 
+        $submissionRepository = $this->getRepository();
+
+        // deleting form submission record in form results table
+        try {
+            $submissionRepository->deleteFormResultsTableRecord($submission);
+        } catch (\Exception $e) {
+            $this->logger->error($e);
+        }
+
         parent::deleteEntity($submission);
+    }
+
+    /**
+     * @param array<int,string> $ids
+     *
+     * @return array<int,mixed>
+     */
+    public function deleteEntities($ids): array
+    {
+        if (!empty($ids)) {
+            $submissionRepository = $this->getRepository();
+
+            // deleting form submission record in form results table
+            try {
+                $submissionRepository->batchDeleteFormResultsTableRecord($ids);
+            } catch (\Exception $e) {
+                $this->logger->error($e);
+            }
+        }
+
+        return parent::deleteEntities($ids);
     }
 
     /**

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -17,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateTestEntitiesTrait;
+
     public function testWidgetWithReport(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy([]);
@@ -196,5 +200,46 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $crawlerTable = $crawler->filter('table')->first();
 
         return array_slice($crawlerTable->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text()))), 1);
+    }
+
+    public function testUpcomingEmailsWidget(): void
+    {
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+
+        $widget = new Widget();
+        $widget->setName('Upcoming Emails');
+        $widget->setType('upcoming.emails');
+        $widget->setWidth(50);
+        $widget->setHeight(330);
+        $widget->setCreatedBy($user);
+
+        $this->em->persist($widget);
+        $this->em->flush();
+
+        $campaign = $this->createCampaign('Test Campaign');
+        $event    = $this->createEvent(
+            'Send Email',
+            $campaign,
+            'email.send',
+            'action',
+            ['email' => 1]
+        );
+
+        $lead = $this->createLead('TestFN', 'TestLN');
+
+        $campaignLeadEvent = new LeadEventLog();
+        $campaignLeadEvent->setLead($lead);
+        $campaignLeadEvent->setEvent($event);
+        $campaignLeadEvent->setCampaign($campaign);
+        $campaignLeadEvent->setTriggerDate(new \DateTime('+1 day'));
+        $campaignLeadEvent->setIsScheduled(true);
+        $this->em->persist($campaignLeadEvent);
+
+        $this->em->flush();
+
+        $this->client->request('GET', "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
+
+        self::assertResponseIsSuccessful();
+        Assert::assertStringContainsString('TestFN TestLN', $this->client->getResponse()->getContent());
     }
 }

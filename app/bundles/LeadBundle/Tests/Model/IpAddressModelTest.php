@@ -54,8 +54,6 @@ class IpAddressModelTest extends TestCase
         $contact      = $this->createMock(Lead::class);
         $ipAddress    = $this->createMock(IpAddress::class);
         $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
-        $connection   = $this->createMock(Connection::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $contact->expects($this->exactly(1))
             ->method('getIpAddresses')

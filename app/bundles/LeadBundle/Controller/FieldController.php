@@ -206,7 +206,7 @@ class FieldController extends FormController
                         ],
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $field->getId(), true);
             } elseif (!$valid) {
                 // some bug in Symfony prevents repopulating list options on errors
@@ -584,7 +584,7 @@ class FieldController extends FormController
                 'type'    => 'error',
                 'msg'     => 'mautic.core.notice.used.fields',
                 'msgVars' => [
-                    '%fields%' => implode(', ', array_map(fn ($entity) => $entity->getName().' ('.$entity->getId().')', $unableToDeleteEntities)),
+                    '%fields%' => implode(', ', array_map(fn ($entity): string => $entity->getName().' ('.$entity->getId().')', $unableToDeleteEntities)),
                 ],
             ];
         }

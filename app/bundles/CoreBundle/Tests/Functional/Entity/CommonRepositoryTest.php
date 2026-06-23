@@ -11,7 +11,7 @@ class CommonRepositoryTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', 's/contacts?search=is:mine');
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('is:mine', $this->client->getResponse()->getContent());
     }
 
@@ -19,7 +19,7 @@ class CommonRepositoryTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', 's/companies?search=is:mine');
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('is:mine', $this->client->getResponse()->getContent());
     }
 
@@ -27,7 +27,7 @@ class CommonRepositoryTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', 's/emails?search=is:published');
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('is:published', $this->client->getResponse()->getContent());
     }
 }

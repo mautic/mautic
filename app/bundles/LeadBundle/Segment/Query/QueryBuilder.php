@@ -136,7 +136,7 @@ class QueryBuilder extends BaseQueryBuilder
             $knownAliases[$tableReference] = true;
 
             $fromClauses[$tableReference] = $tableSql.\Closure::bind(
-                fn ($tableReference, &$knownAliases) => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
+                fn ($tableReference, &$knownAliases): string => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
                 $this,
                 parent::class
             )($tableReference, $knownAliases);
@@ -353,7 +353,7 @@ class QueryBuilder extends BaseQueryBuilder
                 $val = "'$val'";
             } elseif (is_array($val)) {
                 if (ArrayParameterType::STRING === $this->getParameterType($key)) {
-                    $val = array_map(static fn ($value) => "'$value'", $val);
+                    $val = array_map(static fn ($value): string => "'$value'", $val);
                 }
                 $val = implode(', ', $val);
             }

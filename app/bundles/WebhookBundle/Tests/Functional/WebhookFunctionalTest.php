@@ -228,6 +228,8 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * Creating some contacts via API so all the listeners are triggered.
      * It's closer to a real world contact creation.
+     *
+     * @return int[]|string[]
      */
     private function createContacts(): array
     {

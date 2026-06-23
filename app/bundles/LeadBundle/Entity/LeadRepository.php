@@ -324,9 +324,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if (count($result)) {
             return $all ? $result : $result[0];
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**
@@ -694,7 +694,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     protected function addCatchAllWhereClause($q, $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
-        $availableForSearch = array_map(fn ($alias) => 'l.'.$alias, $customFields);
+        $availableForSearch = array_map(fn ($alias): string => 'l.'.$alias, $customFields);
 
         $columns = array_merge(
             [
@@ -1166,8 +1166,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->in('l.id', $contactIds)
-            );
+                $qb->expr()->in('l.id', ':ids')
+            )
+            ->setParameter('ids', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
@@ -1412,7 +1413,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private function buildDuplicateValuesQuery(array $uniqueFields): string
     {
-        $fieldsAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
+        $fieldsAliases = array_map(fn ($uniqueField): string => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
 
         if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return $this->getDuplicateValuesQuery($fieldsAliases)->getSQL();

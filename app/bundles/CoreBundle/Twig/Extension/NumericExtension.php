@@ -13,7 +13,7 @@ class NumericExtension extends AbstractExtension
     public function getTests()
     {
         return [
-            new TwigTest('numeric', fn ($value) => !is_array($value) && is_numeric($value)),
+            new TwigTest('numeric', fn ($value): bool => !is_array($value) && is_numeric($value)),
         ];
     }
 
@@ -21,7 +21,7 @@ class NumericExtension extends AbstractExtension
     {
         return [
             new TwigFilter('int', fn ($value): int => (int) $value),
-            new TwigFilter('array', fn ($value) => (array) $value),
+            new TwigFilter('array', fn ($value): array => (array) $value),
         ];
     }
 }

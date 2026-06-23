@@ -6,10 +6,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 
 class BatchIdToEntityHelper
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     private array $originalKeys = [];
 
@@ -78,7 +75,7 @@ class BatchIdToEntityHelper
             if (!isset($entitiesKeyedById[$id])) {
                 $hasPreviousId = array_filter(
                     $entities,
-                    fn ($entity) => $id == $entity->getPreviousId()
+                    fn ($entity): bool => $id == $entity->getPreviousId()
                 );
 
                 if ($hasPreviousId) {

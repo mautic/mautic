@@ -96,7 +96,7 @@ class ArrayHelper
         }
 
         return array_map(
-            fn (array $subArray) => array_flip($subArray),
+            fn (array $subArray): array => array_flip($subArray),
             $masterArrays
         );
     }
@@ -130,9 +130,9 @@ class ArrayHelper
         return array_map(function ($x, $y) use ($subtracted) {
             if ($subtracted) {
                 return $x - $y;
-            } else {
-                return $x + $y;
             }
+
+            return $x + $y;
         }, $a1, $b2);
     }
 }

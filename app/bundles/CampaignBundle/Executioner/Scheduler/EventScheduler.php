@@ -87,6 +87,7 @@ class EventScheduler
     public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn): void
     {
         $log->setTriggerDate($toBeExecutedOn, 'Event rescheduled');
+        $log->setDateQueued(null);
         $this->eventLogger->persistLog($log);
 
         $event  = $log->getEvent();
@@ -102,6 +103,7 @@ class EventScheduler
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn, 'Bulk rescheduling of events');
+            $log->setDateQueued(null);
         }
 
         $this->eventLogger->persistCollection($logs);
@@ -209,8 +211,13 @@ class EventScheduler
             $ellapsedSeconds   = $lastPublishDate->getTimestamp() - $log->getDateTriggered()->getTimestamp(); // Seconds since the event log was created and now.
             $publishedSeconds  = $ellapsedSeconds - $unublishedSeconds;
             $secondsToAdd      = (new DateTimeHelper())->intervalToSeconds($scheduledInterval) - $publishedSeconds;
-            $newTriggerDate    = \DateTimeImmutable::createFromInterface($lastPublishDate)->add((new DateTimeHelper())->buildInterval($secondsToAdd, 'S'));
-            $log->setTriggerDate(\DateTime::createFromImmutable($newTriggerDate), 'Campaign republish behavior: '.RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value);
+            $newTriggerDate    = \DateTimeImmutable::createFromInterface($lastPublishDate);
+
+            if ($secondsToAdd > 0) {
+                $newTriggerDate = $newTriggerDate->add((new DateTimeHelper())->buildInterval($secondsToAdd, 'S'));
+            }
+
+            $log->setTriggerDate(\DateTime::createFromImmutable($newTriggerDate), 'Campaign republish behavior: count_only_while_published');
 
             return true;
         }

@@ -217,7 +217,7 @@ class MessageQueue
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannel()
     {
@@ -233,7 +233,7 @@ class MessageQueue
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getChannelId()
     {
@@ -271,7 +271,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDatePublished()
     {
@@ -287,7 +287,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -303,7 +303,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getLastAttempt()
     {
@@ -319,7 +319,7 @@ class MessageQueue
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -364,7 +364,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getScheduledDate()
     {
@@ -460,7 +460,7 @@ class MessageQueue
     }
 
     /**
-     * @return array|mixed
+     * @return array<array-key, mixed>
      */
     public function getMetadata()
     {

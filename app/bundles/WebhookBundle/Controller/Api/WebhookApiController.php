@@ -14,6 +14,7 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -61,6 +62,12 @@ class WebhookApiController extends CommonApiController
         $entity->buildTriggers();
     }
 
+    /**
+     * @param Webhook              &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $eventsToKeep = [];

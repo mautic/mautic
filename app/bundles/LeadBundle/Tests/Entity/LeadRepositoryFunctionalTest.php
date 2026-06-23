@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -111,6 +110,47 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param mixed[] $contactIds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetContacts')]
+    public function testGetContacts(array $contactIds, bool $includeLead, int $expectedCount): void
+    {
+        if ($includeLead) {
+            $contactIds[] = $this->lead->getId();
+        }
+
+        /** @var LeadRepository $repo */
+        $repo     = $this->em->getRepository(Lead::class);
+        $contacts = $repo->getContacts($contactIds);
+
+        $this->assertCount($expectedCount, $contacts);
+    }
+
+    /**
+     * @return iterable<string, mixed>
+     */
+    public static function dataForGetContacts(): iterable
+    {
+        yield 'No ids' => [
+            [],
+            false,
+            0,
+        ];
+
+        yield 'Random ids only' => [
+            [99999, 0],
+            false,
+            0,
+        ];
+
+        yield 'Random ids with lead' => [
+            [99999],
+            true,
+            1,
+        ];
+    }
+
+    /**
      * @param string[]|string $emails
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestAjaxGetLeadsByFieldValue')]
@@ -125,7 +165,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         ];
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', $payload);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), print_r(json_decode($this->client->getResponse()->getContent(), true), true));
+        $this->assertResponseIsSuccessful();
         $contentArray = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount($expectedCount, $contentArray['items']);

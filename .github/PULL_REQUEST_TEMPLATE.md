@@ -50,7 +50,7 @@ Please write a short README for your feature/bugfix. This will help people under
 <!--
 This part is crucial. Take the time to write very clear, annotated and step by step test instructions, because testers may not be developers.
 -->
-1. Open this PR on Gitpod or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
+1. Open this PR on GitHub Codespaces or pull down for testing locally (see docs on testing PRs [here](https://contribute.mautic.org/contributing-to-mautic/tester))
 2. 
 
 <!--

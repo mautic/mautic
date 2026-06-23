@@ -83,11 +83,10 @@ class FileLogHandlerTest extends TestCase
         $this->assertEquals(7, $maxFiles);
     }
 
-    private function getProperty(FileLogHandler $handler, string $property)
+    private function getProperty(FileLogHandler $handler, string $property): mixed
     {
         $reflection = new \ReflectionClass($handler);
         $fileName   = $reflection->getProperty($property);
-        $fileName->setAccessible(true);
 
         return $fileName->getValue($handler);
     }
