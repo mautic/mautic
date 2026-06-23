@@ -37,6 +37,8 @@ class MenuBuilderTest extends TestCase
 
     public function testMainMenuKeepsUriOnlyItems(): void
     {
+        $menuName = uniqid('uriOnlyItems', false);
+
         $this->dispatcher
             ->expects(self::once())
             ->method('dispatch')
@@ -56,7 +58,7 @@ class MenuBuilderTest extends TestCase
 
         $builder = new MenuBuilder($this->factory, $this->matcher, $this->dispatcher, $this->menuHelper);
 
-        $menu = $builder->__call('mainMenu', []);
+        $menu = $builder->__call($menuName, []);
 
         Assert::assertInstanceOf(ItemInterface::class, $menu);
         $menuItem = $menu->getChild('mautic.contribute.menu.index');
