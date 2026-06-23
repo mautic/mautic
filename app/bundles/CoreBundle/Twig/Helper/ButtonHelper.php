@@ -169,10 +169,7 @@ final class ButtonHelper
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getButtonCount()
+    public function getButtonCount(): int
     {
         return $this->buttonCount;
     }

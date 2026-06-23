@@ -212,73 +212,71 @@ class DashboardSubscriber extends MainDashboardSubscriber
             }
 
             // Build table rows with links
-            if ($lists) {
-                $stages            = [];
-                $deviceGranularity = [];
+            $stages            = [];
+            $deviceGranularity = [];
 
-                foreach ($lists as &$list) {
-                    if ('' != $list['alias']) {
-                        $listUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
-                    } else {
-                        $listUrl = $this->router->generate('mautic_contact_index', []);
-                    }
-                    if ($list['id']) {
-                        $params['filter']['leadlist_id'] = [
-                            'value'            => $list['id'],
-                            'list_column_name' => 't.id',
-                        ];
-                    } else {
-                        unset($params['filter']['leadlist_id']);
-                    }
-
-                    $column = $this->leadListModel->getLifeCycleSegmentChartData(
-                        $params['timeUnit'],
-                        $params['dateFrom'],
-                        $params['dateTo'],
-                        $params['dateFormat'],
-                        $params['filter'],
-                        $canViewOthers,
-                        $list['name']
-                    );
-                    $items['columnName'][] = $list['name'];
-                    $items['value'][]      = $list['leads'];
-                    $items['link'][]       = $listUrl;
-                    $items['chartItems'][] = $column;
-
-                    $stages[] = $this->leadListModel->getStagesBarChartData(
-                        $params['timeUnit'],
-                        $params['dateFrom'],
-                        $params['dateTo'],
-                        $params['dateFormat'],
-                        $params['filter'],
-                        $canViewOthers
-                    );
-
-                    $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData(
-                        $params['timeUnit'],
-                        $params['dateFrom'],
-                        $params['dateTo'],
-                        $params['dateFormat'],
-                        $params['filter'],
-                        $canViewOthers
-                    );
+            foreach ($lists as &$list) {
+                if ('' != $list['alias']) {
+                    $listUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
+                } else {
+                    $listUrl = $this->router->generate('mautic_contact_index', []);
                 }
-                $width = 100 / count($lists);
+                if ($list['id']) {
+                    $params['filter']['leadlist_id'] = [
+                        'value'            => $list['id'],
+                        'list_column_name' => 't.id',
+                    ];
+                } else {
+                    unset($params['filter']['leadlist_id']);
+                }
 
-                $event->setTemplateData([
-                    'columnName'  => $items['columnName'],
-                    'value'       => $items['value'],
-                    'width'       => $width,
-                    'link'        => $items['link'],
-                    'chartType'   => 'pie',
-                    'chartHeight' => $event->getWidget()->getHeight() - 180,
-                    'chartItems'  => $items['chartItems'],
-                    'stages'      => $stages,
-                    'devices'     => $deviceGranularity,
-                ]);
-                $event->setTemplate('@MauticCore/Helper/lifecycle.html.twig');
-                $event->stopPropagation();
+                $column = $this->leadListModel->getLifeCycleSegmentChartData(
+                    $params['timeUnit'],
+                    $params['dateFrom'],
+                    $params['dateTo'],
+                    $params['dateFormat'],
+                    $params['filter'],
+                    $canViewOthers,
+                    $list['name']
+                );
+                $items['columnName'][] = $list['name'];
+                $items['value'][]      = $list['leads'];
+                $items['link'][]       = $listUrl;
+                $items['chartItems'][] = $column;
+
+                $stages[] = $this->leadListModel->getStagesBarChartData(
+                    $params['timeUnit'],
+                    $params['dateFrom'],
+                    $params['dateTo'],
+                    $params['dateFormat'],
+                    $params['filter'],
+                    $canViewOthers
+                );
+
+                $deviceGranularity[] = $this->leadListModel->getDeviceGranularityData(
+                    $params['timeUnit'],
+                    $params['dateFrom'],
+                    $params['dateTo'],
+                    $params['dateFormat'],
+                    $params['filter'],
+                    $canViewOthers
+                );
             }
+            $width = 100 / count($lists);
+
+            $event->setTemplateData([
+                'columnName'  => $items['columnName'],
+                'value'       => $items['value'],
+                'width'       => $width,
+                'link'        => $items['link'],
+                'chartType'   => 'pie',
+                'chartHeight' => $event->getWidget()->getHeight() - 180,
+                'chartItems'  => $items['chartItems'],
+                'stages'      => $stages,
+                'devices'     => $deviceGranularity,
+            ]);
+            $event->setTemplate('@MauticCore/Helper/lifecycle.html.twig');
+            $event->stopPropagation();
 
             return;
         }
