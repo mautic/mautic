@@ -20,11 +20,6 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     public const INTERNAL_ENTITY    = 'lead';
 
     /**
-     * @var string
-     */
-    private $prefix;
-
-    /**
      * @var IntegrationEntityRepository
      */
     private $integrationEntityRepository;
@@ -32,7 +27,6 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
         $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
     }
 
