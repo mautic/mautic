@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
+use Psr\Http\Client\ClientExceptionInterface;
 
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
@@ -67,7 +68,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $data = $this->client->get($package, [
                 RequestOptions::ALLOW_REDIRECTS => true,
             ]);
-        } catch (\Throwable $exception) {
+        } catch (ClientExceptionInterface $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
 
             return false;

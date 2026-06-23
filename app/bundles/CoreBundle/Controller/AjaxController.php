@@ -350,9 +350,9 @@ class AjaxController extends CommonController
     {
         $dataArray = ['success' => 0];
 
-        if ($request->query->has('service')) {
-            $serviceName = $request->query->get('service');
-            $serviceAuth = $request->query->get('auth');
+        if ($request->request->has('service')) {
+            $serviceName = $request->request->get('service');
+            $serviceAuth = $request->request->get('auth');
 
             $ipService = $ipServiceFactory->getService($serviceName, $serviceAuth);
 
