@@ -448,7 +448,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     *
      * @throws \Exception
      *                    To be modified
      */

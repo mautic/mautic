@@ -15,7 +15,7 @@ class UserHelper
     /**
      * @param bool $nullIfGuest
      */
-    public function getUser($nullIfGuest = false): ?\Mautic\UserBundle\Entity\User
+    public function getUser($nullIfGuest = false): ?User
     {
         $user  = null;
         $token = $this->tokenStorage->getToken();

@@ -40,7 +40,7 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(23)
+    ->withTypeCoverageLevel(24)
     ->withSkip([
         '*/Test/*',
         '*/Tests/*',

@@ -64,7 +64,7 @@ class ImportModel extends FormModel
     /**
      * Returns the Import entity which should be processed next.
      */
-    public function getImportToProcess(): ?\Mautic\LeadBundle\Entity\Import
+    public function getImportToProcess(): ?Import
     {
         $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
 
@@ -626,7 +626,7 @@ class ImportModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ImportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

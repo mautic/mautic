@@ -978,7 +978,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     *
      * @throws \Exception
      */
     public function pushLeadActivity($params = []): ?int

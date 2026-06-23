@@ -29,7 +29,7 @@ class EventCollector
             $this->buildEventList();
         }
 
-        if (empty($this->events)) {
+        if (!$this->events instanceof EventAccessor) {
             $this->events = new EventAccessor($this->eventsArray);
         }
 

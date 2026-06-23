@@ -497,7 +497,7 @@ class CommonController extends AbstractController implements MauticController
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
             $page = $pageModel->getEntity($page404);
-            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+            if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug     = $pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',
@@ -663,10 +663,8 @@ class CommonController extends AbstractController implements MauticController
      * Overwrite in your controller if required.
      *
      * @param AbstractCommonModel<object> $model
-     *
-     * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0): ?array
     {
         $data = new DataExporterHelper();
 

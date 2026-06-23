@@ -310,8 +310,6 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get the content hash to note if the content has been changed.
-     *
-     * @return string
      */
     public function getContentHash(): ?string
     {

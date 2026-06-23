@@ -40,12 +40,10 @@ class InputHelper
     /**
      * @param bool $html
      * @param bool $strict
-     *
-     * @return InputFilter
      */
-    private static function getFilter($html = false, $strict = false): ?\Joomla\Filter\InputFilter
+    private static function getFilter($html = false, $strict = false): ?InputFilter
     {
-        if (empty(self::$htmlFilter)) {
+        if (!self::$htmlFilter instanceof InputFilter) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
             self::$htmlFilter->blockedTags  = [
