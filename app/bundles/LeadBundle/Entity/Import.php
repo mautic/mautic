@@ -631,10 +631,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->object;
     }

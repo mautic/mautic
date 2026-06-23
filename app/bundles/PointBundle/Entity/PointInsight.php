@@ -135,10 +135,7 @@ class PointInsight extends FormEntity
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

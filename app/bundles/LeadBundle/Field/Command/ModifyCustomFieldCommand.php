@@ -160,6 +160,6 @@ final class ModifyCustomFieldCommand extends Command
             'isIndexed'         => $this->translator->trans('mautic.lead.field.analyse.header.indexed'),
         ];
 
-        return array_map(fn ($val) => array_search($val, $headers), $row);
+        return array_map(fn ($val): false|string => array_search($val, $headers), $row);
     }
 }
