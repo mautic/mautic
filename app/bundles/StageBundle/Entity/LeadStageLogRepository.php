@@ -3,14 +3,27 @@
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * @extends CommonRepository<LeadStageLog>
  */
 class LeadStageLogRepository extends CommonRepository
 {
+    private const UPDATE_STAGE_BATCH_SIZE = 500;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        #[Autowire(service: 'doctrine.dbal.unbuffered_connection')]
+        private Connection $unbufferedConnection,
+    ) {
+        parent::__construct($registry);
+    }
+
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
@@ -60,28 +73,99 @@ class LeadStageLogRepository extends CommonRepository
         $connection = $this->_em->getConnection();
         $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
 
+        foreach ($this->getLeadIdBatchesForStage($fromStageId, $table) as $leadIds) {
+            $this->deleteDuplicateStageLogs($connection, $table, $fromStageId, $toStageId, $leadIds);
+            $this->updateStageLogs($connection, $table, $fromStageId, $toStageId, $leadIds);
+        }
+    }
+
+    /**
+     * @return iterable<array<int>>
+     */
+    private function getLeadIdBatchesForStage(int $stageId, string $table): iterable
+    {
+        $hasRows = false;
+        foreach ($this->getLeadIdBatchesFromConnection($this->unbufferedConnection, $stageId, $table) as $leadIds) {
+            $hasRows = true;
+
+            yield $leadIds;
+        }
+
+        $connection = $this->_em->getConnection();
+        if ($hasRows) {
+            return;
+        }
+
+        // The separate unbuffered connection can be isolated from the active connection in tests.
+        foreach ($this->getLeadIdBatchesFromConnection($connection, $stageId, $table) as $leadIds) {
+            yield $leadIds;
+        }
+    }
+
+    /**
+     * @return iterable<array<int>>
+     */
+    private function getLeadIdBatchesFromConnection(Connection $connection, int $stageId, string $table): iterable
+    {
+        $result = $connection->executeQuery(
+            sprintf('SELECT lead_id FROM %s WHERE stage_id = :stageId ORDER BY lead_id', $table),
+            ['stageId' => $stageId],
+            ['stageId' => ParameterType::INTEGER]
+        );
+
+        $leadIds = [];
+        while (false !== $row = $result->fetchAssociative()) {
+            $leadIds[] = (int) $row['lead_id'];
+
+            if (self::UPDATE_STAGE_BATCH_SIZE === count($leadIds)) {
+                yield $leadIds;
+
+                $leadIds = [];
+            }
+        }
+
+        if ([] !== $leadIds) {
+            yield $leadIds;
+        }
+    }
+
+    /**
+     * @param array<int> $leadIds
+     */
+    private function deleteDuplicateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
+    {
         // Lead and stage are a composite key, so delete source rows that would duplicate an existing target row.
         $connection->executeStatement(
             sprintf(
-                'DELETE source_log FROM %s source_log INNER JOIN %s target_log ON target_log.lead_id = source_log.lead_id AND target_log.stage_id = :toStageId WHERE source_log.stage_id = :fromStageId',
+                'DELETE source_log FROM %s source_log INNER JOIN %s target_log ON target_log.lead_id = source_log.lead_id AND target_log.stage_id = :toStageId WHERE source_log.stage_id = :fromStageId AND source_log.lead_id IN (:leadIds)',
                 $table,
                 $table
             ),
             [
                 'fromStageId' => $fromStageId,
+                'leadIds'     => $leadIds,
                 'toStageId'   => $toStageId,
             ],
             [
                 'fromStageId' => ParameterType::INTEGER,
+                'leadIds'     => ArrayParameterType::INTEGER,
                 'toStageId'   => ParameterType::INTEGER,
             ]
         );
+    }
 
+    /**
+     * @param array<int> $leadIds
+     */
+    private function updateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
+    {
         $connection->createQueryBuilder()
             ->update($table)
             ->set('stage_id', ':toStageId')
             ->where('stage_id = :fromStageId')
+            ->andWhere('lead_id IN (:leadIds)')
             ->setParameter('fromStageId', $fromStageId, ParameterType::INTEGER)
+            ->setParameter('leadIds', $leadIds, ArrayParameterType::INTEGER)
             ->setParameter('toStageId', $toStageId, ParameterType::INTEGER)
             ->executeStatement();
     }
