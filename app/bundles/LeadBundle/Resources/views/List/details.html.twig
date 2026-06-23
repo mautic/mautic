@@ -146,7 +146,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
-                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {% set segmentCards = [
                                 {
                                     'title': 'mautic.lead.segments.total.contacts'|trans,
                                     'value': segmentCount,
@@ -158,9 +158,26 @@
                                     'value': activeSegmentCount,
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' !' ~ ('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)}),
                                     'icon': 'ri-user-follow-line',
-                                    tooltip: 'mautic.lead.segments.active.contacts.tooltip'|trans
+                                    'tooltip': 'mautic.lead.segments.active.contacts.tooltip'|trans
+                                },
+                                {
+                                    'title': 'mautic.lead.segments.manually.added.contacts'|trans,
+                                    'value': manuallyAddedSegmentCount,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' ' ~ ('mautic.lead.lead.searchcommand.source'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.source.manually_added'|trans)}),
+                                    'icon': 'ri-user-add-line',
+                                    'tooltip': 'mautic.lead.segments.manually.added.contacts.tooltip'|trans
                                 }
-                            ]}) }}
+                            ] %}
+                            {% if list.filters is not empty %}
+                                {% set segmentCards = segmentCards|merge([{
+                                    'title': 'mautic.lead.segments.filter.added.contacts'|trans,
+                                    'value': filterAddedSegmentCount,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' ' ~ ('mautic.lead.lead.searchcommand.source'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.source.filter_added'|trans)}),
+                                    'icon': 'ri-filter-line',
+                                    'tooltip': 'mautic.lead.segments.filter.added.contacts.tooltip'|trans
+                                }]) %}
+                            {% endif %}
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': segmentCards}) }}
                         {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">

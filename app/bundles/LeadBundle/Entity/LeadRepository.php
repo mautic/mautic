@@ -59,6 +59,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private $listLeadRepository;
 
+    /** @var array<int> Segment IDs resolved from the current search query's list/segment command */
+    private array $activeSearchSegmentIds = [];
+
     /**
      * Used by search functions to search social profiles.
      */
@@ -470,6 +473,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getEntities(array $args = [])
     {
+        $this->activeSearchSegmentIds = [];
+
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
             $args,
@@ -786,6 +791,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
+                $listIds                      = $this->getListIdsByAlias($string) ?: [0];
+                $this->activeSearchSegmentIds = array_map('intval', $listIds);
+
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('1')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lla')
@@ -802,7 +810,49 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
                 $filter->strict  = true;
                 $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
-                $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
+                $q->setParameter($unique, $listIds, ArrayParameterType::INTEGER);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.source'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.source', [], null, 'en_US'):
+                $manuallyAddedValue   = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added');
+                $manuallyAddedValueEn = $this->translator->trans('mautic.lead.lead.searchcommand.source.manually_added', [], null, 'en_US');
+                $filterAddedValue     = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added');
+                $filterAddedValueEn   = $this->translator->trans('mautic.lead.lead.searchcommand.source.filter_added', [], null, 'en_US');
+
+                if (in_array($string, [$manuallyAddedValue, $manuallyAddedValueEn], true)) {
+                    $manuallyAddedParam = 1;
+                } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
+                    $manuallyAddedParam = 0;
+                } else {
+                    // Unknown source value — match nothing
+                    $expr = $q->expr()->eq(1, 0);
+                    break;
+                }
+
+                // This command is designed to be used together with segment:alias.
+                // Without a segment context it returns no results to prevent unintended broad matches.
+                $activeSegmentIds = $this->getActiveSearchSegmentIds();
+                if (empty($activeSegmentIds)) {
+                    $expr = $q->expr()->eq(1, 0);
+                    break;
+                }
+
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lls')
+                    ->where(
+                        $q->expr()->and(
+                            $q->expr()->eq('l.id', 'lls.lead_id'),
+                            $q->expr()->eq('lls.manually_removed', 0),
+                            $q->expr()->eq('lls.manually_added', ":$unique"),
+                            $q->expr()->in('lls.leadlist_id', ":lls_seg_$unique")
+                        )
+                    );
+
+                $filter->strict = true;
+                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
+                $q->setParameter($unique, $manuallyAddedParam, 'integer');
+                $q->setParameter("lls_seg_$unique", $activeSegmentIds, ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
@@ -1457,6 +1507,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @return string[]
      */
+    /**
+     * Returns the segment IDs stored from the most recently processed list/segment search command.
+     * Used by the source: command to scope results to the active segment context.
+     *
+     * @return array<int>
+     */
+    private function getActiveSearchSegmentIds(): array
+    {
+        return $this->activeSearchSegmentIds;
+    }
+
     private function getListIdsByAlias(string $alias): array
     {
         return $this->getEntityManager()
