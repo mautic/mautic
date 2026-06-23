@@ -84,7 +84,7 @@ class AjaxController extends CommonAjaxController
      *
      * @param string|null $query
      *
-     * @return array<string, string>
+     * @return array<string|int, int>
      */
     protected function getBuilderTokens($query): array
     {
@@ -96,7 +96,7 @@ class AjaxController extends CommonAjaxController
         $tokens       = $components['tokens'];
 
         array_map(
-            function ($token, $value) use ($findTokens, &$returnTokens): void {
+            function (int|string $token, int $value) use ($findTokens, &$returnTokens): void {
                 foreach ($findTokens as $findToken) {
                     if (str_starts_with($token, $findToken)) {
                         $returnTokens[$token] = $value;
