@@ -57,15 +57,13 @@ class CategoryController extends AbstractFormController
             );
         }
 
-        return $this->accessDenied();
+        return $this->notFound();
     }
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, $bundle, $page = 1)
+    public function indexAction(Request $request, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -98,7 +96,7 @@ class CategoryController extends AbstractFormController
         );
 
         if (!$permissions[$permissionBase.':view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -482,7 +480,7 @@ class CategoryController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':delete')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'category.category');
             }
@@ -559,7 +557,7 @@ class CategoryController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':delete')) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'category', true);
                 } else {

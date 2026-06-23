@@ -47,6 +47,11 @@ class TrackableModel extends AbstractCommonModel
     protected $contentReplacements = [];
 
     /**
+     * Indicates whether first-pass replacements were collected while parsing content.
+     */
+    protected bool $hasFirstPassReplacements = false;
+
+    /**
      * Used to rebuild correct URLs when the tokenized URL contains query parameters.
      *
      * @var bool
@@ -342,6 +347,8 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
+     * @phpstan-impure
+     *
      * @return array
      */
     protected function extractTrackablesFromContent($content)
@@ -456,6 +463,7 @@ class TrackableModel extends AbstractCommonModel
             if ($token === $tokenizedHost && $scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
                 // Token has a schema so let's get rid of it before replacing tokens
                 $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
+                $this->hasFirstPassReplacements                                        = true;
                 unset($urlParts['scheme']);
             }
 
@@ -470,7 +478,8 @@ class TrackableModel extends AbstractCommonModel
                 $trackableKey = $trackableUrl;
 
                 // Replace the URL token with the actual URL
-                $this->contentReplacements['first_pass'][$url] = $trackableUrl;
+                $this->contentReplacements['first_pass'][$url]  = $trackableUrl;
+                $this->hasFirstPassReplacements                 = true;
             }
         } else {
             // Regular URL without a tokenized host
@@ -685,6 +694,8 @@ class TrackableModel extends AbstractCommonModel
      */
     private function parseContent($content, $channel, $channelId, array &$trackableTokens)
     {
+        $this->hasFirstPassReplacements = false;
+
         // Reset content replacement arrays
         $this->contentReplacements = [
             // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
@@ -719,8 +730,8 @@ class TrackableModel extends AbstractCommonModel
 
             // Replace URLs in content with tokens
             $content = $this->prepareContentWithTrackableTokens($content, $contentType);
-        } elseif (!empty($this->contentReplacements['first_pass'])) {
-            // Replace URLs in content with tokens
+        } elseif ($this->hasFirstPassReplacements) {
+            // Apply first-pass replacements even when no trackables are created.
             $content = $this->prepareContentWithTrackableTokens($content, $contentType);
         }
 

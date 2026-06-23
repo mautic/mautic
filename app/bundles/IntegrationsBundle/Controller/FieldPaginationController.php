@@ -31,7 +31,7 @@ class FieldPaginationController extends CommonController
     ) {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // Find the integration

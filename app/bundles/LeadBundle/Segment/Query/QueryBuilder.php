@@ -136,7 +136,7 @@ class QueryBuilder extends BaseQueryBuilder
             $knownAliases[$tableReference] = true;
 
             $fromClauses[$tableReference] = $tableSql.\Closure::bind(
-                fn ($tableReference, &$knownAliases) => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
+                fn ($tableReference, &$knownAliases): string => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
                 $this,
                 parent::class
             )($tableReference, $knownAliases);
@@ -268,10 +268,8 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Functions returns either the 'lead.id' or the primary key from right joined table.
-     *
-     * @return string
      */
-    public function guessPrimaryLeadContactIdColumn()
+    public function guessPrimaryLeadContactIdColumn(): string
     {
         $parts     = $this->getQueryParts();
         $leadTable = $parts['from'][0]['alias'];
@@ -353,7 +351,7 @@ class QueryBuilder extends BaseQueryBuilder
                 $val = "'$val'";
             } elseif (is_array($val)) {
                 if (ArrayParameterType::STRING === $this->getParameterType($key)) {
-                    $val = array_map(static fn ($value) => "'$value'", $val);
+                    $val = array_map(static fn ($value): string => "'$value'", $val);
                 }
                 $val = implode(', ', $val);
             }
