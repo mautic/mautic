@@ -110,8 +110,7 @@ class EventType extends AbstractType
                 ]
             );
 
-            $data = (!isset($options['data']['triggerInterval']) || '' === $options['data']['triggerInterval']
-                || null === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
+            $data = (!isset($options['data']['triggerInterval']) || '' === $options['data']['triggerInterval']) ? 1 : (int) $options['data']['triggerInterval'];
             $builder->add(
                 'triggerInterval',
                 IntegerType::class,

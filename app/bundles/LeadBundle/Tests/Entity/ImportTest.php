@@ -153,8 +153,9 @@ class ImportTest extends StandardImportTestHelper
 
         $this->fakeImportStartDate($import, 10 * 60);
 
-        $this->assertTrue($import->getRunTime() instanceof \DateInterval);
-        $this->assertSame(10, $import->getRunTime()->i);
+        $runTime = $import->getRunTime();
+        $this->assertInstanceOf(\DateInterval::class, $runTime);
+        $this->assertSame(10, $runTime->i);
     }
 
     public function testGetRunTimeSeconds(): void

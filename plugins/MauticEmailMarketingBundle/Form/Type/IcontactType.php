@@ -75,9 +75,7 @@ class IcontactType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
                 $form = $event->getForm();
 
-                if ($error) {
-                    $form['list']->addError(new FormError($error));
-                }
+                $form['list']->addError(new FormError($error));
             });
         }
 

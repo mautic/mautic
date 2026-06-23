@@ -47,7 +47,7 @@ class InstallController extends CommonController
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             || !$this->config->isComposerEnabled()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView(

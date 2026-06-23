@@ -201,7 +201,7 @@ class ImportController extends FormController
         try {
             $initEvent = $this->dispatchImportOnInit();
         } catch (AccessDeniedException $e) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (!$initEvent->objectSupported) {
