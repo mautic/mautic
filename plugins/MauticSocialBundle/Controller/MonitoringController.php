@@ -24,10 +24,10 @@ class MonitoringController extends FormController
     /*
      * @param int $page
      */
-    public function indexAction(Request $request, MonitoringModel $model, $page = 1)
+    public function indexAction(Request $request, MonitoringModel $model, $page = 1): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session = $request->getSession();
@@ -110,13 +110,11 @@ class MonitoringController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return RedirectResponse|Response
      */
-    public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper)
+    public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl('mautic_social_action', ['objectAction' => 'new']);
@@ -230,13 +228,10 @@ class MonitoringController extends FormController
         );
     }
 
-    /**
-     * @return JsonResponse|RedirectResponse|Response
-     */
-    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false)
+    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:edit')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl('mautic_social_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
@@ -386,13 +381,11 @@ class MonitoringController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session = $request->getSession();
@@ -501,7 +494,7 @@ class MonitoringController extends FormController
     public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session   = $request->getSession();
@@ -562,13 +555,11 @@ class MonitoringController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session   = $request->getSession();

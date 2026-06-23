@@ -122,7 +122,7 @@ class Clearbit_Base
         if (!in_array($this->response_code, [200, 201, 202], true)) {
             throw new \Exception($this->response_obj->error->message);
         }
-        if ('200' === $this->response_code) {
+        if (200 === $this->response_code) {
             $this->_update_rate_limit($headers);
         }
 

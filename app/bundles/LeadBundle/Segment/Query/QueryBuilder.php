@@ -268,10 +268,8 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Functions returns either the 'lead.id' or the primary key from right joined table.
-     *
-     * @return string
      */
-    public function guessPrimaryLeadContactIdColumn()
+    public function guessPrimaryLeadContactIdColumn(): string
     {
         $parts     = $this->getQueryParts();
         $leadTable = $parts['from'][0]['alias'];

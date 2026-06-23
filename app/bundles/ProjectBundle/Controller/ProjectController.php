@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ProjectController extends AbstractFormController
 {
@@ -40,7 +39,7 @@ final class ProjectController extends AbstractFormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions[ProjectPermissions::CAN_VIEW]) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -135,7 +134,7 @@ final class ProjectController extends AbstractFormController
     public function newAction(Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $project   = new Project();
@@ -194,7 +193,7 @@ final class ProjectController extends AbstractFormController
     public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions, bool $ignorePost = false): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $postActionVars = $this->getPostActionVars($request, $objectId);
@@ -274,8 +273,6 @@ final class ProjectController extends AbstractFormController
                     'mauticContent' => 'project',
                 ],
             ]);
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -346,7 +343,7 @@ final class ProjectController extends AbstractFormController
         }
 
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_VIEW)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $entityTypes     = $entityLoader->getEntityTypesWithViewPermissions();
@@ -394,7 +391,7 @@ final class ProjectController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $projectModel->deleteEntity($project);
@@ -443,7 +440,7 @@ final class ProjectController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } else {
                     $deleteIds[] = $objectId;
                 }
@@ -480,7 +477,7 @@ final class ProjectController extends AbstractFormController
     public function selectEntityTypeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $projectId = $request->get('objectId');
@@ -506,7 +503,7 @@ final class ProjectController extends AbstractFormController
     public function addEntityAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, FormFactoryInterface $formFactory, ProjectEntityLoaderService $entityLoader): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $projectId  = $request->get('objectId');
@@ -652,7 +649,7 @@ final class ProjectController extends AbstractFormController
     public function removeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $projectId  = $request->get('objectId');

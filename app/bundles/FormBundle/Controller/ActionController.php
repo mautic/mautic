@@ -287,7 +287,7 @@ class ActionController extends CommonFormController
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;

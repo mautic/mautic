@@ -67,7 +67,7 @@ class PublicController extends AbstractFormController
         if (!$this->isAccessAllowed($entity)) {
             $model->trackDownload($entity, $request, 401);
 
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ($entity->isRemote()) {
