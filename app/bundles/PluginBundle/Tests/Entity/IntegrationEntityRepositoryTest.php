@@ -117,17 +117,21 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public function testGetIntegrationEntityByLeadWhenNoIntegrationNamePassed(): void
     {
-        if ($this->isMysqlPlatform()) {
-            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
-        }
+        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
+        // create NULL plugin integration
         $integration = new Integration();
-        $integration->setPluginId(1);
         $integration->setName(self::INTEGRATION);
         $integration->setIsPublished(true);
 
         $this->em->persist($integration);
         $this->em->flush();
+
+        if ($this->isMysqlPlatform()) {
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
+        }
+
+        $this->connection->executeQuery("UPDATE {$prefix}plugin_integration_settings SET plugin_id = :id WHERE name = :name)", ['id' => 1, 'name' => self::INTEGRATION]);
 
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
