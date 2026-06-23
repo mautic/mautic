@@ -160,7 +160,8 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('page', (int) $pageId);
         }
 
-        $q->andWhere('a.source = "page"')
+        $q->andWhere($q->expr()->eq('a.source', ':source'))
+            ->setParameter('source', 'page')
             ->andWhere('a.code = 200');
 
         if (null != $fromDate) {

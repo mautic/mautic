@@ -2,8 +2,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Stat;
 

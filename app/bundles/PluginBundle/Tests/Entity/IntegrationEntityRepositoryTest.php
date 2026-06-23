@@ -20,11 +20,6 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     public const INTERNAL_ENTITY    = 'lead';
 
     /**
-     * @var string
-     */
-    private $prefix;
-
-    /**
      * @var IntegrationEntityRepository
      */
     private $integrationEntityRepository;
@@ -32,13 +27,12 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
         $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void
     {
-        $now                 = new \DateTimeImmutable();
+        $now                 = new \DateTime(); // IntegrationEntity->setDateAdded() expects DateTime not DateTimeImmutable
         $integrationEntityId = random_int(1, 1000);
         $internalEntityId    = random_int(1, 1000);
 
@@ -124,9 +118,13 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     {
         $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
 
-        $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
+        if ($this->isMysqlPlatform()) {
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
+        }
         $this->connection->executeQuery("INSERT INTO {$prefix}plugin_integration_settings(plugin_id, name, is_published, api_keys) VALUES (:id, :name, :isPublished, '')", ['id' => 1, 'name' => self::INTEGRATION, 'isPublished' => 1]);
-        $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
+        if ($this->isMysqlPlatform()) {
+            $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
+        }
 
         $integrationEntityId = random_int(1, 1000);
         // Create lead

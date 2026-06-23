@@ -1295,7 +1295,7 @@ class DatabasePlatform
             if (is_string($columns)) {
                 $columnsStr = trim($columns, '{}');
                 $columns    = explode(',', $columnsStr);
-                $columns    = array_map(fn ($part) => trim($part, '"'), $columns);
+                $columns    = array_map(fn ($part): string => trim($part, '"'), $columns);
             }
 
             $indexes[] = new Index(

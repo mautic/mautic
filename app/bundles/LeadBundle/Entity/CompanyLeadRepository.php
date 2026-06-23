@@ -302,7 +302,7 @@ class CompanyLeadRepository extends CommonRepository
                     $deleteQb->expr()->in(
                         '(company_id, lead_id)',
                         array_map(
-                            static fn ($pair) => '('.(int) $pair['company_id'].', '.(int) $pair['lead_id'].')',
+                            static fn ($pair): string => '('.(int) $pair['company_id'].', '.(int) $pair['lead_id'].')',
                             $pairs
                         )
                     )

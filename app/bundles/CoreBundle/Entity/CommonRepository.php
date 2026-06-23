@@ -850,7 +850,7 @@ class CommonRepository extends ServiceEntityRepository
         $metadata   = $this->getClassMetadata();
 
         // Platform-specific "Update" expression
-        $makeUpdate = fn (string $column) => DatabasePlatform::getUpsertUpdateExpression($platform, $column);
+        $makeUpdate = fn (string $column): string => DatabasePlatform::getUpsertUpdateExpression($platform, $column);
 
         $columns    = [];
         $values     = [];

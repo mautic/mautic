@@ -39,27 +39,17 @@ class TagRepository extends CommonRepository
      */
     public function deleteOrphans(): void
     {
-        $qb       = $this->_em->getConnection()->createQueryBuilder();
-        $havingQb = $this->_em->getConnection()->createQueryBuilder();
+        $qb = $this->_em->getConnection()->createQueryBuilder();
 
-        $havingQb->select('count(x.lead_id) as the_count')
+        $subQb = $this->_em->getConnection()->createQueryBuilder();
+        $subQb->select('1')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
             ->where('x.tag_id = t.id');
 
-        $qb->select('t.id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
-            ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->executeQuery()->fetchFirstColumn();
+        $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
+            ->where($qb->expr()->notExists($subQb->getSQL()));
 
-        if (count($delete)) {
-            $qb->resetQueryParts();
-            $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
-                ->where(
-                    $qb->expr()->in('id', ':deleteIds')
-                )
-                ->setParameter('deleteIds', $delete, ArrayParameterType::INTEGER)
-                ->executeStatement();
-        }
+        $qb->executeStatement();
     }
 
     /**

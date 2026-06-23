@@ -37,7 +37,7 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
         try {
             // Build WHERE clause for identifiers
             $whereConditions = implode(' AND ', array_map(
-                fn (string $name) => "{$name} = :{$name}",
+                fn (string $name): string => "{$name} = :{$name}",
                 $metadata->getIdentifierFieldNames()
             ));
 
