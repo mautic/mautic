@@ -100,7 +100,7 @@ class EventModel extends FormModel
      */
     public function deleteEventsByEventIds(array $eventIds): void
     {
-        $deletedData = array_map(fn ($id) => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
+        $deletedData = array_map(fn ($id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
         $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
         $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }

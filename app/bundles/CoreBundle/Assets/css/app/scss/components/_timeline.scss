@@ -1,0 +1,303 @@
+//
+// Timeline
+// --------------------------------------------------
+.timeline {
+  overflow: hidden;
+  height: auto;
+  position: relative;
+  padding: 0;
+  list-style-type: none;
+
+  // center line
+  &:after {
+    position: absolute;
+    width: 1px;
+    left: 50%;
+    margin-left: -1px;
+    top: 20px;
+    bottom: 0;
+    content: "";
+    background-image: linear-gradient(180deg, var(--background) 0%, var(--border-subtle) 10%, var(--border-subtle) 90%, var(--background) 100%);
+  }
+
+  // panel
+  .panel {
+    position: relative;
+    z-index: 1;
+    padding: var(--spacing-03) var(--spacing-04);
+    box-shadow: none;
+    border-color: var(--layer);
+    margin-bottom: var(--spacing-03);
+    max-width: 300px;
+    background-color: var(--layer);
+  }
+
+  button.panel {
+    text-align: start;
+    width: 100%;
+
+    &:hover {
+      background-color: var(--layer-hover);
+
+      &:after,
+      &:before {
+        border-color: transparent var(--layer-hover) transparent transparent;
+      }
+    }
+  }
+
+  // header
+  .header {
+    position: relative;
+    z-index: 10;
+    clear: both;
+    margin-top: 0;
+    margin-right: auto;
+    margin-bottom: 20px;
+    margin-left: auto;
+    background-color: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 120px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    text-align: center;
+    color: $brand-primary;
+  }
+
+  // Events
+  .events {
+    padding-left: 0;
+    overflow: auto;
+
+    .figure {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      margin-top: var(--spacing-02);
+      margin-left: -10px;
+      width: 28px;
+      aspect-ratio: 1/1;
+      line-height: 18px;
+      text-align: center;
+      border-radius: 50%;
+      background-color: var(--border-subtle);
+      font-size: 12px;
+      color: var(--border-strong);
+
+      i {
+        border-radius: 20px;
+        aspect-ratio: 1 / 1;
+        width: 18px;
+        font-weight: bold;
+        font-size: 10px;
+      }
+    }
+
+    > .featured {
+      list-style: none;
+      width: 45%;
+      clear: both;
+      float: none !important;
+      margin-bottom: 50px;
+      margin-top: 50px;
+      margin-left: auto;
+      margin-right: auto;
+
+      // panel
+      > .panel {
+        &:after,
+        &:before {
+          display: none;
+        }
+      }
+
+      // feature figure
+      .figure {
+        margin-top: -30px;
+      }
+    }
+
+    // wrapper
+    > .wrapper {
+      list-style: none;
+      width: 46%;
+      clear: both;
+
+      &:first-child {
+        margin-top: 0 !important;
+      }
+
+      &:nth-of-type(odd) {
+        float: left;
+        margin-top: -30px;
+
+        // wrapper - panel
+        > .panel {
+          z-index: 5;
+
+          // panel - arrow
+          // -----------------------------------
+          &:after,
+          &:before {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+          }
+          &:after {
+            right: -10px;
+            top: 10px;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent var(--layer);
+          }
+          &:before {
+            right: -11px;
+            top: 10px;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent var(--border-subtle);
+          }
+        }
+      }
+
+      &:nth-of-type(even) {
+        float: right;
+        margin-top: -30px;
+
+        // wrapper - panel
+        // -----------------------------------
+        > .panel {
+          z-index: 5;
+
+          // panel - arrow
+          // -----------------------------------
+          &:after,
+          &:before {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            transition: var(--transition-all-productive);
+          }
+          &:after {
+            left: -10px;
+            top: 10px;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent var(--layer) transparent transparent;
+          }
+          &:before {
+            left: -11px;
+            top: 10px;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent var(--border-subtle) transparent transparent;
+          }
+        }
+
+        > button.panel {
+          &:hover {
+            &:after,
+            &:before {
+              border-color: transparent var(--layer-hover) transparent transparent;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Right-side only timeline variation
+  &.timeline-right {
+    &:after {
+      left: 13px;
+      margin-left: 0;
+    }
+
+    .events {
+      .figure {
+        left: 0;
+        margin-left: 0;
+      }
+
+      > .featured {
+        width: 85%;
+        margin-left: var(--spacing-08);
+        margin-right: 0;
+      }
+
+      > .wrapper {
+        width: 85%;
+        float: left;
+        margin-left: var(--spacing-08);
+
+        &:nth-of-type(odd),
+        &:nth-of-type(even) {
+          float: left;
+          clear: both;
+          margin-top: 0;
+
+          > .panel {
+            &:after {
+              left: -8px;
+              right: auto;
+              border-width: 8px 8px 8px 0;
+              border-color: transparent var(--layer) transparent transparent;
+            }
+
+            &:before {
+              left: -9px;
+              right: auto;
+              border-width: 8px 8px 8px 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .timeline {
+    // Events
+    .events {
+      padding-left: 0;
+
+      // wrapper
+      > .wrapper {
+        width: auto;
+
+        &:nth-of-type(odd),
+        &:nth-of-type(even) {
+          float: none;
+          clear: both;
+          margin-top: 48px;
+
+          // wrapper - panel
+          > .panel {
+            &:after,
+            &:before {
+              display: none;
+            }
+          }
+        }
+
+        // wrapper - figure
+        > .figure {
+          margin-top: -41px;
+        }
+      }
+    }
+
+    &.timeline-right {
+      .events {
+        > .wrapper {
+          margin-left: var(--spacing-08);
+        }
+      }
+    }
+  }
+}

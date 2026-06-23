@@ -44,14 +44,15 @@ trait CustomFieldRepositoryTrait
         // Generate where clause first to know if we need to use distinct on primary ID or not
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
+        $groupBy = $dq->getQueryPart('groupBy');
 
         if (!empty($args['withTotalCount']) || !isset($args['count'])) {
             // Distinct is required here to get the correct count when group by is used due to applied filters
-            $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+            $countSelect = !empty($groupBy) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
             $dq->select($countSelect.' as count');
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
-            if ($groupBy = $dq->getQueryPart('groupBy')) {
+            if ($groupBy) {
                 $dq->resetQueryPart('groupBy');
             }
 

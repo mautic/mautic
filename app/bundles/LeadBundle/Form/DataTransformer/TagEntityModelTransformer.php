@@ -33,7 +33,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
             return $entity->getTag();
         }
 
-        if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
             return [];
         }
 
