@@ -6,6 +6,7 @@ namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use PHPUnit\Framework\Assert;
@@ -116,12 +117,18 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public function testGetIntegrationEntityByLeadWhenNoIntegrationNamePassed(): void
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
-
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
         }
-        $this->connection->executeQuery("INSERT INTO {$prefix}plugin_integration_settings(plugin_id, name, is_published, api_keys) VALUES (:id, :name, :isPublished, '')", ['id' => 1, 'name' => self::INTEGRATION, 'isPublished' => 1]);
+
+        $integration = new Integration();
+        $integration->setPluginId(1);
+        $integration->setName(self::INTEGRATION);
+        $integration->setIsPublished(true);
+
+        $this->em->persist($integration);
+        $this->em->flush();
+
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
         }

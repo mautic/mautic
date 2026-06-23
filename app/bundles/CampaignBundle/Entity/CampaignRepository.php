@@ -616,16 +616,16 @@ class CampaignRepository extends CommonRepository
     public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('c.id, c.name, ROUND(COALESCE(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');
-        $q->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
+        $q->select('c.id, c.name, ROUND(COALESCE(COUNT(DISTINCT t.lead_id) * 100.0 / NULLIF(COUNT(DISTINCT cl.lead_id), 0), 0), 1) AS segmentCampaignShare')
+            ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = FALSE')
             ->leftJoin('cl',
-                '(SELECT lll.lead_id AS ll, lll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
-                .' AND lll.manually_removed = 0)',
+                '(SELECT lll.lead_id AS ll, lll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads lll WHERE lll.leadlist_id = :segmentId AND lll.manually_removed = FALSE)',
                 't',
                 't.lead_id = cl.lead_id'
-            );
-        $q->groupBy('c.id');
+            )
+        ->setParameter('segmentId', (int) $segmentId)
+        ->groupBy('c.id');
 
         if (!empty($campaignIds)) {
             $q->where($q->expr()->in('c.id', ':campaignIds'));
