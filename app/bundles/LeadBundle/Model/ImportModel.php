@@ -168,12 +168,6 @@ class ImportModel extends FormModel
 
         $this->setGhostImportsAsFailed();
 
-        if (!$import) {
-            $msg = 'import is empty, closing the import process';
-            $this->logDebug($msg, $import);
-            throw new ImportFailedException($msg);
-        }
-
         if (!$import->canProceed()) {
             $this->saveEntity($import);
             $msg = 'import cannot be processed because '.$import->getStatusInfo();

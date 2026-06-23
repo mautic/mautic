@@ -176,7 +176,7 @@ class CampaignController extends AbstractStandardFormController
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->logger->error('Access denied for campaign export', ['user' => $this->user->getId()]);
 
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $campaign = $campaignModel->getEntity($objectId);
@@ -220,9 +220,9 @@ class CampaignController extends AbstractStandardFormController
         );
 
         if (!$permissions['campaign:campaigns:viewown'] && !$permissions['campaign:campaigns:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session     = $request->getSession();
@@ -358,7 +358,7 @@ class CampaignController extends AbstractStandardFormController
         $campaign        = $this->getCampaignModel()->getEntity($objectId);
         $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
         // Filter out deleted events for the preview (but keep them for action/decision/condition tabs)
-        $previewEvents = array_filter($events, fn ($event) => empty($event['deleted']));
+        $previewEvents = array_filter($events, fn ($event): bool => empty($event['deleted']));
 
         $response['preview']    = trim(
             $this->renderView(
@@ -427,29 +427,27 @@ class CampaignController extends AbstractStandardFormController
         return $this->indexStandard($request, $page);
     }
 
-    protected function getDefaultOrderColumn()
+    protected function getDefaultOrderColumn(): string
     {
         return 'dateModified';
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return RedirectResponse|Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): Response
     {
         /** @var CampaignModel $model */
         $model    = $this->getModel('campaign');
         $campaign = $model->getEntity();
 
         if (!$this->security->isGranted('campaign:campaigns:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -568,7 +566,7 @@ class CampaignController extends AbstractStandardFormController
         // If the response contains events and is a form view, make sure deleted events are marked
         if ($result instanceof Response && $this->campaignEvents) {
             // Pre-filter the campaign events for the preview tab (in case something was missed)
-            $this->campaignEvents = array_filter($this->campaignEvents, fn ($event) => empty($event['deleted']));
+            $this->campaignEvents = array_filter($this->campaignEvents, fn ($event): bool => empty($event['deleted']));
 
             $this->campaignElements['campaignEvents'] = $this->campaignEvents;
         }

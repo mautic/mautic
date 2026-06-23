@@ -144,10 +144,8 @@ class FileApiController extends CommonApiController
      *
      * @param string $dir
      * @param bool   $createDir
-     *
-     * @return string
      */
-    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
+    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false): string
     {
         try {
             $possibleDirs = ['media', 'images'];

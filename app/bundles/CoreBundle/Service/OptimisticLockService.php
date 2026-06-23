@@ -63,7 +63,7 @@ final class OptimisticLockService implements OptimisticLockServiceInterface
             ->createQueryBuilder()
             ->update($metadata->table['name'])
             ->where(implode(' AND ', array_map(
-                fn (string $name) => "{$name} = :{$name}",
+                fn (string $name): string => "{$name} = :{$name}",
                 $metadata->getIdentifierFieldNames(),
             )))
             ->setParameters($identifierValues);

@@ -19,10 +19,8 @@ class StageController extends AbstractFormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -37,7 +35,7 @@ class StageController extends AbstractFormController
         );
 
         if (!$permissions['stage:stages:view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -133,7 +131,7 @@ class StageController extends AbstractFormController
         }
 
         if (!$this->security->isGranted('stage:stages:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -287,7 +285,7 @@ class StageController extends AbstractFormController
                 )
             );
         } elseif (!$this->security->isGranted('stage:stages:edit')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'stage');
@@ -406,7 +404,7 @@ class StageController extends AbstractFormController
 
         if (null != $entity) {
             if (!$this->security->isGranted('stage:stages:create')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;
@@ -451,7 +449,7 @@ class StageController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->isGranted('stage:stages:delete')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'stage');
             }
@@ -515,7 +513,7 @@ class StageController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->isGranted('stage:stages:delete')) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);
                 } else {

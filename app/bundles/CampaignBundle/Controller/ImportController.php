@@ -65,7 +65,7 @@ final class ImportController extends AbstractFormController
     public function newAction(): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session  = $this->requestStack->getSession();
@@ -94,7 +94,7 @@ final class ImportController extends AbstractFormController
     public function uploadAction(Request $request): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fullPath = $this->pathsHelper->getImportCampaignsPath().'/'.$this->getImportFileName();
@@ -180,7 +180,7 @@ final class ImportController extends AbstractFormController
     public function cancelAction(): Response
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $filePath = $this->requestStack->getSession()->get('mautic.campaign.import.file');
@@ -446,7 +446,7 @@ final class ImportController extends AbstractFormController
     public function undoAction(): JsonResponse
     {
         if (!$this->security->isGranted('campaign:imports:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session         = $this->requestStack->getSession();

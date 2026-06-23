@@ -111,7 +111,7 @@ class EmailType extends AbstractType
                     'allow-full-html'      => true,
                 ],
                 'constraints' => [
-                    new Callback(callback: function ($value, ExecutionContextInterface $context) {
+                    new Callback(callback: function ($value, ExecutionContextInterface $context): void {
                         if ('' === trim(strip_tags($value))) {
                             $context->buildViolation('mautic.lead.email.body.required')->addViolation();
                         }

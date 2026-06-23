@@ -133,7 +133,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
 
         return array_map(
-            fn (array $company) => (string) $company['company_id'],
+            fn (array $company): string => (string) $company['company_id'],
             $q->executeQuery()->fetchAllAssociative()
         );
     }

@@ -1454,39 +1454,37 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 continue;
             }
             $groupedContactsByEmail[$eid] = [];
-            if ($details['limit']) {
-                // Take a chunk of contacts based on variant weights
-                if ($batchContacts = array_slice($sendTo, $offset, $details['limit'])) {
-                    $offset += $details['limit'];
+            // Take a chunk of contacts based on variant weights
+            if ($batchContacts = array_slice($sendTo, $offset, $details['limit'])) {
+                $offset += $details['limit'];
 
-                    // Group contacts by preferred locale
-                    foreach ($batchContacts as $key => $contact) {
-                        if (!empty($contact['preferred_locale'])) {
-                            $locale     = $contact['preferred_locale'];
-                            $localeCore = $this->getTranslationLocaleCore($locale);
+                // Group contacts by preferred locale
+                foreach ($batchContacts as $key => $contact) {
+                    if (!empty($contact['preferred_locale'])) {
+                        $locale     = $contact['preferred_locale'];
+                        $localeCore = $this->getTranslationLocaleCore($locale);
 
-                            if (isset($details['languages'][$localeCore])) {
-                                if (isset($details['languages'][$localeCore][$locale])) {
-                                    // Exact match
-                                    $translatedId                                  = $details['languages'][$localeCore][$locale];
-                                    $groupedContactsByEmail[$eid][$translatedId][] = $contact;
-                                } else {
-                                    // Grab the closest match
-                                    $bestMatch                                     = array_keys($details['languages'][$localeCore])[0];
-                                    $translatedId                                  = $details['languages'][$localeCore][$bestMatch];
-                                    $groupedContactsByEmail[$eid][$translatedId][] = $contact;
-                                }
-
-                                unset($batchContacts[$key]);
+                        if (isset($details['languages'][$localeCore])) {
+                            if (isset($details['languages'][$localeCore][$locale])) {
+                                // Exact match
+                                $translatedId                                  = $details['languages'][$localeCore][$locale];
+                                $groupedContactsByEmail[$eid][$translatedId][] = $contact;
+                            } else {
+                                // Grab the closest match
+                                $bestMatch                                     = array_keys($details['languages'][$localeCore])[0];
+                                $translatedId                                  = $details['languages'][$localeCore][$bestMatch];
+                                $groupedContactsByEmail[$eid][$translatedId][] = $contact;
                             }
+
+                            unset($batchContacts[$key]);
                         }
                     }
+                }
 
-                    // If there are any contacts left over, assign them to the default
-                    if (count($batchContacts)) {
-                        $translatedId                                = $details['languages']['default'];
-                        $groupedContactsByEmail[$eid][$translatedId] = $batchContacts;
-                    }
+                // If there are any contacts left over, assign them to the default
+                if (count($batchContacts)) {
+                    $translatedId                                = $details['languages']['default'];
+                    $groupedContactsByEmail[$eid][$translatedId] = $batchContacts;
                 }
             }
         }
