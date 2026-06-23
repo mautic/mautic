@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -615,8 +616,10 @@ class CampaignRepository extends CommonRepository
      */
     public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('c.id, c.name, ROUND(COALESCE(COUNT(DISTINCT t.lead_id) * 100.0 / NULLIF(COUNT(DISTINCT cl.lead_id), 0), 0), 1) AS segmentCampaignShare')
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $q          = $connection->createQueryBuilder();
+        $q->select('c.id, c.name, ROUND(COALESCE(COUNT(DISTINCT t.lead_id) * 100.0 / NULLIF(COUNT(DISTINCT cl.lead_id), 0), 0), 1) AS '.DatabasePlatform::quoteColumn($platform, 'segmentCampaignShare'))
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = FALSE')
             ->leftJoin('cl',
