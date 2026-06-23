@@ -38,24 +38,26 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void
     {
-        $now                 = new \DateTimeImmutable();
+        $now                 = new \DateTime();
         $integrationEntityId = random_int(1, 1000);
         $internalEntityId    = random_int(1, 1000);
 
-        $this->connection->insert($this->prefix.'integration_entity', [
-            'date_added'            => $now->format('Y-m-d H:i:s'),
-            'integration'           => 'someIntegration',
-            'integration_entity'    => 'someIntegrationEntity',
-            'integration_entity_id' => $integrationEntityId,
-            'internal_entity'       => 'someInternalEntity',
-            'internal_entity_id'    => $internalEntityId,
-            'last_sync_date'        => null,
-            'internal'              => 'someInternalValue',
-        ]);
+        $integrationEntity = new IntegrationEntity();
+
+        $integrationEntity->setDateAdded($now);
+        $integrationEntity->setIntegration(self::INTEGRATION);
+        $integrationEntity->setIntegrationEntity(self::INTEGRATION_ENTITY);
+        $integrationEntity->setIntegrationEntityId((string) $integrationEntityId);
+        $integrationEntity->setInternalEntity('someInternalEntity');
+        $integrationEntity->setInternalEntityId($internalEntityId);
+        $integrationEntity->setInternal(['someInternalValue']);
+
+        $this->em->persist($integrationEntity);
+        $this->em->flush();
 
         $results = $this->integrationEntityRepository->getIntegrationsEntityId(
-            'someIntegration',
-            'someIntegrationEntity',
+            self::INTEGRATION,
+            self::INTEGRATION_ENTITY,
             'someInternalEntity',
             [$internalEntityId],
             null,
