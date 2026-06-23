@@ -56,10 +56,12 @@ class MenuBuilderTest extends TestCase
 
         $builder = new MenuBuilder($this->factory, $this->matcher, $this->dispatcher, $this->menuHelper);
 
-        $menu = $builder->mainMenu();
+        $menu = $builder->__call('mainMenu', []);
 
         Assert::assertInstanceOf(ItemInterface::class, $menu);
-        Assert::assertNotNull($menu->getChild('mautic.contribute.menu.index'));
-        Assert::assertSame('https://mautic.org', $menu->getChild('mautic.contribute.menu.index')?->getUri());
+        $menuItem = $menu->getChild('mautic.contribute.menu.index');
+
+        Assert::assertInstanceOf(ItemInterface::class, $menuItem);
+        Assert::assertSame('https://mautic.org', $menuItem->getUri());
     }
 }
