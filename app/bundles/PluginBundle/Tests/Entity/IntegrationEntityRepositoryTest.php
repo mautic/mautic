@@ -131,7 +131,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
         }
 
-        $this->connection->executeQuery("UPDATE {$prefix}plugin_integration_settings SET plugin_id = :id WHERE name = :name)", ['id' => 1, 'name' => self::INTEGRATION]);
+        $this->connection->executeQuery("UPDATE {$prefix}plugin_integration_settings SET plugin_id = :id WHERE name = :name", ['id' => 1, 'name' => self::INTEGRATION]);
 
         if ($this->isMysqlPlatform()) {
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');

@@ -40,7 +40,7 @@ class TagRepository extends CommonRepository
     public function deleteOrphans(): void
     {
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql    = "DELETE t FROM {$prefix}lead_tags t
+        $sql    = "DELETE FROM {$prefix}lead_tags
         WHERE NOT EXISTS (
             SELECT 1
             FROM {$prefix}lead_tags_xref x
