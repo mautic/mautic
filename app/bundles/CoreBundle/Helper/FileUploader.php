@@ -41,11 +41,9 @@ class FileUploader
     /**
      * @param string $uploadDir
      *
-     * @return string
-     *
      * @throws FileUploadException
      */
-    public function upload($uploadDir, UploadedFile $file)
+    public function upload($uploadDir, UploadedFile $file): string
     {
         try {
             $fileName = $this->filePathResolver->getUniqueFileName($uploadDir, $file);

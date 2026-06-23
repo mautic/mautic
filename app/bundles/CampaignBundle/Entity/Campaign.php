@@ -666,7 +666,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
         $eventIds = array_filter(
             array_column($canvasSettings['nodes'], 'id'),
-            fn ($id) => !in_array($id, ['lists', 'forms'])
+            fn ($id): bool => !in_array($id, ['lists', 'forms'])
         );
 
         if (empty($eventIds)) {

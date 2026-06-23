@@ -35,8 +35,8 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $emailModel,
-            fn ($formType, $formOptions) => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn ($form)                   => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
+            fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn ($form): string                                                  => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
             'emailform'
         ));
@@ -285,7 +285,7 @@ class AjaxController extends CommonAjaxController
             $email->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content           = $email->getCustomHtml();

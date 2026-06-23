@@ -98,7 +98,7 @@ class Asset extends FormEntity implements UuidInterface
     private $originalFileName;
 
     /**
-     * @var File
+     * @var File|null
      */
     private $file;
 
@@ -1284,7 +1284,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         $value = ini_get($setting);
 
-        if (-1 == $value || 0 === $value) {
+        if ('-1' === $value || '0' === $value) {
             return PHP_INT_MAX;
         }
 
