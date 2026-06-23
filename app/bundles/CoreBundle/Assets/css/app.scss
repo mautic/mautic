@@ -1,0 +1,123 @@
+// Application styles generated from the previous Core LESS entrypoint.
+@import 'app/scss/functions';
+@import 'libraries/libraries';
+@import 'app/scss/variables';
+@import 'app/scss/mixins';
+@import 'app/scss/lesshat';
+@import 'libraries/bootstrap/bootstrap-mautic-custom';
+@import 'app/scss/spinning';
+@import 'app/scss/layouts/base';
+@import 'app/scss/layouts/header';
+@import 'app/scss/layouts/sidebar';
+@import 'app/scss/layouts/content';
+@import 'app/scss/layouts/footer';
+@import 'app/scss/components/scaffolding';
+@import 'app/scss/components/scrollbar';
+@import 'app/scss/components/buttons';
+@import 'app/scss/components/button-groups';
+@import 'app/scss/components/type';
+@import 'app/scss/components/alerts';
+@import 'app/scss/components/calendar';
+@import 'app/scss/components/editor';
+@import 'app/scss/components/media';
+@import 'app/scss/components/menu';
+@import 'app/scss/components/grid';
+@import 'app/scss/components/list-group';
+@import 'app/scss/components/dropdowns';
+@import 'app/scss/components/navs';
+@import 'app/scss/components/notes';
+@import 'app/scss/components/bullet';
+@import 'app/scss/components/labels';
+@import 'app/scss/components/badges';
+@import 'app/scss/components/brand';
+@import 'app/scss/components/forms';
+@import 'app/scss/components/graphs';
+@import 'app/scss/components/input-groups';
+@import 'app/scss/components/image';
+@import 'app/scss/components/table';
+@import 'app/scss/components/progress-bars';
+@import 'app/scss/components/panels';
+@import 'app/scss/components/box';
+@import 'app/scss/components/switch';
+@import 'app/scss/components/steps';
+@import 'app/scss/components/colors';
+@import 'app/scss/components/pagination';
+@import 'app/scss/components/loading-bar';
+@import 'app/scss/components/offcanvas';
+@import 'app/scss/components/timeline';
+@import 'app/scss/components/utilities';
+@import 'app/scss/components/maps';
+@import 'app/scss/components/modals';
+@import 'app/scss/components/accordions';
+@import 'app/scss/components/tiles';
+@import 'app/scss/custom';
+@import 'app/scss/components/toggle';
+@import 'app/scss/components/globalsearch';
+@import 'app/scss/marketplace';
+@import 'app/scss/components/toolbar';
+@import 'app/scss/components/contained-list';
+@import 'app/scss/components/uishell';
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 300;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-300.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 300;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-300italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 400;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 600;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-600.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 600;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-600italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: normal;
+    font-weight: 700;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700.woff2') format('woff2');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Source Sans 3';
+    font-style: italic;
+    font-weight: 700;
+    src: url('fonts/source-sans-3-v15-cyrillic_cyrillic-ext_greek_greek-ext_latin_latin-ext_vietnamese-700italic.woff2') format('woff2');
+}

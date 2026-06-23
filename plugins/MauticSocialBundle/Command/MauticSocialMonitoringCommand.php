@@ -99,11 +99,9 @@ class MauticSocialMonitoringCommand extends Command
     }
 
     /**
-     * @return bool|int
-     *
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output)
+    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();

@@ -346,7 +346,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         $mergedValues = array_merge($actionValues, array_filter(
             $contactFieldMatches,
-            static fn ($value) => '' !== $value && null !== $value
+            static fn ($value): bool => '' !== $value && null !== $value
         ));
 
         $processedValues = [];

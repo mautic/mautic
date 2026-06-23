@@ -40,7 +40,7 @@ class GenerateProductionAssetsCommand extends Command
         $this
             ->setHelp(
                 <<<'EOT'
-                The <info>%command.name%</info> command Combines and minifies files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively. It allso runs the command elfinder:install internally to install ElFinder assets.
+                The <info>%command.name%</info> command builds Symfony Asset Mapper assets, combines and minifies legacy files from node_modules and each bundle's Assets/css/* and Assets/js/* folders into production files stored in root/media/css and root/media/js respectively. It also runs the command elfinder:install internally to install ElFinder assets.
 
 <info>php %command.full_name%</info>
 EOT
@@ -70,10 +70,23 @@ EOT
             return Command::FAILURE;
         }
 
+        foreach ([
+            'sass:build'        => [],
+            'importmap:install' => ['--no-interaction' => true],
+            'asset-map:compile' => [],
+        ] as $commandName => $arguments) {
+            if (Command::SUCCESS !== $this->runConsoleCommand($commandName, $arguments, $output)) {
+                $output->writeln('<error>'.$this->translator->trans("The {$commandName} command failed. Generating production assets was not successful.").'</error>');
+
+                return Command::FAILURE;
+            }
+        }
+
         $this->installElFinderAssets($relativeMediaPath);
 
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
+        $this->ensureStylesheetCompatibilityFiles($mediaDir, $vendorDir);
 
         $this->moveExtraLibraries($nodeModulesDir, $mediaDir);
 
@@ -99,6 +112,7 @@ EOT
             'bundles/fmelfinder/js/elfinder.min.js',
             'css/app.css',
             'css/libraries.css',
+            'css/offline.css',
             'js/app.js',
             'js/libraries.js',
             'js/mautic-form.js',
@@ -125,6 +139,52 @@ EOT
         $command = $this->getApplication()->find('elfinder:install');
 
         $command->run(new ArrayInput(['--docroot' => $mediaDir]), new NullOutput());
+    }
+
+    /**
+     * Asset Mapper loads the main SCSS entry for normal pages. These files keep
+     * older entry points, especially the offline page, working during migration.
+     */
+    private function ensureStylesheetCompatibilityFiles(string $mediaDir, string $rootDir): void
+    {
+        $cssDir = $mediaDir.'/css';
+        $this->filesystem->mkdir($cssDir);
+
+        $appCssFile       = $cssDir.'/app.css';
+        $librariesCssFile = $cssDir.'/libraries.css';
+        $offlineCssFile   = $cssDir.'/offline.css';
+        $sassCssFile      = $rootDir.'/var/sass/app.output.css';
+
+        if (!$this->filesystem->exists($appCssFile)) {
+            $this->filesystem->dumpFile($appCssFile, '');
+        }
+
+        if (!$this->filesystem->exists($librariesCssFile)) {
+            $this->filesystem->dumpFile($librariesCssFile, '');
+        }
+
+        if (!$this->filesystem->exists($sassCssFile)) {
+            return;
+        }
+
+        $this->filesystem->dumpFile(
+            $offlineCssFile,
+            $this->filesystem->readFile($sassCssFile)."\n".$this->filesystem->readFile($appCssFile)
+        );
+    }
+
+    /**
+     * Run internal asset commands.
+     *
+     * @param array<string, mixed> $arguments
+     */
+    private function runConsoleCommand(string $commandName, array $arguments, OutputInterface $output): int
+    {
+        $command = $this->getApplication()->find($commandName);
+        $input   = new ArrayInput($arguments);
+        $input->setInteractive(false);
+
+        return $command->run($input, $output);
     }
 
     /**

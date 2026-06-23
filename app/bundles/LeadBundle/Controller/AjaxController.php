@@ -32,7 +32,6 @@ use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -314,7 +313,7 @@ class AjaxController extends CommonAjaxController
     {
         if (!$this->security->isGranted('campaign:campaigns:editown')
             && !$this->security->isGranted('campaign:campaigns:editother')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $dataArray  = ['success' => 0];
@@ -411,10 +410,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the rows for new leads.
-     *
-     * @return array|JsonResponse|RedirectResponse
      */
-    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model)
+    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model): array|JsonResponse
     {
         $dataArray = ['success' => 0];
         $maxId     = $request->get('maxId');
@@ -435,7 +432,7 @@ class AjaxController extends CommonAjaxController
             );
 
             if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-                return $this->accessDenied(true);
+                return $this->getAccessDeniedFlash();
             }
 
             $session    = $request->getSession();

@@ -831,7 +831,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Return success if any company was updated or created
-                return ($companyFound) ? $companies : false;
+                return $companies;
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -846,6 +846,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param string $object
      *
      * @return array|null
+     *
+     * @phpstan-impure
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
@@ -1957,7 +1959,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
                 if (isset($item['body'][0]['errorCode'])) {
                     $exception = new ApiErrorException($item['body'][0]['message']);
-                    if ('Contact' == $object || $object = 'Lead') {
+                    if ('Contact' == $object || 'Lead' == $object) {
                         $exception->setContactId($contactId);
                     }
                     $this->logIntegrationError($exception);
@@ -2038,7 +2040,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $exception = new ApiErrorException($error);
-                    if (!empty($item['referenceId']) && ('Contact' == $object || $object = 'Lead')) {
+                    if (!empty($item['referenceId']) && ('Contact' == $object || 'Lead' == $object)) {
                         $exception->setContactId($item['referenceId']);
                     }
                     $this->logIntegrationError($exception);
