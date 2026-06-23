@@ -13,7 +13,9 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        $this->configParams['contact_columns'] = ['name', 'location', 'email'];
+        $this->configParams['contact_columns'] = 'testContactListingDecodesHtmlEntitiesInCompanySecondaryIdentifier' === $this->name()
+            ? ['name', 'company', 'email']
+            : ['name', 'location', 'email'];
 
         parent::setUp();
     }
@@ -87,6 +89,25 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
 
         Assert::assertStringContainsString('Acme &amp; Sons', $content);
         Assert::assertStringNotContainsString('Acme &amp;amp; Sons', $content);
+    }
+
+    public function testContactListingDecodesHtmlEntitiesInCompanySecondaryIdentifier(): void
+    {
+        $contact = new Lead();
+        $contact->setFirstname('Jane');
+        $contact->setLastname('Doe');
+        $contact->setEmail('jane@doe.example.com');
+        $contact->setCompany('Acme &amp; Sons');
+
+        $this->em->persist($contact);
+        $this->em->flush();
+
+        $crawler        = $this->client->request('GET', 's/contacts');
+        $nameColumnHtml = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr/td[2]")->html();
+
+        Assert::assertStringContainsString('Jane Doe', $nameColumnHtml);
+        Assert::assertStringContainsString('Acme &amp; Sons', $nameColumnHtml);
+        Assert::assertStringNotContainsString('Acme &amp;amp; Sons', $nameColumnHtml);
     }
 
     /**
