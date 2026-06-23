@@ -26,7 +26,7 @@ export const editorLifecycleMixin = {
     let options = this.isInline(target) ? this.inlineOptions : this.options;
     const compiledOptions = {
       ...(options ? options : {}),
-      licenseKey: this.licenseKey
+      licenseKey: this.licenseKey,
     };
 
     const fontFamilyConfig = this.mergeFontFamilyOptions(compiledOptions.fontFamily);
@@ -35,7 +35,10 @@ export const editorLifecycleMixin = {
     }
 
     const headingConfig = this.mergeHeadingOptions(compiledOptions.heading);
-    const headingConfigWithTargetClasses = this.extendHeadingOptionsFromTarget(headingConfig, target);
+    const headingConfigWithTargetClasses = this.extendHeadingOptionsFromTarget(
+      headingConfig,
+      target
+    );
     if (headingConfigWithTargetClasses) {
       compiledOptions.heading = headingConfigWithTargetClasses;
     }
@@ -54,19 +57,29 @@ export const editorLifecycleMixin = {
       return headingConfig;
     }
 
-    const resolvedHeadingConfig = headingConfig && typeof headingConfig === 'object' ? { ...headingConfig } : {};
-    const options = Array.isArray(resolvedHeadingConfig.options) ? [...resolvedHeadingConfig.options] : [];
+    const resolvedHeadingConfig =
+      headingConfig && typeof headingConfig === 'object' ? { ...headingConfig } : {};
+    const options = Array.isArray(resolvedHeadingConfig.options)
+      ? [...resolvedHeadingConfig.options]
+      : [];
 
     const knownViews = new Set();
     const knownModels = new Set();
-    options.forEach(option => {
+    options.forEach((option) => {
       const view = option?.view;
-      const viewName = typeof view === 'string' ? view.toLowerCase() : (typeof view?.name === 'string' ? view.name.toLowerCase() : '');
+      const viewName =
+        typeof view === 'string'
+          ? view.toLowerCase()
+          : typeof view?.name === 'string'
+          ? view.name.toLowerCase()
+          : '';
       const viewClasses = Array.isArray(view?.classes)
         ? [...view.classes]
-        : (typeof view?.classes === 'string' ? view.classes.split(/\s+/) : []);
+        : typeof view?.classes === 'string'
+        ? view.classes.split(/\s+/)
+        : [];
       const normalizedClasses = viewClasses
-        .map(item => `${item || ''}`.trim())
+        .map((item) => `${item || ''}`.trim())
         .filter(Boolean)
         .sort()
         .join(' ');
@@ -96,9 +109,9 @@ export const editorLifecycleMixin = {
         class: `ck-heading_${variant.name}_${model.replace(/[^a-z0-9_-]/gi, '_').toLowerCase()}`,
         view: {
           name: variant.name,
-          classes: variant.classes
+          classes: variant.classes,
         },
-        converterPriority: 'high'
+        converterPriority: 'high',
       });
     });
 
@@ -113,8 +126,9 @@ export const editorLifecycleMixin = {
       return [];
     }
 
-    const implementation = (this.frameDoc && this.frameDoc.implementation)
-      || (typeof document !== 'undefined' ? document.implementation : null);
+    const implementation =
+      (this.frameDoc && this.frameDoc.implementation) ||
+      (typeof document !== 'undefined' ? document.implementation : null);
     if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
       return [];
     }
@@ -123,17 +137,18 @@ export const editorLifecycleMixin = {
     workingDocument.body.innerHTML = html;
 
     const variantsByKey = new Map();
-    const selector = 'h1[class], h2[class], h3[class], h4[class], h5[class], h6[class], span[class]';
+    const selector =
+      'h1[class], h2[class], h3[class], h4[class], h5[class], h6[class], span[class]';
 
-    workingDocument.body.querySelectorAll(selector).forEach(element => {
+    workingDocument.body.querySelectorAll(selector).forEach((element) => {
       const name = `${element.tagName || ''}`.toLowerCase();
       if (!name) {
         return;
       }
 
       const classes = Array.from(element.classList || [])
-        .map(item => item.trim())
-        .filter(item => item && !item.startsWith('ck-'))
+        .map((item) => item.trim())
+        .filter((item) => item && !item.startsWith('ck-'))
         .sort((a, b) => a.localeCompare(b));
 
       if (!classes.length) {
@@ -156,7 +171,7 @@ export const editorLifecycleMixin = {
       .join('_')
       .replace(/[^a-z0-9_-]/gi, '_')
       .split('_')
-      .filter(s => s.length > 0)
+      .filter((s) => s.length > 0)
       .join('_')
       .toLowerCase();
 
@@ -192,9 +207,8 @@ export const editorLifecycleMixin = {
     this.originalContent = typeof el?.innerHTML === 'string' ? el.innerHTML : '';
     this.latestContent = this.originalContent;
 
-    const selectedComponent = typeof this.editor?.getSelected === 'function'
-      ? this.editor.getSelected()
-      : null;
+    const selectedComponent =
+      typeof this.editor?.getSelected === 'function' ? this.editor.getSelected() : null;
     this.trackBadgableComponent(selectedComponent);
     this.trackToolbarVisibility();
     const computedWidth = this.updateMenuWidthsBySelection(selectedComponent);
@@ -225,11 +239,14 @@ export const editorLifecycleMixin = {
     const optionsKey = this.registerEditorOptions(this.compileEditorOptions(el));
     const reuseEditor = this._Ck5ForGrapesJsData.reuseEditor ? 'true' : 'false';
     this.executeInFrame(
-      `${injectEditorInstant.name}('#${this.getElementId(this.editorContainer)}','${optionsKey}',${this.inlineMode ? 'true' : 'false'},${reuseEditor});`
+      `${injectEditorInstant.name}('#${this.getElementId(this.editorContainer)}','${optionsKey}',${
+        this.inlineMode ? 'true' : 'false'
+      },${reuseEditor});`
     );
 
     const toolbarContainer = this.toolbarContainer;
-    const toolbarMaxWidth = computedWidth || (this.inlineMode ? this.inlineMenuMaxWidth : this.menuMaxWidth);
+    const toolbarMaxWidth =
+      computedWidth || (this.inlineMode ? this.inlineMenuMaxWidth : this.menuMaxWidth);
     this.applyToolbarMaxWidth(toolbarContainer, toolbarMaxWidth);
     this.applyInlineModeStyles(el);
     this.observeEditorElements(toolbarContainer);
@@ -257,14 +274,11 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    this.inlineStyles = createHtmlElem(
-      'style',
-      head,
-      {
-        innerHTML: `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}` +
-          `.ck-editor__editable {display: inline-block;}`
-      }
-    );
+    this.inlineStyles = createHtmlElem('style', head, {
+      innerHTML:
+        `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}` +
+        `.ck-editor__editable {display: inline-block;}`,
+    });
   },
 
   observeEditorElements(toolbarContainer) {
@@ -272,7 +286,7 @@ export const editorLifecycleMixin = {
       this.toolBarMObserver.observe(toolbarContainer.firstChild, {
         subtree: true,
         childList: true,
-        attributes: true
+        attributes: true,
       });
     }
 
@@ -280,7 +294,7 @@ export const editorLifecycleMixin = {
       this.elementObserver.observe(this.el, {
         subtree: true,
         childList: true,
-        attributes: true
+        attributes: true,
       });
     }
   },
@@ -333,7 +347,7 @@ export const editorLifecycleMixin = {
     const observer = new MutationObserver(() => removeClasses());
     observer.observe(editableEl, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ['class'],
     });
 
     this._Ck5ForGrapesJsData.editableClassObserver = observer;
@@ -341,14 +355,14 @@ export const editorLifecycleMixin = {
 
   ensureBodyWrapperHandlers() {
     if (!this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler) {
-      this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler = e => {
+      this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler = (e) => {
         e.stopPropagation();
         e.stopImmediatePropagation();
       };
     }
 
     if (!this._Ck5ForGrapesJsData.bodyWrapperClickHandler) {
-      this._Ck5ForGrapesJsData.bodyWrapperClickHandler = e => {
+      this._Ck5ForGrapesJsData.bodyWrapperClickHandler = (e) => {
         e.stopPropagation();
         e.stopImmediatePropagation();
       };
@@ -436,8 +450,8 @@ export const editorLifecycleMixin = {
     if (range) {
       range = this.frameDoc.createRange();
       let sel = this.frameContentWindow.getSelection();
-      range.setStart(textNode, offset)
-      range.collapse(true)
+      range.setStart(textNode, offset);
+      range.collapse(true);
       sel.removeAllRanges();
       sel.addRange(range);
     }
@@ -501,7 +515,7 @@ export const editorLifecycleMixin = {
 
     this.badgableInfo = {
       component,
-      previousState
+      previousState,
     };
 
     try {
@@ -543,7 +557,8 @@ export const editorLifecycleMixin = {
     this.restoreToolbarVisibility();
 
     const canvas = this.editor?.Canvas;
-    const getToolbar = typeof canvas?.getToolbarEl === 'function' ? () => canvas.getToolbarEl() : null;
+    const getToolbar =
+      typeof canvas?.getToolbarEl === 'function' ? () => canvas.getToolbarEl() : null;
     if (!getToolbar) {
       this.toolbarVisibilityInfo = null;
       return;
@@ -560,11 +575,11 @@ export const editorLifecycleMixin = {
       previousDisplay: toolbarEl.style.display,
       previousVisibility: toolbarEl.style.visibility,
       previousPointerEvents: toolbarEl.style.pointerEvents,
-      listener: null
+      listener: null,
     };
 
     const hideToolbar = () => {
-      const target = getToolbar ? (getToolbar() || toolbarEl) : toolbarEl;
+      const target = getToolbar ? getToolbar() || toolbarEl : toolbarEl;
       if (!target) {
         return;
       }
@@ -594,7 +609,8 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    const { toolbarEl, previousDisplay, previousVisibility, previousPointerEvents, listener } = this.toolbarVisibilityInfo;
+    const { toolbarEl, previousDisplay, previousVisibility, previousPointerEvents, listener } =
+      this.toolbarVisibilityInfo;
 
     if (listener && typeof this.editor?.off === 'function') {
       try {
@@ -607,7 +623,8 @@ export const editorLifecycleMixin = {
     if (toolbarEl) {
       toolbarEl.style.display = typeof previousDisplay === 'string' ? previousDisplay : '';
       toolbarEl.style.visibility = typeof previousVisibility === 'string' ? previousVisibility : '';
-      toolbarEl.style.pointerEvents = typeof previousPointerEvents === 'string' ? previousPointerEvents : '';
+      toolbarEl.style.pointerEvents =
+        typeof previousPointerEvents === 'string' ? previousPointerEvents : '';
     }
 
     this.toolbarVisibilityInfo = null;
@@ -621,16 +638,14 @@ export const editorLifecycleMixin = {
   getContent() {
     const ckeditor = this.ckeditor;
     let ckeditorContent = ckeditor?.data ? ckeditor.data.get() : '';
-    if (typeof ckeditorContent !== "string") ckeditorContent = "";
+    if (typeof ckeditorContent !== 'string') ckeditorContent = '';
     // Remove the placeholder injected in mountEditorUi() to preserve plain <span> elements.
     ckeditorContent = ckeditorContent.replace(/ data-gjs-span="1"/g, '');
     const baseContent = this.resolveBaseContent(ckeditorContent);
 
     return this.normalizeWordInlineStyles(
       this.normalizeListMarkerStyles(
-        this.normalizeIndentationStyles(
-          this.normalizeLinkUnderlineColors(baseContent)
-        )
+        this.normalizeIndentationStyles(this.normalizeLinkUnderlineColors(baseContent))
       )
     );
   },
@@ -645,8 +660,9 @@ export const editorLifecycleMixin = {
       return content;
     }
 
-    const implementation = (this.frameDoc && this.frameDoc.implementation)
-      || (typeof document !== 'undefined' ? document.implementation : null);
+    const implementation =
+      (this.frameDoc && this.frameDoc.implementation) ||
+      (typeof document !== 'undefined' ? document.implementation : null);
     if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
       return content;
     }
@@ -687,7 +703,10 @@ export const editorLifecycleMixin = {
       return '';
     }
 
-    return value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+    return value
+      .replace(/\u00a0/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   },
 
   collectDataSpanDescriptors(root) {
@@ -730,10 +749,10 @@ export const editorLifecycleMixin = {
       descriptors.push({
         start,
         end,
-        attributes: Array.from(node.attributes || []).map(attribute => ({
+        attributes: Array.from(node.attributes || []).map((attribute) => ({
           name: attribute.name,
-          value: attribute.value || ''
-        }))
+          value: attribute.value || '',
+        })),
       });
     };
 
@@ -747,7 +766,7 @@ export const editorLifecycleMixin = {
       return false;
     }
 
-    return Array.from(element.attributes || []).some(attribute => {
+    return Array.from(element.attributes || []).some((attribute) => {
       const name = `${attribute?.name || ''}`.toLowerCase();
       return name.startsWith('data-');
     });
@@ -758,7 +777,7 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    descriptors.forEach(descriptor => {
+    descriptors.forEach((descriptor) => {
       const startPoint = this.resolveTextOffset(root, descriptor.start);
       const endPoint = this.resolveTextOffset(root, descriptor.end);
       if (!startPoint || !endPoint) {
@@ -774,7 +793,7 @@ export const editorLifecycleMixin = {
       }
 
       const span = root.ownerDocument.createElement('span');
-      (descriptor.attributes || []).forEach(attribute => {
+      (descriptor.attributes || []).forEach((attribute) => {
         if (!attribute?.name) {
           return;
         }
@@ -798,11 +817,7 @@ export const editorLifecycleMixin = {
     }
 
     const normalizedTarget = Math.max(0, Number.isFinite(targetOffset) ? targetOffset : 0);
-    const walker = root.ownerDocument.createTreeWalker(
-      root,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
+    const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
 
     let consumed = 0;
     let currentNode = walker.nextNode();
@@ -814,7 +829,7 @@ export const editorLifecycleMixin = {
       if (normalizedTarget <= nextConsumed) {
         return {
           node: currentNode,
-          offset: Math.max(0, Math.min(length, normalizedTarget - consumed))
+          offset: Math.max(0, Math.min(length, normalizedTarget - consumed)),
         };
       }
 
@@ -835,7 +850,9 @@ export const editorLifecycleMixin = {
       return false;
     }
 
-    return Array.from(clonedContent.querySelectorAll('span')).some(element => this.elementHasDataAttributes(element));
+    return Array.from(clonedContent.querySelectorAll('span')).some((element) =>
+      this.elementHasDataAttributes(element)
+    );
   },
 
   reconcileElementAttributes(originalRoot, currentRoot) {
@@ -863,7 +880,10 @@ export const editorLifecycleMixin = {
         // current:  <span ...>text</span>
         // Reconcile attributes from the inner element to the current element so
         // data-gjs-type, id, draggable etc. are preserved after editing.
-        if (originalTagName === 'div' && originalElement.classList.contains('gjs-heading-wrapper')) {
+        if (
+          originalTagName === 'div' &&
+          originalElement.classList.contains('gjs-heading-wrapper')
+        ) {
           const originalInner = originalElement.firstElementChild;
           if (originalInner && `${originalInner.tagName || ''}`.toLowerCase() === currentTagName) {
             this.reconcileSingleElementAttributes(originalInner, currentElement);
@@ -890,7 +910,7 @@ export const editorLifecycleMixin = {
       currentElement.id = originalElement.id;
     }
 
-    Array.from(originalElement.attributes || []).forEach(attribute => {
+    Array.from(originalElement.attributes || []).forEach((attribute) => {
       const name = `${attribute?.name || ''}`.toLowerCase();
       if (!name || name === 'class' || name === 'style' || name === 'id') {
         return;
@@ -907,15 +927,19 @@ export const editorLifecycleMixin = {
   },
 
   reconcileClassAttribute(originalElement, currentElement) {
-    const originalClasses = Array.from(originalElement.classList || []).map(item => item.trim()).filter(Boolean);
+    const originalClasses = Array.from(originalElement.classList || [])
+      .map((item) => item.trim())
+      .filter(Boolean);
     if (!originalClasses.length) {
       return;
     }
 
-    const currentClasses = Array.from(currentElement.classList || []).map(item => item.trim()).filter(Boolean);
+    const currentClasses = Array.from(currentElement.classList || [])
+      .map((item) => item.trim())
+      .filter(Boolean);
     const mergedClasses = [...currentClasses];
 
-    originalClasses.forEach(className => {
+    originalClasses.forEach((className) => {
       if (!mergedClasses.includes(className)) {
         mergedClasses.push(className);
       }
@@ -946,6 +970,14 @@ export const editorLifecycleMixin = {
         continue;
       }
 
+      // Skip when CKEditor moved the declaration onto a descendant (e.g. a
+      // heading's font-size pushed into an inner <span>). Re-adding it on the
+      // ancestor would duplicate the style and compound across edit cycles,
+      // progressively corrupting the snapshot taken on the next enable().
+      if (this.descendantHasStyleProperty(currentElement, property)) {
+        continue;
+      }
+
       const value = originalStyle.getPropertyValue(property);
       if (!value) {
         continue;
@@ -954,6 +986,16 @@ export const editorLifecycleMixin = {
       const priority = originalStyle.getPropertyPriority(property) || '';
       currentStyle.setProperty(property, value, priority);
     }
+  },
+
+  descendantHasStyleProperty(element, property) {
+    if (!element || typeof element.querySelectorAll !== 'function' || !property) {
+      return false;
+    }
+
+    return Array.from(element.querySelectorAll('[style]')).some((descendant) => {
+      return !!(descendant.style && descendant.style.getPropertyValue(property));
+    });
   },
 
   resolveBaseContent(ckeditorContent) {
@@ -978,15 +1020,17 @@ export const editorLifecycleMixin = {
       return '';
     }
 
-    const originalContent = typeof this.originalContent === 'string' ? this.originalContent.trim() : '';
+    const originalContent =
+      typeof this.originalContent === 'string' ? this.originalContent.trim() : '';
     const originalStartsWithParagraph = /^<p(\s|>)/i.test(originalContent);
     const originalEndsWithParagraph = /<\/p>$/i.test(originalContent);
     if (originalStartsWithParagraph && originalEndsWithParagraph) {
       return ckeditorContent;
     }
 
-    const implementation = (this.frameDoc && this.frameDoc.implementation)
-      || (typeof document !== 'undefined' ? document.implementation : null);
+    const implementation =
+      (this.frameDoc && this.frameDoc.implementation) ||
+      (typeof document !== 'undefined' ? document.implementation : null);
     if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
       return ckeditorContent;
     }
@@ -1062,7 +1106,8 @@ export const editorLifecycleMixin = {
     this.detachBodyWrapperListeners();
     this.disconnectTipObserver(reuseEditor);
 
-    const finalizeCleanup = () => this.finalizeDisableCleanup(content, reuseEditor, toolbarContainer);
+    const finalizeCleanup = () =>
+      this.finalizeDisableCleanup(content, reuseEditor, toolbarContainer);
     this.destroyEditorAndCleanup(ckeditor, reuseEditor, finalizeCleanup);
   },
 
@@ -1077,8 +1122,14 @@ export const editorLifecycleMixin = {
   },
 
   detachFrameBodyListeners() {
-    if (this._Ck5ForGrapesJsData.frameBodyEl && this._Ck5ForGrapesJsData.frameBodyMouseDownHandler) {
-      this._Ck5ForGrapesJsData.frameBodyEl.removeEventListener('mousedown', this._Ck5ForGrapesJsData.frameBodyMouseDownHandler);
+    if (
+      this._Ck5ForGrapesJsData.frameBodyEl &&
+      this._Ck5ForGrapesJsData.frameBodyMouseDownHandler
+    ) {
+      this._Ck5ForGrapesJsData.frameBodyEl.removeEventListener(
+        'mousedown',
+        this._Ck5ForGrapesJsData.frameBodyMouseDownHandler
+      );
     }
   },
 
@@ -1089,7 +1140,10 @@ export const editorLifecycleMixin = {
     }
 
     if (this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler) {
-      bodyWrapperEl.removeEventListener('mousedown', this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler);
+      bodyWrapperEl.removeEventListener(
+        'mousedown',
+        this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler
+      );
     }
     if (this._Ck5ForGrapesJsData.bodyWrapperClickHandler) {
       bodyWrapperEl.removeEventListener('click', this._Ck5ForGrapesJsData.bodyWrapperClickHandler);
@@ -1152,7 +1206,7 @@ export const editorLifecycleMixin = {
 
     if (typeof ckeditor?.destroy === 'function') {
       Promise.resolve(ckeditor.destroy())
-        .catch(error => {
+        .catch((error) => {
           console.warn('GrapesJS CKEditor: unable to destroy editor', error);
         })
         .then(destroyEditorContext)
@@ -1173,14 +1227,10 @@ export const editorLifecycleMixin = {
   injectEditorModule(src) {
     const hostHead = document.querySelector('head');
     if (hostHead && !document.getElementById('grapesjs-ckeditor-toolbar-style')) {
-      createHtmlElem(
-        'style',
-        hostHead,
-        {
-          id: 'grapesjs-ckeditor-toolbar-style',
-          innerHTML: `.gjs-rte-toolbar {opacity: 0;}`
-        }
-      );
+      createHtmlElem('style', hostHead, {
+        id: 'grapesjs-ckeditor-toolbar-style',
+        innerHTML: `.gjs-rte-toolbar {opacity: 0;}`,
+      });
     }
 
     const frameDocument = this.frameDoc;
@@ -1191,59 +1241,48 @@ export const editorLifecycleMixin = {
 
     const moduleSource = typeof src === 'string' ? src.trim() : '';
     const injectedModuleScript = frameDocument.getElementById('grapesjs-ckeditor-module-loader');
-    const hasInjectedModule = !!(moduleSource && injectedModuleScript?.getAttribute('src') === moduleSource);
+    const hasInjectedModule = !!(
+      moduleSource && injectedModuleScript?.getAttribute('src') === moduleSource
+    );
 
     if (!hasInjectedModule && moduleSource) {
-      createHtmlElem(
-        'script',
-        body,
-        {
-          id: 'grapesjs-ckeditor-module-loader',
-          src: moduleSource,
-        }
-      ).onload =
-        () => setTimeout(
-          () => {
-            const styles = [...frameDocument.querySelectorAll('style')];
-            for (let index = 0; index < styles.length; index += 1) {
-              const item = styles[index];
-              let innerHTML = item.innerHTML;
-              let match = innerHTML.match(/.ck.ck-editor__editable_inline ?{[^}]*(overflow:[^;]*;)[^}]*}/);
-              if (!match) {
-                continue;
-              }
-
-              item.innerHTML = innerHTML.replace(match[0], '');
-              createHtmlElem(
-                'style',
-                item.parentNode,
-                {
-                  innerHTML: `.ck-toolbar {border-bottom-width: 1px !important;}` +
-                    `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;} 
-                         .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `
-                }
-              );
-              break;
+      createHtmlElem('script', body, {
+        id: 'grapesjs-ckeditor-module-loader',
+        src: moduleSource,
+      }).onload = () =>
+        setTimeout(() => {
+          const styles = [...frameDocument.querySelectorAll('style')];
+          for (let index = 0; index < styles.length; index += 1) {
+            const item = styles[index];
+            let innerHTML = item.innerHTML;
+            let match = innerHTML.match(
+              /.ck.ck-editor__editable_inline ?{[^}]*(overflow:[^;]*;)[^}]*}/
+            );
+            if (!match) {
+              continue;
             }
+
+            item.innerHTML = innerHTML.replace(match[0], '');
+            createHtmlElem('style', item.parentNode, {
+              innerHTML:
+                `.ck-toolbar {border-bottom-width: 1px !important;}` +
+                `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;} 
+                         .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `,
+            });
+            break;
           }
-        );
+        });
     }
 
     if (!frameDocument.getElementById('grapesjs-ckeditor-runtime')) {
-      createHtmlElem(
-        'script',
-        body,
-        {
-          id: 'grapesjs-ckeditor-runtime',
-          innerHTML: `${setElementProperty.toString()}; ${injectEditorInstant.toString()}; function _typeof(obj) { return typeof obj; }`
-        }
-      );
+      createHtmlElem('script', body, {
+        id: 'grapesjs-ckeditor-runtime',
+        innerHTML: `${setElementProperty.toString()}; ${injectEditorInstant.toString()}; function _typeof(obj) { return typeof obj; }`,
+      });
     }
 
     if (!this.frameContentWindow.grapesjsCkeditorData) {
-      this.executeInFrame(
-        `(${injectDataStorage.toString()})()`
-      );
+      this.executeInFrame(`(${injectDataStorage.toString()})()`);
     }
 
     if (!this._Ck5ForGrapesJsData.frameScrollHandler) {
@@ -1252,14 +1291,8 @@ export const editorLifecycleMixin = {
     if (!this._Ck5ForGrapesJsData.frameResizeHandler) {
       this._Ck5ForGrapesJsData.frameResizeHandler = this.onResize.bind(this);
     }
-    this.frameContentWindow.addEventListener(
-      'scroll',
-      this._Ck5ForGrapesJsData.frameScrollHandler
-    );
-    this.frameContentWindow.addEventListener(
-      'resize',
-      this._Ck5ForGrapesJsData.frameResizeHandler
-    );
+    this.frameContentWindow.addEventListener('scroll', this._Ck5ForGrapesJsData.frameScrollHandler);
+    this.frameContentWindow.addEventListener('resize', this._Ck5ForGrapesJsData.frameResizeHandler);
   },
 
   /**
@@ -1268,13 +1301,9 @@ export const editorLifecycleMixin = {
    * @param {string} code
    */
   executeInFrame(code) {
-    createHtmlElem(
-      'script',
-      this.frameBody,
-      {
-        innerHTML: code
-      }
-    ).remove();
+    createHtmlElem('script', this.frameBody, {
+      innerHTML: code,
+    }).remove();
   },
 
   /**
@@ -1297,7 +1326,10 @@ export const editorLifecycleMixin = {
   tuneGjsToolbar() {
     const gjsToolbar = this.gjsToolbar;
     if (gjsToolbar) {
-      if (this.isActive && isOpenPanelOverlapGjsToolbar(this.toolbarContainer, gjsToolbar, this.frame)) {
+      if (
+        this.isActive &&
+        isOpenPanelOverlapGjsToolbar(this.toolbarContainer, gjsToolbar, this.frame)
+      ) {
         gjsToolbar.style.opacity = 0;
         gjsToolbar.style.pointerEvents = 'none';
       } else {
@@ -1314,9 +1346,14 @@ export const editorLifecycleMixin = {
    * @returns {string|null}
    */
   updateMenuWidthsBySelection(component) {
-    const targetComponent = component || (typeof this.editor?.getSelected === 'function' ? this.editor.getSelected() : null);
+    const targetComponent =
+      component ||
+      (typeof this.editor?.getSelected === 'function' ? this.editor.getSelected() : null);
     const element = typeof targetComponent?.getEl === 'function' ? targetComponent.getEl() : null;
-    const width = typeof element?.getBoundingClientRect === 'function' ? element.getBoundingClientRect().width : null;
+    const width =
+      typeof element?.getBoundingClientRect === 'function'
+        ? element.getBoundingClientRect().width
+        : null;
     if (!Number.isFinite(width) || width <= 0) {
       return null;
     }
@@ -1350,13 +1387,22 @@ export const editorLifecycleMixin = {
     const gjsToolbarBoundingRect = this.getGjsToolbarRect(gjsToolbar);
     let toolBarBoundingRect = this.toolbarContainer.getBoundingClientRect();
     const elBoundingRect = this.el.getBoundingClientRect();
-    const center = this.shouldCenterToolbar(toolBarBoundingRect, elBoundingRect, gjsToolbarBoundingRect.width);
+    const center = this.shouldCenterToolbar(
+      toolBarBoundingRect,
+      elBoundingRect,
+      gjsToolbarBoundingRect.width
+    );
     const left = this.calculateToolbarLeft(toolBarBoundingRect, elBoundingRect, center);
 
     this.toolbarContainer.style.left = `${left}px`;
 
     toolBarBoundingRect = this.toolbarContainer.getBoundingClientRect();
-    const top = this.calculateToolbarTop(toolBarBoundingRect, elBoundingRect, gjsToolbarBoundingRect, center);
+    const top = this.calculateToolbarTop(
+      toolBarBoundingRect,
+      elBoundingRect,
+      gjsToolbarBoundingRect,
+      center
+    );
     this.toolbarContainer.style.top = `${top}px`;
   },
 
@@ -1372,7 +1418,7 @@ export const editorLifecycleMixin = {
     this.gjsToolBarMObserver.observe(gjsToolbar, {
       subtree: false,
       childList: false,
-      attributes: true
+      attributes: true,
     });
   },
 
@@ -1391,10 +1437,17 @@ export const editorLifecycleMixin = {
     }
 
     const gjsToolbarToScreenBorderSpace = 5;
-    let left = elBoundingRect.left - (toolBarBoundingRect.width - elBoundingRect.width) / 2 + this.frameScrollX;
+    let left =
+      elBoundingRect.left -
+      (toolBarBoundingRect.width - elBoundingRect.width) / 2 +
+      this.frameScrollX;
 
     if (left + toolBarBoundingRect.width > this.frameBody.offsetWidth) {
-      left -= left + toolBarBoundingRect.width - this.frameBody.offsetWidth + gjsToolbarToScreenBorderSpace;
+      left -=
+        left +
+        toolBarBoundingRect.width -
+        this.frameBody.offsetWidth +
+        gjsToolbarToScreenBorderSpace;
     }
 
     if (left < this.frameScrollX) {
@@ -1406,19 +1459,24 @@ export const editorLifecycleMixin = {
 
   calculateToolbarTop(toolBarBoundingRect, elBoundingRect, gjsToolbarBoundingRect, center) {
     const gjsToolbarVSpace = 1;
-    let top = (
-      elBoundingRect.top + this.frameScrollY - toolBarBoundingRect.height - gjsToolbarVSpace -
-      (center ? gjsToolbarBoundingRect.height : 0)
-    );
+    let top =
+      elBoundingRect.top +
+      this.frameScrollY -
+      toolBarBoundingRect.height -
+      gjsToolbarVSpace -
+      (center ? gjsToolbarBoundingRect.height : 0);
 
     if (top > this.frameScrollY) {
       return top;
     }
 
-    top = (
-      elBoundingRect.bottom + this.frameScrollY + gjsToolbarVSpace +
-      (center && gjsToolbarBoundingRect.bottom > elBoundingRect.bottom ? gjsToolbarBoundingRect.height : 0)
-    );
+    top =
+      elBoundingRect.bottom +
+      this.frameScrollY +
+      gjsToolbarVSpace +
+      (center && gjsToolbarBoundingRect.bottom > elBoundingRect.bottom
+        ? gjsToolbarBoundingRect.height
+        : 0);
 
     return top;
   },
@@ -1434,7 +1492,9 @@ export const editorLifecycleMixin = {
       return '';
     }
 
-    const frameData = this.frameContentWindow.grapesjsCkeditorData || (this.frameContentWindow.grapesjsCkeditorData = {});
+    const frameData =
+      this.frameContentWindow.grapesjsCkeditorData ||
+      (this.frameContentWindow.grapesjsCkeditorData = {});
     const registry = frameData.optionsRegistry || (frameData.optionsRegistry = {});
     const data = this._Ck5ForGrapesJsData || (this._Ck5ForGrapesJsData = {});
 
@@ -1453,5 +1513,5 @@ export const editorLifecycleMixin = {
     if (this.isActive) {
       this.positionToolbar();
     }
-  }
+  },
 };
