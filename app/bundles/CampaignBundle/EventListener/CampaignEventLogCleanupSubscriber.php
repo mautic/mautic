@@ -29,7 +29,7 @@ final class CampaignEventLogCleanupSubscriber implements EventSubscriberInterfac
     public function onEventBatchExecuted(ExecutedBatchEvent $event): void
     {
         $ids = $event->getExecuted()
-            ->map(fn (LeadEventLog $eventLog) => $eventLog->getId())
+            ->map(fn (LeadEventLog $eventLog): int => $eventLog->getId())
             ->getValues();
 
         if (!$ids) {

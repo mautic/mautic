@@ -71,7 +71,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             }
         }
 
-        uasort($data['columns'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
+        uasort($data['columns'], fn ($a, $b): int => strnatcmp((string) $a['label'], (string) $b['label']));
 
         if (isset($data['filters'])) {
             foreach ($data['filters'] as $column => &$d) {
@@ -84,7 +84,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 }
             }
 
-            uasort($data['filters'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
+            uasort($data['filters'], fn ($a, $b): int => strnatcmp((string) $a['label'], (string) $b['label']));
         }
 
         $this->tableArray[$context] = $data;

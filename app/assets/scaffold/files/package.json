@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "description": "Mautic Open Source Distribution",
   "devDependencies": {
-    "grunt": "^1.6.1",
-    "grunt-contrib-less": "^3.0.0",
-    "grunt-contrib-watch": "^1.1.0",
     "patch-package": "^8.0.1",
     "webpack-cli": "^5.1.4"
   },
@@ -22,8 +19,8 @@
     "@ckeditor/ckeditor5-ckfinder": "^48.0.1",
     "@ckeditor/ckeditor5-cloud-services": "^48.0.1",
     "@ckeditor/ckeditor5-core": "^48.0.1",
-    "@ckeditor/ckeditor5-dev-translations": "^54.3.2",
-    "@ckeditor/ckeditor5-dev-utils": "^54.3.2",
+    "@ckeditor/ckeditor5-dev-translations": "^56.4.0",
+    "@ckeditor/ckeditor5-dev-utils": "^56.4.0",
     "@ckeditor/ckeditor5-easy-image": "^48.0.1",
     "@ckeditor/ckeditor5-editor-classic": "^48.0.1",
     "@ckeditor/ckeditor5-essentials": "^48.0.1",
@@ -47,7 +44,6 @@
     "@ckeditor/ckeditor5-word-count": "^48.0.1",
     "@claviska/jquery-minicolors": "^2.3.6",
     "at.js": "^1.5.4",
-    "bootstrap": "^3.4.1",
     "chart.js": "^2.9.4",
     "chosen-js": "^1.8.7",
     "dropzone": "^4.3.0",

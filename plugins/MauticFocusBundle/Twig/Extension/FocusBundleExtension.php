@@ -29,7 +29,7 @@ class FocusBundleExtension extends AbstractExtension
     public function getTests(): array
     {
         return [
-            new TwigTest('color light', fn (string $hexColor) => FocusModel::isLightColor($hexColor)),
+            new TwigTest('color light', fn (string $hexColor): bool => FocusModel::isLightColor($hexColor)),
         ];
     }
 

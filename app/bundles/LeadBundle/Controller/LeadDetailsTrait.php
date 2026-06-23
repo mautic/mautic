@@ -338,8 +338,8 @@ trait LeadDetailsTrait
             $model->getRepository()->refetchEntity($lead);
             $engagementsData = $this->getStatsCount($lead);
 
-            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
-            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
+            $engagements = array_map(fn ($a, $b): float|int => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user): float|int => $points_first_user + $points_second_user, $engagementsData['points'], $points);
         }
 
         return [

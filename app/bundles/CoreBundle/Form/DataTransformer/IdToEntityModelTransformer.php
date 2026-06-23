@@ -36,7 +36,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
             return $entity->$func();
         }
 
-        if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
             return [];
         }
 

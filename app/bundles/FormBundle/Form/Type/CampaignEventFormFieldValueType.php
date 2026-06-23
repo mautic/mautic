@@ -99,7 +99,7 @@ class CampaignEventFormFieldValueType extends AbstractType
                                     foreach ($option as $opt) {
                                         $options[$field->getAlias()][$opt] = $opt;
                                     }
-                                } elseif (!is_array($option)) {
+                                } else {
                                     // Kept here for BC
                                     $options[$field->getAlias()][$option] = $option;
                                 }

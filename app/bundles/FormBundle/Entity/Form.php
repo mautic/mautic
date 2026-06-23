@@ -647,7 +647,7 @@ class Form extends FormEntity implements UuidInterface
                 ],
                 $this->getFields()->getValues(),
             ),
-            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField']),
+            fn ($elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
     }
 
@@ -662,7 +662,7 @@ class Form extends FormEntity implements UuidInterface
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        fn (Field $field) => $field->getMappedObject(),
+                        fn (Field $field): ?string => $field->getMappedObject(),
                     )->toArray(),
                 ),
             ),
