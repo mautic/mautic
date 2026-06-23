@@ -544,7 +544,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
 
         $renderedResults = array_map(
-            fn ($item) => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
+            fn ($item): string => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
             $results['results']
         );
 

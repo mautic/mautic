@@ -562,18 +562,6 @@ parameters:
 			path: app/bundles/AssetBundle/Entity/Asset.php
 
 		-
-			message: '#^Property Mautic\\AssetBundle\\Entity\\Asset\:\:\$file \(Symfony\\Component\\HttpFoundation\\File\\File\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Property Mautic\\AssetBundle\\Entity\\Asset\:\:\$file \(Symfony\\Component\\HttpFoundation\\File\\File\) in empty\(\) is not falsy\.$#'
-			identifier: empty.property
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
 			message: '#^Property Mautic\\AssetBundle\\Entity\\Asset\:\:\$maxSize has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -600,18 +588,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\AssetBundle\\Entity\\Asset\:\:\$uploadDir has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Result of && is always false\.$#'
-			identifier: booleanAnd.alwaysFalse
-			count: 1
-			path: app/bundles/AssetBundle/Entity/Asset.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between 0 and string\|false will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
 			count: 1
 			path: app/bundles/AssetBundle/Entity/Asset.php
 
@@ -1063,12 +1039,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\CampaignApiController\:\:checkLeadAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1147,12 +1117,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventApiController.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventApiController\:\:checkLeadAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1185,12 +1149,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController\:\:checkAllAccess\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\Api\\EventLogApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
 
@@ -2347,12 +2305,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Event/CampaignDecisionEvent.php
 
 		-
-			message: '#^Left side of && is always true\.$#'
-			identifier: booleanAnd.leftAlwaysTrue
-			count: 1
-			path: app/bundles/CampaignBundle/Event/CampaignExecutionEvent.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:\:__construct\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -3108,12 +3060,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Form\\Type\\EventType\:\:getTimeValue\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Form/Type/EventType.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between null and mixed will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
 			count: 1
 			path: app/bundles/CampaignBundle/Form/Type/EventType.php
 
@@ -4807,12 +4753,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
 
 		-
-			message: '#^Strict comparison using \=\=\= between null and Symfony\\Component\\HttpFoundation\\Request will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 4
-			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Controller\\AjaxController\:\:executeAjaxAction\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -4888,24 +4828,6 @@ parameters:
 			message: '#^Call to an undefined method Twig\\Environment\:\:get\(\)\.$#'
 			identifier: method.notFound
 			count: 2
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^Instanceof between string\|false and Symfony\\Component\\HttpFoundation\\Response will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: app/bundles/CoreBundle/Controller/CommonController.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Controller\\CommonController\:\:accessDenied\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
 			path: app/bundles/CoreBundle/Controller/CommonController.php
 
 		-
@@ -7234,18 +7156,6 @@ parameters:
 			path: app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
 
 		-
-			message: '#^Call to function is_array\(\) with null will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
-
-		-
-			message: '#^Instanceof between null and Doctrine\\ORM\\PersistentCollection will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Form\\DataTransformer\\SecondsConversionTransformer\:\:__construct\(\) has parameter \$viewFormat with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7392,12 +7302,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\AbstractFormFieldHelper\:\:parseList\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/CoreBundle/Helper/AbstractFormFieldHelper.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between null and \(int\|non\-empty\-string\) will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
 			count: 1
 			path: app/bundles/CoreBundle/Helper/AbstractFormFieldHelper.php
 
@@ -8054,12 +7958,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Helper/FileHelper.php
-
-		-
-			message: '#^Left side of && is always false\.$#'
-			identifier: booleanAnd.leftAlwaysFalse
-			count: 1
-			path: app/bundles/CoreBundle/Helper/InputHelper.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\InputHelper\:\:__callStatic\(\) has parameter \$arguments with no type specified\.$#'
@@ -9661,12 +9559,6 @@ parameters:
 			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
 
 		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
-			count: 2
-			path: app/bundles/DashboardBundle/Event/WidgetDetailEvent.php
-
-		-
 			message: '#^Property Mautic\\DashboardBundle\\Event\\WidgetDetailEvent\:\:\$cacheDir has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -9886,12 +9778,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:indexAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/DynamicContentBundle/Controller/DynamicContentController.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Controller\\DynamicContentController\:\:indexAction\(\) has parameter \$page with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9983,12 +9869,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/DynamicContentLeadData.php
-
-		-
-			message: '#^Elseif condition is always false\.$#'
-			identifier: elseif.alwaysFalse
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContentRepository.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContentRepository\:\:addSearchCommandWhereClause\(\) return type has no value type specified in iterable type array\.$#'
@@ -10237,12 +10117,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
 
 		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
-
-		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Entity\\VariantEntityInterface\:\:getChanges\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -10389,12 +10263,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\EmailBundle\\Controller\\Api\\EmailApiController\:\:checkAllAccess\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Controller\\Api\\EmailApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/EmailBundle/Controller/Api/EmailApiController.php
 
@@ -12085,18 +11953,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
-			message: '#^If condition is always false\.$#'
-			identifier: if.alwaysFalse
-			count: 1
-			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\PlainTextHelper\:\:convert\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -12237,12 +12093,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Entity\\VariantEntityInterface\:\:isPublished\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
@@ -13915,12 +13765,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/FormController.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 2
-			path: app/bundles/FormBundle/Controller/FormController.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Controller\\FormController\:\:clearSessionComponents\(\) has parameter \$sessionId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -13983,18 +13827,6 @@ parameters:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
 			'''
 			identifier: class.extendsDeprecatedClass
-			count: 1
-			path: app/bundles/FormBundle/Controller/ResultController.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Controller\\ResultController\:\:deleteAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/FormBundle/Controller/ResultController.php
-
-		-
-			message: '#^Method Mautic\\FormBundle\\Controller\\ResultController\:\:downloadFileAction\(\) should return Symfony\\Component\\HttpFoundation\\BinaryFileResponse but returns array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/FormBundle/Controller/ResultController.php
 
@@ -14713,12 +14545,6 @@ parameters:
 			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Exception\\ValidationException\:\:__construct\(\) has parameter \$code with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -14731,18 +14557,6 @@ parameters:
 			path: app/bundles/FormBundle/Exception/ValidationException.php
 
 		-
-			message: '#^Call to function is_array\(\) with mixed will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/bundles/FormBundle/Form/Type/CampaignEventFormFieldValueType.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 2
-			path: app/bundles/FormBundle/Form/Type/FieldType.php
-
-		-
 			message: '#^Method Mautic\\FormBundle\\Form\\Type\\FieldType\:\:getFormFields\(\) has parameter \$formId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -14752,12 +14566,6 @@ parameters:
 			message: '#^Method Mautic\\FormBundle\\Form\\Type\\FieldType\:\:getFormFields\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: app/bundles/FormBundle/Form/Type/FieldType.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between null and mixed will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 2
 			path: app/bundles/FormBundle/Form/Type/FieldType.php
 
 		-
@@ -15327,12 +15135,6 @@ parameters:
 		-
 			message: '#^Argument of an invalid type Mautic\\CoreBundle\\Configurator\\Step\\StepInterface supplied for foreach, only iterables are supported\.$#'
 			identifier: foreach.nonIterable
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/CheckStep.php
-
-		-
-			message: '#^Call to function is_null\(\) with Collator will always evaluate to false\.$#'
-			identifier: function.impossibleType
 			count: 1
 			path: app/bundles/InstallBundle/Configurator/Step/CheckStep.php
 
@@ -16918,12 +16720,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
 
 		-
-			message: '#^Call to function is_double\(\) with mixed will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/bundles/IntegrationsBundle/Sync/VariableExpresser/VariableExpresserHelper.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Tests\\Functional\\Services\\SyncService\\TestExamples\\Integration\\ExampleIntegration\:\:getConfiguredFieldMapping\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -17002,12 +16798,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/CompanyApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\CompanyApiController\:\:checkLeadAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -17040,12 +16830,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:checkAllAccess\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\DeviceApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/DeviceApiController.php
 
@@ -17374,12 +17158,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\ListApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/ListApiController.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\ListApiController\:\:checkLeadAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -17418,12 +17196,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\NoteApiController\:\:checkAllAccess\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\NoteApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/LeadBundle/Controller/Api/NoteApiController.php
 
@@ -17836,12 +17608,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/FieldController.php
 
 		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\FieldController\:\:indexAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Controller/FieldController.php
-
-		-
 			message: '''
 				#^Call to method generateUrl\(\) of deprecated class Mautic\\CoreBundle\\Controller\\AbstractStandardFormController\:
 				2\.3 \- to be removed in 3\.0; use AbstractFormController instead$#
@@ -17967,12 +17733,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\LeadController\:\:contactFrequencyAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Controller\\LeadController\:\:contactFrequencyAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
@@ -20695,12 +20455,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
-			message: '#^Ternary operator condition is always false\.$#'
-			identifier: ternary.alwaysFalse
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
 			message: '''
 				#^Call to deprecated method addLead\(\) of class Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:
 				Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id$#
@@ -21350,12 +21104,6 @@ parameters:
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^Parameter \#1 \$lead of method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:checkLeadInCampaigns\(\) expects Mautic\\CampaignBundle\\Entity\\Lead, Mautic\\LeadBundle\\Entity\\Lead given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
-
-		-
 			message: '''
 				#^Parameter \$event of method Mautic\\LeadBundle\\EventListener\\CampaignSubscriber\:\:compareDateValue\(\) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:
 				2\.13\.0; to be removed in 3\.0$#
@@ -21450,12 +21198,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/CampaignSubscriber.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
 
 		-
 			message: '#^Parameter \#3 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getAnonymousVsIdentifiedPieChartData\(\) expects array, bool given\.$#'
@@ -22042,18 +21784,6 @@ parameters:
 		-
 			message: '#^Call to an undefined method Doctrine\\ORM\\EntityRepository\<object\>\:\:getTableAlias\(\)\.$#'
 			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
-
-		-
-			message: '#^Call to function is_array\(\) with null will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
-
-		-
-			message: '#^Instanceof between null and Doctrine\\ORM\\PersistentCollection will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
 			count: 1
 			path: app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
 
@@ -22837,12 +22567,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\ImportModel\:\:trimArrayValues\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/LeadBundle/Model/ImportModel.php
-
-		-
-			message: '#^Negated boolean expression is always false\.$#'
-			identifier: booleanNot.alwaysFalse
 			count: 1
 			path: app/bundles/LeadBundle/Model/ImportModel.php
 
@@ -24081,12 +23805,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Query/Expression/ExpressionBuilder.php
-
-		-
-			message: '#^Call to function is_null\(\) with Mautic\\LeadBundle\\Segment\\ContactSegmentFilter will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Query/Filter/ForeignFuncFilterQueryBuilder.php
 
 		-
 			message: '#^Parameter \#3 \$y of method Mautic\\LeadBundle\\Segment\\Query\\Expression\\ExpressionBuilder\:\:func\(\) expects array\|string\|null, int given\.$#'
@@ -26177,12 +25895,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/PageModel.php
 
 		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\RedirectModel\:\:createRedirectEntity\(\) has parameter \$url with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -26435,12 +26147,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
-			message: '#^Offset ''first_pass'' on array\{first_pass\: array\{\}, second_pass\: array\{\}\} in empty\(\) always exists and is always falsy\.$#'
-			identifier: empty.offset
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
 			message: '#^Property Mautic\\PageBundle\\Model\\TrackableModel\:\:\$contactFieldUrlTokens type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -26563,12 +26269,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\PluginBundle\\Controller\\PluginController\:\:infoAction\(\) has parameter \$name with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Controller/PluginController.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Controller\\PluginController\:\:infoAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PluginBundle/Controller/PluginController.php
 
@@ -28424,12 +28124,6 @@ parameters:
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
 
 		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\PointApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Controller\\Api\\PointApiController\:\:checkLeadAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -28499,20 +28193,8 @@ parameters:
 			path: app/bundles/PointBundle/Controller/TriggerController.php
 
 		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\TriggerController\:\:cloneAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/PointBundle/Controller/TriggerController.php
-
-		-
 			message: '#^Method Mautic\\PointBundle\\Controller\\TriggerController\:\:deleteAction\(\) has parameter \$objectId with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PointBundle/Controller/TriggerController.php
-
-		-
-			message: '#^Method Mautic\\PointBundle\\Controller\\TriggerController\:\:viewAction\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/PointBundle/Controller/TriggerController.php
 
@@ -29033,12 +28715,6 @@ parameters:
 			path: app/bundles/ReportBundle/Controller/ReportController.php
 
 		-
-			message: '#^Method Mautic\\ReportBundle\\Controller\\ReportController\:\:downloadAction\(\) should return Symfony\\Component\\HttpFoundation\\BinaryFileResponse but returns array\|Symfony\\Component\\HttpFoundation\\JsonResponse\|Symfony\\Component\\HttpFoundation\\RedirectResponse\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/ReportBundle/Controller/ReportController.php
-
-		-
 			message: '#^PHPDoc tag @var for variable \$dynamicFilters has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -29232,12 +28908,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: app/bundles/ReportBundle/Entity/Report.php
-
-		-
-			message: '#^Elseif condition is always false\.$#'
-			identifier: elseif.alwaysFalse
-			count: 1
-			path: app/bundles/ReportBundle/Entity/ReportRepository.php
 
 		-
 			message: '#^Method Mautic\\ReportBundle\\Entity\\ReportRepository\:\:addCatchAllWhereClause\(\) return type has no value type specified in iterable type array\.$#'
@@ -29843,12 +29513,6 @@ parameters:
 			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
 
 		-
-			message: '#^Method Mautic\\SmsBundle\\Controller\\Api\\SmsApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/SmsBundle/Controller/Api/SmsApiController.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Controller\\Api\\SmsApiController\:\:checkLeadAccess\(\) has parameter \$action with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -30403,12 +30067,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\StageBundle\\Controller\\Api\\StageApiController\:\:checkAllAccess\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
-
-		-
-			message: '#^Method Mautic\\StageBundle\\Controller\\Api\\StageApiController\:\:checkAllAccess\(\) should return array\|Symfony\\Component\\HttpFoundation\\RedirectResponse but returns Symfony\\Component\\HttpFoundation\\Response\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/StageBundle/Controller/Api/StageApiController.php
 
@@ -31966,12 +31624,6 @@ parameters:
 		-
 			message: '#^Property MauticPlugin\\MauticClearbitBundle\\Services\\Clearbit_Base\:\:\$response_obj has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: plugins/MauticClearbitBundle/Services/Clearbit_Base.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between ''200'' and 200\|201\|202 will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
 			count: 1
 			path: plugins/MauticClearbitBundle/Services/Clearbit_Base.php
 
@@ -34145,12 +33797,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/Salesforce/ResultsPaginator.php
 
 		-
-			message: '#^If condition is always false\.$#'
-			identifier: if.alwaysFalse
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SalesforceIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has parameter \$data with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -35138,18 +34784,6 @@ parameters:
 			message: '#^Parameter \#4 \$limit of method Mautic\\PluginBundle\\Entity\\IntegrationEntityRepository\:\:findLeadsToUpdate\(\) expects int, false given\.$#'
 			identifier: argument.type
 			count: 2
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Right side of \|\| is always true\.$#'
-			identifier: booleanOr.rightAlwaysTrue
-			count: 2
-			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
@@ -36218,24 +35852,6 @@ parameters:
 			path: plugins/MauticEmailMarketingBundle/Api/MailchimpApi.php
 
 		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: plugins/MauticEmailMarketingBundle/Form/Type/ConstantContactType.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: plugins/MauticEmailMarketingBundle/Form/Type/IcontactType.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: plugins/MauticEmailMarketingBundle/Form/Type/MailchimpType.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticEmailMarketingBundle\\Integration\\ConstantContactIntegration\:\:authCallback\(\) has parameter \$parameters with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -37249,12 +36865,6 @@ parameters:
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:generateContactsGrid\(\) has parameter \$routeParameters with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Controller\\MonitoringController\:\:indexAction\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: plugins/MauticSocialBundle/Controller/MonitoringController.php
 

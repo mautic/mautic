@@ -14,11 +14,9 @@ class Parser
     }
 
     /**
-     * @return string|null
-     *
      * @throws FeedbackLoopNotFound
      */
-    public function parse()
+    public function parse(): string
     {
         if (null === $this->message->fblReport) {
             throw new FeedbackLoopNotFound();
