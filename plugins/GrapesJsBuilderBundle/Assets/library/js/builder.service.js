@@ -12,6 +12,7 @@ import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
+import grapesjsImageLink from './plugins/grapesjs-image-link';
 import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
@@ -1141,6 +1142,7 @@ export default class BuilderService {
         grapesjspostcss,
         grapesjstuiimageeditor,
         grapesjsstylebg,
+        grapesjsImageLink,
         ...BuilderService.getPluginNames('page'), // grapesjs-custom-plugins: load custom plugins by their name
         this.getDataSlotTextPlugin(),
       ],
