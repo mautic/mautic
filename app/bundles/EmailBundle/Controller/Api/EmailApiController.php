@@ -225,11 +225,9 @@ class EmailApiController extends CommonApiController
      *
      * @param int $id Email ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendExampleAction(Request $request, $id, LeadModel $leadModel, FakeContactHelper $fakeContactHelper)
+    public function sendExampleAction(Request $request, $id, LeadModel $leadModel, FakeContactHelper $fakeContactHelper): Response
     {
         $entity     = $this->model->getEntity($id);
         $post       = $request->request->all();
@@ -284,7 +282,7 @@ class EmailApiController extends CommonApiController
      *
      * @return array<int|string, mixed>|Response
      */
-    private function resolveExampleContactFields(array $post, LeadModel $leadModel, FakeContactHelper $fakeContactHelper)
+    private function resolveExampleContactFields(array $post, LeadModel $leadModel, FakeContactHelper $fakeContactHelper): Response|array
     {
         if (empty($post['contactId'])) {
             return $fakeContactHelper->prepareFakeContactWithPrimaryCompany();

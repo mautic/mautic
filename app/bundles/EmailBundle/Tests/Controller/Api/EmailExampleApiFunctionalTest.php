@@ -16,10 +16,10 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const RECIPIENT     = self::RECIPIENT;
-    private const RECIPIENT_ONE = self::RECIPIENT_ONE;
-    private const RECIPIENT_TWO = self::RECIPIENT_TWO;
-    private const EMAIL_SUBJECT = self::EMAIL_SUBJECT;
+    private const RECIPIENT     = 'proof@example.com';
+    private const RECIPIENT_ONE = 'one@example.com';
+    private const RECIPIENT_TWO = 'two@example.com';
+    private const EMAIL_SUBJECT = 'Email subject';
 
     protected $useCleanupRollback = false;
 
