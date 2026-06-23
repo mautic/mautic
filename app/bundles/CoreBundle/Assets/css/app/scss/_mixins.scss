@@ -1,0 +1,327 @@
+//
+// Mixins
+// --------------------------------------------------
+
+// Background color
+// ------------------------
+
+@mixin background-blur() {
+  backdrop-filter: blur(6px);
+  background-color: var(--layer-translucent);
+}
+
+@mixin bg-color($bg-color, $color) {
+  background-color: $bg-color !important;
+  border-color: $bg-color !important;
+  color: $color !important;
+}
+
+// Text emphasis
+// ------------------------
+@mixin text-emphasis-variants($color) {
+  color: $color;
+
+  @at-root a#{&}:hover {
+    color: darken($color, 10%);
+  }
+
+  @at-root #{&}.light-xs {
+    color: lighten($color, 15%);
+  }
+
+  @at-root a#{&}.light-xs:hover {
+    color: lighten($color, 10%);
+  }
+
+  @at-root #{&}.dark-xs {
+    color: darken($color, 15%);
+  }
+
+  @at-root a#{&}.dark-xs:hover {
+    color: darken($color, 20%);
+  }
+
+  @at-root #{&}.dark-sm {
+    color: darken($color, 30%);
+  }
+
+  @at-root a#{&}.dark-sm:hover {
+    color: darken($color, 35%);
+  }
+
+  @at-root #{&}.dark-md {
+    color: darken($color, 45%);
+  }
+
+  @at-root a#{&}.dark-md:hover {
+    color: darken($color, 50%);
+  }
+
+  @at-root #{&}.dark-lg {
+    color: darken($color, 60%);
+  }
+
+  @at-root a#{&}.dark-lg:hover {
+    color: darken($color, 65%);
+  }
+}
+
+// Switch size
+// ------------------------
+@mixin switch-size($height) {
+  input {
+    ~ .text {
+      line-height: $height;
+    }
+
+    ~ .switch {
+      font-size: $height;
+      height: $height;
+      width: ($height * 1.6);
+      border-radius: $height;
+
+      &:after {
+        border-radius: $height;
+        height: $height;
+        width: $height;
+      }
+    }
+  }
+}
+
+// Switch color
+// ------------------------
+@mixin switch-color($color) {
+  input {
+    &:checked {
+      + .switch {
+        border-color: $color;
+        box-shadow: inset 0 0 0 0.6em $color;
+        &:after { border-color: $color; }
+      }
+    }
+  }
+}
+
+// Custom checkbox & radio color
+// ------------------------
+@mixin checkbox-radio-color($color) {
+  label {
+    input {
+      + span {
+        &:after {
+          background-color: $color;
+        }
+      }
+      // checked state
+      &:checked {
+        + span {
+          border: 1px solid $color;
+        }
+      }
+    }
+    // hover state
+    &:hover {
+      input {
+        + span {
+          border: 1px solid var(--text-primary);
+          opacity: .8;
+          @include transition(var(--transition-all-productive));
+        }
+        &:checked {
+          + span {
+            border: 1px solid $color;
+          }
+        }
+      }
+    }
+  }
+}
+
+// sidebar nav variant
+// ------------------------
+@mixin nav-sidebar-variants($bgcolor) {
+  > li {
+    // nav-group line
+    &.nav-group {
+      &:after {
+        content: '';
+        position: absolute;
+        right: 0;
+        left: 50px;
+        bottom: 0;
+        border-bottom: none;
+      }
+    }
+
+    > a {
+      color: var(--text-secondary);
+      &:hover,
+      &:focus {
+        background-color: var(--layer-hover);
+        color: var(--text-primary);
+      }
+    }
+
+    // Active and open state
+    &.active,
+    &.open {
+      > a {
+        background-color: var(--layer-selected);
+        color: var(--text-primary);
+      }
+
+      // `nav-submenu`
+      > .nav-submenu {
+        background-color: var(--layer-accent);
+      }
+    }
+
+    // nav-submenu style
+    > .nav-submenu {
+      background-color: var(--layer-accent);
+      &:after {
+        background-color: var(--layer-accent-hover);
+      }
+      > li {
+        // the dot
+        &:after {
+          background-color: var(--layer);
+          box-shadow: none;
+        }
+        > a {
+          color: var(--text-secondary);
+          &:hover,
+          &:focus {
+            color: var(--text-primary);
+          }
+        }
+
+        // Active and open state
+        &.active,
+        &.open {
+          > a {
+            color: var(--text-primary);
+          }
+        }
+      }
+    }
+  }
+
+  // nav-heading
+  .nav-heading {
+    color: fade(mautic-contrast($bgcolor), 25%);
+  }
+
+  // nav-divider
+  .nav-divider {
+    background-color: fade(mautic-contrast($bgcolor), 6%);
+  }
+}
+
+@mixin outline() {
+  outline: 2px var(--outline-style) transparent;
+  outline-offset: -2px;
+
+  @at-root #{&}:hover {
+    outline: 2px var(--outline-style) transparent;
+  }
+
+  @at-root #{&}:focus,
+    #{&}.focus,
+    #{&}:focus-visible {
+    outline: 2px var(--outline-style) var(--focus);
+  }
+}
+
+@mixin outline-noff() {
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+
+  @at-root #{&}:hover {
+    outline: 2px solid transparent;
+  }
+
+  @at-root #{&}:focus,
+    #{&}.focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+  }
+}
+
+// Alerts
+
+@mixin alert-variant($background, $border, $text-color) {
+  color: var(--text-primary);
+  background-color: var(--layer);
+  border-color: $border;
+
+  hr {
+    border-top-color: var(--border-subtle);
+  }
+
+  .alert-link {
+    color: var(--text-primary);
+  }
+}
+
+@mixin button-variant($background, $text-color, $border-color, $hover-background, $hover-text-color, $active-background, $disabled-background, $disabled-text-color) {
+  background-color: $background;
+  color: $text-color;
+  border: 1px solid $border-color;
+  @include outline();
+
+  i { color: $text-color; }
+
+  @at-root #{&}:hover {
+    color: $hover-text-color;
+    background-color: $hover-background;
+    border: 1px solid $hover-background;
+    i { color: $hover-text-color; }
+  }
+
+  @at-root #{&}:active,
+    #{&}.active,
+    .open > #{&}.dropdown-toggle {
+    color: $hover-text-color;
+    background-color: $active-background;
+    border: 1px solid transparent;
+    i { color: $hover-text-color; }
+
+    @at-root #{&}:hover,
+      #{&}:focus,
+      #{&}.focus {
+      color: $hover-text-color;
+      background-color: $active-background;
+      border-color: $active-background;
+      i { color: $hover-text-color; }
+    }
+  }
+
+  @at-root #{&}:focus,
+    #{&}.focus {
+    color: $hover-text-color;
+    background-color: $active-background;
+    border: 1px solid $active-background;
+    box-shadow: inset 0 0 0 1px var(--focus), inset 0 0 0 2px var(--background,#ffffff);
+    i { color: $hover-text-color; }
+  }
+
+  @at-root #{&}[disabled],
+    #{&}.disabled,
+    fieldset[disabled] #{&},
+    #{&}[disabled]:hover,
+    #{&}.disabled:hover,
+    fieldset[disabled] #{&}:hover,
+    #{&}[disabled]:focus,
+    #{&}.disabled:focus,
+    fieldset[disabled] #{&}:focus,
+    #{&}[disabled].focus,
+    #{&}.disabled.focus,
+    fieldset[disabled] #{&}.focus {
+    background-color: $disabled-background;
+    color: $disabled-text-color;
+    border: 1px solid;
+    i { color: $disabled-text-color; }
+  }
+}

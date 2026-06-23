@@ -89,7 +89,7 @@ class PublishStateService
         return array_values(
             array_filter(
                 $ranges,
-                static fn (PublishStateDateRange $range) => $range->getPublished() === $published
+                static fn (PublishStateDateRange $range): bool => $range->getPublished() === $published
             )
         );
     }

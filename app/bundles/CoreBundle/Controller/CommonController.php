@@ -390,13 +390,7 @@ class CommonController extends AbstractController implements MauticController
             );
         }
 
-        if ($newContent instanceof Response) {
-            $response = $newContent;
-        } else {
-            $response = new JsonResponse($dataArray, $code);
-        }
-
-        return $response;
+        return new JsonResponse($dataArray, $code);
     }
 
     /**
@@ -449,31 +443,43 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
+     * @throws AccessDeniedHttpException
+     */
+    public function throwAccessDenied(string $msg = 'mautic.core.url.error.401'): void
+    {
+        throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
+    }
+
+    /**
+     * @return array{type: string, msg: string}
+     */
+    public function getAccessDeniedFlash(): array
+    {
+        return [
+            'type' => 'error',
+            'msg'  => $this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'),
+        ];
+    }
+
+    /**
      * Generates access denied message.
+     *
+     * @deprecated Use getAccessDeniedFlash or throwAccessDenied
      *
      * @param bool   $batch Flag if a batch action is being performed
      * @param string $msg   Message that is logged
      *
-     * @return JsonResponse|RedirectResponse|array
+     * @return array{type: string, msg: string}
      *
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
+    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401'): array
     {
-        $request = $this->getCurrentRequest();
-
-        $anonymous = $this->security->isAnonymous();
-
-        if ($anonymous || !$batch) {
-            throw new AccessDeniedHttpException($this->translator->trans($msg, ['%url%' => $request->getRequestUri()]));
+        if ($this->security->isAnonymous() || !$batch) {
+            $this->throwAccessDenied($msg);
         }
 
-        if ($batch) {
-            return [
-                'type' => 'error',
-                'msg'  => $this->translator->trans('mautic.core.error.accessdenied', [], 'flashes'),
-            ];
-        }
+        return $this->getAccessDeniedFlash();
     }
 
     /**

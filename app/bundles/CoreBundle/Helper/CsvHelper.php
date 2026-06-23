@@ -38,7 +38,7 @@ final class CsvHelper
      */
     public static function sanitizeHeaders(array $headers): array
     {
-        return array_map(fn ($header) => trim($header), $headers);
+        return array_map(fn ($header): string => trim($header), $headers);
     }
 
     /**
