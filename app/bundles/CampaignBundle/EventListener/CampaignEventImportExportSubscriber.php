@@ -200,7 +200,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
                 $data[$key] = $values;
             } else {
                 $existingIds = array_column($data[$key], 'id');
-                $data[$key]  = array_merge($data[$key], array_filter($values, fn ($value) => !in_array($value['id'], $existingIds)));
+                $data[$key]  = array_merge($data[$key], array_filter($values, fn ($value): bool => !in_array($value['id'], $existingIds)));
             }
         }
     }

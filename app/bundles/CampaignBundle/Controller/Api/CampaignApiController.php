@@ -264,10 +264,10 @@ class CampaignApiController extends CommonApiController
         /** @var array<ConstraintViolationListInterface<ConstraintViolationInterface>> $eventViolations */
         $eventViolations = array_filter(
             array_map(
-                fn (Event $event) => $this->validator->validate($event),
+                fn (Event $event): ConstraintViolationListInterface => $this->validator->validate($event),
                 $entity->getEvents()->toArray()
             ),
-            fn ($error) => $error->count() > 0
+            fn ($error): bool => $error->count() > 0
         );
 
         if (count($eventViolations) > 0) {

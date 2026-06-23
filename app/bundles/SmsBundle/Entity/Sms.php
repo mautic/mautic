@@ -499,10 +499,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getPendingCount()
+    public function getPendingCount(): int
     {
         return $this->pendingCount;
     }

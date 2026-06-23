@@ -449,7 +449,7 @@ class PublicController extends CommonFormController
                     $emailEntity->getCreatedBy()
                 ))
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // bogus ID
@@ -751,9 +751,9 @@ class PublicController extends CommonFormController
             'showContactSegments'          => str_contains($content, BuilderSubscriber::segmentListRegex),
             'showContactCategories'        => str_contains($content, BuilderSubscriber::categoryListRegex),
             'showContactPreferredChannels' => str_contains($content, BuilderSubscriber::preferredchannel),
-        ], fn (bool $value) =>!$value);
+        ], fn (bool $value): bool =>!$value);
 
-        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
+        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key): bool => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
 
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }

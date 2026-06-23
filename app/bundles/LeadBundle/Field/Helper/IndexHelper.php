@@ -79,7 +79,7 @@ class IndexHelper
         $indexes = $stmt->executeQuery()->fetchAllAssociative();
 
         $this->indexedColumns = array_map(
-            fn ($index) => $index['Column_name'],
+            fn ($index): mixed => $index['Column_name'],
             $indexes
         );
 
