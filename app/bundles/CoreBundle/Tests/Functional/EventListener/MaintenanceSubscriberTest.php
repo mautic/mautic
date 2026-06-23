@@ -17,7 +17,8 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
 
     public function testMaintenanceDataCleanUp(): void
     {
-        $admin = $this->getUser(self::ADMIN_USER);
+        $user    = $this->getUser(self::ADMIN_USER);
+        $user_id = $user->getId();
 
         // Insert the audit_log and notification
         $prefix        = self::getContainer()->getParameter('mautic.db_table_prefix');
@@ -27,28 +28,28 @@ final class MaintenanceSubscriberTest extends MauticMysqlTestCase
         $connection    = $this->em->getConnection();
         $connection->executeQuery("INSERT INTO {$prefix}audit_log (user_id, user_name, bundle, object, object_id, action, details, date_added, ip_address)
             VALUES
-                ($admin->getId(), 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ($admin->getId(), 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ($admin->getId(), 'Admin User', 'campaign', 'campaign', 8, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
+                ({$user_id}, 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
+                ({$user_id}, 'Admin User', 'campaign', 'campaign', 8, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
+                ({$user_id}, 'Admin User', 'campaign', 'campaign', 8, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
                 (0, 'System', 'lead', 'lead', 46, 'create', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
                 (0, 'System', 'lead', 'lead', 46, 'ipadded', 'a:0:{}', '{$today}', '127.0.0.1'),
                 (0, 'System', 'lead', 'lead', 45, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
                 (0, 'System', 'lead', 'lead', 45, 'ipadded', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ($admin->getId(), 'Admin User', 'asset', 'asset', 1, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
-                ($admin->getId(), 'Admin User', 'page', 'page', 2, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
-                ($admin->getId(), 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$today}', '127.0.0.1'),
-                ($admin->getId(), 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1');"
+                ({$user_id}, 'Admin User', 'asset', 'asset', 1, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1'),
+                ({$user_id}, 'Admin User', 'page', 'page', 2, 'create', 'a:0:{}', '{$today}', '127.0.0.1'),
+                ({$user_id}, 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$today}', '127.0.0.1'),
+                ({$user_id}, 'Admin User', 'lead', 'company', 5, 'update', 'a:0:{}', '{$threeDaysAgo}', '127.0.0.1');"
         );
 
         $connection->executeQuery("INSERT INTO {$prefix}notifications (user_id, type, header, message, date_added, icon_class, is_read, deduplicate)
             VALUES
-              ($admin->getId(), 'notice', NULL, 'Some data', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
-              ($admin->getId(), 'info', 'NULL', 'View details', '{$today}', 'fa-download', 0, NULL),
-              ($admin->getId(), 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
-              ($admin->getId(), 'notice', NULL, 'Membership has been rebuilt.', '{$today}', 'fa-info-circle', 0, NULL),
-              ($admin->getId(), 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
-              ($admin->getId(), 'notice', NULL, 'Membership has been rebuilt.', '{$today}', 'fa-info-circle', 0, NULL),
-              ($admin->getId(), 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL);"
+              ({$user_id}, 'notice', NULL, 'Some data', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
+              ({$user_id}, 'info', 'NULL', 'View details', '{$today}', 'fa-download', 0, NULL),
+              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
+              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$today}', 'fa-info-circle', 0, NULL),
+              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL),
+              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$today}', 'fa-info-circle', 0, NULL),
+              ({$user_id}, 'notice', NULL, 'Membership has been rebuilt.', '{$threeDaysAgo}', 'fa-info-circle', 0, NULL);"
         );
 
         /** @var TranslatorInterface $translator */

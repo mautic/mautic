@@ -47,7 +47,9 @@ class TagRepository extends CommonRepository
             ->where('x.tag_id = t.id');
 
         $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
-            ->where($qb->expr()->notExists($subQb->getSQL()));
+            ->where($qb->expr()->not(
+                $qb->expr()->exists($subQb->getSQL())
+            ));
 
         $qb->executeStatement();
     }

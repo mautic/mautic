@@ -11,6 +11,13 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private Lead $lead;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->lead = $this->createLead();
+    }
+
     public function testPointsAreAdded(): void
     {
         $model = static::getContainer()->get('mautic.lead.model.lead');

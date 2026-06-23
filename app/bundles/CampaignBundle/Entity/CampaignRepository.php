@@ -486,9 +486,9 @@ class CampaignRepository extends CommonRepository
         }
 
         if ($dateFrom && $dateTo) {
-            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+            $q->andWhere('cl.date_added BETWEEN :dateFrom AND :dateTo')
+                ->setParameter('dateFrom', $dateFrom, Types::DATETIME_MUTABLE)
+                ->setParameter('dateTo', $dateTo, Types::DATETIME_MUTABLE);
         }
 
         if (count($pendingEvents) > 0) {
@@ -503,9 +503,9 @@ class CampaignRepository extends CommonRepository
                 );
 
             if ($dateFrom && $dateTo) {
-                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                $sq->andWhere('cl.date_triggered BETWEEN :dateFrom AND :dateTo')
+                    ->setParameter('dateFrom', $dateFrom, Types::DATETIME_MUTABLE)
+                    ->setParameter('dateTo', $dateTo, Types::DATETIME_MUTABLE);
             }
 
             $q->andWhere(
