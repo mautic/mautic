@@ -479,7 +479,7 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Assume success
-            return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
+            return self::QUEUE_RETURN_ERRORS === strtoupper($returnMode) ? [true, []] : true;
         }
         $success = $this->send($dispatchSendEvent);
 

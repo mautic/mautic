@@ -101,6 +101,10 @@ class MauticMap {
         return this.scope.find('.vector-map');
     }
 
+    getMapObject(map = this.map) {
+        return mQuery(map).children('.jvectormap-container').data('mapObject');
+    }
+
     getStatUnitFromItem(item) {
         return mQuery(item).data('stat-unit');
     }
@@ -139,16 +143,23 @@ class MauticMap {
      * Destroy a jVector map
      */
     destroyMap() {
-        if (this.map.length) {
-            const mapObj = this.map.vectorMap('get', 'mapObject');
-
-            if (mapObj) {
-                mapObj.removeAllMarkers();
-                mapObj.remove();
-                this.map.empty();
-                this.map.removeClass('map-rendered');
-            }
+        if (!this.map.length) {
+            return;
         }
+
+        this.map.each((index, mapElement) => {
+            const map = mQuery(mapElement);
+            const mapObj = this.getMapObject(map);
+
+            if (!mapObj) {
+                return;
+            }
+
+            mapObj.removeAllMarkers();
+            mapObj.remove();
+            map.empty();
+            map.removeClass('map-rendered');
+        });
     };
 
     /**
@@ -200,7 +211,12 @@ class MauticMap {
     }
 
     setMapValues(values) {
-        const mapObject = this.map.vectorMap('get', 'mapObject');
+        const mapObject = this.getMapObject();
+
+        if (!mapObject) {
+            return;
+        }
+
         const dataSeries = mapObject.series.regions[0];
         this.mapData = values;
         mapObject.reset();

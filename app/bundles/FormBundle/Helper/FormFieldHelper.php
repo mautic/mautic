@@ -163,7 +163,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $escapedAlias      = preg_quote($alias, '/');
 
         // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
-        $fieldAttributeReadOnly = fn ($field, $sanitizedValue) => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
+        $fieldAttributeReadOnly = fn ($field, $sanitizedValue): string => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
 
         switch ($field->getType()) {
             case 'text':

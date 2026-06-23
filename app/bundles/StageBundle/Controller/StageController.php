@@ -18,10 +18,8 @@ final class StageController extends AbstractFormController
 {
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -36,7 +34,7 @@ final class StageController extends AbstractFormController
         );
 
         if (!$permissions[StagePermissions::PERMISSION_VIEW]) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -126,7 +124,7 @@ final class StageController extends AbstractFormController
         }
 
         if (!$this->security->isGranted(StagePermissions::PERMISSION_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -280,7 +278,7 @@ final class StageController extends AbstractFormController
                 )
             );
         } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'stage');
@@ -301,7 +299,7 @@ final class StageController extends AbstractFormController
         );
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -397,9 +395,9 @@ final class StageController extends AbstractFormController
         $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
+        if (null !== $entity) {
             if (!$this->security->isGranted(StagePermissions::PERMISSION_CREATE)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;
@@ -439,7 +437,7 @@ final class StageController extends AbstractFormController
                 ])
             );
         } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
-            $response = $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (null !== $response) {
@@ -482,7 +480,7 @@ final class StageController extends AbstractFormController
                 'contentTemplate' => '@MauticStage/Stage/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
-                    'target' => ('update' == $tmpl) ? '.stage-merge-options' : null,
+                    'target' => ('update' === $tmpl) ? '.stage-merge-options' : null,
                 ],
             ]
         );
@@ -523,7 +521,7 @@ final class StageController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'stage');
             }
@@ -587,7 +585,7 @@ final class StageController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_DELETE)) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'stage', true);
                 } else {
@@ -650,7 +648,7 @@ final class StageController extends AbstractFormController
                 'contentTemplate' => '@MauticStage/Stage/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
-                    'target' => ('update' == $request->get('tmpl', 'index')) ? '.stage-merge-options' : null,
+                    'target' => ('update' === $request->get('tmpl', 'index')) ? '.stage-merge-options' : null,
                 ],
             ]);
         }

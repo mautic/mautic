@@ -301,11 +301,9 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @return string
-     *
      * @throws \Exception
      */
-    protected function getCurrentPropertyName()
+    protected function getCurrentPropertyName(): string
     {
         if (empty($this->currentPropertyName)) {
             throw new \Exception('Current property is not set');
