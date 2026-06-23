@@ -39,15 +39,30 @@ class TagRepository extends CommonRepository
      */
     public function deleteOrphans(): void
     {
-        $prefix = MAUTIC_TABLE_PREFIX;
-        $sql    = "DELETE FROM {$prefix}lead_tags
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM {$prefix}lead_tags_xref x
-            WHERE x.tag_id = t.id
-        )";
+        $qb = $this->_em->getConnection()->createQueryBuilder();
 
-        $this->_em->getConnection()->executeStatement($sql);
+        // Cross-platform safe query to find orphan tags using a LEFT JOIN
+        $qb->select('t.id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
+            ->leftJoin(
+                't',
+                MAUTIC_TABLE_PREFIX.'lead_tags_xref',
+                'x',
+                'x.tag_id = t.id'
+            )
+            ->where('x.lead_id IS NULL');
+
+        $delete = $qb->executeQuery()->fetchFirstColumn();
+
+        if (count($delete)) {
+            $qb->resetQueryParts();
+            $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
+                ->where(
+                    $qb->expr()->in('id', ':deleteIds')
+                )
+                ->setParameter('deleteIds', $delete, ArrayParameterType::INTEGER)
+                ->executeStatement();
+        }
     }
 
     /**

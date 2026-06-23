@@ -6,7 +6,6 @@ namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use PHPUnit\Framework\Assert;
@@ -21,6 +20,11 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     public const INTERNAL_ENTITY    = 'lead';
 
     /**
+     * @var string
+     */
+    private $prefix;
+
+    /**
      * @var IntegrationEntityRepository
      */
     private $integrationEntityRepository;
@@ -28,26 +32,26 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
         $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void
     {
-        $now                 = new \DateTime(); // IntegrationEntity->setDateAdded() expects DateTime not DateTimeImmutable
+        $now                 = new \DateTimeImmutable();
         $integrationEntityId = random_int(1, 1000);
         $internalEntityId    = random_int(1, 1000);
 
-        $integrationEntity = new IntegrationEntity();
-        $integrationEntity->setDateAdded($now);
-        $integrationEntity->setIntegration('someIntegration');
-        $integrationEntity->setIntegrationEntity('someIntegrationEntity');
-        $integrationEntity->setIntegrationEntityId((string) $integrationEntityId);
-        $integrationEntity->setInternalEntity('someInternalEntity');
-        $integrationEntity->setInternalEntityId($internalEntityId);
-        $integrationEntity->setInternal(['someInternalValue']);
-
-        $this->em->persist($integrationEntity);
-        $this->em->flush();
+        $this->connection->insert($this->prefix.'integration_entity', [
+            'date_added'            => $now->format('Y-m-d H:i:s'),
+            'integration'           => 'someIntegration',
+            'integration_entity'    => 'someIntegrationEntity',
+            'integration_entity_id' => $integrationEntityId,
+            'internal_entity'       => 'someInternalEntity',
+            'internal_entity_id'    => $internalEntityId,
+            'last_sync_date'        => null,
+            'internal'              => 'someInternalValue',
+        ]);
 
         $results = $this->integrationEntityRepository->getIntegrationsEntityId(
             'someIntegration',
@@ -117,35 +121,25 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public function testGetIntegrationEntityByLeadWhenNoIntegrationNamePassed(): void
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
-
-        // create NULL plugin integration
-        $integration = new Integration();
-        $integration->setName(self::INTEGRATION);
-        $integration->setIsPublished(true);
-
-        $this->em->persist($integration);
-        $this->em->flush();
-
         if ($this->isMysqlPlatform()) {
+            $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
-        }
-
-        $this->connection->executeQuery("UPDATE {$prefix}plugin_integration_settings SET plugin_id = :id WHERE name = :name", ['id' => 1, 'name' => self::INTEGRATION]);
-
-        if ($this->isMysqlPlatform()) {
+            $this->connection->executeQuery("INSERT INTO {$prefix}plugin_integration_settings(plugin_id, name, is_published, api_keys) VALUES (:id, :name, :isPublished, '')", ['id' => 1, 'name' => self::INTEGRATION, 'isPublished' => 1]);
             $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=1;');
+
+            $integrationEntityId = random_int(1, 1000);
+            // Create lead
+            $lead = $this->createLead('test@example.com', 'TestName');
+
+            $this->createIntegrationEntity($integrationEntityId, $lead->getId());
+
+            $results = $this->integrationEntityRepository->getIntegrationEntityByLead($lead->getId());
+            $this->assertNotEmpty($results);
+            $this->assertCount(1, $results);
+        } else {
+            $this->markTestSkipped('PostgreSQL doesn\'t support foreign key checks');
         }
-
-        $integrationEntityId = random_int(1, 1000);
-        // Create lead
-        $lead = $this->createLead('test@example.com', 'TestName');
-
-        $this->createIntegrationEntity($integrationEntityId, $lead->getId());
-
-        $results = $this->integrationEntityRepository->getIntegrationEntityByLead($lead->getId());
-        $this->assertNotEmpty($results);
-        $this->assertCount(1, $results);
     }
 
     public function testMarkAsDeleted(): void
