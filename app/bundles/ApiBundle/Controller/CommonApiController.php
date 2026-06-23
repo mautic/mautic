@@ -380,6 +380,11 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Give the controller an opportunity to process the entity before persisting.
      *
+     * @param E                    $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     *
      * @return mixed
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class TokenReplacementEvent extends CommonEvent
 {
     /**
-     * @var CommonEntity|string
+     * @var CommonEntity|string|null
      */
     protected $entity;
 

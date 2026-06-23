@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -242,8 +243,9 @@ class PageRepository extends CommonRepository
             ->set('variant_start_date', ':date')
             ->setParameter('date', $date)
             ->where(
-                $qb->expr()->in('id', $relatedIds)
+                $qb->expr()->in('id', ':ids')
             )
+            ->setParameter('ids', $relatedIds, ArrayParameterType::INTEGER)
             ->executeStatement();
     }
 
