@@ -10,7 +10,9 @@ setup_mautic() {
 
     cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
-    cp ./.ddev/.env.local.dist ./.env.local
+    if [[ "${CODESPACES:-}" != "true" ]]; then
+        cp ./.ddev/.env.local.dist ./.env.local
+    fi
 
     printf "Installing Mautic...\n"
     php bin/console mautic:install "${MAUTIC_URL}" --force --no-interaction

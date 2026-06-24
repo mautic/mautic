@@ -12,6 +12,7 @@ final class EntityExportEvent extends Event
      * @var array<string, array<string, mixed>>
      */
     private array $entities     = [];
+
     /**
      * @var array<string, array<string, mixed>>
      */

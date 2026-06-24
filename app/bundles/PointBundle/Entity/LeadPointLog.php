@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 class LeadPointLog
 {
     public const TABLE_NAME = 'point_lead_action_log';
+
     /**
      * @var Point
      **/

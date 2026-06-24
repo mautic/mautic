@@ -9,6 +9,7 @@ use Mautic\CoreBundle\ProcessSignal\Exception\InvalidStateException;
 class ProcessSignalState implements \Stringable
 {
     private const START_TAG = '<<<StartOfState>>>';
+
     private const END_TAG   = '<<<EndOfState>>>';
 
     /**

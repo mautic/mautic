@@ -29,10 +29,7 @@ class BatchIdToEntityHelper
         return !empty($this->ids);
     }
 
-    /**
-     * @return array
-     */
-    public function getIds()
+    public function getIds(): array
     {
         return $this->ids;
     }
@@ -42,10 +39,7 @@ class BatchIdToEntityHelper
         return !empty($this->errors);
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

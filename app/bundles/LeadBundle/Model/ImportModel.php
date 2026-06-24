@@ -63,10 +63,8 @@ class ImportModel extends FormModel
 
     /**
      * Returns the Import entity which should be processed next.
-     *
-     * @return Import|null
      */
-    public function getImportToProcess()
+    public function getImportToProcess(): ?Import
     {
         $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
 
@@ -85,7 +83,7 @@ class ImportModel extends FormModel
         $parallelImportLimit = $this->getParallelImportLimit();
         $importsInProgress   = $this->getRepository()->countImportsInProgress();
 
-        return !($importsInProgress >= $parallelImportLimit);
+        return $importsInProgress < $parallelImportLimit;
     }
 
     /**
@@ -432,7 +430,7 @@ class ImportModel extends FormModel
             if ($diffCount > 0) {
                 // Fill in the data with empty string
                 $fill = array_fill($dataCount, $diffCount, '');
-                $data = $data + $fill;
+                $data += $fill;
             } else {
                 return true;
             }
@@ -628,7 +626,7 @@ class ImportModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ImportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

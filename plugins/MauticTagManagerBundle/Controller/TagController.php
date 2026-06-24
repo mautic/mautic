@@ -23,8 +23,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class TagController extends FormController
 {
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
+
     private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';
+
     private const PERMISSION_DELETE = 'tagManager:tagManager:delete';
+
     private const PERMISSION_CREATE = 'tagManager:tagManager:create';
 
     private TagModel $leadTagModel;

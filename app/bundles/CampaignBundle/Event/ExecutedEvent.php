@@ -13,18 +13,12 @@ class ExecutedEvent extends \Symfony\Contracts\EventDispatcher\Event
     ) {
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getConfig()
+    public function getConfig(): AbstractEventAccessor
     {
         return $this->config;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLog()
+    public function getLog(): LeadEventLog
     {
         return $this->log;
     }
