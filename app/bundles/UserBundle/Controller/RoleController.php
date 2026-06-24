@@ -16,10 +16,13 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 class RoleController extends FormController
 {
     private const PERMISSION_CREATE = 'user:roles:create';
+
     private const PERMISSION_EDIT   = 'user:roles:edit';
+
     private const PERMISSION_DELETE = 'user:roles:delete';
 
     private const FLASH_MENU_LINK = '%menu_link%';
+
     private const FLASH_URL       = '%url%';
 
     private const TEMPLATE_FORM = '@MauticUser/Role/form.html.twig';
