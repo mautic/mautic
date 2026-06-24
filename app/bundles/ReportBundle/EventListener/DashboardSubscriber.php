@@ -62,7 +62,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 [$reportId, $graph]     = explode(':', $params['graph']);
                 $report                 = $this->reportModel->getEntity($reportId);
 
-                if ($report && $this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+                if ($report instanceof \Mautic\ReportBundle\Entity\Report && $this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
                     $reportOptions = $this->prepareReportOptions($graph, $params);
                     $reportData    = $this->reportModel->getReportData($report, null, $reportOptions);
 

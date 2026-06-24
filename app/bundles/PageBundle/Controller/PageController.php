@@ -894,7 +894,7 @@ class PageController extends FormController
 
         $parent = $entity->getVariantParent();
 
-        if ($parent || !$this->security->isGranted('page:pages:create')
+        if ($parent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface || !$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )

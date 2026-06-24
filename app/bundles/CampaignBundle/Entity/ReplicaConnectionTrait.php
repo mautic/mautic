@@ -23,8 +23,13 @@ trait ReplicaConnectionTrait
         $connection = $this->getEntityManager()->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
             if (
+<<<<<<< HEAD
                 !$limiter
                 || !$limiter->getContactId() && !$limiter->getContactIdList()
+=======
+                !$limiter instanceof \Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter
+                || !($limiter->getContactId() || $limiter->getContactIdList())
+>>>>>>> 8486faf781 (Apply BinaryOpNullableToInstanceofRector)
             ) {
                 $connection->ensureConnectedToReplica();
             }

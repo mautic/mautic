@@ -1341,7 +1341,7 @@ class EmailController extends FormController
         if (null != $entity) {
             $parent = $entity->getVariantParent();
 
-            if ($parent || !$this->security->isGranted('email:emails:create')
+            if ($parent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface || !$this->security->isGranted('email:emails:create')
                 || !$this->security->hasEntityAccess(
                     'email:emails:viewown',
                     'email:emails:viewother',

@@ -1991,7 +1991,7 @@ class MailHelper
     private function setReplyToForSingleMessage(?Email $emailToSend): void
     {
         // 1. Set the reply to address from the email "reply-to" setting if set.
-        if ($emailToSend && null !== $emailToSend->getReplyToAddress()) {
+        if ($emailToSend instanceof \Mautic\EmailBundle\Entity\Email && null !== $emailToSend->getReplyToAddress()) {
             $this->setMessageReplyTo($emailToSend->getReplyToAddress());
 
             return;
@@ -2010,7 +2010,7 @@ class MailHelper
         }
 
         // 3. Set the reply to address from the email "from" setting if set.
-        if ($emailToSend && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
+        if ($emailToSend instanceof \Mautic\EmailBundle\Entity\Email && null !== $emailToSend->getFromAddress() && empty($this->coreParametersHelper->get('mailer_reply_to_email'))) {
             $this->setMessageReplyTo($emailToSend->getFromAddress());
 
             return;
@@ -2047,7 +2047,7 @@ class MailHelper
 
     private function getSystemFrom(): AddressDTO
     {
-        if (!$this->systemFrom || $this->systemFrom->isEmpty()) {
+        if (!$this->systemFrom instanceof \Mautic\EmailBundle\Helper\DTO\AddressDTO || $this->systemFrom->isEmpty()) {
             $this->systemFrom = new AddressDTO($this->coreParametersHelper->get('mailer_from_email'), $this->coreParametersHelper->get('mailer_from_name'));
             $this->fromEmailHelper->setDefaultFrom($this->systemFrom);
         }

@@ -140,7 +140,7 @@ class CustomFieldNotification
      */
     private function getUser(?int $userId): User
     {
-        if (!$userId || !$user = $this->userModel->getEntity($userId)) {
+        if (!$userId || !($user = $this->userModel->getEntity($userId)) instanceof \Mautic\UserBundle\Entity\User) {
             throw new NoUserException();
         }
 

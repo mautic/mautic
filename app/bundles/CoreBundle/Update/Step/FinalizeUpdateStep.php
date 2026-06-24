@@ -47,7 +47,7 @@ final class FinalizeUpdateStep implements StepInterface
 
         // Check for a post install message from migrations
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->hasSession()) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request && $request->hasSession()) {
             if ($postMessage = $this->requestStack->getSession()->get('post_upgrade_message')) {
                 $postMessage = strip_tags($postMessage);
                 $this->requestStack->getSession()->remove('post_upgrade_message');

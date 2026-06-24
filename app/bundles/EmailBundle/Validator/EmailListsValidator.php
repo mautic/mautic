@@ -21,7 +21,7 @@ final class EmailListsValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, Email::class);
         }
 
-        if ('list' !== $value->getEmailType() || $value->getTranslationParent()) {
+        if ('list' !== $value->getEmailType() || $value->getTranslationParent() instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
             return;
         }
 

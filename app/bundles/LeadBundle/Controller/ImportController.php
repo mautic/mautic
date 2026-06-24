@@ -150,7 +150,7 @@ class ImportController extends FormController
         $fullPath    = $this->getFullCsvPath($object);
         $import      = $this->importModel->getEntity($this->requestStack->getSession()->get('mautic.lead.import.id'));
 
-        if ($import && $import->getId()) {
+        if ($import instanceof \Mautic\LeadBundle\Entity\Import && $import->getId()) {
             $import->setStatus($import::STOPPED)
                 ->setIsPublished(false);
             $this->importModel->saveEntity($import);
@@ -640,7 +640,7 @@ class ImportController extends FormController
 
     private function getImportNotificationUser(?Import $import, UserRepository $userRepository): ?User
     {
-        if (!$import || !$import->getCreatedBy()) {
+        if (!$import instanceof \Mautic\LeadBundle\Entity\Import || !$import->getCreatedBy()) {
             return null;
         }
 
@@ -651,11 +651,11 @@ class ImportController extends FormController
 
     private function getImportCancellationMessage(string $fileName, ?Import $import, ?User $notificationUser): string
     {
-        if (!$import || !$import->getId()) {
+        if (!$import instanceof \Mautic\LeadBundle\Entity\Import || !$import->getId()) {
             return $this->translator->trans('mautic.lead.import.canceled', ['%file%' => $fileName]);
         }
 
-        if ($notificationUser && $this->user && $notificationUser->getId() !== $this->user->getId()) {
+        if ($notificationUser instanceof \Mautic\UserBundle\Entity\User && $this->user instanceof \Mautic\UserBundle\Entity\User && $notificationUser->getId() !== $this->user->getId()) {
             return $this->translator->trans('mautic.lead.import.canceled.with_id_and_user', [
                 '%file%' => $fileName,
                 '%id%'   => $import->getId(),

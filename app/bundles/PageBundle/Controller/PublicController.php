@@ -320,7 +320,7 @@ class PublicController extends AbstractFormController
     {
         $page = $model->getEntity($id);
 
-        if (!$page || !$page->getId()) {
+        if (!$page instanceof \Mautic\PageBundle\Entity\Page || !$page->getId()) {
             return $this->notFound();
         }
 

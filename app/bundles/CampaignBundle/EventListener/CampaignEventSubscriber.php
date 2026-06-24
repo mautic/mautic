@@ -169,7 +169,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());
 
-        if ($logStats->firstExecutionDate && $logStats->lastExecutionDate) {
+        if ($logStats->firstExecutionDate instanceof \DateTimeImmutable && $logStats->lastExecutionDate instanceof \DateTimeImmutable) {
             $firstExecutionDate = new DateTimeHelper($logStats->firstExecutionDate);
             $lastExecutionDate  = new DateTimeHelper($logStats->lastExecutionDate);
 

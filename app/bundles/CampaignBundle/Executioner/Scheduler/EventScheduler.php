@@ -199,7 +199,7 @@ class EventScheduler
         $lastPublishDate   = $this->publishStateService->getLastPublishDate($event->getCampaign());
         $scheduledInterval = (new DateTimeHelper())->buildInterval($interval, $unit);
 
-        if (RepublishBehavior::RESTART_ON_PUBLISH->value === $campaignRepublishBehavior && $lastPublishDate) {
+        if (RepublishBehavior::RESTART_ON_PUBLISH->value === $campaignRepublishBehavior && $lastPublishDate instanceof \DateTimeInterface) {
             $lastPublishDatePlusInterval = \DateTimeImmutable::createFromInterface($lastPublishDate)->add($scheduledInterval);
             $log->setTriggerDate(\DateTime::createFromImmutable($lastPublishDatePlusInterval), 'Campaign republish behavior: '.RepublishBehavior::RESTART_ON_PUBLISH->value);
 

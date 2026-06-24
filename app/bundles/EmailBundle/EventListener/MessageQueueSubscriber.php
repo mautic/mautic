@@ -44,7 +44,7 @@ class MessageQueueSubscriber implements EventSubscriberInterface
 
         /** @var MessageQueue $message */
         foreach ($messages as $message) {
-            if (!($email && $message->getLead() && $email->isPublished())) {
+            if (!($email instanceof \Mautic\EmailBundle\Entity\Email && $message->getLead() && $email->isPublished())) {
                 $message->setFailed();
                 continue;
             }

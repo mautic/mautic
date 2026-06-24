@@ -48,7 +48,7 @@ class PublicController extends CommonController
 
             $lead = $contactTracker->getContact();
 
-            if ($focus && $focus->isPublished() && $lead) {
+            if ($focus && $focus->isPublished() && $lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $request, $lead);
                 if ($stat && $this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_VIEW)) {
                     $event = new FocusViewEvent($stat);

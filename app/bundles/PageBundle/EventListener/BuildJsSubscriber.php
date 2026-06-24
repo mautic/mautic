@@ -197,7 +197,7 @@ JS;
                 $gtagSettings['anonymize_ip'] = true;
             }
 
-            if ($lead && $lead->getId()) {
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $lead->getId()) {
                 $gtagSettings['user_id'] = $lead->getId();
             }
 
@@ -222,7 +222,7 @@ JS;
 
         if ($id = $this->trackingHelper->displayInitCode('facebook_pixel')) {
             $customMatch = [];
-            if ($lead && $lead->getId()) {
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $lead->getId()) {
                 $fieldsToMatch = [
                     'fn' => 'firstname',
                     'ln' => 'lastname',

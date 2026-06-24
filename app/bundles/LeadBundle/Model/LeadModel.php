@@ -2451,7 +2451,7 @@ class LeadModel extends FormModel
         $lead = $this->getEntity($leadId);
         $tag  = $this->getTagRepository()->find($tagId);
 
-        if ($lead && $tag) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $tag) {
             $lead->removeTag($tag);
             $this->saveEntity($lead);
         }

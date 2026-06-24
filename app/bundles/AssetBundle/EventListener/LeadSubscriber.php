@@ -56,7 +56,7 @@ class LeadSubscriber implements EventSubscriberInterface
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
                 $asset    = $download['asset_id'] ? $this->assetModel->getEntity($download['asset_id']) : null;
-                $hasAsset = $asset && $asset->getId();
+                $hasAsset = $asset instanceof \Mautic\AssetBundle\Entity\Asset && $asset->getId();
 
                 $eventLabel = $hasAsset
                     ? [
