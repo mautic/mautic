@@ -235,7 +235,7 @@ class IntegrationHelper
             $integrationsWithFeatures = [];
             foreach ($withFeatures as $feature) {
                 if (isset($this->byFeatureList[$feature])) {
-                    $integrationsWithFeatures = $integrationsWithFeatures + $this->byFeatureList[$feature];
+                    $integrationsWithFeatures += $this->byFeatureList[$feature];
                 }
             }
 

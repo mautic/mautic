@@ -197,26 +197,17 @@ class SendEmailToContact
         $this->mailer->reset();
     }
 
-    /**
-     * @return array
-     */
-    public function getSentCounts()
+    public function getSentCounts(): array
     {
         return $this->emailSentCounts;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errorMessages;
     }
 
-    /**
-     * @return array
-     */
-    public function getFailedContacts()
+    public function getFailedContacts(): array
     {
         return $this->failedContacts;
     }

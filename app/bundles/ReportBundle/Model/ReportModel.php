@@ -166,7 +166,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ReportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

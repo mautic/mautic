@@ -23,10 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelper
 {
-    /**
-     * @var Lead|null
-     */
-    private $trackedContact;
+    private ?Lead $trackedContact = null;
 
     private array $queryFields = [];
 

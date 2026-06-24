@@ -15,18 +15,12 @@ class PluginIntegrationFormBuildEvent extends AbstractPluginIntegrationEvent
         $this->integration = $integration;
     }
 
-    /**
-     * @return FormBuilderInterface
-     */
-    public function getFormBuilder()
+    public function getFormBuilder(): FormBuilderInterface
     {
         return $this->builder;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

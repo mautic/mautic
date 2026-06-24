@@ -146,11 +146,9 @@ final class ButtonHelper
     }
 
     /**
-     * @param string $groupType
-     *
      * @return $this
      */
-    public function setGroupType($groupType)
+    public function setGroupType(string $groupType)
     {
         $this->groupType = $groupType;
 
@@ -232,11 +230,10 @@ final class ButtonHelper
      * Reset the buttons.
      *
      * @param string $buttonCount
-     * @param string $groupType
      *
      * @return $this
      */
-    public function reset(Request $request, $buttonCount, $groupType = self::TYPE_GROUP, $item = null)
+    public function reset(Request $request, $buttonCount, string $groupType = self::TYPE_GROUP, $item = null)
     {
         // @escopecz: I think there is a possible bug here
         $this->location       = $buttonCount;

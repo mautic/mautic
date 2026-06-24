@@ -35,10 +35,10 @@ Mautic.campaignOnLoad = function (container, response) {
         // set hover and double click functions for the event buttons
         if (!isCampaignPreview) {
             mQuery('#CampaignCanvas .list-campaign-event, #CampaignCanvas .list-campaign-source').off('.eventbuttons')
-                .on('mouseover.eventbuttons', function() {
+                .on('mouseenter.eventbuttons', function() {
                     mQuery(this).find('.campaign-event-buttons').removeClass('hide');
                 })
-                .on('mouseout.eventbuttons', function() {
+                .on('mouseleave.eventbuttons', function() {
                     mQuery(this).find('.campaign-event-buttons').addClass('hide');
                 })
                 .on('dblclick.eventbuttons', function(event) {
@@ -503,10 +503,10 @@ Mautic.campaignEventOnLoad = function (container, response) {
         mQuery(eventId + " a[data-toggle='ajax-delete']").off("click.ajax").on("click.ajax", Mautic.handleEventDeleteClick);
 
         mQuery(eventId).off('.eventbuttons')
-            .on('mouseover.eventbuttons', function() {
+            .on('mouseenter.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').removeClass('hide');
             })
-            .on('mouseout.eventbuttons', function() {
+            .on('mouseleave.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').addClass('hide');
             })
             .on('dblclick.eventbuttons', function(event) {
@@ -693,10 +693,10 @@ Mautic.campaignSourceOnLoad = function (container, response) {
         });
 
         mQuery(eventId).off('.eventbuttons')
-            .on('mouseover.eventbuttons', function() {
+            .on('mouseenter.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').removeClass('hide');
             })
-            .on('mouseout.eventbuttons', function() {
+            .on('mouseleave.eventbuttons', function() {
                 mQuery(this).find('.campaign-event-buttons').addClass('hide');
             })
             .on('dblclick.eventbuttons', function(event) {

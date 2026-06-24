@@ -164,12 +164,14 @@ class MailHelper
      * @var string
      */
     protected $subject              = '';
+
     private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
     protected $plainText              = '';
+
     private ?string $plainTextInitial = null;
 
     /**
@@ -857,10 +859,8 @@ class MailHelper
 
     /**
      * Return the content identifier.
-     *
-     * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         return $this->contentHash;
     }
@@ -1061,10 +1061,9 @@ class MailHelper
     /**
      * Set reply to address(es) for this mailer instance.
      *
-     * @param array<string>|string $addresses
-     * @param string               $name
+     * @param string $name
      */
-    public function setReplyTo($addresses, $name = null): void
+    public function setReplyTo(?string $addresses, $name = null): void
     {
         $this->replyTo = $addresses;
     }
@@ -1130,10 +1129,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIdHash()
+    public function getIdHash(): ?string
     {
         return $this->idHash;
     }
@@ -1641,10 +1637,8 @@ class MailHelper
 
     /**
      * Returns if the mailer supports and is in tokenization mode.
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
         return $this->tokenizationEnabled;
     }

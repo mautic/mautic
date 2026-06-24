@@ -43,7 +43,7 @@ class SysinfoModel
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
+        if (function_exists('phpinfo') && 'cli' !== PHP_SAPI) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');

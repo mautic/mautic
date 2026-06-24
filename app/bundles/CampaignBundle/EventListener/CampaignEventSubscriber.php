@@ -28,6 +28,7 @@ class CampaignEventSubscriber implements EventSubscriberInterface
     public const LOOPS_TO_FAIL = 100;
 
     private const MINIMUM_CONTACTS_FOR_DISABLE = 100;
+
     private const DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
 
     public function __construct(

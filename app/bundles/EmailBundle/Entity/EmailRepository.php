@@ -22,6 +22,7 @@ class EmailRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
     use QueryBuilderManipulatorTrait;
+
     public const EMAILS_PREFIX        = 'e';
 
     public const DNC_PREFIX           = 'dnc';

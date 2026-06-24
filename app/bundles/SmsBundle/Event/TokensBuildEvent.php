@@ -24,7 +24,7 @@ class TokensBuildEvent extends Event
     /**
      * @param array<string, string> $tokens
      */
-    public function setTokens($tokens): void
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }

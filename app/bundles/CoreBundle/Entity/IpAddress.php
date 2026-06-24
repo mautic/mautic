@@ -154,10 +154,8 @@ class IpAddress
 
     /**
      * Get list of IPs to not track.
-     *
-     * @return array
      */
-    public function getDoNotTrackList()
+    public function getDoNotTrackList(): array
     {
         return $this->doNotTrack;
     }

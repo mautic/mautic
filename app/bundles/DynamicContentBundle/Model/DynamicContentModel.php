@@ -177,10 +177,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @param Lead|array $lead
      * @param string     $source
-     *
-     * @return Stat|null
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): ?Stat
     {
         if (empty($lead)) {
             return null;
@@ -236,7 +234,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new DynamicContentEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
