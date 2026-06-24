@@ -53,7 +53,7 @@ class ResourceInstaller
         }
 
         try {
-            $zipPath = $this->downloadZip($distUrl, $packageName);
+            $zipPath = $this->downloadZip($distUrl);
         } catch (\Exception $e) {
             return ['success' => false, 'summary' => [], 'errors' => ['Failed to download package: '.$e->getMessage()]];
         }
@@ -118,12 +118,14 @@ class ResourceInstaller
         return $version['dist']['url'];
     }
 
-    private function downloadZip(string $url, string $packageName): string
+    private function downloadZip(string $url): string
     {
         $importDir = $this->pathsHelper->getImportCampaignsPath();
         (new Filesystem())->mkdir($importDir, 0755);
 
-        $fileName = str_replace('/', '_', $packageName).'_'.bin2hex(random_bytes(4)).'.zip';
+        // Use a fully random file name so the path never derives from user-controlled
+        // input (the package name), preventing path-injection.
+        $fileName = 'marketplace_resource_'.bin2hex(random_bytes(16)).'.zip';
         $filePath = $importDir.'/'.$fileName;
 
         $this->logger->debug('Downloading resource package from: '.$url);
