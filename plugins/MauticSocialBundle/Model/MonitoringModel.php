@@ -85,7 +85,7 @@ class MonitoringModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 

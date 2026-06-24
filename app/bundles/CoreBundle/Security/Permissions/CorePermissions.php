@@ -49,10 +49,8 @@ class CorePermissions implements ResetInterface
 
     /**
      * Retrieves all permission objects.
-     *
-     * @return array
      */
-    public function getPermissionObjects()
+    public function getPermissionObjects(): array
     {
         if ($this->permissionObjectsGenerated) {
             return $this->permissionObjectsByName;
@@ -421,26 +419,20 @@ class CorePermissions implements ResetInterface
         return ($userEntity instanceof User && !$userEntity->isGuest()) ? false : true;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
+    protected function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
 
     /**
-     * @return bool|mixed
+     * @return mixed[]
      */
-    protected function getBundles()
+    protected function getBundles(): array
     {
         return $this->bundles;
     }
 
-    /**
-     * @return array
-     */
-    protected function getPluginBundles()
+    protected function getPluginBundles(): array
     {
         return $this->pluginBundles;
     }

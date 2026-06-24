@@ -58,10 +58,7 @@ class EventAccessor
         return $this->actions[$key];
     }
 
-    /**
-     * @return array
-     */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->actions;
     }
@@ -82,10 +79,7 @@ class EventAccessor
         return $this->conditions[$key];
     }
 
-    /**
-     * @return array
-     */
-    public function getConditions()
+    public function getConditions(): array
     {
         return $this->conditions;
     }
@@ -106,10 +100,7 @@ class EventAccessor
         return $this->decisions[$key];
     }
 
-    /**
-     * @return array
-     */
-    public function getDecisions()
+    public function getDecisions(): array
     {
         return $this->decisions;
     }

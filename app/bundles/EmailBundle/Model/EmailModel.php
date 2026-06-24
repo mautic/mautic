@@ -388,7 +388,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new EmailEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

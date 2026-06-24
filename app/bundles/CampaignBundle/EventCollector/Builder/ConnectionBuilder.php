@@ -12,10 +12,8 @@ class ConnectionBuilder
 
     /**
      * Used by JS/JsPlumb to restrict how events can be associated to each other in the UI.
-     *
-     * @return array
      */
-    public static function buildRestrictionsArray(array $events)
+    public static function buildRestrictionsArray(array $events): array
     {
         // Reset restrictions
         self::$connectionRestrictions = ['anchor' => []];

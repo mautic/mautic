@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -99,10 +100,14 @@ class PageTestAbstract extends TestCase
 
         $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
 
+        $lead = new Lead();
+        $lead->setId(self::$mockId);
+        $lead->setFirstname(self::$mockName);
+
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
-            ->willReturn(['id' => self::$mockId, 'name' => self::$mockName]);
+            ->willReturn($lead);
 
         $entityManager->expects($this
             ->any())

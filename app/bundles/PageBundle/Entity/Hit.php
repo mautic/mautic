@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Hit
 {
     public const TABLE_NAME = 'page_hits';
+
     /**
      * @var string
      */
@@ -620,10 +621,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return ?Page
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }
