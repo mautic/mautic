@@ -33,8 +33,8 @@ class ReviewCollection implements \Iterator, \Countable
 
         return new self(
             array_map(
-                fn (array $record) => Review::fromArray($record),
-                array_filter($array, fn ($record) => is_array($record))
+                fn (array $record): Review => Review::fromArray($record),
+                array_filter($array, fn ($record): bool => is_array($record))
             )
         );
     }
@@ -47,7 +47,7 @@ class ReviewCollection implements \Iterator, \Countable
             return 0;
         }
 
-        $total = array_reduce($this->records, fn ($carry, $review) => $carry + $review->rating, 0);
+        $total = array_reduce($this->records, fn (int $carry, Review $review): int => $carry + $review->rating, 0);
 
         return $total / $count;
     }

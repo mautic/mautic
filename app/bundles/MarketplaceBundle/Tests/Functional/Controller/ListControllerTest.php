@@ -50,7 +50,7 @@ final class ListControllerTest extends MauticMysqlTestCase
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))
         );
 
-        $crawler = $this->client->request('GET', 's/marketplace?search=recaptcha');
+        $this->client->request('GET', 's/marketplace?search=recaptcha');
 
         $this->assertResponseIsSuccessful();
     }

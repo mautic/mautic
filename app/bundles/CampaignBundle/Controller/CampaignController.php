@@ -209,12 +209,12 @@ class CampaignController extends AbstractStandardFormController
     public function shareAction(Request $request, CampaignModel $campaignModel, CampaignShareService $shareService, ExportHelper $exportHelper, int $objectId): RedirectResponse|BinaryFileResponse|Response
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $campaign = $campaignModel->getEntity($objectId);
 
-        if (empty($campaign)) {
+        if (!$campaign instanceof Campaign) {
             return $this->notFound();
         }
 
