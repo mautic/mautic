@@ -21,9 +21,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ContentPreviewSettingsType extends AbstractType
 {
     public const TYPE_EMAIL = 'email';
+
     public const TYPE_PAGE  = 'page';
 
     private const CHOICE_TYPE_TRANSLATION = 'translation';
+
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
     public function __construct(private TranslatorInterface $translator, private CorePermissions $security, private UserHelper $userHelper)

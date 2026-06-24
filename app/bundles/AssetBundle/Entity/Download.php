@@ -302,10 +302,7 @@ class Download
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead): void
+    public function setLead(?Lead $lead): void
     {
         $this->lead = $lead;
     }

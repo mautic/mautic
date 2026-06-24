@@ -52,6 +52,7 @@ class Form extends FormEntity implements UuidInterface
     use ProjectTrait;
 
     public const ENTITY_NAME = 'forms';
+
     public const TABLE_NAME  = 'forms';
 
     /**

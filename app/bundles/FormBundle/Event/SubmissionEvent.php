@@ -117,11 +117,9 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param array $results
-     *
      * @return SubmissionEvent
      */
-    public function setResults($results)
+    public function setResults(array $results)
     {
         $this->results = $results;
 
@@ -134,11 +132,9 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param array $fields
-     *
      * @return SubmissionEvent
      */
-    public function setFields($fields)
+    public function setFields(array $fields)
     {
         $this->fields = $fields;
 
@@ -151,11 +147,9 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param array $tokens
-     *
      * @return SubmissionEvent
      */
-    public function setTokens($tokens)
+    public function setTokens(array $tokens)
     {
         $this->tokens = $tokens;
 
@@ -168,11 +162,9 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @param array $contactFieldMatches
-     *
      * @return SubmissionEvent
      */
-    public function setContactFieldMatches($contactFieldMatches)
+    public function setContactFieldMatches(array $contactFieldMatches)
     {
         $this->contactFieldMatches = $contactFieldMatches;
 
