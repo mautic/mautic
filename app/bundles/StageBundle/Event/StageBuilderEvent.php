@@ -62,10 +62,8 @@ class StageBuilderEvent extends Event
 
     /**
      * Get actions.
-     *
-     * @return array
      */
-    public function getActions()
+    public function getActions(): array
     {
         uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
             $a['label'], $b['label']));

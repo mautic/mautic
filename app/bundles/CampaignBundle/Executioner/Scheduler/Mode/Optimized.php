@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Services\PeakInteractionTimer;
 class Optimized implements ScheduleModeInterface
 {
     public const OPTIMIZED_TIME         = 0;
+
     public const OPTIMIZED_DAY_AND_TIME = 1;
 
     /** @var string[] */

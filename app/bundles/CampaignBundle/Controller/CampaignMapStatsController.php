@@ -85,7 +85,7 @@ class CampaignMapStatsController extends AbstractController
     ): Response {
         $entity = $this->model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($security, $entity)) {
+        if (!$entity instanceof Campaign || !$this->hasAccess($security, $entity)) {
             throw new AccessDeniedHttpException();
         }
 

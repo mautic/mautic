@@ -17,10 +17,8 @@ class MonitoredEmailEvent extends Event
 
     /**
      * Get the FormBuilder for monitored_mailboxes FormType.
-     *
-     * @return FormBuilderInterface
      */
-    public function getFormBuilder()
+    public function getFormBuilder(): FormBuilderInterface
     {
         return $this->formBuilder;
     }
@@ -54,10 +52,8 @@ class MonitoredEmailEvent extends Event
 
     /**
      * Get array of folders.
-     *
-     * @return array
      */
-    public function getFolders()
+    public function getFolders(): array
     {
         return $this->folders;
     }

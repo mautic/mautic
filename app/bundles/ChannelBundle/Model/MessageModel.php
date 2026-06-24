@@ -267,7 +267,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new MessageEvent($entity, $isNew);
             }
             $this->dispatcher->dispatch($event, $name);

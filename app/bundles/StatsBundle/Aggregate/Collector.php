@@ -17,10 +17,8 @@ class Collector
 
     /**
      * @param string $statName
-     *
-     * @return StatCollection
      */
-    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null)
+    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null): StatCollection
     {
         if (null === $fetchOptions) {
             $fetchOptions = new FetchOptions();
