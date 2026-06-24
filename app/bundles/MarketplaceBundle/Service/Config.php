@@ -9,8 +9,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class Config
 {
     public const MARKETPLACE_ENABLED           = 'marketplace_enabled';
+
     public const MARKETPLACE_WEBSITE_URL       = 'marketplace_website_url';
+
     public const MARKETPLACE_API_BASE          = 'marketplace_api_base';
+
     public const MARKETPLACE_API_KEY           = 'marketplace_api_key';
 
     public function __construct(
