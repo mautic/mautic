@@ -368,19 +368,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $parent   = $page->getTranslationParent();
         $children = $page->getTranslationChildren();
 
-        if (empty($parent) && empty($children)) {
+        if (!$parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface && !$children instanceof \Doctrine\Common\Collections\Collection) {
             return $related;
         }
 
         // If this page has a parent, then fetch the children from the parent
-        if (!empty($parent)) {
+        if ($parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
             $children = $parent->getTranslationChildren();
         } else {
             // Otherwise this is the parent page.
             $parent = $page;
         }
 
-        if (empty($children)) {
+        if (!$children instanceof \Doctrine\Common\Collections\Collection) {
             return $related;
         }
 

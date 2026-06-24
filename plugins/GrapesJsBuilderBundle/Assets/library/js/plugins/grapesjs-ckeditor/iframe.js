@@ -66,6 +66,29 @@ export function injectEditorInstant(selector, optionsKey, forceBr, reuseEditor) 
   if (registry && optionsKey) {
     delete registry[optionsKey];
   }
+
+  // RegExp objects created in the outer frame fail `instanceof RegExp` checks inside the iframe
+  // because each frame has its own RegExp constructor. CKEditor's GHS uses `instanceof RegExp`
+  // to detect pattern-based allow rules, so outer-frame RegExps are silently ignored and inline
+  // spans (and other elements) are stripped. Reconstruct any RegExp values in htmlSupport.allow
+  // using the local RegExp constructor so the instanceof check passes.
+  const rebuildHtmlSupportRegExps = (opts) => {
+    if (!opts || typeof opts !== 'object') return;
+    const allow = opts.htmlSupport && Array.isArray(opts.htmlSupport.allow) ? opts.htmlSupport.allow : null;
+    if (!allow) return;
+    for (let i = 0; i < allow.length; i++) {
+      const rule = allow[i];
+      if (!rule || typeof rule !== 'object') continue;
+      const name = rule.name;
+      if (name && typeof name === 'object' && typeof name.source === 'string') {
+        try {
+          allow[i] = Object.assign({}, rule, { name: new RegExp(name.source, name.flags || '') });
+        } catch (e) {}
+      }
+    }
+  };
+  rebuildHtmlSupportRegExps(options);
+
   const attachToolbarContainer = () => {
     if (window.grapesjsCkeditorData.customFontSizeObserver) {
       try {

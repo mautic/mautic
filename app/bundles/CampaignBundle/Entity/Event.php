@@ -1148,10 +1148,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedDaysOfWeek.
-     *
-     * @return array
      */
-    public function getTriggerRestrictedDaysOfWeek()
+    public function getTriggerRestrictedDaysOfWeek(): array
     {
         return (array) $this->triggerRestrictedDaysOfWeek;
     }

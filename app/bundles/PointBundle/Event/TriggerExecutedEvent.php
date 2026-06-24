@@ -16,26 +16,17 @@ class TriggerExecutedEvent extends Event
     ) {
     }
 
-    /**
-     * @return TriggerEventEntity
-     */
-    public function getTriggerEvent()
+    public function getTriggerEvent(): TriggerEventEntity
     {
         return $this->triggerEvent;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @return bool
-     */
-    public function getResult()
+    public function getResult(): ?bool
     {
         return $this->result;
     }

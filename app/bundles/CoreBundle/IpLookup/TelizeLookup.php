@@ -5,11 +5,17 @@ namespace Mautic\CoreBundle\IpLookup;
 class TelizeLookup extends AbstractRemoteDataLookup
 {
     public string $offset         = '';
+
     public string $area_code      = '';
+
     public string $dma_code       = '';
+
     public string $country_code3  = '';
+
     public string $continent_code = '';
+
     public string $country_code   = '';
+
     public string $region_code    = '';
 
     public function getAttribution(): string

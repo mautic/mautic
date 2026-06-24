@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
     public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+
     public const CACHE_NAMESPACE             = 'Plugin';
 
     /**

@@ -71,7 +71,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @return mixed[]
      */
-    public function getClickthrough()
+    public function getClickthrough(): array
     {
         if (!in_array('lead', $this->clickthrough)) {
             if (is_array($this->lead) && !empty($this->lead['id'])) {
@@ -87,7 +87,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param mixed[] $clickthrough
      */
-    public function setClickthrough($clickthrough): void
+    public function setClickthrough(array $clickthrough): void
     {
         $this->clickthrough = $clickthrough;
     }

@@ -29,18 +29,12 @@ class ConditionEvent extends CampaignExecutionEvent
         );
     }
 
-    /**
-     * @return AbstractEventAccessor
-     */
-    public function getEventConfig()
+    public function getEventConfig(): AbstractEventAccessor
     {
         return $this->eventConfig;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLog()
+    public function getLog(): LeadEventLog
     {
         return $this->eventLog;
     }

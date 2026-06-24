@@ -331,20 +331,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
-     *
      * @return $this
      */
-    public function setName($name)
+    public function setName(?string $name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -352,20 +347,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @param string $description
-     *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(?string $description)
     {
         $this->description = $description;
 
@@ -384,20 +374,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->type;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
     /**
-     * @param Category $category
-     *
      * @return $this
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;

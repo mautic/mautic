@@ -9,17 +9,24 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\KnownMagicClassMethodTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
-// use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
+
+$extendableControllers = [
+    __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
+    __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
+    __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
+];
 
 return RectorConfig::configure()
     ->withPaths([
@@ -30,22 +37,29 @@ return RectorConfig::configure()
     ->withPhpSets(php80: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
+        Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector::class,
+        Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
+        AddParamTypeFromPropertyTypeRector::class,
+        KnownMagicClassMethodTypeRector::class,
         ReturnTypeFromStrictTypedCallRector::class,
         TypedPropertyFromAssignsRector::class,
-        ReturnTypeFromReturnNewRector::class,
         ReturnTypeFromStrictNativeCallRector::class,
         ReturnTypeFromStrictParamRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
-        AddVoidReturnTypeWhereNoReturnRector::class,
         TypedPropertyFromStrictConstructorRector::class,
         TypedPropertyFromStrictSetUpRector::class,
         SimplifyUselessVariableRector::class,
-        ReturnTypeFromReturnDirectArrayRector::class,
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(15)
+    ->withTypeCoverageLevel(23)
+    ->withCodingStyleLevel(3)
+    ->withCodeQualityLevel(17)
     ->withSkip([
+        // too many changes
+        Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
+
+        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
         '*/Test/*',
         '*/Tests/*',
 
@@ -65,11 +79,25 @@ return RectorConfig::configure()
 
         // designed to be overriden by 3rd party, adding return type will break BC
         Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictScalarReturnsRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
-            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
+            ...$extendableControllers,
+        ],
+        ReturnTypeFromStrictTypedCallRector::class => [
+            ...$extendableControllers,
         ],
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
+        ],
+        ReturnTypeFromStrictTypedPropertyRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
+            // handle mocks later
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/Scheduler/Mode/DAO/GroupExecutionDateDAO.php',
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
+        ],
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnNullableTypeRector::class => [
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
+            // can be overriden, BC
+            ...$extendableControllers,
         ],
 
         TypedPropertyFromAssignsRector::class => [

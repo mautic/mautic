@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 class EmailPeriodMetrics
 {
     private const CAMPAIGN_EVENT_SOURCE = 'campaign.event';
+
     private const EMAIL_SOURCE          = 'email';
 
     public function __construct(

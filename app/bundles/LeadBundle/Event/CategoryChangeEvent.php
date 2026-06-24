@@ -30,28 +30,20 @@ class CategoryChangeEvent extends Event
         }
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
     /**
      * Returns batch array of leads.
-     *
-     * @return array
      */
-    public function getLeads()
+    public function getLeads(): ?array
     {
         return $this->leads;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): Category
     {
         return $this->category;
     }

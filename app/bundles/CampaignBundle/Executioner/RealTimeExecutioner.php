@@ -22,10 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class RealTimeExecutioner
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var array
@@ -54,14 +51,12 @@ class RealTimeExecutioner
      * @param string|null $channel
      * @param int|null    $channelId
      *
-     * @return Responses
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null)
+    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();
