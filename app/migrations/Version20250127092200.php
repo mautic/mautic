@@ -10,10 +10,12 @@ use Mautic\FormBundle\Entity\Form;
 
 final class Version20250127092200 extends PreUpAssertionMigration
 {
+    private const TRANSLATION_PARENT_ID = 'translation_parent_id';
+
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(Form::ENTITY_NAME))->hasColumn('translation_parent_id'),
+            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName(Form::ENTITY_NAME))->hasColumn(self::TRANSLATION_PARENT_ID),
             'Column translation_parent_id already exists in forms table'
         );
     }
@@ -22,19 +24,22 @@ final class Version20250127092200 extends PreUpAssertionMigration
     {
         $table = $schema->getTable($this->getPrefixedTableName(Form::ENTITY_NAME));
 
-        $table->addColumn('translation_parent_id', 'integer', [
+        $table->addColumn(self::TRANSLATION_PARENT_ID, 'integer', [
             'unsigned' => true,
             'notnull'  => false,
         ]);
 
         $table->addForeignKeyConstraint(
             $this->getPrefixedTableName(Form::ENTITY_NAME),
-            ['translation_parent_id'],
+            [self::TRANSLATION_PARENT_ID],
             ['id'],
             ['onDelete' => 'CASCADE']
         );
 
-        $table->addIndex(['translation_parent_id'], 'idx_forms_translation_parent_id');
+        $table->addIndex(
+            [self::TRANSLATION_PARENT_ID],
+            $this->generatePropertyName(Form::ENTITY_NAME, 'idx', [self::TRANSLATION_PARENT_ID])
+        );
     }
 
     public function down(Schema $schema): void
@@ -49,10 +54,12 @@ final class Version20250127092200 extends PreUpAssertionMigration
             }
         }
 
-        if ($table->hasIndex('idx_forms_translation_parent_id')) {
-            $table->dropIndex('idx_forms_translation_parent_id');
+        $indexName = $this->generatePropertyName(Form::ENTITY_NAME, 'idx', [self::TRANSLATION_PARENT_ID]);
+
+        if ($table->hasIndex($indexName)) {
+            $table->dropIndex($indexName);
         }
 
-        $table->dropColumn('translation_parent_id');
+        $table->dropColumn(self::TRANSLATION_PARENT_ID);
     }
 }
