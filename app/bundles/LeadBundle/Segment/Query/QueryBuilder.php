@@ -366,10 +366,7 @@ class QueryBuilder extends BaseQueryBuilder
         return count($this->logicStack) > 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getLogicStack()
+    public function getLogicStack(): array
     {
         return $this->logicStack;
     }

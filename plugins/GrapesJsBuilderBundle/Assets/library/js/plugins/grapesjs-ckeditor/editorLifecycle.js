@@ -26,7 +26,7 @@ export const editorLifecycleMixin = {
     let options = this.isInline(target) ? this.inlineOptions : this.options;
     const compiledOptions = {
       ...(options ? options : {}),
-      licenseKey: this.licenseKey
+      licenseKey: this.licenseKey,
     };
 
     const fontFamilyConfig = this.mergeFontFamilyOptions(compiledOptions.fontFamily);
@@ -35,8 +35,12 @@ export const editorLifecycleMixin = {
     }
 
     const headingConfig = this.mergeHeadingOptions(compiledOptions.heading);
-    if (headingConfig) {
-      compiledOptions.heading = headingConfig;
+    const headingConfigWithTargetClasses = this.extendHeadingOptionsFromTarget(
+      headingConfig,
+      target
+    );
+    if (headingConfigWithTargetClasses) {
+      compiledOptions.heading = headingConfigWithTargetClasses;
     }
 
     const styleConfig = this.mergeStyleDefinitions(compiledOptions.style);
@@ -45,6 +49,142 @@ export const editorLifecycleMixin = {
     }
 
     return compiledOptions;
+  },
+
+  extendHeadingOptionsFromTarget(headingConfig, target) {
+    const variants = this.collectHeadingClassVariants(target);
+    if (!variants.length) {
+      return headingConfig;
+    }
+
+    const resolvedHeadingConfig =
+      headingConfig && typeof headingConfig === 'object' ? { ...headingConfig } : {};
+    const options = Array.isArray(resolvedHeadingConfig.options)
+      ? [...resolvedHeadingConfig.options]
+      : [];
+
+    const knownViews = new Set();
+    const knownModels = new Set();
+    options.forEach((option) => {
+      const view = option?.view;
+      const viewName =
+        typeof view === 'string'
+          ? view.toLowerCase()
+          : typeof view?.name === 'string'
+          ? view.name.toLowerCase()
+          : '';
+      const viewClasses = Array.isArray(view?.classes)
+        ? [...view.classes]
+        : typeof view?.classes === 'string'
+        ? view.classes.split(/\s+/)
+        : [];
+      const normalizedClasses = viewClasses
+        .map((item) => `${item || ''}`.trim())
+        .filter(Boolean)
+        .sort()
+        .join(' ');
+
+      if (viewName) {
+        knownViews.add(`${viewName}|${normalizedClasses}`);
+      }
+
+      if (typeof option?.model === 'string' && option.model.trim()) {
+        knownModels.add(option.model.trim().toLowerCase());
+      }
+    });
+
+    variants.forEach((variant, index) => {
+      const viewKey = `${variant.name}|${variant.classes.join(' ')}`;
+      if (knownViews.has(viewKey)) {
+        return;
+      }
+
+      const model = this.generateHeadingVariantModel(variant, knownModels, index);
+      knownModels.add(model.toLowerCase());
+      knownViews.add(viewKey);
+
+      options.push({
+        model,
+        title: `${variant.name.toUpperCase()} (${variant.classes.join(' ')})`,
+        class: `ck-heading_${variant.name}_${model.replace(/[^a-z0-9_-]/gi, '_').toLowerCase()}`,
+        view: {
+          name: variant.name,
+          classes: variant.classes,
+        },
+        converterPriority: 'high',
+      });
+    });
+
+    resolvedHeadingConfig.options = options;
+
+    return resolvedHeadingConfig;
+  },
+
+  collectHeadingClassVariants(target) {
+    const html = typeof target?.innerHTML === 'string' ? target.innerHTML : '';
+    if (!html.trim()) {
+      return [];
+    }
+
+    const implementation =
+      (this.frameDoc && this.frameDoc.implementation) ||
+      (typeof document !== 'undefined' ? document.implementation : null);
+    if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
+      return [];
+    }
+
+    const workingDocument = implementation.createHTMLDocument('');
+    workingDocument.body.innerHTML = html;
+
+    const variantsByKey = new Map();
+    const selector =
+      'h1[class], h2[class], h3[class], h4[class], h5[class], h6[class], span[class]';
+
+    workingDocument.body.querySelectorAll(selector).forEach((element) => {
+      const name = `${element.tagName || ''}`.toLowerCase();
+      if (!name) {
+        return;
+      }
+
+      const classes = Array.from(element.classList || [])
+        .map((item) => item.trim())
+        .filter((item) => item && !item.startsWith('ck-'))
+        .sort((a, b) => a.localeCompare(b));
+
+      if (!classes.length) {
+        return;
+      }
+
+      const key = `${name}|${classes.join(' ')}`;
+      if (!variantsByKey.has(key)) {
+        variantsByKey.set(key, { name, classes });
+      }
+    });
+
+    return Array.from(variantsByKey.values());
+  },
+
+  generateHeadingVariantModel(variant, knownModels, index) {
+    const levelMatch = variant.name.match(/^h([1-6])$/);
+    const baseModel = levelMatch ? `heading${levelMatch[1]}` : `heading_${variant.name}`;
+    const classSlug = variant.classes
+      .join('_')
+      .replace(/[^a-z0-9_-]/gi, '_')
+      .split('_')
+      .filter((s) => s.length > 0)
+      .join('_')
+      .toLowerCase();
+
+    const suffix = classSlug || `variant_${index}`;
+    let candidate = `${baseModel}_${suffix}`;
+    let attempt = 1;
+
+    while (knownModels.has(candidate.toLowerCase())) {
+      candidate = `${baseModel}_${suffix}_${attempt}`;
+      attempt += 1;
+    }
+
+    return candidate;
   },
 
   /**
@@ -64,11 +204,11 @@ export const editorLifecycleMixin = {
       return rte;
     }
 
-    this.latestContent = el.innerHTML;
+    this.originalContent = typeof el?.innerHTML === 'string' ? el.innerHTML : '';
+    this.latestContent = this.originalContent;
 
-    const selectedComponent = typeof this.editor?.getSelected === 'function'
-      ? this.editor.getSelected()
-      : null;
+    const selectedComponent =
+      typeof this.editor?.getSelected === 'function' ? this.editor.getSelected() : null;
     this.trackBadgableComponent(selectedComponent);
     this.trackToolbarVisibility();
     const computedWidth = this.updateMenuWidthsBySelection(selectedComponent);
@@ -99,11 +239,14 @@ export const editorLifecycleMixin = {
     const optionsKey = this.registerEditorOptions(this.compileEditorOptions(el));
     const reuseEditor = this._Ck5ForGrapesJsData.reuseEditor ? 'true' : 'false';
     this.executeInFrame(
-      `${injectEditorInstant.name}('#${this.getElementId(this.editorContainer)}','${optionsKey}',${this.inlineMode ? 'true' : 'false'},${reuseEditor});`
+      `${injectEditorInstant.name}('#${this.getElementId(this.editorContainer)}','${optionsKey}',${
+        this.inlineMode ? 'true' : 'false'
+      },${reuseEditor});`
     );
 
     const toolbarContainer = this.toolbarContainer;
-    const toolbarMaxWidth = computedWidth || (this.inlineMode ? this.inlineMenuMaxWidth : this.menuMaxWidth);
+    const toolbarMaxWidth =
+      computedWidth || (this.inlineMode ? this.inlineMenuMaxWidth : this.menuMaxWidth);
     this.applyToolbarMaxWidth(toolbarContainer, toolbarMaxWidth);
     this.applyInlineModeStyles(el);
     this.observeEditorElements(toolbarContainer);
@@ -131,14 +274,11 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    this.inlineStyles = createHtmlElem(
-      'style',
-      head,
-      {
-        innerHTML: `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}` +
-          `.ck-editor__editable {display: inline-block;}`
-      }
-    );
+    this.inlineStyles = createHtmlElem('style', head, {
+      innerHTML:
+        `.ck-editor__editable>p {display: inline-block; margin-top: 0px !important; margin-bottom: 0px !important;}` +
+        `.ck-editor__editable {display: inline-block;}`,
+    });
   },
 
   observeEditorElements(toolbarContainer) {
@@ -146,7 +286,7 @@ export const editorLifecycleMixin = {
       this.toolBarMObserver.observe(toolbarContainer.firstChild, {
         subtree: true,
         childList: true,
-        attributes: true
+        attributes: true,
       });
     }
 
@@ -154,7 +294,7 @@ export const editorLifecycleMixin = {
       this.elementObserver.observe(this.el, {
         subtree: true,
         childList: true,
-        attributes: true
+        attributes: true,
       });
     }
   },
@@ -175,16 +315,54 @@ export const editorLifecycleMixin = {
     return null;
   },
 
+  detachEditableClassObserver() {
+    const observer = this._Ck5ForGrapesJsData?.editableClassObserver;
+    if (!observer || typeof observer.disconnect !== 'function') {
+      this._Ck5ForGrapesJsData.editableClassObserver = null;
+      return;
+    }
+
+    observer.disconnect();
+    this._Ck5ForGrapesJsData.editableClassObserver = null;
+  },
+
+  stripEditableClasses(editableEl) {
+    if (!editableEl || typeof editableEl.removeAttribute !== 'function') {
+      return;
+    }
+
+    const removeClasses = () => {
+      if (editableEl.getAttribute('class')) {
+        editableEl.removeAttribute('class');
+      }
+    };
+
+    removeClasses();
+    this.detachEditableClassObserver();
+
+    if (typeof MutationObserver !== 'function') {
+      return;
+    }
+
+    const observer = new MutationObserver(() => removeClasses());
+    observer.observe(editableEl, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    this._Ck5ForGrapesJsData.editableClassObserver = observer;
+  },
+
   ensureBodyWrapperHandlers() {
     if (!this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler) {
-      this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler = e => {
+      this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler = (e) => {
         e.stopPropagation();
         e.stopImmediatePropagation();
       };
     }
 
     if (!this._Ck5ForGrapesJsData.bodyWrapperClickHandler) {
-      this._Ck5ForGrapesJsData.bodyWrapperClickHandler = e => {
+      this._Ck5ForGrapesJsData.bodyWrapperClickHandler = (e) => {
         e.stopPropagation();
         e.stopImmediatePropagation();
       };
@@ -209,12 +387,19 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    ckeditor.data.set(this.latestContent);
+    // CKEditor 5 silently drops plain <span> elements (no attributes) because its
+    // model is attribute-based and has nothing to store for them. Injecting a
+    // placeholder attribute gives GHS something to preserve; it is removed in getContent().
+    // A non-empty value ("1") is required — CKEditor GHS may discard attributes whose
+    // value is an empty string, which would cause the span to be silently dropped.
+    const contentForEditor = this.latestContent.replace(/<span\s*>/gi, '<span data-gjs-span="1">');
+    ckeditor.data.set(contentForEditor);
     this.latestContent = null;
     el.innerHTML = '';
 
     const editableEl = this.getEditorEditableElement(ckeditor);
     if (editableEl) {
+      this.stripEditableClasses(editableEl);
       el.appendChild(editableEl);
     }
 
@@ -265,8 +450,8 @@ export const editorLifecycleMixin = {
     if (range) {
       range = this.frameDoc.createRange();
       let sel = this.frameContentWindow.getSelection();
-      range.setStart(textNode, offset)
-      range.collapse(true)
+      range.setStart(textNode, offset);
+      range.collapse(true);
       sel.removeAllRanges();
       sel.addRange(range);
     }
@@ -330,7 +515,7 @@ export const editorLifecycleMixin = {
 
     this.badgableInfo = {
       component,
-      previousState
+      previousState,
     };
 
     try {
@@ -372,7 +557,8 @@ export const editorLifecycleMixin = {
     this.restoreToolbarVisibility();
 
     const canvas = this.editor?.Canvas;
-    const getToolbar = typeof canvas?.getToolbarEl === 'function' ? () => canvas.getToolbarEl() : null;
+    const getToolbar =
+      typeof canvas?.getToolbarEl === 'function' ? () => canvas.getToolbarEl() : null;
     if (!getToolbar) {
       this.toolbarVisibilityInfo = null;
       return;
@@ -389,11 +575,11 @@ export const editorLifecycleMixin = {
       previousDisplay: toolbarEl.style.display,
       previousVisibility: toolbarEl.style.visibility,
       previousPointerEvents: toolbarEl.style.pointerEvents,
-      listener: null
+      listener: null,
     };
 
     const hideToolbar = () => {
-      const target = getToolbar ? (getToolbar() || toolbarEl) : toolbarEl;
+      const target = getToolbar ? getToolbar() || toolbarEl : toolbarEl;
       if (!target) {
         return;
       }
@@ -423,7 +609,8 @@ export const editorLifecycleMixin = {
       return;
     }
 
-    const { toolbarEl, previousDisplay, previousVisibility, previousPointerEvents, listener } = this.toolbarVisibilityInfo;
+    const { toolbarEl, previousDisplay, previousVisibility, previousPointerEvents, listener } =
+      this.toolbarVisibilityInfo;
 
     if (listener && typeof this.editor?.off === 'function') {
       try {
@@ -436,7 +623,8 @@ export const editorLifecycleMixin = {
     if (toolbarEl) {
       toolbarEl.style.display = typeof previousDisplay === 'string' ? previousDisplay : '';
       toolbarEl.style.visibility = typeof previousVisibility === 'string' ? previousVisibility : '';
-      toolbarEl.style.pointerEvents = typeof previousPointerEvents === 'string' ? previousPointerEvents : '';
+      toolbarEl.style.pointerEvents =
+        typeof previousPointerEvents === 'string' ? previousPointerEvents : '';
     }
 
     this.toolbarVisibilityInfo = null;
@@ -450,16 +638,364 @@ export const editorLifecycleMixin = {
   getContent() {
     const ckeditor = this.ckeditor;
     let ckeditorContent = ckeditor?.data ? ckeditor.data.get() : '';
-    if (typeof ckeditorContent !== "string") ckeditorContent = "";
+    if (typeof ckeditorContent !== 'string') ckeditorContent = '';
+    // Remove the placeholder injected in mountEditorUi() to preserve plain <span> elements.
+    ckeditorContent = ckeditorContent.replace(/ data-gjs-span="1"/g, '');
     const baseContent = this.resolveBaseContent(ckeditorContent);
 
     return this.normalizeWordInlineStyles(
       this.normalizeListMarkerStyles(
-        this.normalizeIndentationStyles(
-          this.normalizeLinkUnderlineColors(baseContent)
-        )
+        this.normalizeIndentationStyles(this.normalizeLinkUnderlineColors(baseContent))
       )
     );
+  },
+
+  restoreOriginalElementAttributes(content) {
+    if (typeof content !== 'string') {
+      return '';
+    }
+
+    const originalContent = typeof this.originalContent === 'string' ? this.originalContent : '';
+    if (!originalContent.trim()) {
+      return content;
+    }
+
+    const implementation =
+      (this.frameDoc && this.frameDoc.implementation) ||
+      (typeof document !== 'undefined' ? document.implementation : null);
+    if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
+      return content;
+    }
+
+    const currentDocument = implementation.createHTMLDocument('');
+    const originalDocument = implementation.createHTMLDocument('');
+
+    currentDocument.body.innerHTML = content;
+    originalDocument.body.innerHTML = originalContent;
+
+    this.reconcileElementAttributes(originalDocument.body, currentDocument.body);
+    this.restoreMissingDataSpanWrappers(originalDocument.body, currentDocument.body);
+
+    return currentDocument.body.innerHTML;
+  },
+
+  restoreMissingDataSpanWrappers(originalRoot, currentRoot) {
+    if (!originalRoot || !currentRoot) {
+      return;
+    }
+
+    const originalText = this.normalizeComparableText(originalRoot.textContent);
+    const currentText = this.normalizeComparableText(currentRoot.textContent);
+    if (!originalText || originalText !== currentText) {
+      return;
+    }
+
+    const spanDescriptors = this.collectDataSpanDescriptors(originalRoot);
+    if (!spanDescriptors.length) {
+      return;
+    }
+
+    this.applyMissingDataSpansByOffsets(currentRoot, spanDescriptors);
+  },
+
+  normalizeComparableText(value) {
+    if (typeof value !== 'string') {
+      return '';
+    }
+
+    return value
+      .replace(/\u00a0/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+
+  collectDataSpanDescriptors(root) {
+    if (!root || typeof Node === 'undefined') {
+      return [];
+    }
+
+    const descriptors = [];
+    let offset = 0;
+
+    const walk = (node) => {
+      if (!node) {
+        return;
+      }
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        offset += (node.nodeValue || '').length;
+        return;
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+
+      const tagName = `${node.tagName || ''}`.toLowerCase();
+      const isDataSpan = tagName === 'span' && this.elementHasDataAttributes(node);
+      const start = offset;
+
+      Array.from(node.childNodes || []).forEach(walk);
+
+      if (!isDataSpan) {
+        return;
+      }
+
+      const end = offset;
+      if (end <= start) {
+        return;
+      }
+
+      descriptors.push({
+        start,
+        end,
+        attributes: Array.from(node.attributes || []).map((attribute) => ({
+          name: attribute.name,
+          value: attribute.value || '',
+        })),
+      });
+    };
+
+    Array.from(root.childNodes || []).forEach(walk);
+
+    return descriptors;
+  },
+
+  elementHasDataAttributes(element) {
+    if (!element) {
+      return false;
+    }
+
+    return Array.from(element.attributes || []).some((attribute) => {
+      const name = `${attribute?.name || ''}`.toLowerCase();
+      return name.startsWith('data-');
+    });
+  },
+
+  applyMissingDataSpansByOffsets(root, descriptors) {
+    if (!root || !Array.isArray(descriptors) || !descriptors.length) {
+      return;
+    }
+
+    descriptors.forEach((descriptor) => {
+      const startPoint = this.resolveTextOffset(root, descriptor.start);
+      const endPoint = this.resolveTextOffset(root, descriptor.end);
+      if (!startPoint || !endPoint) {
+        return;
+      }
+
+      const range = root.ownerDocument.createRange();
+      range.setStart(startPoint.node, startPoint.offset);
+      range.setEnd(endPoint.node, endPoint.offset);
+
+      if (range.collapsed || this.rangeContainsDataSpan(range)) {
+        return;
+      }
+
+      const span = root.ownerDocument.createElement('span');
+      (descriptor.attributes || []).forEach((attribute) => {
+        if (!attribute?.name) {
+          return;
+        }
+
+        span.setAttribute(attribute.name, attribute.value || '');
+      });
+
+      try {
+        const fragment = range.extractContents();
+        span.appendChild(fragment);
+        range.insertNode(span);
+      } catch (error) {
+        // Ignore restoration errors and preserve edited content.
+      }
+    });
+  },
+
+  resolveTextOffset(root, targetOffset) {
+    if (!root || typeof NodeFilter === 'undefined') {
+      return null;
+    }
+
+    const normalizedTarget = Math.max(0, Number.isFinite(targetOffset) ? targetOffset : 0);
+    const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+
+    let consumed = 0;
+    let currentNode = walker.nextNode();
+
+    while (currentNode) {
+      const length = (currentNode.nodeValue || '').length;
+      const nextConsumed = consumed + length;
+
+      if (normalizedTarget <= nextConsumed) {
+        return {
+          node: currentNode,
+          offset: Math.max(0, Math.min(length, normalizedTarget - consumed)),
+        };
+      }
+
+      consumed = nextConsumed;
+      currentNode = walker.nextNode();
+    }
+
+    return null;
+  },
+
+  rangeContainsDataSpan(range) {
+    if (!range) {
+      return false;
+    }
+
+    const clonedContent = range.cloneContents();
+    if (!clonedContent || typeof clonedContent.querySelectorAll !== 'function') {
+      return false;
+    }
+
+    return Array.from(clonedContent.querySelectorAll('span')).some((element) =>
+      this.elementHasDataAttributes(element)
+    );
+  },
+
+  reconcileElementAttributes(originalRoot, currentRoot) {
+    if (!originalRoot || !currentRoot) {
+      return;
+    }
+
+    const originalChildren = Array.from(originalRoot.children || []);
+    const currentChildren = Array.from(currentRoot.children || []);
+    const length = Math.min(originalChildren.length, currentChildren.length);
+
+    for (let index = 0; index < length; index += 1) {
+      const originalElement = originalChildren[index];
+      const currentElement = currentChildren[index];
+      if (!originalElement || !currentElement) {
+        continue;
+      }
+
+      const originalTagName = `${originalElement.tagName || ''}`.toLowerCase();
+      const currentTagName = `${currentElement.tagName || ''}`.toLowerCase();
+
+      if (originalTagName !== currentTagName) {
+        // Handle the case where CKEditor flattened a gjs-heading-wrapper div:
+        // original: <div class="gjs-heading-wrapper"><span ...>text</span></div>
+        // current:  <span ...>text</span>
+        // Reconcile attributes from the inner element to the current element so
+        // data-gjs-type, id, draggable etc. are preserved after editing.
+        if (
+          originalTagName === 'div' &&
+          originalElement.classList.contains('gjs-heading-wrapper')
+        ) {
+          const originalInner = originalElement.firstElementChild;
+          if (originalInner && `${originalInner.tagName || ''}`.toLowerCase() === currentTagName) {
+            this.reconcileSingleElementAttributes(originalInner, currentElement);
+            this.reconcileElementAttributes(originalInner, currentElement);
+          }
+        }
+        continue;
+      }
+
+      this.reconcileSingleElementAttributes(originalElement, currentElement);
+      this.reconcileElementAttributes(originalElement, currentElement);
+    }
+  },
+
+  reconcileSingleElementAttributes(originalElement, currentElement) {
+    if (!originalElement || !currentElement) {
+      return;
+    }
+
+    this.reconcileClassAttribute(originalElement, currentElement);
+    this.reconcileStyleAttribute(originalElement, currentElement);
+
+    if (originalElement.id && !currentElement.id) {
+      currentElement.id = originalElement.id;
+    }
+
+    Array.from(originalElement.attributes || []).forEach((attribute) => {
+      const name = `${attribute?.name || ''}`.toLowerCase();
+      if (!name || name === 'class' || name === 'style' || name === 'id') {
+        return;
+      }
+
+      if (!name.startsWith('data-') && !name.startsWith('aria-')) {
+        return;
+      }
+
+      if (!currentElement.hasAttribute(name)) {
+        currentElement.setAttribute(name, attribute.value || '');
+      }
+    });
+  },
+
+  reconcileClassAttribute(originalElement, currentElement) {
+    const originalClasses = Array.from(originalElement.classList || [])
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (!originalClasses.length) {
+      return;
+    }
+
+    const currentClasses = Array.from(currentElement.classList || [])
+      .map((item) => item.trim())
+      .filter(Boolean);
+    const mergedClasses = [...currentClasses];
+
+    originalClasses.forEach((className) => {
+      if (!mergedClasses.includes(className)) {
+        mergedClasses.push(className);
+      }
+    });
+
+    if (!mergedClasses.length) {
+      return;
+    }
+
+    currentElement.setAttribute('class', mergedClasses.join(' '));
+  },
+
+  reconcileStyleAttribute(originalElement, currentElement) {
+    const originalStyle = originalElement.style;
+    const currentStyle = currentElement.style;
+    if (!originalStyle || !currentStyle) {
+      return;
+    }
+
+    for (let index = 0; index < originalStyle.length; index += 1) {
+      const property = originalStyle[index];
+      if (!property) {
+        continue;
+      }
+
+      const currentValue = currentStyle.getPropertyValue(property);
+      if (currentValue) {
+        continue;
+      }
+
+      // Skip when CKEditor moved the declaration onto a descendant (e.g. a
+      // heading's font-size pushed into an inner <span>). Re-adding it on the
+      // ancestor would duplicate the style and compound across edit cycles,
+      // progressively corrupting the snapshot taken on the next enable().
+      if (this.descendantHasStyleProperty(currentElement, property)) {
+        continue;
+      }
+
+      const value = originalStyle.getPropertyValue(property);
+      if (!value) {
+        continue;
+      }
+
+      const priority = originalStyle.getPropertyPriority(property) || '';
+      currentStyle.setProperty(property, value, priority);
+    }
+  },
+
+  descendantHasStyleProperty(element, property) {
+    if (!element || typeof element.querySelectorAll !== 'function' || !property) {
+      return false;
+    }
+
+    return Array.from(element.querySelectorAll('[style]')).some((descendant) => {
+      return !!(descendant.style && descendant.style.getPropertyValue(property));
+    });
   },
 
   resolveBaseContent(ckeditorContent) {
@@ -471,7 +1007,53 @@ export const editorLifecycleMixin = {
       return ckeditorContent;
     }
 
-    return ckeditorContent.replace(/^<p>/, '').replace(/<\/p>$/, '');
+    return this.unwrapInlineParagraphRoot(ckeditorContent);
+  },
+
+  unwrapInlineParagraphRoot(ckeditorContent) {
+    if (typeof ckeditorContent !== 'string') {
+      return '';
+    }
+
+    const content = ckeditorContent.trim();
+    if (!content) {
+      return '';
+    }
+
+    const originalContent =
+      typeof this.originalContent === 'string' ? this.originalContent.trim() : '';
+    const originalStartsWithParagraph = /^<p(\s|>)/i.test(originalContent);
+    const originalEndsWithParagraph = /<\/p>$/i.test(originalContent);
+    if (originalStartsWithParagraph && originalEndsWithParagraph) {
+      return ckeditorContent;
+    }
+
+    const implementation =
+      (this.frameDoc && this.frameDoc.implementation) ||
+      (typeof document !== 'undefined' ? document.implementation : null);
+    if (!implementation || typeof implementation.createHTMLDocument !== 'function') {
+      return ckeditorContent;
+    }
+
+    const workingDocument = implementation.createHTMLDocument('');
+    workingDocument.body.innerHTML = content;
+
+    const elementChildren = Array.from(workingDocument.body.children || []);
+    if (elementChildren.length !== 1) {
+      return ckeditorContent;
+    }
+
+    const rootElement = elementChildren[0];
+    if (`${rootElement.tagName || ''}`.toLowerCase() !== 'p') {
+      return ckeditorContent;
+    }
+
+    const hasOnlyOneBlock = workingDocument.body.childNodes.length === 1;
+    if (!hasOnlyOneBlock) {
+      return ckeditorContent;
+    }
+
+    return rootElement.innerHTML || '';
   },
 
   /**
@@ -524,7 +1106,8 @@ export const editorLifecycleMixin = {
     this.detachBodyWrapperListeners();
     this.disconnectTipObserver(reuseEditor);
 
-    const finalizeCleanup = () => this.finalizeDisableCleanup(content, reuseEditor, toolbarContainer);
+    const finalizeCleanup = () =>
+      this.finalizeDisableCleanup(content, reuseEditor, toolbarContainer);
     this.destroyEditorAndCleanup(ckeditor, reuseEditor, finalizeCleanup);
   },
 
@@ -539,8 +1122,14 @@ export const editorLifecycleMixin = {
   },
 
   detachFrameBodyListeners() {
-    if (this._Ck5ForGrapesJsData.frameBodyEl && this._Ck5ForGrapesJsData.frameBodyMouseDownHandler) {
-      this._Ck5ForGrapesJsData.frameBodyEl.removeEventListener('mousedown', this._Ck5ForGrapesJsData.frameBodyMouseDownHandler);
+    if (
+      this._Ck5ForGrapesJsData.frameBodyEl &&
+      this._Ck5ForGrapesJsData.frameBodyMouseDownHandler
+    ) {
+      this._Ck5ForGrapesJsData.frameBodyEl.removeEventListener(
+        'mousedown',
+        this._Ck5ForGrapesJsData.frameBodyMouseDownHandler
+      );
     }
   },
 
@@ -551,7 +1140,10 @@ export const editorLifecycleMixin = {
     }
 
     if (this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler) {
-      bodyWrapperEl.removeEventListener('mousedown', this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler);
+      bodyWrapperEl.removeEventListener(
+        'mousedown',
+        this._Ck5ForGrapesJsData.bodyWrapperMouseDownHandler
+      );
     }
     if (this._Ck5ForGrapesJsData.bodyWrapperClickHandler) {
       bodyWrapperEl.removeEventListener('click', this._Ck5ForGrapesJsData.bodyWrapperClickHandler);
@@ -573,6 +1165,8 @@ export const editorLifecycleMixin = {
   },
 
   finalizeDisableCleanup(content, reuseEditor, toolbarContainer) {
+    this.detachEditableClassObserver();
+
     if (this.inFrameData) {
       if (!reuseEditor) {
         this.inFrameData.editor = null;
@@ -585,13 +1179,15 @@ export const editorLifecycleMixin = {
     this.inlineStyles = null;
     this._Ck5ForGrapesJsData.frameBodyEl = null;
     this._Ck5ForGrapesJsData.bodyWrapperEl = null;
-    this.el.innerHTML = content;
+    const restoredContent = this.restoreOriginalElementAttributes(content);
+    this.el.innerHTML = restoredContent;
     this.el.style.display = this.display;
     this.el.contentEditable = false;
     this.el = null;
     this.editorContainer?.remove();
     this.editorContainer = null;
     this.latestContent = null;
+    this.originalContent = null;
     this.display = undefined;
     this.latestClickEvent = null;
   },
@@ -610,7 +1206,7 @@ export const editorLifecycleMixin = {
 
     if (typeof ckeditor?.destroy === 'function') {
       Promise.resolve(ckeditor.destroy())
-        .catch(error => {
+        .catch((error) => {
           console.warn('GrapesJS CKEditor: unable to destroy editor', error);
         })
         .then(destroyEditorContext)
@@ -631,14 +1227,10 @@ export const editorLifecycleMixin = {
   injectEditorModule(src) {
     const hostHead = document.querySelector('head');
     if (hostHead && !document.getElementById('grapesjs-ckeditor-toolbar-style')) {
-      createHtmlElem(
-        'style',
-        hostHead,
-        {
-          id: 'grapesjs-ckeditor-toolbar-style',
-          innerHTML: `.gjs-rte-toolbar {opacity: 0;}`
-        }
-      );
+      createHtmlElem('style', hostHead, {
+        id: 'grapesjs-ckeditor-toolbar-style',
+        innerHTML: `.gjs-rte-toolbar {opacity: 0;}`,
+      });
     }
 
     const frameDocument = this.frameDoc;
@@ -649,59 +1241,48 @@ export const editorLifecycleMixin = {
 
     const moduleSource = typeof src === 'string' ? src.trim() : '';
     const injectedModuleScript = frameDocument.getElementById('grapesjs-ckeditor-module-loader');
-    const hasInjectedModule = !!(moduleSource && injectedModuleScript?.getAttribute('src') === moduleSource);
+    const hasInjectedModule = !!(
+      moduleSource && injectedModuleScript?.getAttribute('src') === moduleSource
+    );
 
     if (!hasInjectedModule && moduleSource) {
-      createHtmlElem(
-        'script',
-        body,
-        {
-          id: 'grapesjs-ckeditor-module-loader',
-          src: moduleSource,
-        }
-      ).onload =
-        () => setTimeout(
-          () => {
-            const styles = [...frameDocument.querySelectorAll('style')];
-            for (let index = 0; index < styles.length; index += 1) {
-              const item = styles[index];
-              let innerHTML = item.innerHTML;
-              let match = innerHTML.match(/.ck.ck-editor__editable_inline ?{[^}]*(overflow:[^;]*;)[^}]*}/);
-              if (!match) {
-                continue;
-              }
-
-              item.innerHTML = innerHTML.replace(match[0], '');
-              createHtmlElem(
-                'style',
-                item.parentNode,
-                {
-                  innerHTML: `.ck-toolbar {border-bottom-width: 1px !important;}` +
-                    `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;} 
-                         .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `
-                }
-              );
-              break;
+      createHtmlElem('script', body, {
+        id: 'grapesjs-ckeditor-module-loader',
+        src: moduleSource,
+      }).onload = () =>
+        setTimeout(() => {
+          const styles = [...frameDocument.querySelectorAll('style')];
+          for (let index = 0; index < styles.length; index += 1) {
+            const item = styles[index];
+            let innerHTML = item.innerHTML;
+            let match = innerHTML.match(
+              /.ck.ck-editor__editable_inline ?{[^}]*(overflow:[^;]*;)[^}]*}/
+            );
+            if (!match) {
+              continue;
             }
+
+            item.innerHTML = innerHTML.replace(match[0], '');
+            createHtmlElem('style', item.parentNode, {
+              innerHTML:
+                `.ck-toolbar {border-bottom-width: 1px !important;}` +
+                `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;} 
+                         .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `,
+            });
+            break;
           }
-        );
+        });
     }
 
     if (!frameDocument.getElementById('grapesjs-ckeditor-runtime')) {
-      createHtmlElem(
-        'script',
-        body,
-        {
-          id: 'grapesjs-ckeditor-runtime',
-          innerHTML: `${setElementProperty.toString()}; ${injectEditorInstant.toString()}; function _typeof(obj) { return typeof obj; }`
-        }
-      );
+      createHtmlElem('script', body, {
+        id: 'grapesjs-ckeditor-runtime',
+        innerHTML: `${setElementProperty.toString()}; ${injectEditorInstant.toString()}; function _typeof(obj) { return typeof obj; }`,
+      });
     }
 
     if (!this.frameContentWindow.grapesjsCkeditorData) {
-      this.executeInFrame(
-        `(${injectDataStorage.toString()})()`
-      );
+      this.executeInFrame(`(${injectDataStorage.toString()})()`);
     }
 
     if (!this._Ck5ForGrapesJsData.frameScrollHandler) {
@@ -710,14 +1291,8 @@ export const editorLifecycleMixin = {
     if (!this._Ck5ForGrapesJsData.frameResizeHandler) {
       this._Ck5ForGrapesJsData.frameResizeHandler = this.onResize.bind(this);
     }
-    this.frameContentWindow.addEventListener(
-      'scroll',
-      this._Ck5ForGrapesJsData.frameScrollHandler
-    );
-    this.frameContentWindow.addEventListener(
-      'resize',
-      this._Ck5ForGrapesJsData.frameResizeHandler
-    );
+    this.frameContentWindow.addEventListener('scroll', this._Ck5ForGrapesJsData.frameScrollHandler);
+    this.frameContentWindow.addEventListener('resize', this._Ck5ForGrapesJsData.frameResizeHandler);
   },
 
   /**
@@ -726,13 +1301,9 @@ export const editorLifecycleMixin = {
    * @param {string} code
    */
   executeInFrame(code) {
-    createHtmlElem(
-      'script',
-      this.frameBody,
-      {
-        innerHTML: code
-      }
-    ).remove();
+    createHtmlElem('script', this.frameBody, {
+      innerHTML: code,
+    }).remove();
   },
 
   /**
@@ -755,7 +1326,10 @@ export const editorLifecycleMixin = {
   tuneGjsToolbar() {
     const gjsToolbar = this.gjsToolbar;
     if (gjsToolbar) {
-      if (this.isActive && isOpenPanelOverlapGjsToolbar(this.toolbarContainer, gjsToolbar, this.frame)) {
+      if (
+        this.isActive &&
+        isOpenPanelOverlapGjsToolbar(this.toolbarContainer, gjsToolbar, this.frame)
+      ) {
         gjsToolbar.style.opacity = 0;
         gjsToolbar.style.pointerEvents = 'none';
       } else {
@@ -772,9 +1346,14 @@ export const editorLifecycleMixin = {
    * @returns {string|null}
    */
   updateMenuWidthsBySelection(component) {
-    const targetComponent = component || (typeof this.editor?.getSelected === 'function' ? this.editor.getSelected() : null);
+    const targetComponent =
+      component ||
+      (typeof this.editor?.getSelected === 'function' ? this.editor.getSelected() : null);
     const element = typeof targetComponent?.getEl === 'function' ? targetComponent.getEl() : null;
-    const width = typeof element?.getBoundingClientRect === 'function' ? element.getBoundingClientRect().width : null;
+    const width =
+      typeof element?.getBoundingClientRect === 'function'
+        ? element.getBoundingClientRect().width
+        : null;
     if (!Number.isFinite(width) || width <= 0) {
       return null;
     }
@@ -808,13 +1387,22 @@ export const editorLifecycleMixin = {
     const gjsToolbarBoundingRect = this.getGjsToolbarRect(gjsToolbar);
     let toolBarBoundingRect = this.toolbarContainer.getBoundingClientRect();
     const elBoundingRect = this.el.getBoundingClientRect();
-    const center = this.shouldCenterToolbar(toolBarBoundingRect, elBoundingRect, gjsToolbarBoundingRect.width);
+    const center = this.shouldCenterToolbar(
+      toolBarBoundingRect,
+      elBoundingRect,
+      gjsToolbarBoundingRect.width
+    );
     const left = this.calculateToolbarLeft(toolBarBoundingRect, elBoundingRect, center);
 
     this.toolbarContainer.style.left = `${left}px`;
 
     toolBarBoundingRect = this.toolbarContainer.getBoundingClientRect();
-    const top = this.calculateToolbarTop(toolBarBoundingRect, elBoundingRect, gjsToolbarBoundingRect, center);
+    const top = this.calculateToolbarTop(
+      toolBarBoundingRect,
+      elBoundingRect,
+      gjsToolbarBoundingRect,
+      center
+    );
     this.toolbarContainer.style.top = `${top}px`;
   },
 
@@ -830,7 +1418,7 @@ export const editorLifecycleMixin = {
     this.gjsToolBarMObserver.observe(gjsToolbar, {
       subtree: false,
       childList: false,
-      attributes: true
+      attributes: true,
     });
   },
 
@@ -849,10 +1437,17 @@ export const editorLifecycleMixin = {
     }
 
     const gjsToolbarToScreenBorderSpace = 5;
-    let left = elBoundingRect.left - (toolBarBoundingRect.width - elBoundingRect.width) / 2 + this.frameScrollX;
+    let left =
+      elBoundingRect.left -
+      (toolBarBoundingRect.width - elBoundingRect.width) / 2 +
+      this.frameScrollX;
 
     if (left + toolBarBoundingRect.width > this.frameBody.offsetWidth) {
-      left -= left + toolBarBoundingRect.width - this.frameBody.offsetWidth + gjsToolbarToScreenBorderSpace;
+      left -=
+        left +
+        toolBarBoundingRect.width -
+        this.frameBody.offsetWidth +
+        gjsToolbarToScreenBorderSpace;
     }
 
     if (left < this.frameScrollX) {
@@ -864,19 +1459,24 @@ export const editorLifecycleMixin = {
 
   calculateToolbarTop(toolBarBoundingRect, elBoundingRect, gjsToolbarBoundingRect, center) {
     const gjsToolbarVSpace = 1;
-    let top = (
-      elBoundingRect.top + this.frameScrollY - toolBarBoundingRect.height - gjsToolbarVSpace -
-      (center ? gjsToolbarBoundingRect.height : 0)
-    );
+    let top =
+      elBoundingRect.top +
+      this.frameScrollY -
+      toolBarBoundingRect.height -
+      gjsToolbarVSpace -
+      (center ? gjsToolbarBoundingRect.height : 0);
 
     if (top > this.frameScrollY) {
       return top;
     }
 
-    top = (
-      elBoundingRect.bottom + this.frameScrollY + gjsToolbarVSpace +
-      (center && gjsToolbarBoundingRect.bottom > elBoundingRect.bottom ? gjsToolbarBoundingRect.height : 0)
-    );
+    top =
+      elBoundingRect.bottom +
+      this.frameScrollY +
+      gjsToolbarVSpace +
+      (center && gjsToolbarBoundingRect.bottom > elBoundingRect.bottom
+        ? gjsToolbarBoundingRect.height
+        : 0);
 
     return top;
   },
@@ -892,7 +1492,9 @@ export const editorLifecycleMixin = {
       return '';
     }
 
-    const frameData = this.frameContentWindow.grapesjsCkeditorData || (this.frameContentWindow.grapesjsCkeditorData = {});
+    const frameData =
+      this.frameContentWindow.grapesjsCkeditorData ||
+      (this.frameContentWindow.grapesjsCkeditorData = {});
     const registry = frameData.optionsRegistry || (frameData.optionsRegistry = {});
     const data = this._Ck5ForGrapesJsData || (this._Ck5ForGrapesJsData = {});
 
@@ -911,5 +1513,5 @@ export const editorLifecycleMixin = {
     if (this.isActive) {
       this.positionToolbar();
     }
-  }
+  },
 };

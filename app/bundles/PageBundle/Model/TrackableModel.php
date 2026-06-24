@@ -83,10 +83,7 @@ class TrackableModel extends AbstractCommonModel
         return $this->em->getRepository(Trackable::class);
     }
 
-    /**
-     * @return RedirectModel
-     */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): RedirectModel
     {
         return $this->redirectModel;
     }
@@ -738,10 +735,7 @@ class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
-    /**
-     * @return array
-     */
-    protected function getContactFieldUrlTokens()
+    protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;

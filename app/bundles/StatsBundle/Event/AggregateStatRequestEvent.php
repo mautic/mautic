@@ -38,34 +38,22 @@ class AggregateStatRequestEvent extends Event
         return $this->statName;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getFromDateTime()
+    public function getFromDateTime(): \DateTimeInterface
     {
         return $this->fromDateTime;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getToDateTime()
+    public function getToDateTime(): \DateTimeInterface
     {
         return $this->toDateTime;
     }
 
-    /**
-     * @return FetchOptions
-     */
-    public function getOptions()
+    public function getOptions(): FetchOptions
     {
         return $this->options;
     }
 
-    /**
-     * @return StatCollection
-     */
-    public function getStatCollection()
+    public function getStatCollection(): StatCollection
     {
         return $this->statCollection;
     }

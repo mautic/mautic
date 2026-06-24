@@ -40,12 +40,10 @@ class InputHelper
     /**
      * @param bool $html
      * @param bool $strict
-     *
-     * @return InputFilter
      */
-    private static function getFilter($html = false, $strict = false)
+    private static function getFilter($html = false, $strict = false): ?InputFilter
     {
-        if (empty(self::$htmlFilter)) {
+        if (!self::$htmlFilter instanceof InputFilter) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
             self::$htmlFilter->blockedTags  = [
@@ -98,9 +96,11 @@ class InputHelper
     /**
      * Wrapper to InputHelper.
      *
+     * @param mixed[] $arguments
+     *
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $arguments)
     {
         return self::getFilter()->clean($arguments[0], $name);
     }
