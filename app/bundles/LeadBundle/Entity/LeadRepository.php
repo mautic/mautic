@@ -1071,6 +1071,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
             'mautic.lead.lead.searchcommand.dnc',
+            'mautic.lead.lead.searchcommand.source',
         ];
 
         if (!empty($this->availableSearchFields)) {
