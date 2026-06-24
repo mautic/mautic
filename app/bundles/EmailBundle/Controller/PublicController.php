@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\EmailConfig;
+use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -117,7 +118,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null)
+    public function unsubscribeAction(Request $request, ContactTracker $contactTracker, EmailModel $model, LeadModel $leadModel, FormModel $formModel, PageModel $pageModel, MailHashHelper $mailHash, ThemeHelper $themeHelper, EmailDefaultsHelper $emailDefaultsHelper, $idHash, ?string $urlEmail = null, ?string $secretHash = null)
     {
         $stat                   = $model->getEmailStatus($idHash);
         $message                = '';
@@ -226,7 +227,7 @@ class PublicController extends CommonFormController
                 $formView = $form->createView();
 
                 /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter()) && $prefCenter->getIsPreferenceCenter()) {
+                if ($email && ($prefCenter = $emailDefaultsHelper->resolvePreferenceCenter($email))) {
                     // Set the page language if there is no lead preferred locale
                     if (empty($language) && $language = $prefCenter->getLanguage()) {
                         $this->translator->setLocale($language);

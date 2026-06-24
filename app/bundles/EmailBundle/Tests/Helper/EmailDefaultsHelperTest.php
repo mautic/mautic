@@ -32,25 +32,19 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testAppliesPreferenceCenterAndUtmTagDefaults(): void
     {
-        $page = new Page();
-        $page->setTitle('Default PC');
-
         $this->coreParametersHelper->method('get')->willReturnMap([
-            ['email_default_preference_center_id', null, 42],
             ['email_default_utm_source', null, 'config-source'],
             ['email_default_utm_medium', null, 'config-medium'],
             ['email_default_utm_campaign', null, 'config-campaign'],
             ['email_default_utm_content', null, 'config-content'],
         ]);
 
-        $this->entityManager->method('find')
-            ->with(Page::class, 42)
-            ->willReturn($page);
+        $this->entityManager->expects($this->never())->method('find');
 
         $email = new Email();
         $this->helper->applyDefaults($email);
 
-        $this->assertSame($page, $email->getPreferenceCenter());
+        $this->assertNull($email->getPreferenceCenter());
         $this->assertSame([
             'utmSource'   => 'config-source',
             'utmMedium'   => 'config-medium',
@@ -59,28 +53,17 @@ final class EmailDefaultsHelperTest extends TestCase
         ], $email->getUtmTags());
     }
 
-    public function testDoesNotOverwriteExistingPreferenceCenter(): void
+    public function testResolvePreferenceCenterReturnsExplicitPreferenceCenter(): void
     {
-        $existingPage = new Page();
-        $existingPage->setTitle('Existing PC');
+        $existingPage = $this->createPreferenceCenterPageMock(true);
 
         $email = new Email();
         $email->setPreferenceCenter($existingPage);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
-            ['email_default_preference_center_id', null, 99],
-            ['email_default_utm_source', null, 'config-source'],
-            ['email_default_utm_medium', null, null],
-            ['email_default_utm_campaign', null, null],
-            ['email_default_utm_content', null, null],
-        ]);
-
-        // Verify helper skips loading when preference center already set
         $this->entityManager->expects($this->never())->method('find');
+        $this->coreParametersHelper->expects($this->never())->method('get');
 
-        $this->helper->applyDefaults($email);
-
-        $this->assertSame($existingPage, $email->getPreferenceCenter());
+        $this->assertSame($existingPage, $this->helper->resolvePreferenceCenter($email));
     }
 
     public function testDoesNotOverwriteExistingUtmTags(): void
@@ -159,14 +142,28 @@ final class EmailDefaultsHelperTest extends TestCase
         $this->assertEmpty($email->getUtmTags());
     }
 
-    public function testHandlesInvalidPreferenceCenterIdGracefully(): void
+    public function testResolvePreferenceCenterReturnsConfiguredDefaultForEmailsWithoutExplicitPreferenceCenter(): void
+    {
+        $page = $this->createPreferenceCenterPageMock(true);
+
+        $this->coreParametersHelper->method('get')->willReturnMap([
+            ['email_default_preference_center_id', null, 42],
+        ]);
+
+        $this->entityManager->method('find')
+            ->with(Page::class, 42)
+            ->willReturn($page);
+
+        $email = new Email();
+
+        $this->assertSame($page, $this->helper->resolvePreferenceCenter($email));
+        $this->assertNull($email->getPreferenceCenter());
+    }
+
+    public function testResolvePreferenceCenterReturnsNullForInvalidDefault(): void
     {
         $this->coreParametersHelper->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, 999],
-            ['email_default_utm_source', null, null],
-            ['email_default_utm_medium', null, null],
-            ['email_default_utm_campaign', null, null],
-            ['email_default_utm_content', null, null],
         ]);
 
         $this->entityManager->method('find')
@@ -174,9 +171,25 @@ final class EmailDefaultsHelperTest extends TestCase
             ->willReturn(null);
 
         $email = new Email();
-        $this->helper->applyDefaults($email);
 
-        $this->assertNull($email->getPreferenceCenter());
+        $this->assertNull($this->helper->resolvePreferenceCenter($email));
+    }
+
+    public function testResolvePreferenceCenterReturnsNullForUnpublishedDefault(): void
+    {
+        $page = $this->createPreferenceCenterPageMock(false);
+
+        $this->coreParametersHelper->method('get')->willReturnMap([
+            ['email_default_preference_center_id', null, 42],
+        ]);
+
+        $this->entityManager->method('find')
+            ->with(Page::class, 42)
+            ->willReturn($page);
+
+        $email = new Email();
+
+        $this->assertNull($this->helper->resolvePreferenceCenter($email));
     }
 
     public function testPreservesPreExistingChanges(): void
@@ -199,5 +212,14 @@ final class EmailDefaultsHelperTest extends TestCase
 
         $this->assertSame($changesBefore, $email->getChanges());
         $this->assertSame(['utmSource' => 'src'], $email->getUtmTags());
+    }
+
+    private function createPreferenceCenterPageMock(bool $published): Page&MockObject
+    {
+        $page = $this->createMock(Page::class);
+        $page->method('getIsPreferenceCenter')->willReturn(true);
+        $page->method('isPublished')->willReturn($published);
+
+        return $page;
     }
 }

@@ -12,8 +12,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Functional tests for email form pre-population from global config defaults
- * (default preference center and UTM tag defaults).
+ * Functional tests for email form defaults from global config.
  *
  * These tests run with the config params set so they do not bleed into the
  * unrelated tests in EmailFunctionalTest.
@@ -40,7 +39,7 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testNewEmailFormPreselectsConfiguredPreferenceCenterAndUtmDefaults(): void
+    public function testNewEmailFormLeavesPreferenceCenterBlankAndAppliesUtmDefaults(): void
     {
         $preferenceCenter = $this->createPreferenceCenterPage('Default Preference Center');
         $this->em->flush();
@@ -58,7 +57,7 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
 
         $form = $crawler->selectButton(self::SAVE_AND_CLOSE)->form();
 
-        Assert::assertSame((string) $pageId, $form['emailform[preferenceCenter]']->getValue());
+        Assert::assertSame('', $form['emailform[preferenceCenter]']->getValue());
         Assert::assertSame('config-source', $form['emailform[utmTags][utmSource]']->getValue());
         Assert::assertSame('config-medium', $form['emailform[utmTags][utmMedium]']->getValue());
         Assert::assertSame('config-campaign', $form['emailform[utmTags][utmCampaign]']->getValue());

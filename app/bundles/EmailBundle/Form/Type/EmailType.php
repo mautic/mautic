@@ -71,9 +71,8 @@ class EmailType extends AbstractType
         $emailEntity =  $options['data'];
         \assert($emailEntity instanceof Email);
 
-        // Pre-populates the form with config defaults for UI display.
-        // The authoritative application of defaults (covering API and programmatic creation)
-        // is handled by EmailDefaultsSubscriber on EMAIL_PRE_SAVE.
+        // Apply only defaults that should be persisted on new emails, such as UTM tags.
+        // Preference center fallback is resolved dynamically at unsubscribe time.
         $this->applyDefaultsForNewEmail($emailEntity);
 
         $builder->add(
