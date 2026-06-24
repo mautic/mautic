@@ -29,7 +29,7 @@ class ContactSegmentFilterDictionary
     /**
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         if (empty($this->filters)) {
             $this->setDefaultFilters();

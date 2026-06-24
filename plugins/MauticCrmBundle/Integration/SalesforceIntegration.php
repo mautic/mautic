@@ -978,11 +978,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return int|null
-     *
      * @throws \Exception
      */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity($params = []): ?int
     {
         $executed = null;
 
@@ -3099,10 +3097,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $matchedFields;
     }
 
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    public function getEntityManager()
+    public function getEntityManager(): \Doctrine\ORM\EntityManager
     {
         return $this->em;
     }
