@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 class BatchTagController extends AbstractFormController
 {
     private const OBJECT_TYPE_COMPANY = 'company';
+
     private const OBJECT_TYPE_LEAD    = 'lead';
 
     public function indexAction(Request $request): Response

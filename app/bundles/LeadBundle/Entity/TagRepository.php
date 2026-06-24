@@ -11,7 +11,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class TagRepository extends CommonRepository
 {
     private const LEAD_TABLE_NAME           = 'leads';
+
     private const LEAD_TAGS_XREF_TABLE_NAME = 'lead_tags_xref';
+
     private const TAG_ACTION_ADD            = 'add';
 
     /**

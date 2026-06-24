@@ -199,7 +199,7 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
             return $this->generateRandomParameterName();
         }
 
-        return array_map(fn () => $this->generateRandomParameterName(), $filterParameters);
+        return array_map(fn (): string => $this->generateRandomParameterName(), $filterParameters);
     }
 
     protected function getRelationJoinCondition(string $relationAlias, string $leadsTableAlias): string

@@ -576,7 +576,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $val = InputHelper::_($val, 'string');
         });
 
-        return array_filter($tags, fn ($tag) => strlen($tag) > 0);
+        return array_filter($tags, fn ($tag): bool => strlen($tag) > 0);
     }
 
     /**
