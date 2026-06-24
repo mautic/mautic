@@ -9,15 +9,9 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-<<<<<<< HEAD
-use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
-<<<<<<< HEAD
-use Rector\TypeDeclaration\Rector\ClassMethod\KnownMagicClassMethodTypeRector;
-=======
-=======
 use Rector\Renaming\Rector\FuncCall\RenameFunctionRector;
->>>>>>> 3e5e2bcdac (trigger)
->>>>>>> 9fa73c34b2 (trigger)
+use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\KnownMagicClassMethodTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
@@ -44,16 +38,10 @@ return RectorConfig::configure()
     ->withPhpSets(php80: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
-<<<<<<< HEAD
         Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector::class,
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         AddParamTypeFromPropertyTypeRector::class,
-<<<<<<< HEAD
         KnownMagicClassMethodTypeRector::class,
-=======
-=======
->>>>>>> 166b3935ce ([rector] apply full instanceof set to make object checks explicit)
->>>>>>> 572edd1091 ([rector] apply full instanceof set to make object checks explicit)
         ReturnTypeFromStrictTypedCallRector::class,
         TypedPropertyFromAssignsRector::class,
         ReturnTypeFromStrictNativeCallRector::class,
@@ -69,14 +57,10 @@ return RectorConfig::configure()
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(17)
     ->withSkip([
-<<<<<<< HEAD
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
 
-        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
-=======
         RenameFunctionRector::class,
->>>>>>> 3e5e2bcdac (trigger)
         '*/Test/*',
         '*/Tests/*',
 

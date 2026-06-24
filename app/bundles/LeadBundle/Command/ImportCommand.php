@@ -76,7 +76,7 @@ EOT
             $import = $this->importModel->getImportToProcess();
 
             // No import waiting in the queue. Finish silently.
-            if (!$import instanceof \Mautic\LeadBundle\Entity\Import) {
+            if (!$import instanceof Import) {
                 return Command::SUCCESS;
             }
         }

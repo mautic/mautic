@@ -935,7 +935,7 @@ class Asset extends FormEntity implements UuidInterface
             return pathinfo(parse_url($this->getRemotePath(), PHP_URL_PATH), PATHINFO_EXTENSION);
         }
 
-        if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
+        if (!$this->loadFile() instanceof File) {
             return '';
         }
 
@@ -965,7 +965,7 @@ class Asset extends FormEntity implements UuidInterface
             return $fileInfo;
         }
 
-        if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
+        if (!$this->loadFile() instanceof File) {
             return '';
         }
 
@@ -985,7 +985,7 @@ class Asset extends FormEntity implements UuidInterface
 
         $file = $this->loadFile();
 
-        if (!$file instanceof \Symfony\Component\HttpFoundation\File\File) {
+        if (!$file instanceof File) {
             return '';
         }
 
@@ -1250,7 +1250,7 @@ class Asset extends FormEntity implements UuidInterface
                 $this->setSize(round(curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD)));
             }
 
-            if (!$this->loadFile() instanceof \Symfony\Component\HttpFoundation\File\File) {
+            if (!$this->loadFile() instanceof File) {
                 return 0;
             }
 
