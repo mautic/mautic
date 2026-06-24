@@ -474,6 +474,35 @@ class TrackableModelTest extends TestCase
         }
     }
 
+    #[\PHPUnit\Framework\Attributes\TestDox('Test that a do-not-track link is not corrupted when a tracked URL is a path prefix of its href')]
+    public function testDoNotTrackUrlIsNotCorruptedWhenTrackedUrlIsPrefixOfIt(): void
+    {
+        $model = $this->getModel();
+
+        $content = <<<HTML
+<a href="https://example.com/">Homepage</a>
+<a href="https://example.com/contact/" data-mautic-disable-tracking="true">Contact</a>
+HTML;
+
+        [$processedContent, $trackables] = $model->parseContentForTrackables(
+            $content,
+            [],
+            'email',
+            1
+        );
+
+        // Only the root URL should be tracked; the do-not-track URL must be absent.
+        Assert::assertCount(1, $trackables);
+        $trackedUrl = reset($trackables)->getRedirect()->getUrl();
+        Assert::assertSame('https://example.com/', $trackedUrl);
+
+        // The do-not-track link href must remain exactly as authored.
+        Assert::assertStringContainsString(
+            'href="https://example.com/contact/"',
+            $processedContent
+        );
+    }
+
     #[\PHPUnit\Framework\Attributes\TestDox('Test that css images are not converted if there are no links')]
     public function testCssUrlsAreNotConvertedIfThereAreNoLinks(): void
     {

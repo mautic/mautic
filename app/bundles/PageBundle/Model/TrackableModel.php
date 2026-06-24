@@ -324,12 +324,21 @@ class TrackableModel extends AbstractCommonModel
             // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 // Make the search regular expression match both "&" and "&amp;".
-                $search  = preg_quote($search, '/');
-                $search  = str_replace('&amp;', '&', $search);
-                $search  = str_replace('&', '(?:&|&amp;)', $search);
-                $content = preg_replace(
-                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
-                    '<$1 href=$2'.$replace.'$3$2$4>',
+                $searchPattern = preg_quote($search, '/');
+                $searchPattern = str_replace('&amp;', '&', $searchPattern);
+                $searchPattern = str_replace('&', '(?:&|&amp;)', $searchPattern);
+                $content       = preg_replace_callback(
+                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$searchPattern.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
+                    function (array $m) use ($search, $replace): string {
+                        // Decode HTML entities so raw href suffixes (&amp;) match normalized URLs
+                        // in the do-not-track list (which are stored with plain &).
+                        $fullHref = html_entity_decode($search.$m[3], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        if ($this->isInDoNotTrack($fullHref)) {
+                            return $m[0];
+                        }
+
+                        return '<'.$m[1].' href='.$m[2].$replace.$m[3].$m[2].$m[4].'>';
+                    },
                     $content
                 );
             }
