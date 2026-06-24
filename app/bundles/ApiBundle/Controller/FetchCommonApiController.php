@@ -176,7 +176,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
             && !$this->security->isGranted($this->permissionBase.':viewother')
-            && null !== $user = $userHelper->getUser()
+            && ($user = $userHelper->getUser()) instanceof \Mautic\UserBundle\Entity\User
         ) {
             $this->listFilters[] = [
                 'column' => $tableAlias.'.createdBy',

@@ -99,7 +99,7 @@ class NotificationModel extends FormModel
             $user = $this->userHelper->getUser();
         }
 
-        if (null === $user || !$user->getId()) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User || !$user->getId()) {
             // ensure notifications aren't written for non users
             return;
         }

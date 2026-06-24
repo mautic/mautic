@@ -300,7 +300,7 @@ class SubmissionModel extends CommonFormModel
         $lead = $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
-        if ($lead && $form->usesProgressiveProfiling()) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);

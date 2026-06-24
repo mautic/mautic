@@ -202,7 +202,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         if (!$lead instanceof Lead) {
             $lead = $this->contactTracker->getContact();
 
-            if (null === $lead || !$lead->getId()) {
+            if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
                 return;
             }
         }
