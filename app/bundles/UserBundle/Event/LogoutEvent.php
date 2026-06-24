@@ -16,10 +16,7 @@ class LogoutEvent extends Event
     ) {
     }
 
-    /**
-     * @return User
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -34,18 +31,13 @@ class LogoutEvent extends Event
 
     /**
      * Get session items to be added after session has been cleared.
-     *
-     * @return array
      */
-    public function getPostSessionItems()
+    public function getPostSessionItems(): array
     {
         return $this->session;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

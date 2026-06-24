@@ -60,7 +60,7 @@ class CheckStep implements StepInterface
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        if (!empty($request)) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
     }

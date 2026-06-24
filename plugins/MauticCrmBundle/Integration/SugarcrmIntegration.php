@@ -448,12 +448,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return int|null
-     *
      * @throws \Exception
      *                    To be modified
      */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity($params = []): ?int
     {
         $executed = null;
 

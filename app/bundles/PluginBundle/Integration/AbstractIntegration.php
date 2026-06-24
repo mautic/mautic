@@ -92,6 +92,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected array $persistIntegrationEntities = [];
 
     protected array $commandParameters = [];
+
     private \Closure $clientFactory;
 
     public function __construct(

@@ -177,10 +177,7 @@ class ContactSegmentFilterCrate // NOSONAR Existing segment filter value object 
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->sourceArray;
     }

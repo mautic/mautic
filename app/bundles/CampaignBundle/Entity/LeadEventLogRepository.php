@@ -20,6 +20,7 @@ class LeadEventLogRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+
     public const LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = [])

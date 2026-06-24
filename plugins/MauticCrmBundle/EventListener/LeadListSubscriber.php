@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -89,7 +88,7 @@ class LeadListSubscriber implements EventSubscriberInterface
         // get Integration Campaign members
         $list    = $event->getList();
         $success = false;
-        $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
+        $filters = $list['filters'];
 
         foreach ($filters as $filter) {
             if ('integration_campaigns' == $filter['field']) {

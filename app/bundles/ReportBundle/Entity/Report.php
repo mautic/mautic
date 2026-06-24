@@ -150,6 +150,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      */
     #[Groups(['report:read', 'report:write'])]
     private $scheduleMonthFrequency;
+
     private bool $hasScheduleChanged = false;
 
     public function __clone()

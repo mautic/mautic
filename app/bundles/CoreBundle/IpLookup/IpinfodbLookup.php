@@ -5,8 +5,11 @@ namespace Mautic\CoreBundle\IpLookup;
 class IpinfodbLookup extends AbstractRemoteDataLookup
 {
     public string $statusCode    = '';
+
     public string $statusMessage = '';
+
     public string $ipAddress     = '';
+
     public string $countryCode   = '';
 
     public function getAttribution(): string
