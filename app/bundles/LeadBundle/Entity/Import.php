@@ -619,11 +619,9 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $object
-     *
      * @return Import
      */
-    public function setObject($object)
+    public function setObject(string $object)
     {
         $this->isChanged('object', $object);
         $this->object = $object;

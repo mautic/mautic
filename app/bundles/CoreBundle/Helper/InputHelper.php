@@ -96,9 +96,11 @@ class InputHelper
     /**
      * Wrapper to InputHelper.
      *
+     * @param mixed[] $arguments
+     *
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $arguments)
     {
         return self::getFilter()->clean($arguments[0], $name);
     }

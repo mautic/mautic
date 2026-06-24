@@ -61,6 +61,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     use ProjectTrait;
 
     public const TABLE_NAME  = 'campaigns';
+
     public const ENTITY_NAME = 'campaign';
 
     /**

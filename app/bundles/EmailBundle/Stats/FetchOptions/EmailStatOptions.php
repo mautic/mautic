@@ -118,10 +118,7 @@ class EmailStatOptions extends FetchOptions
         return $this->canViewOthers;
     }
 
-    /**
-     * @param bool $canViewOthers
-     */
-    public function setCanViewOthers($canViewOthers): self
+    public function setCanViewOthers(bool $canViewOthers): self
     {
         $this->canViewOthers = $canViewOthers;
 

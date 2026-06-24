@@ -125,7 +125,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         // set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);

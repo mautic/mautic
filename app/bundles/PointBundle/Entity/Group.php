@@ -16,6 +16,7 @@ class Group extends FormEntity implements UuidInterface
     use UuidTrait;
 
     public const TABLE_NAME  = 'point_groups';
+
     public const ENTITY_NAME = 'point_group';
 
     private ?int $id             = null;

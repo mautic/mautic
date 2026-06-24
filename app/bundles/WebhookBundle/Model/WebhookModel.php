@@ -122,6 +122,7 @@ class WebhookModel extends FormModel
     private ?float $startTime = null;
 
     private bool $disableAutoUnpublish;
+
     private int $webhookRetryDelay;
 
     public function __construct(

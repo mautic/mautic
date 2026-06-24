@@ -702,7 +702,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $zohoFields        = [];
         $silenceExceptions = $settings['silence_exceptions'] ?? true;

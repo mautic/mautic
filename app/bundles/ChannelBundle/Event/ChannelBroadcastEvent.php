@@ -133,10 +133,7 @@ class ChannelBroadcastEvent extends Event
         return $this->maxContactIdFilter;
     }
 
-    /**
-     * @param int $limit
-     */
-    public function setLimit($limit): void
+    public function setLimit(int $limit): void
     {
         $this->limit = $limit;
     }
@@ -146,10 +143,7 @@ class ChannelBroadcastEvent extends Event
         return $this->limit;
     }
 
-    /**
-     * @param int $batch
-     */
-    public function setBatch($batch): void
+    public function setBatch(int $batch): void
     {
         $this->batch = $batch;
     }

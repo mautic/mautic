@@ -134,7 +134,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Set email content.
      */
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         if (null !== $this->helper) {
             $this->helper->setBody($content, 'text/html', null, true);
@@ -158,7 +158,7 @@ class EmailSendEvent extends CommonEvent
         return $this->plainText;
     }
 
-    public function setPlainText($content): void
+    public function setPlainText(string $content): void
     {
         if (null !== $this->helper) {
             $this->helper->setPlainText($content);
@@ -195,10 +195,7 @@ class EmailSendEvent extends CommonEvent
         return $this->subject;
     }
 
-    /**
-     * @param string $subject
-     */
-    public function setSubject($subject): void
+    public function setSubject(string $subject): void
     {
         if (null !== $this->helper) {
             $this->helper->setSubject($subject);

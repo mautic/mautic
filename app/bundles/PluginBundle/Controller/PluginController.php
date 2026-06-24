@@ -138,7 +138,7 @@ class PluginController extends FormController
         $session   = $request->getSession();
 
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
-        $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
+        $authorize              = !empty($integrationDetailsPost['in_auth']);
 
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);

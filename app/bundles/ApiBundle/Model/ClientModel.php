@@ -63,7 +63,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         return self::DEFAULT_API_MODE;
     }
 
-    public function setApiMode($apiMode): void
+    public function setApiMode(?string $apiMode): void
     {
         $this->apiMode = $apiMode;
     }

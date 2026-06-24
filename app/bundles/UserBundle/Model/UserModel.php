@@ -37,6 +37,7 @@ use Twig\Environment;
 class UserModel extends FormModel implements GlobalSearchInterface
 {
     private const INVITE_TOKEN_SELECTOR_BYTES = 16;
+
     private const INVITE_TOKEN_VERIFIER_BYTES = 32;
 
     public function __construct(

@@ -20,6 +20,7 @@ class LeadEventLogRepository extends CommonRepository
     use TimelineTrait;
     use ContactLimiterTrait;
     use ReplicaConnectionTrait;
+
     public const LOG_DELETE_BATCH_SIZE = 5000;
 
     public function getEntities(array $args = [])
@@ -653,11 +654,7 @@ SQL;
         /** @var LeadEventLog $log */
         $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
 
-        if (null !== $log && null !== $log->getFailedLog()) {
-            return true;
-        }
-
-        return false;
+        return null !== $log && null !== $log->getFailedLog();
     }
 
     public function deleteAnonymousContacts(): int

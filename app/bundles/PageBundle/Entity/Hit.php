@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Hit
 {
     public const TABLE_NAME = 'page_hits';
+
     /**
      * @var string
      */
