@@ -157,7 +157,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
 
         $contact = $this->contactObjectHelper->findObjectById($event->getId());
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 

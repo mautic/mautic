@@ -245,7 +245,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     public function setDateTriggered(?\DateTimeInterface $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
-        if (null !== $dateTriggered) {
+        if ($dateTriggered instanceof \DateTimeInterface) {
             $this->setIsScheduled(false);
         }
 

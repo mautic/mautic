@@ -92,7 +92,7 @@ class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        if (!$this->adapter || !$this->fileSystem) {
+        if (!$this->adapter || !$this->fileSystem instanceof ResolvableFilesystem) {
             $keys = $this->getDecryptedApiKeys();
             if (empty($keys['client_id']) || empty($keys['client_secret'])) {
                 $errorMessage = 'Configuration error: client_id and client_secret are not set!';

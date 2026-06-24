@@ -56,7 +56,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
             return $this->apiMode;
         }
 
-        if (null !== $request = $this->requestStack->getCurrentRequest()) {
+        if (($request = $this->requestStack->getCurrentRequest()) instanceof \Symfony\Component\HttpFoundation\Request) {
             return $request->get('api_mode', $request->getSession()->get('mautic.client.filter.api_mode', self::DEFAULT_API_MODE));
         }
 

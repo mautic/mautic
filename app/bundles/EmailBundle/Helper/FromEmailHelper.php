@@ -137,7 +137,7 @@ class FromEmailHelper
 
     public function getFrom(?Email $email): AddressDTO
     {
-        if ($email && $email->getFromAddress()) {
+        if ($email instanceof Email && $email->getFromAddress()) {
             return new AddressDTO($email->getFromAddress(), $email->getFromName());
         }
 

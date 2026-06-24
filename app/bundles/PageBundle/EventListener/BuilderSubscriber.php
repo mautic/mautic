@@ -436,7 +436,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $xpath = $this->createDOMXPathForContent($content);
         $node  = $this->getFirstNodeThatContainsAPreferenceCenterToken($xpath);
 
-        if (null === $node) {
+        if (!$node instanceof \DOMNode) {
             return $content;
         }
 
@@ -465,7 +465,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         // Check if the save button exists in the content. If not, try again with the parentNode.
         if (!str_contains($content, static::saveButtonContainerClass)) {
-            if (null === $node->parentNode) {
+            if (!$node->parentNode instanceof \DOMNode) {
                 throw new \RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
             }
 

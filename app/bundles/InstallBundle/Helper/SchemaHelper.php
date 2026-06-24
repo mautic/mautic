@@ -331,7 +331,7 @@ class SchemaHelper
      */
     private function getSchemaManager(): AbstractSchemaManager
     {
-        if (null !== $this->schemaManager) {
+        if ($this->schemaManager instanceof AbstractSchemaManager) {
             return $this->schemaManager;
         }
 

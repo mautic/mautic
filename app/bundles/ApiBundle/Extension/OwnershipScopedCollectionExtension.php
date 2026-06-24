@@ -36,7 +36,7 @@ final class OwnershipScopedCollectionExtension implements QueryCollectionExtensi
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if (null === $operation) {
+        if (!$operation instanceof Operation) {
             return;
         }
 

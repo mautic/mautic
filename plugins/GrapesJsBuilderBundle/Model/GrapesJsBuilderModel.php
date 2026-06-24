@@ -60,7 +60,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
     public function addOrEditEntity(Email $email): void
     {
         $currentRequest = $this->requestStack->getCurrentRequest();
-        if (!$currentRequest || !$currentRequest->request->has('grapesjsbuilder')) {
+        if (!$currentRequest instanceof Request || !$currentRequest->request->has('grapesjsbuilder')) {
             return;
         }
 
@@ -71,7 +71,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
     public function addOrEditPageEntity(Page $page): void
     {
         $currentRequest = $this->requestStack->getCurrentRequest();
-        if (!$currentRequest || !$currentRequest->request->has('grapesjsbuilder')) {
+        if (!$currentRequest instanceof Request || !$currentRequest->request->has('grapesjsbuilder')) {
             return;
         }
 

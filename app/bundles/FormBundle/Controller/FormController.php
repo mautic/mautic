@@ -998,7 +998,7 @@ class FormController extends CommonFormController
             \assert($model instanceof FormModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof Form) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.form.error.notfound',
@@ -1068,7 +1068,7 @@ class FormController extends CommonFormController
                 $objectId = (int) $objectId;
                 $entity   = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof Form) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.form.error.notfound',

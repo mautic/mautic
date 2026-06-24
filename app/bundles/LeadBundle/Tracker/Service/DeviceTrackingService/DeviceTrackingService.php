@@ -64,7 +64,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return $trackedDevice;
         }
 
-        if (null !== $existingDevice = $this->leadDeviceRepository->findExistingDevice($device)) {
+        if (($existingDevice = $this->leadDeviceRepository->findExistingDevice($device)) instanceof LeadDevice) {
             $device = $existingDevice;
         }
 
@@ -99,7 +99,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             return null;
         }
 

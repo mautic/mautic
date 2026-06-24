@@ -141,14 +141,14 @@ class EventScheduler
      */
     public function getExecutionDateTime(Event $event, ?\DateTimeInterface $compareFromDateTime = null, ?\DateTime $comparedToDateTime = null): \DateTimeInterface
     {
-        if (null === $compareFromDateTime) {
+        if (!$compareFromDateTime instanceof \DateTimeInterface) {
             $compareFromDateTime = new \DateTime();
         } else {
             // Prevent comparisons from modifying original object
             $compareFromDateTime = clone $compareFromDateTime;
         }
 
-        if (null === $comparedToDateTime) {
+        if (!$comparedToDateTime instanceof \DateTime) {
             $comparedToDateTime = clone $compareFromDateTime;
         } else {
             // Prevent comparisons from modifying original object
@@ -199,7 +199,7 @@ class EventScheduler
         $lastPublishDate   = $this->publishStateService->getLastPublishDate($event->getCampaign());
         $scheduledInterval = (new DateTimeHelper())->buildInterval($interval, $unit);
 
-        if (RepublishBehavior::RESTART_ON_PUBLISH->value === $campaignRepublishBehavior && $lastPublishDate) {
+        if (RepublishBehavior::RESTART_ON_PUBLISH->value === $campaignRepublishBehavior && $lastPublishDate instanceof \DateTimeInterface) {
             $lastPublishDatePlusInterval = \DateTimeImmutable::createFromInterface($lastPublishDate)->add($scheduledInterval);
             $log->setTriggerDate(\DateTime::createFromImmutable($lastPublishDatePlusInterval), 'Campaign republish behavior: '.RepublishBehavior::RESTART_ON_PUBLISH->value);
 

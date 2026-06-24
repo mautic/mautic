@@ -164,7 +164,7 @@ class StatRepository extends CommonRepository
             )
             ->setParameter('ids', $notificationIds, ArrayParameterType::INTEGER);
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

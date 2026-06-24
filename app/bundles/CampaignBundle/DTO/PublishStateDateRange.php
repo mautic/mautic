@@ -8,7 +8,7 @@ final class PublishStateDateRange
 {
     public function __construct(private bool $published, private \DateTimeInterface $fromDate, private ?\DateTimeInterface $toDate = null)
     {
-        if ($this->toDate && $this->fromDate > $this->toDate) {
+        if ($this->toDate instanceof \DateTimeInterface && $this->fromDate > $this->toDate) {
             $this->toDate = null; // Invalid range: make it open-ended when fromDate is after toDate
         }
     }
@@ -38,6 +38,6 @@ final class PublishStateDateRange
      */
     public function happenedWithinRange(\DateTimeInterface $date): bool
     {
-        return $date >= $this->fromDate && (null === $this->toDate || $date <= $this->toDate);
+        return $date >= $this->fromDate && (!$this->toDate instanceof \DateTimeInterface || $date <= $this->toDate);
     }
 }

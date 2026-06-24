@@ -278,7 +278,7 @@ class LeadEventLogRepository extends CommonRepository
             ->where(
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
-        if ($dateFrom && $dateTo) {
+        if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
             $failedSq->andWhere('fe.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
@@ -291,7 +291,7 @@ class LeadEventLogRepository extends CommonRepository
           ->setParameter('false', false, 'boolean')
           ->groupBy($groupBy);
 
-        if ($dateFrom && $dateTo) {
+        if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
             $q->andWhere('o.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);

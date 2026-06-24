@@ -20,7 +20,7 @@ final class ObjectCollector implements ObjectCollectorInterface
 
     public function getObjects(): ObjectCollection
     {
-        if (null === $this->objects) {
+        if (!$this->objects instanceof ObjectCollection) {
             $this->collect();
         }
 

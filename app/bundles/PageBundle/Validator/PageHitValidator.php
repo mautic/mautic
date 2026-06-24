@@ -31,7 +31,7 @@ final class PageHitValidator extends ConstraintValidator
             return;
         }
 
-        if ($value->getPage() || $value->getRedirect()) {
+        if ($value->getPage() instanceof \Mautic\PageBundle\Entity\Page || $value->getRedirect()) {
             return;
         }
 

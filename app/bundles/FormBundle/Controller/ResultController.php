@@ -465,7 +465,7 @@ class ResultController extends CommonFormController
         $formPage  = $session->get('mautic.form.page', 1);
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
-        if (null === $form) {
+        if (!$form instanceof \Mautic\FormBundle\Entity\Form) {
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $formPage],

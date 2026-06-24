@@ -511,7 +511,7 @@ class TriggerController extends FormController
             \assert($model instanceof TriggerModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof Trigger) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.point.trigger.error.notfound',
@@ -572,7 +572,7 @@ class TriggerController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof Trigger) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.point.trigger.error.notfound',

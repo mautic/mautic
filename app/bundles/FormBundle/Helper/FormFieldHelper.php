@@ -77,7 +77,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $this->translator = $translator;
 
-        if (null === $validator) {
+        if (!$validator instanceof ValidatorInterface) {
             $validator = $validator = Validation::createValidator();
         }
         $this->validator = $validator;

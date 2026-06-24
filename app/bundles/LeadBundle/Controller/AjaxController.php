@@ -270,7 +270,7 @@ class AjaxController extends CommonAjaxController
             $lead = $leadModel->getEntity($leadId);
             $list = $listModel->getEntity($listId);
 
-            if (null !== $lead && null !== $list) {
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $list instanceof \Mautic\LeadBundle\Entity\LeadList) {
                 $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
                 $leadModel->$class($lead, $list);
                 $dataArray['success'] = 1;
@@ -290,7 +290,7 @@ class AjaxController extends CommonAjaxController
         if (!empty($leadId) && !empty($channel) && in_array($action, ['remove', 'add'])) {
             $lead = $leadModel->getEntity($leadId);
 
-            if (null !== $lead) {
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                 if ('remove' === $action) {
                     $doNotContact->addDncForContact($leadId, $channel, DoNotContact::MANUAL, 'user');
                 } elseif ('add' === $action) {
@@ -323,7 +323,7 @@ class AjaxController extends CommonAjaxController
         $lead     = $leadModel->getEntity($leadId);
         $campaign = $campaignModel->getEntity($campaignId);
 
-        if (null === $lead || null === $campaign) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$campaign instanceof \Mautic\CampaignBundle\Entity\Campaign) {
             return $this->sendJsonResponse($dataArray);
         }
 
@@ -351,7 +351,7 @@ class AjaxController extends CommonAjaxController
             $lead    = $leadModel->getEntity($leadId);
             $company = $companyModel->getEntity($companyId);
 
-            if (null !== $lead && null !== $company) {
+            if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $company instanceof \Mautic\LeadBundle\Entity\Company) {
                 $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
                 $companyModel->$class($company, $lead);
                 $dataArray['success'] = 1;
@@ -526,7 +526,7 @@ class AjaxController extends CommonAjaxController
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
 
-        if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $leadModel->setTags($lead, $updatedTags, true);
 
             /** @var \Doctrine\ORM\PersistentCollection $leadTags */

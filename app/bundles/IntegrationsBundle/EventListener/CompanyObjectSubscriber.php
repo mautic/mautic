@@ -153,7 +153,7 @@ class CompanyObjectSubscriber implements EventSubscriberInterface
 
         $company = $this->companyObjectHelper->findObjectById($event->getId());
 
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return;
         }
 

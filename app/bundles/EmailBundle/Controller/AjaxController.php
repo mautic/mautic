@@ -273,7 +273,7 @@ class AjaxController extends CommonAjaxController
         $emailId     = (int) $request->query->get('id');
         $email       = $model->getEntity($emailId);
 
-        if (null === $email) {
+        if (!$email instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->sendJsonResponse([
                 'message' => $this->translator->trans('mautic.api.call.notfound'),
             ], 404);

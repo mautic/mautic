@@ -73,7 +73,7 @@ class PageSubscriber implements EventSubscriberInterface
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form
+                if ($form instanceof \Mautic\FormBundle\Entity\Form
                     && (
                         $form->isPublished(false)
                         || $this->security->hasEntityAccess(

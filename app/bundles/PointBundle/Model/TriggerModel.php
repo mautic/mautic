@@ -317,7 +317,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             return false;
         }
 
-        if (null === $lead) {
+        if (!$lead instanceof Lead) {
             $lead = $this->contactTracker->getContact();
         }
 

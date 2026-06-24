@@ -661,7 +661,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (!str_contains($column, '.')) {
                         $column = "entity.$column";
                     }
-                    if (null === $expr) {
+                    if (!$expr instanceof CompositeExpression) {
                         $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
                         $qb->andWhere($expr);
                         continue;
@@ -677,7 +677,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $args['qb']    = $qb;
         $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
 
-        if ($dateFrom && $dateTo) {
+        if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
             $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);

@@ -529,7 +529,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $this->flushAndCatch();
             }
 
-            if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
+            if ($hitDateTime instanceof \DateTimeInterface && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
                 $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
@@ -1119,7 +1119,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $failedCount            = 0;
 
         $progress = false;
-        if ($batch && $output) {
+        if ($batch && $output instanceof OutputInterface) {
             $progressCounter = 0;
             $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             if (!$totalLeadCount) {
@@ -1661,7 +1661,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             if (!isset($user['email'])) {
                 $userEntity = $this->userModel->getEntity($id);
 
-                if (null === $userEntity) {
+                if (!$userEntity instanceof \Mautic\UserBundle\Entity\User) {
                     continue;
                 }
 

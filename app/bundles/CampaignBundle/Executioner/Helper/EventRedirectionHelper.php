@@ -42,7 +42,7 @@ class EventRedirectionHelper
         }
 
         // Replace the current event with the redirected event in the collection
-        if ($events && null !== $key) {
+        if ($events instanceof Collection && null !== $key) {
             $events->set($key, $redirectEvent);
         }
 

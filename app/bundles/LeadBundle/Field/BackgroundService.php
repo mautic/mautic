@@ -41,7 +41,7 @@ class BackgroundService
     public function addColumn(int $leadFieldId, ?int $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
-        if (null === $leadField) {
+        if (!$leadField instanceof \Mautic\LeadBundle\Entity\LeadField) {
             throw new LeadFieldWasNotFoundException('LeadField entity was not found');
         }
 
@@ -81,7 +81,7 @@ class BackgroundService
     public function updateColumn(int $leadFieldId, int $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
-        if (null === $leadField) {
+        if (!$leadField instanceof \Mautic\LeadBundle\Entity\LeadField) {
             throw new LeadFieldWasNotFoundException('LeadField entity was not found');
         }
 
@@ -112,7 +112,7 @@ class BackgroundService
     public function deleteColumn(int $leadFieldId, int $userId): void
     {
         $leadField = $this->fieldModel->getEntity($leadFieldId);
-        if (null === $leadField) {
+        if (!$leadField instanceof \Mautic\LeadBundle\Entity\LeadField) {
             throw new LeadFieldWasNotFoundException('LeadField entity was not found');
         }
 

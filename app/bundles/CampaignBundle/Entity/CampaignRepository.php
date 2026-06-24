@@ -485,7 +485,7 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        if ($dateFrom && $dateTo) {
+        if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
             $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
@@ -502,7 +502,7 @@ class CampaignRepository extends CommonRepository
                     )
                 );
 
-            if ($dateFrom && $dateTo) {
+            if ($dateFrom instanceof \DateTimeInterface && $dateTo instanceof \DateTimeInterface) {
                 $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
                     ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                     ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);

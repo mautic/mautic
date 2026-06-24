@@ -230,7 +230,7 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
 
-        if (null === $note || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if (!$note instanceof LeadNote || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $this->throwAccessDenied();
         }
 
@@ -311,7 +311,7 @@ class NoteController extends FormController
         \assert($model instanceof NoteModel);
         $note = $model->getEntity($objectId);
 
-        if (null === $note) {
+        if (!$note instanceof LeadNote) {
             return $this->notFound();
         }
 

@@ -2194,7 +2194,7 @@ class LeadModel extends FormModel
         }
 
         // company does not exist anymore
-        if (null === $company) {
+        if (!$company instanceof Company) {
             return false;
         }
 
@@ -2451,7 +2451,7 @@ class LeadModel extends FormModel
         $lead = $this->getEntity($leadId);
         $tag  = $this->getTagRepository()->find($tagId);
 
-        if ($lead && $tag) {
+        if ($lead instanceof Lead && $tag) {
             $lead->removeTag($tag);
             $this->saveEntity($lead);
         }

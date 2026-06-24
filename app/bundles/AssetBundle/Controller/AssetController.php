@@ -141,7 +141,7 @@ class AssetController extends FormController
         $action          = $this->generateUrl('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if (null === $activeAsset) {
+        if (!$activeAsset instanceof \Mautic\AssetBundle\Entity\Asset) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_asset_index', ['page' => $page]);
 
@@ -223,7 +223,7 @@ class AssetController extends FormController
     {
         $activeAsset = $model->getEntity($objectId);
 
-        if (null === $activeAsset || !$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
+        if (!$activeAsset instanceof \Mautic\AssetBundle\Entity\Asset || !$this->security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             return $this->modalAccessDenied();
         }
 
@@ -440,7 +440,7 @@ class AssetController extends FormController
         ];
 
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\AssetBundle\Entity\Asset) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -612,7 +612,7 @@ class AssetController extends FormController
         if ('POST' === $request->getMethod()) {
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\AssetBundle\Entity\Asset) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.asset.asset.error.notfound',
@@ -676,7 +676,7 @@ class AssetController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\AssetBundle\Entity\Asset) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.asset.asset.error.notfound',

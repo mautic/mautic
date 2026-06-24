@@ -48,7 +48,7 @@ class ContactTracker
 
     public function getContact(): ?Lead
     {
-        if (null !== $this->getRequest() && $this->getRequest()->cookies->get('Blocked-Tracking')) {
+        if ($this->getRequest() instanceof Request && $this->getRequest()->cookies->get('Blocked-Tracking')) {
             return null;
         }
 
@@ -117,7 +117,7 @@ class ContactTracker
         // Generate cookies for the newly tracked contact
         $this->generateTrackingCookies();
 
-        if ($previouslyTrackedContact && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
+        if ($previouslyTrackedContact instanceof Lead && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
             $this->dispatchContactChangeEvent($previouslyTrackedContact, $previouslyTrackedId);
         }
     }
@@ -127,7 +127,7 @@ class ContactTracker
      */
     public function setSystemContact(?Lead $lead = null): void
     {
-        if (null !== $lead) {
+        if ($lead instanceof Lead) {
             $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
 
             $fields = $lead->getFields();
@@ -171,7 +171,7 @@ class ContactTracker
 
     private function getSystemContact(): ?Lead
     {
-        if ($this->useSystemContact() && $this->systemContact) {
+        if ($this->useSystemContact() && $this->systemContact instanceof Lead) {
             $this->logger->debug('CONTACT: System lead is being used');
 
             return $this->systemContact;
@@ -296,7 +296,7 @@ class ContactTracker
 
     private function hydrateCustomFieldData(?Lead $lead = null): void
     {
-        if (null === $lead) {
+        if (!$lead instanceof Lead) {
             return;
         }
 
@@ -311,7 +311,7 @@ class ContactTracker
             return $this->useSystemContact;
         }
 
-        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->getRequest();
+        return $this->isUserSession() || $this->systemContact instanceof Lead || defined('IN_MAUTIC_CONSOLE') || !$this->getRequest() instanceof Request;
     }
 
     private function isUserSession(): bool

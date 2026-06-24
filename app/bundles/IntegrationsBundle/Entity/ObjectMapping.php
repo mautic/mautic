@@ -125,7 +125,7 @@ class ObjectMapping
 
     public function __construct(?\DateTime $dateCreated = null)
     {
-        if (null === $dateCreated) {
+        if (!$dateCreated instanceof \DateTime) {
             $dateCreated = new \DateTime();
         }
 

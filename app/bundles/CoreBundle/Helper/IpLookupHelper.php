@@ -67,7 +67,7 @@ class IpLookupHelper
     {
         $request = $this->getRequest();
 
-        if (null !== $request) {
+        if ($request instanceof Request) {
             $ipHolders = [
                 'HTTP_CLIENT_IP',
                 'HTTP_X_FORWARDED_FOR',
@@ -280,7 +280,7 @@ class IpLookupHelper
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (null === $request) {
+        if (!$request instanceof Request) {
             return $this->getIpAddress()->isTrackable();
         }
 

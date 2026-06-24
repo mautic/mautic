@@ -101,7 +101,7 @@ class SyncDateHelper
         $lastSync = new \DateTimeImmutable($result, new \DateTimeZone('UTC'));
 
         // The last sync is out of the requested sync date/time range
-        if ($this->syncFromDateTime && $lastSync < $this->syncFromDateTime) {
+        if ($this->syncFromDateTime instanceof \DateTimeInterface && $lastSync < $this->syncFromDateTime) {
             return null;
         }
 

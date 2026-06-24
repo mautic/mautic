@@ -598,7 +598,7 @@ class NotificationController extends AbstractFormController
             \assert($model instanceof NotificationModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof Notification) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.notification.error.notfound',
@@ -667,7 +667,7 @@ class NotificationController extends AbstractFormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof Notification) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.notification.error.notfound',

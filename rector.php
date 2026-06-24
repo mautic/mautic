@@ -33,14 +33,20 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
     ])
-    ->withPreparedSets(deadCode: true)
+    ->withPreparedSets(deadCode: true, instanceOf: true)
     ->withPhpSets(php80: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
+<<<<<<< HEAD
         Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector::class,
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         AddParamTypeFromPropertyTypeRector::class,
+<<<<<<< HEAD
         KnownMagicClassMethodTypeRector::class,
+=======
+=======
+>>>>>>> 166b3935ce ([rector] apply full instanceof set to make object checks explicit)
+>>>>>>> 572edd1091 ([rector] apply full instanceof set to make object checks explicit)
         ReturnTypeFromStrictTypedCallRector::class,
         TypedPropertyFromAssignsRector::class,
         ReturnTypeFromStrictNativeCallRector::class,

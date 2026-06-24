@@ -351,7 +351,7 @@ class CompanyController extends FormController
         ];
 
         // form not found
-        if (null === $entity) {
+        if (!$entity instanceof Company) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -723,7 +723,7 @@ class CompanyController extends FormController
             \assert($model instanceof CompanyModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof Company) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.company.error.notfound',
@@ -786,7 +786,7 @@ class CompanyController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof Company) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.company.error.notfound',

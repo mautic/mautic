@@ -879,7 +879,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        if (null !== $event && !$event instanceof LeadFieldEvent) {
+        if ($event instanceof Event && !$event instanceof LeadFieldEvent) {
             throw new \RuntimeException('Event should be LeadFieldEvent|null.');
         }
 

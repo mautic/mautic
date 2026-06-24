@@ -201,7 +201,7 @@ class Interval implements ScheduleModeInterface
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour of %s', $eventId, $contact->getId(), $hour->format('H:i e'))
             );
             $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $eventId, $compareFromDateTime);
-        } elseif ($startTime && $endTime) {
+        } elseif ($startTime instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
             $this->logger->debug(
                 sprintf(
                     'CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour range of %s to %s',

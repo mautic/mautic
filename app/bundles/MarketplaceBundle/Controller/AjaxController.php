@@ -88,7 +88,7 @@ class AjaxController extends CommonAjaxController
         // Note: do not do anything except returning a response after clearing the cache to prevent errors
         $clearCacheResult = $this->clearCacheOrReturnError();
 
-        if (null !== $clearCacheResult) {
+        if ($clearCacheResult instanceof JsonResponse) {
             return $clearCacheResult;
         }
 
@@ -139,7 +139,7 @@ class AjaxController extends CommonAjaxController
         // Note: do not do anything except returning a response after clearing the cache to prevent errors
         $clearCacheResult = $this->clearCacheOrReturnError();
 
-        if (null !== $clearCacheResult) {
+        if ($clearCacheResult instanceof JsonResponse) {
             return $clearCacheResult;
         }
 

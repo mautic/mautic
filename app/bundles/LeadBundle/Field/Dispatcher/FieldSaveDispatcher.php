@@ -44,7 +44,7 @@ class FieldSaveDispatcher
             throw new NoListenerException('There is no Listener for '.$action.' event');
         }
 
-        if (null === $event) {
+        if (!$event instanceof LeadFieldEvent) {
             $event = new LeadFieldEvent($entity, $isNew);
             $event->setEntityManager($this->entityManager);
         }

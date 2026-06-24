@@ -116,7 +116,7 @@ class AuthenticationEvent extends Event
     {
         $this->token                 = $token;
         $this->authenticatingService = $service;
-        $this->isAuthenticated       = null !== $token->getUser();
+        $this->isAuthenticated       = $token->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface;
 
         $this->stopPropagation();
     }
@@ -149,7 +149,7 @@ class AuthenticationEvent extends Event
     {
         $this->authenticatingService = $service;
 
-        if (null !== $user) {
+        if ($user instanceof User) {
             $this->isAuthenticated = true;
             $this->setUser($user, $createIfNotExists);
         }
