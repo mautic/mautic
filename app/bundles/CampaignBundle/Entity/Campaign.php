@@ -582,7 +582,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return Lead[]|Collection
      */
-    public function getLeads()
+    public function getLeads(): Collection
     {
         return $this->leads;
     }
@@ -590,7 +590,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return ArrayCollection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -616,7 +616,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return ArrayCollection<int, Form>
      */
-    public function getForms()
+    public function getForms(): Collection
     {
         return $this->forms;
     }
@@ -642,7 +642,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return array<string, mixed>
      */
-    public function getCanvasSettings()
+    public function getCanvasSettings(): array
     {
         return $this->canvasSettings;
     }
@@ -657,7 +657,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     public function hasOrphanEvents(): bool
     {
-        $canvasSettings = $this->getCanvasSettings() ?? [];
+        $canvasSettings = $this->getCanvasSettings();
 
         if (empty($canvasSettings['nodes'])) {
             return false;

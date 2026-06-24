@@ -331,10 +331,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -352,10 +349,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -384,10 +378,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->type;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }

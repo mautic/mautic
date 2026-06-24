@@ -39,10 +39,7 @@ class DeviceModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return LeadDeviceRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadDeviceRepository
     {
         return $this->leadDeviceRepository;
     }

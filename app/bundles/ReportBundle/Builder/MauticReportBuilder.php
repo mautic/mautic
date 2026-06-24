@@ -159,7 +159,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                         switch ($condition) {
                             case 'startsWith':
-                                $value = $value.'%';
+                                $value .= '%';
                                 break;
                             case 'endsWith':
                                 $value = '%'.$value;
@@ -517,7 +517,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                         break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';
-                                        $filter['value'] = $filter['value'].'%';
+                                        $filter['value'] .= '%';
                                         break;
                                     case 'endsWith':
                                         $exprFunction    = 'like';

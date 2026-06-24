@@ -316,10 +316,8 @@ class UpdateHelper
 
     /**
      * Tries to get server OS.
-     *
-     * @return string
      */
-    private function getServerOs()
+    private function getServerOs(): string
     {
         if (function_exists('php_uname')) {
             return php_uname('s').' '.php_uname('r');

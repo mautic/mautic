@@ -55,18 +55,12 @@ class ChannelBroadcastEvent extends Event
     ) {
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChannel()
+    public function getChannel(): ?string
     {
         return $this->channel;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
+    public function getId(): string|int|null
     {
         return $this->id;
     }
@@ -102,10 +96,7 @@ class ChannelBroadcastEvent extends Event
         return true;
     }
 
-    /**
-     * @return OutputInterface
-     */
-    public function getOutput()
+    public function getOutput(): OutputInterface
     {
         return $this->output;
     }

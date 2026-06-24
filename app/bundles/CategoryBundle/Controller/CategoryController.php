@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -362,9 +361,7 @@ class CategoryController extends AbstractFormController
                         ]
                     );
 
-                    /** @var SubmitButton $applySubmitButton */
-                    $applySubmitButton = $form->get('buttons')->get('apply');
-                    if ($applySubmitButton->isClicked()) {
+                    if ($this->isButtonClicked($form, 'apply')) {
                         // Rebuild the form with new action so that apply doesn't keep creating a clone
                         $action = $this->generateUrl(
                             'mautic_category_action',

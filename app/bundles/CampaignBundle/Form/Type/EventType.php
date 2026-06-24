@@ -68,8 +68,8 @@ class EventType extends AbstractType
                 $label .= '_inaction';
 
                 unset($choices['immediate']);
-                $choices['interval'] = $choices['interval'].'_inaction';
-                $choices['date']     = $choices['date'].'_inaction';
+                $choices['interval'] .= '_inaction';
+                $choices['date'] .= '_inaction';
             }
             $default = array_key_first($choices);
 
@@ -315,10 +315,7 @@ class EventType extends AbstractType
         $resolver->setRequired(['settings']);
     }
 
-    /**
-     * @return \DateTime|mixed|null
-     */
-    private function getTimeValue(array $data, $name)
+    private function getTimeValue(array $data, string $name): ?\DateTime
     {
         if (empty($data[$name])) {
             return null;
@@ -329,10 +326,33 @@ class EventType extends AbstractType
         }
 
         if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
-            return new \DateTime($data[$name]['date']);
+            return $this->parseTimeValue($data[$name]['date']);
         } elseif (is_string($data[$name])) {
-            return new \DateTime($data[$name]);
+            return $this->parseTimeValue($data[$name]);
         }
+
+        return null;
+    }
+
+    private function parseTimeValue(string $value): \DateTime
+    {
+        $trimmedValue = trim($value);
+
+        if (preg_match('/^\d{1,2}$/', $trimmedValue)) {
+            $parsed = \DateTime::createFromFormat('!H', $trimmedValue);
+            if (false !== $parsed) {
+                return $parsed;
+            }
+        }
+
+        if (preg_match('/^\d{1,2}:\d{2}$/', $trimmedValue)) {
+            $parsed = \DateTime::createFromFormat('!H:i', $trimmedValue);
+            if (false !== $parsed) {
+                return $parsed;
+            }
+        }
+
+        return new \DateTime($trimmedValue);
     }
 
     public function getBlockPrefix(): string

@@ -216,10 +216,7 @@ class TweetStat
         $this->lead = $lead;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getRetryCount()
+    public function getRetryCount(): ?int
     {
         return $this->retryCount;
     }
@@ -237,10 +234,7 @@ class TweetStat
         $this->setRetryCount($this->getRetryCount() + 1);
     }
 
-    /**
-     * @return ?int
-     */
-    public function getFavoriteCount()
+    public function getFavoriteCount(): ?int
     {
         return $this->favoriteCount;
     }
@@ -257,10 +251,7 @@ class TweetStat
         return $this;
     }
 
-    /**
-     * @return ?int
-     */
-    public function getRetweetCount()
+    public function getRetweetCount(): ?int
     {
         return $this->retweetCount;
     }
@@ -277,10 +268,7 @@ class TweetStat
         return $this;
     }
 
-    /**
-     * @return ?bool
-     */
-    public function getIsFailed()
+    public function getIsFailed(): ?bool
     {
         return $this->isFailed;
     }
@@ -293,10 +281,7 @@ class TweetStat
         $this->isFailed = $isFailed;
     }
 
-    /**
-     * @return ?bool
-     */
-    public function isFailed()
+    public function isFailed(): ?bool
     {
         return $this->getIsFailed();
     }
@@ -352,7 +337,7 @@ class TweetStat
     /**
      * @return ?mixed[]
      */
-    public function getResponseDetails()
+    public function getResponseDetails(): ?array
     {
         return $this->responseDetails;
     }

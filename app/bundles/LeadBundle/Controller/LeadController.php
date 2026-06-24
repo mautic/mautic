@@ -113,7 +113,7 @@ class LeadController extends FormController
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
-        $orderBy    = $orderBy.$orderById;
+        $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
         $filter      = ['string' => $search, 'force' => ''];
@@ -2199,7 +2199,7 @@ class LeadController extends FormController
         $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
         // Add an id field to orderBy. Prevent Null-value ordering
         $orderById  = 'l.id' !== $orderBy ? ', l.id' : '';
-        $orderBy    = $orderBy.$orderById;
+        $orderBy .= $orderById;
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
         $ids        = $request->get('ids');
 

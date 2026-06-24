@@ -238,7 +238,7 @@ class Import extends FormEntity
      */
     public function isBackgroundProcess(): bool
     {
-        return !(self::MANUAL === $this->getStatus());
+        return self::MANUAL !== $this->getStatus();
     }
 
     /**
@@ -631,10 +631,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->object;
     }

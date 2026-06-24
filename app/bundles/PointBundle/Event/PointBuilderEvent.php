@@ -60,10 +60,7 @@ class PointBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * @return array
-     */
-    public function getActions()
+    public function getActions(): array
     {
         uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
             $a['label'], $b['label']));

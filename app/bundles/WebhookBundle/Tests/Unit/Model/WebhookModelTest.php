@@ -145,7 +145,7 @@ class WebhookModelTest extends TestCase
         $queueMock->method('getPayload')->willReturn('{"the": "payload"}');
         $queueMock->method('getEvent')->willReturn($event);
         $queueMock->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
-        $queueMock->method('getId')->willReturn(12);
+        $queueMock->method('getId')->willReturn('12');
 
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
 

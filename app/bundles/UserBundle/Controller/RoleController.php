@@ -16,10 +16,8 @@ class RoleController extends FormController
 {
     /**
      * @param int|string|null $objectId
-     *
-     * @return string
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         $base = 'role';
 

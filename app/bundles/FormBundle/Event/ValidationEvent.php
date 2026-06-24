@@ -20,10 +20,7 @@ class ValidationEvent extends CommonEvent
     ) {
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }

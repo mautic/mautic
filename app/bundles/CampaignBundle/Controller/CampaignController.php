@@ -427,12 +427,12 @@ class CampaignController extends AbstractStandardFormController
         return $this->indexStandard($request, $page);
     }
 
-    protected function getDefaultOrderColumn()
+    protected function getDefaultOrderColumn(): string
     {
         return 'dateModified';
     }
 
-    protected function getDefaultOrderDirection()
+    protected function getDefaultOrderDirection(): string
     {
         return 'DESC';
     }

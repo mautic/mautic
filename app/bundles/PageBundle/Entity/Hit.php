@@ -620,10 +620,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return ?Page
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }

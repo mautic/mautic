@@ -485,7 +485,7 @@ class SubmissionRepository extends CommonRepository
                 break;
             case 'startsWith':
                 $operatorExpr    = 'like';
-                $value           = $value.'%';
+                $value .= '%';
                 break;
             case 'endsWith':
                 $operatorExpr   = 'like';

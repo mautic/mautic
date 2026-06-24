@@ -17,10 +17,7 @@ class IconEvent extends Event
     ) {
     }
 
-    /**
-     * @return CorePermissions
-     */
-    public function getSecurity()
+    public function getSecurity(): CorePermissions
     {
         return $this->security;
     }
