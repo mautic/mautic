@@ -1119,7 +1119,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $failedCount            = 0;
 
         $progress = false;
-        if ($batch && $output instanceof \Symfony\Component\Console\Output\OutputInterface) {
+        if ($batch && $output instanceof OutputInterface) {
             $progressCounter = 0;
             $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             if (!$totalLeadCount) {

@@ -458,7 +458,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                     $this->addLead($l, $leadList, false, true, -1, $dtHelper->getLocalDateTime());
 
                     ++$leadsProcessed;
-                    if ($output instanceof \Symfony\Component\Console\Output\OutputInterface && $leadsProcessed < $maxCount) {
+                    if ($output instanceof OutputInterface && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 
@@ -541,7 +541,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                     $this->removeLead($l, $leadList, false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
-                    if ($output instanceof \Symfony\Component\Console\Output\OutputInterface && $leadsProcessed < $maxCount) {
+                    if ($output instanceof OutputInterface && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 

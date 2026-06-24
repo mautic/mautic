@@ -293,11 +293,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             }
         } elseif ('owner' === $prop) {
             $current = $this->getOwner();
-            if ($current instanceof \Mautic\UserBundle\Entity\User && !$val) {
+            if ($current instanceof User && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {
                 $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current instanceof \Mautic\UserBundle\Entity\User && $current->getId() != $val->getId()) {
+            } elseif ($current instanceof User && $current->getId() != $val->getId()) {
                 $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
                     $val->getName().'('.$val->getId().')',

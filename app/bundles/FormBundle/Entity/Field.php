@@ -882,7 +882,7 @@ class Field implements UuidInterface
             }
         }
 
-        if ($displayManager instanceof \Mautic\FormBundle\ProgressiveProfiling\DisplayManager && $displayManager->useProgressiveProfilingLimit()) {
+        if ($displayManager instanceof DisplayManager && $displayManager->useProgressiveProfilingLimit()) {
             if (!$displayManager->showForField($this)) {
                 return false;
             }

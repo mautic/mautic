@@ -44,7 +44,7 @@ class EmailToUserAccessor
             }
         }
 
-        if ($this->shouldSentToOwner() && $owner instanceof \Mautic\UserBundle\Entity\User && !in_array($owner->getId(), $userIds)) {
+        if ($this->shouldSentToOwner() && $owner instanceof User && !in_array($owner->getId(), $userIds)) {
             $users[] = ['id' => $owner->getId()];
         }
 

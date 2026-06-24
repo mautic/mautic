@@ -448,7 +448,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
+        if (!$lead instanceof Lead || !$lead->getId()) {
             // Lead came from a non-trackable IP so ignore
             return false;
         }

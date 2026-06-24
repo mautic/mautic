@@ -117,7 +117,7 @@ class DsnType extends AbstractType
             ]
         );
 
-        if ($options['test_button']['action'] && $this->getCurrentDsn($name) instanceof \Mautic\CoreBundle\Helper\Dsn\Dsn) {
+        if ($options['test_button']['action'] && $this->getCurrentDsn($name) instanceof Dsn) {
             $builder->add(
                 'test_button',
                 StandAloneButtonType::class,

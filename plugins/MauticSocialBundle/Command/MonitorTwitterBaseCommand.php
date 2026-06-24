@@ -155,7 +155,7 @@ abstract class MonitorTwitterBaseCommand extends Command
 
         $monitor = $this->twitterCommandHelper->getMonitor($mid);
 
-        if (!$monitor instanceof \MauticPlugin\MauticSocialBundle\Entity\Monitoring || !$monitor->getId()) {
+        if (!$monitor instanceof Monitoring || !$monitor->getId()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.monitor.does.not.exist', ['%id%' => $mid]));
 
             return Command::FAILURE;

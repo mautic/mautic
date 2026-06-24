@@ -120,12 +120,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
             $dwc     =  $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
             $utmTags = [];
-<<<<<<< HEAD
 
             if ($dwc instanceof DynamicContent) {
-=======
-            if ($dwc instanceof \Mautic\DynamicContentBundle\Entity\DynamicContent && $dwc instanceof DynamicContent) {
->>>>>>> 90a353c763 (Apply BinaryOpNullableToInstanceofRector)
                 $utmTags = $dwc->getUtmTags();
             }
 

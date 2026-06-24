@@ -253,7 +253,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
 
-        if (!$email instanceof \Mautic\EmailBundle\Entity\Email || !$email->isPublished()) {
+        if (!$email instanceof Email || !$email->isPublished()) {
             $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
 
             return;

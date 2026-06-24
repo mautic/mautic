@@ -117,7 +117,7 @@ class ContactTracker
         // Generate cookies for the newly tracked contact
         $this->generateTrackingCookies();
 
-        if ($previouslyTrackedContact instanceof \Mautic\LeadBundle\Entity\Lead && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
+        if ($previouslyTrackedContact instanceof Lead && $previouslyTrackedContact->getId() != $this->trackedContact->getId()) {
             $this->dispatchContactChangeEvent($previouslyTrackedContact, $previouslyTrackedId);
         }
     }
@@ -171,7 +171,7 @@ class ContactTracker
 
     private function getSystemContact(): ?Lead
     {
-        if ($this->useSystemContact() && $this->systemContact instanceof \Mautic\LeadBundle\Entity\Lead) {
+        if ($this->useSystemContact() && $this->systemContact instanceof Lead) {
             $this->logger->debug('CONTACT: System lead is being used');
 
             return $this->systemContact;
@@ -308,7 +308,7 @@ class ContactTracker
             return $this->useSystemContact;
         }
 
-        return $this->isUserSession() || $this->systemContact instanceof \Mautic\LeadBundle\Entity\Lead || defined('IN_MAUTIC_CONSOLE') || null === $this->getRequest();
+        return $this->isUserSession() || $this->systemContact instanceof Lead || defined('IN_MAUTIC_CONSOLE') || null === $this->getRequest();
     }
 
     private function isUserSession(): bool
