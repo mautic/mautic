@@ -30,6 +30,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use ExpressionHelperTrait;
     use OperatorListTrait;
 
+    private const EXISTS_EXPRESSION     = 'EXISTS';
+
+    private const NOT_EXISTS_EXPRESSION = 'NOT EXISTS';
+
     private static LeadFieldRepository $leadFieldRepository;
 
     /**
@@ -746,6 +750,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $eqExpr   = $operators['='][$exprType];
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
+
+        $formSearchCommand = $this->translator->trans('mautic.lead.lead.searchcommand.form');
+        if ($command === $this->translator->trans('mautic.lead.lead.searchcommand.form', [], null, 'en_US')) {
+            $command = $formSearchCommand;
+        }
+
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -801,7 +811,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
-                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
+                $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
@@ -955,11 +965,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
                     $returnParameter = true;
                 }
-                $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
+                $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';
                 $filter->strict = true;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.form'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.form', [], null, 'en_US'):
+            case $formSearchCommand:
                 if (empty($string)) {
                     $expr = $q->expr()->eq(1, 0);
                     break;
@@ -975,7 +984,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         )
                     );
                 $filter->strict = true;
-                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
+                $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
                 $q->setParameter($unique, $string);
                 break;
             default:
@@ -1489,5 +1498,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('alias', $alias)
             ->executeQuery()
             ->fetchFirstColumn();
+    }
+
+    private function getExistsExpression(bool $isNegated): string
+    {
+        return $isNegated ? self::NOT_EXISTS_EXPRESSION : self::EXISTS_EXPRESSION;
     }
 }
