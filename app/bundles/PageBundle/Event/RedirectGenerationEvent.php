@@ -26,20 +26,16 @@ class RedirectGenerationEvent extends CommonEvent
 
     /**
      * Get the redirect from the event.
-     *
-     * @return Redirect
      */
-    public function getRedirect()
+    public function getRedirect(): Redirect
     {
         return $this->redirect;
     }
 
     /**
      * Get the modified clickthrough from the event.
-     *
-     * @return array
      */
-    public function getClickthrough()
+    public function getClickthrough(): array
     {
         return $this->clickthrough;
     }

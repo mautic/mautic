@@ -86,10 +86,7 @@ class Fetcher
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }

@@ -441,7 +441,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new SmsEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

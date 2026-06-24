@@ -63,10 +63,7 @@ class DisplayManager
         return '' != $this->form->getProgressiveProfilingLimit();
     }
 
-    /**
-     * @return DisplayCounter
-     */
-    public function getDisplayCounter()
+    public function getDisplayCounter(): DisplayCounter
     {
         return $this->displayCounter;
     }

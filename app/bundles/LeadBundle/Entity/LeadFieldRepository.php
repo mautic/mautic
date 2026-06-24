@@ -339,7 +339,7 @@ class LeadFieldRepository extends CommonRepository
                 switch ($operatorExpr) {
                     case 'startsWith':
                         $operatorExpr    = 'like';
-                        $value           = $value.'%';
+                        $value .= '%';
                         break;
                     case 'endsWith':
                         $operatorExpr   = 'like';

@@ -166,10 +166,8 @@ class StatsEvent extends Event
 
     /**
      * Returns the order.
-     *
-     * @return array
      */
-    public function getOrder()
+    public function getOrder(): array
     {
         return $this->order;
     }
@@ -247,10 +245,7 @@ class StatsEvent extends Event
         return $this->hasResults;
     }
 
-    /**
-     * @return User
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }
