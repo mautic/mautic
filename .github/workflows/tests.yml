@@ -214,13 +214,6 @@ jobs:
             ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}
             ${{ runner.os }}-phpunit-
 
-      # Add this step to resolve the Node v18 vs v24 mismatch
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '24'
-          cache: 'npm'       # enables faster local caching
-
       - name: Setup PHP, with composer and extensions
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
