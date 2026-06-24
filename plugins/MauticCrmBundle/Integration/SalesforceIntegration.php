@@ -167,11 +167,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function updateDncByDate(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
-        if (isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0]) {
-            return true;
-        }
 
-        return false;
+        return isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0];
     }
 
     /**

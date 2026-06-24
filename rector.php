@@ -37,10 +37,12 @@ return RectorConfig::configure()
     ->withPhpSets(php80: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
-        Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector::class,
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         AddParamTypeFromPropertyTypeRector::class,
         KnownMagicClassMethodTypeRector::class,
+        // flips nested negated conditions to same-meaning clear ones
+        Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector::class,
+        Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector::class,
         ReturnTypeFromStrictTypedCallRector::class,
         TypedPropertyFromAssignsRector::class,
         ReturnTypeFromStrictNativeCallRector::class,
@@ -54,7 +56,7 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withTypeCoverageLevel(23)
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(17)
+    ->withCodeQualityLevel(19)
     ->withSkip([
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,

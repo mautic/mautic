@@ -1763,11 +1763,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
         // example format: '^choice1^,^choice2^,^choice_3^'
         $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
-        if (preg_match($regex, $stringToCheck)) {
-            return true;
-        }
 
-        return false;
+        return (bool) preg_match($regex, $stringToCheck);
     }
 
     /**

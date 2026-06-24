@@ -26,6 +26,7 @@ class ConsoleErrorListener
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),
+
             $command instanceof \Symfony\Component\Console\Command\Command ? $command->getName() : 'UNKNOWN',
             "\n[stack trace]\n".$exception->getTraceAsString()
         );

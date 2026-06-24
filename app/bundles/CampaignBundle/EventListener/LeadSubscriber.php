@@ -79,7 +79,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
 
         $options                   = $event->getQueryOptions();
-        $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
+        $options['scheduledState'] = 'campaign.event' !== $eventTypeKey;
         $logs                      = $leadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->eventCollector->getEventsArray();
 
