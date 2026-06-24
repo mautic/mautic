@@ -388,7 +388,7 @@ final class StageController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
     {
