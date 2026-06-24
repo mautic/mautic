@@ -20,10 +20,7 @@ class ValidationEvent extends CommonEvent
     ) {
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }
@@ -36,7 +33,7 @@ class ValidationEvent extends CommonEvent
         return $this->value;
     }
 
-    public function failedValidation($reason): void
+    public function failedValidation(string $reason): void
     {
         $this->valid         = false;
         $this->invalidReason = $reason;

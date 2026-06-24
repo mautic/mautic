@@ -22,10 +22,7 @@ class MessageQueueBatchProcessEvent extends Event
         return $channel === $this->channel;
     }
 
-    /**
-     * @return array
-     */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }

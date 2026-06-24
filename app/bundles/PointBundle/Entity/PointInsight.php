@@ -127,10 +127,7 @@ class PointInsight extends FormEntity
             ->build();
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -141,11 +138,9 @@ class PointInsight extends FormEntity
     }
 
     /**
-     * @param string $name
-     *
      * @return PointInsight
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;

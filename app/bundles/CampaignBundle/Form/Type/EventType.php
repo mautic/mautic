@@ -68,8 +68,8 @@ class EventType extends AbstractType
                 $label .= '_inaction';
 
                 unset($choices['immediate']);
-                $choices['interval'] = $choices['interval'].'_inaction';
-                $choices['date']     = $choices['date'].'_inaction';
+                $choices['interval'] .= '_inaction';
+                $choices['date'] .= '_inaction';
             }
             $default = array_key_first($choices);
 

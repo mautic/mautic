@@ -40,7 +40,7 @@ class YearStat implements StatInterface
     /**
      * @return MonthStat[]
      */
-    public function getStats()
+    public function getStats(): array
     {
         return $this->stats;
     }

@@ -26,10 +26,8 @@ class EmailOpenEvent extends CommonEvent
 
     /**
      * Returns the Email entity.
-     *
-     * @return Email
      */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }

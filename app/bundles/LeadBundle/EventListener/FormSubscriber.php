@@ -189,7 +189,7 @@ class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if (!empty($pointGroup)) {
+        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);

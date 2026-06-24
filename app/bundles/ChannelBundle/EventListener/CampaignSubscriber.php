@@ -56,7 +56,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $decisions = [];
         foreach ($channels as $channel) {
             if (isset($channel['campaignDecisionsSupported'])) {
-                $decisions = $decisions + $channel['campaignDecisionsSupported'];
+                $decisions += $channel['campaignDecisionsSupported'];
             }
         }
 
