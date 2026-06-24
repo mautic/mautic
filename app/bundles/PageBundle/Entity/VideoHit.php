@@ -565,7 +565,7 @@ class VideoHit
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -621,7 +621,7 @@ class VideoHit
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {

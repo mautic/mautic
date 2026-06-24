@@ -40,10 +40,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         return $this->operators;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }

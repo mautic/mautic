@@ -209,10 +209,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get the MailHelper object.
-     *
-     * @return MailHelper
      */
-    public function getHelper()
+    public function getHelper(): ?MailHelper
     {
         return $this->helper;
     }

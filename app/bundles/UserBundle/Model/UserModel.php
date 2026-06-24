@@ -12,10 +12,13 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserInvite;
+use Mautic\UserBundle\Entity\UserInviteRepositoryInterface;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
 use Mautic\UserBundle\Event\UserEvent;
+use Mautic\UserBundle\Exception\PasswordResetTokenCreationFailedException;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
@@ -23,16 +26,19 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
  * @extends FormModel<User>
  */
 class UserModel extends FormModel implements GlobalSearchInterface
 {
+    private const INVITE_TOKEN_SELECTOR_BYTES = 16;
+    private const INVITE_TOKEN_VERIFIER_BYTES = 32;
+
     public function __construct(
         protected MailHelper $mailHelper,
         private UserTokenServiceInterface $userTokenService,
@@ -44,6 +50,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private Environment $twig,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -64,7 +71,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof User) {
-            throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
+            throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
         }
 
         parent::saveEntity($entity, $unlock);
@@ -110,7 +117,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof User) {
-            throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
+            throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
         }
         if (!empty($action)) {
             $options['action'] = $action;
@@ -158,7 +165,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
-            throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
+            throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
         }
 
         switch ($action) {
@@ -217,7 +224,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, UserPasswordHasher $hasher, $newPassword): void
+    public function resetPassword(User $user, UserPasswordHasherInterface $hasher, $newPassword): void
     {
         $hashedPassword = $this->checkNewPassword($user, $hasher, $newPassword);
 
@@ -255,7 +262,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws PasswordResetTokenCreationFailedException
      */
     public function sendResetEmail(User $user): void
     {
@@ -265,9 +272,9 @@ class UserModel extends FormModel implements GlobalSearchInterface
         $this->em->persist($resetToken);
         try {
             $this->em->flush();
-        } catch (\Exception $exception) {
-            $this->logger->error($exception->getMessage());
-            throw new \RuntimeException();
+        } catch (\Doctrine\DBAL\Exception $exception) {
+            $this->logger->error($this->translator->trans('mautic.user.password.reset.token.creation.database.error', [], 'messages').': '.$exception->getMessage());
+            throw new PasswordResetTokenCreationFailedException($this->translator->trans('mautic.user.password.reset.token.creation.failed'), 0, $exception);
         }
         $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -390,5 +397,138 @@ class UserModel extends FormModel implements GlobalSearchInterface
     public function getOwnerListChoices(): array
     {
         return $this->getRepository()->getOwnerListChoices();
+    }
+
+    public function hasUserWithEmail(string $email): bool
+    {
+        return null !== $this->getRepository()->findOneBy(['email' => $email]);
+    }
+
+    public function createInvite(string $email, Role $role): UserInvite
+    {
+        $inviteToken = $this->createInviteToken();
+        $invite      = (new UserInvite($role))
+            ->setEmail($email)
+            ->setTokenSelector($inviteToken['selector'])
+            ->setTokenVerifierHash(password_hash($inviteToken['verifier'], PASSWORD_DEFAULT))
+            ->setExpiration((new \DateTime())->add(new \DateInterval('PT48H')));
+        $this->getUserInviteRepository()->revokeOutstandingInvites($email);
+        $this->em->persist($invite);
+        $this->em->flush();
+
+        $link   = $this->router->generate('mautic_user_invite_register', ['token' => $inviteToken['token']], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mailer = $this->mailHelper->getMailer();
+        $mailer->setTo([$email => $email]);
+        $mailer->setSubject($this->translator->trans('mautic.user.invite.subject'));
+        $text = $this->translator->trans('mautic.user.invite.email.body', ['%invite_link%' => $link]);
+        $text = str_replace('\\n', "\n", $text);
+        $mailer->setBody($this->twig->render('@MauticUser/Email/invite.html.twig', [
+            'inviteLink' => $link,
+        ]));
+        $mailer->setPlainText($text);
+        $mailer->send();
+
+        return $invite;
+    }
+
+    public function getInvite(string $token): ?UserInvite
+    {
+        $inviteToken = $this->parseInviteToken($token);
+        if (null === $inviteToken) {
+            $this->logInvalidInvite('token format is invalid');
+
+            return null;
+        }
+
+        $invite = $this->getUserInviteRepository()->findOneByTokenSelector($inviteToken['selector']);
+        if (null === $invite) {
+            $this->logInvalidInvite('token selector was not found', null, $inviteToken['selector']);
+
+            return null;
+        }
+        if ($invite->isUsed()) {
+            $this->logInvalidInvite('invite has already been used', $invite);
+
+            return null;
+        }
+        if ($invite->getExpiration() < new \DateTime()) {
+            $this->logInvalidInvite('invite has expired', $invite);
+
+            return null;
+        }
+        if (!password_verify($inviteToken['verifier'], (string) $invite->getTokenVerifierHash())) {
+            $this->logInvalidInvite('token verifier did not match', $invite);
+
+            return null;
+        }
+
+        return $invite;
+    }
+
+    public function markInviteUsed(UserInvite $invite): void
+    {
+        $invite->setUsed(true);
+        $this->em->persist($invite);
+        $this->em->flush();
+    }
+
+    /**
+     * @return array{selector: string, verifier: string, token: string}
+     */
+    private function createInviteToken(): array
+    {
+        $selector = bin2hex(random_bytes(self::INVITE_TOKEN_SELECTOR_BYTES));
+        $verifier = bin2hex(random_bytes(self::INVITE_TOKEN_VERIFIER_BYTES));
+
+        return [
+            'selector' => $selector,
+            'verifier' => $verifier,
+            'token'    => $selector.'.'.$verifier,
+        ];
+    }
+
+    /**
+     * @return array{selector: string, verifier: string}|null
+     */
+    private function parseInviteToken(string $token): ?array
+    {
+        $tokenParts = explode('.', $token, 2);
+        if (2 !== count($tokenParts)) {
+            return null;
+        }
+
+        [$selector, $verifier] = $tokenParts;
+        if ('' === $selector || '' === $verifier) {
+            return null;
+        }
+
+        return [
+            'selector' => $selector,
+            'verifier' => $verifier,
+        ];
+    }
+
+    private function getUserInviteRepository(): UserInviteRepositoryInterface
+    {
+        $repository = $this->em->getRepository(UserInvite::class);
+        \assert($repository instanceof UserInviteRepositoryInterface);
+
+        return $repository;
+    }
+
+    private function logInvalidInvite(string $reason, ?UserInvite $invite = null, ?string $selector = null): void
+    {
+        if ($invite) {
+            $context = [
+                'invite_id' => $invite->getId(),
+                'email'     => $invite->getEmail(),
+            ];
+        } elseif (null !== $selector) {
+            $context = ['selector' => $selector];
+        } else {
+            $context = [];
+        }
+
+        $this->logger->warning('User invite link rejected: '.$reason, $context);
     }
 }

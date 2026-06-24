@@ -4,6 +4,7 @@ namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -73,17 +74,25 @@ class MessageQueueRepository extends CommonRepository
 
         if (!empty($ids)) {
             $expr = $expr->with(
-                $q->expr()->in($this->getTableAlias().'.channel_id', $ids)
+                $q->expr()->in($this->getTableAlias().'.channel_id', ':ids')
             );
         }
 
         return (int) $q->select('count(*)')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', $this->getTableAlias())
             ->where($expr)
-            ->setParameter('channel', $channel)
-            ->setParameter('status', MessageQueue::STATUS_SENT)
-            ->setParameter('ids', $ids, ArrayParameterType::INTEGER)
-            ->executeQuery()
+            ->setParameters(
+                [
+                    'channel' => $channel,
+                    'status'  => MessageQueue::STATUS_SENT,
+                    'ids'     => $ids,
+                ],
+                [
+                    'channel' => Types::STRING,
+                    'status'  => Types::STRING,
+                    'ids'     => ArrayParameterType::INTEGER,
+                ]
+            )->executeQuery()
             ->fetchOne();
     }
 

@@ -20,10 +20,7 @@ class ReportQueryEvent extends AbstractReportEvent
         $this->totalResults = (int) $totalResults;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQuery()
+    public function getQuery(): QueryBuilder
     {
         return $this->query;
     }
@@ -36,10 +33,7 @@ class ReportQueryEvent extends AbstractReportEvent
         $this->query = $query;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

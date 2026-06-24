@@ -423,7 +423,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                 if (pageNumber > 1) {
                     // Hide other pages by default
-                    page.style.display = 'none';
+                    page.classList.add('mauticform-page-hidden');
                 }
 
                 if (pageBreak) {
@@ -463,7 +463,7 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
 
                     if (1 === pageNumber) {
                         prevButton.setAttribute('disabled', 'disabled');
-                        pageBreak.style.display = 'block';
+                        pageBreak.classList.remove('mauticform-page-hidden');
                     } else {
                         if (lastPageNumber === pageNumber) {
                             var theSubmit = theForm.querySelector('button[type="submit"]').parentNode;
@@ -479,23 +479,23 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
             var pages          = theForm.querySelectorAll('[data-mautic-form-page]');
             [].forEach.call(pages, function (page) {
                 // Hide all pages
-                page.style.display = 'none';
+                page.classList.add('mauticform-page-hidden');
 
                 var pageNumber = parseInt(page.getAttribute('data-mautic-form-page'));
                 var pageBreak  = theForm.querySelector('[data-mautic-form-pagebreak="'+pageNumber+'"]');
                 if (pageBreak) {
-                    pageBreak.style.display = 'none';
+                    pageBreak.classList.add('mauticform-page-hidden');
                 }
             });
 
             // Show the wanted page
             var thePage = theForm.querySelector('[data-mautic-form-page="' + showPageNumber + '"]');
             if (thePage) {
-                thePage.style.display = 'block'
+                thePage.classList.remove('mauticform-page-hidden');
             }
             var showPageBreak = theForm.querySelector('[data-mautic-form-pagebreak="' + showPageNumber + '"]');
             if (showPageBreak) {
-                showPageBreak.style.display = 'block';
+                showPageBreak.classList.remove('mauticform-page-hidden');
             }
         };
 
@@ -637,14 +637,12 @@ var t,e;t=this,e=function(){"use strict";function t(t,e){var n=Object.keys(t);if
                         if (typeof theForm.elements[name] != 'undefined') {
                             switch (field.type) {
                                 case 'radiogrp':
-                                    var elOptions = theForm.elements[name];
+                                case 'rating':
+                                case 'checkboxgrp': {
+                                    const elOptions = theForm.elements[name];
                                     valid = validator.validateOptions(elOptions);
                                     break;
-
-                                case 'checkboxgrp':
-                                    var elOptions = theForm.elements[name];
-                                    valid = validator.validateOptions(elOptions);
-                                    break;
+                                }
 
                                 case 'email':
                                     valid = validator.validateEmail(theForm.elements[name].value);

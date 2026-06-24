@@ -37,10 +37,7 @@ class Hit
      */
     private $redirect;
 
-    /**
-     * @var Email|null
-     */
-    private $email;
+    private ?Email $email = null;
 
     /**
      * @var Lead|null
@@ -623,10 +620,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return ?Page
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }
@@ -720,7 +714,7 @@ class Hit
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -795,18 +789,12 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail(Email $email): void
+    public function setEmail(?Email $email): void
     {
         $this->email = $email;
     }

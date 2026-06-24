@@ -85,7 +85,7 @@ class ImportModel extends FormModel
         $parallelImportLimit = $this->getParallelImportLimit();
         $importsInProgress   = $this->getRepository()->countImportsInProgress();
 
-        return !($importsInProgress >= $parallelImportLimit);
+        return $importsInProgress < $parallelImportLimit;
     }
 
     /**
@@ -167,12 +167,6 @@ class ImportModel extends FormModel
         }
 
         $this->setGhostImportsAsFailed();
-
-        if (!$import) {
-            $msg = 'import is empty, closing the import process';
-            $this->logDebug($msg, $import);
-            throw new ImportFailedException($msg);
-        }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
@@ -438,7 +432,7 @@ class ImportModel extends FormModel
             if ($diffCount > 0) {
                 // Fill in the data with empty string
                 $fill = array_fill($dataCount, $diffCount, '');
-                $data = $data + $fill;
+                $data += $fill;
             } else {
                 return true;
             }

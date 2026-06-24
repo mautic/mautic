@@ -65,10 +65,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->negate;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }
@@ -135,10 +132,7 @@ class LeadBuildSearchEvent extends CommonEvent
         $this->returnParameters = $val;
     }
 
-    /**
-     * @return array
-     */
-    public function getParameters()
+    public function getParameters(): array
     {
         return $this->parameters;
     }

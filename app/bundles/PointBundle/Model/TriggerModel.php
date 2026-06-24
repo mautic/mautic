@@ -40,7 +40,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @var array<string, mixed[]>
      */
-    private $cachedEvents = [];
+    private array $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
@@ -275,7 +275,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         if (empty($this->cachedEvents)) {
             $event = new TriggerBuilderEvent($this->translator);

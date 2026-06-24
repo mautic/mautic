@@ -134,7 +134,7 @@ class ObjectMapping
     }
 
     /**
-     * @return int|null ?int
+     * @return int|null
      */
     public function getId()
     {
@@ -153,16 +153,13 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateCreated()
+    public function getDateCreated(): ?\DateTimeInterface
     {
         return $this->dateCreated;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegration()
     {
@@ -182,7 +179,7 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInternalObjectName()
     {
@@ -219,7 +216,7 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegrationObjectName()
     {
@@ -239,7 +236,7 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegrationObjectId()
     {
@@ -258,10 +255,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getLastSyncDate()
+    public function getLastSyncDate(): ?\DateTimeInterface
     {
         return $this->lastSyncDate;
     }

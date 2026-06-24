@@ -205,7 +205,7 @@ class UtmTag
     /**
      * Get referer.
      *
-     * @return string
+     * @return string|null
      */
     public function getReferer()
     {
@@ -229,7 +229,7 @@ class UtmTag
     /**
      * Get remoteHost.
      *
-     * @return string
+     * @return string|null
      */
     public function getRemoteHost()
     {
@@ -277,7 +277,7 @@ class UtmTag
     /**
      * Get userAgent.
      *
-     * @return string
+     * @return string|null
      */
     public function getUserAgent()
     {
@@ -285,7 +285,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmCampaign()
     {
@@ -305,7 +305,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmContent()
     {
@@ -326,7 +326,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmMedium()
     {
@@ -346,7 +346,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmSource()
     {
@@ -366,7 +366,7 @@ class UtmTag
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getUtmTerm()
     {

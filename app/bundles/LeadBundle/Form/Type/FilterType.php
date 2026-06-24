@@ -69,7 +69,7 @@ class FilterType extends AbstractType
                 $deprecatedOperatorTypes = $this->listModel->getOperatorsForFieldType([
                     'include' => $legacyOperators,
                 ]);
-                $operators += array_filter($deprecatedOperatorTypes, static fn ($v) => $v === $operator);
+                $operators += array_filter($deprecatedOperatorTypes, static fn ($v): bool => $v === $operator);
             }
 
             $form->add(

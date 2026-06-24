@@ -34,7 +34,7 @@ class ConfigBuilderEventTest extends CommonMocks
         $this->assertTrue($result);
     }
 
-    protected function initEvent()
+    protected function initEvent(): ConfigBuilderEvent
     {
         return new ConfigBuilderEvent($this->getBundleHelperMock());
     }

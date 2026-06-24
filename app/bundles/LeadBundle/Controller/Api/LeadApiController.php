@@ -585,9 +585,10 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * @param Lead   $entity
-     * @param array  $parameters
-     * @param string $action
+     * @param Lead                 $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

@@ -37,10 +37,7 @@ class SmsSendEvent extends CommonEvent
         $this->content = $content;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }

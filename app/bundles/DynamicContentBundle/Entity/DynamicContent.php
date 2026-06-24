@@ -331,10 +331,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -352,10 +349,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -384,10 +378,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->type;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -406,7 +397,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -427,7 +418,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -448,7 +439,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getContent()
     {
@@ -471,7 +462,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @param bool $includeVariants
      *
-     * @return mixed
+     * @return int
      */
     public function getSentCount($includeVariants = false)
     {
@@ -518,7 +509,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSlotName()
     {
@@ -560,7 +551,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getUtmTags()
     {

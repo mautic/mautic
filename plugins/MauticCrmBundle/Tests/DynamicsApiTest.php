@@ -8,8 +8,6 @@ use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
 class DynamicsApiTest extends AbstractIntegrationTestCase
 {
-    private DynamicsApi $api;
-
     private DynamicsIntegration $integration;
 
     protected function setUp(): void
@@ -35,7 +33,8 @@ class DynamicsApiTest extends AbstractIntegrationTestCase
             $this->fieldsWithUniqueIdentifier
         );
 
-        $this->api = new DynamicsApi($this->integration);
+        /** @phpstan-ignore new.resultUnused */
+        new DynamicsApi($this->integration);
     }
 
     public function testIntegration(): void

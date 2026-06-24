@@ -59,10 +59,7 @@ class SocialMonitorEvent extends CommonEvent
         return $this->updatedLeadCount + $this->newLeadCount;
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadIds()
+    public function getLeadIds(): array
     {
         return $this->leadIds;
     }

@@ -65,12 +65,12 @@ class RedirectModel extends FormModel
         $shortenUrl = false,
         $utmTags = [],
     ) {
-        if (count(func_get_args()) > 2) {
+        if (func_num_args() > 2) {
             $deprecation = '$shortenUrl is deprecated. Please use \Mautic\PageBundle\Model\RedirectModel::shortenUrl.';
             trigger_error($deprecation, E_USER_DEPRECATED);
         }
 
-        if (count(func_get_args()) > 3) {
+        if (func_num_args() > 3) {
             $deprecation = '$utmTags is deprecated. Please use \Mautic\PageBundle\Model\RedirectModel::applyUtmTags.';
             trigger_error($deprecation, E_USER_DEPRECATED);
         }

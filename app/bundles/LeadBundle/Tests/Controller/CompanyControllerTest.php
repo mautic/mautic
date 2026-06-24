@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CompanyControllerTest extends MauticMysqlTestCase
 {
+    private const COUNTRY_UNITED_STATES = 'United States';
+
     private int $company1Id;
 
     private int $company2Id;
@@ -32,14 +34,14 @@ class CompanyControllerTest extends MauticMysqlTestCase
                 'name'     => 'Amazon',
                 'state'    => 'Washington',
                 'city'     => 'Seattle',
-                'country'  => 'United States',
+                'country'  => self::COUNTRY_UNITED_STATES,
                 'industry' => 'Goods',
             ],
             2 => [
                 'name'     => 'Google',
                 'state'    => 'Washington',
                 'city'     => 'Seattle',
-                'country'  => 'United States',
+                'country'  => self::COUNTRY_UNITED_STATES,
                 'industry' => 'Services',
             ],
         ];
@@ -177,6 +179,114 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertEquals(0, $leadsTableRows->count(), $crawler->html());
+    }
+
+    public function testCompanyFieldsAreUpdatedWithBatchFindAndReplace(): void
+    {
+        $companyA = $this->createCompany('Find Replace Company A', 'Goods');
+        $companyB = $this->createCompany('Find Replace Company B', 'Goods');
+        $companyC = $this->createCompany('Find Replace Company C', 'Services');
+
+        $payload = [
+            'lead_batch_find_replace' => [
+                'field'   => 'companyindustry',
+                'find'    => 'Goods',
+                'replace' => 'Retail',
+                'ids'     => json_encode([$companyA->getId(), $companyB->getId(), $companyC->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/companies/batchFindReplace', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $this->em->clear();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+
+        $companyA = $companyModel->getEntity($companyA->getId());
+        $companyB = $companyModel->getEntity($companyB->getId());
+        $companyC = $companyModel->getEntity($companyC->getId());
+
+        self::assertInstanceOf(Company::class, $companyA);
+        self::assertInstanceOf(Company::class, $companyB);
+        self::assertInstanceOf(Company::class, $companyC);
+        self::assertSame('Retail', $companyA->getIndustry());
+        self::assertSame('Retail', $companyB->getIndustry());
+        self::assertSame('Services', $companyC->getIndustry());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('2 companies affected', $response['flashes']);
+    }
+
+    public function testCompanyFieldsAreUpdatedWithBatchFindAndReplaceForCurrentSearch(): void
+    {
+        $companyA = $this->createCompany('Find Replace Current Company A', 'Goods');
+        $companyB = $this->createCompany('Find Replace Current Company B', 'Goods');
+        $companyC = $this->createCompany('Other Company', 'Goods');
+        $companyD = $this->createCompany('Find Replace Current Company D', 'Services');
+        $companyE = $this->createCompany('Find Replace Current Company E', 'Goods');
+        $companyF = $this->createCompany('Find Replace Current Company F', 'Goods');
+        $companyG = $this->createCompany('Find Replace Current Company G', 'Goods');
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/s/companies?search=Find Replace Current&name=company&limit=5'
+        );
+
+        $companyTableRows = $crawler->filterXPath("//table[@id='companyTable']//tbody//tr");
+        $this->assertEquals(5, $companyTableRows->count(), $crawler->html());
+
+        $payload = [
+            'lead_batch_find_replace' => [
+                'field'   => 'companyindustry',
+                'find'    => 'Goods',
+                'replace' => 'Retail',
+                'all'     => '1',
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/companies/batchFindReplace', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $this->em->clear();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+
+        $companyA = $companyModel->getEntity($companyA->getId());
+        $companyB = $companyModel->getEntity($companyB->getId());
+        $companyC = $companyModel->getEntity($companyC->getId());
+        $companyD = $companyModel->getEntity($companyD->getId());
+        $companyE = $companyModel->getEntity($companyE->getId());
+        $companyF = $companyModel->getEntity($companyF->getId());
+        $companyG = $companyModel->getEntity($companyG->getId());
+
+        self::assertInstanceOf(Company::class, $companyA);
+        self::assertInstanceOf(Company::class, $companyB);
+        self::assertInstanceOf(Company::class, $companyC);
+        self::assertInstanceOf(Company::class, $companyD);
+        self::assertInstanceOf(Company::class, $companyE);
+        self::assertInstanceOf(Company::class, $companyF);
+        self::assertInstanceOf(Company::class, $companyG);
+        self::assertSame('Retail', $companyA->getIndustry());
+        self::assertSame('Retail', $companyB->getIndustry());
+        self::assertSame('Goods', $companyC->getIndustry());
+        self::assertSame('Services', $companyD->getIndustry());
+        self::assertSame('Retail', $companyE->getIndustry());
+        self::assertSame('Retail', $companyF->getIndustry());
+        self::assertSame('Retail', $companyG->getIndustry());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('5 companies affected', $response['flashes']);
     }
 
     /**
@@ -325,6 +435,23 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $lead;
+    }
+
+    private function createCompany(string $name, string $industry): Company
+    {
+        $company = new Company();
+        $company->setIsPublished(true)
+            ->setName($name)
+            ->setState('Washington')
+            ->setCity('Seattle')
+            ->setCountry(self::COUNTRY_UNITED_STATES)
+            ->setIndustry($industry);
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get('mautic.lead.model.company');
+        $companyModel->saveEntity($company);
+
+        return $company;
     }
 
     private function createSegment(): LeadList

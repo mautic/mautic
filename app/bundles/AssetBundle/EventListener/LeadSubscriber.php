@@ -55,18 +55,24 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
-                $asset = $this->assetModel->getEntity($download['asset_id']);
+                $asset    = $download['asset_id'] ? $this->assetModel->getEntity($download['asset_id']) : null;
+                $hasAsset = $asset && $asset->getId();
+
+                $eventLabel = $hasAsset
+                    ? [
+                        'label' => $download['title'],
+                        'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']]),
+                    ]
+                    : (string) ($download['title'] ?? $this->translator->trans('mautic.asset.asset.deleted'));
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
                         'eventId'    => $eventTypeKey.$download['download_id'],
-                        'eventLabel' => [
-                            'label' => $download['title'],
-                            'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']]),
-                        ],
-                        'extra' => [
-                            'asset'            => $asset,
-                            'assetDownloadUrl' => $this->assetModel->generateUrl($asset),
+                        'eventLabel' => $eventLabel,
+                        'extra'      => [
+                            'asset'            => $hasAsset ? $asset : null,
+                            'assetDownloadUrl' => $hasAsset ? $this->assetModel->generateUrl($asset) : null,
                         ],
                         'eventType'       => $eventTypeName,
                         'timestamp'       => $download['dateDownload'],

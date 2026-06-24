@@ -280,7 +280,7 @@ class TriggerEventController extends CommonFormController
                 'point:triggers:create',
             ], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
@@ -341,7 +341,7 @@ class TriggerEventController extends CommonFormController
                 'point:triggers:create',
             ], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;

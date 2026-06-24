@@ -23,10 +23,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
     ) {
     }
 
-    /**
-     * @return Lead
-     */
-    public function getContact()
+    public function getContact(): Lead
     {
         return $this->contact;
     }
@@ -44,10 +41,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
         $this->response = $response;
     }
 
-    /**
-     * @return Response|null
-     */
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->response;
     }
