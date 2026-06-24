@@ -23,6 +23,27 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssetController extends FormController
 {
+    private BatchDownloadRequestValidator $batchDownloadRequestValidator;
+
+    private BatchFileCollector $batchFileCollector;
+
+    private ArchiveBuilder $archiveBuilder;
+
+    private BatchDownloadResponder $batchDownloadResponder;
+
+    #[\Symfony\Contracts\Service\Attribute\Required]
+    public function setBatchDownloadServices(
+        BatchDownloadRequestValidator $batchDownloadRequestValidator,
+        BatchFileCollector $batchFileCollector,
+        ArchiveBuilder $archiveBuilder,
+        BatchDownloadResponder $batchDownloadResponder,
+    ): void {
+        $this->batchDownloadRequestValidator = $batchDownloadRequestValidator;
+        $this->batchFileCollector            = $batchFileCollector;
+        $this->archiveBuilder                = $archiveBuilder;
+        $this->batchDownloadResponder        = $batchDownloadResponder;
+    }
+
     public function indexAction(Request $request, CoreParametersHelper $parametersHelper, AssetModel $assetModel, int $page = 1): Response
     {
         // set some permissions
@@ -656,23 +677,18 @@ class AssetController extends FormController
         );
     }
 
-    public function batchDownloadAction(
-        Request $request,
-        BatchDownloadRequestValidator $requestValidator,
-        BatchFileCollector $fileCollector,
-        ArchiveBuilder $archiveBuilder,
-        BatchDownloadResponder $responder,
-    ): Response {
-        if (!$requestValidator->validatePermissions()) {
-            return $this->accessDenied();
+    public function batchDownloadAction(Request $request): Response
+    {
+        if (!$this->batchDownloadRequestValidator->validatePermissions()) {
+            $this->throwAccessDenied();
         }
 
         try {
-            $ids                = $requestValidator->validateAndExtractIds($request);
-            $downloadableAssets = $fileCollector->collectDownloadableAssets($ids);
-            $zipPath            = $archiveBuilder->buildArchive($downloadableAssets);
+            $ids                = $this->batchDownloadRequestValidator->validateAndExtractIds($request);
+            $downloadableAssets = $this->batchFileCollector->collectDownloadableAssets($ids);
+            $zipPath            = $this->archiveBuilder->buildArchive($downloadableAssets);
 
-            return $responder->createResponse($zipPath);
+            return $this->batchDownloadResponder->createResponse($zipPath);
         } catch (BatchDownloadException $e) {
             return $this->createBatchDownloadErrorResponse($e->getMessage());
         }
