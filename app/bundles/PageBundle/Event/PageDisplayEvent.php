@@ -38,10 +38,8 @@ class PageDisplayEvent extends Event
 
     /**
      * Set page content.
-     *
-     * @param string $content
      */
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
@@ -56,10 +54,8 @@ class PageDisplayEvent extends Event
 
     /**
      * Set params.
-     *
-     * @param array $params
      */
-    public function setParams($params): void
+    public function setParams(array $params): void
     {
         $this->params = $params;
     }

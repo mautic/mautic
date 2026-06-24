@@ -96,10 +96,7 @@ class Mapper
         return $mapped;
     }
 
-    /**
-     * @return array
-     */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->objectMappedValues;
     }

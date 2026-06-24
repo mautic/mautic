@@ -475,11 +475,9 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     /**
      * Set username.
      *
-     * @param string $username
-     *
      * @return User
      */
-    public function setUsername($username)
+    public function setUsername(?string $username)
     {
         $this->isChanged('username', $username);
         $this->username = $username;

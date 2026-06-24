@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     public const TABLE_NAME = 'push_notification_stats';
+
     /**
      * @var string
      */

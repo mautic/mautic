@@ -155,7 +155,7 @@ class FieldModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormFieldEvent($entity, $isNew);
             }
 

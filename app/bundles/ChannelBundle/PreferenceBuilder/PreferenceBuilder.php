@@ -27,7 +27,7 @@ class PreferenceBuilder
     /**
      * @return ChannelPreferences[]
      */
-    public function getChannelPreferences()
+    public function getChannelPreferences(): array
     {
         return $this->channels;
     }

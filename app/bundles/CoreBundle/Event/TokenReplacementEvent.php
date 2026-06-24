@@ -87,7 +87,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param mixed[] $clickthrough
      */
-    public function setClickthrough($clickthrough): void
+    public function setClickthrough(array $clickthrough): void
     {
         $this->clickthrough = $clickthrough;
     }

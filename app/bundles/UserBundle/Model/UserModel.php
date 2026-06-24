@@ -37,6 +37,7 @@ use Twig\Environment;
 class UserModel extends FormModel implements GlobalSearchInterface
 {
     private const INVITE_TOKEN_SELECTOR_BYTES = 16;
+
     private const INVITE_TOKEN_VERIFIER_BYTES = 32;
 
     public function __construct(
@@ -186,7 +187,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new UserEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

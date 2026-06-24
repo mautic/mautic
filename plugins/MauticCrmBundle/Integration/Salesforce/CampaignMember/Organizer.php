@@ -26,7 +26,7 @@ class Organizer
     /**
      * @return array<string, Lead>
      */
-    public function getLeads()
+    public function getLeads(): array
     {
         return $this->leads;
     }
@@ -42,7 +42,7 @@ class Organizer
     /**
      * @return array<string, Contact>
      */
-    public function getContacts()
+    public function getContacts(): array
     {
         return $this->contacts;
     }
