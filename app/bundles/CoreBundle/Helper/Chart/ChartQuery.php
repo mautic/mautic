@@ -557,6 +557,7 @@ class ChartQuery extends AbstractChart
             $this->connection->getDatabasePlatform(),
             $tablePrefix.'.'.$column,
             $this->unit,
+            false,
             $this->dateTimeHelper->getLocalTimezoneOffset()
         );
     }

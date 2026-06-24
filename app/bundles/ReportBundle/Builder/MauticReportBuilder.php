@@ -356,7 +356,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Ensure all non-aggregated SELECT/ORDER columns are in GROUP BY
-        $allSelectColumns = array_merge(array_merge($selectColumns, $event->getSelectColumns() ?: []), $orderByColumns);
+        $allSelectColumns = array_merge(array_merge($selectColumns, $event->getSelectColumns()), $orderByColumns);
         if ($allSelectColumns && ($groupByColumns || $existingGroupBy || $aggregators)) {
             $nonAggregatedColumns = [];
 

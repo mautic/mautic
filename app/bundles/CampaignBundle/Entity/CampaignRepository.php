@@ -715,7 +715,17 @@ class CampaignRepository extends CommonRepository
     public function findStuckEventsToExecute(int $campaignId, int $limit = 100, ?int $minLeadId = 0,
         ?int $maxLeadId = 0, ?string $recordsAfter = null): array
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+        $query      = $connection->createQueryBuilder();
+
+        // Make sure we use platform dependent date construct
+        $dateConstructExpr = DatabasePlatform::getDateConstructExpression(
+            $platform,
+            'log.date_triggered',
+            'i',
+            true);
+
         $query->select(
             'log.lead_id AS contact_id',
             'ce.id AS next_event_id',
@@ -724,7 +734,7 @@ class CampaignRepository extends CommonRepository
             'ce.event_type AS next_event_event_type',
             'ce.event_order AS event_order',
             'parent.id AS parent_event_id',
-            'DATE_FORMAT(log.date_triggered, \'%Y-%m-%d %H:%i\') AS last_executed_date'
+            $dateConstructExpr.' AS last_executed_date'
         )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'clr')
             // Ensure the contact is still active in the campaign and get the latest rotation

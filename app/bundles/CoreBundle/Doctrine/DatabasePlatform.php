@@ -236,7 +236,7 @@ class DatabasePlatform
     ];
 
     /**
-     * Returns the full date construct expression used in charts (group by + display).
+     * Returns the full date construct expression (ex: used in charts).
      *
      * Handles timezone offset, weekly grouping differences, and platform-specific formatting.
      *
@@ -246,27 +246,37 @@ class DatabasePlatform
         ?AbstractPlatform $platform,
         string $columnName,
         string $unit,
+        bool $ignoreZeroTimezoneOffset = false,
         string $defaultTimezoneOffset = '+00:00',
     ): string {
-        $dbUnit                = self::getTimeUnitFormat($platform, $unit);
+        $dbUnit   = self::getTimeUnitFormat($platform, $unit);
+
+        // Check if timezone adjustment is needed
+        $isZeroTz = $ignoreZeroTimezoneOffset && in_array(trim($defaultTimezoneOffset), ['+00:00', '-00:00', '+0', '-0', '0', 'Z', 'UTC'], true);
 
         if (self::isPostgreSQL($platform)) {
             // Shift the UTC-stored timestamp to the user's local offset
             // Works whether the column is timestamp or timestamptz
             // ::timestamp strips any timezone info to avoid session TimeZone influence
-            $tzAdjusted = "({$columnName} + '{$defaultTimezoneOffset}'::interval)::timestamp";
+            // Apply timezone interval only if offset is non-zero
+            $formattedColumn = $isZeroTz
+                ? "({$columnName})::timestamp"
+                : "({$columnName} + '{$defaultTimezoneOffset}'::interval)::timestamp";
             // Special handling for weekly grouping ('W' unit → '%Y %U')
             // MySQL %U = Sunday-based week 00–53
             // We approximate with ISO week (Monday-based, 01–53) – common compromise in ports
             // Padded with space like "2026 03" for identical grouping/label behavior
             $sql = ('IYYY IW' === $dbUnit) ?
-                "TO_CHAR({$tzAdjusted}, 'YYYY') || ' ' || LPAD(TO_CHAR({$tzAdjusted}, 'IW')::text, 2, '0')" :
-                "TO_CHAR({$tzAdjusted}, '{$dbUnit}')";
+                "TO_CHAR({$formattedColumn}, 'YYYY') || ' ' || LPAD(TO_CHAR({$formattedColumn}, 'IW')::text, 2, '0')" :
+                "TO_CHAR({$formattedColumn}, '{$dbUnit}')";
         } else {
             // MySQL / MariaDB
-            $columnName = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
+            // Skip CONVERT_TZ wrapping if offset is zero
+            $formattedColumn = $isZeroTz
+                ? $columnName
+                : "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
 
-            $sql = 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
+            $sql = "DATE_FORMAT({$formattedColumn}, '{$dbUnit}')";
         }
 
         return $sql;
