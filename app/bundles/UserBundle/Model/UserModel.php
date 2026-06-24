@@ -442,7 +442,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         }
 
         $invite = $this->getUserInviteRepository()->findOneByTokenSelector($inviteToken['selector']);
-        if (!$invite instanceof \Mautic\UserBundle\Entity\UserInvite) {
+        if (!$invite instanceof UserInvite) {
             $this->logInvalidInvite('token selector was not found', null, $inviteToken['selector']);
 
             return null;

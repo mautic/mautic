@@ -590,7 +590,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     {
         static $campaigns = [];
 
-        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
+        if (!$lead instanceof Lead) {
             $lead = $this->contactTracker->getContact();
         }
 

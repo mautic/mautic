@@ -135,7 +135,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         \assert($userBadge instanceof UserBadge);
 
         // A custom token has not been set by the plugin, so create a new one. Mainly used for oAuth.
-        if (!($token = $pluginBadge->getPreAuthenticatedToken()) instanceof \Symfony\Component\Security\Core\Authentication\Token\TokenInterface) {
+        if (!($token = $pluginBadge->getPreAuthenticatedToken()) instanceof TokenInterface) {
             $user  = $userBadge->getUser();
             $token = new PluginToken(
                 $this->firewallName,
@@ -172,7 +172,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
 
         $response = null;
-        if (!$token->getResponse() instanceof \Symfony\Component\HttpFoundation\Response) {
+        if (!$token->getResponse() instanceof Response) {
             $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
         }
 

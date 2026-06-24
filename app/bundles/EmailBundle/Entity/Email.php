@@ -1435,7 +1435,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function hasDraft(): bool
     {
-        return $this->getDraft() instanceof \Mautic\EmailBundle\Entity\EmailDraft;
+        return $this->getDraft() instanceof EmailDraft;
     }
 
     public function getDraftContent(): ?string

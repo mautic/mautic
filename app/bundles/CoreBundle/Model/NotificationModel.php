@@ -95,11 +95,11 @@ class NotificationModel extends FormModel
         ?string $deduplicateValue = null,
         ?\DateTime $deduplicateDateTimeFrom = null,
     ): void {
-        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
+        if (!$user instanceof User) {
             $user = $this->userHelper->getUser();
         }
 
-        if (!$user instanceof \Mautic\UserBundle\Entity\User || !$user->getId()) {
+        if (!$user instanceof User || !$user->getId()) {
             // ensure notifications aren't written for non users
             return;
         }

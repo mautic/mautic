@@ -48,7 +48,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         }
 
         $lead = $this->leadRepository->getEntity($leadId);
-        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
+        if (!$lead instanceof Lead) {
             // Check if this contact was merged into another and if so, return the new contact
             $lead = $this->mergeRecordRepository->findMergedContact($leadId);
 

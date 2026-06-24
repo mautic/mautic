@@ -1571,7 +1571,7 @@ class LeadModel extends FormModel
                 $this->addToLists($lead, [$list]);
             }
 
-            if ($company instanceof \Mautic\LeadBundle\Entity\Company) {
+            if ($company instanceof Company) {
                 $this->companyModel->addLeadToCompany($company, $lead);
                 $this->setPrimaryCompany($company->getId(), $lead->getId());
             }
@@ -2194,7 +2194,7 @@ class LeadModel extends FormModel
         }
 
         // company does not exist anymore
-        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
+        if (!$company instanceof Company) {
             return false;
         }
 

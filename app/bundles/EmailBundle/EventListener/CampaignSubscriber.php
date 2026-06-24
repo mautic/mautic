@@ -168,7 +168,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $email = $event->getEmail();
 
-        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
+        if ($email instanceof Email) {
             $this->realTimeExecutioner->execute('email.open', $email, 'email', $email->getId());
         }
     }
@@ -184,7 +184,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     public function onEmailReply(EmailReplyEvent $event): void
     {
         $email = $event->getEmail();
-        if ($email instanceof \Mautic\EmailBundle\Entity\Email) {
+        if ($email instanceof Email) {
             $this->realTimeExecutioner->execute('email.reply', $email, 'email', $email->getId());
         }
     }

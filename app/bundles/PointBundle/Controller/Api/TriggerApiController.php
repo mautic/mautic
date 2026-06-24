@@ -96,7 +96,7 @@ class TriggerApiController extends CommonApiController
                     $requestTriggerIds[] = $eventParams['id'];
                 }
 
-                if (!$triggerEventEntity instanceof \Mautic\PointBundle\Entity\TriggerEvent) {
+                if (!$triggerEventEntity instanceof TriggerEvent) {
                     return $this->notFound();
                 }
 

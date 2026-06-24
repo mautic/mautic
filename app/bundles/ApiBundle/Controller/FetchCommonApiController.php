@@ -352,7 +352,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
+        if (!$request instanceof Request) {
             throw new \RuntimeException('Request is not set.');
         }
 

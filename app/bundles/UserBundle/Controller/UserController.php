@@ -301,7 +301,7 @@ class UserController extends FormController
         $model = $this->getModel('user.user');
         \assert($model instanceof UserModel);
         $user = $model->getEntity($objectId);
-        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
+        if (!$user instanceof User) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_user_index'),
                 'flashes'         => [
@@ -479,7 +479,7 @@ class UserController extends FormController
                 \assert($model instanceof UserModel);
                 $entity = $model->getEntity($objectId);
 
-                if (!$entity instanceof \Mautic\UserBundle\Entity\User) {
+                if (!$entity instanceof User) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.user.user.error.notfound',
@@ -668,7 +668,7 @@ class UserController extends FormController
                         'type' => 'error',
                         'msg'  => 'mautic.user.user.error.cannotdeleteself',
                     ];
-                } elseif (!$entity instanceof \Mautic\UserBundle\Entity\User) {
+                } elseif (!$entity instanceof User) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.user.user.error.notfound',

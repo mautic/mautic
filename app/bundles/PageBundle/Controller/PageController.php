@@ -175,7 +175,7 @@ class PageController extends FormController
         // set the page we came from
         $page = $request->getSession()->get('mautic.page.page', 1);
 
-        if (!$activePage instanceof \Mautic\PageBundle\Entity\Page) {
+        if (!$activePage instanceof Page) {
             // set the return URL
             $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
 
@@ -503,7 +503,7 @@ class PageController extends FormController
         ];
 
         // not found
-        if (!$entity instanceof \Mautic\PageBundle\Entity\Page) {
+        if (!$entity instanceof Page) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -730,7 +730,7 @@ class PageController extends FormController
         if ('POST' === $request->getMethod()) {
             $entity = $model->getEntity($objectId);
 
-            if (!$entity instanceof \Mautic\PageBundle\Entity\Page) {
+            if (!$entity instanceof Page) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.page.error.notfound',
@@ -941,7 +941,7 @@ class PageController extends FormController
         if ('POST' === $request->getMethod()) {
             $entity = $model->getEntity($objectId);
 
-            if (!$entity instanceof \Mautic\PageBundle\Entity\Page) {
+            if (!$entity instanceof Page) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.page.error.notfound',
@@ -996,7 +996,7 @@ class PageController extends FormController
         $pageListPage = $session->get('mautic.page.page', 1);
         $returnUrl    = $this->generateUrl('mautic_page_index', ['page' => $pageListPage]);
 
-        if (!$activePage instanceof \Mautic\PageBundle\Entity\Page) {
+        if (!$activePage instanceof Page) {
             // redirect back to page list
             return $this->postActionRedirect(
                 [
@@ -1135,7 +1135,7 @@ class PageController extends FormController
         $pageListPage = $session->get('mautic.page.page', 1);
         $returnUrl    = $this->generateUrl('mautic_page_index', ['page' => $pageListPage]);
 
-        if (!$activePage instanceof \Mautic\PageBundle\Entity\Page) {
+        if (!$activePage instanceof Page) {
             // redirect back to page list
             return $this->postActionRedirect(
                 [

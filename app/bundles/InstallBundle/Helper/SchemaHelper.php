@@ -331,7 +331,7 @@ class SchemaHelper
      */
     private function getSchemaManager(): AbstractSchemaManager
     {
-        if ($this->schemaManager instanceof \Doctrine\DBAL\Schema\AbstractSchemaManager) {
+        if ($this->schemaManager instanceof AbstractSchemaManager) {
             return $this->schemaManager;
         }
 

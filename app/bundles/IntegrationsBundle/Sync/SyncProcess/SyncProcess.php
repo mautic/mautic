@@ -268,7 +268,7 @@ class SyncProcess
     private function shouldStopIntegrationSync(): bool
     {
         // We don't want to iterate sync for specific ids
-        return $this->inputOptionsDAO->getIntegrationObjectIds() instanceof \Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
+        return $this->inputOptionsDAO->getIntegrationObjectIds() instanceof ObjectIdsDAO;
     }
 
     /**

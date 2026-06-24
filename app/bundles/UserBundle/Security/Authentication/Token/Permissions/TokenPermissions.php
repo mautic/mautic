@@ -36,18 +36,18 @@ class TokenPermissions
         }
 
         $user = $token->getUser();
-        \assert(!$user instanceof \Symfony\Component\Security\Core\User\UserInterface || $user instanceof User);
+        \assert(!$user instanceof UserInterface || $user instanceof User);
 
         // If no user is associated with a token, it's a client credentials grant type. Handle accordingly.
-        if (!$user instanceof \Mautic\UserBundle\Entity\User && ($token instanceof OAuthToken || $token instanceof OAuthTokenInterface)) {
+        if (!$user instanceof User && ($token instanceof OAuthToken || $token instanceof OAuthTokenInterface)) {
             $user = $this->assignRoleFromToken($token->getToken());
         }
 
-        if ($user instanceof \Mautic\UserBundle\Entity\User) {
+        if ($user instanceof User) {
             $this->setPermissionsOnUser($user);
         }
 
-        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
+        if (!$user instanceof User) {
             throw new \RuntimeException('The user should be either already set in the token, or come from assignRoleFromToken.');
         }
 

@@ -259,7 +259,7 @@ class StageController extends AbstractFormController
         ];
 
         // form not found
-        if (!$entity instanceof \Mautic\StageBundle\Entity\Stage) {
+        if (!$entity instanceof Stage) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -432,7 +432,7 @@ class StageController extends AbstractFormController
             \assert($model instanceof StageModel);
             $entity = $model->getEntity($objectId);
 
-            if (!$entity instanceof \Mautic\StageBundle\Entity\Stage) {
+            if (!$entity instanceof Stage) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.stage.error.notfound',
@@ -496,7 +496,7 @@ class StageController extends AbstractFormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (!$entity instanceof \Mautic\StageBundle\Entity\Stage) {
+                if (!$entity instanceof Stage) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.stage.error.notfound',

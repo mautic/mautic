@@ -71,7 +71,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
     {
         $error = $authenticationUtils->getLastAuthenticationError();
 
-        if ($error instanceof \Symfony\Component\Security\Core\Exception\AuthenticationException) {
+        if ($error instanceof Exception\AuthenticationException) {
             if ($error instanceof WeakPasswordException) {
                 $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
 

@@ -230,7 +230,7 @@ class PublishStateService
 
         // At first build a timeline of only manually set publish state changes without publish up and down dates.
         foreach ($publishStates as $publishState) {
-            if (!$currentRange instanceof \Mautic\CampaignBundle\DTO\PublishStateDateRange) {
+            if (!$currentRange instanceof PublishStateDateRange) {
                 $currentRange          = new PublishStateDateRange($publishState->getPublished(), $publishState->getDateAdded());
                 $currentState          = $publishState->getPublished();
                 $manualPublishRanges[] = $currentRange;

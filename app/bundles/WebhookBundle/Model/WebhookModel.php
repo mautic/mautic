@@ -501,7 +501,7 @@ class WebhookModel extends FormModel
         if (self::COMMAND_PROCESS === $this->queueMode) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = $queue instanceof \Mautic\WebhookBundle\Entity\WebhookQueue ? [$queue] : [];
+            $queuesArray = $queue instanceof WebhookQueue ? [$queue] : [];
         }
         $this->webhookQueueIdList = [];
         /* @var WebhookQueue $queueItem */

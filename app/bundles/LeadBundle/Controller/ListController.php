@@ -571,7 +571,7 @@ class ListController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (!$entity instanceof \Mautic\LeadBundle\Entity\LeadList) {
+                if (!$entity instanceof LeadList) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.list.error.notfound',

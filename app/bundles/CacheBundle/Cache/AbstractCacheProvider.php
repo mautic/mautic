@@ -84,7 +84,7 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
 
     protected function cacheAdapterFactory(string $parameter): AdapterInterface
     {
-        if (!$this->adapter instanceof \Symfony\Component\Cache\Adapter\AdapterInterface) {
+        if (!$this->adapter instanceof AdapterInterface) {
             $service       = $this->coreParametersHelper->get($parameter);
             $this->adapter = $this->container->get($service);
         }

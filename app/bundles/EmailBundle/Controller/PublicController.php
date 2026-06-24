@@ -610,7 +610,7 @@ class PublicController extends CommonFormController
             $lead = $repo->getLeadByEmail($email);
             if (null === $lead) {
                 $lead = $this->createLead($email, $repo);
-                if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
+                if (!$lead instanceof Lead) {
                     continue;
                 }
             }

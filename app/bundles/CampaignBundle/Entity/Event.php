@@ -1235,7 +1235,7 @@ class Event implements ChannelInterface, UuidInterface
 
     public function shouldBeRedirected(): bool
     {
-        return $this->isDeleted() && $this->redirectEvent instanceof \Mautic\CampaignBundle\Entity\Event;
+        return $this->isDeleted() && $this->redirectEvent instanceof Event;
     }
 
     /**

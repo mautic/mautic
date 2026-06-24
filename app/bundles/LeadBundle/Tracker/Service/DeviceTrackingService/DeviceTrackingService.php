@@ -64,7 +64,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return $trackedDevice;
         }
 
-        if (($existingDevice = $this->leadDeviceRepository->findExistingDevice($device)) instanceof \Mautic\LeadBundle\Entity\LeadDevice) {
+        if (($existingDevice = $this->leadDeviceRepository->findExistingDevice($device)) instanceof LeadDevice) {
             $device = $existingDevice;
         }
 

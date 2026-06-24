@@ -661,7 +661,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (!str_contains($column, '.')) {
                         $column = "entity.$column";
                     }
-                    if (!$expr instanceof \Doctrine\DBAL\Query\Expression\CompositeExpression) {
+                    if (!$expr instanceof CompositeExpression) {
                         $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
                         $qb->andWhere($expr);
                         continue;

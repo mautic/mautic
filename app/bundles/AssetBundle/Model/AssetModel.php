@@ -130,7 +130,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                    if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
+                    if ($lead instanceof Lead) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
                         $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();

@@ -31,7 +31,7 @@ class HitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
         // If we know the lead, use that to determine uniqueness
-        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead && $lead->getId()) {
+        if ($lead instanceof Lead && $lead->getId()) {
             $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
         } else {
             $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));

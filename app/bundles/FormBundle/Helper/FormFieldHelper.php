@@ -77,7 +77,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     {
         $this->translator = $translator;
 
-        if (!$validator instanceof \Symfony\Component\Validator\Validator\ValidatorInterface) {
+        if (!$validator instanceof ValidatorInterface) {
             $validator = $validator = Validation::createValidator();
         }
         $this->validator = $validator;

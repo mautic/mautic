@@ -108,7 +108,7 @@ class PublicController extends FormController
         $response = null;
         $user     = $model->getRepository()->findByIdentifier($data['identifier']);
 
-        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
+        if (!$user instanceof User) {
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
 
             $response = $this->redirectToRoute('login');

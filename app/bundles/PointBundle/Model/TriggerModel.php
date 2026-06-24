@@ -317,7 +317,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
             return false;
         }
 
-        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
+        if (!$lead instanceof Lead) {
             $lead = $this->contactTracker->getContact();
         }
 

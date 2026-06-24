@@ -328,7 +328,7 @@ class CategoryController extends AbstractFormController
             ]);
         }
 
-        if ($response instanceof \Symfony\Component\HttpFoundation\JsonResponse) {
+        if ($response instanceof JsonResponse) {
             return $response;
         }
 
