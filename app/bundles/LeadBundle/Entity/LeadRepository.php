@@ -958,6 +958,26 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
                 $filter->strict = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.form'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.form', [], null, 'en_US'):
+                if (empty($string)) {
+                    $expr = $q->expr()->eq(1, 0);
+                    break;
+                }
+                $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+                $sq->select('1')
+                    ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fsub')
+                    ->innerJoin('fsub', MAUTIC_TABLE_PREFIX.'forms', 'ffrm', 'fsub.form_id = ffrm.id')
+                    ->where(
+                        $q->expr()->and(
+                            $q->expr()->eq('fsub.lead_id', 'l.id'),
+                            $q->expr()->eq('ffrm.alias', ":$unique")
+                        )
+                    );
+                $filter->strict = true;
+                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
+                $q->setParameter($unique, $string);
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
@@ -1021,6 +1041,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.web_sent',
             'mautic.lead.lead.searchcommand.mobile_sent',
             'mautic.lead.lead.searchcommand.dnc',
+            'mautic.lead.lead.searchcommand.form',
         ];
 
         if (!empty($this->availableSearchFields)) {
