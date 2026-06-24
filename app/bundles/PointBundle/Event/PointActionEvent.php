@@ -14,10 +14,7 @@ class PointActionEvent extends CommonEvent
     ) {
     }
 
-    /**
-     * @return Point
-     */
-    public function getPoint()
+    public function getPoint(): Point
     {
         return $this->point;
     }
@@ -27,10 +24,7 @@ class PointActionEvent extends CommonEvent
         $this->point = $point;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }

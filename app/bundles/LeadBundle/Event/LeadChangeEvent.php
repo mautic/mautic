@@ -15,10 +15,7 @@ class LeadChangeEvent extends Event
     ) {
     }
 
-    /**
-     * @return Lead
-     */
-    public function getOldLead()
+    public function getOldLead(): Lead
     {
         return $this->oldLead;
     }
@@ -31,10 +28,7 @@ class LeadChangeEvent extends Event
         return $this->oldTrackingId;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getNewLead()
+    public function getNewLead(): Lead
     {
         return $this->newLead;
     }

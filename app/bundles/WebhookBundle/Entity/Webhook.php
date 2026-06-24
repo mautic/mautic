@@ -126,7 +126,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     private $eventsOrderbyDir;
 
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
+
     private ?\DateTimeImmutable $unHealthySince         = null;
+
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
@@ -233,7 +235,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -254,7 +256,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -275,7 +277,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -296,7 +298,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getWebhookUrl()
     {
@@ -336,7 +338,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return Category
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -460,7 +462,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getEventsOrderbyDir()
     {

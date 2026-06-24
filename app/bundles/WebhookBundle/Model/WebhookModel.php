@@ -122,6 +122,7 @@ class WebhookModel extends FormModel
     private ?float $startTime = null;
 
     private bool $disableAutoUnpublish;
+
     private int $webhookRetryDelay;
 
     public function __construct(
@@ -658,7 +659,7 @@ class WebhookModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof SymfonyEvent) {
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

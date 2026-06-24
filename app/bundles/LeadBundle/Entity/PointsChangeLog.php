@@ -10,6 +10,7 @@ use Mautic\PointBundle\Entity\Group;
 class PointsChangeLog
 {
     public const TABLE_NAME = 'lead_points_change_log';
+
     /**
      * @var string
      */
@@ -248,7 +249,7 @@ class PointsChangeLog
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {

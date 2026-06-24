@@ -331,20 +331,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
-     *
      * @return $this
      */
-    public function setName($name)
+    public function setName(?string $name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -352,20 +347,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @param string $description
-     *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(?string $description)
     {
         $this->description = $description;
 
@@ -384,20 +374,15 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->type;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
     /**
-     * @param Category $category
-     *
      * @return $this
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category)
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -406,7 +391,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -427,7 +412,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -448,7 +433,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getContent()
     {
@@ -471,7 +456,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @param bool $includeVariants
      *
-     * @return mixed
+     * @return int
      */
     public function getSentCount($includeVariants = false)
     {
@@ -518,7 +503,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSlotName()
     {
@@ -560,7 +545,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     public function getUtmTags()
     {

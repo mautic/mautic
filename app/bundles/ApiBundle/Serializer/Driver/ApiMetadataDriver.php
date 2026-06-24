@@ -67,7 +67,7 @@ class ApiMetadataDriver implements DriverInterface
      *
      * @return $this
      */
-    public function setGroupPrefix($name)
+    public function setGroupPrefix(string $name)
     {
         $this->groupPrefix = $name;
 
@@ -301,11 +301,9 @@ class ApiMetadataDriver implements DriverInterface
     }
 
     /**
-     * @return string
-     *
      * @throws \Exception
      */
-    protected function getCurrentPropertyName()
+    protected function getCurrentPropertyName(): string
     {
         if (empty($this->currentPropertyName)) {
             throw new \Exception('Current property is not set');

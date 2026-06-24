@@ -316,7 +316,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOut.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getCheckedOut()
     {
@@ -345,7 +345,7 @@ class FormEntity extends CommonEntity
     /**
      * Get createdBy.
      *
-     * @return int
+     * @return int|null
      */
     public function getCreatedBy()
     {
@@ -409,7 +409,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOutBy.
      *
-     * @return User
+     * @return int|null
      */
     public function getCheckedOutBy()
     {
@@ -499,7 +499,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCheckedOutByUser()
     {
@@ -507,7 +507,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCreatedByUser()
     {
@@ -515,7 +515,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getModifiedByUser()
     {

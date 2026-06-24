@@ -99,7 +99,7 @@ class IpAddress
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -117,7 +117,7 @@ class IpAddress
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIpAddress()
     {
@@ -154,10 +154,8 @@ class IpAddress
 
     /**
      * Get list of IPs to not track.
-     *
-     * @return array
      */
-    public function getDoNotTrackList()
+    public function getDoNotTrackList(): array
     {
         return $this->doNotTrack;
     }

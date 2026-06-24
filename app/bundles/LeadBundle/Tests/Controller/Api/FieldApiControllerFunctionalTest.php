@@ -387,6 +387,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         yield 'empty string value' => [''];
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
     {
         // Test creating a new field
@@ -415,6 +416,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         return $response['field']['id'];
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertGetResponse(array $payload, int $id): void
     {
         // Test get and that the field was published
@@ -430,6 +432,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
         $typeSafePayload = $this->generateTypeSafePayload($payload);
@@ -451,6 +454,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
@@ -474,6 +478,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @return array<string, mixed> */
     private function getCreatePayload(string $alias): array
     {
         return [
@@ -495,6 +500,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    /** @return array<string, mixed> */
     private function getEditPayload(int $id): array
     {
         return [

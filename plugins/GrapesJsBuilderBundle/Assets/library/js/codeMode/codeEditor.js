@@ -104,7 +104,7 @@ class CodeEditor {
 
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${e.message}`);
     }
   }
 

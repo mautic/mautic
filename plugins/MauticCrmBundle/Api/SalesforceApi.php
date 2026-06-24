@@ -110,7 +110,7 @@ class SalesforceApi extends CrmApi
         ];
 
         // try searching for lead as this has been changed before in updated done to the plugin
-        if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
+        if (isset($config['objects']) && in_array('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
             $fields      = $this->integration->getFieldsForQuery('Contact');
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
             $fields[]    = 'Id';
@@ -153,7 +153,7 @@ class SalesforceApi extends CrmApi
         $appendToQuery = '';
 
         // try searching for lead as this has been changed before in updated done to the plugin
-        if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
+        if (isset($config['objects']) && in_array('company', $config['objects']) && !empty($data['company']['Name'])) {
             $fields = $this->integration->getFieldsForQuery('Account');
 
             if (!empty($data['company']['BillingCountry'])) {

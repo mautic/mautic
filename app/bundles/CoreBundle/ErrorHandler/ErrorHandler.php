@@ -514,7 +514,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
-                $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
+                $loader             = new \Twig\Loader\FilesystemLoader([
+                    self::$root.'/app/bundles/CoreBundle/Resources/views/Offline',
+                    self::$root.'/app/bundles/CoreBundle/Resources/views/Exception',
+                ]);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn () => realpath(__DIR__.'/../../../../')));

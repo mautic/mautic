@@ -45,6 +45,7 @@ class Trigger extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
+
     public const ENTITY_NAME = 'point_trigger';
 
     /**
@@ -215,7 +216,7 @@ class Trigger extends FormEntity implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -240,7 +241,7 @@ class Trigger extends FormEntity implements UuidInterface
     /**
      * Get description.
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -265,7 +266,7 @@ class Trigger extends FormEntity implements UuidInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -323,7 +324,7 @@ class Trigger extends FormEntity implements UuidInterface
     /**
      * Get publishUp.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -348,7 +349,7 @@ class Trigger extends FormEntity implements UuidInterface
     /**
      * Get publishDown.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -356,7 +357,7 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPoints()
     {
@@ -373,7 +374,7 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getColor()
     {
@@ -389,7 +390,7 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getTriggerExistingLeads()
     {
@@ -405,7 +406,7 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {

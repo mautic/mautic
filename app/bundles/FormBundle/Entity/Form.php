@@ -54,6 +54,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     use ProjectTrait;
 
     public const ENTITY_NAME = 'forms';
+
     public const TABLE_NAME  = 'forms';
 
     /**
@@ -417,7 +418,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -438,7 +439,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -459,7 +460,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription($truncate = false, $length = 45)
     {
@@ -485,7 +486,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCachedHtml()
     {
@@ -562,7 +563,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -583,7 +584,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -654,7 +655,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
                 ],
                 $this->getFields()->getValues(),
             ),
-            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField']),
+            fn ($elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
     }
 
@@ -699,7 +700,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
             array_filter(
                 array_unique(
                     $this->getFields()->map(
-                        fn (Field $field) => $field->getMappedObject(),
+                        fn (Field $field): ?string => $field->getMappedObject(),
                     )->toArray(),
                 ),
             ),
@@ -720,7 +721,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -745,7 +746,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     /**
      * @return Collection|Submission[]
      */
-    public function getSubmissions()
+    public function getSubmissions(): Collection
     {
         return $this->submissions;
     }
@@ -787,7 +788,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -803,7 +804,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -819,7 +820,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getInKioskMode()
     {
@@ -843,7 +844,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function isInKioskMode()
     {
@@ -853,7 +854,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     /**
      * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getFormType()
     {
@@ -909,7 +910,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFormAttributes()
     {
@@ -995,7 +996,7 @@ class Form extends FormEntity implements UuidInterface, TranslationEntityInterfa
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getProgressiveProfilingLimit()
     {

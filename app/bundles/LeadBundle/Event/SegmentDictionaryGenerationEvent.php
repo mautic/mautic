@@ -37,7 +37,7 @@ class SegmentDictionaryGenerationEvent extends CommonEvent
     /**
      * @return array<string,mixed[]>
      */
-    public function getTranslations()
+    public function getTranslations(): array
     {
         return $this->translations;
     }

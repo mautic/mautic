@@ -64,20 +64,16 @@ class ConfigBuilderEvent extends Event
 
     /**
      * Returns the forms array.
-     *
-     * @return array
      */
-    public function getForms()
+    public function getForms(): array
     {
         return $this->forms;
     }
 
     /**
      * Returns the formThemes array.
-     *
-     * @return array
      */
-    public function getFormThemes()
+    public function getFormThemes(): array
     {
         return $this->formThemes;
     }
@@ -112,10 +108,7 @@ class ConfigBuilderEvent extends Event
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFileFields()
+    public function getFileFields(): array
     {
         return $this->encodedFields;
     }

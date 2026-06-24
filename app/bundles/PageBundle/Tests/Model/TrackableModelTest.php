@@ -13,6 +13,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -559,12 +560,12 @@ TEXT;
     }
 
     /**
-     * @param array $doNotTrack
-     * @param array $urlFieldsForPlaintext
+     * @param array<int, string>        $doNotTrack
+     * @param array<string|int, string> $urlFieldsForPlaintext
      *
-     * @return TrackableModel|\PHPUnit\Framework\MockObject\MockObject
+     * @return TrackableModel&MockObject
      */
-    protected function getModel($doNotTrack = [], $urlFieldsForPlaintext = [])
+    protected function getModel(array $doNotTrack = [], array $urlFieldsForPlaintext = [])
     {
         // Add default DoNotTrack
         $doNotTrack = array_merge(
@@ -619,10 +620,7 @@ TEXT;
         return $mockModel;
     }
 
-    /**
-     * @return Trackable
-     */
-    protected function getTrackableEntity($url)
+    protected function getTrackableEntity(string $url): Trackable
     {
         $redirect = new Redirect();
         $redirect->setUrl($url);

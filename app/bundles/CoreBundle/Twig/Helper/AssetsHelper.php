@@ -623,10 +623,8 @@ final class AssetsHelper
      * @param string    $country
      * @param bool|true $urlOnly
      * @param string    $class
-     *
-     * @return string
      */
-    public function getCountryFlag($country, $urlOnly = true, $class = '')
+    public function getCountryFlag($country, $urlOnly = true, $class = ''): string
     {
         $country  = ucwords(iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(' ', '-', $country)));
         $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');
