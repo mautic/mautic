@@ -41,7 +41,9 @@ class EmailController extends FormController
     public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     private const FILTER_TYPE_CATEGORY = 'category';
+
     private const FILTER_TYPE_LIST     = 'list';
+
     private const FILTER_TYPE_THEME    = 'theme';
 
     private bool $invalidHtmlError = false;
