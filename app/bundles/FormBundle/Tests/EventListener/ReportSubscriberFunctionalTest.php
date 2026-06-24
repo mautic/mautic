@@ -167,7 +167,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $response       = json_decode($clientResponse->getContent(), true);
         $formId         = (int) $response['form']['id'];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         return $formId;
     }

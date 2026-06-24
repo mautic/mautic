@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Validator\Dsn;
+use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -269,12 +270,7 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.email.required',
                         ]
                     ),
-                    new Email(
-                        [
-                            'message' => 'mautic.core.email.required',
-                            'mode'    => Email::VALIDATION_MODE_HTML5,
-                        ]
-                    ),
+                    new EmailOrEmailTokenList(['allowMultiple' => false]),
                 ],
             ]
         );
@@ -453,6 +449,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'disable_unsubscribe_link_header',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.disable.unsubscribe.link',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.mailer.disable.unsubscribe.link.tooltip',
+                ],
+                'data'       => !empty($options['data']['disable_unsubscribe_link_header']),
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_is_owner',
             YesNoButtonGroupType::class,
             [
@@ -466,6 +477,7 @@ class ConfigType extends AbstractType
                 'required'   => false,
             ]
         );
+
         $builder->add(
             'email_frequency_number',
             NumberType::class,

@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -146,7 +147,8 @@ class DownloadRepository extends CommonRepository
             ->join('a', MAUTIC_TABLE_PREFIX.'pages', 'p', 'a.source_id = p.id');
 
         if (is_array($pageId)) {
-            $q->where($q->expr()->in('p.id', $pageId))
+            $q->where($q->expr()->in('p.id', ':pageIds'))
+                ->setParameter('pageIds', $pageId, ArrayParameterType::INTEGER)
                 ->groupBy('p.id, a.source_id, p.title, p.hits');
         } else {
             $q->where($q->expr()->eq('p.id', ':page'))
@@ -187,7 +189,8 @@ class DownloadRepository extends CommonRepository
             ->join('a', MAUTIC_TABLE_PREFIX.'emails', 'e', 'a.email_id = e.id');
 
         if (is_array($emailId)) {
-            $q->where($q->expr()->in('e.id', $emailId))
+            $q->where($q->expr()->in('e.id', ':emailIds'))
+                ->setParameter('emailIds', $emailId, ArrayParameterType::INTEGER)
                 ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':email'))

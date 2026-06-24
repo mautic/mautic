@@ -95,13 +95,13 @@ jobs:
 
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
-            -   uses: actions/checkout@v4
+            -   uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
                 with:
                     persist-credentials: false
                     fetch-depth: 0
 
             # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
-            -   uses: frankdejonge/use-github-token@1.0.1
+            -   uses: frankdejonge/use-github-token@15e6289d07c12b3b1603268a628bb74f2e9765f4 # 1.1.0
                 with:
                     authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
                     user_name: 'Mautic CI'
@@ -109,13 +109,13 @@ jobs:
 
             # Cache the splitsh executable to speedup future runs
             -   name: Cache splitsh-lite
-                uses: actions/cache@v4
+                uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
                 with:
                     path: './splitsh'
                     key: '${{ runner.os }}-${{ matrix.config }}-splitsh-v101'
 
             # Sync commits and tags for the configured subtree splits
             -   name: subtree split
-                uses: acrobat/subtree-splitter@v1.0.0
+                uses: acrobat/subtree-splitter@eb1d1193757c60c5d98df34d679cc02e3f8111fb # v1.1.5
                 with:
                     config-path: .github/workflows/gitsplit/${{ matrix.config }}.json # Reference the location where you saved your config file

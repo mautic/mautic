@@ -274,13 +274,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $settings['feature_settings']['objects'] = $sugarObjects;
         }
 
-        $isRequired = fn (array $field, $object) => match (true) {
+        $isRequired = fn (array $field, $object): bool => match (true) {
             'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']), 'Contacts' === $object && 'email1' === $field['name'], 'id' !== $field['name'] && !empty($field['required']) => true,
             default => false,
         };
 
         try {
-            if (!empty($sugarObjects) and is_array($sugarObjects)) {
+            if (is_array($sugarObjects)) {
                 foreach ($sugarObjects as $sObject) {
                     if ('Accounts' === $sObject) {
                         // Match Sugar object to Mautic's
@@ -448,12 +448,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return int|null
-     *
      * @throws \Exception
      *                    To be modified
      */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity($params = []): ?int
     {
         $executed = null;
 
@@ -1611,7 +1609,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
                 } else {
+                    // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $error = 'Unknown status code '.$item['httpStatusCode'];
+                    // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
                     $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));
                 }
             }

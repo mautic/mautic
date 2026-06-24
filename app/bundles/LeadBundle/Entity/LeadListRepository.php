@@ -297,7 +297,8 @@ class LeadListRepository extends CommonRepository
             $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
             $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
         } else {
-            $expression = $q->expr()->in('l.leadlist_id', $listIds);
+            $expression = $q->expr()->in('l.leadlist_id', ':listIds');
+            $q->setParameter('listIds', $listIds, ArrayParameterType::INTEGER);
         }
 
         $q->where(
@@ -772,11 +773,11 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = unserialize($property['properties']);
+            $property       = \Mautic\CoreBundle\Helper\Serializer::decode($property['properties']);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
-        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+        return array_map(fn ($segment): array => ['item_id' => (string) $segment], $segmentIds);
     }
 
     /**
@@ -795,8 +796,8 @@ SQL;
 
         foreach ($query->getResult() as $rowFilters) {
             $segmentMembershipFilters = array_filter(
-                unserialize($rowFilters['filters']),
-                fn (array $filter) => 'leadlist' === $filter['type']
+                \Mautic\CoreBundle\Helper\Serializer::decode($rowFilters['filters']),
+                fn (array $filter): bool => 'leadlist' === $filter['type']
             );
 
             foreach ($segmentMembershipFilters as $filter) {
@@ -874,11 +875,11 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = unserialize($property['properties']);
+            $property       = \Mautic\CoreBundle\Helper\Serializer::decode($property['properties']);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
-        return array_map(fn ($segment) => ['item_id' => (string) $segment], $segmentIds);
+        return array_map(fn ($segment): array => ['item_id' => (string) $segment], $segmentIds);
     }
 
     /**
@@ -922,6 +923,6 @@ SQL;
             ->executeQuery()
             ->fetchAllNumeric();
 
-        return array_map(fn ($row) => (int) $row[0], $result);
+        return array_map(fn ($row): int => (int) $row[0], $result);
     }
 }

@@ -49,10 +49,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
             return new EncodedValueDAO(EncodedValueDAO::FLOAT_TYPE, (string) $var);
         }
 
-        if (is_double($var)) {
-            return new EncodedValueDAO(EncodedValueDAO::DOUBLE_TYPE, (string) $var);
-        }
-
         if ($var instanceof \DateTime) {
             return new EncodedValueDAO(EncodedValueDAO::DATETIME_TYPE, $var->format('c'));
         }

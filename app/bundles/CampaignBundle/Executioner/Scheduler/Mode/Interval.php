@@ -315,10 +315,7 @@ class Interval implements ScheduleModeInterface
         return $groupExecutionDate;
     }
 
-    /**
-     * @return \DateTimeZone
-     */
-    private function getDefaultTimezone()
+    private function getDefaultTimezone(): \DateTimeZone
     {
         if ($this->defaultTimezone) {
             return $this->defaultTimezone;

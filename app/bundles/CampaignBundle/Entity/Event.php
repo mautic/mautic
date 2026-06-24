@@ -28,10 +28,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
         new Post(security: "is_granted('campaign:campaigns:create')"),
-        new Get(security: "is_granted('campaign:campaigns:viewown')"),
-        new Put(security: "is_granted('campaign:campaigns:editown')"),
-        new Patch(security: "is_granted('campaign:campaigns:editother')"),
-        new Delete(security: "is_granted('campaign:campaigns:deleteown')"),
+        new Get(security: "is_granted('campaign:campaigns:viewown', object)"),
+        new Put(security: "is_granted('campaign:campaigns:editown', object)"),
+        new Patch(security: "is_granted('campaign:campaigns:editother', object)"),
+        new Delete(security: "is_granted('campaign:campaigns:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['event:read'],
@@ -355,6 +355,7 @@ class Event implements ChannelInterface, UuidInterface
         $builder->createManyToOne('campaign', 'Campaign')
             ->inversedBy('events')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->createOneToMany('children', 'Event')
@@ -669,7 +670,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -853,7 +854,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getTriggerDate()
     {
@@ -873,7 +874,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getTriggerInterval()
     {
@@ -912,7 +913,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTriggerIntervalUnit()
     {
@@ -929,7 +930,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEventType()
     {
@@ -960,7 +961,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTriggerMode()
     {
@@ -977,7 +978,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDecisionPath()
     {
@@ -994,7 +995,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTempId()
     {
@@ -1011,7 +1012,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getChannel()
     {
@@ -1028,7 +1029,7 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannelId()
     {
@@ -1102,7 +1103,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStartHour.
      *
-     * @param \DateTime|null $triggerRestrictedStartHour
+     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStartHour
      *
      * @return self
      */
@@ -1130,7 +1131,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Set the value of triggerRestrictedStopHour.
      *
-     * @param \DateTime|null $triggerRestrictedStopHour
+     * @param \DateTime|string|array<string,string>|null $triggerRestrictedStopHour
      *
      * @return self
      */
@@ -1147,10 +1148,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedDaysOfWeek.
-     *
-     * @return array
      */
-    public function getTriggerRestrictedDaysOfWeek()
+    public function getTriggerRestrictedDaysOfWeek(): array
     {
         return (array) $this->triggerRestrictedDaysOfWeek;
     }
@@ -1246,5 +1245,10 @@ class Event implements ChannelInterface, UuidInterface
     public function isRedirectTarget(): bool
     {
         return $this->redirectingEvents->count() > 0;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getCampaign()->getCreatedBy();
     }
 }

@@ -22,10 +22,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('form:forms:viewown')"),
         new Post(security: "is_granted('form:forms:create')"),
-        new Get(security: "is_granted('form:forms:viewown')"),
-        new Put(security: "is_granted('form:forms:editown')"),
-        new Patch(security: "is_granted('form:forms:editother')"),
-        new Delete(security: "is_granted('form:forms:deleteown')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['action:read'],
@@ -117,6 +117,7 @@ class Action implements UuidInterface
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('actions')
             ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         static::addUuidField($builder);
@@ -167,7 +168,7 @@ class Action implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -266,7 +267,7 @@ class Action implements UuidInterface
     /**
      * Get type.
      *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -296,7 +297,7 @@ class Action implements UuidInterface
     /**
      * Get description.
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -321,10 +322,15 @@ class Action implements UuidInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getForm()?->getCreatedBy();
     }
 }

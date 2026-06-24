@@ -98,10 +98,7 @@ class SubmissionEvent extends CommonEvent
         return $this->server;
     }
 
-    /**
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -114,10 +111,7 @@ class SubmissionEvent extends CommonEvent
         return $this->entity->getForm();
     }
 
-    /**
-     * @return array
-     */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }
@@ -134,10 +128,7 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
@@ -154,10 +145,7 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -174,10 +162,7 @@ class SubmissionEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactFieldMatches()
+    public function getContactFieldMatches(): array
     {
         return $this->contactFieldMatches;
     }

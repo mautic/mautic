@@ -42,10 +42,7 @@ class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getEmailIds()
+    public function getEmailIds(): array
     {
         return $this->ids;
     }
@@ -104,10 +101,7 @@ class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters;
     }

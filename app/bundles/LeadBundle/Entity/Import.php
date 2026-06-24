@@ -238,7 +238,7 @@ class Import extends FormEntity
      */
     public function isBackgroundProcess(): bool
     {
-        return !(self::MANUAL === $this->getStatus());
+        return self::MANUAL !== $this->getStatus();
     }
 
     /**
@@ -338,7 +338,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getOriginalFile()
     {
@@ -519,7 +519,7 @@ class Import extends FormEntity
      */
     public function start(): self
     {
-        if (empty($this->getDateStarted())) {
+        if (!$this->getDateStarted() instanceof \DateTimeInterface) {
             $this->setDateStarted(new \DateTime());
         }
 
@@ -530,6 +530,8 @@ class Import extends FormEntity
 
     /**
      * Modify the entity for the end of import.
+     *
+     * @phpstan-impure
      */
     public function end($removeFile = true): self
     {
@@ -629,10 +631,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getObject()
+    public function getObject(): string
     {
         return $this->object;
     }
@@ -770,7 +769,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return array
+     * @return array<mixed>|null
      */
     public function getProperties()
     {

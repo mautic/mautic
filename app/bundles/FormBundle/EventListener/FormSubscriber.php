@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
@@ -180,7 +181,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
+        if (!empty($config['email_to_owner']) && null !== $owner) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 

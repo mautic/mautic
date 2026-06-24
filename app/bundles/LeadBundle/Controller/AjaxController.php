@@ -307,6 +307,11 @@ class AjaxController extends CommonAjaxController
 
     public function toggleLeadCampaignAction(Request $request, MembershipManager $membershipManager, LeadModel $leadModel, CampaignModel $campaignModel): JsonResponse
     {
+        if (!$this->security->isGranted('campaign:campaigns:editown')
+            && !$this->security->isGranted('campaign:campaigns:editother')) {
+            $this->throwAccessDenied();
+        }
+
         $dataArray  = ['success' => 0];
         $leadId     = (int) $request->request->get('leadId');
         $campaignId = (int) $request->request->get('campaignId');
@@ -401,10 +406,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Get the rows for new leads.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model)
+    public function getNewLeadsAction(Request $request, ContactColumnsDictionary $contactColumnsDictionary, LeadModel $model): array|JsonResponse
     {
         $dataArray = ['success' => 0];
         $maxId     = $request->get('maxId');
@@ -425,7 +428,7 @@ class AjaxController extends CommonAjaxController
             );
 
             if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-                return $this->accessDenied(true);
+                return $this->getAccessDeniedFlash();
             }
 
             $session    = $request->getSession();

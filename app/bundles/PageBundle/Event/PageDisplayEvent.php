@@ -22,10 +22,8 @@ class PageDisplayEvent extends Event
 
     /**
      * Returns the Page entity.
-     *
-     * @return Page
      */
-    public function getPage()
+    public function getPage(): Page
     {
         return $this->page;
     }
@@ -50,10 +48,8 @@ class PageDisplayEvent extends Event
 
     /**
      * Get params.
-     *
-     * @return array
      */
-    public function getParams()
+    public function getParams(): array
     {
         return $this->params;
     }

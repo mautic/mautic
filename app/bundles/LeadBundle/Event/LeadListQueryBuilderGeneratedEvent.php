@@ -14,18 +14,12 @@ class LeadListQueryBuilderGeneratedEvent extends Event
     ) {
     }
 
-    /**
-     * @return LeadList
-     */
-    public function getSegment()
+    public function getSegment(): LeadList
     {
         return $this->segment;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    public function getQueryBuilder()
+    public function getQueryBuilder(): QueryBuilder
     {
         return $this->queryBuilder;
     }

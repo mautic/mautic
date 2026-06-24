@@ -87,11 +87,13 @@ class SendEmailToContact
      * Use an Email entity to populate content, from, etc.
      *
      * @param array $channel ['channelName', 'channelId']
-     *
-     * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], ?string $emailType = null)
-    {
+    public function setEmail(
+        Email $email,
+        array $channel = [],
+        array $customHeaders = [],
+        array $assetAttachments = [],
+    ): SendEmailToContact {
         // Flush anything that's pending from a previous email
         $this->flush();
 
@@ -99,7 +101,6 @@ class SendEmailToContact
         $this->mailer->enableQueue();
 
         if ($this->mailer->setEmail($email, true, $assetAttachments)) {
-            $this->mailer->setEmailType($emailType);
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
 
@@ -196,26 +197,17 @@ class SendEmailToContact
         $this->mailer->reset();
     }
 
-    /**
-     * @return array
-     */
-    public function getSentCounts()
+    public function getSentCounts(): array
     {
         return $this->emailSentCounts;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errorMessages;
     }
 
-    /**
-     * @return array
-     */
-    public function getFailedContacts()
+    public function getFailedContacts(): array
     {
         return $this->failedContacts;
     }

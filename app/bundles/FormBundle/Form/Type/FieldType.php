@@ -72,6 +72,9 @@ class FieldType extends AbstractType
                 $formTypeOptions = array_merge($formTypeOptions, $customParams['formTypeOptions']);
             }
 
+            $addInputAttributes     = (bool) ($customParams['builderOptions']['addInputAttributes'] ?? true);
+            $addContainerAttributes = (bool) ($customParams['builderOptions']['addContainerAttributes'] ?? true);
+
             $addFields = [
                 'labelText',
                 'addHelpMessage',
@@ -80,9 +83,7 @@ class FieldType extends AbstractType
                 'addDefaultValue',
                 'addLabelAttributes',
                 'labelAttributesText',
-                'addInputAttributes',
                 'inputAttributesText',
-                'addContainerAttributes',
                 'containerAttributesText',
                 'addMappedFieldList',
                 'addSaveResult',
@@ -140,6 +141,9 @@ class FieldType extends AbstractType
                     break;
                 case 'file':
                     $addShowLabel = $addDefaultValue = $addBehaviorFields = false;
+                    break;
+                case 'rating':
+                    $addDefaultValue = false;
                     break;
                 case 'slider':
                     $addIsRequired = false;
@@ -218,7 +222,7 @@ class FieldType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.form.field.form.alias.tooltip',
                     ],
-                    'disabled' => (!empty($options['data']['id']) && !str_contains($options['data']['id'], 'new')) ? true : false,
+                    'disabled' => !empty($options['data']['id']) && !str_contains($options['data']['id'], 'new'),
                     'required' => false,
                 ]
             );
@@ -297,7 +301,7 @@ class FieldType extends AbstractType
                 'labelAttributes',
                 TextType::class,
                 [
-                    'label'      => (!empty($labelAttributesText)) ? $labelAttributesText : 'mautic.form.field.form.labelattr',
+                    'label'      => $labelAttributesText ?? 'mautic.form.field.form.labelattr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
@@ -314,7 +318,7 @@ class FieldType extends AbstractType
                 'inputAttributes',
                 TextType::class,
                 [
-                    'label'      => (!empty($inputAttributesText)) ? $inputAttributesText : 'mautic.form.field.form.inputattr',
+                    'label'      => $inputAttributesText ?? 'mautic.form.field.form.inputattr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
@@ -369,7 +373,7 @@ class FieldType extends AbstractType
         }
 
         if ($addSaveResult) {
-            $default = (!isset($options['data']['saveResult']) || null === $options['data']['saveResult']) ? true
+            $default = !isset($options['data']['saveResult']) ? true
                 : (bool) $options['data']['saveResult'];
             $builder->add(
                 'saveResult',
@@ -398,7 +402,7 @@ class FieldType extends AbstractType
                 ]
             );
 
-            $default = (!isset($options['data']['showWhenValueExists']) || null === $options['data']['showWhenValueExists']) ? true
+            $default = !isset($options['data']['showWhenValueExists']) ? true
                 : (bool) $options['data']['showWhenValueExists'];
             $builder->add(
                 'showWhenValueExists',
@@ -459,7 +463,7 @@ class FieldType extends AbstractType
             );
         }
 
-        $func = function (FormEvent $event) use ($addMappedFieldList, $type) {
+        $func = function (FormEvent $event) use ($addMappedFieldList, $type): void {
             $fieldData = $event->getData();
             $form      = $event->getForm();
 
@@ -587,6 +591,16 @@ class FieldType extends AbstractType
                     $builder->add(
                         'properties',
                         FormFieldGroupType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
+                    break;
+                case 'rating':
+                    $builder->add(
+                        'properties',
+                        FormFieldRatingType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,

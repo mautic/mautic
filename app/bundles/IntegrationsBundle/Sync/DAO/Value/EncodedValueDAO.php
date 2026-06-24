@@ -12,7 +12,7 @@ class EncodedValueDAO
 
     public const FLOAT_TYPE    = 'float';
 
-    public const DOUBLE_TYPE   = 'double';
+    public const DOUBLE_TYPE   = self::FLOAT_TYPE; // float and double are the same in PHP
 
     public const DATETIME_TYPE = 'datetime';
 

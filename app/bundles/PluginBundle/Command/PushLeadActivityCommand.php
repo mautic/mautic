@@ -33,8 +33,7 @@ class PushLeadActivityCommand extends Command
                 '--integration',
                 '-i',
                 InputOption::VALUE_REQUIRED,
-                'Integration name. Integration must be enabled and authorised.',
-                null
+                'Integration name. Integration must be enabled and authorised.'
             )
             ->addOption('--start-date', '-d', InputOption::VALUE_REQUIRED, 'Set start date for updated values.')
             ->addOption(

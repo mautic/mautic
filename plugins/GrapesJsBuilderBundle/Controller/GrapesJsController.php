@@ -59,7 +59,7 @@ class GrapesJsController extends CommonController
         });
 
         try {
-            $unserialized = unserialize($content, ['allowed_classes' => false]);
+            $unserialized = \Mautic\CoreBundle\Helper\Serializer::decode($content);
         } catch (\Throwable) {
             return [];
         } finally {
@@ -121,7 +121,7 @@ class GrapesJsController extends CommonController
             $isNew = true;
 
             if (!$this->security->isGranted($aclToCheck.'create')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             /** @var Email|Page $entity */
@@ -139,7 +139,7 @@ class GrapesJsController extends CommonController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
         }
 
@@ -163,9 +163,9 @@ class GrapesJsController extends CommonController
         }
 
         // Replace short codes to emoji
-        $content = array_map(fn ($text) => EmojiHelper::toEmoji($text, 'short'), $content);
+        $content = array_map(fn ($text): string => EmojiHelper::toEmoji($text, 'short'), $content);
 
-        $renderedTemplate =  $this->renderView(
+        $renderedTemplate =  $themeHelper->renderThemeTemplate(
             $logicalName,
             [
                 'isNew'     => $isNew,
@@ -217,7 +217,7 @@ class GrapesJsController extends CommonController
                 $entity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content     = $this->normalizeContentToArray($entity->getContent());

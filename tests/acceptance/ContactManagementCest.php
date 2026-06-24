@@ -230,8 +230,8 @@ class ContactManagementCest
         $I->amOnPage(ContactPage::$URL);
 
         // Grab the names of the first and second contacts from the list
-        $contactName1 = $contact->grabContactNameFromList(1);
-        $contactName2 = $contact->grabContactNameFromList(2);
+        $contact->grabContactNameFromList(1);
+        $contact->grabContactNameFromList(2);
 
         // Navigate to the campaign page and click the Contacts tab
         $I->amOnPage(CampaignPage::$URL);
@@ -499,7 +499,7 @@ class ContactManagementCest
         $initialContactCount = $I->grabNumRecords('test_leads');
 
         // Click on the import button
-        $contact->selectOptionFromDropDownContactsPage(3);
+        $contact->selectOptionFromDropDownContactsPage('Import');
 
         // Wait for the import page to load
         $I->waitForText('Import Contacts', 30, 'h1.page-header-title');

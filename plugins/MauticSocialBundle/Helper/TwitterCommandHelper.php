@@ -52,10 +52,7 @@ class TwitterCommandHelper
         return $this->updatedLeads;
     }
 
-    /**
-     * @return array
-     */
-    public function getManipulatedLeads()
+    public function getManipulatedLeads(): array
     {
         return $this->manipulatedLeads;
     }

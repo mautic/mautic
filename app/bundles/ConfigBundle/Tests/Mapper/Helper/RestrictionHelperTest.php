@@ -7,10 +7,8 @@ use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
 class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var array
-     */
-    private $restrictedFields = [
+    /** @var array<int|string, mixed> */
+    private array $restrictedFields = [
         'db_host',
         'db_user',
         'monitored_email' => [

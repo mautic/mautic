@@ -57,18 +57,12 @@ class WebhookQueue
             ->build();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?Webhook
     {
         return $this->webhook;
     }
@@ -85,10 +79,7 @@ class WebhookQueue
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
@@ -137,10 +128,7 @@ class WebhookQueue
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }

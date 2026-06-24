@@ -42,7 +42,7 @@
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpunit": "^10.5.62",
-    "rector/rector": "2.2",
+    "rector/rector": "^2.5.2",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
@@ -110,6 +110,11 @@
       "MauticPlugin\\": "plugins/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "MauticRector\\": "rector/"
+    }
+  },
   "repositories": [
     {
       "type": "path",
@@ -166,6 +171,15 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
+    "asset-map:clean": "php -r 'if (is_dir(\"assets/build\")) { $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\"assets/build\", FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST); foreach ($it as $file) { $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname()); } rmdir(\"assets/build\"); }'",
+    "sass:build": [
+      "@asset-map:clean",
+      "php bin/console sass:build"
+    ],
+    "sass:watch": [
+      "@asset-map:clean",
+      "php bin/console sass:build --watch"
+    ],
     "generate-assets": "bin/console mautic:assets:generate && bin/console assets:install --symlink --relative ./",
     "motd": "bin/console mautic:motd"
   },
@@ -204,13 +218,10 @@
     "symfony-var-dir": "var",
     "symfony-tests-dir": "tests",
     "symfony-assets-install": "relative",
+    "public-dir": ".",
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
     },
-    "patches": {
-      "studio-42/elfinder": {
-        "Fix PHP 8.5 deprecated scalar casts": "patches/studio-42-elfinder-php85-float-cast.patch"
-      }
-    }
+    "patches": {}
   }
 }

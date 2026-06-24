@@ -166,7 +166,7 @@ class MobileNotificationType extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
+            function (FormEvent $event): void {
                 $data = $event->getData();
                 if (isset($data['translationParentSelector'])) {
                     $data['translationParent'] = $data['translationParentSelector'];

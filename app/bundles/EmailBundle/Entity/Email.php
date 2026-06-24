@@ -49,10 +49,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('email:emails:viewown')"),
         new Post(security: "is_granted('email:emails:create')"),
-        new Get(security: "is_granted('email:emails:viewown')"),
-        new Put(security: "is_granted('email:emails:editown')"),
-        new Patch(security: "is_granted('email:emails:editother')"),
-        new Delete(security: "is_granted('email:emails:deleteown')"),
+        new Get(security: "is_granted('email:emails:viewown', object)"),
+        new Put(security: "is_granted('email:emails:editown', object)"),
+        new Patch(security: "is_granted('email:emails:editother', object)"),
+        new Delete(security: "is_granted('email:emails:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['email:read'],
@@ -80,6 +80,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public const ENTITY_NAME = 'email';
 
     public const MAX_NAME_SUBJECT_LENGTH = 190;
+
+    public const TABLE_NAME = 'emails';
 
     /**
      * @var int
@@ -110,6 +112,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $useOwnerAsMailer;
+
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private ?string $preheaderText = null;
@@ -349,7 +354,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('emails')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(EmailRepository::class)
             ->addLifecycleEvent('cleanUrlsInContent', Events::preUpdate)
             ->addLifecycleEvent('cleanUrlsInContent', Events::prePersist);
@@ -362,6 +367,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
         $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
         $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
+
+        $builder->createField('sendToDnc', Types::BOOLEAN)
+            ->columnName('send_to_dnc')
+            ->option('default', 0)
+            ->build();
+
         $builder->addNullableField('template', Types::STRING);
         $builder->addNullableField('content', Types::ARRAY);
         $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
@@ -492,7 +503,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $metadata->addPropertyConstraint(
             'fromAddress',
-            new EmailOrEmailTokenList(),
+            new EmailOrEmailTokenList(['allowMultiple' => false]),
         );
 
         $metadata->addPropertyConstraint(
@@ -564,6 +575,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'replyToAddress',
                     'bccAddress',
                     'useOwnerAsMailer',
+                    'sendToDnc',
                     'utmTags',
                     'preheaderText',
                     'customHtml',
@@ -613,7 +625,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -634,7 +646,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getDescription()
     {
@@ -670,7 +682,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ?Category
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -727,7 +739,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getReadCount($includeVariants = false)
     {
@@ -750,7 +762,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getRevision()
     {
@@ -768,7 +780,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getSessionId()
     {
@@ -786,7 +798,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getSubject()
     {
@@ -805,7 +817,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ?bool
+     * @return bool|null
      */
     public function getUseOwnerAsMailer()
     {
@@ -824,8 +836,21 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
+    public function getSendToDnc(): bool
+    {
+        return $this->sendToDnc;
+    }
+
+    public function setSendToDnc(bool $sendToDnc): Email
+    {
+        $this->isChanged('sendToDnc', $sendToDnc);
+        $this->sendToDnc = $sendToDnc;
+
+        return $this;
+    }
+
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getFromAddress()
     {
@@ -846,7 +871,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getFromName()
     {
@@ -867,7 +892,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getReplyToAddress()
     {
@@ -901,7 +926,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getBccAddress()
     {
@@ -922,7 +947,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -941,7 +966,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -964,7 +989,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -985,7 +1010,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @param bool $includeVariants
      *
-     * @return mixed
+     * @return int
      */
     public function getSentCount($includeVariants = false)
     {
@@ -1003,7 +1028,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getVariantSentCount($includeVariants = false)
     {
@@ -1083,7 +1108,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPlainText()
     {
@@ -1119,7 +1144,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getVariantReadCount()
     {
@@ -1137,7 +1162,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection<int, Stat>
      */
     public function getStats()
     {
@@ -1145,7 +1170,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getCustomHtml()
     {
@@ -1163,7 +1188,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return Form|null
      */
     public function getUnsubscribeForm()
     {
@@ -1181,7 +1206,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return Page|null
      */
     public function getPreferenceCenter()
     {
@@ -1200,7 +1225,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getEmailType()
     {

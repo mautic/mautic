@@ -30,7 +30,7 @@ class ParseEmailEvent extends Event
      *
      * @return \Mautic\EmailBundle\MonitoredEmail\Message[]
      */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }
@@ -45,10 +45,7 @@ class ParseEmailEvent extends Event
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getKeys()
+    public function getKeys(): array
     {
         return $this->keys;
     }
@@ -107,18 +104,12 @@ class ParseEmailEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getCriteriaRequests()
+    public function getCriteriaRequests(): array
     {
         return $this->criteriaRequests;
     }
 
-    /**
-     * @return array
-     */
-    public function getMarkAsSeenInstructions()
+    public function getMarkAsSeenInstructions(): array
     {
         return $this->markAsSeen;
     }

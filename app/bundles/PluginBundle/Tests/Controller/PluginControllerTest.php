@@ -26,7 +26,7 @@ class PluginControllerTest extends MauticMysqlTestCase
         ]);
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testConfigurePluginValidationError(): void
@@ -54,7 +54,7 @@ class PluginControllerTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/plugins/info/MauticFocusBundle');
 
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $response->getContent();
         Assert::assertJson($content);

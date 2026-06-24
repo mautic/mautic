@@ -209,10 +209,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get the MailHelper object.
-     *
-     * @return MailHelper
      */
-    public function getHelper()
+    public function getHelper(): ?MailHelper
     {
         return $this->helper;
     }
@@ -312,10 +310,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get the content hash to note if the content has been changed.
-     *
-     * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         if (null !== $this->helper) {
             return $this->helper->getContentHash();

@@ -2,7 +2,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\EmailBundle\Entity\Stat;
 
 /**
  * @extends CommonRepository<FrequencyRule>
@@ -67,8 +69,9 @@ class FrequencyRuleRepository extends CommonRepository
         if ($leadIds) {
             if ($groupByLeads) {
                 $q->andWhere(
-                    $q->expr()->in('fr.lead_id', $leadIds)
-                );
+                    $q->expr()->in('fr.lead_id', ':leadIds')
+                )
+                ->setParameter('leadIds', $leadIds, ArrayParameterType::INTEGER);
             } else {
                 $q->andWhere('fr.lead_id = :leadId')
                     ->setParameter('leadId', (int) $leadIds);
@@ -124,6 +127,11 @@ class FrequencyRuleRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch')
             ->join('ch', MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'fr', "ch.{$statContactColumn} = fr.lead_id");
 
+        if (Stat::TABLE_NAME === $statTable) {
+            $q->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
+                ->andWhere('e.send_to_dnc = 0');
+        }
+
         if ($channel) {
             $q->andWhere('fr.channel = :channel')
                 ->setParameter('channel', $channel);
@@ -142,8 +150,9 @@ class FrequencyRuleRepository extends CommonRepository
         );
 
         $q->andWhere(
-            $q->expr()->in("ch.$statContactColumn", $leadIds)
-        );
+            $q->expr()->in("ch.$statContactColumn", ':ids')
+        )
+        ->setParameter('ids', $leadIds, ArrayParameterType::INTEGER);
 
         $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
 
@@ -174,6 +183,11 @@ class FrequencyRuleRepository extends CommonRepository
         $query->select("ch.$statContactColumn")
             ->from(MAUTIC_TABLE_PREFIX.$statTable, 'ch');
 
+        if (Stat::TABLE_NAME === $statTable) {
+            $query->join('ch', MAUTIC_TABLE_PREFIX.'emails', 'e', 'ch.email_id = e.id')
+                ->andWhere('e.send_to_dnc = 0');
+        }
+
         switch ($defaultFrequencyTime) {
             case 'MONTH':
                 $since = new \DateTime('-1 month', new \DateTimeZone('UTC'));
@@ -192,8 +206,9 @@ class FrequencyRuleRepository extends CommonRepository
             ->setParameter('frequencyTime', $since->format('Y-m-d H:i:s'));
 
         $query->andWhere(
-            $query->expr()->in("ch.$statContactColumn", $leadIds)
-        );
+            $query->expr()->in("ch.$statContactColumn", ':ids')
+        )
+            ->setParameter('ids', $leadIds, ArrayParameterType::INTEGER);
 
         $hasCustomRules = $this->tableHasRows(MAUTIC_TABLE_PREFIX.'lead_frequencyrules');
         // We don't need to check if users have custom rules if there are no records inside that table

@@ -67,10 +67,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getSelectColumns()
+    public function getSelectColumns(): array
     {
         return $this->selectColumns;
     }
@@ -85,10 +82,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
