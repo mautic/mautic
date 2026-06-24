@@ -242,7 +242,7 @@ class OrderDAO
     /**
      * @return NotificationDAO[]
      */
-    public function getNotifications()
+    public function getNotifications(): array
     {
         return $this->notifications;
     }

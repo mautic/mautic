@@ -47,7 +47,7 @@ class TableSchemaHelper
      *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    public function getSchemaManager()
+    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
     {
         return $this->sm;
     }

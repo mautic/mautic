@@ -71,18 +71,12 @@ class EmailReply
         return $this->id;
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): Stat
     {
         return $this->stat;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateReplied()
+    public function getDateReplied(): \DateTimeInterface
     {
         return $this->dateReplied;
     }

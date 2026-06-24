@@ -40,6 +40,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Monitoring extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+
     /**
      * @var int
      */

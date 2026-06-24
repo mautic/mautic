@@ -100,10 +100,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $this->translationKeyPrefix = 'mautic.lead.field.type.';
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return self::$types;
     }

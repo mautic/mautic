@@ -1120,10 +1120,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Load the file object from it's path.
-     *
-     * @return File|null
      */
-    public function loadFile($temp = false)
+    public function loadFile($temp = false): ?File
     {
         if ($temp) {
             $path = $this->getAbsoluteTempPath();

@@ -180,7 +180,7 @@ class OperatorOptions
     /**
      * @return array<string,array<string,string>>
      */
-    public static function getFilterExpressionFunctions()
+    public static function getFilterExpressionFunctions(): array
     {
         return self::$operatorOptions;
     }
@@ -188,7 +188,7 @@ class OperatorOptions
     /**
      * @return array<string,array<string,string>>
      */
-    public function getFilterExpressionFunctionsNonStatic()
+    public function getFilterExpressionFunctionsNonStatic(): array
     {
         return self::$operatorOptions;
     }
