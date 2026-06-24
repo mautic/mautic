@@ -792,7 +792,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
                 $listIds                      = $this->getListIdsByAlias($string) ?: [0];
-                $this->activeSearchSegmentIds = array_map('intval', $listIds);
+                $this->activeSearchSegmentIds = $listIds;
 
                 $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                 $sq->select('1')
@@ -824,7 +824,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 } elseif (in_array($string, [$filterAddedValue, $filterAddedValueEn], true)) {
                     $manuallyAddedParam = 0;
                 } else {
-                    // Unknown source value — match nothing
+                    // Unknown source value, so match nothing.
                     $expr = $q->expr()->eq(1, 0);
                     break;
                 }
@@ -1506,9 +1506,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return string[]
-     */
-    /**
      * Returns the segment IDs stored from the most recently processed list/segment search command.
      * Used by the source: command to scope results to the active segment context.
      *
@@ -1519,16 +1516,22 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         return $this->activeSearchSegmentIds;
     }
 
+    /**
+     * @return array<int>
+     */
     private function getListIdsByAlias(string $alias): array
     {
-        return $this->getEntityManager()
-            ->getConnection()
-            ->createQueryBuilder()
-            ->select('list.id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
-            ->where('list.alias = :alias')
-            ->setParameter('alias', $alias)
-            ->executeQuery()
-            ->fetchFirstColumn();
+        return array_map(
+            'intval',
+            $this->getEntityManager()
+                ->getConnection()
+                ->createQueryBuilder()
+                ->select('list.id')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_lists', 'list')
+                ->where('list.alias = :alias')
+                ->setParameter('alias', $alias)
+                ->executeQuery()
+                ->fetchFirstColumn()
+        );
     }
 }
