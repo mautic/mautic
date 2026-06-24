@@ -108,7 +108,7 @@ class PublicController extends FormController
         $response = null;
         $user     = $model->getRepository()->findByIdentifier($data['identifier']);
 
-        if (null === $user) {
+        if (!$user instanceof \Mautic\UserBundle\Entity\User) {
             $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
 
             $response = $this->redirectToRoute('login');
@@ -149,7 +149,7 @@ class PublicController extends FormController
         $invite   = $model->getInvite($token);
         $response = null;
 
-        if (null === $invite) {
+        if (!$invite instanceof \Mautic\UserBundle\Entity\UserInvite) {
             $this->addFlashMessage('mautic.user.invite.invalid', [], 'error', 'flashes');
 
             $response = $this->redirectToRoute('login');

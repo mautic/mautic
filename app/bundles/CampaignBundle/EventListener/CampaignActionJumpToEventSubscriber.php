@@ -72,7 +72,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
 
-        if (null === $jumpTarget) {
+        if (!$jumpTarget instanceof \Mautic\CampaignBundle\Entity\Event) {
             // Target event has been removed.
             $pending  = $campaignEvent->getPending();
             $contacts = $campaignEvent->getContacts();
@@ -125,7 +125,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 
             $jumpTarget = $this->getJumpTargetForEvent($event, 'e.tempId');
 
-            if (null !== $jumpTarget) {
+            if ($jumpTarget instanceof \Mautic\CampaignBundle\Entity\Event) {
                 $event->setProperties(array_merge(
                     $event->getProperties(),
                     [

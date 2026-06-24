@@ -314,7 +314,7 @@ class CategoryController extends AbstractFormController
         $inForm    = $this->getInFormValue($request, $method);
         $response  = null;
         // not found
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\CategoryBundle\Entity\Category) {
             $closeModal = true;
         } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':edit')) {
             $response = $this->modalAccessDenied();
@@ -328,7 +328,7 @@ class CategoryController extends AbstractFormController
             ]);
         }
 
-        if (null !== $response) {
+        if ($response instanceof \Symfony\Component\HttpFoundation\JsonResponse) {
             return $response;
         }
 
@@ -470,7 +470,7 @@ class CategoryController extends AbstractFormController
             \assert($model instanceof CategoryModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\CategoryBundle\Entity\Category) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.category.error.notfound',
@@ -547,7 +547,7 @@ class CategoryController extends AbstractFormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\CategoryBundle\Entity\Category) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.category.error.notfound',

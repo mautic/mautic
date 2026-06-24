@@ -42,7 +42,7 @@ class FieldApiController extends CommonApiController
     public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, FieldModel $fieldModel)
     {
         $request = $requestStack->getCurrentRequest();
-        \assert(null !== $request);
+        \assert($request instanceof \Symfony\Component\HttpFoundation\Request);
 
         $this->model           = $fieldModel;
         $this->fieldObject     = $request->get('object');

@@ -529,7 +529,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $this->flushAndCatch();
             }
 
-            if (null !== $hitDateTime && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
+            if ($hitDateTime instanceof \DateTimeInterface && $lead->getLastActive() < $hitDateTime) { // We need to perform the update after all is saved
                 $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
             }
         }
@@ -1661,7 +1661,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             if (!isset($user['email'])) {
                 $userEntity = $this->userModel->getEntity($id);
 
-                if (null === $userEntity) {
+                if (!$userEntity instanceof \Mautic\UserBundle\Entity\User) {
                     continue;
                 }
 

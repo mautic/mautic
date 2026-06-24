@@ -49,7 +49,7 @@ class PointGroupsApiController extends CommonApiController
     {
         $contact = $this->leadModel->getEntity($contactId);
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound($this->translator->trans('mautic.lead.event.api.lead.not.found'));
         }
 
@@ -76,7 +76,7 @@ class PointGroupsApiController extends CommonApiController
     {
         $contact = $this->leadModel->getEntity($contactId);
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound($this->translator->trans('mautic.lead.event.api.lead.not.found'));
         }
 
@@ -107,7 +107,7 @@ class PointGroupsApiController extends CommonApiController
     {
         $contact = $this->leadModel->getEntity($contactId);
 
-        if (null === $contact) {
+        if (!$contact instanceof \Mautic\LeadBundle\Entity\Lead) {
             return $this->notFound($this->translator->trans('mautic.lead.event.api.lead.not.found'));
         }
 

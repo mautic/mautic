@@ -152,7 +152,7 @@ class ClientController extends AbstractStandardFormController
         if ('POST' == $request->getMethod()) {
             $client = $this->clientModel->getEntity($clientId);
 
-            if (null === $client) {
+            if (!$client instanceof \Mautic\ApiBundle\Entity\oAuth2\Client) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',
@@ -309,7 +309,7 @@ class ClientController extends AbstractStandardFormController
         ];
 
         // client not found
-        if (null === $client) {
+        if (!$client instanceof \Mautic\ApiBundle\Entity\oAuth2\Client) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -416,7 +416,7 @@ class ClientController extends AbstractStandardFormController
 
         if ('POST' === $request->getMethod()) {
             $entity = $this->clientModel->getEntity($objectId);
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\ApiBundle\Entity\oAuth2\Client) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.api.client.error.notfound',

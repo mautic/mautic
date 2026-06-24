@@ -380,7 +380,7 @@ class RoleController extends FormController
                 \assert($model instanceof RoleModel);
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\UserBundle\Entity\Role) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.user.role.error.notfound',
@@ -445,7 +445,7 @@ class RoleController extends FormController
                 $entity = $model->getEntity($objectId);
                 $users  = $userRepo->findByRole($entity);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\UserBundle\Entity\Role) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.user.role.error.notfound',

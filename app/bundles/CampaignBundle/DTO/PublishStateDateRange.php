@@ -38,6 +38,6 @@ final class PublishStateDateRange
      */
     public function happenedWithinRange(\DateTimeInterface $date): bool
     {
-        return $date >= $this->fromDate && (null === $this->toDate || $date <= $this->toDate);
+        return $date >= $this->fromDate && (!$this->toDate instanceof \DateTimeInterface || $date <= $this->toDate);
     }
 }

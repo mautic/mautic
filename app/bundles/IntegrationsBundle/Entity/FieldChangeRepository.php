@@ -52,7 +52,7 @@ class FieldChangeRepository extends CommonRepository
             $qb->setParameter('integration', $integration);
         }
 
-        if (null !== $toDateTime) {
+        if ($toDateTime instanceof \DateTimeInterface) {
             $expr = $expr->with($qb->expr()->lte('modified_at', ':toDateTime'));
             $qb->setParameter('toDateTime', $toDateTime->format('Y-m-d H:i:s'));
         }

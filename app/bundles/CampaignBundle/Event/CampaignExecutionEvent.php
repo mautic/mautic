@@ -209,7 +209,7 @@ class CampaignExecutionEvent extends Event
      */
     public function setChannel($channel, $channelId = null): void
     {
-        if (null !== $this->log) {
+        if ($this->log instanceof \Mautic\CampaignBundle\Entity\LeadEventLog) {
             // Set the channel since we have the resource
             $this->log->setChannel($channel);
             $this->log->setChannelId($channelId);

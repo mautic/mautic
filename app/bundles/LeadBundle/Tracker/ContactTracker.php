@@ -48,7 +48,7 @@ class ContactTracker
 
     public function getContact(): ?Lead
     {
-        if (null !== $this->getRequest() && $this->getRequest()->cookies->get('Blocked-Tracking')) {
+        if ($this->getRequest() instanceof \Symfony\Component\HttpFoundation\Request && $this->getRequest()->cookies->get('Blocked-Tracking')) {
             return null;
         }
 
@@ -127,7 +127,7 @@ class ContactTracker
      */
     public function setSystemContact(?Lead $lead = null): void
     {
-        if (null !== $lead) {
+        if ($lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $this->logger->debug("LEAD: {$lead->getId()} set as system lead.");
 
             $fields = $lead->getFields();
@@ -296,7 +296,7 @@ class ContactTracker
 
     private function hydrateCustomFieldData(?Lead $lead = null): void
     {
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             return;
         }
 
@@ -311,7 +311,7 @@ class ContactTracker
             return $this->useSystemContact;
         }
 
-        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || null === $this->getRequest();
+        return $this->isUserSession() || $this->systemContact || defined('IN_MAUTIC_CONSOLE') || !$this->getRequest() instanceof \Symfony\Component\HttpFoundation\Request;
     }
 
     private function isUserSession(): bool

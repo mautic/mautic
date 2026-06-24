@@ -26,7 +26,7 @@ class WebhookService
     {
         $healthyWebhookTime = $this->getHealthyWebhookTime();
 
-        return null === $webhook->getMarkedUnhealthyAt() || ($webhook->getMarkedUnhealthyAt() < $healthyWebhookTime);
+        return !$webhook->getMarkedUnhealthyAt() instanceof \DateTimeImmutable || ($webhook->getMarkedUnhealthyAt() < $healthyWebhookTime);
     }
 
     public function sendWebhookFailureNotification(Webhook $webhook, string $reason): bool
@@ -47,7 +47,7 @@ class WebhookService
 
     private function isFailingMoreThanThresholdTime(Webhook $webhook): bool
     {
-        if (null === $webhook->getUnHealthySince()) {
+        if (!$webhook->getUnHealthySince() instanceof \DateTimeImmutable) {
             return false;
         }
         $webhookFailureNotificationTime = $this->coreParametersHelper->get('first_webhook_failure_notification_time', 3600);
@@ -58,7 +58,7 @@ class WebhookService
 
     private function shouldSendNotificationNow(Webhook $webhook): bool
     {
-        if (null === $webhook->getLastNotificationSentAt()) {
+        if (!$webhook->getLastNotificationSentAt() instanceof \DateTimeImmutable) {
             return true;
         }
         $webhookFailureNotificationInterval = $this->coreParametersHelper->get('webhook_failure_notification_interval', 86400);

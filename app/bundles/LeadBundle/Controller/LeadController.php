@@ -1151,7 +1151,7 @@ class LeadController extends FormController
             \assert($model instanceof LeadModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.lead.lead.error.notfound',
@@ -1220,7 +1220,7 @@ class LeadController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\LeadBundle\Entity\Lead) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.lead.lead.error.notfound',
@@ -2405,7 +2405,7 @@ class LeadController extends FormController
         int $objectId): Response
     {
         $lead  = $model->getEntity($objectId);
-        if (null === $lead
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead
             || !$this->security->hasEntityAccess(
                 'lead:leads:editown',
                 'lead:leads:editother',

@@ -29,7 +29,7 @@ class TokenHelper
                     continue;
                 }
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form
+                if ($form instanceof \Mautic\FormBundle\Entity\Form
                     && (
                         $form->isPublished(false)
                         || $this->security->hasEntityAccess(

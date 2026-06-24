@@ -55,9 +55,9 @@ class CommonController extends AbstractController implements MauticController
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
+        $request = $this->requestStack instanceof \Symfony\Component\HttpFoundation\RequestStack ? $this->requestStack->getCurrentRequest() : null;
 
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             throw new \RuntimeException('Request is not set.');
         }
 
@@ -602,7 +602,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function getNotificationContent(?Request $request = null): array
     {
-        if (null === $request) {
+        if (!$request instanceof \Symfony\Component\HttpFoundation\Request) {
             $request = $this->getCurrentRequest();
         }
 

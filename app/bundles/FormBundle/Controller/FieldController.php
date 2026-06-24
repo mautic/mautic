@@ -201,7 +201,7 @@ class FieldController extends CommonFormController
                     'field'                => $formField,
                     'id'                   => $keyId,
                     'formId'               => $formId,
-                    'formName'             => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
+                    'formName'             => !$formEntity instanceof \Mautic\FormBundle\Entity\Form ? 'newform' : $formEntity->generateFormName(),
                     'mappedFields'         => $this->mappedObjectCollector->buildCollection((string) $formField['mappedObject']),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),

@@ -241,7 +241,7 @@ class ReportController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\ReportBundle\Entity\Report) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.report.report.error.notfound',
@@ -540,7 +540,7 @@ class ReportController extends FormController
         $entity   = $model->getEntity($objectId);
         $security = $this->security;
 
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\ReportBundle\Entity\Report) {
             $page = $request->getSession()->get('mautic.report.page', 1);
 
             return $this->postActionRedirect(
@@ -736,7 +736,7 @@ class ReportController extends FormController
      */
     private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, ReportModel $model, string $modelName)
     {
-        if (null === $entity) {
+        if (!$entity instanceof \Mautic\ReportBundle\Entity\Report) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,

@@ -73,7 +73,7 @@ class ProcessWebhookQueuesCommand extends Command
         $healthyWebhookTime     = $this->webhookService->getHealthyWebhookTime();
         if ($id) {
             $webhook        = $this->webhookModel->getEntity($id);
-            $webhooks       = (null !== $webhook && $webhook->isPublished()
+            $webhooks       = ($webhook instanceof \Mautic\WebhookBundle\Entity\Webhook && $webhook->isPublished()
                 && $this->webhookService->isWebhookHealthy($webhook)) ? [$id => $webhook] : [];
             $queueRangeMode = $minId && $maxId;
         } else {

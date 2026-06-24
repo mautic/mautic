@@ -418,7 +418,7 @@ class PublicController extends CommonFormController
     {
         $response = $this->getStandardRedirectResponse($context, $submissionResult);
 
-        if (null === $response) {
+        if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
             $msg     = $submissionResult['postActionProperty'];
             $msgType = 'notice';
 
@@ -516,7 +516,7 @@ class PublicController extends CommonFormController
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
         $template          = null;
 
-        if (null === $form || !$form->isPublished()) {
+        if (!$form instanceof \Mautic\FormBundle\Entity\Form || !$form->isPublished()) {
             return $this->notFound();
         }
         $html = $model->getContent($form);
@@ -586,7 +586,7 @@ class PublicController extends CommonFormController
         $form  = $model->getEntity($formId);
         $js    = '';
 
-        if (null !== $form) {
+        if ($form instanceof \Mautic\FormBundle\Entity\Form) {
             $status = $form->getPublishStatus();
             if ('published' === $status) {
                 $js = $model->getAutomaticJavascript($form);

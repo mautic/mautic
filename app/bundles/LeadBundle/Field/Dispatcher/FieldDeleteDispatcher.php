@@ -56,7 +56,7 @@ class FieldDeleteDispatcher
             throw new NoListenerException('There is no Listener for this event');
         }
 
-        if (null === $event) {
+        if (!$event instanceof \Mautic\LeadBundle\Event\LeadFieldEvent) {
             $event = new LeadFieldEvent($entity);
             $event->setEntityManager($this->entityManager);
         }

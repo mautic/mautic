@@ -418,7 +418,7 @@ class ThemeHelper implements ThemeHelperInterface
             return $this->twig->render($template, $params);
         }
 
-        if (null === $this->sandboxEnv) {
+        if (!$this->sandboxEnv instanceof \Twig\Environment) {
             $this->sandboxEnv = new Environment($this->twig->getLoader(), [
                 'debug'            => $this->twig->isDebug(),
                 'strict_variables' => $this->twig->isStrictVariables(),

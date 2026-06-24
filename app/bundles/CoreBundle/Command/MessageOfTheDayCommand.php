@@ -160,15 +160,15 @@ final class MessageOfTheDayCommand extends Command
                 continue;
             }
 
-            if (null !== $start && $now < $start) {
+            if ($start instanceof \DateTimeImmutable && $now < $start) {
                 continue;
             }
 
-            if (null !== $end && $now > $end) {
+            if ($end instanceof \DateTimeImmutable && $now > $end) {
                 continue;
             }
 
-            $pool = (null !== $start && null !== $end) ? 'timed' : 'timeless';
+            $pool = ($start instanceof \DateTimeImmutable && $end instanceof \DateTimeImmutable) ? 'timed' : 'timeless';
 
             $messages[$pool][] = [
                 'category' => $data['categories'][$message['category']],

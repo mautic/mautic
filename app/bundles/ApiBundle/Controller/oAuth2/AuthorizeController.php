@@ -67,7 +67,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     public function authorizeAction(Request $request, AuthorizeFormHandler $formHandler, Environment $twig): Response
     {
         // The parent bundle does not care about token being empty.
-        if (null === $this->tokenStorage->getToken()) {
+        if (!$this->tokenStorage->getToken() instanceof \Symfony\Component\Security\Core\Authentication\Token\TokenInterface) {
             throw new AccessDeniedException('This user does not have access to this section. No token.');
         }
 

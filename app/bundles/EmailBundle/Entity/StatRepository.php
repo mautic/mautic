@@ -352,7 +352,7 @@ class StatRepository extends CommonRepository
             )->setParameter('false', false, 'boolean')
             ->setParameter('inIds', $inIds, ArrayParameterType::INTEGER);
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $sq->andWhere(
@@ -573,7 +573,7 @@ class StatRepository extends CommonRepository
             )->setParameter('false', false, 'boolean')
             ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER);
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof \DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

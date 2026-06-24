@@ -430,7 +430,7 @@ class PublicController extends CommonFormController
         $contactId   = (int) $request->query->get('contactId');
         $emailEntity = $model->getEntity($objectId);
 
-        if (null === $emailEntity) {
+        if (!$emailEntity instanceof \Mautic\EmailBundle\Entity\Email) {
             return $this->notFound();
         }
 
@@ -610,7 +610,7 @@ class PublicController extends CommonFormController
             $lead = $repo->getLeadByEmail($email);
             if (null === $lead) {
                 $lead = $this->createLead($email, $repo);
-                if (null === $lead) {
+                if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
                     continue;
                 }
             }

@@ -178,7 +178,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
             return;
         }
 
-        if (null !== $typeId && MAUTIC_ENV === 'prod' && null !== $this->requestStack->getMainRequest()) {
+        if (null !== $typeId && MAUTIC_ENV === 'prod' && $this->requestStack->getMainRequest() instanceof \Symfony\Component\HttpFoundation\Request) {
             // let's prevent some unnecessary DB calls
             $session         = $this->requestStack->getMainRequest()->getSession();
             $triggeredEvents = $session->get('mautic.triggered.point.actions', []);
@@ -199,10 +199,10 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
         $hasLeadPointChanges = false;
-        if (null === $lead) {
+        if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead) {
             $lead = $this->contactTracker->getContact();
 
-            if (null === $lead || !$lead->getId()) {
+            if (!$lead instanceof \Mautic\LeadBundle\Entity\Lead || !$lead->getId()) {
                 return;
             }
         }

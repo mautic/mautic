@@ -443,7 +443,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
 
-            if (null !== $companyChangeLog) {
+            if ($companyChangeLog instanceof \Mautic\LeadBundle\Entity\CompanyChangeLog) {
                 $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
             }
         }
@@ -701,7 +701,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
 
-        if (null !== $hitDate) {
+        if ($hitDate instanceof \DateTimeInterface) {
             if (null === $lead->getLastActive() || $lead->getLastActive() < $hitDate) {
                 try {
                     $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);

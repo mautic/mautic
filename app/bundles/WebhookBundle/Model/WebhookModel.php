@@ -424,7 +424,7 @@ class WebhookModel extends FormModel
 
     public function markWebhookHealthy(Webhook $webhook): void
     {
-        if (null === $webhook->getMarkedUnhealthyAt()) {
+        if (!$webhook->getMarkedUnhealthyAt() instanceof \DateTimeImmutable) {
             return;
         }
         $webhook->setMarkedUnhealthyAt(null);
@@ -501,7 +501,7 @@ class WebhookModel extends FormModel
         if (self::COMMAND_PROCESS === $this->queueMode) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = null !== $queue ? [$queue] : [];
+            $queuesArray = $queue instanceof \Mautic\WebhookBundle\Entity\WebhookQueue ? [$queue] : [];
         }
         $this->webhookQueueIdList = [];
         /* @var WebhookQueue $queueItem */

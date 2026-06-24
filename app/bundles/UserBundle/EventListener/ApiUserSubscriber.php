@@ -55,11 +55,11 @@ class ApiUserSubscriber implements EventSubscriberInterface
             }
 
             $accessToken = $accessTokenBadge->getAccessToken();
-            if (null === $user) {
+            if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                 $user = $this->tokenPermissions->setActivePermissionsOnAuthToken($accessToken);
             }
 
-            if (null === $user) {
+            if (!$user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
                 return null;
             }
 
@@ -87,7 +87,7 @@ class ApiUserSubscriber implements EventSubscriberInterface
         $authenticatedToken = $event->getAuthenticatedToken();
         \assert($authenticatedToken instanceof OAuthToken);
 
-        if (null !== $authenticatedToken->getUser()) {
+        if ($authenticatedToken->getUser() instanceof \Symfony\Component\Security\Core\User\UserInterface) {
             return;
         }
 

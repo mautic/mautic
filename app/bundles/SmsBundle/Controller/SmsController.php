@@ -603,7 +603,7 @@ class SmsController extends FormController
             \assert($model instanceof SmsModel);
             $entity = $model->getEntity($objectId);
 
-            if (null === $entity) {
+            if (!$entity instanceof \Mautic\SmsBundle\Entity\Sms) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.sms.error.notfound',
@@ -670,7 +670,7 @@ class SmsController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\SmsBundle\Entity\Sms) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.sms.error.notfound',

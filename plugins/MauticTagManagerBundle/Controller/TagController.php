@@ -174,7 +174,7 @@ class TagController extends FormController
         $form = $model->createForm($tag, $this->formFactory, $action);
 
         $response = $this->handleNewActionPost($request, $tagDependencies, $tag, $model, $form, $returnUrl, $page);
-        if (null === $response) {
+        if (!$response instanceof \Symfony\Component\HttpFoundation\Response) {
             $response = $this->delegateView([
                 'viewParameters' => [
                     'form'   => $form->createView(),
@@ -299,7 +299,7 @@ class TagController extends FormController
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $request->getMethod()) {
             $response = $this->handleEditFormPost($request, $tag, $tagDependencies, $tagModel, $form, $postActionVars);
-            if (null !== $response) {
+            if ($response instanceof \Symfony\Component\HttpFoundation\Response) {
                 return $response;
             }
         }
@@ -521,7 +521,7 @@ class TagController extends FormController
         } else {
             $secondaryTag = $this->leadTagModel->getEntity($objectId);
 
-            if (null === $secondaryTag) {
+            if (!$secondaryTag instanceof \Mautic\LeadBundle\Entity\Tag) {
                 $response = $this->handleTagNotFound($objectId);
             } else {
                 $postActionVars = $this->getMergePostActionVars($request);
@@ -788,7 +788,7 @@ class TagController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
+                if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.tagmanager.tag.error.notfound',

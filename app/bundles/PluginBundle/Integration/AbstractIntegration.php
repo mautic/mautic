@@ -1923,7 +1923,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $logger = $this->logger;
 
         if ($e instanceof ApiErrorException) {
-            if (null === $this->adminUsers) {
+            if (!$this->adminUsers instanceof \Doctrine\ORM\Tools\Pagination\Paginator) {
                 $this->adminUsers = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->getEntities(
                     [
                         'filter' => [
