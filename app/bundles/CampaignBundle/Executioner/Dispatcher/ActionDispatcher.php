@@ -47,11 +47,11 @@ class ActionDispatcher
 
             $this->validateProcessedLogs($logs, $success, $failed);
 
-            if ($success) {
+            if ($success->count()) {
                 $this->dispatchExecutedEvent($config, $event, $success);
             }
 
-            if ($failed) {
+            if ($failed->count()) {
                 $this->dispatchFailedEvent($config, $failed);
             }
 

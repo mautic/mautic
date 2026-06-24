@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 abstract class AbstractCacheProvider implements CacheProviderInterface
 {
     private ?AdapterInterface $adapter = null;
+
     private ?Psr16Cache $psr16         = null;
 
     public function __construct(

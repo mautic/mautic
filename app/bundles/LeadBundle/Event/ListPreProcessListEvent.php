@@ -20,10 +20,8 @@ class ListPreProcessListEvent extends CommonEvent
 
     /**
      * Returns the List entity.
-     *
-     * @return array
      */
-    public function getList()
+    public function getList(): array
     {
         return $this->list;
     }
