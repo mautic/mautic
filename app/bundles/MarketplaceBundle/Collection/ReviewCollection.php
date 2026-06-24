@@ -6,7 +6,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 
 use Mautic\MarketplaceBundle\DTO\Review;
 
-class ReviewCollection implements \Iterator, \Countable
+final class ReviewCollection implements \Iterator, \Countable
 {
     /**
      * @var Review[]

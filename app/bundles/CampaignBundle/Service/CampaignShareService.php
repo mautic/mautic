@@ -135,6 +135,42 @@ final class CampaignShareService
     }
 
     /**
+     * Normalizes the submitted share form data into the metadata structure consumed
+     * by share() and buildComposerJson().
+     *
+     * @param array<string, mixed> $formData
+     *
+     * @return array<string, mixed>
+     */
+    public function buildShareMetadata(array $formData): array
+    {
+        $gallery = [];
+        for ($i = 1; $i <= 8; ++$i) {
+            $image = $formData['galleryImage'.$i] ?? null;
+            if (null !== $image) {
+                $gallery[] = [
+                    'image' => $image,
+                    'alt'   => $formData['galleryAlt'.$i] ?? '',
+                ];
+            }
+        }
+
+        return [
+            'title'             => $formData['title'],
+            'vendorName'        => $formData['vendorName'] ?? '',
+            'headline'          => $formData['headline'] ?? '',
+            'description'       => $formData['description'] ?? '',
+            'keywords'          => $formData['keywords'] ?? '',
+            'version'           => $formData['version'],
+            'worksWithVersions' => $formData['worksWithVersions'] ?? [],
+            'languages'         => $formData['languages'] ?? [],
+            'bannerImage'       => $formData['bannerImage'] ?? null,
+            'gallery'           => $gallery,
+            'price'             => $formData['price'] ?? null,
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $composerJson
      */
     public function addComposerJsonToZip(string $zipFilePath, array $composerJson): void

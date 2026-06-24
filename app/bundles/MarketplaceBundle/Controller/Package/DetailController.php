@@ -17,7 +17,7 @@ use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
-use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,7 +30,7 @@ class DetailController extends CommonController
         private RouteProvider $routeProvider,
         private Config $config,
         private ComposerHelper $composer,
-        private ResourceInstaller $resourceInstaller,
+        private ResourceInstallerInterface $resourceInstaller,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

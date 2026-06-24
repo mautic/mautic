@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
-use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -33,7 +33,7 @@ class AjaxController extends CommonAjaxController
         private CacheHelper $cacheHelper,
         private LoggerInterface $logger,
         private Config $config,
-        private ResourceInstaller $resourceInstaller,
+        private ResourceInstallerInterface $resourceInstaller,
         private PackageModel $packageModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,

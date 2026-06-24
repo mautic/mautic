@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-class CampaignShareDownloadController extends CommonController
+final class CampaignShareDownloadController extends CommonController
 {
     public function downloadAction(string $token, CampaignShareService $shareService): Response
     {

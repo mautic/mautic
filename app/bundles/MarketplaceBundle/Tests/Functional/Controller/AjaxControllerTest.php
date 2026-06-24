@@ -20,7 +20,7 @@ use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
-use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,7 +47,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     private MockObject $requestStack;
 
     private MockObject&PackageModel $packageModel;
-    private MockObject&ResourceInstaller $resourceInstaller;
+    private MockObject&ResourceInstallerInterface $resourceInstaller;
 
     public function testInstallPackageAction(): void
     {
@@ -218,7 +218,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $this->requestStack      = $this->createMock(RequestStack::class);
         $this->security          = $this->createMock(CorePermissions::class);
         $this->marketplaceConfig = $this->createMock(Config::class);
-        $this->resourceInstaller = $this->createMock(ResourceInstaller::class);
+        $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
         $this->packageModel      = $this->createMock(PackageModel::class);
 
         $controller = new AjaxController(

@@ -11,7 +11,7 @@ use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
-use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -20,7 +20,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
 {
     private MockObject&LoggerInterface $logger;
     private MockObject&PackageModel $packageModel;
-    private MockObject&ResourceInstaller $resourceInstaller;
+    private MockObject&ResourceInstallerInterface $resourceInstaller;
 
     private string $packageName;
 
@@ -29,7 +29,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         parent::setUp();
         $this->logger            = $this->createMock(LoggerInterface::class);
         $this->packageModel      = $this->createMock(PackageModel::class);
-        $this->resourceInstaller = $this->createMock(ResourceInstaller::class);
+        $this->resourceInstaller = $this->createMock(ResourceInstallerInterface::class);
         $this->packageName       = 'koco/mautic-recaptcha-bundle';
     }
 

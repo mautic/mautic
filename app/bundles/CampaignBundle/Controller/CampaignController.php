@@ -280,7 +280,7 @@ class CampaignController extends AbstractStandardFormController
         $assetListEvent = $this->dispatcher->dispatch($assetListEvent);
         $assetList      = $assetListEvent->getList();
 
-        $metadata = $this->buildShareMetadata($formData);
+        $metadata = $shareService->buildShareMetadata($formData);
 
         $publishButton = $form->get('publish');
         \assert($publishButton instanceof \Symfony\Component\Form\SubmitButton);
@@ -312,39 +312,6 @@ class CampaignController extends AbstractStandardFormController
         $shareService->addComposerJsonToZip($filePath, $composerJson);
 
         return $exportHelper->downloadAsZip($filePath, $exportFileName);
-    }
-
-    /**
-     * @param array<string, mixed> $formData
-     *
-     * @return array<string, mixed>
-     */
-    private function buildShareMetadata(array $formData): array
-    {
-        $gallery = [];
-        for ($i = 1; $i <= 8; ++$i) {
-            $image = $formData['galleryImage'.$i] ?? null;
-            if (null !== $image) {
-                $gallery[] = [
-                    'image' => $image,
-                    'alt'   => $formData['galleryAlt'.$i] ?? '',
-                ];
-            }
-        }
-
-        return [
-            'title'             => $formData['title'],
-            'vendorName'        => $formData['vendorName'] ?? '',
-            'headline'          => $formData['headline'] ?? '',
-            'description'       => $formData['description'] ?? '',
-            'keywords'          => $formData['keywords'] ?? '',
-            'version'           => $formData['version'],
-            'worksWithVersions' => $formData['worksWithVersions'] ?? [],
-            'languages'         => $formData['languages'] ?? [],
-            'bannerImage'       => $formData['bannerImage'] ?? null,
-            'gallery'           => $gallery,
-            'price'             => $formData['price'] ?? null,
-        ];
     }
 
     public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response

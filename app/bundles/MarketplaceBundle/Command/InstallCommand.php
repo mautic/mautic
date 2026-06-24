@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Command;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
-use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -28,7 +28,7 @@ class InstallCommand extends Command
     public function __construct(
         private ComposerHelper $composer,
         private PackageModel $packageModel,
-        private ResourceInstaller $resourceInstaller,
+        private ResourceInstallerInterface $resourceInstaller,
         private UserModel $userModel,
     ) {
         parent::__construct();

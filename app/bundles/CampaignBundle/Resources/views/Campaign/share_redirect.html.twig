@@ -29,21 +29,21 @@
 </div>
 <script>
 (function () {
-    var root          = document.getElementById('campaign-share-publish');
-    var statusEl      = document.getElementById('campaign-share-status');
-    var detailEl      = document.getElementById('campaign-share-detail');
-    var errorEl       = document.getElementById('campaign-share-error');
-    var archiveUrl    = root.getAttribute('data-archive-url');
-    var marketplace   = root.getAttribute('data-marketplace-url').replace(/\/$/, '');
-    var marketplaceUploadUrl = marketplace + '/publish/upload';
+    const root          = document.getElementById('campaign-share-publish');
+    const statusEl      = document.getElementById('campaign-share-status');
+    const detailEl      = document.getElementById('campaign-share-detail');
+    const errorEl       = document.getElementById('campaign-share-error');
+    const archiveUrl    = root.getAttribute('data-archive-url');
+    const marketplace   = root.getAttribute('data-marketplace-url').replace(/\/$/, '');
+    const marketplaceUploadUrl = marketplace + '/publish/upload';
 
-    var popup = window.open(marketplaceUploadUrl, 'mautic-marketplace-publish');
+    const popup = window.open(marketplaceUploadUrl, 'mautic-marketplace-publish');
     if (!popup) {
         showError('{{ 'mautic.campaign.share.popup_blocked'|trans|e('js') }}');
         return;
     }
 
-    var done = false;
+    let done = false;
 
     window.addEventListener('message', function (event) {
         if (event.source !== popup) {
@@ -69,7 +69,7 @@
     });
 
     // If user closes the popup before completion, surface that.
-    var poll = setInterval(function () {
+    const poll = setInterval(function () {
         if (popup.closed) {
             clearInterval(poll);
             if (!done) {

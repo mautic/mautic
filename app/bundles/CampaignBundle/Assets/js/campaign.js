@@ -224,24 +224,24 @@ Mautic.campaignOnLoad = function (container, response) {
 };
 
 Mautic.campaignShareOnLoad = function (container, response) {
-    var headlineInput = document.querySelector('[data-share-headline]');
-    var counter = document.getElementById('headline-counter');
+    const headlineInput = document.querySelector('[data-share-headline]');
+    const counter = document.getElementById('headline-counter');
     if (headlineInput && counter) {
-        var updateCounter = function () {
+        const updateCounter = function () {
             counter.textContent = headlineInput.value.length + '/60';
         };
         headlineInput.addEventListener('input', updateCounter);
         updateCounter();
     }
 
-    var addBtn = document.getElementById('add-gallery-slot');
-    var maxSlots = 8;
+    const addBtn = document.getElementById('add-gallery-slot');
+    const maxSlots = 8;
     if (addBtn) {
         addBtn.addEventListener('click', function () {
-            var slots = document.querySelectorAll('[data-gallery-slot]');
-            var shown = 0;
-            var nextHidden = null;
-            for (var i = 0; i < slots.length; i++) {
+            const slots = document.querySelectorAll('[data-gallery-slot]');
+            let shown = 0;
+            let nextHidden = null;
+            for (let i = 0; i < slots.length; i++) {
                 if (slots[i].style.display !== 'none') {
                     shown++;
                 } else if (!nextHidden) {
@@ -259,8 +259,8 @@ Mautic.campaignShareOnLoad = function (container, response) {
         });
     }
 
-    var $shareForm = mQuery('form[name="campaign_share"]');
-    var $downloadBtn = $shareForm.find('#campaign_share_download');
+    const $shareForm = mQuery('form[name="campaign_share"]');
+    const $downloadBtn = $shareForm.find('#campaign_share_download');
     if ($shareForm.length && $downloadBtn.length) {
         $downloadBtn.off('click.shareDownload').on('click.shareDownload', function (e) {
             e.preventDefault();

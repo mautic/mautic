@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Command;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
-use Mautic\MarketplaceBundle\Service\ResourceInstaller;
+use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -27,7 +27,7 @@ class RemoveCommand extends Command
         private ComposerHelper $composer,
         private LoggerInterface $logger,
         private PackageModel $packageModel,
-        private ResourceInstaller $resourceInstaller,
+        private ResourceInstallerInterface $resourceInstaller,
     ) {
         parent::__construct();
     }

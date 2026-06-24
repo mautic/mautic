@@ -13,7 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignShareControllerTest extends MauticMysqlTestCase
+final class CampaignShareControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
