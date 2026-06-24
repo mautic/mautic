@@ -360,7 +360,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new AssetEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

@@ -188,10 +188,7 @@ class CampaignExecutionEvent extends Event
         return $this;
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLogEntry()
+    public function getLogEntry(): ?LeadEventLog
     {
         return $this->log;
     }

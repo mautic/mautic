@@ -153,10 +153,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateCreated()
+    public function getDateCreated(): ?\DateTimeInterface
     {
         return $this->dateCreated;
     }
@@ -258,10 +255,7 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getLastSyncDate()
+    public function getLastSyncDate(): ?\DateTimeInterface
     {
         return $this->lastSyncDate;
     }

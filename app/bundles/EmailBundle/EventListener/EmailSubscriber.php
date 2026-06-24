@@ -20,8 +20,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+
     public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+
     public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+
     public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
     private const RETRY_COUNT = 3;

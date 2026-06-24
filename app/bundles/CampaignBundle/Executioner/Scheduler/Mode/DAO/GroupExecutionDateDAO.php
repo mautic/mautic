@@ -28,10 +28,7 @@ class GroupExecutionDateDAO
         return $this->executionDate;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getContacts()
+    public function getContacts(): ArrayCollection
     {
         return $this->contacts;
     }

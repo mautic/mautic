@@ -19,7 +19,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class CacheInvalidateSubscriber
 {
     private const ACTION_PERSIST = 'persist';
+
     private const ACTION_UPDATE  = 'update';
+
     private const ACTION_REMOVE  = 'remove';
 
     public function __construct(
