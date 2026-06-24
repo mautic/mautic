@@ -108,10 +108,7 @@ class TrackingHelper
         return false;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->contactTracker->getContact();
     }

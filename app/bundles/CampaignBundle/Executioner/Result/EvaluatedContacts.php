@@ -30,7 +30,7 @@ class EvaluatedContacts
     /**
      * @return ArrayCollection|Lead[]
      */
-    public function getPassed()
+    public function getPassed(): ArrayCollection
     {
         return $this->passed;
     }
@@ -38,7 +38,7 @@ class EvaluatedContacts
     /**
      * @return ArrayCollection|Lead[]
      */
-    public function getFailed()
+    public function getFailed(): ArrayCollection
     {
         return $this->failed;
     }

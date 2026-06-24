@@ -126,7 +126,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     private $eventsOrderbyDir;
 
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
+
     private ?\DateTimeImmutable $unHealthySince         = null;
+
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()

@@ -63,7 +63,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         return self::DEFAULT_API_MODE;
     }
 
-    public function setApiMode($apiMode): void
+    public function setApiMode(?string $apiMode): void
     {
         $this->apiMode = $apiMode;
     }
@@ -122,7 +122,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ClientEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

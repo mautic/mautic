@@ -181,7 +181,7 @@ class CampaignController extends AbstractStandardFormController
 
         $campaign = $campaignModel->getEntity($objectId);
 
-        if (empty($campaign)) {
+        if (!$campaign instanceof Campaign) {
             $this->logger->error('Campaign not found for export', ['objectId' => $objectId]);
 
             return $this->notFound();

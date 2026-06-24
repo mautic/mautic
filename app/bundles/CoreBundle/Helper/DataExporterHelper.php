@@ -24,7 +24,7 @@ class DataExporterHelper
         array $args,
         ?callable $resultsCallback = null,
         bool $skipOrdering = false,
-    ) {
+    ): ?array {
         $args['limit']        = max($args['limit'], 200);
         $args['start']        = $start;
         $args['skipOrdering'] = $skipOrdering;

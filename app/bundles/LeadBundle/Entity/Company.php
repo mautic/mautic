@@ -47,6 +47,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     use ProjectTrait;
 
     public const FIELD_ALIAS = 'company';
+
     public const TABLE_NAME  = 'companies';
 
     /**

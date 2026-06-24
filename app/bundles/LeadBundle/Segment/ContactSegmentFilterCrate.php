@@ -165,10 +165,7 @@ class ContactSegmentFilterCrate
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->sourceArray;
     }

@@ -67,7 +67,7 @@ class ApiMetadataDriver implements DriverInterface
      *
      * @return $this
      */
-    public function setGroupPrefix($name)
+    public function setGroupPrefix(string $name)
     {
         $this->groupPrefix = $name;
 

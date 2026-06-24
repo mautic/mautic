@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
                 $stats['failed'] += $batchFailedCount;
 
                 foreach ($batchFailedRecipients as $emails) {
-                    $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
+                    $stats['failedRecipients'] += $emails;
                 }
 
                 $session->set('mautic.email.send.progress', $progress);

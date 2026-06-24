@@ -85,10 +85,7 @@ class ReportDataResult
         return count($this->data);
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }

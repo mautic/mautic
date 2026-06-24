@@ -9,6 +9,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 class RemoteAssetBrowseEvent extends CommonEvent
 {
     private ?Adapter $adapter       = null;
+
     private ?string $failureMessage = null;
 
     public function __construct(
