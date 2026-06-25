@@ -180,6 +180,9 @@ class ReportDataResult
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     private function buildTypes(array $data): void
     {
         foreach ($this->columnKeys as $k) {
