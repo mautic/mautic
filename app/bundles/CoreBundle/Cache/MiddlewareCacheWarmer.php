@@ -37,7 +37,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         return false;
     }
 
-    private function createCacheFile($cacheDirectory): void
+    private function createCacheFile(string $cacheDirectory): void
     {
         $middlewarsDir = __DIR__.'/../../../middlewares';
 

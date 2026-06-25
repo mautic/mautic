@@ -82,7 +82,7 @@ class Adder
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember): void
+    private function saveCampaignMember(CampaignMember $campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);
