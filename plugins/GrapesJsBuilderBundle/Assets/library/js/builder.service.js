@@ -10,7 +10,6 @@ import grapesjstouch from 'grapesjs-touch';
 import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjsckeditor from './plugins/grapesjs.ckeditor';
 import grapesjstypography from './plugins/grapesjs.typography';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
@@ -665,7 +664,7 @@ export default class BuilderService {
       // trigger hide event on DOM element
       mQuery('.builder').trigger('builder:hide', [this.editor]);
       // trigger hide event on editor instance
-    this.editor.trigger('hide');
+      this.editor.trigger('hide');
     };
 
     if (this.context?.form) {
