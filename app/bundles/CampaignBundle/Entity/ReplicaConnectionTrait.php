@@ -24,7 +24,7 @@ trait ReplicaConnectionTrait
         if ($connection instanceof PrimaryReadReplicaConnection) {
             if (
                 !$limiter instanceof ContactLimiter
-                || !($limiter->getContactId() || $limiter->getContactIdList())
+                || !$limiter->getContactId() && !$limiter->getContactIdList()
             ) {
                 $connection->ensureConnectedToReplica();
             }
