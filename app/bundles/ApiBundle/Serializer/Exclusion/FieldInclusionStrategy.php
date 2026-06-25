@@ -45,10 +45,6 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
         }
 
         // children of children or parents of chidlren will be more than 3 levels deep
-        if ($navigatorContext->getDepth() <= $this->level) {
-            return false;
-        }
-
-        return true;
+        return $navigatorContext->getDepth() > $this->level;
     }
 }

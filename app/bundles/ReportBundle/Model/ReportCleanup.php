@@ -54,10 +54,6 @@ class ReportCleanup
         $now     = new \DateTime();
         $days    = $created->diff($now)->days;
 
-        if ($days > self::KEEP_FILE_DAYS) {
-            return true;
-        }
-
-        return false;
+        return $days > self::KEEP_FILE_DAYS;
     }
 }

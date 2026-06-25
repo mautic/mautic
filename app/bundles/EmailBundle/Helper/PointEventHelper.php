@@ -23,12 +23,8 @@ class PointEventHelper
             $limitToEmails = $action['properties']['emails'];
         }
 
-        if (!empty($limitToEmails) && !in_array($emailId, $limitToEmails)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToEmails) || in_array($emailId, $limitToEmails);
     }
 
     public function sendEmail($event, Lead $lead): bool
@@ -48,7 +44,7 @@ class PointEventHelper
                 $options   = ['source' => ['trigger', $event['id']]];
                 $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
 
-                return is_array($emailSent) ? false : true;
+                return !is_array($emailSent);
             }
         }
 

@@ -99,11 +99,7 @@ class HttpFactory implements AuthProviderInterface
             return false;
         }
 
-        if (empty($credentials->getClientSecret())) {
-            return false;
-        }
-
-        return true;
+        return !empty($credentials->getClientSecret());
     }
 
     private function getStackHandler(): HandlerStack

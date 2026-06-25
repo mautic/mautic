@@ -120,7 +120,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
             $dwc     =  $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
             $utmTags = [];
-            if ($dwc && $dwc instanceof DynamicContent) {
+
+            if ($dwc instanceof DynamicContent) {
                 $utmTags = $dwc->getUtmTags();
             }
 

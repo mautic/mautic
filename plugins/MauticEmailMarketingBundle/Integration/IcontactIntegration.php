@@ -114,11 +114,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             }
         }
 
-        if (empty($this->keys['accountId']) || empty($this->keys['clientFolderId'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($this->keys['accountId']) && !empty($this->keys['clientFolderId']);
     }
 
     /**
