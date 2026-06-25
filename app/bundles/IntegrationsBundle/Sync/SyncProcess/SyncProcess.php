@@ -256,7 +256,7 @@ class SyncProcess
     /**
      * @throws IntegrationNotFoundException
      */
-    private function processParallelSync($inputOptions): void
+    private function processParallelSync(InputOptionsDAO $inputOptions): void
     {
         $currentSyncProcess = clone $this->integrationSyncProcess;
         $this->syncService->processIntegrationSync($inputOptions);
