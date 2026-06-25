@@ -18,10 +18,6 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
     public function testFormSubmissionSegmentFilter(): void
     {
-        $application = new Application(self::$kernel);
-        $application->setAutoExit(false);
-        $applicationTester = new ApplicationTester($application);
-
         $contactA = $this->createContact('contact-a@example.com');
         $contactB = $this->createContact('contact-b@example.com');
         $contactC = $this->createContact('contact-c@example.com');
@@ -32,38 +28,8 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->createSubmission($form, $contactB);
         $this->em->flush();
 
-        $segment = new LeadList();
-        $segment->setName('Submitted Test Form');
-        $segment->setPublicName('Submitted Test Form');
-        $segment->setAlias('submitted-test-form');
-        $segment->setIsPublished(true);
-        $segment->setFilters([
-            [
-                'glue'       => 'and',
-                'field'      => 'lead_form_submission',
-                'object'     => 'behaviors',
-                'type'       => 'lead_form_submission',
-                'operator'   => 'in',
-                'properties' => [
-                    'filter' => [$form->getId()],
-                ],
-            ],
-        ]);
-        $this->em->persist($segment);
-        $this->em->flush();
-        $this->em->clear();
+        $response = $this->buildAndRunFormSubmissionSegment('Submitted Test Form', 'submitted-test-form', 'in', [$form->getId()]);
 
-        $exitCode = $applicationTester->run([
-            'command' => 'mautic:segments:update',
-            '-i'      => $segment->getId(),
-        ]);
-
-        $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
-
-        $this->client->request('GET', '/api/contacts?search=segment:submitted-test-form');
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk());
-        $response = json_decode($clientResponse->getContent(), true);
         $this->assertEquals(2, (int) $response['total']);
         $contactIds = array_column($response['contacts'], 'id');
         $this->assertContains((int) $contactA->getId(), $contactIds);
@@ -73,10 +39,6 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
     public function testFormSubmissionSegmentFilterExclude(): void
     {
-        $application = new Application(self::$kernel);
-        $application->setAutoExit(false);
-        $applicationTester = new ApplicationTester($application);
-
         $contactA = $this->createContact('exclude-a@example.com');
         $contactB = $this->createContact('exclude-b@example.com');
         $form     = $this->createForm('Exclude Form');
@@ -85,10 +47,26 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->createSubmission($form, $contactA);
         $this->em->flush();
 
+        $response   = $this->buildAndRunFormSubmissionSegment('Not Submitted Exclude Form', 'not-submitted-exclude-form', '!in', [$form->getId()]);
+        $contactIds = array_column($response['contacts'], 'id');
+        $this->assertNotContains((int) $contactA->getId(), $contactIds);
+        $this->assertContains((int) $contactB->getId(), $contactIds);
+    }
+
+    /**
+     * Persists a segment filtered by the form-submission filter, runs the segment update command
+     * and returns the decoded contacts API response for the resulting members.
+     *
+     * @param array<int> $formIds
+     *
+     * @return array<string, mixed>
+     */
+    private function buildAndRunFormSubmissionSegment(string $name, string $alias, string $operator, array $formIds): array
+    {
         $segment = new LeadList();
-        $segment->setName('Not Submitted Exclude Form');
-        $segment->setPublicName('Not Submitted Exclude Form');
-        $segment->setAlias('not-submitted-exclude-form');
+        $segment->setName($name);
+        $segment->setPublicName($name);
+        $segment->setAlias($alias);
         $segment->setIsPublished(true);
         $segment->setFilters([
             [
@@ -96,15 +74,19 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
                 'field'      => 'lead_form_submission',
                 'object'     => 'behaviors',
                 'type'       => 'lead_form_submission',
-                'operator'   => '!in',
+                'operator'   => $operator,
                 'properties' => [
-                    'filter' => [$form->getId()],
+                    'filter' => $formIds,
                 ],
             ],
         ]);
         $this->em->persist($segment);
         $this->em->flush();
         $this->em->clear();
+
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
 
         $exitCode = $applicationTester->run([
             'command' => 'mautic:segments:update',
@@ -113,13 +95,14 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $exitCode, $applicationTester->getDisplay());
 
-        $this->client->request('GET', '/api/contacts?search=segment:not-submitted-exclude-form');
+        $this->client->request('GET', '/api/contacts?search=segment:'.$alias);
         $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk());
-        $response   = json_decode($clientResponse->getContent(), true);
-        $contactIds = array_column($response['contacts'], 'id');
-        $this->assertNotContains((int) $contactA->getId(), $contactIds);
-        $this->assertContains((int) $contactB->getId(), $contactIds);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($clientResponse->getContent(), true);
+        \assert(is_array($response));
+
+        return $response;
     }
 
     private function createContact(string $email): Lead
