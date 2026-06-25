@@ -440,7 +440,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function generateTooltipAttributes($button): string
+    private function generateTooltipAttributes(array $button): string
     {
         $tooltip = '';
         if (isset($button['tooltip'])) {

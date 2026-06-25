@@ -55,7 +55,7 @@ class FullContact_Base
     /**
      * @param mixed[] $hdr
      */
-    private function _update_rate_limit($hdr): void
+    private function _update_rate_limit(array $hdr): void
     {
         $remaining            = (float) $hdr['X-Rate-Limit-Remaining'];
         $reset                = (float) $hdr['X-Rate-Limit-Reset'];

@@ -77,7 +77,7 @@ final class MenuHelper
         /** @var ItemInterface $item */
         foreach ($menu as $item) {
             if ($matcher->isCurrent($item)) {
-                return ($item->isDisplayed()) ? false : true;
+                return !$item->isDisplayed();
             }
         }
 

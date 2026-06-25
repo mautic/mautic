@@ -641,7 +641,10 @@ class PublicController extends CommonFormController
         return TrackingPixelHelper::getResponse($request); // send gif
     }
 
-    private function addStat(MailHelper $mailer, $lead, $email, $query, $idHash): ?Stat
+    /**
+     * @param array<string, mixed> $query
+     */
+    private function addStat(MailHelper $mailer, $lead, string $email, array $query, string $idHash): ?Stat
     {
         if (null !== $lead) {
             // To lead
@@ -669,7 +672,7 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead($email, $repo): ?Lead
+    private function createLead(string $email, $repo): ?Lead
     {
         $model = $this->getModel('lead.lead');
         \assert($model instanceof LeadModel);

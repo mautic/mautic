@@ -40,14 +40,13 @@ final class DateHelper
     }
 
     /**
-     * @param string           $type
      * @param \DateTime|string $datetime
      * @param string           $timezone
      * @param string           $fromFormat
      *
      * @return string
      */
-    private function format($type, $datetime, $timezone, $fromFormat)
+    private function format(string $type, $datetime, $timezone, $fromFormat)
     {
         if (empty($datetime)) {
             return '';

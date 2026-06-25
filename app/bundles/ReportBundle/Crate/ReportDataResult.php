@@ -165,10 +165,7 @@ class ReportDataResult
         return $this->columnKeys;
     }
 
-    /**
-     * @param array $data
-     */
-    private function buildHeader($data): void
+    private function buildHeader(array $data): void
     {
         foreach ($this->columnKeys as $k) {
             $dataColumn      = $data['dataColumns'][$k];
@@ -183,10 +180,7 @@ class ReportDataResult
         }
     }
 
-    /**
-     * @param array $data
-     */
-    private function buildTypes($data): void
+    private function buildTypes(array $data): void
     {
         foreach ($this->columnKeys as $k) {
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
