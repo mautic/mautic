@@ -10,18 +10,20 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 
+/**
+ * @extends FormModel<Scheduler>
+ */
 class ScheduleModel extends FormModel
 {
-    /**
-     * @var SchedulerRepository
-     */
-    private \Doctrine\ORM\EntityRepository $schedulerRepository;
+    private SchedulerRepository $schedulerRepository;
 
     public function __construct(
         private EntityManager $entityManager,
         private SchedulerPlanner $schedulerPlanner,
     ) {
-        $this->schedulerRepository = $entityManager->getRepository(Scheduler::class);
+        /** @var SchedulerRepository $schedulerRepository */
+        $schedulerRepository       = $entityManager->getRepository(Scheduler::class);
+        $this->schedulerRepository = $schedulerRepository;
     }
 
     /**
