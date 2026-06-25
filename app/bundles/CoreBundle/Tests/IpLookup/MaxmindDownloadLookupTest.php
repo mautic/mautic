@@ -32,14 +32,21 @@ class MaxmindDownloadLookupTest extends TestCase
         yield 'Wrong License key' => ['aaa:thepw!'];
     }
 
-    public function testProperAuth(): void
+    #[DataProvider('provideProperAuth')]
+    public function testProperAuth(string $auth): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->never())
             ->method('warning');
 
-        $lookup = new MaxmindDownloadLookup('12123:passwd', logger: $logger);
+        $lookup = new MaxmindDownloadLookup($auth, logger: $logger);
 
-        self::assertSame('https://12123:passwd@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', $lookup->getRemoteDateStoreDownloadUrl());
+        self::assertSame('https://'.$auth.'@download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz', $lookup->getRemoteDateStoreDownloadUrl());
+    }
+
+    public static function provideProperAuth(): \Generator
+    {
+        yield 'No underscore auth' => ['12123:passwd'];
+        yield 'Auth with underscore password' => ['12123:license_key_part'];
     }
 }
