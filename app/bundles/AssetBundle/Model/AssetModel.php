@@ -306,9 +306,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    /**
-     * @throws NotFoundHttpException
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Asset) {
@@ -363,7 +360,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new AssetEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

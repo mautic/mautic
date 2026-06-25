@@ -13,18 +13,12 @@ class FileFieldCrate
     ) {
     }
 
-    /**
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
+    public function getUploadedFile(): UploadedFile
     {
         return $this->uploadedFile;
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }

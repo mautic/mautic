@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 class CompanyLeadRepository extends CommonRepository
 {
     public const DELETE_BATCH_SIZE = 1000;
+
     public const BATCH_SIZE        = 5000;
 
     /**
@@ -133,7 +134,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
 
         return array_map(
-            fn (array $company) => (string) $company['company_id'],
+            fn (array $company): string => (string) $company['company_id'],
             $q->executeQuery()->fetchAllAssociative()
         );
     }

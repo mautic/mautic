@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class VideoHit
 {
     public const TABLE_NAME = 'video_hits';
+
     /**
      * @var int
      */
@@ -565,7 +566,7 @@ class VideoHit
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -621,7 +622,7 @@ class VideoHit
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {

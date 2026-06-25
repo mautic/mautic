@@ -166,7 +166,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ReportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -726,11 +726,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($orderByDirection, ['ASC', 'DESC', ''], true)) {
-            return false;
-        }
-
-        return true;
+        return array_key_exists($orderBy, $allowedColumns) && in_array($orderByDirection, ['ASC', 'DESC', ''], true);
     }
 
     /**

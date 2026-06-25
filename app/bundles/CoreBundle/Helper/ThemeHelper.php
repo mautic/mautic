@@ -47,6 +47,7 @@ class ThemeHelper implements ThemeHelperInterface
     private Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
+
     private ?Environment $sandboxEnv         = null;
 
     /**
@@ -625,7 +626,7 @@ class ThemeHelper implements ThemeHelperInterface
             return [];
         }
 
-        return $this->hiddenThemes = array_map(fn ($item) => trim($item), explode('|', $this->filesystem->readFile($hidden)));
+        return $this->hiddenThemes = array_map(fn ($item): string => trim($item), explode('|', $this->filesystem->readFile($hidden)));
     }
 
     /**

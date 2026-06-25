@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 trait LeadAccessTrait
 {
@@ -59,7 +60,7 @@ trait LeadAccessTrait
             $lead->getPermissionUser()
         )
         ) {
-            return $this->accessDenied();
+            throw new AccessDeniedHttpException($this->translator->trans('mautic.core.url.error.401', ['%url%' => $this->getCurrentRequest()->getRequestUri()]));
         }
 
         return $lead;
@@ -68,7 +69,7 @@ trait LeadAccessTrait
     /**
      * Returns leads the user has access to.
      *
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|Response
      */
     protected function checkAllAccess($action, $limit)
     {
@@ -96,7 +97,7 @@ trait LeadAccessTrait
             ]);
 
         if (null === $leads) {
-            return $this->accessDenied();
+            return $this->notFound();
         }
 
         foreach ($leads as $lead) {

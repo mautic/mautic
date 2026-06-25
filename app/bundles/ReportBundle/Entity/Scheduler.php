@@ -52,25 +52,19 @@ class Scheduler
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * @return Report
-     */
-    public function getReport()
+    public function getReport(): Report
     {
         return $this->report;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getScheduleDate()
+    public function getScheduleDate(): \DateTimeInterface
     {
         return $this->scheduleDate;
     }

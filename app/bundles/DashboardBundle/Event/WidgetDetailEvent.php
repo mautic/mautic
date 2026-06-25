@@ -103,7 +103,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Set the cache timeout.
      *
-     * @param string $cacheTimeout
+     * @param int|null $cacheTimeout
      */
     public function setCacheTimeout($cacheTimeout): void
     {
@@ -164,10 +164,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Returns the widget entity.
-     *
-     * @return Widget $widget
      */
-    public function getWidget()
+    public function getWidget(): Widget
     {
         return $this->widget;
     }
@@ -320,10 +318,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Get the Translator object.
-     *
-     * @return TranslatorInterface
      */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
@@ -333,9 +329,6 @@ class WidgetDetailEvent extends CommonEvent
      */
     public function hasPermissions(array $permissions): bool
     {
-        if (!$this->security) {
-            return true;
-        }
         $perm = $this->security->isGranted($permissions, 'RETURN_ARRAY');
 
         return in_array(true, $perm);
@@ -350,10 +343,6 @@ class WidgetDetailEvent extends CommonEvent
      */
     public function hasPermission($permission)
     {
-        if (!$this->security) {
-            return true;
-        }
-
         return $this->security->isGranted($permission);
     }
 

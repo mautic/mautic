@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
@@ -29,7 +30,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $this->cleanData($event, 'lead_utmtags');
     }
 
-    private function cleanData(MaintenanceEvent $event, $table): void
+    private function cleanData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
@@ -82,10 +83,10 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $rows += $qb->delete(MAUTIC_TABLE_PREFIX.$table)
                   ->where(
                       $qb->expr()->in(
-                          'lead_id', $leadsIds
-                      )
+                          'lead_id', ':leadsIds')
                   )
-                  ->executeStatement();
+                  ->setParameter('leadsIds', array_map('intval', $leadsIds), ArrayParameterType::INTEGER)
+                    ->executeStatement();
                 ++$loop;
             }
         }

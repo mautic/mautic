@@ -138,6 +138,7 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
+    /** @return iterable<array{0: string, 1: string, 2: string, 3?: bool}> */
     public static function urlProvider(): iterable
     {
         yield [

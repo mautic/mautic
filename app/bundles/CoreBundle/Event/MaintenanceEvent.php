@@ -46,10 +46,8 @@ class MaintenanceEvent extends Event
 
     /**
      * Returns a DateTime in UTC for the date to delete records older than the given date.
-     *
-     * @return \DateTimeInterface
      */
-    public function getDate()
+    public function getDate(): \DateTimeInterface
     {
         return $this->date;
     }
@@ -66,7 +64,10 @@ class MaintenanceEvent extends Event
 
         if ($sql) {
             foreach ($parameters as $paramKey => $value) {
-                $sql = str_replace(":$paramKey", $value, $sql);
+                if (is_array($value)) {
+                    $value = implode(', ', $value);
+                }
+                $sql = str_replace(":$paramKey", (string) $value, $sql);
             }
             $this->debug[$key] = $sql;
         }

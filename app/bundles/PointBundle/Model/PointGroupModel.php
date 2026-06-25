@@ -95,7 +95,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\GroupEvent($entity);
             }
             $this->dispatcher->dispatch($event, $name);
@@ -110,7 +110,7 @@ class PointGroupModel extends CommonFormModel implements GlobalSearchInterface
     {
         $contactScore = $contact->getGroupScore($group);
 
-        if (empty($contactScore)) {
+        if (!$contactScore instanceof GroupContactScore) {
             $contactScore = new GroupContactScore();
             $contactScore->setContact($contact);
             $contactScore->setGroup($group);

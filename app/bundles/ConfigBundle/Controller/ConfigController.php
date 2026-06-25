@@ -31,7 +31,7 @@ class ConfigController extends FormController
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
@@ -190,7 +190,7 @@ class ConfigController extends FormController
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event      = new ConfigBuilderEvent($bundleHelper);
@@ -201,7 +201,7 @@ class ConfigController extends FormController
         $fileFields = $event->getFileFields();
 
         if (!in_array($objectId, $fileFields)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content  = $this->coreParametersHelper->get($objectId);
@@ -229,7 +229,7 @@ class ConfigController extends FormController
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $success    = 0;

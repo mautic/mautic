@@ -19,26 +19,17 @@ class ReportDataEvent extends AbstractReportEvent
         $this->totalResults = (int) $totalResults;
     }
 
-    /**
-     * @return array
-     */
-    public function getData()
+    public function getData(): array
     {
         return $this->data;
     }
 
-    /**
-     * @param array $data
-     */
-    public function setData($data): void
+    public function setData(array $data): void
     {
         $this->data = $data;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

@@ -21,7 +21,7 @@ final class GlobalCategoryType extends AbstractType
                 'required'           => false,
                 'model'              => 'category.category',
                 'multiple'           => true,
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'for_lookup' => 1,
                     ];
@@ -29,7 +29,7 @@ final class GlobalCategoryType extends AbstractType
                     return 'lead:getLookupChoiceList&'.http_build_query($query);
                 },
                 'model_lookup_method' => 'getLookupResults',
-                'lookup_arguments'    => fn (Options $options) => [
+                'lookup_arguments'    => fn (Options $options): array => [
                     'type'    => 'global',
                     'filter'  => '$data',
                     'limit'   => 10,

@@ -87,6 +87,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
         $this->assertEquals(0, $result);
     }
 
+    /** @param array<int, mixed> $dataToReturn */
     private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);

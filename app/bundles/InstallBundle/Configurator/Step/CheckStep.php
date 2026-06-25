@@ -60,7 +60,7 @@ class CheckStep implements StepInterface
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        if (!empty($request)) {
+        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
     }
@@ -210,9 +210,7 @@ class CheckStep implements StepInterface
 
         if (class_exists('\\Collator')) {
             try {
-                if (is_null(new \Collator('fr_FR'))) {
-                    $messages[] = 'mautic.install.intl.config';
-                }
+                new \Collator('fr_FR');
             } catch (\Exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
