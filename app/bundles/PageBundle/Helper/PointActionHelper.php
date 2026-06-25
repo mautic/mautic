@@ -29,12 +29,8 @@ class PointActionHelper
             $limitToPages = $action['properties']['pages'];
         }
 
-        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToPages) || in_array($pageHitId, $limitToPages);
     }
 
     public function validateUrlHit($eventDetails, $action): bool

@@ -49,7 +49,8 @@
     "symfony/phpunit-bridge": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",
     "symfony/web-profiler-bundle": "~7.4.0",
-    "symplify/easy-coding-standard": "^12.0.13"
+    "symplify/easy-coding-standard": "^12.0.13",
+    "tomasvotruba/type-coverage": "^2.2.1"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",

@@ -32,11 +32,7 @@ class DisplayManager
             return true;
         }
 
-        if ($this->shouldDisplayNotAlwaysDisplayField($field)) {
-            return true;
-        }
-
-        return false;
+        return $this->shouldDisplayNotAlwaysDisplayField($field);
     }
 
     private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
