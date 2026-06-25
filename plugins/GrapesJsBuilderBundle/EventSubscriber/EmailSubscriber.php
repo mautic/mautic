@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     private string $existingMjml = '';
+
     private string $existingHtml = '';
 
     public function __construct(

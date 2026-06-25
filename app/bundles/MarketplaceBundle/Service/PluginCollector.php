@@ -28,7 +28,7 @@ class PluginCollector
     {
         $allowlist = $this->allowlist->getAllowList();
 
-        if (!empty($allowlist)) {
+        if ($allowlist instanceof \Mautic\MarketplaceBundle\DTO\Allowlist) {
             $this->allowlistedPackages = $this->filterAllowlistedPackagesForCurrentMauticVersion($allowlist->entries);
             $payload                   = $this->getAllowlistedPackages($page, $limit);
         } else {
@@ -62,14 +62,7 @@ class PluginCollector
                 return false;
             }
 
-            if (
-                !empty($entry->maximumMauticVersion)
-                && !version_compare($mauticVersion, $entry->maximumMauticVersion, '<=')
-            ) {
-                return false;
-            }
-
-            return true;
+            return empty($entry->maximumMauticVersion) || version_compare($mauticVersion, $entry->maximumMauticVersion, '<=');
         });
     }
 

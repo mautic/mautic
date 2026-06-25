@@ -29,6 +29,7 @@ export default (editor) => {
 
   domComponents.addType('image', {
     extend: 'image',
+    isComponent: (el) => el.tagName === 'IMG',
     model: {
       defaults: {
         traits: ['alt', 'title', 'href', 'target', 'rel'],

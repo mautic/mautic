@@ -500,7 +500,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function toupper($str): string
+    private function toupper(string $str): string
     {
         // string can contain HTML tags
         $chunks = preg_split('/(<[^>]*>)/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
@@ -522,7 +522,7 @@ class PlainTextHelper
      *
      * @return string Converted text
      */
-    private function strtoupper($str): string
+    private function strtoupper(string $str): string
     {
         $str = html_entity_decode($str, ENT_COMPAT, self::ENCODING);
 
@@ -539,7 +539,7 @@ class PlainTextHelper
      * @param string     $breakline
      * @param bool|false $cut
      */
-    private function linewrap($text, $width, $breakline = "\n", $cut = false): string
+    private function linewrap(string $text, $width, $breakline = "\n", $cut = false): string
     {
         $lines = explode("\n", $text);
         $text  = '';

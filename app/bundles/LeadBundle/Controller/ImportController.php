@@ -724,7 +724,7 @@ class ImportController extends FormController
         return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }
 
-    protected function getPermissionBase()
+    protected function getPermissionBase(): ?string
     {
         return $this->getModel($this->getModelName())->getPermissionBase();
     }

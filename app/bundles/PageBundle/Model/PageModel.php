@@ -274,7 +274,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new PageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -1091,7 +1091,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
     }
 
-    private function setLeadManipulator($page, Hit $hit, Lead $lead): void
+    private function setLeadManipulator(Page|Redirect|null $page, Hit $hit, Lead $lead): void
     {
         // Only save the lead and dispatch events if needed
         $source   = 'hit';

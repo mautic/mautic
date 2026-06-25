@@ -383,11 +383,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function hasGroupBy(): bool
     {
-        if (!empty($this->getReport()->getGroupBy())) {
-            return true;
-        }
-
-        return false;
+        return !empty($this->getReport()->getGroupBy());
     }
 
     public function createParameterName(): string

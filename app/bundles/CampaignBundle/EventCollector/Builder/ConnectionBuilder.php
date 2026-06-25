@@ -12,10 +12,8 @@ class ConnectionBuilder
 
     /**
      * Used by JS/JsPlumb to restrict how events can be associated to each other in the UI.
-     *
-     * @return array
      */
-    public static function buildRestrictionsArray(array $events)
+    public static function buildRestrictionsArray(array $events): array
     {
         // Reset restrictions
         self::$connectionRestrictions = ['anchor' => []];
@@ -32,10 +30,9 @@ class ConnectionBuilder
     }
 
     /**
-     * @param string $eventType
      * @param string $key
      */
-    private static function addTypeConnection($eventType, $key, array $event): void
+    private static function addTypeConnection(int|string $eventType, $key, array $event): void
     {
         if (!isset(self::$connectionRestrictions[$key])) {
             self::$connectionRestrictions[$key] = [
@@ -86,7 +83,7 @@ class ConnectionBuilder
      * @param string $eventType
      * @param string $key
      */
-    private static function addDeprecatedAnchorRestrictions($eventType, $key, array $event): void
+    private static function addDeprecatedAnchorRestrictions(string|int $eventType, $key, array $event): void
     {
         switch ($eventType) {
             case Event::TYPE_DECISION:

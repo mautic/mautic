@@ -32,10 +32,7 @@ class StatDAO
         return $this->stats[$key];
     }
 
-    /**
-     * @return array
-     */
-    public function getStats()
+    public function getStats(): array
     {
         return $this->stats;
     }

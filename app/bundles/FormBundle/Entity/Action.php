@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Action implements UuidInterface
 {
     use UuidTrait;
+
     public const ENTITY_NAME = 'form_action';
 
     /**
@@ -150,7 +151,7 @@ class Action implements UuidInterface
         ]));
     }
 
-    private function isChanged($prop, $val): void
+    private function isChanged(string $prop, $val): void
     {
         if ($this->$prop != $val) {
             $this->changes[$prop] = [$this->$prop, $val];

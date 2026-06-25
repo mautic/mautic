@@ -164,12 +164,14 @@ class MailHelper
      * @var string
      */
     protected $subject              = '';
+
     private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
     protected $plainText              = '';
+
     private ?string $plainTextInitial = null;
 
     /**
@@ -259,7 +261,7 @@ class MailHelper
             $coreParametersHelper->get('mailer_from_name')
         );
         $this->addressLengthLimit = (int) $coreParametersHelper->get('mailer_address_length_limit');
-        $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
+        $this->setDefaultFrom(new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->message = $this->getMessageInstance();
@@ -1059,10 +1061,9 @@ class MailHelper
     /**
      * Set reply to address(es) for this mailer instance.
      *
-     * @param array<string>|string $addresses
-     * @param string               $name
+     * @param string $name
      */
-    public function setReplyTo($addresses, $name = null): void
+    public function setReplyTo(?string $addresses, $name = null): void
     {
         $this->replyTo = $addresses;
     }
@@ -1936,17 +1937,9 @@ class MailHelper
         }
     }
 
-    private function setDefaultFrom($overrideFrom, AddressDTO $systemFrom): void
+    private function setDefaultFrom(AddressDTO $systemFrom): void
     {
-        if (is_array($overrideFrom)) {
-            $fromEmail    = key($overrideFrom);
-            $fromName     = $this->cleanName($overrideFrom[$fromEmail]);
-            $overrideFrom = [$fromEmail => $fromName];
-        } elseif (!empty($overrideFrom)) {
-            $overrideFrom = [$overrideFrom => null];
-        }
-
-        $this->systemFrom = $overrideFrom ?: $systemFrom;
+        $this->systemFrom = $systemFrom;
         $this->from       = $this->systemFrom;
     }
 

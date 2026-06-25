@@ -19,10 +19,7 @@ class Result
      */
     private $email;
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): ?Stat
     {
         return $this->stat;
     }
@@ -44,7 +41,7 @@ class Result
     /**
      * @return Lead[]
      */
-    public function getContacts()
+    public function getContacts(): array
     {
         return $this->contacts;
     }

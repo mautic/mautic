@@ -54,14 +54,12 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -89,14 +87,12 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param int $decisionId
      *
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->limiter = $limiter;
         $this->output  = $output ?: new NullOutput();
