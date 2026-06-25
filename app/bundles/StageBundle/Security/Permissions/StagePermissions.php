@@ -17,7 +17,10 @@ class StagePermissions extends AbstractPermissions
 
     public const PERMISSION_PUBLISH = 'stage:stages:publish';
 
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
 

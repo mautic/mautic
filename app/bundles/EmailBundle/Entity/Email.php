@@ -1510,11 +1510,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             return false;
         }
 
-        if (empty($this->getSentCount(true))) {
-            return false;
-        }
-
-        return true;
+        return !empty($this->getSentCount(true));
     }
 
     public function isDuplicate(): bool

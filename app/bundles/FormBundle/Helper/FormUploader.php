@@ -121,7 +121,7 @@ class FormUploader
      * Fix iOS picture orientation after upload PHP
      * https://stackoverflow.com/questions/22308921/fix-ios-picture-orientation-after-upload-php.
      */
-    private function fixRotationJPG($filename): void
+    private function fixRotationJPG(string $filename): void
     {
         if (IMAGETYPE_JPEG != exif_imagetype($filename)) {
             return;

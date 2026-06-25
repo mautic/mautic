@@ -21,7 +21,7 @@ final class GlobalCategoryType extends AbstractType
                 'required'           => false,
                 'model'              => 'category.category',
                 'multiple'           => true,
-                'ajax_lookup_action' => function (Options $options) {
+                'ajax_lookup_action' => function (Options $options): string {
                     $query = [
                         'for_lookup' => 1,
                     ];
