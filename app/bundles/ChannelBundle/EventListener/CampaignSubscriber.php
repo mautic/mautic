@@ -140,15 +140,13 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param string $channel
-     *
      * @return bool|ArrayCollection
      *
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    private function sendChannelMessage(ArrayCollection $logs, int|string $channel, array $messageChannel)
+    private function sendChannelMessage(ArrayCollection $logs, string $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);

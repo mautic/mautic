@@ -167,7 +167,7 @@ class DoNotContact implements MauticModelInterface
         return DNC::IS_CONTACTABLE;
     }
 
-    public function createDncRecord(Lead $contact, $channel, $reason, $comments = null): DNC
+    public function createDncRecord(Lead $contact, $channel, $reason, ?string $comments = null): DNC
     {
         $dnc = new DNC();
 
@@ -189,7 +189,7 @@ class DoNotContact implements MauticModelInterface
         return $dnc;
     }
 
-    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, $comments = null): void
+    public function updateDncRecord(DNC $dnc, Lead $contact, $channel, $reason, ?string $comments = null): void
     {
         // Update the DNC entry
         $dnc->setChannel($channel);

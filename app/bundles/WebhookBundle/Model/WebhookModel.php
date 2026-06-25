@@ -441,7 +441,7 @@ class WebhookModel extends FormModel
      * @param string $note
      *                           $runtime variable unit is in seconds
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null): void
+    public function addLog(Webhook $webhook, $statusCode, $runtime, ?string $note = null): void
     {
         if (!$webhook->getId()) {
             return;

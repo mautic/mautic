@@ -895,11 +895,10 @@ class FieldModel extends FormModel
      *
      * @param bool|true $byGroup
      * @param bool|true $alphabetical
-     * @param array     $filters
      *
      * @return mixed[]
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
+    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }

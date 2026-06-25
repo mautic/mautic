@@ -41,12 +41,10 @@ final class DateHelper
 
     /**
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    private function format(string $type, $datetime, $timezone, $fromFormat)
+    private function format(string $type, $datetime, string $timezone, ?string $fromFormat)
     {
         if (empty($datetime)) {
             return '';
@@ -76,12 +74,10 @@ final class DateHelper
      * Returns date and time concat eg 2014-08-02 5:00am.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toFullConcat($datetime, string $timezone = 'local', ?string $fromFormat = 'Y-m-d H:i:s')
     {
         $this->helper->setDateTime($datetime, $fromFormat, $timezone);
 

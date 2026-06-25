@@ -70,13 +70,12 @@ class CampaignHelper
     }
 
     /**
-     * @param string $method
-     * @param int    $timeout
+     * @param int $timeout
      *
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      */
-    private function makeRequest(string $url, $method, $timeout, array $headers, array $payload): void
+    private function makeRequest(string $url, string $method, $timeout, array $headers, array $payload): void
     {
         switch ($method) {
             case 'get':

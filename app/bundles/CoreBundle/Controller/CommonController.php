@@ -84,11 +84,9 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param string $modelNameKey
-     *
      * @return AbstractCommonModel<object>
      */
-    protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
+    protected function getModel(string $modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
         return $this->modelFactory->getModel($modelNameKey);
     }
@@ -205,7 +203,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return JsonResponse|RedirectResponse
      */
-    public function delegateRedirect($url)
+    public function delegateRedirect(string $url)
     {
         $request = $this->getCurrentRequest();
 
@@ -473,7 +471,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401'): array
+    public function accessDenied($batch = false, string $msg = 'mautic.core.url.error.401'): array
     {
         if ($this->security->isAnonymous() || !$batch) {
             $this->throwAccessDenied($msg);
@@ -485,11 +483,9 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Generate 404 not found message.
      *
-     * @param string $msg
-     *
      * @return Response
      */
-    public function notFound($msg = 'mautic.core.url.error.404')
+    public function notFound(string $msg = 'mautic.core.url.error.404')
     {
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
@@ -524,10 +520,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Returns a json encoded access denied error for modal windows.
-     *
-     * @param string $msg
      */
-    public function modalAccessDenied($msg = 'mautic.core.error.accessdenied'): JsonResponse
+    public function modalAccessDenied(string $msg = 'mautic.core.error.accessdenied'): JsonResponse
     {
         return new JsonResponse([
             'error' => $this->translator->trans($msg, [], 'flashes'),

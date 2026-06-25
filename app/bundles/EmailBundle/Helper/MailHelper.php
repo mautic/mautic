@@ -719,12 +719,11 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param array  $vars
      * @param bool   $returnContent
      *
      * @return void|string
      */
-    public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
     {
         $content = $this->twig->render($template, $vars);
 
@@ -1104,9 +1103,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);

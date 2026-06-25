@@ -246,13 +246,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Apply date filters to the query.
      *
-     * @param string $dateColumn
-     * @param string $tablePrefix
-     * @param bool   $dateOnly
-     *
      * @throws \Exception
      */
-    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false): ReportGeneratorEvent
+    public function applyDateFilters(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): ReportGeneratorEvent
     {
         $this->setDateRangeQueryFilters(
             $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,

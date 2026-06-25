@@ -222,7 +222,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return null;
     }
 
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
+    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];

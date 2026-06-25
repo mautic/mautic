@@ -464,7 +464,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults($format, $form, array $queryArgs)
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -575,7 +575,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs)
+    public function exportResultsForPage($format, $page, array $queryArgs)
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];
