@@ -48,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function addEmailEvents(LeadTimelineEvent $event, $state): void
+    private function addEmailEvents(LeadTimelineEvent $event, string $state): void
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;
