@@ -6,7 +6,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class SystemPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
         $this->addStandardPermissions('themes');

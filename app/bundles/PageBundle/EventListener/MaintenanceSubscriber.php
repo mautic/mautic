@@ -30,7 +30,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $this->cleanData($event, 'lead_utmtags');
     }
 
-    private function cleanData(MaintenanceEvent $event, $table): void
+    private function cleanData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
