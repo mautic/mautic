@@ -12,7 +12,7 @@ class UTCDateTimeType extends DateTimeType
     private static ?\DateTimeZone $utc = null;
 
     /**
-     * @param \DateTime $value
+     * @param \DateTime|\DateTimeImmutable|null $value
      *
      * @return string|null
      */
