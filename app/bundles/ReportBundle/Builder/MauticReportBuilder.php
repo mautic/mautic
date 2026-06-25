@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class MauticReportBuilder implements ReportBuilderInterface
 {
     public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+
     /**
      * @SuppressWarnings("php:S5843")
      * Reason: This regex is intentionally complex to handle most basic cases

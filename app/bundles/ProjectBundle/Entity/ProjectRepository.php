@@ -49,6 +49,6 @@ class ProjectRepository extends CommonRepository
 
     public function checkProjectNameExists(string $name, ?int $ignoredId = null): bool
     {
-        return !empty($this->getProjectByName($name, $ignoredId));
+        return $this->getProjectByName($name, $ignoredId) instanceof Project;
     }
 }
