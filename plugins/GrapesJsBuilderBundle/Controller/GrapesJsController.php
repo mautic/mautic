@@ -229,7 +229,7 @@ class GrapesJsController extends CommonController
     /**
      * @deprecated deprecated since version 5.0 - use mjml directly in email.html.twig
      */
-    private function checkForMjmlTemplate($template)
+    private function checkForMjmlTemplate(string $template): ?string
     {
         $twig = $this->container->get('twig');
 

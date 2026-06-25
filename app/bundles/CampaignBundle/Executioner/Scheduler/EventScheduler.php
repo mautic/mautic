@@ -345,10 +345,7 @@ class EventScheduler
         throw new NotSchedulableException();
     }
 
-    /**
-     * @param bool $isReschedule
-     */
-    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false): void
+    private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, bool $isReschedule = false): void
     {
         $this->dispatcher->dispatch(
             new ScheduledEvent($config, $log, $isReschedule),
@@ -356,10 +353,7 @@ class EventScheduler
         );
     }
 
-    /**
-     * @param bool $isReschedule
-     */
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, $isReschedule = false): void
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, bool $isReschedule = false): void
     {
         if (!$logs->count()) {
             return;

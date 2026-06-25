@@ -120,7 +120,7 @@ class Mapper
     /**
      * @return mixed
      */
-    private function getField($fieldName)
+    private function getField(int|string $fieldName)
     {
         return $this->fields[$this->object][$fieldName] ?? null;
     }

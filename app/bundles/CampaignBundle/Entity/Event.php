@@ -523,10 +523,9 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * @param string $prop
-     * @param mixed  $val
+     * @param mixed $val
      */
-    private function isChanged($prop, $val): bool
+    private function isChanged(string $prop, $val): bool
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
