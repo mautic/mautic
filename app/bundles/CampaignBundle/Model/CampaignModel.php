@@ -545,7 +545,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                     }
                 }
 
-            // no break
+                // no break
             case 'forms':
             case null:
                 $choices['forms'] = [];

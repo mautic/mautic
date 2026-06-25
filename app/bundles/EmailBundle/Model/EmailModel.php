@@ -2377,6 +2377,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array<string, string>|array<string, int> $routeParams
      * @param bool                                     $absolute
      * @param array<array<string>>                     $clickthrough
+     *
      * @return string
      */
     public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])

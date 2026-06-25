@@ -893,7 +893,6 @@ class FieldModel extends FormModel
     /**
      * @deprecated Use FieldList::getFieldList method instead
      *
-     *
      * @return mixed[]
      */
     public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array

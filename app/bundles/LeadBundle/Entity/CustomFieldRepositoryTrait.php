@@ -185,9 +185,9 @@ trait CustomFieldRepositoryTrait
      * @param bool   $byGroup
      * @param string $object
      *
-     * @return array
+     * @return mixed[]
      */
-    public function getFieldValues($id, $byGroup = true, $object = 'lead')
+    public function getFieldValues($id, $byGroup = true, $object = 'lead'): array
     {
         // use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();

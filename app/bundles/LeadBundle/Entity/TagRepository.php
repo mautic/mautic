@@ -13,7 +13,7 @@ class TagRepository extends CommonRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param bool $flush true by default; use false if persisting in batches
      */
     public function deleteEntity(object $entity, $flush = true): void
     {
