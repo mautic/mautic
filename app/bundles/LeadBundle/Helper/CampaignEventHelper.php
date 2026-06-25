@@ -32,10 +32,6 @@ class CampaignEventHelper
             return false;
         }
 
-        if ($eventDetails->wasRemoved() && !empty($limitRemoveFrom) && !in_array($list->getId(), $limitRemoveFrom)) {
-            return false;
-        }
-
-        return true;
+        return !$eventDetails->wasRemoved() || empty($limitRemoveFrom) || in_array($list->getId(), $limitRemoveFrom);
     }
 }

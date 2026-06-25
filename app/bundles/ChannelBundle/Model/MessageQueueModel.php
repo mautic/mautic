@@ -342,7 +342,7 @@ class MessageQueueModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

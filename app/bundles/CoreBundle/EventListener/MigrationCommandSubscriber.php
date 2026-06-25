@@ -96,10 +96,6 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
     {
         $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
 
-        if (isset($tableColumns[$generatedColumn->getColumnName()])) {
-            return true;
-        }
-
-        return false;
+        return isset($tableColumns[$generatedColumn->getColumnName()]);
     }
 }

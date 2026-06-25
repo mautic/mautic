@@ -25,6 +25,7 @@ use Twig\Environment;
 class SearchSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
+
     private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
 
     public function __construct(

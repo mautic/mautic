@@ -68,11 +68,9 @@ class WebhookQueue
     }
 
     /**
-     * @param Webhook|null $webhook
-     *
      * @return WebhookQueue
      */
-    public function setWebhook($webhook)
+    public function setWebhook(?Webhook $webhook)
     {
         $this->webhook = $webhook;
 
@@ -85,11 +83,9 @@ class WebhookQueue
     }
 
     /**
-     * @param \DateTime|null $dateAdded
-     *
      * @return WebhookQueue
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(?\DateTime $dateAdded)
     {
         $this->dateAdded = $dateAdded;
 
@@ -134,11 +130,9 @@ class WebhookQueue
     }
 
     /**
-     * @param Event|null $event
-     *
      * @return WebhookQueue
      */
-    public function setEvent($event)
+    public function setEvent(?Event $event)
     {
         $this->event = $event;
 

@@ -250,11 +250,9 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param bool $preferredChannel
-     *
      * @return FrequencyRule
      */
-    public function setPreferredChannel($preferredChannel)
+    public function setPreferredChannel(bool $preferredChannel)
     {
         $this->isChanged('preferredChannel', $preferredChannel);
 

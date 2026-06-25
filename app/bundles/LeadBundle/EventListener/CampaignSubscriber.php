@@ -281,7 +281,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $pointGroupId             = $event->getConfig()['group'] ?? null;
             $pointGroup               = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
 
-            if (!empty($pointGroup)) {
+            if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
                 $this->groupModel->adjustPoints($lead, $pointGroup, $points);
             } else {
                 $lead->adjustPoints($points);

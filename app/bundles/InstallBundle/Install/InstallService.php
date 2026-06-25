@@ -128,11 +128,7 @@ class InstallService
         // if db_driver and site_url are present then it is assumed all the steps of the installation have been
         // performed; manually deleting these values or deleting the config file will be required to re-enter
         // installation.
-        if (empty($params['db_driver']) || empty($params['site_url'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($params['db_driver']) && !empty($params['site_url']);
     }
 
     /**

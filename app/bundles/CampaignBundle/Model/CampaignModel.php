@@ -210,7 +210,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new Events\CampaignEvent($entity, $isNew);
             }
 

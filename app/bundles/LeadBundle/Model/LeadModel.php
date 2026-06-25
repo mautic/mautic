@@ -382,7 +382,7 @@ class LeadModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -399,7 +399,7 @@ class LeadModel extends FormModel
      */
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        if (empty($event)) {
+        if (!$event instanceof Event) {
             $event = new LeadEvent($entity, $isNew);
             $event->setAlreadyProcessedInBatch(true);
             $event->setEntityManager($this->em);
@@ -435,7 +435,7 @@ class LeadModel extends FormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             $leadEvents = [];
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 foreach ($entitiesBatchParams as $entityParam) {
                     if (!$leadEvent = $entityParam['event']) {
                         $leadEvent = new LeadEvent($entityParam['entity'], $entityParam['isNew']);

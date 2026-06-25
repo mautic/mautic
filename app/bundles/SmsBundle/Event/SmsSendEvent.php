@@ -42,10 +42,7 @@ class SmsSendEvent extends CommonEvent
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): void
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }

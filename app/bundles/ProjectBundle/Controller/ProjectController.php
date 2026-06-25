@@ -22,9 +22,13 @@ use Symfony\Component\HttpFoundation\Response;
 final class ProjectController extends AbstractFormController
 {
     public const ROUTE_INDEX     = 'mautic_project_index';
+
     private const ROUTE_ACTION   = 'mautic_project_action';
+
     private const LINK_ID_INDEX  = '#'.self::ROUTE_INDEX;
+
     private const TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
+
     private const TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
     public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
