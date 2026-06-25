@@ -40,7 +40,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @var array<string, mixed[]>
      */
-    private $cachedEvents = [];
+    private array $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
@@ -104,7 +104,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         parent::saveEntity($entity, $unlock);
 
@@ -224,7 +224,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
@@ -275,7 +275,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         if (empty($this->cachedEvents)) {
             $event = new TriggerBuilderEvent($this->translator);

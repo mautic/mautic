@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
-    private $pointsAdded = false;
+    private bool $pointsAdded = false;
 
     protected $useCleanupRollback = false;
 

@@ -148,7 +148,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                         switch ($condition) {
                             case 'startsWith':
-                                $value = $value.'%';
+                                $value .= '%';
                                 break;
                             case 'endsWith':
                                 $value = '%'.$value;
@@ -444,7 +444,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                         break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';
-                                        $filter['value'] = $filter['value'].'%';
+                                        $filter['value'] .= '%';
                                         break;
                                     case 'endsWith':
                                         $exprFunction    = 'like';
@@ -560,7 +560,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ->select('DISTINCT lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'ldnc')
             ->where(implode(' OR ', array_map(
-                fn ($condition) => sprintf(
+                fn ($condition): string => sprintf(
                     '(ldnc.channel = %s AND ldnc.reason = %d)',
                     $condition['channel'],
                     $condition['reason']

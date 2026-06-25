@@ -153,8 +153,11 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('setIsGlobalDataProvider')]
-    public function testSetIsGlobal($value, $expected, array $changes): void
+    public function testSetIsGlobal(mixed $value, mixed $expected, array $changes): void
     {
         $segment = new LeadList();
         $segment->setIsGlobal($value);
@@ -163,6 +166,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $segment->getChanges());
     }
 
+    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
     public static function setIsGlobalDataProvider(): iterable
     {
         yield [null, false, ['isGlobal' => [true, false]]];
@@ -173,8 +177,11 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, []];
     }
 
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
-    public function testSetIsPreferenceCenter($value, $expected, array $changes): void
+    public function testSetIsPreferenceCenter(mixed $value, mixed $expected, array $changes): void
     {
         $segment = new LeadList();
         $segment->setIsPreferenceCenter($value);
@@ -183,6 +190,7 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $segment->getChanges());
     }
 
+    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
     public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, false, []];

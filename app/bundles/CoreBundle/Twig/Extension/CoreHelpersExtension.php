@@ -27,7 +27,7 @@ class CoreHelpersExtension extends AbstractExtension
             new TwigFunction('getFilterAttributes', [$this, 'getFilterAttributes'], ['is_safe' => 'all']),
             // Used by CoreBundle:Helper:pagination.html.twig
             new TwigFunction('getPaginationAction', [$this, 'getPaginationAction'], ['is_safe' => 'all']),
-            new TwigFunction('md5', fn (string $string) => md5($string), ['is_safe' => 'all']),
+            new TwigFunction('md5', fn (string $string): string => md5($string), ['is_safe' => 'all']),
         ];
     }
 
@@ -37,7 +37,7 @@ class CoreHelpersExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('json_decode', fn (string $json) => json_decode($json, true)),
+            new TwigFilter('json_decode', fn (string $json): mixed => json_decode($json, true)),
             new TwigFilter('parse_str', [$this, 'parseString']),
         ];
     }

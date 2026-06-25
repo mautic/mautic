@@ -70,6 +70,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
+        /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
                 private GrapesJsBuilderRepository $grapesJsBuilderRepository,
@@ -172,6 +173,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             }
         };
 
+        /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
                 private GrapesJsBuilderRepository $grapesJsBuilderRepository,

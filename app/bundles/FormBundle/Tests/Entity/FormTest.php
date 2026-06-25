@@ -10,8 +10,11 @@ use PHPUnit\Framework\Assert;
 
 final class FormTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
     #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
-    public function testSetNoIndex($value, $expected, array $changes): void
+    public function testSetNoIndex(mixed $value, mixed $expected, array $changes): void
     {
         $form = new Form();
         $form->setNoIndex($value);
@@ -20,6 +23,7 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $form->getChanges());
     }
 
+    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, ['noIndex' => [true, null]]];

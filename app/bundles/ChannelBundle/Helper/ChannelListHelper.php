@@ -75,10 +75,7 @@ class ChannelListHelper
         return $channels;
     }
 
-    /**
-     * @return array
-     */
-    public function getChannels()
+    public function getChannels(): array
     {
         $this->setupChannels();
 

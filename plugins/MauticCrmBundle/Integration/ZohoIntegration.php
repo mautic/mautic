@@ -574,10 +574,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * Generate the auth login URL.  Note that if oauth2, response_type=code is assumed.  If this is not the case,
      * override this function.
-     *
-     * @return string
      */
-    public function getAuthLoginUrl()
+    public function getAuthLoginUrl(): string
     {
         $authType = $this->getAuthenticationType();
 
@@ -704,7 +702,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $zohoFields        = [];
         $silenceExceptions = $settings['silence_exceptions'] ?? true;

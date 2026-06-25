@@ -32,11 +32,7 @@ class DisplayManager
             return true;
         }
 
-        if ($this->shouldDisplayNotAlwaysDisplayField($field)) {
-            return true;
-        }
-
-        return false;
+        return $this->shouldDisplayNotAlwaysDisplayField($field);
     }
 
     private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
@@ -63,10 +59,7 @@ class DisplayManager
         return '' != $this->form->getProgressiveProfilingLimit();
     }
 
-    /**
-     * @return DisplayCounter
-     */
-    public function getDisplayCounter()
+    public function getDisplayCounter(): DisplayCounter
     {
         return $this->displayCounter;
     }

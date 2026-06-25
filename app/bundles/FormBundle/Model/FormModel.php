@@ -152,7 +152,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -319,7 +319,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);

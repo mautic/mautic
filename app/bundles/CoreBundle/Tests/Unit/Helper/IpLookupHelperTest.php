@@ -177,10 +177,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($result);
     }
 
-    /**
-     * @return IpLookupHelper
-     */
-    private function getIpHelper($request = null, $mockCoreParametersHelper = null)
+    private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null): IpLookupHelper
     {
         $requestStack = new RequestStack();
 

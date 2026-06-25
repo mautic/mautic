@@ -9,6 +9,7 @@ use Mautic\IntegrationsBundle\Helper\FieldMergerHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FieldMergerHelperTest extends TestCase
@@ -73,7 +74,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -110,7 +111,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field4 */
+        /** @var MappedFieldInfoInterface&MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -147,7 +148,7 @@ class FieldMergerHelperTest extends TestCase
         ];
 
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -202,7 +203,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field4 */
         $field4 = $integrationFields['field4'];
         $field4->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -239,7 +240,7 @@ class FieldMergerHelperTest extends TestCase
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
 
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -276,7 +277,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -314,7 +315,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -351,7 +352,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -391,7 +392,7 @@ class FieldMergerHelperTest extends TestCase
 
         $integrationObject = $this->getIntegrationObject();
         $integrationFields = $integrationObject->getAllFieldsForMapping('Lead');
-        /** @var MappedFieldInfoInterface|\PHPUnit\Framework\MockObject\MockObject $field1 */
+        /** @var MappedFieldInfoInterface&MockObject $field1 */
         $field1 = $integrationFields['field1'];
         $field1->expects($this->once())
             ->method('isBidirectionalSyncEnabled')
@@ -413,10 +414,7 @@ class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigFormSyncInterface
-     */
-    private function getIntegrationObject(bool $removeFirstField = false): ConfigFormSyncInterface
+    private function getIntegrationObject(bool $removeFirstField = false): MockObject&ConfigFormSyncInterface
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getName')
@@ -453,6 +451,7 @@ class FieldMergerHelperTest extends TestCase
         return $integrationObject;
     }
 
+    /** @return array<string, array<string, array<string, string>>> */
     private function getCurrentFieldMappings(): array
     {
         return [

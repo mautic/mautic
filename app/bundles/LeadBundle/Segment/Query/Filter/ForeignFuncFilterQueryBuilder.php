@@ -84,25 +84,17 @@ class ForeignFuncFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             default:
                 if ($filterAggr) {
-                    if (!is_null($filter)) {
-                        if ('sum' === $filterAggr) {
-                            $expressionArg = $queryBuilder->expr()->func('COALESCE',
-                                $queryBuilder->expr()->func('SUM', $tableAlias.'.'.$filter->getField()),
-                                0
-                            );
-                            $expression = $queryBuilder->expr()->$filterOperator($expressionArg,
-                                $filterParametersHolder);
-                        } else {
-                            $expressionArg = sprintf('%s(DISTINCT %s)', $filterAggr, $tableAlias.'.'
-                                .$filter->getField());
-                            $expression = $queryBuilder->expr()->$filterOperator(
-                                $expressionArg,
-                                $filterParametersHolder
-                            );
-                        }
+                    if ('sum' === $filterAggr) {
+                        $expressionArg = $queryBuilder->expr()->func('COALESCE',
+                            $queryBuilder->expr()->func('SUM', $tableAlias.'.'.$filter->getField()),
+                            0
+                        );
+                        $expression = $queryBuilder->expr()->$filterOperator($expressionArg,
+                            $filterParametersHolder);
                     } else {
-                        $expressionArg = $queryBuilder->expr()->func($filterAggr, $tableAlias.'.'.$filter->getField());
-                        $expression    = $queryBuilder->expr()->$filterOperator(
+                        $expressionArg = sprintf('%s(DISTINCT %s)', $filterAggr, $tableAlias.'.'
+                            .$filter->getField());
+                        $expression = $queryBuilder->expr()->$filterOperator(
                             $expressionArg,
                             $filterParametersHolder
                         );

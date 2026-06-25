@@ -12,7 +12,7 @@ class AssetGenerationHelper
     private const NODE_MODULES = [
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
-        'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
+        '../vendor/twbs/bootstrap-sass/assets/javascripts/bootstrap.js', // Needed for the UI components like modal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
@@ -126,7 +126,7 @@ class AssetGenerationHelper
                 }
 
                 foreach (self::NODE_MODULES as $path) {
-                    $relPath  = "node_modules/{$path}";
+                    $relPath  = str_starts_with($path, '../vendor/') ? substr($path, 3) : "node_modules/{$path}";
                     $fullPath = "{$this->pathsHelper->getVendorRootPath()}/{$relPath}";
                     $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
                     $details  = [

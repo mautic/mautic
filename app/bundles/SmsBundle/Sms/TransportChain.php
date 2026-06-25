@@ -141,7 +141,7 @@ class TransportChain
      *
      * @return array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
-    public function getTransports()
+    public function getTransports(): array
     {
         return $this->transports;
     }

@@ -43,6 +43,7 @@ class Field implements UuidInterface
     use UuidTrait;
 
     public const TABLE_NAME  = 'form_fields';
+
     public const ENTITY_NAME = 'form_field';
 
     /**
@@ -350,7 +351,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -371,7 +372,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLabel()
     {
@@ -392,7 +393,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -413,7 +414,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -434,7 +435,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDefaultValue()
     {
@@ -486,7 +487,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getOrder()
     {
@@ -549,7 +550,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getValidationMessage()
     {
@@ -588,7 +589,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLabelAttributes()
     {
@@ -609,7 +610,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInputAttributes()
     {
@@ -617,7 +618,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getContainerAttributes()
     {
@@ -687,7 +688,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getHelpMessage()
     {
@@ -763,7 +764,7 @@ class Field implements UuidInterface
     /**
      * @deprecated, to be removed in Mautic 4. Use mappedObject and mappedField instead.
      *
-     * @return mixed
+     * @return string|null
      */
     public function getLeadField()
     {
@@ -781,7 +782,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
     public function getSaveResult()
     {
@@ -813,7 +814,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getShowWhenValueExists()
     {
@@ -829,7 +830,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getShowAfterXSubmissions()
     {
@@ -949,7 +950,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isAlwaysDisplay()
     {
@@ -999,7 +1000,7 @@ class Field implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getParent()
     {

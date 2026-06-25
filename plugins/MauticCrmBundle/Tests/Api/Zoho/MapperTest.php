@@ -9,9 +9,9 @@ use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 class MapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var array<string, array<string, array<string, mixed>>>
      */
-    protected $availableFields = [
+    protected array $availableFields = [
         'Leads' => [
             'Company'   => [
                 'type'     => 'string',
@@ -40,10 +40,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /**
-     * @var array
-     */
-    protected $mappedFields = [
+    /** @var array<string, string> */
+    protected array $mappedFields = [
         'Company'   => 'company',
         'Email'     => 'email',
         'Country'   => 'country',
@@ -51,10 +49,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         'LastName'  => 'lastname',
     ];
 
-    /**
-     * @var array
-     */
-    protected $contacts = [
+    /** @var array<int, array<string, int|string|null>> */
+    protected array $contacts = [
         [
             'firstname'             => 'FirstName1',
             'lastname'              => 'LastName1',

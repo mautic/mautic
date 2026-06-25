@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 class LeadTriggerLog
 {
     public const TABLE_NAME = 'point_lead_event_log';
+
     /**
      * @var TriggerEvent
      **/
@@ -52,7 +53,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
     public function getDateFired()
     {
@@ -84,7 +85,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead|null
      */
     public function getLead()
     {
@@ -100,7 +101,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return mixed
+     * @return TriggerEvent|null
      */
     public function getEvent()
     {

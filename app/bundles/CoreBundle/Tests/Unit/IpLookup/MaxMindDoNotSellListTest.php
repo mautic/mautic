@@ -15,13 +15,13 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParamsHelperMock;
 
-    private $badFilePath = 'bad_list.json';
+    private string $badFilePath = 'bad_list.json';
 
-    private $badData     = 'bad data';
+    private string $badData     = 'bad data';
 
-    private $goodFilePath = 'good_list.json';
+    private string $goodFilePath = 'good_list.json';
 
-    private $goodData     = '{
+    private string $goodData     = '{
                                 "exclusions": [
                                     {
                                       "exclusion_type": "ccpa_do_not_sell",

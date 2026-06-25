@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Action implements UuidInterface
 {
     use UuidTrait;
+
     public const ENTITY_NAME = 'form_action';
 
     /**
@@ -168,7 +169,7 @@ class Action implements UuidInterface
     /**
      * Get id.
      *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -267,7 +268,7 @@ class Action implements UuidInterface
     /**
      * Get type.
      *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -297,7 +298,7 @@ class Action implements UuidInterface
     /**
      * Get description.
      *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -322,7 +323,7 @@ class Action implements UuidInterface
     /**
      * Get name.
      *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
