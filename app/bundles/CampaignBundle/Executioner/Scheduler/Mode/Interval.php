@@ -141,11 +141,7 @@ class Interval implements ScheduleModeInterface
             return true;
         }
 
-        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event)) {
-            return false;
-        }
-
-        return true;
+        return !(!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event));
     }
 
     private function isTriggerModeInterval(Event $event): bool
