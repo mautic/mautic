@@ -43,7 +43,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
             return null;
         }
 
-        if (1 !== preg_match('/^\d+:[a-z0-9]+$/i', $this->auth)) {
+        if (1 !== preg_match('/^\d+:[a-z0-9_]+$/i', $this->auth)) {
             return '';
         }
 
