@@ -1289,10 +1289,7 @@ class Asset extends FormEntity implements UuidInterface
         return (int) $value;
     }
 
-    /**
-     * @param string $unit
-     */
-    public static function convertBytesToHumanReadable($size, $unit = ''): string
+    public static function convertBytesToHumanReadable($size, string $unit = ''): string
     {
         [$number, $unit] = self::convertBytesToUnit($size, $unit);
 

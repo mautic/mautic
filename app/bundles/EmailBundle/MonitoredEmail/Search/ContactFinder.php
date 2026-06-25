@@ -38,10 +38,7 @@ class ContactFinder
         return $this->findByAddress($contactEmail);
     }
 
-    /**
-     * @param string $hash
-     */
-    public function findByHash($hash): Result
+    public function findByHash(string $hash): Result
     {
         $result = new Result();
         $this->logger->debug('MONITORED EMAIL: Searching for a contact by hash '.$hash);

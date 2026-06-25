@@ -42,7 +42,7 @@ class CategoryController extends AbstractFormController
      * @param int    $objectId
      * @param string $objectModel
      */
-    public function executeCategoryAction(Request $request, $bundle, $objectAction, $objectId = 0, $objectModel = ''): Response
+    public function executeCategoryAction(Request $request, $bundle, string $objectAction, $objectId = 0, $objectModel = ''): Response
     {
         if (method_exists($this, $objectAction.'Action')) {
             return $this->forward(
@@ -205,7 +205,7 @@ class CategoryController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $bundle)
+    public function newAction(Request $request, string $bundle)
     {
         $model = $this->getModel('category');
         \assert($model instanceof CategoryModel);
@@ -302,7 +302,7 @@ class CategoryController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false)
+    public function editAction(Request $request, string $bundle, $objectId, $ignorePost = false)
     {
         $session = $request->getSession();
         $model   = $this->getModel('category');
@@ -444,7 +444,7 @@ class CategoryController extends AbstractFormController
      *
      * @return Response
      */
-    public function deleteAction(Request $request, $bundle, $objectId)
+    public function deleteAction(Request $request, string $bundle, $objectId)
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);
@@ -512,10 +512,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @param string $bundle
      */
-    public function batchDeleteAction(Request $request, $bundle): Response
+    public function batchDeleteAction(Request $request, string $bundle): Response
     {
         $session    = $request->getSession();
         $page       = $session->get('mautic.category.page', 1);

@@ -29,7 +29,7 @@ class DeviceTracker
     /**
      * @return LeadDevice|null
      */
-    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
+    public function createDeviceFromUserAgent(Lead $trackedContact, string $userAgent)
     {
         $signature = $trackedContact->getId().$userAgent;
         if (isset($this->trackedDevice[$signature])) {

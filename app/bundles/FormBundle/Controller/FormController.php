@@ -1115,7 +1115,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId): void
+    public function clearSessionComponents(Request $request, string $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');

@@ -499,13 +499,12 @@ class HitRepository extends CommonRepository
      * @param \Doctrine\DBAL\Query\QueryBuilder $query
      * @param int                               $limit
      * @param int                               $offset
-     * @param string                            $column
      * @param string                            $as
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited($query, $limit = 10, $offset = 0, $column = 'p.hits', $as = ''): array
+    public function getMostVisited($query, $limit = 10, $offset = 0, string $column = 'p.hits', $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';

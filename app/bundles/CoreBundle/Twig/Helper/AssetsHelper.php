@@ -622,9 +622,8 @@ final class AssetsHelper
     /**
      * @param string    $country
      * @param bool|true $urlOnly
-     * @param string    $class
      */
-    public function getCountryFlag($country, $urlOnly = true, $class = ''): string
+    public function getCountryFlag($country, $urlOnly = true, string $class = ''): string
     {
         $country  = ucwords(iconv('UTF-8', 'ASCII//TRANSLIT', str_replace(' ', '-', $country)));
         $flagImg  = (string) $this->getOverridableUrl('images/flags/'.$country.'.png');
@@ -672,10 +671,9 @@ final class AssetsHelper
     }
 
     /**
-     * @param string     $secretKey
      * @param string|int $version
      */
-    public function setVersion($secretKey, $version): void
+    public function setVersion(string $secretKey, $version): void
     {
         $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
     }

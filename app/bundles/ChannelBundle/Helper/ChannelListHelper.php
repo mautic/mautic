@@ -82,7 +82,7 @@ class ChannelListHelper
         return $this->channels;
     }
 
-    public function getChannelLabel($channel): string
+    public function getChannelLabel(string $channel): string
     {
         return match (true) {
             $this->translator->hasId('mautic.channel.'.$channel)      => $this->translator->trans('mautic.channel.'.$channel),

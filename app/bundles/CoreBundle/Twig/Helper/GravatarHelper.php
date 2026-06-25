@@ -27,10 +27,9 @@ final class GravatarHelper
 
     /**
      * @param string $email
-     * @param string $size
      * @param string $default
      */
-    public function getImage($email, $size = '250', $default = null): string
+    public function getImage($email, string $size = '250', $default = null): string
     {
         $request      = $this->requestStack->getCurrentRequest();
         $localDefault = ($this->devMode

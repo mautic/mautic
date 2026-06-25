@@ -495,11 +495,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
-     *
      * @return array
      */
-    protected function getFieldsByPriority(array $config, $priorityObject, $direction)
+    protected function getFieldsByPriority(array $config, string $priorityObject, $direction)
     {
         return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }
@@ -535,7 +533,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return [$fromDate, $toDate];
     }
 
-    public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
+    public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, string $object = 'Lead')
     {
         foreach ($objectFields as $integrationField => $mauticField) {
             if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {

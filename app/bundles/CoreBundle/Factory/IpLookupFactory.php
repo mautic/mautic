@@ -21,7 +21,7 @@ class IpLookupFactory
     /**
      * @return AbstractLookup|null
      */
-    public function getService($service, $auth = null, array $ipLookupConfig = [])
+    public function getService(?string $service, $auth = null, array $ipLookupConfig = [])
     {
         static $services = [];
 

@@ -166,7 +166,7 @@ class IntegrationEntityRepository extends CommonRepository
     public function findLeadsToUpdate(
         $integration,
         $internalEntity,
-        $leadFields,
+        string $leadFields,
         $limit = 25,
         $fromDate = null,
         $toDate = null,
@@ -309,7 +309,7 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead')
+    public function findLeadsToCreate($integration, string $leadFields, $limit = 25, $fromDate = null, $toDate = null, string $internalEntity = 'lead')
     {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
@@ -481,7 +481,7 @@ class IntegrationEntityRepository extends CommonRepository
         return $results;
     }
 
-    public function markAsDeleted(array $integrationIds, $integration, $internalEntityType): void
+    public function markAsDeleted(array $integrationIds, $integration, string $internalEntityType): void
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')

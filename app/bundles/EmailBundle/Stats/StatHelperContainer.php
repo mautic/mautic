@@ -20,7 +20,7 @@ class StatHelperContainer
     /**
      * @throws InvalidStatHelperException
      */
-    public function getHelper($name): StatHelperInterface
+    public function getHelper(string $name): StatHelperInterface
     {
         if (!isset($this->helpers[$name])) {
             throw new InvalidStatHelperException($name.' has not been registered');

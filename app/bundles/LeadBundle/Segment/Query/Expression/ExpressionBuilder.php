@@ -16,7 +16,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *
      * @throws SegmentQueryException
      */
-    public function between($x, $arr): string
+    public function between(string $x, $arr): string
     {
         if (!is_array($arr) || 2 != count($arr)) {
             throw new SegmentQueryException('Between expression expects second argument to be an array with exactly two elements');
@@ -103,7 +103,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      * @param mixed        $x    the left expression
      * @param string|array $y    the placeholder or the array of values to be used by IN() comparison
      */
-    public function func($func, $x, $y = null): string
+    public function func(string $func, string $x, $y = null): string
     {
         $functionArguments = func_get_args();
         $additionArguments = array_splice($functionArguments, 2);

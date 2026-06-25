@@ -26,10 +26,9 @@ trait CustomFieldRepositoryTrait
     protected $uniqueIdentifiersOperator;
 
     /**
-     * @param string $object
-     * @param array  $args
+     * @param array $args
      */
-    public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
+    public function getEntitiesWithCustomFields(string $object, $args, $resultsCallback = null)
     {
         $skipOrdering           = $args['skipOrdering'] ?? false;
         [$fields, $fixedFields] = $this->getCustomFieldList($object);
@@ -214,7 +213,7 @@ trait CustomFieldRepositoryTrait
      *
      * @return array
      */
-    public function getValueList($field, $search = '', $limit = 10, $start = 0)
+    public function getValueList(string $field, $search = '', $limit = 10, $start = 0)
     {
         // Includes prefix
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();

@@ -147,13 +147,11 @@ class TransportChain
     }
 
     /**
-     * @param string $transport
-     *
      * @return TransportInterface
      *
      * @throws PrimaryTransportNotEnabledException
      */
-    public function getTransport($transport)
+    public function getTransport(string $transport)
     {
         $enabled = $this->getEnabledTransports();
 

@@ -692,7 +692,7 @@ class EmailController extends FormController
         EmailConfig $emailConfig,
         EmailModel $model,
         ThemeHelper $themeHelper,
-        $objectId,
+        string|int|null $objectId,
         $ignorePost = false,
         $forceTypeSelection = false,
     ) {
@@ -1270,7 +1270,7 @@ class EmailController extends FormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId)
+    public function builderAction(Request $request, ThemeHelper $themeHelper, string $objectId)
     {
         /** @var EmailModel $model */
         $model = $this->getModel('email');

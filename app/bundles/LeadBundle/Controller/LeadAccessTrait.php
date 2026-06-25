@@ -16,7 +16,7 @@ trait LeadAccessTrait
      *
      * @return Response|Lead
      */
-    protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
+    protected function checkLeadAccess($leadId, string $action, $isPlugin = false, string $integration = '')
     {
         if (!$leadId instanceof Lead) {
             // make sure the user has view access to this lead
@@ -71,7 +71,7 @@ trait LeadAccessTrait
      *
      * @return array|Response
      */
-    protected function checkAllAccess($action, $limit)
+    protected function checkAllAccess(string $action, $limit)
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');

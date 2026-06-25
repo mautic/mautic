@@ -56,7 +56,7 @@ class FoursquareIntegration extends SocialIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
+    public function makeRequest(string $url, $parameters = [], $method = 'GET', $settings = [])
     {
         $settings[$this->getAuthTokenKey()] = 'oauth_token';
 
@@ -213,7 +213,10 @@ class FoursquareIntegration extends SocialIntegration
         return '';
     }
 
-    public function matchFieldName($field, $subfield = '')
+    /**
+     * @param string $field
+     */
+    public function matchFieldName($field, ?string $subfield = '')
     {
         if ('contact' == $field && in_array($subfield, ['facebook', 'twitter'])) {
             return $subfield.'ProfileHandle';

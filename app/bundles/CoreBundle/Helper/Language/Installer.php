@@ -23,12 +23,9 @@ class Installer
     }
 
     /**
-     * @param string $sourceDirectory
-     * @param string $languageCode
-     *
      * @return $this
      */
-    public function install($sourceDirectory, $languageCode)
+    public function install(string $sourceDirectory, string $languageCode)
     {
         $this->sourceDirectory  = $sourceDirectory.'/'.$languageCode;
         $this->installDirectory = $this->translationsDirectory.'/'.$languageCode;

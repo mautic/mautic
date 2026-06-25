@@ -1926,7 +1926,7 @@ class MailHelper
      *
      * @throws InvalidEmailException
      */
-    public static function validateEmail($address): void
+    public static function validateEmail(string $address): void
     {
         $invalidChar = strpbrk($address, '\'^&*%');
         if (false !== $invalidChar) {

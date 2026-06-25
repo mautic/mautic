@@ -54,7 +54,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function setName($table, $addPrefix = true)
+    public function setName(string $table, $addPrefix = true)
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 

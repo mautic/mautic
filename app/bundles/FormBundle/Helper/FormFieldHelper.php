@@ -154,7 +154,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Search and replace the HTML of the form field with the value.
      */
-    public function populateField($field, $value, $formName, &$formHtml): void
+    public function populateField($field, $value, string $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 

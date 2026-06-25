@@ -200,7 +200,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function createObject(array $data, $sfObject)
+    public function createObject(array $data, string $sfObject)
     {
         $objectData = $this->request('', $data, 'POST', false, $sfObject);
         $this->integration->getLogger()->debug('SALESFORCE: POST createObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
@@ -218,7 +218,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function updateObject(array $data, $sfObject, $sfObjectId)
+    public function updateObject(array $data, string $sfObject, string $sfObjectId)
     {
         $objectData = $this->request('', $data, 'PATCH', false, $sfObject.'/'.$sfObjectId);
         $this->integration->getLogger()->debug('SALESFORCE: PATCH updateObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
@@ -442,7 +442,7 @@ class SalesforceApi extends CrmApi
     /**
      * @throws ApiErrorException
      */
-    public function checkCampaignMembership($campaignId, $object, array $people): array
+    public function checkCampaignMembership(string $campaignId, $object, array $people): array
     {
         $campaignMembers = [];
         if (!empty($people)) {
@@ -466,7 +466,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMemberStatus($campaignId)
+    public function getCampaignMemberStatus(string $campaignId)
     {
         $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
         $queryUrl      = $this->integration->getQueryUrl();
@@ -490,7 +490,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getCompaniesByName(array $names, $requiredFieldString)
+    public function getCompaniesByName(array $names, string $requiredFieldString)
     {
         $names     = array_map([$this, 'escapeQueryValue'], $names);
         $queryUrl  = $this->integration->getQueryUrl();
@@ -504,7 +504,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getCompaniesById(array $ids, $requiredFieldString)
+    public function getCompaniesById(array $ids, string $requiredFieldString)
     {
         $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from Account where  Id in (\''.implode("','", $ids).'\')';
         $queryUrl  = $this->integration->getQueryUrl();

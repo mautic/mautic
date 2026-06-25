@@ -389,7 +389,7 @@ class SmsController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, string $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var SmsModel $model */
         $model   = $this->getModel('sms');

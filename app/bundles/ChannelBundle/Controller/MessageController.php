@@ -252,7 +252,7 @@ class MessageController extends AbstractStandardFormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $channel,
+        string $channel,
         $page = 1,
     ) {
         $filter = [];

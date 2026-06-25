@@ -23,7 +23,7 @@ class StatDAO
     /**
      * @return mixed
      */
-    public function getStat($key)
+    public function getStat(string $key)
     {
         if (!isset($this->stats[$key])) {
             throw new \InvalidArgumentException($key.' does not exist');

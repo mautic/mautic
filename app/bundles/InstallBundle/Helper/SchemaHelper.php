@@ -206,7 +206,7 @@ class SchemaHelper
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
+    protected function backupExistingSchema($tables, $mauticTables, string $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();
@@ -317,7 +317,7 @@ class SchemaHelper
     /**
      * @return mixed|string
      */
-    protected function generateBackupName($prefix, $backupPrefix, $name)
+    protected function generateBackupName($prefix, string $backupPrefix, string $name): string
     {
         if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;

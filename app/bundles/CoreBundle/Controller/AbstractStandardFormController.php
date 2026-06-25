@@ -666,7 +666,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName(string $file)
     {
         $namespaces = [
             $this->getTemplateBase(),
@@ -697,7 +697,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTranslatedString($string)
+    protected function getTranslatedString(string $string)
     {
         return $this->translator->hasId($this->getTranslationBase().'.'.$string) ? $this->getTranslationBase()
             .'.'.$string : 'mautic.core.'.$string;

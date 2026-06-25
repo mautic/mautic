@@ -12,7 +12,6 @@ trait EntityContactsTrait
      * @param string|int              $entityId
      * @param int                     $page
      * @param string[]|string         $permission
-     * @param string                  $sessionVar
      * @param string                  $entityJoinTable    Table to join to obtain list of related contacts or a DBAL QueryBuilder object defining custom joins
      * @param string|null             $dncChannel         Channel for this entity to get do not contact records for
      * @param string|null             $entityIdColumnName If the entity ID in $joinTable is not "id", set the column name here
@@ -34,7 +33,7 @@ trait EntityContactsTrait
         $entityId,
         $page,
         $permission,
-        $sessionVar,
+        string $sessionVar,
         $entityJoinTable,
         $dncChannel = null,
         $entityIdColumnName = 'id',

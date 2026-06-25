@@ -59,7 +59,7 @@ class MailchimpApi extends EmailMarketingApi
      *
      * @throws ApiErrorException
      */
-    public function getCustomFields($listId)
+    public function getCustomFields(string $listId)
     {
         return $this->request('lists/'.$listId.'/merge-fields');
     }
@@ -72,7 +72,7 @@ class MailchimpApi extends EmailMarketingApi
      *
      * @throws ApiErrorException
      */
-    public function subscribeLead($email, $listId, $fields = [], $config = [])
+    public function subscribeLead($email, string $listId, $fields = [], $config = [])
     {
         $emailStruct        = new \stdClass();
         $emailStruct->email = $email;

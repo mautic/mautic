@@ -611,7 +611,7 @@ class TriggerController extends FormController
     /**
      * Clear field and events from the session.
      */
-    private function clearSessionComponents(Request $request, $sessionId): void
+    private function clearSessionComponents(Request $request, string $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.point.'.$sessionId.'.triggerevents.modified');

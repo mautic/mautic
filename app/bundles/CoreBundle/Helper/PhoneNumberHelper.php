@@ -48,9 +48,8 @@ class PhoneNumberHelper
 
     /**
      * @param string $number
-     * @param string $delimiter
      */
-    public function formatDelimitedNational($number, $delimiter = '-'): ?string
+    public function formatDelimitedNational($number, string $delimiter = '-'): ?string
     {
         $national = $this->format($number, PhoneNumberFormat::NATIONAL);
         $national = str_replace([') ', '-'], $delimiter, $national);

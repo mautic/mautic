@@ -14,7 +14,7 @@ class TimelineController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, $page = 1)
+    public function indexAction(Request $request, string $leadId, $page = 1)
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -125,7 +125,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function pluginViewAction(Request $request, $integration, $leadId, $page = 1)
+    public function pluginViewAction(Request $request, $integration, ?string $leadId, $page = 1)
     {
         if (empty($leadId)) {
             return $this->notFound();
@@ -187,7 +187,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): array|Response
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, string $leadId): array|Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

@@ -73,7 +73,7 @@ abstract class ModeratedCommand extends Command
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Deprecated; use --bypass-locking instead.');
     }
 
-    protected function checkRunStatus(InputInterface $input, OutputInterface $output, $moderationKey = ''): bool
+    protected function checkRunStatus(InputInterface $input, OutputInterface $output, string $moderationKey = ''): bool
     {
         // Bypass locking
         if ((bool) $input->getOption('bypass-locking') || (bool) $input->getOption('force')) {

@@ -457,7 +457,7 @@ class PublicController extends AbstractFormController
         LoggerInterface $logger,
         RedirectModel $redirectModel,
         PageModel $pageModel,
-        $redirectId,
+        string $redirectId,
     ): RedirectResponse {
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 

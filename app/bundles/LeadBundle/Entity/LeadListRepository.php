@@ -364,7 +364,7 @@ class LeadListRepository extends CommonRepository
     /**
      * @return QueryBuilder
      */
-    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
+    protected function createFilterExpressionSubQuery(string $table, string $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subExpr = [];

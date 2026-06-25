@@ -41,7 +41,7 @@ class UrlHelper
     /**
      * @return string
      */
-    public static function rel2abs($rel)
+    public static function rel2abs(string $rel)
     {
         $path = $host = $scheme = '';
 

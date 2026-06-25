@@ -322,10 +322,8 @@ class PlainTextHelper
      *
      * @param string $link    URL of the link
      * @param string $display Part of the text to associate number with
-     *
-     * @return string
      */
-    protected function buildlinkList($link, $display, ?string $linkOverride = null)
+    protected function buildlinkList(string $link, string $display, ?string $linkOverride = null): string
     {
         $linkMethod = $linkOverride ?: $this->options['do_links'];
         if ('none' == $linkMethod) {

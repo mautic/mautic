@@ -531,7 +531,7 @@ class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): void
+    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, string $integration): void
     {
         $logger = $mauticLogger;
 

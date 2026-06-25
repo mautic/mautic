@@ -14,7 +14,7 @@ class AuditlogController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, $page = 1)
+    public function indexAction(Request $request, string $leadId, $page = 1)
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -67,7 +67,7 @@ class AuditlogController extends CommonController
     /**
      * @return array|Response
      */
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, string $leadId)
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

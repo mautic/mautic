@@ -287,7 +287,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         array_walk(
             $columns,
-            function (&$column, $key, $prefix): void {
+            function (&$column, $key, string $prefix): void {
                 $column = trim($column);
                 if (1 === count(explode('.', $column))) {
                     $column = $prefix.$column;

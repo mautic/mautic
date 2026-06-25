@@ -129,7 +129,7 @@ class ConnectwiseApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function updateContact(array $params, $id)
+    public function updateContact(array $params, string $id)
     {
         return $this->request('company/contacts/'.$id, $params, 'PATCH');
     }
@@ -149,7 +149,7 @@ class ConnectwiseApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId, $page = 1)
+    public function getCampaignMembers(string $campaignId, $page = 1)
     {
         return $this->request('marketing/groups/'.$campaignId.'/contacts', ['page' => $page, 'pageSize' => ConnectwiseIntegration::PAGESIZE]);
     }

@@ -13,11 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 class AuthController extends FormController
 {
     /**
-     * @param string $integration
-     *
      * @return JsonResponse
      */
-    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
+    public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, string $integration): JsonResponse|RedirectResponse
     {
         $isAjax  = $request->isXmlHttpRequest();
         $session = $request->getSession();
@@ -68,7 +66,7 @@ class AuthController extends FormController
         return new RedirectResponse($this->generateUrl('mautic_integration_auth_postauth', ['integration' => $integration]));
     }
 
-    public function authStatusAction(Request $request, $integration): \Symfony\Component\HttpFoundation\Response
+    public function authStatusAction(Request $request, ?string $integration): \Symfony\Component\HttpFoundation\Response
     {
         $postAuthTemplate = '@MauticPlugin/Auth/postauth.html.twig';
 

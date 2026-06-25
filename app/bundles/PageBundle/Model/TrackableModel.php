@@ -366,7 +366,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string $html HTML content
      */
-    protected function extractTrackablesFromHtml($html): array
+    protected function extractTrackablesFromHtml(string $html): array
     {
         // Find links using DOM to only find <a> tags
         $libxmlPreviousState = libxml_use_internal_errors(true);

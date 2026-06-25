@@ -115,7 +115,7 @@ class oAuthHelper
      *
      * @param array<string, mixed> $params
      */
-    private function buildBaseString($baseURI, $method, array $params): string
+    private function buildBaseString($baseURI, string $method, array $params): string
     {
         $r = $this->normalizeParameters($params);
 

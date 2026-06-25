@@ -123,9 +123,8 @@ class ChartQuery extends AbstractChart
      *
      * @param QueryBuilder $query
      * @param string       $dateColumn
-     * @param string       $tablePrefix
      */
-    public function applyDateFilters(&$query, $dateColumn, $tablePrefix = 't'): void
+    public function applyDateFilters(&$query, $dateColumn, string $tablePrefix = 't'): void
     {
         // Check if the date filters have already been applied
         if ($parameters = $query->getParameters()) {
@@ -227,10 +226,9 @@ class ChartQuery extends AbstractChart
      *
      * @param string      $column       name
      * @param string      $tablePrefix
-     * @param string      $countColumn
      * @param bool|string $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery(QueryBuilder $query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true): void
+    public function modifyTimeDataQuery(QueryBuilder $query, $column, $tablePrefix = 't', string $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true): void
     {
         // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
@@ -439,9 +437,8 @@ class ChartQuery extends AbstractChart
      *
      * @param string $uniqueColumn name
      * @param array  $options      for special behavior
-     * @param string $tablePrefix
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = [], $tablePrefix = 't')
+    public function modifyCountQuery(QueryBuilder &$query, string $uniqueColumn, $options = [], string $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 
@@ -524,13 +521,10 @@ class ChartQuery extends AbstractChart
     /**
      * Modify the query to count how many rows is between a range of date diff in seconds.
      *
-     * @param string $dateColumn1
-     * @param string $dateColumn2
-     * @param int    $startSecond
-     * @param int    $endSecond
-     * @param string $tablePrefix
+     * @param int $startSecond
+     * @param int $endSecond
      */
-    public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
+    public function modifyCountDateDiffQuery(QueryBuilder &$query, string $dateColumn1, string $dateColumn2, $startSecond = 0, $endSecond = 60, string $tablePrefix = 't'): void
     {
         $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
         $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
@@ -552,10 +546,7 @@ class ChartQuery extends AbstractChart
         return (int) $data['count'];
     }
 
-    /**
-     * @return mixed
-     */
-    protected function prepareTable($table)
+    protected function prepareTable(string $table): string
     {
         if (MAUTIC_TABLE_PREFIX && str_starts_with($table, MAUTIC_TABLE_PREFIX)) {
             return $table;
@@ -568,11 +559,7 @@ class ChartQuery extends AbstractChart
         return MAUTIC_TABLE_PREFIX.$table;
     }
 
-    /**
-     * @param string $tablePrefix
-     * @param string $column
-     */
-    private function getDateConstruct(QueryBuilder $query, $tablePrefix, $column): string
+    private function getDateConstruct(QueryBuilder $query, string $tablePrefix, string $column): string
     {
         $generatedColumn = $this->getGeneratedColumnForDateColumn($query, (string) $column, (string) $tablePrefix);
 

@@ -383,7 +383,7 @@ class NotificationController extends AbstractFormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, string $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var NotificationModel $model */
         $model   = $this->getModel('notification');

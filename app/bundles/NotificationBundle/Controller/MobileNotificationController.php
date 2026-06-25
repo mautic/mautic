@@ -393,7 +393,7 @@ class MobileNotificationController extends FormController
      *
      * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, IntegrationHelper $integrationHelper, $objectId, $ignorePost = false, $forceTypeSelection = false)
+    public function editAction(Request $request, IntegrationHelper $integrationHelper, string $objectId, $ignorePost = false, $forceTypeSelection = false)
     {
         /** @var NotificationModel $model */
         $model   = $this->getModel('notification');

@@ -90,7 +90,7 @@ class FieldModel extends CommonFormModel
     /**
      * Get the fields saved in session.
      */
-    public function getSessionFields($formId): array
+    public function getSessionFields(string $formId): array
     {
         $fields = $this->getSession()->get('mautic.form.'.$formId.'.fields.modified', []);
         $remove = $this->getSession()->get('mautic.form.'.$formId.'.fields.deleted', []);

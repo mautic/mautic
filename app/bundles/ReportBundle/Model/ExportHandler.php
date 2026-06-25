@@ -60,7 +60,7 @@ class ExportHandler
     /**
      * @throws FileIOException
      */
-    public function getPath($fileName): string
+    public function getPath(string $fileName): string
     {
         try {
             $this->filePathResolver->createDirectory($this->dir);

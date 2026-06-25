@@ -214,11 +214,9 @@ class Mailbox
     /**
      * Switch to another configured monitored mailbox.
      *
-     * @param string $mailbox
-     *
      * @throws MailboxException
      */
-    public function switchMailbox($bundle, $mailbox = ''): void
+    public function switchMailbox(string $bundle, ?string $mailbox = ''): void
     {
         $key = $bundle.(!empty($mailbox) ? '_'.$mailbox : '');
 
@@ -288,13 +286,11 @@ class Mailbox
     /**
      * Get settings.
      *
-     * @param string $mailbox
-     *
      * @return mixed
      *
      * @throws MailboxException
      */
-    public function getMailboxSettings($bundle = null, $mailbox = '')
+    public function getMailboxSettings($bundle = null, ?string $mailbox = '')
     {
         if (null == $bundle) {
             return $this->settings;
@@ -333,7 +329,7 @@ class Mailbox
     /**
      * Switch to another box.
      */
-    public function switchFolder($folder): void
+    public function switchFolder(string $folder): void
     {
         if ($folder != $this->imapFolder) {
             $this->imapFullPath = $this->imapPath.$folder;
@@ -854,7 +850,7 @@ class Mailbox
      * @param bool|false $isDsn
      * @param bool|false $isFbl
      */
-    protected function initMailPart(Message $mail, $partStructure, $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
+    protected function initMailPart(Message $mail, $partStructure, string $partNum, $markAsSeen = true, $isDsn = false, $isFbl = false)
     {
         $options = FT_UID;
         if (!$markAsSeen) {
@@ -1052,11 +1048,10 @@ class Mailbox
      *
      * @param string $string
      * @param string $fromEncoding
-     * @param string $toEncoding
      *
      * @return string Converted string if conversion was successful, or the original string if not
      */
-    protected function convertStringEncoding($string, $fromEncoding, $toEncoding)
+    protected function convertStringEncoding($string, $fromEncoding, string $toEncoding)
     {
         $convertedString = null;
         if ($string && $fromEncoding != $toEncoding) {

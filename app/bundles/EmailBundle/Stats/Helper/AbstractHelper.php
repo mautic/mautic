@@ -68,10 +68,8 @@ abstract class AbstractHelper implements StatHelperInterface
 
     /**
      * Joins the email table and limits created_by to currently logged in user.
-     *
-     * @param string $emailIdColumn
      */
-    protected function limitQueryToCreator(QueryBuilder $q, $emailIdColumn = 't.email_id')
+    protected function limitQueryToCreator(QueryBuilder $q, string $emailIdColumn = 't.email_id')
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = '.$emailIdColumn)
             ->andWhere('e.created_by = :userId')

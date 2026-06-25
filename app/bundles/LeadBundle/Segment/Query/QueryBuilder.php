@@ -171,7 +171,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @throws QueryException
      */
-    public function addJoinCondition($alias, $expr)
+    public function addJoinCondition(string $alias, string $expr)
     {
         $result = $parts = $this->getQueryPart('join');
 

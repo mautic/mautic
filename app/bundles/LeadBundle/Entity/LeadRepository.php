@@ -132,13 +132,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @internal
      *
-     * @param string          $field
      * @param string[]|string $value
      * @param ?int            $ignoreId
      *
      * @return QueryBuilder
      */
-    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
+    protected function buildQueryForGetLeadsByFieldValue(string $field, $value, $ignoreId = null)
     {
         $col = 'l.'.$field;
 
@@ -357,7 +356,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @return array
      */
-    public function getLead($id)
+    public function getLead(string $id)
     {
         $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $fq->select('l.*')
@@ -599,7 +598,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Get contacts for a specific channel entity.
      *
      * @param array      $args             same as getEntity/getEntities
-     * @param string     $joinTable
      * @param int        $entityId
      * @param array      $filters
      * @param string     $entityColumnName
@@ -607,7 +605,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getEntityContacts(
         $args,
-        $joinTable,
+        ?string $joinTable,
         $entityId,
         $filters = [],
         $entityColumnName = 'id',
@@ -1341,7 +1339,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param int $tries
      */
-    protected function updateContactPoints(array $changes, $id, $tries = 1): int
+    protected function updateContactPoints(array $changes, string $id, $tries = 1): int
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')

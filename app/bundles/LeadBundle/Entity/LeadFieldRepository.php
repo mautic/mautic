@@ -202,10 +202,9 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Return property by field alias and join tables.
      *
-     * @param string                                                       $field
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
-    public function getPropertyByField($field, $q): string
+    public function getPropertyByField(string $field, $q): string
     {
         $columnAlias = 'l.';
         // Join company tables If we're trying search by company fields

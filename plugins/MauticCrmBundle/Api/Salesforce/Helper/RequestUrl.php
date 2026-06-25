@@ -6,10 +6,8 @@ class RequestUrl
 {
     /**
      * Correctly generate the URL based on given URL parts.
-     *
-     * @return string
      */
-    public static function get($apiUrl, $queryUrl, $operation = null, $object = null)
+    public static function get(string $apiUrl, ?string $queryUrl, $operation = null, $object = null): string
     {
         if ($queryUrl) {
             return ($operation) ? sprintf($queryUrl.'/%s', $operation) : $queryUrl;

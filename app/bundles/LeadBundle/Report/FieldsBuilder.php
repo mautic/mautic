@@ -219,10 +219,7 @@ class FieldsBuilder
         return $columns;
     }
 
-    /**
-     * @param string $prefix
-     */
-    private function sanitizePrefix($prefix): string
+    private function sanitizePrefix(string $prefix): string
     {
         if (!str_contains($prefix, '.')) {
             $prefix .= '.';

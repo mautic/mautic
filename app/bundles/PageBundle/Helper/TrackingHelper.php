@@ -94,7 +94,7 @@ class TrackingHelper
     /**
      * @return bool|mixed
      */
-    public function displayInitCode($service)
+    public function displayInitCode(string $service)
     {
         $pixelId = $this->coreParametersHelper->get($service.'_id');
 

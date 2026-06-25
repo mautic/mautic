@@ -64,7 +64,7 @@ class MessageQueueModel extends FormModel
      */
     public function processFrequencyRules(
         array &$leads,
-        $channel,
+        string $channel,
         $channelId,
         $campaignEventId = null,
         $attempts = 3,

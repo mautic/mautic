@@ -330,7 +330,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath(string $name, bool $fullPath = false)
                 {
                     Assert::assertSame('themes', $name);
 

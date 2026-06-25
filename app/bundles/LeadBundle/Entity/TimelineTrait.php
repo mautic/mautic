@@ -26,7 +26,7 @@ trait TimelineTrait
         QueryBuilder $query,
         array $options,
         $eventNameColumn,
-        $timestampColumn,
+        string $timestampColumn,
         $serializedColumns = [],
         $dateTimeColumns = [],
         $resultsParserCallback = null,

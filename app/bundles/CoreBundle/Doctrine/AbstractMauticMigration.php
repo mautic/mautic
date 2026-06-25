@@ -146,7 +146,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      *
      * @return string
      */
-    protected function generatePropertyName($table, $type, array $columnNames)
+    protected function generatePropertyName(string $table, string $type, array $columnNames)
     {
         $columnNames = array_merge([$this->prefix.$table], $columnNames);
         $hash        = implode(

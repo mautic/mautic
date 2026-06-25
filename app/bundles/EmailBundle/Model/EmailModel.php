@@ -1852,11 +1852,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param string $column
-     * @param bool   $canViewOthers
+     * @param bool $canViewOthers
      */
     public function getBestHours(
-        $column,
+        string $column,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         array $filter = [],

@@ -27,10 +27,9 @@ class WidgetTypeListEvent extends CommonEvent
     /**
      * Adds a new widget type to the widget types list.
      *
-     * @param string $widgetType
-     * @param string $bundle     name (widget category)
+     * @param string $bundle name (widget category)
      */
-    public function addType($widgetType, $bundle = 'others'): void
+    public function addType(string $widgetType, $bundle = 'others'): void
     {
         $bundle         = 'mautic.'.$bundle.'.dashboard.widgets';
         $widgetTypeName = 'mautic.widget.'.$widgetType;

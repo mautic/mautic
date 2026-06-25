@@ -112,7 +112,7 @@ class AjaxController extends CommonController
      */
     public function executeAjaxAction(
         Request $request,
-        $action,
+        string $action,
         $bundle = null,
     ) {
         if (method_exists($this, $action.'Action')) {
