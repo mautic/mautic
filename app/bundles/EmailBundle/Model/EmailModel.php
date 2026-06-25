@@ -1339,13 +1339,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param $options = array()
-     *                 array source array('model', 'id')
-     *                 array emailSettings
-     *                 int   listId
-     *                 bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                 bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                 array assetAttachments Array of optional Asset IDs to attach
+     * @param mixed[] $options = array()
+     *                         array source array('model', 'id')
+     *                         array emailSettings
+     *                         int   listId
+     *                         bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                         bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                         array assetAttachments Array of optional Asset IDs to attach
      *
      * @return string[]|bool|string|null
      */
@@ -2374,14 +2374,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param string                                   $route
      * @param array<string, string>|array<string, int> $routeParams
      * @param bool                                     $absolute
      * @param array<array<string>>                     $clickthrough
-     *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 

@@ -44,7 +44,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function saveEntity($entity, $flush = true): void
+            public function saveEntity(object $entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
             }
@@ -59,12 +59,12 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
             {
                 return null;
             }
 
-            public function saveEntity($entity, $flush = true): void
+            public function saveEntity(object $entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
             }
@@ -157,7 +157,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function findOneBy(array $criteria, ?array $orderBy = null)
+            public function findOneBy(array $criteria, ?array $orderBy = null): ?object
             {
                 return null;
             }

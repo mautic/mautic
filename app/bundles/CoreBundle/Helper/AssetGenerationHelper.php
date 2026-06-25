@@ -239,12 +239,11 @@ class AssetGenerationHelper
     /**
      * Finds directory assets.
      *
-     * @param string $dir
-     * @param string $ext
-     * @param string $env
-     * @param array  $assets
+     * @param string  $ext
+     * @param string  $env
+     * @param mixed[] $assets
      */
-    protected function findAssets(string|array $dir, $ext, $env, &$assets): array
+    protected function findAssets(string $dir, $ext, $env, &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();

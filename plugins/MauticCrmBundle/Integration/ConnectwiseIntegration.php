@@ -213,7 +213,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $cwFields;
     }
 
-    public function setFields($fields): array
+    /**
+     * @param array<string, mixed[]> $fields
+     *
+     * @return array<string, mixed[]>
+     */
+    public function setFields(array $fields): array
     {
         $cwFields = [];
 
@@ -787,7 +792,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
     {
         if ('company' == $object) {
             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');

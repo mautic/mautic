@@ -82,8 +82,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Just selected get tokens from email  builder.
      *
-     * @param string|null $query
-     *
      * @return array<string, string>
      */
     protected function getBuilderTokens(string $query): array

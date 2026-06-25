@@ -469,7 +469,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
+     * @param string  $priorityObject
      *
      * @return array
      */
@@ -482,7 +483,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
+     * @param string  $priorityObject
      *
      * @return array
      */

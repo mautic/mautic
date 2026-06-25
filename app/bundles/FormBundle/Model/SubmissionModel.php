@@ -460,6 +460,8 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @param array<string,mixed> $queryArgs
+     *
      * @return StreamedResponse|Response
      *
      * @throws \Exception

@@ -893,8 +893,6 @@ class FieldModel extends FormModel
     /**
      * @deprecated Use FieldList::getFieldList method instead
      *
-     * @param bool|true $byGroup
-     * @param bool|true $alphabetical
      *
      * @return mixed[]
      */
