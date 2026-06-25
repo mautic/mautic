@@ -15,6 +15,8 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 class RoleController extends FormController
 {
+    private const PERMISSION_VIEW = 'user:roles:view';
+
     private const PERMISSION_CREATE = 'user:roles:create';
 
     private const PERMISSION_EDIT   = 'user:roles:edit';
@@ -48,7 +50,7 @@ class RoleController extends FormController
      */
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
-        if (!$this->security->isGranted('user:roles:view')) {
+        if (!$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
         }
 
@@ -205,7 +207,7 @@ class RoleController extends FormController
      */
     public function cloneAction(Request $request, int $objectId, RoleModel $model): Response
     {
-        if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
+        if (!$this->security->isGranted(self::PERMISSION_CREATE) || !$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
         }
 

@@ -70,7 +70,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
         $rolesBefore = $this->em->getRepository(Role::class)->count([]);
 
-        $crawler = $this->client->request(Request::METHOD_POST, '/s/roles/clone/'.$role->getId());
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/roles/clone/'.$role->getId());
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $newName      = 'Cloned Role';
