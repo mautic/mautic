@@ -211,10 +211,7 @@ abstract class ModeratedCommand extends Command
         }
 
         $disabled = explode(',', ini_get('disable_functions'));
-        if (in_array('getmypid', $disabled) || in_array('posix_getpgid', $disabled)) {
-            return false;
-        }
 
-        return true;
+        return !in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled);
     }
 }

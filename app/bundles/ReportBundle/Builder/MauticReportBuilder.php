@@ -537,7 +537,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Parse and validate filter values
         $conditions = array_map(
-            function (string $item) {
+            function (string $item): array {
                 $parts = explode(':', $item);
                 if (2 !== count($parts)) {
                     throw new \InvalidArgumentException('Invalid DNC filter format');

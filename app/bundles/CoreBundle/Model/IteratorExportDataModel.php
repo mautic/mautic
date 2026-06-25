@@ -93,11 +93,7 @@ class IteratorExportDataModel implements \Iterator
      */
     public function valid(): bool
     {
-        if ($this->position <= $this->totalResult && !is_null($this->data)) {
-            return true;
-        }
-
-        return false;
+        return $this->position <= $this->totalResult && !is_null($this->data);
     }
 
     /**

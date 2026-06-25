@@ -74,4 +74,30 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $emails = 'xxx';
         $multipleEmailsValidValidator->validate($emails, $constraintMock);
     }
+
+    public function testZeroValueIsValidated(): void
+    {
+        $emailValidatorMock                      = $this->createMock(EmailValidator::class);
+        $constraintMock                          = $this->createMock(Constraint::class);
+        $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
+
+        $emailValidatorMock->expects($this->once())
+            ->method('validate')
+            ->with('0')
+            ->willThrowException(new InvalidEmailException('0'));
+
+        $executionContextInterfaceMock->expects($this->once())
+            ->method('buildViolation')
+            ->willReturn($constraintViolationBuilderInterfaceMock);
+
+        $constraintViolationBuilderInterfaceMock->expects($this->once())
+            ->method('addViolation')
+            ->with();
+
+        $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
+        $multipleEmailsValidValidator->initialize($executionContextInterfaceMock);
+
+        $multipleEmailsValidValidator->validate('0', $constraintMock);
+    }
 }

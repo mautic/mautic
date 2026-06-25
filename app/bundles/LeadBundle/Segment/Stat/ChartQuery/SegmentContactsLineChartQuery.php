@@ -57,7 +57,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         // require start from end and  substract added/removed logs
         $sums     = array_reverse(ArrayHelper::sub($this->getAddedEventLogStats(), $this->getRemovedEventLogStats()));
         $totalSum = 0;
-        $totals   = array_map(function ($sum) use ($totalCountDateTo, &$totalSum) {
+        $totals   = array_map(function ($sum) use ($totalCountDateTo, &$totalSum): float|int {
             $total = $totalCountDateTo - $totalSum;
             $totalSum += $sum;
             if ($total > -1) {
