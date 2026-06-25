@@ -86,14 +86,19 @@ class DatabasePlatform
     // Define bitwise flags
     // 1 << 0
     public const FLAG_ENSURE_CAST        = 1;
+
     // 1 << 1
     public const FLAG_LOWER_COLUMN       = 2;
+
     // 1 << 2
     public const FLAG_LOWER_VALUE        = 4;
+
     // 1 << 3
     public const FLAG_FORCE_LOWER_COLUMN = 8;
+
     // 1 << 4
     public const FLAG_FORCE_LOWER_VALUE  = 16;
+
     // 1 << 5
     public const FLAG_NEGATIVE           = 32;
 
