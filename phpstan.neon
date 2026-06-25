@@ -9,6 +9,11 @@ parameters:
 	parallel:
 		maximumNumberOfProcesses: 2
 		processTimeout: 1000.0
+    # see https://github.com/tomasVotruba/type-coverage
+	type_coverage:
+		return: 80
+		param: 70
+		property: 65
 	paths:
 		- app/bundles
 		- app/migrations
@@ -78,8 +83,8 @@ parameters:
 		-
 			message: '#Parameter \#1 \$credentials of method Mautic\\IntegrationsBundle\\Auth\\Provider\\(.*?)::getClient\(\) expect#'
 			paths:
-			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
-			     - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
+				 - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/ApiKey/HttpFactoryTest.php
+				 - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth2TwoLegged/HttpFactoryTest.php
 		-
 			message: '#Method Mautic\\CampaignBundle\\Executioner\\ContactFinder\\InactiveContactFinder::getDatesAdded\(\) should return Doctrine\\Common\\Collections\\ArrayCollection but returns array<string, DateTimeInterface>\|null#'
 			path: app/bundles/CampaignBundle/Executioner/ContactFinder/InactiveContactFinder.php

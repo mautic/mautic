@@ -654,11 +654,7 @@ SQL;
         /** @var LeadEventLog $log */
         $log = $this->findOneBy(['lead' => $leadId, 'event' => $eventId], ['dateTriggered' => 'DESC']);
 
-        if (null !== $log && null !== $log->getFailedLog()) {
-            return true;
-        }
-
-        return false;
+        return null !== $log && null !== $log->getFailedLog();
     }
 
     public function deleteAnonymousContacts(): int

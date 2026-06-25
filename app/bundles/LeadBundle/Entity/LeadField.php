@@ -873,7 +873,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function isNew(): bool
     {
-        return $this->getId() ? false : true;
+        return !(bool) $this->getId();
     }
 
     public function getColumnIsNotCreated(): bool

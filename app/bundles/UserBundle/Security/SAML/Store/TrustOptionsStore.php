@@ -33,11 +33,7 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
         }
 
         // EntityIds do not match
-        if ($entityId !== $this->entityId) {
-            return false;
-        }
-
-        return true;
+        return $entityId === $this->entityId;
     }
 
     private function createTrustOptions(): TrustOptions

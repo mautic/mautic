@@ -538,7 +538,7 @@ class FieldType extends AbstractType
 
         $builder->add('type', HiddenType::class);
 
-        $update = (!empty($options['data']['id'])) ? true : false;
+        $update = !empty($options['data']['id']);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
             $btnIcon  = 'ri-edit-line';
