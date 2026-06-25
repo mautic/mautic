@@ -98,6 +98,7 @@ export default class DynamicContentCommands {
         dynamicContent,
         dynConToken,
       });
+      dynamicContent.components(''); // prevents dynamic content duplication on clone/save
       dynamicContent.set('content', dynConToken);
     });
 
