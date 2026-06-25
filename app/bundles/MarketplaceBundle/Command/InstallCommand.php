@@ -37,7 +37,7 @@ class InstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $packageName = $input->getArgument('package');
-        $dryRun      = true === $input->getOption('dry-run') ? true : false;
+        $dryRun      = true === $input->getOption('dry-run');
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);

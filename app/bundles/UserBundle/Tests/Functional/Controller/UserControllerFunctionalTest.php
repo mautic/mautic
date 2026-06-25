@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -23,13 +22,13 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditGetPage(): void
     {
         $this->client->request('GET', '/s/users/edit/1');
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testRedirectNonExistingUser(): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/00000');
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Users', $crawler->filter('h1')->text());
         $this->assertStringContainsString('User not found with', $crawler->filter('#flashes')->text());
     }
@@ -43,7 +42,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('has been updated!', $response->getContent());
     }
 
@@ -60,8 +59,32 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
+    }
+
+    public function testIndexIncludesInviteForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    public function testInviteActionShowsForm(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users/invite');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    public function testInviteActionReturnsInvalidForm(): void
+    {
+        $this->client->request('POST', '/s/users/invite');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('name="user_invite"', $this->client->getResponse()->getContent());
     }
 
     public function testBatchDeleteAction(): void
@@ -77,7 +100,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/users/batchDelete?ids=all');
         $response = $this->client->getResponse();
         $this->assertTrue($response->isOk());
-        // Asser that user has been deleted
+        // Assert that user has been deleted.
         $this->assertNull($user->getId());
         // User with role admin cannot be deleted.
         $users = $this->em->getRepository(User::class)->findAll();
@@ -103,7 +126,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
     }
 
@@ -156,7 +179,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
     }
 

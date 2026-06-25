@@ -25,7 +25,7 @@ class CircularDependencyValidator extends ConstraintValidator
      */
     public function validate($filters, Constraint $constraint): void
     {
-        $dependentSegmentIds = $this->flatten(array_map(fn ($id) => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
+        $dependentSegmentIds = $this->flatten(array_map(fn ($id): array => $this->reduceToSegmentIds($this->model->getEntity($id)->getFilters()), $this->reduceToSegmentIds($filters)));
 
         try {
             $segmentId = $this->getSegmentIdFromRequest();

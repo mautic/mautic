@@ -45,13 +45,11 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
     {
         /** @var FormModel $formModel */
         $formModel      = $this->getModel('form.form');
@@ -87,7 +85,7 @@ class ResultController extends CommonFormController
             $form->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ('POST' === $request->getMethod()) {
@@ -101,7 +99,7 @@ class ResultController extends CommonFormController
         $start = $pageHelper->getStart();
 
         // Set order direction to desc if not set
-        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir', null)) {
+        if (!$session->get('mautic.formresult.'.$objectId.'.orderbydir')) {
             $session->set('mautic.formresult.'.$objectId.'.orderbydir', 'DESC');
         }
 
@@ -191,10 +189,7 @@ class ResultController extends CommonFormController
         );
     }
 
-    /**
-     * @return BinaryFileResponse
-     */
-    public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader)
+    public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
     {
         /** @var SubmissionResultLoader $submissionResultLoader */
         $submissionResultLoader = $this->getModel('form.submission_result_loader');
@@ -216,7 +211,7 @@ class ResultController extends CommonFormController
             'form:forms:viewother',
             $submission->getForm()->getCreatedBy())
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $fileName = $results[$field];
@@ -246,7 +241,7 @@ class ResultController extends CommonFormController
             'form:forms:viewother',
             $fieldEntity->getForm()->getCreatedBy())
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $file = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
@@ -283,7 +278,7 @@ class ResultController extends CommonFormController
         $returnUrl = $this->generateUrl('mautic_form_index', ['page' => $formPage]);
 
         if (!$this->security->isAdmin() && !$this->security->isGranted('form:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (null === $form) {
@@ -312,7 +307,7 @@ class ResultController extends CommonFormController
             $form->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');
@@ -335,10 +330,8 @@ class ResultController extends CommonFormController
 
     /**
      * Delete a form result.
-     *
-     * @return array|Response
      */
-    public function deleteAction(Request $request)
+    public function deleteAction(Request $request): Response
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
@@ -360,7 +353,7 @@ class ResultController extends CommonFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $entity->getCreatedBy())) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } else {
                 $id = $entity->getId();
                 $model->deleteEntity($entity);
@@ -507,7 +500,7 @@ class ResultController extends CommonFormController
                 ],
             ]);
         } elseif (!$this->security->hasEntityAccess('form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $orderBy    = $session->get('mautic.formresult.'.$objectId.'.orderby', 's.date_submitted');

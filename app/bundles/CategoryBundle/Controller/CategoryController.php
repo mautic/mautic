@@ -8,7 +8,6 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Service\FlashBag;
-use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,15 +32,13 @@ class CategoryController extends AbstractStandardFormController
             );
         }
 
-        return $this->accessDenied();
+        return $this->notFound();
     }
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction(Request $request, $bundle, $page = 1)
+    public function indexAction(Request $request, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -74,7 +71,7 @@ class CategoryController extends AbstractStandardFormController
         );
 
         if (!$permissions[$permissionBase.':view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -340,9 +337,7 @@ class CategoryController extends AbstractStandardFormController
                         ]
                     );
 
-                    /** @var SubmitButton $applySubmitButton */
-                    $applySubmitButton = $form->get('buttons')->get('apply');
-                    if ($applySubmitButton->isClicked()) {
+                    if ($this->isButtonClicked($form, 'apply')) {
                         // Rebuild the form with new action so that apply doesn't keep creating a clone
                         $action = $this->generateUrl(
                             'mautic_category_action',
@@ -458,7 +453,7 @@ class CategoryController extends AbstractStandardFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->isGranted($model->getPermissionBase($bundle).':delete')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'category.category');
             }

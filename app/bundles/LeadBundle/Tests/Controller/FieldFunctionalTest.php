@@ -43,7 +43,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
 
@@ -54,7 +54,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
         $text = strip_tags($this->client->getResponse()->getContent());
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $text);
+        self::assertResponseIsSuccessful();
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
         Assert::assertStringContainsString('Edit Custom Field - Best Date Ever', $text);
@@ -117,7 +117,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $domDocument = $crawler->getNode(0)->ownerDocument;
         $inputLabel  = $domDocument->createElement('input');
@@ -141,7 +141,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
         $text = strip_tags($this->client->getResponse()->getContent());
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $text);
+        self::assertResponseIsSuccessful();
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
         Assert::assertStringContainsString('Edit Custom Field - Test select field', $text);
@@ -155,7 +155,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $domDocument = $crawler->getNode(0)->ownerDocument;
         $yesLabel    = $domDocument->createElement('input');
@@ -179,7 +179,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $form['leadfield[properties][no]']->setValue($properties['no'] ?? '');
 
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $text = strip_tags($this->client->getResponse()->getContent());
         Assert::assertStringNotContainsString($expectedMessage, $text);
@@ -250,7 +250,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         // Check if the radio button with value 0 is checked and value 1 is not
         Assert::assertNotNull(

@@ -71,10 +71,7 @@ class ContactLimiter
         return $this->batchLimit;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getContactId()
+    public function getContactId(): ?int
     {
         return $this->contactId;
     }
@@ -84,18 +81,12 @@ class ContactLimiter
         return $this->batchMinContactId ?: $this->minContactId;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxContactId()
+    public function getMaxContactId(): ?int
     {
         return $this->maxContactId;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactIdList()
+    public function getContactIdList(): array
     {
         return $this->contactIdList;
     }
@@ -139,18 +130,12 @@ class ContactLimiter
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getMaxThreads()
+    public function getMaxThreads(): ?int
     {
         return $this->maxThreads;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getThreadId()
+    public function getThreadId(): ?int
     {
         return $this->threadId;
     }

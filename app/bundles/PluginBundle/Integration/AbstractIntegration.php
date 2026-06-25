@@ -92,6 +92,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected array $persistIntegrationEntities = [];
 
     protected array $commandParameters = [];
+
     private \Closure $clientFactory;
 
     public function __construct(
@@ -1693,7 +1694,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         // Find unique identifier fields used by the integration
-        /** @var LeadModel $leadModel */
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier();
         $uniqueLeadFieldData = [];

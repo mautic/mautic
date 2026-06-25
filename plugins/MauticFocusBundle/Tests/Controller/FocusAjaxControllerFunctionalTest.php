@@ -32,7 +32,7 @@ class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getViewsCount&focusId={$focus->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame([
             'success'     => 1,
             'views'       => 3,
@@ -56,7 +56,7 @@ class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/ajax?action=plugin:focus:getClickThroughCount&focusId={$focus->getId()}");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertSame([
             'success'      => 1,
             'clickThrough' => 2,

@@ -139,7 +139,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface, CannotBeDele
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new RoleEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

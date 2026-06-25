@@ -44,10 +44,8 @@ class EmailController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -67,7 +65,7 @@ class EmailController extends FormController
         );
 
         if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -256,17 +254,16 @@ class EmailController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $objectId)
+    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $objectId): Response
     {
         $security = $this->security;
 
         /** @var Email $email */
-        $email = $model->getEntity($objectId);
+        $email   = $model->getEntity($objectId);
+        $session = $request->getSession();
         // set the page we came from
-        $page = $request->getSession()->get('mautic.email.page', 1);
+        $page = $session->get('mautic.email.page', 1);
 
         // Init the date range filter form
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
@@ -301,7 +298,7 @@ class EmailController extends FormController
             $email->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // get A/B test information
@@ -369,37 +366,80 @@ class EmailController extends FormController
         \assert($auditLog instanceof AuditLogModel);
         $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
-        // Get click through stats
-        $trackableLinks  = $model->getEmailClickStats($email->getId());
-        $draftPreviewUrl = null;
-        if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
-            $draftPreviewUrl = $this->generateUrl(
-                'mautic_email_preview',
-                [
-                    'objectId'   => $email->getId(),
-                    'objectType' => 'draft',
-                ]
-            );
+        if (!$session->has('mautic.email.clicks.orderby')) {
+            $session->set('mautic.email.clicks.orderby', 'r.url');
+            $session->set('mautic.email.clicks.orderbydir', 'DESC');
         }
+        $this->setListFilters('email.clicks');
 
-        $variants = [
-            'parent'             => $parent,
-            'children'           => $children,
-            'properties'         => $properties,
-            'criteria'           => $criteria['criteria'],
-        ];
-
-        $translations = [
-            'parent'   => $translationParent,
-            'children' => $translationChildren,
-        ];
-
-        $plainTextHelper = new PlainTextHelper();
-        $plainTextHelper->setHtml($email->getCustomHtml());
-        $emailPreview = $plainTextHelper->getPreview();
-
-        return $this->delegateView(
+        $clickCountsBaseUrl = $this->generateUrl(
+            'mautic_email_action',
             [
+                'objectAction' => 'view',
+                'objectId'     => $email->getId(),
+            ]
+        );
+        $clickCountsSorting = [
+            'sessionVar' => 'email.clicks',
+            'orderBy'    => 't.hits',
+            'target'     => '#clicks-container',
+            'tmpl'       => 'click_counts',
+            'baseUrl'    => $clickCountsBaseUrl,
+        ];
+
+        // Get click through stats
+        $trackableLinks = $model->getEmailClickStats(
+            $email->getId(),
+            $session->get('mautic.email.clicks.orderby', 'r.url'),
+            $session->get('mautic.email.clicks.orderbydir', 'DESC')
+        );
+
+        if ('click_counts' === $request->get('tmpl')) {
+            $view = [
+                'viewParameters' => [
+                    'trackables'          => $trackableLinks,
+                    'entity'              => $email,
+                    'channel'             => 'email',
+                    'clickCountsSortable' => true,
+                    'clickCountsSorting'  => $clickCountsSorting,
+                    'tmpl'                => 'click_counts',
+                ],
+                'contentTemplate' => '@MauticPage/Trackable/click_counts.html.twig',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_email_index',
+                    'mauticContent' => 'email',
+                    'route'         => $clickCountsBaseUrl,
+                ],
+            ];
+        } else {
+            $draftPreviewUrl = null;
+            if ($emailConfig->isDraftEnabled() && $email->hasDraft()) {
+                $draftPreviewUrl = $this->generateUrl(
+                    'mautic_email_preview',
+                    [
+                        'objectId'   => $email->getId(),
+                        'objectType' => 'draft',
+                    ]
+                );
+            }
+
+            $variants = [
+                'parent'             => $parent,
+                'children'           => $children,
+                'properties'         => $properties,
+                'criteria'           => $criteria['criteria'],
+            ];
+
+            $translations = [
+                'parent'   => $translationParent,
+                'children' => $translationChildren,
+            ];
+
+            $plainTextHelper = new PlainTextHelper();
+            $plainTextHelper->setHtml($email->getCustomHtml());
+            $emailPreview = $plainTextHelper->getPreview();
+
+            $view = [
                 'returnUrl' => $this->generateUrl(
                     'mautic_email_action',
                     [
@@ -408,14 +448,15 @@ class EmailController extends FormController
                     ]
                 ),
                 'viewParameters' => [
-                    'email'        => $email,
-                    'emailPreview' => $emailPreview,
-                    'trackables'   => $trackableLinks,
-                    'logs'         => $logs,
-                    'isEmbedded'   => $request->get('isEmbedded') ?: false,
-                    'variants'     => $variants,
-                    'translations' => $translations,
-                    'permissions'  => $security->isGranted(
+                    'email'              => $email,
+                    'emailPreview'       => $emailPreview,
+                    'trackables'         => $trackableLinks,
+                    'logs'               => $logs,
+                    'isEmbedded'         => $request->get('isEmbedded') ?: false,
+                    'clickCountsSorting' => $clickCountsSorting,
+                    'variants'           => $variants,
+                    'translations'       => $translations,
+                    'permissions'        => $security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -462,8 +503,10 @@ class EmailController extends FormController
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
                 ],
-            ]
-        );
+            ];
+        }
+
+        return $this->delegateView($view);
     }
 
     /**
@@ -490,7 +533,7 @@ class EmailController extends FormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('email:emails:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -693,7 +736,7 @@ class EmailController extends FormController
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'email');
@@ -949,7 +992,7 @@ class EmailController extends FormController
                 $emailEntity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'email');
@@ -1102,7 +1145,7 @@ class EmailController extends FormController
                 $emailEntity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ($model->isLocked($emailEntity)) {
@@ -1192,7 +1235,7 @@ class EmailController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
@@ -1236,7 +1279,7 @@ class EmailController extends FormController
         if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
             $entity = $model->getEntity();
             $entity->setSessionId($objectId);
@@ -1250,7 +1293,7 @@ class EmailController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
         }
 
@@ -1305,7 +1348,7 @@ class EmailController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             // Note this since it's cleared on __clone()
@@ -1360,7 +1403,7 @@ class EmailController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
@@ -1402,10 +1445,8 @@ class EmailController extends FormController
 
     /**
      * Manually sends emails.
-     *
-     * @return Response
      */
-    public function sendAction(Request $request, $objectId)
+    public function sendAction(Request $request, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         /** @var EmailModel $model */
         $model   = $this->getModel('email');
@@ -1471,7 +1512,7 @@ class EmailController extends FormController
                 $entity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // Check that the parent is getting sent

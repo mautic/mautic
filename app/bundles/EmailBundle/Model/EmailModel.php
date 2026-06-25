@@ -269,7 +269,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
-            $isNew = ($entity->getId()) ? false : true;
+            $isNew = !(bool) $entity->getId();
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
@@ -380,12 +380,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             case 'post_delete':
                 $name = EmailEvents::EMAIL_POST_DELETE;
                 break;
+            case 'on_toggle_publish':
+                $name = EmailEvents::EMAIL_ON_TOGGLE_PUBLISH;
+                break;
             default:
                 return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new EmailEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -694,6 +697,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailListStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
+        $dateTo = $dateTo ? (clone $dateTo)->setTime(23, 59, 59) : null;
+
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
         }
@@ -893,6 +898,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
     {
+        $dateTo = (clone $dateTo)->setTime(23, 59, 59);
+
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
         }
@@ -942,9 +949,30 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get an array of tracked links.
      */
-    public function getEmailClickStats($emailId): array
+    public function getEmailClickStats($emailId, ?string $orderBy = null, ?string $orderByDir = null): array
     {
-        return $this->pageTrackableModel->getTrackableList('email', $emailId);
+        $stats = $this->pageTrackableModel->getTrackableList('email', $emailId);
+
+        if ('t.hits' !== $orderBy) {
+            return $stats;
+        }
+
+        $direction = 'DESC' === strtoupper((string) $orderByDir) ? -1 : 1;
+
+        usort(
+            $stats,
+            static function (array $first, array $second) use ($direction): int {
+                $comparison = (int) $first['hits'] <=> (int) $second['hits'];
+
+                if (0 === $comparison) {
+                    $comparison = strcmp((string) $first['url'], (string) $second['url']);
+                }
+
+                return $comparison * $direction;
+            }
+        );
+
+        return $stats;
     }
 
     /**
@@ -1359,7 +1387,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
         }
 
-        /** @var EmailRepository $emailRepo */
         $emailRepo = $this->getRepository();
 
         // get email settings such as templates, weights, etc
@@ -1427,39 +1454,37 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 continue;
             }
             $groupedContactsByEmail[$eid] = [];
-            if ($details['limit']) {
-                // Take a chunk of contacts based on variant weights
-                if ($batchContacts = array_slice($sendTo, $offset, $details['limit'])) {
-                    $offset += $details['limit'];
+            // Take a chunk of contacts based on variant weights
+            if ($batchContacts = array_slice($sendTo, $offset, $details['limit'])) {
+                $offset += $details['limit'];
 
-                    // Group contacts by preferred locale
-                    foreach ($batchContacts as $key => $contact) {
-                        if (!empty($contact['preferred_locale'])) {
-                            $locale     = $contact['preferred_locale'];
-                            $localeCore = $this->getTranslationLocaleCore($locale);
+                // Group contacts by preferred locale
+                foreach ($batchContacts as $key => $contact) {
+                    if (!empty($contact['preferred_locale'])) {
+                        $locale     = $contact['preferred_locale'];
+                        $localeCore = $this->getTranslationLocaleCore($locale);
 
-                            if (isset($details['languages'][$localeCore])) {
-                                if (isset($details['languages'][$localeCore][$locale])) {
-                                    // Exact match
-                                    $translatedId                                  = $details['languages'][$localeCore][$locale];
-                                    $groupedContactsByEmail[$eid][$translatedId][] = $contact;
-                                } else {
-                                    // Grab the closest match
-                                    $bestMatch                                     = array_keys($details['languages'][$localeCore])[0];
-                                    $translatedId                                  = $details['languages'][$localeCore][$bestMatch];
-                                    $groupedContactsByEmail[$eid][$translatedId][] = $contact;
-                                }
-
-                                unset($batchContacts[$key]);
+                        if (isset($details['languages'][$localeCore])) {
+                            if (isset($details['languages'][$localeCore][$locale])) {
+                                // Exact match
+                                $translatedId                                  = $details['languages'][$localeCore][$locale];
+                                $groupedContactsByEmail[$eid][$translatedId][] = $contact;
+                            } else {
+                                // Grab the closest match
+                                $bestMatch                                     = array_keys($details['languages'][$localeCore])[0];
+                                $translatedId                                  = $details['languages'][$localeCore][$bestMatch];
+                                $groupedContactsByEmail[$eid][$translatedId][] = $contact;
                             }
+
+                            unset($batchContacts[$key]);
                         }
                     }
+                }
 
-                    // If there are any contacts left over, assign them to the default
-                    if (count($batchContacts)) {
-                        $translatedId                                = $details['languages']['default'];
-                        $groupedContactsByEmail[$eid][$translatedId] = $batchContacts;
-                    }
+                // If there are any contacts left over, assign them to the default
+                if (count($batchContacts)) {
+                    $translatedId                                = $details['languages']['default'];
+                    $groupedContactsByEmail[$eid][$translatedId] = $batchContacts;
                 }
             }
         }
@@ -1904,19 +1929,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $flag    = ArrayHelper::pickValue('flag', $filter, false);
         $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
-        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter, null))) {
+        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter))) {
             $fetchOptions->setCompanyId((int) $companyId);
         }
 
-        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter, null))) {
+        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter))) {
             $fetchOptions->setCampaignId((int) $campaignId);
         }
 
-        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter, null))) {
+        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter))) {
             $fetchOptions->setSegmentId((int) $segmentId);
         }
 
-        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter, null))) {
+        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter))) {
             $fetchOptions->setEmailIds([(int) $emailId]);
         }
 

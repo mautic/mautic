@@ -497,6 +497,26 @@ final class LeadEvents
     public const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
 
     /**
+     * The mautic.lead_tag_pre_merge event is dispatched before two tags are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagMergeEvent instance.
+     *
+     * @var string
+     */
+    public const TAG_PRE_MERGE = 'mautic.lead_tag_pre_merge';
+
+    /**
+     * The mautic.lead_tag_post_merge event is dispatched after two tags are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagMergeEvent instance.
+     *
+     * @var string
+     */
+    public const TAG_POST_MERGE = 'mautic.lead_tag_post_merge';
+
+    /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.
      *
      * The event listener receives a
@@ -600,6 +620,15 @@ final class LeadEvents
      * @var string
      */
     public const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+    /**
+     * The mautic.company_soft_delete event is thrown after a company is marked as deleted.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SOFT_DELETE = 'mautic.company_soft_delete';
 
     /**
      * The mautic.company_pre_merge event is dispatched before two companies are merged.
@@ -797,6 +826,7 @@ final class LeadEvents
      * @var string
      */
     public const LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_update_column_background_job';
+
     /**
      * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
      *

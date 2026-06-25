@@ -50,7 +50,7 @@ abstract class AbstractFormController extends CommonController
             return $this->redirect($returnUrl);
         }
 
-        return $this->accessDenied();
+        $this->throwAccessDenied();
     }
 
     /**
@@ -135,11 +135,7 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isFormCancelled(FormInterface $form): bool
     {
-        $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
+        $request  = $this->getCurrentRequest();
         $formData = $request->request->all()[$form->getName()] ?? [];
 
         return is_array($formData) && array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
@@ -150,11 +146,7 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isFormApplied(FormInterface $form): bool
     {
-        $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
+        $request  = $this->getCurrentRequest();
         $formData = $request->request->all()[$form->getName()] ?? [];
 
         return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
@@ -166,10 +158,6 @@ abstract class AbstractFormController extends CommonController
     protected function isFormValid(FormInterface $form): bool
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
         // bind request to the form
         $form->handleRequest($request);
 
@@ -231,10 +219,6 @@ abstract class AbstractFormController extends CommonController
     protected function refererPostActionVars($vars)
     {
         $request = $this->getCurrentRequest();
-        if (null === $request) {
-            throw new \RuntimeException('Request is required.');
-        }
-
         if (empty($request->server->get('HTTP_REFERER'))) {
             return $vars;
         }

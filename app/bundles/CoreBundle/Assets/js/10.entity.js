@@ -410,9 +410,8 @@ Mautic.getCheckedListIds = function(el, stringify) {
  */
 Mautic.getSelectedIds = function(el, stringify) {
     if (mQuery('[data-toggle=selectall]').attr('data-selectall') === "1") {
-        return 'all'
+        return 'all';
     }
-    else {
-        return Mautic.getCheckedListIds(el, stringify)
-    }
-}
+
+    return Mautic.getCheckedListIds(el, stringify);
+};

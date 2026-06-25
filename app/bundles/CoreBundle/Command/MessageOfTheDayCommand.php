@@ -42,9 +42,9 @@ final class MessageOfTheDayCommand extends Command
 
             $this->renderMessage($output, $selectedMessage);
         } catch (MessageOfTheDayException $e) {
-            $output->writeln('<error>Failed to load MOTD: '.$e->getMessage().'</error>');
+            $output->writeln('<comment>Skipped MOTD: '.$e->getMessage().'</comment>');
 
-            return Command::FAILURE;
+            return Command::SUCCESS;
         }
 
         return Command::SUCCESS;

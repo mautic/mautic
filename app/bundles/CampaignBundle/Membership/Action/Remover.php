@@ -36,7 +36,7 @@ class Remover
             // Contact was removed by the change campaign action or a segment
             $campaignMember->setDateLastExited(new \DateTime());
         } else {
-            $campaignMember->setDateLastExited(null);
+            $campaignMember->setDateLastExited();
         }
 
         if ($campaignMember->wasManuallyRemoved()) {
@@ -56,7 +56,7 @@ class Remover
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember): void
+    private function saveCampaignMember(CampaignMember $campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

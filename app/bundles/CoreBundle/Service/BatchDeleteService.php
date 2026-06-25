@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Service;
 
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -43,7 +44,7 @@ final class BatchDeleteService
     }
 
     /**
-     * @return array<string, array{string?:string, force?:array<string, mixed>}>
+     * @return array{}|array{string?: string, force?: list<array{column: string, expr: string, value: list<mixed>}>}
      */
     public function getBatchActionFilter(string $ids, string $searchValue, FormModel $model, ?string $filterAlias = null): array
     {
@@ -53,12 +54,13 @@ final class BatchDeleteService
             $filter     = ['string' => $searchValue, 'force' => []];
         }
         // When user select specific entities.
-        if (json_decode($ids)) {
+        $decodedIds = json_decode($ids, true);
+        if (is_array($decodedIds) && [] !== $decodedIds) {
             $alias           = $filterAlias ?? $model->getRepository()->getTableAlias();
             $filter['force'] = [[
                 'column' => $alias.'.id',
                 'expr'   => 'in',
-                'value'  => json_decode($ids),
+                'value'  => $decodedIds,
             ]];
         }
 
@@ -71,14 +73,15 @@ final class BatchDeleteService
             return $this->security->hasEntityAccess(
                 $permissionBase.':deleteown',
                 $permissionBase.':deleteother',
-                $entity->getCreatedBy());
+                $entity->getCreatedBy()
+            );
         }
 
         return $this->security->isGranted($permissionBase.':delete');
     }
 
     /**
-     * @param array<string, array{string?:string, force?:array<string, mixed>}> $filter
+     * @param array<string, mixed> $filter
      *
      * @return array<mixed>
      */
@@ -97,9 +100,9 @@ final class BatchDeleteService
      */
     private function getEntityLookupFlashes(BatchDeleteRequest $request, array $entities): array
     {
-        $ids = json_decode($request->getIds());
+        $ids = json_decode($request->getIds(), true);
 
-        if (!$ids || count($entities) === count($ids)) {
+        if (!is_array($ids) || count($entities) === count($ids)) {
             return [];
         }
 
@@ -143,11 +146,15 @@ final class BatchDeleteService
      */
     private function filterCannotBeDeleted(FormModel $model, array $chunk): array
     {
-        if (!method_exists($model, 'cannotBeDeleted')) {
+        if (!$model instanceof CannotBeDeletedInterface) {
             return [$chunk, []];
         }
 
-        $cannotBeDeleted = $model->cannotBeDeleted(array_map(fn (object $entity): int|string|null => $this->getEntityId($entity), $chunk));
+        $ids = array_values(array_filter(
+            array_map(fn (object $entity): int|string|null => $this->getEntityId($entity), $chunk),
+            static fn (int|string|null $id): bool => null !== $id,
+        ));
+        $cannotBeDeleted = $model->cannotBeDeleted($ids);
 
         return [
             array_values(array_filter($chunk, fn (object $entity): bool => !isset($cannotBeDeleted[$this->getEntityId($entity)]))),
@@ -239,8 +246,8 @@ final class BatchDeleteService
     /**
      * Return flash messages for ids not found.
      *
-     * @param int[] $givenIds
-     * @param int[] $entityIds
+     * @param list<int|string>  $givenIds
+     * @param array<int|string> $entityIds
      *
      * @return list<array{type: string, msg: string, msgVars: array<string, mixed>}>
      */

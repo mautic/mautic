@@ -71,7 +71,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             }
         }
 
-        uasort($data['columns'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
+        uasort($data['columns'], fn ($a, $b): int => strnatcmp((string) $a['label'], (string) $b['label']));
 
         if (isset($data['filters'])) {
             foreach ($data['filters'] as $column => &$d) {
@@ -84,7 +84,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 }
             }
 
-            uasort($data['filters'], fn ($a, $b) => strnatcmp((string) $a['label'], (string) $b['label']));
+            uasort($data['filters'], fn ($a, $b): int => strnatcmp((string) $a['label'], (string) $b['label']));
         }
 
         $this->tableArray[$context] = $data;
@@ -98,10 +98,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Fetch the tables in the lookup array.
-     *
-     * @return array
      */
-    public function getTables()
+    public function getTables(): array
     {
         return $this->tableArray;
     }
@@ -290,10 +288,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * Get graphs.
-     *
-     * @return array
      */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->graphArray;
     }

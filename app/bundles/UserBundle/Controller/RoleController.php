@@ -15,10 +15,8 @@ class RoleController extends FormController
 {
     /**
      * @param int|string|null $objectId
-     *
-     * @return string
      */
-    protected function getSessionBase($objectId = null)
+    protected function getSessionBase($objectId = null): string
     {
         $base = 'role';
 
@@ -33,13 +31,11 @@ class RoleController extends FormController
      * Generate's default role list view.
      *
      * @param int $page
-     *
-     * @return Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
         if (!$this->security->isGranted('user:roles:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -117,7 +113,7 @@ class RoleController extends FormController
     public function newAction(Request $request)
     {
         if (!$this->security->isGranted('user:roles:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
@@ -201,7 +197,7 @@ class RoleController extends FormController
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:roles:edit')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /** @var RoleModel $model */
@@ -359,7 +355,7 @@ class RoleController extends FormController
     public function deleteAction(Request $request, $objectId)
     {
         if (!$this->security->isGranted('user:roles:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $page           = $request->getSession()->get('mautic.role.page', 1);

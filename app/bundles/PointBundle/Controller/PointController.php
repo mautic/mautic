@@ -15,10 +15,8 @@ class PointController extends AbstractStandardFormController
 {
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -30,7 +28,7 @@ class PointController extends AbstractStandardFormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions['point:points:view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -114,7 +112,7 @@ class PointController extends AbstractStandardFormController
         }
 
         if (!$this->security->isGranted('point:points:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -246,7 +244,7 @@ class PointController extends AbstractStandardFormController
                 ])
             );
         } elseif (!$this->security->isGranted('point:points:edit')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'point');
@@ -348,7 +346,7 @@ class PointController extends AbstractStandardFormController
 
         if (null != $entity) {
             if (!$this->security->isGranted('point:points:create')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;

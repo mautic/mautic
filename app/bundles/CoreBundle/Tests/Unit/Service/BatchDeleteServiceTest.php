@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Service;
 
-use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\BatchDeleteRequest;
@@ -15,17 +14,13 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class BatchDeleteServiceTest extends MauticMysqlTestCase
+final class BatchDeleteServiceTest extends MauticMysqlTestCase
 {
     private BatchDeleteService $batchDeleteService;
-    /**
-     * @var MockObject|CorePermissions
-     */
-    private MockObject $securityMock;
-    /**
-     * @var MockObject|Translator
-     */
-    private MockObject $translatorMock;
+
+    private CorePermissions&MockObject $securityMock;
+
+    private Translator&MockObject $translatorMock;
 
     private CompanyModel $model;
 
@@ -38,8 +33,8 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
         $this->batchDeleteService = new BatchDeleteService($this->securityMock, $this->translatorMock);
         // Create entities to be deleted
         $this->model = static::getContainer()->get('mautic.lead.model.company');
-        $this->createEntity($this->model, Company::class, 'compA');
-        $this->createEntity($this->model, Company::class, 'compB');
+        $this->createCompanyEntity($this->model, 'compA');
+        $this->createCompanyEntity($this->model, 'compB');
     }
 
     public function testBatchDeleteCompanies(): void
@@ -93,9 +88,9 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
         $this->assertEquals('mautic.core.notice.batch_deleted', $flashes[1]['msg']);
     }
 
-    private function createEntity(FormModel $model, string $entityType, string $entityName): FormEntity
+    private function createCompanyEntity(FormModel $model, string $entityName): Company
     {
-        $entity = (new $entityType())
+        $entity = (new Company())
             ->setName($entityName)
             ->setCreatedBy(1);
         $model->saveEntity($entity);
@@ -104,7 +99,7 @@ class BatchDeleteServiceTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return string[]
+     * @return array{type: string, msg: string}
      */
     public function isLocked(): array
     {

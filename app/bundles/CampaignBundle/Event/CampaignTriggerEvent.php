@@ -19,10 +19,8 @@ class CampaignTriggerEvent extends Event
 
     /**
      * Returns the Campaign entity.
-     *
-     * @return Campaign
      */
-    public function getCampaign()
+    public function getCampaign(): Campaign
     {
         return $this->campaign;
     }

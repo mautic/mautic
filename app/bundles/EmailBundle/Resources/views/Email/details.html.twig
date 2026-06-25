@@ -342,6 +342,18 @@
                                   </td>
                                   <td>{{ email.readCount }}</td>
                               </tr>
+                              {% if emailType == 'list' and email.lists|length > 0 %}
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.lead.lead.lists'|trans }}</span>
+                                  </td>
+                                  <td>
+                                      {% for list in email.lists %}
+                                          <a href="{{ path('mautic_segment_action', {'objectAction': 'view', 'objectId': list.id}) }}" data-toggle="ajax">{{ list.name|purify }}</a>{% if not loop.last %}, {% endif %}
+                                      {% endfor %}
+                                  </td>
+                              </tr>
+                              {% endif %}
                               </tbody>
                           </table>
                       </div>
@@ -370,7 +382,7 @@
                   <div class="row">
                       <div class="col-sm-12">
                         {% if securityIsGranted('lead:leads:viewown') %}
-                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                            {% set emailStats = [
                                 {
                                     'title': 'mautic.email.stat.sent',
                                     'value': email.getSentCount(true),
@@ -393,14 +405,17 @@
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_queued'|trans) ~ ':' ~ email.getId()}),
                                     'icon': 'ri-mail-send-line'
                                 },
-                                {
+                            ] %}
+                            {% if email.isSegmentEmail() %}
+                                {% set emailStats = emailStats|merge([{
                                     'title': 'mautic.email.stat.pending',
                                     'value': email.getPendingCount(),
                                     'tooltip': 'mautic.email.stat.leadcount.tooltip',
                                     'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.email_pending'|trans) ~ ':' ~ email.getId()}),
                                     'icon': 'ri-more-fill'
-                                }
-                            ]}) }}
+                                }]) %}
+                            {% endif %}
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': emailStats}) }}
                         {% endif %}
                       </div>
                   </div>
@@ -489,6 +504,8 @@
                       'trackables'  : trackables,
                       'entity'      : email,
                       'channel'     : 'email',
+                      'clickCountsSortable' : true,
+                      'clickCountsSorting'  : clickCountsSorting,
                   }) -}}
               </div>
 

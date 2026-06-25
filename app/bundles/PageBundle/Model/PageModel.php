@@ -266,12 +266,15 @@ class PageModel extends FormModel implements GlobalSearchInterface
             case 'post_delete':
                 $name = PageEvents::PAGE_POST_DELETE;
                 break;
+            case 'on_toggle_publish':
+                $name = PageEvents::PAGE_ON_TOGGLE_PUBLISH;
+                break;
             default:
                 return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new PageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -1055,7 +1058,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($queryHasUtmTags && $lead) {
+        if ($queryHasUtmTags) {
             $utmTags = new UtmTag();
             $utmTags->setDateAdded($hit->getDateHit());
             $utmTags->setUrl($hit->getUrl());
@@ -1088,7 +1091,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
     }
 
-    private function setLeadManipulator($page, Hit $hit, Lead $lead): void
+    private function setLeadManipulator(Page|Redirect|null $page, Hit $hit, Lead $lead): void
     {
         // Only save the lead and dispatch events if needed
         $source   = 'hit';

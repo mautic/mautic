@@ -47,9 +47,9 @@ class TagModel extends BaseTagModel implements GlobalSearchInterface, CannotBeDe
 
     public function cannotBeDeleted(array $ids): array
     {
-        $tagCounts   = $this->getRepository()->countByLeads($ids);
-        $usedTagCount= array_filter($tagCounts, fn ($count) => $count > 0);
-        $usedTags    = [];
+        $tagCounts    = $this->getRepository()->countByLeads($ids);
+        $usedTagCount = array_filter($tagCounts, fn ($count): bool => $count > 0);
+        $usedTags     = [];
         foreach ($usedTagCount as $id => $count) {
             $usedTags[$id] = [
                 'type'    => 'error',

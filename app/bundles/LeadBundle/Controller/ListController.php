@@ -66,7 +66,7 @@ class ListController extends FormController
 
         // If no permission set to the current user.
         if (!in_array(1, $permissions)) {
-            $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -166,13 +166,11 @@ class ListController extends FormController
 
     /**
      * Generate's new form and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel)
+    public function newAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
@@ -196,13 +194,11 @@ class ListController extends FormController
      *
      * @param int  $objectId
      * @param bool $ignorePost
-     *
-     * @return Response
      */
-    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false)
+    public function cloneAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId, $ignorePost = false): Response
     {
         if (!$this->security->isGranted(LeadPermissions::LISTS_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         $postActionVars = $this->getPostActionVars($request, $objectId);
 
@@ -220,8 +216,6 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
                 (bool) $ignorePost
             );
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -267,8 +261,6 @@ class ListController extends FormController
                 $this->generateUrl('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 $ignorePost
             );
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -373,12 +365,11 @@ class ListController extends FormController
     /**
      * Create modifying response for segments - edit.
      *
-     * @param string $action
-     * @param bool   $ignorePost
+     * @param bool $ignorePost
      *
      * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, $action, $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, $ignorePost)
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');
@@ -519,7 +510,7 @@ class ListController extends FormController
                 LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($list)) {
                 return $this->isLocked($postActionVars, $list, 'lead.list');
             } else {
@@ -644,7 +635,7 @@ class ListController extends FormController
             } elseif (!$this->security->hasEntityAccess(
                 LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
             )) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif (null === $list) {
                 $flashes[] = [
                     'type'    => 'error',
@@ -654,7 +645,7 @@ class ListController extends FormController
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
                 LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
             )) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
@@ -688,10 +679,8 @@ class ListController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId)
+    public function viewAction(Request $request, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $listModel, AuditLogModel $auditLogModel, $objectId): Response
     {
         /** @var LeadList $list */
         $list = $listModel->getEntity($objectId);
@@ -733,7 +722,7 @@ class ListController extends FormController
             $list->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $dateRangeValues              = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];

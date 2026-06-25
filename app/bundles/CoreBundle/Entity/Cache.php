@@ -107,7 +107,7 @@ class Cache
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getLifetime()
     {
@@ -127,7 +127,7 @@ class Cache
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getTime()
     {

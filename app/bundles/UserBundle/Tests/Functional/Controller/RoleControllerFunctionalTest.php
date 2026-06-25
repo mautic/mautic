@@ -24,7 +24,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $form['role[description]']->setValue($desc);
 
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString($name, $this->client->getResponse()->getContent());
         $this->assertStringContainsString($desc, $this->client->getResponse()->getContent());
@@ -42,7 +42,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $form['role[name]']->setValue($updatedName);
 
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString($updatedName, $this->client->getResponse()->getContent());
     }

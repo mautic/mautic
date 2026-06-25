@@ -47,7 +47,7 @@ class TableSchemaHelper
      *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
      */
-    public function getSchemaManager()
+    public function getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
     {
         return $this->sm;
     }
@@ -109,7 +109,7 @@ class TableSchemaHelper
         }
 
         if ($checkExists || $dropExisting) {
-            $throwException = ($dropExisting) ? false : true;
+            $throwException = !(bool) $dropExisting;
             if ($this->checkTableExists($table['name'], $throwException) && $dropExisting) {
                 $this->deleteTable($table['name']);
             }

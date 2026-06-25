@@ -11,13 +11,7 @@ trait LeadBatchActionTrait
     /**
      * Return entity query filter for batch action based on ids.
      *
-     * @param Request $request
-     *                         HTTP request
-     * @param string  $ids
-     *                         ids is either all or json array of ids
-     *
-     * @return array{}|array{string?: string, force: array<string, mixed>}
-     *                                                                     Filter arguments for the entity query
+     * @return array{}|array{string?: string, force: string|list<array{column: string, expr: string, value: list<mixed>}>}
      */
     protected function getBatchActionFilter(Request $request, string $ids): array
     {
@@ -25,14 +19,14 @@ trait LeadBatchActionTrait
 
         if ('all' === $ids) {
             $session    = $request->getSession();
-            $search     = $session->get('mautic.lead.filter', '');
-            $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+            $search     = (string) $session->get('mautic.lead.filter', '');
+            $indexMode  = (string) $session->get('mautic.lead.indexmode', 'list');
             $filter     = ['string' => $search, 'force' => ''];
             $translator = $this->translator;
             $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
             $mine       = $translator->trans('mautic.core.searchcommand.ismine');
 
-            if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
+            if ('list' !== $indexMode || !str_contains($search, $anonymous)) {
                 // remove anonymous leads unless requested to prevent clutter
                 $filter['force'] .= " !$anonymous";
             }
@@ -41,12 +35,13 @@ trait LeadBatchActionTrait
             }
         }
 
-        if ($ids = json_decode($ids, true)) {
+        $decodedIds = json_decode($ids, true);
+        if (is_array($decodedIds) && [] !== $decodedIds) {
             $filter['force'] = [
                 [
                     'column' => 'l.id',
                     'expr'   => 'in',
-                    'value'  => $ids,
+                    'value'  => $decodedIds,
                 ],
             ];
         }
@@ -57,11 +52,7 @@ trait LeadBatchActionTrait
     /**
      * Retrieves entity ids for all listed entities.
      *
-     * @param Request $request
-     *                         HTTP request
-     *
      * @return int[]
-     *               Array of entity ids
      */
     protected function getBatchActionEntityIdsForAll(Request $request): array
     {

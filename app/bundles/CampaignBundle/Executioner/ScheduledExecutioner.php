@@ -67,15 +67,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     }
 
     /**
-     * @return Counter|mixed
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      * @throws QueryException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign   = $campaign;
         $this->limiter    = $limiter;
@@ -99,15 +97,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
     }
 
     /**
-     * @return Counter
-     *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      * @throws QueryException
      */
-    public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null)
+    public function executeByIds(array $logIds, ?OutputInterface $output = null, ?\DateTime $now = null): ?Counter
     {
         $now ??= $this->now ?? new \DateTime();
         $this->output  = $output ?: new NullOutput();
@@ -319,7 +315,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                         $latestExecutionDate = $executionDate;
                     }
                 } else {
-                    $toReschedule = $this->addForReschedule($toReschedule, $log, $latestExecutionDate);
+                    $toReschedule = $this->addForReschedule($toReschedule, $log, $executionDate);
                 }
 
                 $logs->remove($key);
@@ -451,11 +447,13 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      *
      * @param Collection<int, LeadEventLog> $logs Collection of logs to organize
      *
-     * @return Collection<int, ArrayCollection> Organized logs with event IDs as keys
+     * @return ArrayCollection<int, ArrayCollection<int, LeadEventLog>> Organized logs with event IDs as keys
      */
     private function organizeByEvent(Collection $logs): Collection
     {
+        /** @var array<int, ArrayCollection<int, LeadEventLog>> $jumpTo */
         $jumpTo = [];
+        /** @var array<int, ArrayCollection<int, LeadEventLog>> $other */
         $other  = [];
 
         /** @var LeadEventLog $log */

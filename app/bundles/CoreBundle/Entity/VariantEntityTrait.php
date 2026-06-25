@@ -169,10 +169,10 @@ trait VariantEntityTrait
         $children = $this->getVariantChildren();
 
         if ($isChild) {
-            return (null === $parent) ? false : true;
+            return null !== $parent;
         }
 
-        return (!empty($parent) || count($children)) ? true : false;
+        return !empty($parent) || count($children);
     }
 
     /**

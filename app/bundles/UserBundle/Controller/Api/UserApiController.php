@@ -14,6 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -148,6 +149,12 @@ class UserApiController extends CommonApiController
         return $this->processForm($request, $entity, $parameters, $method);
     }
 
+    /**
+     * @param User                 &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         switch ($action) {
@@ -212,8 +219,8 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $request->query->get('filter', null);
-        $limit  = (int) $request->query->get('limit', null);
+        $filter = $request->query->get('filter');
+        $limit  = (int) $request->query->get('limit');
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

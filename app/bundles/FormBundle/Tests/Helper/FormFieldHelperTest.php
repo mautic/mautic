@@ -24,17 +24,15 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
-    public function testPopulateField($field, $value, $formHtml, $expectedValue, $message): void
+    public function testPopulateField(Field $field, mixed $value, string &$formHtml, mixed $expectedValue, string $message): void
     {
         $this->fixture->populateField($field, $value, 'mautic', $formHtml);
 
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /**
-     * @return array
-     */
-    public static function fieldProvider()
+    /** @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}> */
+    public static function fieldProvider(): array
     {
         return [
             [
@@ -100,6 +98,107 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
                 '<select id="mauticform_input_mautic_select"><option value="myvalue" selected="selected">My Value</option></select>',
                 'Select lists should have their values set appropriately via GET.',
             ],
+            [
+                self::getField('Rating', 'rating'),
+                '3',
+                '<input id="mauticform_radiogrp_radio_'.self::getAliasFromName('Rating').'1" value="1"/><input id="mauticform_radiogrp_radio_'.self::getAliasFromName('Rating').'2" value="2"/><input id="mauticform_radiogrp_radio_'.self::getAliasFromName('Rating').'3" value="3"/>',
+                '<input id="mauticform_radiogrp_radio_'.self::getAliasFromName('Rating').'1" value="1"/><input id="mauticform_radiogrp_radio_'.self::getAliasFromName('Rating').'2" value="2"/><input id="mauticform_radiogrp_radio_'.self::getAliasFromName('Rating').'3" value="3" checked />',
+                'Rating fields should have their values set appropriately via GET.',
+            ],
+        ];
+    }
+
+    public function testRatingFieldBuildsConfiguredStarList(): void
+    {
+        $field = self::getField('Rating', 'rating');
+        $field->setProperties(['star_count' => 6]);
+
+        $this->assertSame([
+            1 => '★',
+            2 => '★',
+            3 => '★',
+            4 => '★',
+            5 => '★',
+            6 => '★',
+        ], self::getRatingList($field));
+    }
+
+    public function testRatingListIsParsedForTemplateChoices(): void
+    {
+        $field = self::getField('Rating', 'rating');
+        $field->setProperties(['star_count' => 6]);
+
+        $this->assertSame(self::getRatingList($field), \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList(self::getRatingList($field)));
+    }
+
+    public function testRatingTemplateUsesDescendingRadioValues(): void
+    {
+        $field = self::getField('Rating', 'rating');
+        $field->setProperties(['star_count' => 6]);
+
+        $this->assertSame([6, 5, 4, 3, 2, 1], range($field->getProperties()['star_count'], 1, -1));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function getRatingList(Field $field): array
+    {
+        $max  = $field->getProperties()['star_count'] ?? 5;
+        $list = [];
+        for ($i = 1; $i <= $max; ++$i) {
+            $list[$i] = '★';
+        }
+
+        return $list;
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('selectAutoFillProvider')]
+    public function testPopulateFieldSelectAutoFill(string $type, string $value, string $options, string $expectedOptions, string $message): void
+    {
+        $open = '<select name="mauticform['.$type.']" id="mauticform_input_mautic_'.$type.'" class="form-control">';
+        $html = $open.$options.'</select>';
+
+        $this->fixture->populateField(self::getField(ucfirst($type), $type), $value, 'mautic', $html);
+
+        $this->assertSame($open.$expectedOptions.'</select>', $html, $message);
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string, string, string}>
+     */
+    public static function selectAutoFillProvider(): iterable
+    {
+        yield 'attributes precede the id attribute' => [
+            'select',
+            'myvalue',
+            '<option value="myvalue">My Value</option>',
+            '<option value="myvalue" selected="selected">My Value</option>',
+            'Select lists should be auto-filled even when other attributes precede the id attribute.',
+        ];
+
+        yield 'whitespace precedes the option closing bracket' => [
+            'select',
+            'myvalue',
+            '<option value="myvalue" >My Value</option>',
+            '<option value="myvalue" selected="selected">My Value</option>',
+            'Select options should be auto-filled even when whitespace precedes the closing bracket.',
+        ];
+
+        yield 'only the matching option is selected' => [
+            'country',
+            'myvalue',
+            '<option value="other">Other</option><option value="myvalue" >My Value</option>',
+            '<option value="other">Other</option><option value="myvalue" selected="selected">My Value</option>',
+            'Country lists should auto-fill only the option matching the submitted value.',
+        ];
+
+        yield 'regex backreference characters preserved verbatim' => [
+            'select',
+            '$1promo',
+            '<option value="$1promo">Promo</option>',
+            '<option value="$1promo" selected="selected">Promo</option>',
+            'Option values containing regex backreference characters should be preserved verbatim when marked selected.',
         ];
     }
 

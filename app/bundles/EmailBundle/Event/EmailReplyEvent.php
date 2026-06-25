@@ -18,18 +18,13 @@ class EmailReplyEvent extends Event
 
     /**
      * Returns the Email entity.
-     *
-     * @return Email
      */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): Stat
     {
         return $this->stat;
     }

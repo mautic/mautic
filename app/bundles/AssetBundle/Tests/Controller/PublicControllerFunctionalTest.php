@@ -125,11 +125,8 @@ class PublicControllerFunctionalTest extends AbstractAssetTestCase
         // Don't follow redirects automatically
         $this->client->followRedirects(false);
         $this->client->request('GET', '/asset/'.$asset->getSlug());
-
-        $response = $this->client->getResponse();
-
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
-        $this->assertSame($remotePath, $response->headers->get('Location'));
+        $this->assertResponseRedirects($remotePath);
     }
 
     public function testDownloadActionWithMissingLocalFile(): void

@@ -37,7 +37,8 @@ use Twig\Environment;
 
 class OwnerSubscriberTest extends TestCase
 {
-    protected $contacts = [
+    /** @var array<int, array<string, int|string|null>> */
+    protected array $contacts = [
         [
             'id'        => 1,
             'email'     => 'contact1@somewhere.com',
@@ -249,6 +250,9 @@ class OwnerSubscriberTest extends TestCase
         return $coreParametersHelper;
     }
 
+    /**
+     * @param array<string, mixed> $lead
+     */
     protected function getMockMailer(array $lead): MailHelper
     {
         $parameterMap = [

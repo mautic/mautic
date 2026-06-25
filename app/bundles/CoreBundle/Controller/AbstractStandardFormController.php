@@ -32,6 +32,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     use FormErrorMessagesTrait;
 
     private const SESSION_FILTER_KEY_SUFFIX = '.filter';
+
     private const SESSION_PAGE_KEY_SUFFIX   = '.page';
 
     public function __construct(
@@ -234,7 +235,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         if (null != $entity) {
             if (!$this->checkActionPermission('clone', $entity)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $newEntity = clone $entity;
@@ -283,7 +284,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->checkActionPermission('delete', $entity)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, $this->getModelName());
             }
@@ -369,7 +370,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             );
         } elseif ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
             // deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif (!$isClone && $model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, $this->getModelName());
@@ -810,7 +811,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         );
 
         if (!$this->checkActionPermission('index')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -912,7 +913,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $entity = $this->getFormEntity('new');
 
         if (!$this->checkActionPermission('new')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $model = $this->getModel($this->getModelName());
@@ -1076,7 +1077,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 )
             );
         } elseif (!$this->checkActionPermission('view', $entity)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();

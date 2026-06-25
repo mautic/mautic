@@ -179,7 +179,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
@@ -197,7 +197,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
     }
@@ -214,9 +214,9 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $content);
+        $this->assertResponseIsSuccessful($content);
         $this->assertNotEquals($this->expectedPngContent, $content);
-        PageControllerTest::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         PageControllerTest::assertStringContainsString(
             '/asset/'.$this->asset->getSlug(),
@@ -254,7 +254,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/assets/{$route}/{$asset->getId()}");
 
-        Assert::assertSame($expectedStatusCode, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame($expectedStatusCode);
     }
 
     public function testBatchDeleteAction(): void
@@ -290,7 +290,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $response = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $assets      = $this->em->getRepository(Asset::class)->findAll();
-        $assetTitles = array_map(function ($form) {return $form->getTitle(); }, $assets);
+        $assetTitles = array_map(fn ($asset) => $asset->getTitle(), $assets);
         $this->assertNotContains($assetA->getTitle(), $assetTitles);
         $this->assertContains($assetB->getTitle(), $assetTitles);
         $this->assertContains($assetC->getTitle(), $assetTitles);

@@ -9,14 +9,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TokenSorter
 {
     private const CATEGORY_CONTACT   = 10;
+
     private const CATEGORY_COMPANY   = 20;
+
     private const CATEGORY_OWNER     = 30;
+
     private const CATEGORY_PAGE_LINK = 40;
+
     private const CATEGORY_DWC       = 50;
+
     private const CATEGORY_FOCUS     = 60;
+
     private const CATEGORY_ASSET     = 70;
+
     private const CATEGORY_THIS_PAGE = 80;
+
     private const CATEGORY_EMAIL     = 90;
+
     private const CATEGORY_OTHER     = 999;
 
     /**

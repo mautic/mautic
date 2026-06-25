@@ -53,6 +53,7 @@ class EventController extends CommonFormController
         private CampaignModel $campaignModel,
         BatchDeleteService $batchDeleteService,
     ) {
+        // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
@@ -180,7 +181,7 @@ class EventController extends CommonFormController
             'route'         => false,
         ];
 
-        if (1 === $success && !empty($modifiedEvents)) {
+        if (1 === $success) {
             $passthroughVars['modifiedEvents'] = $modifiedEvents;
         }
 
@@ -377,7 +378,7 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
@@ -444,7 +445,7 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
@@ -511,7 +512,7 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
@@ -556,14 +557,16 @@ class EventController extends CommonFormController
         $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
         $event['id']    = $event['tempId'] = $keyId;
 
+        $modifiedEvents         = $this->getModifiedEvents();
         $modifiedEvents[$keyId] = $event;
         $this->modifiedEvents   = $modifiedEvents;
 
-        $passThroughVars               = [
+        $passThroughVars = [
             'mauticContent'     => 'campaignEvent',
             'clearCloneStorage' => true,
             'success'           => 1,
             'route'             => false,
+            'modifiedEvents'    => $modifiedEvents,
         ];
 
         $passThroughVars = array_merge($passThroughVars, $this->eventViewVars($event, $campaignId, 'insert'));

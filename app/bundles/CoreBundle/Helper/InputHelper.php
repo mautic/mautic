@@ -37,15 +37,9 @@ class InputHelper
         };
     }
 
-    /**
-     * @param bool $html
-     * @param bool $strict
-     *
-     * @return InputFilter
-     */
-    private static function getFilter($html = false, $strict = false)
+    private static function getFilter(bool $html = false, bool $strict = false): ?InputFilter
     {
-        if (empty(self::$htmlFilter)) {
+        if (!self::$htmlFilter instanceof InputFilter) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
             self::$htmlFilter->blockedTags  = [
@@ -98,9 +92,11 @@ class InputHelper
     /**
      * Wrapper to InputHelper.
      *
+     * @param mixed[] $arguments
+     *
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $arguments)
     {
         return self::getFilter()->clean($arguments[0], $name);
     }
@@ -205,12 +201,9 @@ class InputHelper
         }
 
         $delimiter = '~';
-        if (false && in_array($delimiter, $allowedCharacters)) {
-            $delimiter = '#';
-        }
 
         if (!empty($allowedCharacters)) {
-            $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters)).']+'.$delimiter.'i';
+            $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters), $delimiter).']+'.$delimiter.'i';
         } else {
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
@@ -598,7 +591,7 @@ class InputHelper
      */
     public static function stripTags(string $input, array $allowedTags = []): string
     {
-        $allowed = implode('', array_map(fn ($tag) => "<$tag>", $allowedTags));
+        $allowed = implode('', array_map(fn ($tag): string => "<$tag>", $allowedTags));
 
         return strip_tags($input, $allowed);
     }
