@@ -257,7 +257,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    protected function deleteStandard(Request $request, int $objectId)
+    protected function deleteStandard(Request $request, int|string $objectId)
     {
         $page      = $request->getSession()->get($this->getSessionKey(self::SESSION_PAGE_KEY_SUFFIX), 1);
         $returnUrl = $this->generateUrl($this->getIndexRoute(), ['page' => $page]);

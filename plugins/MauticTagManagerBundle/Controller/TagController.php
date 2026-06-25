@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\TagModel as LeadTagModel;
+use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -515,7 +517,8 @@ class TagController extends FormController
         if (!$permissions[self::PERMISSION_VIEW]) {
             $this->throwAccessDenied();
         } else {
-            $secondaryTag = $this->leadTagModel->getEntity($objectId);
+            $leadTagModel = $this->getLeadTagModel();
+            $secondaryTag = $leadTagModel->getEntity($objectId);
 
             if (null === $secondaryTag) {
                 $response = $this->handleTagNotFound($objectId);
@@ -527,7 +530,7 @@ class TagController extends FormController
                 ]);
 
                 $form = $this->formFactory->create(
-                    \MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType::class,
+                    TagMergeType::class,
                     [],
                     [
                         'action'      => $action,
@@ -536,7 +539,7 @@ class TagController extends FormController
                 );
 
                 $response = 'POST' === $request->getMethod()
-                    ? $this->handleMergePostRequest($form, $secondaryTag, $permissions, $postActionVars)
+                    ? $this->handleMergePostRequest($form, $secondaryTag, $permissions, $postActionVars, $leadTagModel)
                     : $this->renderMergeForm($request, $action, $form, $secondaryTag);
             }
         }
@@ -587,7 +590,7 @@ class TagController extends FormController
      * @param array<string, bool>  $permissions
      * @param array<string, mixed> $postActionVars
      */
-    private function handleMergePostRequest(FormInterface $form, Tag $secondaryTag, array $permissions, array $postActionVars): Response
+    private function handleMergePostRequest(FormInterface $form, Tag $secondaryTag, array $permissions, array $postActionVars, LeadTagModel $leadTagModel): Response
     {
         if ($this->isFormCancelled($form) || !$this->isFormValid($form)) {
             $response = $this->handleFormCancellation($secondaryTag);
@@ -601,7 +604,7 @@ class TagController extends FormController
             } elseif (!$permissions[self::PERMISSION_EDIT] || !$permissions[self::PERMISSION_DELETE]) {
                 $this->throwAccessDenied();
             } else {
-                $response = $this->performTagMerge($primaryTag, $secondaryTag);
+                $response = $this->performTagMerge($leadTagModel, $primaryTag, $secondaryTag);
             }
         }
 
@@ -647,9 +650,9 @@ class TagController extends FormController
         );
     }
 
-    private function performTagMerge(Tag $primaryTag, Tag $secondaryTag): Response
+    private function performTagMerge(LeadTagModel $leadTagModel, Tag $primaryTag, Tag $secondaryTag): Response
     {
-        $this->leadTagModel->tagMerge($primaryTag, $secondaryTag);
+        $leadTagModel->tagMerge($primaryTag, $secondaryTag);
 
         $viewParameters = [
             'objectId'     => $primaryTag->getId(),
@@ -676,6 +679,14 @@ class TagController extends FormController
             ],
             'flashes' => $flashes,
         ]);
+    }
+
+    private function getLeadTagModel(): LeadTagModel
+    {
+        $leadTagModel = $this->getModel('lead.tag');
+        \assert($leadTagModel instanceof LeadTagModel);
+
+        return $leadTagModel;
     }
 
     private function renderMergeForm(Request $request, string $action, FormInterface $form, Tag $secondaryTag): Response
