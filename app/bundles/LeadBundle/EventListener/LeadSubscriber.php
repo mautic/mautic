@@ -376,7 +376,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $lead = $event->getLead();
         $rows = $this->auditLogModel->getRepository()->getLeadIpLogs($lead, $event->getQueryOptions());
@@ -413,7 +413,7 @@ class LeadSubscriber implements EventSubscriberInterface
         // Purposively not including this in engagements graph as it's info only
     }
 
-    private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
@@ -454,7 +454,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         // Do nothing if the lead is not set
         if (!$event->getLead() instanceof Lead) {
@@ -484,7 +484,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $utmRepo = $this->entityManager->getRepository(UtmTag::class);
         $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
@@ -540,7 +540,7 @@ class LeadSubscriber implements EventSubscriberInterface
         // Purposively not including this in engagements graph as the engagement is counted by the page hit
     }
 
-    private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->entityManager->getRepository(DoNotContact::class);
@@ -606,7 +606,7 @@ class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
@@ -662,7 +662,7 @@ class LeadSubscriber implements EventSubscriberInterface
         // Purposively not including this
     }
 
-    private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo    = $this->entityManager->getRepository(LeadEventLog::class);

@@ -1030,11 +1030,7 @@ class Asset extends FormEntity implements UuidInterface
 
         $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
 
-        if (in_array($fileType, $imageTypes)) {
-            return true;
-        }
-
-        return false;
+        return in_array($fileType, $imageTypes);
     }
 
     /**

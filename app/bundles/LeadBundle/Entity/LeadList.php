@@ -354,11 +354,8 @@ class LeadList extends FormEntity implements UuidInterface
         if (null === $this->getLastBuiltDate()) {
             return true;
         }
-        if (null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp()) {
-            return true;
-        }
 
-        return false;
+        return null !== $this->getDateModified() && $this->getDateModified()->getTimestamp() >= $this->getLastBuiltDate()->getTimestamp();
     }
 
     public function hasFilterTypeOf(string $type): bool

@@ -89,11 +89,7 @@ class CustomFieldIndex
             return true;
         }
 
-        if (!$this->hasMatchingUniqueIdentifierIndex($leadField)) {
-            return true;
-        }
-
-        return false;
+        return !$this->hasMatchingUniqueIdentifierIndex($leadField);
     }
 
     /**

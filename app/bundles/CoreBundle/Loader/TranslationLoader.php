@@ -76,7 +76,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
      *
      * @throws \Exception
      */
-    private function loadTranslations($catalogue, $locale, $file): void
+    private function loadTranslations(MessageCatalogue $catalogue, string $locale, \Symfony\Component\Finder\SplFileInfo $file): void
     {
         $iniFile  = $file->getRealpath();
         $content  = file_get_contents($iniFile);
