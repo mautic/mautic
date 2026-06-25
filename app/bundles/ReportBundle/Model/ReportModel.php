@@ -726,11 +726,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($orderByDirection, ['ASC', 'DESC', ''], true)) {
-            return false;
-        }
-
-        return true;
+        return array_key_exists($orderBy, $allowedColumns) && in_array($orderByDirection, ['ASC', 'DESC', ''], true);
     }
 
     /**

@@ -372,7 +372,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.convert.embed.images.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_convert_embed_images']) ? false : true,
+                'data'       => !empty($options['data']['mailer_convert_embed_images']),
                 'required'   => false,
             ]
         );
@@ -387,7 +387,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
+                'data'       => !empty($options['data']['mailer_append_tracking_pixel']),
                 'required'   => false,
             ]
         );
@@ -402,7 +402,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
                 ],
-                'data'       => empty($options['data']['disable_trackable_urls']) ? false : true,
+                'data'       => !empty($options['data']['disable_trackable_urls']),
                 'required'   => false,
             ]
         );
@@ -473,7 +473,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.is.owner.tooltip',
                 ],
-                'data'       => empty($options['data']['mailer_is_owner']) ? false : true,
+                'data'       => !empty($options['data']['mailer_is_owner']),
                 'required'   => false,
             ]
         );
@@ -519,7 +519,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_segments']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_segments']),
                 'required'   => false,
             ]
         );
@@ -533,7 +533,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_preferences']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_preferences']),
                 'required'   => false,
             ]
         );
@@ -547,7 +547,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_frequency']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_frequency']),
                 'required'   => false,
             ]
         );
@@ -561,7 +561,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_pause_dates']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_pause_dates']),
                 'required'   => false,
             ]
         );
@@ -575,7 +575,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
                 ],
-                'data'       => empty($options['data']['show_contact_categories']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_categories']),
                 'required'   => false,
             ]
         );
@@ -589,7 +589,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
                 ],
-                'data'       => empty($options['data']['show_contact_preferred_channels']) ? false : true,
+                'data'       => !empty($options['data']['show_contact_preferred_channels']),
                 'required'   => false,
             ]
         );

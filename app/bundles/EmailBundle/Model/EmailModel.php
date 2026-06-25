@@ -269,7 +269,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
-            $isNew = ($entity->getId()) ? false : true;
+            $isNew = !(bool) $entity->getId();
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
