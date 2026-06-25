@@ -33,7 +33,7 @@ class UTCDateTimeType extends DateTimeType
             $value = clone $value;
         }
 
-        $value->setTimezone(self::$utc);
+        $value = $value->setTimezone(self::$utc);
 
         return parent::convertToDatabaseValue($value, $platform);
     }
