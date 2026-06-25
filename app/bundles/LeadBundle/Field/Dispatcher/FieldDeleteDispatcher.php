@@ -50,7 +50,7 @@ class FieldDeleteDispatcher
      *
      * @throws NoListenerException
      */
-    private function dispatchEvent($action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
+    private function dispatchEvent(string $action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');

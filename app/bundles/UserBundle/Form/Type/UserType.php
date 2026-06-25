@@ -107,7 +107,7 @@ class UserType extends AbstractType
         $existing    = (!empty($options['data']) && $options['data']->getId());
         $placeholder = ($existing) ?
             $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
-        $required = ($existing) ? false : true;
+        $required = !$existing;
         $builder->add(
             'plainPassword',
             RepeatedType::class,
