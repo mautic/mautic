@@ -371,7 +371,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      *
      * @return $this
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -417,7 +417,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @return $this
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -484,7 +484,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @param array $utmTags
      */
-    public function setUtmTags($utmTags)
+    public function setUtmTags($utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -520,7 +520,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @return $this
      */
-    public function setReadCount($readCount)
+    public function setReadCount($readCount): static
     {
         $this->readCount = $readCount;
 
@@ -538,7 +538,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @return $this
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -557,7 +557,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @return $this
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -573,7 +573,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @return $this
      */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
 
@@ -590,10 +590,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * Add list.
-     *
-     * @return Notification
      */
-    public function addList(LeadList $list)
+    public function addList(LeadList $list): static
     {
         $this->lists[] = $list;
 
@@ -646,7 +644,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      *
      * @return $this
      */
-    public function setMobile($mobile)
+    public function setMobile($mobile): static
     {
         $this->mobile = $mobile;
 
@@ -664,7 +662,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @return $this
      */
-    public function setMobileSettings(array $mobileSettings)
+    public function setMobileSettings(array $mobileSettings): static
     {
         $this->mobileSettings = $mobileSettings;
 

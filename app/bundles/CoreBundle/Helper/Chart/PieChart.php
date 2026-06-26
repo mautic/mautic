@@ -42,7 +42,7 @@ class PieChart extends AbstractChart implements ChartInterface
      *
      * @return $this
      */
-    public function setDataset($label, $value)
+    public function setDataset($label, $value): static
     {
         $this->totalCount += $value;
         $this->datasets[] = $value;

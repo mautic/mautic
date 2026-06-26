@@ -205,7 +205,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -225,7 +225,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -246,7 +246,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -267,7 +267,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setMediaId($mediaId)
+    public function setMediaId($mediaId): static
     {
         $this->isChanged('mediaId', $mediaId);
         $this->mediaId = $mediaId;
@@ -288,7 +288,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setMediaPath($mediaPath)
+    public function setMediaPath($mediaPath): static
     {
         $this->isChanged('mediaPath', $mediaPath);
         $this->mediaPath = $mediaPath;
@@ -309,7 +309,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setText($text)
+    public function setText($text): static
     {
         $this->isChanged('text', $text);
         $this->text = $text;
@@ -328,7 +328,7 @@ class Tweet extends FormEntity
     /**
      * @return $this
      */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): static
     {
         $this->isChanged('sentCount', $sentCount);
         $this->sentCount = $sentCount;
@@ -341,7 +341,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function sentCountUp()
+    public function sentCountUp(): static
     {
         $this->setSentCount($this->getSentCount() + 1);
 
@@ -361,7 +361,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setFavoriteCount($favoriteCount)
+    public function setFavoriteCount($favoriteCount): static
     {
         $this->isChanged('favoriteCount', $favoriteCount);
         $this->favoriteCount = $favoriteCount;
@@ -382,7 +382,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setRetweetCount($retweetCount)
+    public function setRetweetCount($retweetCount): static
     {
         $this->isChanged('retweetCount', $retweetCount);
         $this->retweetCount = $retweetCount;
@@ -403,7 +403,7 @@ class Tweet extends FormEntity
      *
      * @return $this
      */
-    public function setLanguage($language)
+    public function setLanguage($language): static
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -422,7 +422,7 @@ class Tweet extends FormEntity
     /**
      * @return $this
      */
-    public function setAsset(Asset $asset)
+    public function setAsset(Asset $asset): static
     {
         $this->asset = $asset;
 
@@ -440,7 +440,7 @@ class Tweet extends FormEntity
     /**
      * @return $this
      */
-    public function setPage(Page $page)
+    public function setPage(Page $page): static
     {
         $this->page = $page;
 
@@ -458,7 +458,7 @@ class Tweet extends FormEntity
     /**
      * @return $this
      */
-    public function setCategory(Category $category)
+    public function setCategory(Category $category): static
     {
         $this->category = $category;
 
