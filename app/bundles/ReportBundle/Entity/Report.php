@@ -498,12 +498,12 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
     public function getAggregatorColumns(): array
     {
-        return array_map(fn ($aggregator): mixed => $aggregator['column'], $this->getAggregators());
+        return array_map(fn (array $aggregator): mixed => $aggregator['column'], $this->getAggregators());
     }
 
     public function getOrderColumns(): array
     {
-        return array_map(fn ($order): mixed => $order['column'], $this->getTableOrder());
+        return array_map(fn (array $order): mixed => $order['column'], $this->getTableOrder());
     }
 
     public function getSelectAndAggregatorAndOrderAndGroupByColumns(): array

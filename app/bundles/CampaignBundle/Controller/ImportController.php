@@ -177,7 +177,7 @@ final class ImportController extends AbstractFormController
     /**
      * Cancels import by removing the uploaded file.
      */
-    public function cancelAction(): Response
+    public function cancelAction(): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->security->isGranted('campaign:imports:create')) {
             $this->throwAccessDenied();

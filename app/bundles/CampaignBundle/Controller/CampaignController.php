@@ -358,7 +358,7 @@ class CampaignController extends AbstractStandardFormController
         $campaign        = $this->getCampaignModel()->getEntity($objectId);
         $this->prepareCampaignSourcesForEdit($objectId, $sourcesList, true);
         // Filter out deleted events for the preview (but keep them for action/decision/condition tabs)
-        $previewEvents = array_filter($events, fn ($event): bool => empty($event['deleted']));
+        $previewEvents = array_filter($events, fn (array $event): bool => empty($event['deleted']));
 
         $response['preview']    = trim(
             $this->renderView(
@@ -566,7 +566,7 @@ class CampaignController extends AbstractStandardFormController
         // If the response contains events and is a form view, make sure deleted events are marked
         if ($result instanceof Response && $this->campaignEvents) {
             // Pre-filter the campaign events for the preview tab (in case something was missed)
-            $this->campaignEvents = array_filter($this->campaignEvents, fn ($event): bool => empty($event['deleted']));
+            $this->campaignEvents = array_filter($this->campaignEvents, fn (array $event): bool => empty($event['deleted']));
 
             $this->campaignElements['campaignEvents'] = $this->campaignEvents;
         }
@@ -1043,6 +1043,9 @@ class CampaignController extends AbstractStandardFormController
                 $isEmailStatsEnabled = (bool) $this->coreParametersHelper->get('campaign_email_stats_enabled', true);
                 $showEmailStats      = $isEmailStatsEnabled && $entity->isEmailCampaign();
 
+                $contactCounts = $this->getCampaignModel()->getCampaignLeadRepository()->getCampaignContactCounts([$entity->getId()]);
+                $contactCount  = (int) ($contactCounts[0]['contact_count'] ?? 0);
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -1052,6 +1055,7 @@ class CampaignController extends AbstractStandardFormController
                         'dateRangeForm'    => $dateRangeForm->createView(),
                         'campaignElements' => $this->campaignElements,
                         'lastPublishDate'  => $this->publishStateService->getLastPublishDate($entity),
+                        'contactCount'     => $contactCount,
                     ]
                 );
                 break;

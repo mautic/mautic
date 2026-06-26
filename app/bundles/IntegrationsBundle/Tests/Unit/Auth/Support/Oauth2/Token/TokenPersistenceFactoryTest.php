@@ -15,7 +15,7 @@ class TokenPersistenceFactoryTest extends TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $integration;
 
-    public function setup(): void
+    protected function setup(): void
     {
         $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
         $this->integration        = $this->createMock(Integration::class);
