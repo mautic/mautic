@@ -11,7 +11,7 @@ class ObjectMappingTest extends TestCase
 {
     private \DateTime $dateCreated;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->dateCreated = new \DateTime();
 

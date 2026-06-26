@@ -48,7 +48,7 @@ class LeadListSubscriber implements EventSubscriberInterface
                     if ('Salesforce' !== $integrationName) {
                         array_walk(
                             $integrationChoices,
-                            function (&$choice) use ($integrationName): void {
+                            function (array &$choice) use ($integrationName): void {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
                             }
                         );
