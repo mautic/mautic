@@ -20,10 +20,7 @@ class GroupExecutionDateDAO
         $this->contacts->set($contact->getId(), $contact);
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getExecutionDate()
+    public function getExecutionDate(): \DateTimeInterface
     {
         return $this->executionDate;
     }

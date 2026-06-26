@@ -30,7 +30,7 @@ class CacheProviderTest extends TestCase
      */
     private MockObject $container;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->adapter              = $this->createMock(FilesystemTagAwareAdapter::class);
