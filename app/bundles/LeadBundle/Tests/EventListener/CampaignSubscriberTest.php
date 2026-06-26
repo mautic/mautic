@@ -220,11 +220,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
 
-        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
-            function () use ($lead): void {
-                $lead->setPrimaryCompany($this->configTo);
-            }
-        );
+        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')
+            ->willReturnCallback(
+                function () use ($lead): array {
+                    $lead->setPrimaryCompany($this->configTo);
+
+                    return ['oldPrimary' => $this->configTo['id'], 'newPrimary' => $this->configTo['id']];
+                }
+            );
 
         $args = [
             'lead'  => $lead,
