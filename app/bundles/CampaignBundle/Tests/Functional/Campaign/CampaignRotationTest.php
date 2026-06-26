@@ -36,7 +36,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
     private LeadEventLogRepository $leadEventLogRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

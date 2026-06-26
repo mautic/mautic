@@ -26,7 +26,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private FormConditionalSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->formModel  = $this->createMock(FormModel::class);

@@ -170,7 +170,7 @@ class ContactSegmentFilterFactory
 
         $filter                         = $stack[0];
         $filter['operator']             = 'in';
-        $filter['properties']['filter'] = $filter['filter'] = array_map(fn ($ele): mixed => $ele['filter'], $stack);
+        $filter['properties']['filter'] = $filter['filter'] = array_map(fn (array $ele): mixed => $ele['filter'], $stack);
 
         return $filter;
     }

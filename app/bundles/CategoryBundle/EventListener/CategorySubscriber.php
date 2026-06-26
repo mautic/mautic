@@ -93,7 +93,7 @@ class CategorySubscriber implements EventSubscriberInterface
             $message = $this->translator->trans(
                 'mautic.category.is_in_use.delete',
                 [
-                    '%entities%'     => implode(', ', array_map(fn ($entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
+                    '%entities%'     => implode(', ', array_map(fn (array $entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
                     '%categoryName%' => $event->getCategory()->getTitle(),
                 ],
                 'validators');

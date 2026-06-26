@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class LeadRepositoryTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->clientOptions = ['debug' => true];
 
