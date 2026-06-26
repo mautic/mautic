@@ -37,7 +37,7 @@ class ExampleSendTypeTest extends TestCase
      */
     private $userHelperMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $this->security       = $this->createMock(CorePermissions::class);

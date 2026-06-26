@@ -222,7 +222,7 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(fn ($l): array => [
+        $logEvents = array_map(fn (array $l): array => [
             'eventType'       => $l['action'],
             'userName'        => $l['userName'],
             'timestamp'       => $l['dateAdded'],
