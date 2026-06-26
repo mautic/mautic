@@ -560,7 +560,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ->select('DISTINCT lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'ldnc')
             ->where(implode(' OR ', array_map(
-                fn ($condition): string => sprintf(
+                fn (array $condition): string => sprintf(
                     '(ldnc.channel = %s AND ldnc.reason = %d)',
                     $condition['channel'],
                     $condition['reason']

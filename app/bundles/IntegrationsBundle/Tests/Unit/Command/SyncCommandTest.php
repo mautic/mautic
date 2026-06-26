@@ -27,7 +27,7 @@ class SyncCommandTest extends TestCase
 
     private CommandTester $commandTester;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
