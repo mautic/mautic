@@ -27,7 +27,7 @@ class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 
     private Lead $lead;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);

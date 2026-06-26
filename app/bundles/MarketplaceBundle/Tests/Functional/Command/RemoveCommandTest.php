@@ -21,7 +21,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
 
     private string $packageName;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->logger      = $this->createMock(LoggerInterface::class);

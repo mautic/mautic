@@ -34,7 +34,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
     private FormatterHelper $formatterHelperMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
@@ -61,7 +61,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         if (is_resource($this->file)) {
             fclose($this->file);

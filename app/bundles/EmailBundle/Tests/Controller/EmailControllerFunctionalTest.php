@@ -38,7 +38,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private const CLICK_URL_MID  = 'https://example.com/mid';
     private const CLICK_URL_HIGH = 'https://example.com/high';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['legacy_builder_enabled'] = true;
         $this->configParams['disable_trackable_urls'] = false;

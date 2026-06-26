@@ -2262,9 +2262,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @return mixed[]
+     * @return array{oldPrimary: int|false, newPrimary: int|false}
      */
-    public function setPrimaryCompany($companyId, $leadId)
+    public function setPrimaryCompany($companyId, $leadId): array
     {
         $companyArray      = [];
         $oldPrimaryCompany = $newPrimaryCompany = false;
@@ -2498,7 +2498,7 @@ class LeadModel extends FormModel
                     ? $field['properties']
                     : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
 
-                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
+                $flattenedAllowedValues = array_map(fn (array $item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 
                 $fieldValue = $entity->getFieldValue($field['alias'], $group);
                 if (!empty($allowedValues['list']) && !in_array($fieldValue, $flattenedAllowedValues)) {
