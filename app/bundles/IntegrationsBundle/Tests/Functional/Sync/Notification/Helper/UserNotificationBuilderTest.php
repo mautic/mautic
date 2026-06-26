@@ -17,7 +17,7 @@ class UserNotificationBuilderTest extends MauticMysqlTestCase
      */
     private $notificationBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
