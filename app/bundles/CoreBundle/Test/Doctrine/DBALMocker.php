@@ -9,7 +9,11 @@ use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockBuilder;
+<<<<<<< HEAD
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+=======
+use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount as AnyInvokedCountMatcher;
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
 
 class DBALMocker
 {
@@ -99,11 +103,19 @@ class DBALMocker
                 )
                 ->getMock();
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
                 ->method('getConnection')
                 ->willReturn($this->getMockConnection());
 
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+                ->method('getConnection')
+                ->willReturn($this->getMockConnection());
+
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('getReference')
                 ->willReturnCallback(function () {
                     switch (func_get_arg(0)) {
@@ -137,6 +149,7 @@ class DBALMocker
                 ])
                 ->getMock();
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
                 ->method('createQueryBuilder')
                 ->willReturn($this->getMockQueryBuilder());
@@ -146,12 +159,27 @@ class DBALMocker
                 ->willReturnArgument(0);
 
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+                ->method('createQueryBuilder')
+                ->willReturn($this->getMockQueryBuilder());
+
+            $mock->expects(new AnyInvokedCountMatcher())
+                ->method('quote')
+                ->willReturnArgument(0);
+
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('update')
                 ->willReturnCallback(function (): void {
                     $this->connectionUpdated[] = func_get_args();
                 });
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('insert')
                 ->willReturnCallback(function (): void {
                     $this->connectionInserted[] = func_get_args();
@@ -182,7 +210,11 @@ class DBALMocker
                 )
                 ->getMock();
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('select')
                 ->willReturnCallback(
                     function () use ($mock) {
@@ -192,7 +224,11 @@ class DBALMocker
                     }
                 );
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('from')
                 ->willReturnCallback(
                     function () use ($mock) {
@@ -202,13 +238,21 @@ class DBALMocker
                     }
                 );
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('expr')
                 ->willReturnCallback(
                     fn () => new ExpressionBuilder($this->getMockConnection())
                 );
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('where')
                 ->willReturnCallback(
                     function () use ($mock) {
@@ -218,7 +262,11 @@ class DBALMocker
                     }
                 );
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('andWhere')
                 ->willReturnCallback(
                     function () use ($mock) {
@@ -228,7 +276,11 @@ class DBALMocker
                     }
                 );
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('setParameter')
                 ->willReturnCallback(
                     function () use ($mock) {
@@ -238,7 +290,11 @@ class DBALMocker
                     }
                 );
 
+<<<<<<< HEAD
             $mock->expects(new AnyInvokedCount())
+=======
+            $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
                 ->method('executeQuery')
                 ->willReturnCallback([$this, 'getMockResultStatement']);
 
@@ -275,11 +331,19 @@ class DBALMocker
                 return count($this->queryResponse);
             });
 
+<<<<<<< HEAD
         $mock->expects(new AnyInvokedCount())
             ->method('fetchOne')
             ->willReturn($this->queryResponse);
 
         $mock->expects(new AnyInvokedCount())
+=======
+        $mock->expects(new AnyInvokedCountMatcher())
+            ->method('fetchOne')
+            ->willReturn($this->queryResponse);
+
+        $mock->expects(new AnyInvokedCountMatcher())
+>>>>>>> aa77379b79 (update dbal mocker protected calls of mock builder)
             ->method('fetchAllAssociative')
             ->willReturn($this->queryResponse);
 
