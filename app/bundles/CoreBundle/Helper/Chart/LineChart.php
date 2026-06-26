@@ -65,7 +65,7 @@ class LineChart extends AbstractChart implements ChartInterface
      *
      * @return $this
      */
-    public function setDataset($label, array $data)
+    public function setDataset($label, array $data): static
     {
         $datasetId = count($this->datasets);
 

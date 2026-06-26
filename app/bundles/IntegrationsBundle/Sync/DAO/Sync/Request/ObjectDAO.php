@@ -35,10 +35,7 @@ class ObjectDAO
         return $this->object;
     }
 
-    /**
-     * @return self
-     */
-    public function addField(string $field)
+    public function addField(string $field): static
     {
         $this->fields[] = $field;
 

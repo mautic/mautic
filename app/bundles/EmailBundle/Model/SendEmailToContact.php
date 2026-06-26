@@ -52,7 +52,7 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function flush($resetMailer = true)
+    public function flush($resetMailer = true): static
     {
         // Flushes the batch in case of using API mailers
         if ($this->emailEntityId && !$flushResult = $this->mailer->flushQueue()) {
@@ -120,7 +120,7 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setListId($id)
+    public function setListId($id): static
     {
         $this->listId = empty($id) ? null : (int) $id;
 
@@ -132,7 +132,7 @@ class SendEmailToContact
      *
      * @throws FailedToSendToContactException
      */
-    public function setContact(array $contact, array $tokens = [])
+    public function setContact(array $contact, array $tokens = []): static
     {
         $this->contact = $contact;
 

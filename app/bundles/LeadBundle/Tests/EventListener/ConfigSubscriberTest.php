@@ -57,8 +57,10 @@ class ConfigSubscriberTest extends TestCase
         $this->configBuilderEvent
             ->expects($this->exactly(2))
             ->method('addForm')
-            ->willReturnCallback(function (array $form) use (&$invocations): void {
+            ->willReturnCallback(function (array $form) use (&$invocations): ConfigBuilderEvent {
                 $invocations[] = $form;
+
+                return $this->configBuilderEvent;
             });
 
         $this->configSubscriber->onConfigGenerate($this->configBuilderEvent);
@@ -86,7 +88,7 @@ class ConfigSubscriberTest extends TestCase
         $this->configBuilderEvent
             ->expects($matcher)
             ->method('addForm')
-            ->willReturnCallback(function (array $form): void {
+            ->willReturnCallback(function (array $form): ConfigBuilderEvent {
                 $this->assertSame('companyconfig', $form['formAlias']);
                 $this->assertSame(\Mautic\LeadBundle\Form\Type\ConfigCompanyType::class, $form['formType']);
                 $this->assertSame('@MauticLead/FormTheme/Config/_config_companyconfig_widget.html.twig', $form['formTheme']);
@@ -95,6 +97,8 @@ class ConfigSubscriberTest extends TestCase
                     'companyname',
                     'id',
                 ], $form['parameters']['company_columns']);
+
+                return $this->configBuilderEvent;
             });
 
         $this->configSubscriber->onConfigCompanyGenerate($this->configBuilderEvent);

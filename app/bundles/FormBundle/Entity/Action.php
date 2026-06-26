@@ -180,10 +180,8 @@ class Action implements UuidInterface
      * Set order.
      *
      * @param int $order
-     *
-     * @return Action
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
 
@@ -206,10 +204,8 @@ class Action implements UuidInterface
      * Set properties.
      *
      * @param array $properties
-     *
-     * @return Action
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -230,10 +226,8 @@ class Action implements UuidInterface
 
     /**
      * Set form.
-     *
-     * @return Action
      */
-    public function setForm(Form $form)
+    public function setForm(Form $form): static
     {
         $this->form = $form;
 
@@ -254,10 +248,8 @@ class Action implements UuidInterface
      * Set type.
      *
      * @param string $type
-     *
-     * @return Action
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -284,10 +276,8 @@ class Action implements UuidInterface
      * Set description.
      *
      * @param string $description
-     *
-     * @return Action
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -309,10 +299,8 @@ class Action implements UuidInterface
      * Set name.
      *
      * @param string $name
-     *
-     * @return Action
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
