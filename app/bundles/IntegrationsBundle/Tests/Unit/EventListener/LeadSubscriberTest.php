@@ -59,7 +59,7 @@ class LeadSubscriberTest extends TestCase
      */
     private MockObject $eventDispatcherInterfaceMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
