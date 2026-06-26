@@ -13,7 +13,7 @@ class ConfigBuilderEventTest extends CommonMocks
         $form   = ['formAlias' => 'testform'];
         $result = $event->addForm($form);
 
-        $this->assertTrue($result instanceof ConfigBuilderEvent);
+        $this->assertInstanceOf(ConfigBuilderEvent::class, $result);
 
         $forms = $event->getForms();
 

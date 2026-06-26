@@ -29,7 +29,7 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
      *
      * @return $this
      */
-    public function isPrimaryKey()
+    public function isPrimaryKey(): static
     {
         $this->mapping['id'] = true;
 
@@ -42,7 +42,7 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
      *
      * @return $this
      */
-    public function isOwnershipParent()
+    public function isOwnershipParent(): static
     {
         $this->mapping['isOwnershipParent'] = true;
 

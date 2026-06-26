@@ -23,10 +23,7 @@ class RequestDAO
         $this->syncIteration     = (int) $syncIteration;
     }
 
-    /**
-     * @return self
-     */
-    public function addObject(ObjectDAO $objectDAO)
+    public function addObject(ObjectDAO $objectDAO): static
     {
         $this->objects[] = $objectDAO;
 
