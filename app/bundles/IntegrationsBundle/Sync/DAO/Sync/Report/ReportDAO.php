@@ -38,7 +38,7 @@ class ReportDAO
     /**
      * @return $this
      */
-    public function addObject(ObjectDAO $objectDAO)
+    public function addObject(ObjectDAO $objectDAO): static
     {
         if (!isset($this->objects[$objectDAO->getObject()])) {
             $this->objects[$objectDAO->getObject()] = [];

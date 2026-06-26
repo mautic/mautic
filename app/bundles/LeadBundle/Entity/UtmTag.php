@@ -130,10 +130,8 @@ class UtmTag
 
     /**
      * Set date added.
-     *
-     * @return UtmTag
      */
-    public function setDateAdded(\DateTimeInterface $date)
+    public function setDateAdded(\DateTimeInterface $date): static
     {
         $this->dateAdded = $date;
 
@@ -158,10 +156,7 @@ class UtmTag
         return $this->lead;
     }
 
-    /**
-     * @return UtmTag
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -178,10 +173,8 @@ class UtmTag
 
     /**
      * @param array $query
-     *
-     * @return UtmTag
      */
-    public function setQuery($query)
+    public function setQuery($query): static
     {
         $this->query = $query;
 
@@ -192,10 +185,8 @@ class UtmTag
      * Set referer.
      *
      * @param string $referer
-     *
-     * @return UtmTag
      */
-    public function setReferer($referer)
+    public function setReferer($referer): static
     {
         $this->referer = $referer;
 
@@ -216,10 +207,8 @@ class UtmTag
      * Set remoteHost.
      *
      * @param string $remoteHost
-     *
-     * @return UtmTag
      */
-    public function setRemoteHost($remoteHost)
+    public function setRemoteHost($remoteHost): static
     {
         $this->remoteHost = $remoteHost;
 
@@ -240,10 +229,8 @@ class UtmTag
      * Set url.
      *
      * @param string $url
-     *
-     * @return UtmTag
      */
-    public function setUrl($url)
+    public function setUrl($url): static
     {
         $this->url = $url;
 
@@ -264,10 +251,8 @@ class UtmTag
      * Set userAgent.
      *
      * @param string $userAgent
-     *
-     * @return UtmTag
      */
-    public function setUserAgent($userAgent)
+    public function setUserAgent($userAgent): static
     {
         $this->userAgent = $userAgent;
 
@@ -294,10 +279,8 @@ class UtmTag
 
     /**
      * @param string $utmCampaign
-     *
-     * @return UtmTag
      */
-    public function setUtmCampaign($utmCampaign)
+    public function setUtmCampaign($utmCampaign): static
     {
         $this->utmCampaign = $utmCampaign;
 
@@ -314,10 +297,8 @@ class UtmTag
 
     /**
      * @param string $utmContent
-     *
-     * @return UtmTag
      */
-    public function setUtmContent($utmContent)
+    public function setUtmContent($utmContent): static
     {
         $utmContent       = mb_strlen($utmContent) <= ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH ? $utmContent : mb_substr($utmContent, 0, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH);
         $this->utmContent = $utmContent;
@@ -335,10 +316,8 @@ class UtmTag
 
     /**
      * @param string $utmMedium
-     *
-     * @return UtmTag
      */
-    public function setUtmMedium($utmMedium)
+    public function setUtmMedium($utmMedium): static
     {
         $this->utmMedium = $utmMedium;
 
@@ -355,10 +334,8 @@ class UtmTag
 
     /**
      * @param string $utmSource
-     *
-     * @return UtmTag
      */
-    public function setUtmSource($utmSource)
+    public function setUtmSource($utmSource): static
     {
         $this->utmSource = $utmSource;
 
@@ -375,10 +352,8 @@ class UtmTag
 
     /**
      * @param string $utmTerm
-     *
-     * @return UtmTag
      */
-    public function setUtmTerm($utmTerm)
+    public function setUtmTerm($utmTerm): static
     {
         $this->utmTerm = $utmTerm;
 

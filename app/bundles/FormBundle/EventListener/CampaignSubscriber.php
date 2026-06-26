@@ -69,7 +69,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         $eventDetails = $event->getEventDetails();
 
@@ -91,7 +91,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         $lead = $event->getLead();
 

@@ -243,10 +243,8 @@ class Import extends FormEntity
 
     /**
      * @param string $dir
-     *
-     * @return Import
      */
-    public function setDir($dir)
+    public function setDir($dir): static
     {
         $this->isChanged('dir', $dir);
         $this->dir = $dir;
@@ -264,10 +262,8 @@ class Import extends FormEntity
 
     /**
      * @param string $file
-     *
-     * @return Import
      */
-    public function setFile($file)
+    public function setFile($file): static
     {
         $this->isChanged('file', $file);
         $this->file = $file;
@@ -295,10 +291,8 @@ class Import extends FormEntity
      * Set import file path.
      *
      * @param string $path
-     *
-     * @return Import
      */
-    public function setFilePath($path)
+    public function setFilePath($path): static
     {
         $fileName = basename($path);
         $dir      = substr($path, 0, -1 * (strlen($fileName) + 1));
@@ -326,10 +320,8 @@ class Import extends FormEntity
 
     /**
      * @param string $originalFile
-     *
-     * @return Import
      */
-    public function setOriginalFile($originalFile)
+    public function setOriginalFile($originalFile): static
     {
         $this->isChanged('originalFile', $originalFile);
         $this->originalFile = $originalFile;
@@ -446,10 +438,8 @@ class Import extends FormEntity
 
     /**
      * @param int $priority
-     *
-     * @return Import
      */
-    public function setPriority($priority)
+    public function setPriority($priority): static
     {
         $this->isChanged('priority', $priority);
         $this->priority = $priority;
@@ -467,10 +457,8 @@ class Import extends FormEntity
 
     /**
      * @param int $status
-     *
-     * @return Import
      */
-    public function setStatus($status)
+    public function setStatus($status): static
     {
         $this->isChanged('status', $status);
         $this->status = $status;
@@ -618,10 +606,7 @@ class Import extends FormEntity
         return (float) $processedRows;
     }
 
-    /**
-     * @return Import
-     */
-    public function setObject(string $object)
+    public function setObject(string $object): static
     {
         $this->isChanged('object', $object);
         $this->object = $object;
@@ -634,10 +619,7 @@ class Import extends FormEntity
         return $this->object;
     }
 
-    /**
-     * @return Import
-     */
-    public function setMatchedFields(array $fields)
+    public function setMatchedFields(array $fields): static
     {
         $properties           = $this->properties;
         $properties['fields'] = $fields;
@@ -668,10 +650,8 @@ class Import extends FormEntity
 
     /**
      * @param array $properties
-     *
-     * @return Import
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -681,10 +661,8 @@ class Import extends FormEntity
 
     /**
      * @param array<mixed> $properties
-     *
-     * @return Import
      */
-    public function mergeToProperties($properties)
+    public function mergeToProperties($properties): static
     {
         return $this->setProperties(array_merge($this->properties, $properties));
     }
@@ -704,10 +682,8 @@ class Import extends FormEntity
      *
      * @param string $key
      * @param mixed  $value
-     *
-     * @return Import
      */
-    public function setDefault($key, $value)
+    public function setDefault($key, $value): static
     {
         return $this->mergeToProperties([
             'defaults' => array_merge($this->getDefaults(), [$key => $value]),
@@ -726,10 +702,8 @@ class Import extends FormEntity
 
     /**
      * Set headers array to the properties.
-     *
-     * @return Import
      */
-    public function setHeaders(array $headers)
+    public function setHeaders(array $headers): static
     {
         $properties            = $this->properties;
         $properties['headers'] = $headers;
@@ -747,10 +721,8 @@ class Import extends FormEntity
 
     /**
      * Set parser config array to the properties.
-     *
-     * @return Import
      */
-    public function setParserConfig(array $parser)
+    public function setParserConfig(array $parser): static
     {
         $properties           = $this->properties;
         $properties['parser'] = $parser;
@@ -784,10 +756,8 @@ class Import extends FormEntity
 
     /**
      * @param string $info
-     *
-     * @return Import
      */
-    public function setStatusInfo($info)
+    public function setStatusInfo($info): static
     {
         $properties                = $this->properties;
         $properties['status_info'] = $info;
@@ -802,7 +772,7 @@ class Import extends FormEntity
      *
      * @return $this
      */
-    public function setIsPublished($isPublished)
+    public function setIsPublished($isPublished): static
     {
         if ($isPublished && self::STOPPED === $this->getStatus()) {
             $this->setStatus(self::QUEUED);

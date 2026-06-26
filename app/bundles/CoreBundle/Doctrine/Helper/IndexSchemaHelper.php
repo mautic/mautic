@@ -61,7 +61,7 @@ class IndexSchemaHelper
      *
      * @throws SchemaException
      */
-    public function setName($name)
+    public function setName($name): static
     {
         if (!$this->sm->tablesExist([$this->prefix.$name])) {
             throw new SchemaException("Table $name does not exist!");
@@ -85,7 +85,7 @@ class IndexSchemaHelper
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function addIndex($columns, $name, $options = [])
+    public function addIndex($columns, $name, $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
@@ -111,11 +111,9 @@ class IndexSchemaHelper
      * @param string $name
      * @param array  $options
      *
-     * @return self
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function dropIndex($columns, $name, $options = [])
+    public function dropIndex($columns, $name, $options = []): static
     {
         $textColumns = $this->getTextColumns($columns);
 
