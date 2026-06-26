@@ -228,7 +228,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         $config = $event->getConfig();
         if (empty($config['services'])) {

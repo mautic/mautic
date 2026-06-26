@@ -54,7 +54,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function setName($table, $addPrefix = true)
+    public function setName($table, $addPrefix = true): static
     {
         $this->tableName = ($addPrefix) ? $this->prefix.$table : $table;
 
@@ -137,7 +137,7 @@ class ColumnSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addColumn(array $column, $checkExists = true)
+    public function addColumn(array $column, $checkExists = true): static
     {
         if (empty($column['name'])) {
             throw new SchemaException('Column is missing required name key.');
@@ -179,7 +179,7 @@ class ColumnSchemaHelper
      *
      * @return $this
      */
-    public function dropColumn($columnName)
+    public function dropColumn($columnName): static
     {
         if ($this->checkColumnExists($columnName)) {
             $this->toTable->dropColumn($columnName);
