@@ -862,7 +862,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array                       $ids
      * @param IntegrationEntityRepository $integrationEntityRepo
      */
-    private function createIntegrationEntities($ids, $object, $integrationEntityRepo): void
+    private function createIntegrationEntities($ids, string $object, $integrationEntityRepo): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
@@ -877,7 +877,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function getExistingRecord($seachColumn, $searchValue, $object = 'contacts')
+    private function getExistingRecord(string $seachColumn, $searchValue, string $object = 'contacts')
     {
         $availableFields    = $this->getAvailableLeadFields();
         $oparams['$select'] = implode(',', array_keys($availableFields[$object]));

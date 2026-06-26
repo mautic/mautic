@@ -1959,7 +1959,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         /* @var FrequencyRule $rule */
         usort(
             $frequencyRules,
-            function ($a, $b): int {
+            function (array $a, array $b): int {
                 if ($a['pause_from_date'] && $a['pause_to_date']) {
                     $now = new \DateTime();
                     if ($now >= $a['pause_from_date'] && $now <= $a['pause_to_date']) {

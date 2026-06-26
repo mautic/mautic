@@ -265,10 +265,7 @@ class ContactTracker
         return $this->createNewContact($ip);
     }
 
-    /**
-     * @param bool $persist
-     */
-    private function createNewContact(?IpAddress $ip = null, $persist = true): Lead
+    private function createNewContact(?IpAddress $ip = null, bool $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();

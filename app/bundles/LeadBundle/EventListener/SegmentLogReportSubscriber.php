@@ -108,11 +108,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($qb);
     }
 
-    /**
-     * @param string $alias
-     * @param string $action
-     */
-    private function generateLeftJoinCondition($alias, $action): string
+    private function generateLeftJoinCondition(string $alias, string $action): string
     {
         // Fetch the proper platform-specific quote (e.g., "action" for PostgreSQL, `action` for MySQL)
         $actionField = $this->connection->quoteIdentifier('action');

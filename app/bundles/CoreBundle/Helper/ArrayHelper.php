@@ -122,12 +122,10 @@ class ArrayHelper
 
     /**
      *  SUM/SUBSTRACT between two arrays.
-     *
-     * @param bool $subtracted
      */
-    private static function sumOrSub(array $a1, array $b2, $subtracted = false): array
+    private static function sumOrSub(array $a1, array $b2, bool $subtracted = false): array
     {
-        return array_map(function ($x, $y) use ($subtracted) {
+        return array_map(function ($x, $y) use ($subtracted): int|float|array {
             if ($subtracted) {
                 return $x - $y;
             }

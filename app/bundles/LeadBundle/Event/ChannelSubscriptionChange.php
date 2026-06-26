@@ -52,7 +52,7 @@ class ChannelSubscriptionChange extends Event
         return $this->getDncReasonVerb($this->newStatus);
     }
 
-    private function getDncReasonVerb($reason): string
+    private function getDncReasonVerb(int $reason): string
     {
         return match (true) {
             DoNotContact::IS_CONTACTABLE === $reason => 'contactable',
