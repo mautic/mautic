@@ -39,7 +39,7 @@ class CampaignEventSubscriberTest extends TestCase
 
     private DateHelper $dateHelper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->eventRepo                  = $this->createMock(EventRepository::class);
         $this->campaignModelMock          = $this->createMock(CampaignModel::class);

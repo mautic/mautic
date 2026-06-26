@@ -26,7 +26,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use UserEntityTrait;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';

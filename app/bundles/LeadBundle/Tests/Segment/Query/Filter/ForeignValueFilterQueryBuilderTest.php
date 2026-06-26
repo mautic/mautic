@@ -40,7 +40,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
      */
     private MockObject $connectionMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->randomParameter     = new RandomParameterName();
