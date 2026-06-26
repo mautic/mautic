@@ -31,9 +31,13 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function setUp(): void
     {
+<<<<<<< HEAD
         $this->configParams += [
             'db_driver' => 'pdo_mysql',
         ];
+=======
+        $this->configParams['db_driver'] = 'pdo_mysql';
+>>>>>>> a9a9a5841f (remove final ctor method override)
 
         $this->setUpInvoked = true;
 
