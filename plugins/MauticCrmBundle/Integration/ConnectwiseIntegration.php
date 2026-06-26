@@ -851,7 +851,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    fn ($contact): bool => 'lead' === $contact['internal_entity']
+                    fn (array $contact): bool => 'lead' === $contact['internal_entity']
                 ), 'integration_entity_id');
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));

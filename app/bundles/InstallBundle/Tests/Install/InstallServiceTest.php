@@ -49,7 +49,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     private InstallService $installer;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
