@@ -30,7 +30,7 @@ class TableSchemaColumnsCache
     /**
      * @return $this
      */
-    public function clear()
+    public function clear(): static
     {
         $this->cache = [];
 

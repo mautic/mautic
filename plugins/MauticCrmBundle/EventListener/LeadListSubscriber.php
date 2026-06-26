@@ -83,7 +83,7 @@ class LeadListSubscriber implements EventSubscriberInterface
     /**
      * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
      */
-    public function onLeadListProcessList(ListPreProcessListEvent $event)
+    public function onLeadListProcessList(ListPreProcessListEvent $event): ListPreProcessListEvent
     {
         // get Integration Campaign members
         $list    = $event->getList();

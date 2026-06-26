@@ -34,10 +34,8 @@ class ColorHelper
 
     /**
      * Sets random values to RGB properties. It will avoid too black or too wight colors.
-     *
-     * @return ColorHelper
      */
-    public function buildRandomColor()
+    public function buildRandomColor(): static
     {
         $this->red   = random_int(20, 236);
         $this->green = random_int(20, 236);

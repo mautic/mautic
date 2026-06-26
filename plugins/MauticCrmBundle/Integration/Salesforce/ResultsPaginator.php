@@ -40,7 +40,7 @@ class ResultsPaginator
      *
      * @throws ApiErrorException
      */
-    public function setResults(array $results)
+    public function setResults(array $results): static
     {
         if (!isset($results['records'])) {
             throw new ApiErrorException(var_export($results, true));
