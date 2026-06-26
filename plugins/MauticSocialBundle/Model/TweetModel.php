@@ -73,7 +73,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
      *
      * @return $this
      */
-    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null)
+    public function registerSend(Tweet $tweet, Lead $lead, array $sendResponse, $source = null, $sourceId = null): static
     {
         $statRepo = $this->getStatRepository();
 

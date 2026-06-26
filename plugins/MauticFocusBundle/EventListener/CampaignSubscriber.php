@@ -51,7 +51,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('focus.show', $action);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         $focusId = (int) $event->getConfig()['focus'];
         if (!$focusId) {

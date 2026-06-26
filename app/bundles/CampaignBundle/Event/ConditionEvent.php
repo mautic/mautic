@@ -83,7 +83,7 @@ class ConditionEvent extends CampaignExecutionEvent
      *
      * @return $this
      */
-    public function setResult($result)
+    public function setResult($result): static
     {
         $this->passed = (bool) $result;
 

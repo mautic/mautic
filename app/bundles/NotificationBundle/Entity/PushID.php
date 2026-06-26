@@ -72,7 +72,7 @@ class PushID
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -90,7 +90,7 @@ class PushID
     /**
      * @return $this
      */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -110,7 +110,7 @@ class PushID
      *
      * @return $this
      */
-    public function setPushID($pushID)
+    public function setPushID($pushID): static
     {
         $this->pushID = $pushID;
 
@@ -128,7 +128,7 @@ class PushID
     /**
      * @return $this
      */
-    public function setEnabled($enabled)
+    public function setEnabled($enabled): static
     {
         $this->enabled = $enabled;
 
@@ -148,7 +148,7 @@ class PushID
      *
      * @return $this
      */
-    public function setMobile($mobile)
+    public function setMobile($mobile): static
     {
         $this->mobile = $mobile;
 

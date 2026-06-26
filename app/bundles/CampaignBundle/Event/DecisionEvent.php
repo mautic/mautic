@@ -90,7 +90,7 @@ class DecisionEvent extends CampaignExecutionEvent
      *
      * @return $this
      */
-    public function setResult($result)
+    public function setResult($result): static
     {
         $this->applicable = (bool) $result;
 
