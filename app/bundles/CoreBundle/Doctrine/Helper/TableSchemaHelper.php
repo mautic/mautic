@@ -59,7 +59,7 @@ class TableSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addTables(array $tables)
+    public function addTables(array $tables): static
     {
         // ensure none of the tables exist before manipulating the schema
         foreach ($tables as $table) {
@@ -102,7 +102,7 @@ class TableSchemaHelper
      *
      * @throws SchemaException
      */
-    public function addTable(array $table, $checkExists = true, $dropExisting = false)
+    public function addTable(array $table, $checkExists = true, $dropExisting = false): static
     {
         if (empty($table['name'])) {
             throw new SchemaException('Table is missing required name key.');
@@ -155,7 +155,7 @@ class TableSchemaHelper
      *
      * @throws SchemaException
      */
-    public function deleteTable($table)
+    public function deleteTable($table): static
     {
         if ($this->checkTableExists($table)) {
             $this->dropTables[] = $table;
