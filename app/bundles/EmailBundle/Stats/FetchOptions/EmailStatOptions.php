@@ -35,7 +35,7 @@ class EmailStatOptions extends FetchOptions
     /**
      * @return $this
      */
-    public function setEmailIds(array $ids)
+    public function setEmailIds(array $ids): static
     {
         $this->ids = $ids;
 
@@ -138,7 +138,7 @@ class EmailStatOptions extends FetchOptions
      *
      * @return $this
      */
-    public function setUnit($unit)
+    public function setUnit($unit): static
     {
         $this->unit = $unit;
 

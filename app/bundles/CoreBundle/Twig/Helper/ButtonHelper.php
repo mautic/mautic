@@ -110,7 +110,7 @@ final class ButtonHelper
      *
      * @return $this
      */
-    public function addButtons(array $buttons)
+    public function addButtons(array $buttons): self
     {
         $this->buttonCount += count($buttons);
         $this->buttons = array_merge($this->buttons, $buttons);
@@ -123,7 +123,7 @@ final class ButtonHelper
      *
      * @return $this
      */
-    public function addButton(array $button)
+    public function addButton(array $button): self
     {
         $this->buttons[] = $button;
         ++$this->buttonCount;
@@ -137,7 +137,7 @@ final class ButtonHelper
      *
      * @return $this
      */
-    public function setWrappingTags($wrapOpeningTag, $wrapClosingTag)
+    public function setWrappingTags($wrapOpeningTag, $wrapClosingTag): self
     {
         $this->wrapOpeningTag = $wrapOpeningTag;
         $this->wrapClosingTag = $wrapClosingTag;
@@ -148,7 +148,7 @@ final class ButtonHelper
     /**
      * @return $this
      */
-    public function setGroupType(string $groupType)
+    public function setGroupType(string $groupType): self
     {
         $this->groupType = $groupType;
 
@@ -160,7 +160,7 @@ final class ButtonHelper
      *
      * @return $this
      */
-    public function setMenuLink($menuLink)
+    public function setMenuLink($menuLink): self
     {
         $this->menuLink = $menuLink;
 
@@ -216,10 +216,8 @@ final class ButtonHelper
 
     /**
      * @param mixed $location
-     *
-     * @return ButtonHelper
      */
-    public function setLocation($location)
+    public function setLocation($location): self
     {
         $this->location = $location;
 
@@ -233,7 +231,7 @@ final class ButtonHelper
      *
      * @return $this
      */
-    public function reset(Request $request, $buttonCount, string $groupType = self::TYPE_GROUP, $item = null)
+    public function reset(Request $request, $buttonCount, string $groupType = self::TYPE_GROUP, $item = null): self
     {
         // @escopecz: I think there is a possible bug here
         $this->location       = $buttonCount;
@@ -330,7 +328,7 @@ final class ButtonHelper
     /**
      * @return $this
      */
-    private function fetchCustomButtons()
+    private function fetchCustomButtons(): self
     {
         if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
             $event = $this->dispatcher->dispatch(
