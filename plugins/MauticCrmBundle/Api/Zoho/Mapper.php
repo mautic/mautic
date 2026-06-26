@@ -35,7 +35,7 @@ class Mapper
     /**
      * @return $this
      */
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 
@@ -45,7 +45,7 @@ class Mapper
     /**
      * @return $this
      */
-    public function setContact(array $contact)
+    public function setContact(array $contact): static
     {
         $this->contact = $contact;
 
@@ -55,7 +55,7 @@ class Mapper
     /**
      * @return $this
      */
-    public function setMappedFields(array $fields)
+    public function setMappedFields(array $fields): static
     {
         $this->mappedFields = $fields;
 

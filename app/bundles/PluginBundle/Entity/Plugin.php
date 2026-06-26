@@ -121,10 +121,8 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
      * Set name.
      *
      * @param string $name
-     *
-     * @return Plugin
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
 
