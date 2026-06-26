@@ -319,7 +319,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
                         $latestExecutionDate = $executionDate;
                     }
                 } else {
-                    $toReschedule = $this->addForReschedule($toReschedule, $log, $latestExecutionDate);
+                    $toReschedule = $this->addForReschedule($toReschedule, $log, $executionDate);
                 }
 
                 $logs->remove($key);

@@ -1261,11 +1261,11 @@ class MailHelper
         if (empty($customHtml) && $template) {
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
-            $customHtml = $this->setTemplate($logicalName, [
+            $customHtml = $this->themeHelper->renderThemeTemplate($logicalName, [
                 'content'  => $email->getContent(),
                 'email'    => $email,
                 'template' => $template,
-            ], true);
+            ]);
         }
 
         $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel);

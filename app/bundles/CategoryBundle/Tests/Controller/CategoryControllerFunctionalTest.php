@@ -101,6 +101,42 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('categoryName', $body);
     }
 
+    public function testEditCategorySavesWhenApplyButtonIsDisabled(): void
+    {
+        $category = $this->createCategory(
+            'Category for color edit',
+            'Category for color edit',
+            'global',
+            'category-for-color-edit'
+        );
+
+        $crawler        = $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $clientResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $html           = $clientResponse['newContent'];
+        $crawler->addHtmlContent($html);
+
+        $saveButton = $crawler->selectButton('category_form[buttons][save]');
+        $form       = $saveButton->form();
+        $form['category_form[title]']->setValue('Category for color edit');
+        $form['category_form[color]']->setValue('4e5d9d');
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
+
+        $this->client->submit($form);
+
+        // Regression test for #16163: CategoryType builds its buttons with apply_text => false,
+        // so the form has no "apply" child. editAction used to call
+        // $form->get('buttons')->get('apply') unconditionally, which threw
+        // OutOfBoundsException "Child \"apply\" does not exist" (HTTP 500) on a valid save.
+        Assert::assertTrue(
+            $this->client->getResponse()->isOk(),
+            $this->client->getResponse()->getContent()
+        );
+
+        $body = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame('Category for color edit', $body['categoryName']);
+    }
+
     public function testEditLockCategory(): void
     {
         /** @var CategoryModel $categoryModel */
