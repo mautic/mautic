@@ -214,7 +214,7 @@ class LeadTimelineEvent extends Event
         if (!empty($this->orderBy)) {
             usort(
                 $events,
-                function ($a, $b) {
+                function (array $a, array $b) {
                     switch ($this->orderBy[0]) {
                         case 'eventLabel':
                             $aLabel = '';
