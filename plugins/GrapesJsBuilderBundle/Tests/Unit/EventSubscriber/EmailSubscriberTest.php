@@ -26,7 +26,6 @@ final class EmailSubscriberTest extends TestCase
     /** @var MockObject&GrapesJsBuilderRepository */
     private MockObject $grapesJsBuilderRepo;
     private EmailModel|MockObject $emailModel;
-    private EmailConfigInterface|MockObject $emailConfig;
     private EmailSubscriber $subscriber;
 
     protected function setUp(): void
@@ -34,12 +33,11 @@ final class EmailSubscriberTest extends TestCase
         $this->config               = $this->createMock(Config::class);
         $this->grapesJsBuilderModel = $this->createMock(GrapesJsBuilderModel::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
-        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
         $this->grapesJsBuilderRepo  = $this->createMock(GrapesJsBuilderRepository::class);
-        $this->subscriber           = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->emailConfig);
+        $this->subscriber           = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->createStub(EmailConfigInterface::class));
 
         $this->emailModel->method('getRepository')
-            ->willReturn($this->createMock(EmailRepository::class));
+            ->willReturn($this->createStub(EmailRepository::class));
 
         $this->grapesJsBuilderModel->method('getRepository')
             ->willReturn($this->grapesJsBuilderRepo);
@@ -65,7 +63,7 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createMock(Email::class));
+            ->willReturn($this->createStub(Email::class));
 
         $event->expects($this->once())
             ->method('isSaveAsDraft')
@@ -90,7 +88,7 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createMock(Email::class));
+            ->willReturn($this->createStub(Email::class));
 
         $event->expects($this->once())
             ->method('isApplyDraft')

@@ -49,11 +49,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $focusTokenHelper;
 
     /**
-     * @var MockObject|AuditLogModel
-     */
-    private MockObject $auditLogModel;
-
-    /**
      * @var MockObject|DynamicContentHelper
      */
     private MockObject $dynamicContentHelper;
@@ -89,7 +84,6 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetTokenHelper          = $this->createMock(AssetTokenHelper::class);
         $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
         $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
-        $this->auditLogModel             = $this->createMock(AuditLogModel::class);
         $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
@@ -103,7 +97,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->assetTokenHelper,
             $this->formTokenHelper,
             $this->focusTokenHelper,
-            $this->auditLogModel,
+            $this->createStub(AuditLogModel::class),
             $this->dynamicContentHelper,
             $this->dynamicContentModel,
             $this->security,

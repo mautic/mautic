@@ -32,11 +32,6 @@ class CompanyObjectHelperTest extends TestCase
     private MockObject $repository;
 
     /**
-     * @var Connection&MockObject
-     */
-    private MockObject $connection;
-
-    /**
      * @var FieldsWithUniqueIdentifier&MockObject
      */
     private MockObject $fieldsWithUniqueIdentifier;
@@ -45,7 +40,6 @@ class CompanyObjectHelperTest extends TestCase
     {
         $this->model                      = $this->createMock(CompanyModel::class);
         $this->repository                 = $this->createMock(CompanyRepository::class);
-        $this->connection                 = $this->createMock(Connection::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
         $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
@@ -241,7 +235,7 @@ class CompanyObjectHelperTest extends TestCase
 
     private function getObjectHelper(): CompanyObjectHelper
     {
-        return new CompanyObjectHelper($this->model, $this->repository, $this->connection, $this->fieldsWithUniqueIdentifier);
+        return new CompanyObjectHelper($this->model, $this->repository, $this->createStub(Connection::class), $this->fieldsWithUniqueIdentifier);
     }
 
     /**

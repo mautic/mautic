@@ -33,11 +33,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $requestMock;
 
     /**
-     * @var MockObject|CorePermissions
-     */
-    private MockObject $securityMock;
-
-    /**
      * @var MockObject|Translator
      */
     private MockObject $translatorMock;
@@ -56,11 +51,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|RouterInterface
      */
     private MockObject $routerMock;
-
-    /**
-     * @var MockObject&FlashBag
-     */
-    private MockObject $flashBagMock;
 
     /**
      * @var MockObject|Container
@@ -84,9 +74,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
         $dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $this->flashBagMock       = $this->createMock(FlashBag::class);
         $requestStack             = new RequestStack();
-        $this->securityMock       = $this->createMock(CorePermissions::class);
 
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
@@ -96,9 +84,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             $coreParametersHelper,
             $dispatcher,
             $this->translatorMock,
-            $this->flashBagMock,
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $this->securityMock
+            $this->createStub(CorePermissions::class)
         );
         $this->controller->setContainer($this->containerMock);
     }
@@ -212,13 +200,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), $this->createMock(Environment::class), 1);
+        $this->controller->widgetAction($this->requestMock, $this->createStub(Widget::class), $this->createStub(Environment::class), 1);
     }
 
     public function testWidgetNotFound(): void
     {
         $widgetId = '1';
-        $twig     = $this->createMock(Environment::class);
+        $twig     = $this->createStub(Environment::class);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);

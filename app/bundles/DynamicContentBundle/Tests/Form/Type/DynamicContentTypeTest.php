@@ -27,11 +27,11 @@ class DynamicContentTypeTest extends TestCase
 {
     public function testFormBuild(): void
     {
-        $entityManagerMock       = $this->createMock(EntityManager::class);
+        $entityManagerMock       = $this->createStub(EntityManager::class);
         $listModelMock           = $this->createMock(ListModel::class);
-        $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
+        $translatorInterfaceMock = $this->createStub(TranslatorInterface::class);
         $leadModelMock           = $this->createMock(LeadModel::class);
-        $relativeDateMock        = $this->createMock(RelativeDate::class);
+        $relativeDateMock        = $this->createStub(RelativeDate::class);
 
         $listModelMock->expects($this->once())
             ->method('getChoiceFields')

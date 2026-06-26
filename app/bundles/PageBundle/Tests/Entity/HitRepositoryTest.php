@@ -46,8 +46,8 @@ class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertHitDate($dateThree, $leadOne, null);
         $this->assertHitDate($dateFive, $leadTwo, null);
 
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadOne->getId(), 'two-first'));
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadTwo->getId(), 'one-second'));
+        Assert::assertNull($this->hitRepository->getLatestHitDateByLead($leadOne->getId(), 'two-first'));
+        Assert::assertNull($this->hitRepository->getLatestHitDateByLead($leadTwo->getId(), 'one-second'));
     }
 
     public function testGetEmailClickthroughHitCount(): void
@@ -106,7 +106,7 @@ class HitRepositoryTest extends MauticMysqlTestCase
 
     private function assertHitDate(\DateTime $expectedHitDate, Lead $lead, ?string $trackingId): void
     {
-        $hitDate = $this->hitRepository->getLatestHitDateByLead((int) $lead->getId(), $trackingId);
+        $hitDate = $this->hitRepository->getLatestHitDateByLead($lead->getId(), $trackingId);
 
         Assert::assertInstanceOf(\DateTime::class, $hitDate);
         Assert::assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());

@@ -52,7 +52,7 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
             return;
         }
 
-        $campaignId = (int) $event->getEntityId();
+        $campaignId = $event->getEntityId();
         $campaign   = $this->campaignModel->getEntity($campaignId);
 
         if (!$campaign instanceof Campaign) {

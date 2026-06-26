@@ -336,7 +336,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->method('expr')
             ->willReturn($expr);
 
-        $comparison = $this->createMock(Query\Expr\Comparison::class);
+        $comparison = $this->createStub(Query\Expr\Comparison::class);
         $expr->expects($this->once())
             ->method('eq')
             ->willReturn($comparison);
@@ -360,7 +360,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->method('getQuery')
             ->willReturn($query);
 
-        $leadField = $this->createMock(LeadField::class);
+        $leadField = $this->createStub(LeadField::class);
         $query->expects($this->once())
             ->method('getOneOrNullResult')
             ->willReturn($leadField);

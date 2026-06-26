@@ -20,25 +20,19 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     private FormatterHelper $formatterHelper;
 
-    /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
-
     private string $previousTimeZone;
 
     protected function setUp(): void
     {
         $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->dateHelper           = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $this->translator,
-            $this->coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
     }

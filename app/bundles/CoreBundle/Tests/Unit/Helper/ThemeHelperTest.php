@@ -255,10 +255,6 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class extends Filesystem {
-                public function __construct()
-                {
-                }
-
                 /**
                  * @param string $files
                  */
@@ -349,10 +345,6 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class extends Filesystem {
-                public function __construct()
-                {
-                }
-
                 /**
                  * @param string $files
                  */

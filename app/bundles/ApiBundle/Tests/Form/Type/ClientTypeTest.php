@@ -27,21 +27,6 @@ class ClientTypeTest extends TestCase
     private MockObject $requestStack;
 
     /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&ValidatorInterface
-     */
-    private MockObject $validator;
-
-    /**
-     * @var MockObject&RouterInterface
-     */
-    private MockObject $router;
-
-    /**
      * @var MockObject&FormBuilderInterface
      */
     private MockObject $builder;
@@ -56,9 +41,6 @@ class ClientTypeTest extends TestCase
     protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
-        $this->translator   = $this->createMock(TranslatorInterface::class);
-        $this->validator    = $this->createMock(ValidatorInterface::class);
-        $this->router       = $this->createMock(RouterInterface::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
         $this->request      = $this->createMock(Request::class);
         $this->client       = new Client();
@@ -73,9 +55,9 @@ class ClientTypeTest extends TestCase
 
         $this->clientType = new ClientType(
             $this->requestStack,
-            $this->translator,
-            $this->validator,
-            $this->router
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(ValidatorInterface::class),
+            $this->createStub(RouterInterface::class)
         );
     }
 

@@ -36,11 +36,6 @@ class ObjectChangeGeneratorTest extends TestCase
     private MockObject $valueHelper;
 
     /**
-     * @var FieldHelper&MockObject
-     */
-    private MockObject $fieldHelper;
-
-    /**
      * @var MockObject&BulkNotification
      */
     private MockObject $bulkNotification;
@@ -49,7 +44,6 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->syncJudge        = $this->createMock(SyncJudgeInterface::class);
         $this->valueHelper      = $this->createMock(ValueHelper::class);
-        $this->fieldHelper      = $this->createMock(FieldHelper::class);
         $this->bulkNotification = $this->createMock(BulkNotification::class);
     }
 
@@ -466,7 +460,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return new ObjectChangeGenerator(
             $this->syncJudge,
             $this->valueHelper,
-            $this->fieldHelper,
+            $this->createStub(FieldHelper::class),
             $this->bulkNotification
         );
     }

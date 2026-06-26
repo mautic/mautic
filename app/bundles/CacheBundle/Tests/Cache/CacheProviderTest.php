@@ -16,11 +16,6 @@ class CacheProviderTest extends TestCase
     private CacheProvider $cacheProvider;
 
     /**
-     * @var MockObject|FilesystemTagAwareAdapter
-     */
-    private MockObject $adapter;
-
-    /**
      * @var MockObject|CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
@@ -33,7 +28,6 @@ class CacheProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adapter              = $this->createMock(FilesystemTagAwareAdapter::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->container            = $this->createMock(ContainerInterface::class);
         $this->cacheProvider        = new CacheProvider($this->coreParametersHelper, $this->container);
@@ -49,9 +43,9 @@ class CacheProviderTest extends TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('foo.bar')
-            ->willReturn($this->adapter);
+            ->willReturn($this->createStub(FilesystemTagAwareAdapter::class));
 
-        $this->assertEquals($this->cacheProvider->getCacheAdapter(), $this->adapter);
+        $this->assertEquals($this->cacheProvider->getCacheAdapter(), $this->createStub(FilesystemTagAwareAdapter::class));
     }
 
     public function testSimplePsrCacheIsReturned(): void
@@ -64,7 +58,7 @@ class CacheProviderTest extends TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('foo.bar')
-            ->willReturn($this->adapter);
+            ->willReturn($this->createStub(FilesystemTagAwareAdapter::class));
 
         $this->cacheProvider->getSimpleCache();
     }

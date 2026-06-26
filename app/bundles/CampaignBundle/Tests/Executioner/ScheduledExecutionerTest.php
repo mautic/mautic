@@ -29,7 +29,7 @@ class ScheduledExecutionerTest extends TestCase
 {
     private MockObject&LeadEventLogRepository $repository;
 
-    private MockObject&Translator $translator;
+    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
 
     private MockObject&EventExecutioner $executioner;
 
@@ -37,25 +37,25 @@ class ScheduledExecutionerTest extends TestCase
 
     private MockObject&ScheduledContactFinder $contactFinder;
 
-    private MockObject&ProcessSignalService $processSignalService;
+    private \PHPUnit\Framework\MockObject\Stub&ProcessSignalService $processSignalService;
 
     private MockObject&EventRedirectionHelper $redirectionHelper;
 
-    private MockObject&EntityManagerInterface $entityManager;
+    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
 
-    private MockObject&LeadRepository $leadRepository;
+    private \PHPUnit\Framework\MockObject\Stub&LeadRepository $leadRepository;
 
     protected function setUp(): void
     {
         $this->repository           = $this->createMock(LeadEventLogRepository::class);
-        $this->translator           = $this->createMock(Translator::class);
+        $this->translator           = $this->createStub(Translator::class);
         $this->executioner          = $this->createMock(EventExecutioner::class);
         $this->scheduler            = $this->createMock(EventScheduler::class);
         $this->contactFinder        = $this->createMock(ScheduledContactFinder::class);
-        $this->processSignalService = $this->createMock(ProcessSignalService::class);
+        $this->processSignalService = $this->createStub(ProcessSignalService::class);
         $this->redirectionHelper    = $this->createMock(EventRedirectionHelper::class);
-        $this->entityManager        = $this->createMock(EntityManagerInterface::class);
-        $this->leadRepository       = $this->createMock(LeadRepository::class);
+        $this->entityManager        = $this->createStub(EntityManagerInterface::class);
+        $this->leadRepository       = $this->createStub(LeadRepository::class);
 
         // Configure the redirection helper mock to return the event it receives
         $this->redirectionHelper->method('handleEventRedirection')
@@ -71,7 +71,7 @@ class ScheduledExecutionerTest extends TestCase
         $this->repository->expects($this->never())
             ->method('getScheduled');
 
-        $campaign = $this->createMock(Campaign::class);
+        $campaign = $this->createStub(Campaign::class);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 

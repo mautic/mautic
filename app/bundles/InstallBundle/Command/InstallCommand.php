@@ -198,7 +198,7 @@ class InstallCommand extends Command
         $allParams = $this->installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
-        foreach ((array) $allParams as $opt => $value) {
+        foreach ($allParams as $opt => $value) {
             if (str_starts_with($opt, 'db_')) {
                 $dbParams[substr($opt, 3)] = $value;
             } elseif (str_starts_with($opt, 'admin_')) {

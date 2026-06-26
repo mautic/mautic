@@ -26,11 +26,6 @@ class EventLoggerTest extends TestCase
     private MockObject $ipLookupHelper;
 
     /**
-     * @var ContactTracker|MockObject
-     */
-    private MockObject $contactTracker;
-
-    /**
      * @var LeadEventLogRepository|MockObject
      */
     private MockObject $leadEventLogRepository;
@@ -40,24 +35,11 @@ class EventLoggerTest extends TestCase
      */
     private MockObject $leadRepository;
 
-    /**
-     * @var SummaryModel|MockObject
-     */
-    private MockObject $summaryModel;
-
-    /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
-
     protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
-        $this->summaryModel           = $this->createMock(SummaryModel::class);
-        $this->coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
     }
 
     public function testAllLogsAreReturnedWithFinalPersist(): void
@@ -125,11 +107,11 @@ class EventLoggerTest extends TestCase
     {
         return new EventLogger(
             $this->ipLookupHelper,
-            $this->contactTracker,
+            $this->createStub(ContactTracker::class),
             $this->leadEventLogRepository,
             $this->leadRepository,
-            $this->summaryModel,
-            $this->coreParametersHelper
+            $this->createStub(SummaryModel::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 }

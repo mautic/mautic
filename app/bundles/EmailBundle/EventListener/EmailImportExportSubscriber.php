@@ -97,7 +97,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
             $event->addDependencyEntity(Email::ENTITY_NAME, [
-                Email::ENTITY_NAME  => (int) $emailId,
+                Email::ENTITY_NAME  => $emailId,
                 Asset::ENTITY_NAME  => (int) $asset->getId(),
             ]);
         }
@@ -108,7 +108,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
             $event->addDependencyEntity(Email::ENTITY_NAME, [
-                Email::ENTITY_NAME => (int) $emailId,
+                Email::ENTITY_NAME => $emailId,
                 Form::ENTITY_NAME  => (int) $form->getId(),
             ]);
         }
@@ -118,7 +118,7 @@ final class EmailImportExportSubscriber implements EventSubscriberInterface
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
             $event->addDependencyEntity(Email::ENTITY_NAME, [
-                Email::ENTITY_NAME => (int) $emailId,
+                Email::ENTITY_NAME => $emailId,
                 Page::ENTITY_NAME  => (int) $page->getId(),
             ]);
         }

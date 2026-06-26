@@ -40,7 +40,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     public function testCommandDryRun(): void
     {
         $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);
-        $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
+        $mockDoNotSellList = $this->createStub(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
@@ -57,7 +57,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     public function testNoContactsFound(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([]);
-        $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
+        $mockDoNotSellList = $this->createStub(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
@@ -73,7 +73,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     public function testPurge(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([['id' => 1, 'ip_address' => '123.123.123.123']]);
-        $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
+        $mockDoNotSellList = $this->createStub(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);

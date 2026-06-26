@@ -92,7 +92,7 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $defaultFrom = new AddressDTO('{contactfield=other_email}', null);
+        $defaultFrom = new AddressDTO('{contactfield=other_email}');
         $contact     = ['other_email' => 'someone@somewhere.com'];
 
         $fromEmail = $this->getHelper()->getFromAddressConsideringOwner($defaultFrom, $contact);
@@ -108,7 +108,7 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $defaultFrom = new AddressDTO('someone@somewhere.com', null);
+        $defaultFrom = new AddressDTO('someone@somewhere.com');
         $contact     = [];
 
         $fromEmail = $this->getHelper()->getFromAddressConsideringOwner($defaultFrom, $contact);
@@ -160,7 +160,7 @@ class FromEmailHelperTest extends TestCase
             ->with(1)
             ->willReturn($user);
 
-        $defaultFrom = new AddressDTO('{contactfield=other_email}', null);
+        $defaultFrom = new AddressDTO('{contactfield=other_email}');
         $contact     = [
             'owner_id'    => 1,
             'other_email' => '',
@@ -196,7 +196,7 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $defaultFrom = new AddressDTO('{contactfield=other_email}', null);
+        $defaultFrom = new AddressDTO('{contactfield=other_email}');
         $contact     = [
             'owner_id'    => 1,
             'other_email' => '',
@@ -217,14 +217,14 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $defaultFrom = new AddressDTO('{contactfield=other_email}', null);
+        $defaultFrom = new AddressDTO('{contactfield=other_email}');
         $contact     = [
             'owner_id'    => 1,
             'other_email' => '',
         ];
 
         $helper = $this->getHelper();
-        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com', null));
+        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com'));
         $fromEmail = $helper->getFromAddressConsideringOwner($defaultFrom, $contact);
 
         $this->assertEquals(['overridden@somewhere.com' => null], $fromEmail->getAddressArray());
@@ -356,7 +356,7 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $defaultFrom = new AddressDTO('{contactfield=other_email}', null);
+        $defaultFrom = new AddressDTO('{contactfield=other_email}');
         $contact     = [
             'owner_id'    => 1,
             'other_email' => '',
@@ -407,14 +407,14 @@ class FromEmailHelperTest extends TestCase
         $this->leadRepository->expects($this->never())
             ->method('getLeadOwner');
 
-        $defaultFrom = new AddressDTO('{contactfield=other_email}', null);
+        $defaultFrom = new AddressDTO('{contactfield=other_email}');
         $contact     = [
             'owner_id'    => 1,
             'other_email' => '',
         ];
 
         $helper = $this->getHelper();
-        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com', null));
+        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com'));
         $fromEmail = $helper->getFromAddressDto($defaultFrom, $contact);
 
         $this->assertEquals(['overridden@somewhere.com' => null], $fromEmail->getAddressArray());
@@ -510,7 +510,7 @@ class FromEmailHelperTest extends TestCase
         $defaultFrom = new AddressDTO('default@somewhere.com', 'Default Name');
         $contact     = null;
         $helper      = $this->getHelper();
-        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com', null));
+        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com'));
         $from = $helper->getFromAddressConsideringOwner($defaultFrom, $contact);
 
         $this->assertSame('default@somewhere.com', $from->getEmail());
@@ -525,7 +525,7 @@ class FromEmailHelperTest extends TestCase
         $defaultFrom = new AddressDTO('default@somewhere.com', 'Default Name');
         $contact     = null;
         $helper      = $this->getHelper();
-        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com', null));
+        $helper->setDefaultFrom(new AddressDTO('overridden@somewhere.com'));
         $from = $helper->getFromAddressDto($defaultFrom, $contact);
 
         $this->assertSame('default@somewhere.com', $from->getEmail());
@@ -615,7 +615,7 @@ class FromEmailHelperTest extends TestCase
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 
@@ -644,7 +644,7 @@ class FromEmailHelperTest extends TestCase
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 
@@ -673,12 +673,12 @@ class FromEmailHelperTest extends TestCase
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 
         $helper->getFromAddressDto(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 
@@ -703,7 +703,7 @@ class FromEmailHelperTest extends TestCase
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 
@@ -750,12 +750,12 @@ class FromEmailHelperTest extends TestCase
 
         $helper = $this->getHelper();
         $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 
         $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 2]
         );
 
@@ -784,7 +784,7 @@ class FromEmailHelperTest extends TestCase
 
         $helper = $this->getHelper();
         $from   = $helper->getFromAddressConsideringOwner(
-            new AddressDTO('someone@somewhere.com', null),
+            new AddressDTO('someone@somewhere.com'),
             ['owner_id' => 1]
         );
 

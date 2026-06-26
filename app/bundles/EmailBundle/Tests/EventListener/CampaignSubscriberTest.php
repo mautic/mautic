@@ -20,43 +20,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
-
-    /**
-     * @var RealTimeExecutioner&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
-
-    /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
-
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     private CampaignSubscriber $subscriber;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->emailModel          = $this->createMock(EmailModel::class);
-        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
         $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
-        $this->translator          = $this->createMock(TranslatorInterface::class);
         $leadModel                 = $this->createMock(LeadModel::class);
         $statRepository            = $this->createMock(StatRepository::class);
 
         $this->subscriber = new CampaignSubscriber(
-            $this->emailModel,
-            $this->realTimeExecutioner,
+            $this->createStub(EmailModel::class),
+            $this->createStub(RealTimeExecutioner::class),
             $this->sendEmailToUser,
-            $this->translator,
+            $this->createStub(TranslatorInterface::class),
             $leadModel,
             $statRepository
         );
@@ -64,7 +45,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
@@ -89,7 +70,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
@@ -116,7 +97,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = (new Event())->setType('email.send.to.user');
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 
@@ -162,7 +143,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnCampaignTriggerActionSendEmailToContactWithWrongEventType(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $event         = new Event();
         $lead          = (new Lead())->setEmail('tester@mautic.org');
 

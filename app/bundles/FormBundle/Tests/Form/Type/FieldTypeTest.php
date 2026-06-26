@@ -22,17 +22,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldTypeTest extends TypeTestCase
 {
-    private TranslatorInterface $translator;
     private ObjectCollectorInterface $objectCollector;
     private FieldCollectorInterface $fieldCollector;
-    private AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
 
     protected function setUp(): void
     {
-        $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->objectCollector      = $this->createMock(ObjectCollectorInterface::class);
         $this->fieldCollector       = $this->createMock(FieldCollectorInterface::class);
-        $this->mappedFieldCollector = $this->createMock(AlreadyMappedFieldCollectorInterface::class);
 
         // Set up expected behavior for objectCollector
         $objectCollection = new ObjectCollection();
@@ -57,12 +53,12 @@ class FieldTypeTest extends TypeTestCase
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension([
                 FieldType::class => new FieldType(
-                    $this->translator,
+                    $this->createStub(TranslatorInterface::class),
                     $this->objectCollector,
                     $this->fieldCollector,
-                    $this->mappedFieldCollector
+                    $this->createStub(AlreadyMappedFieldCollectorInterface::class)
                 ),
-                FormFieldRatingType::class => new FormFieldRatingType($this->translator),
+                FormFieldRatingType::class => new FormFieldRatingType($this->createStub(TranslatorInterface::class)),
             ], []),
         ];
     }

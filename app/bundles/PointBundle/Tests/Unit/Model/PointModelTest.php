@@ -34,36 +34,36 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PointModelTest extends TestCase
 {
-    private RequestStack&MockObject $requestStack;
+    private RequestStack&\PHPUnit\Framework\MockObject\Stub $requestStack;
     private IpLookupHelper&MockObject $ipLookupHelper;
     private LeadModel&MockObject $leadModel;
-    private ContactTracker&MockObject $contactTracker;
+    private ContactTracker&\PHPUnit\Framework\MockObject\Stub $contactTracker;
     private EntityManager&MockObject $em;
     private CorePermissions&MockObject $security;
     private EventDispatcherInterface&MockObject $dispatcher;
-    private UrlGeneratorInterface&MockObject $router;
-    private Translator&MockObject $translator;
-    private UserHelper&MockObject $userHelper;
-    private LoggerInterface&MockObject $mauticLogger;
-    private CoreParametersHelper&MockObject $coreParametersHelper;
-    private PointGroupModel&MockObject $pointGroupModel;
+    private UrlGeneratorInterface&\PHPUnit\Framework\MockObject\Stub $router;
+    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
+    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $mauticLogger;
+    private CoreParametersHelper&\PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
+    private PointGroupModel&\PHPUnit\Framework\MockObject\Stub $pointGroupModel;
     private PointModel $pointModel;
 
     protected function setUp(): void
     {
-        $this->requestStack         = $this->createMock(RequestStack::class);
+        $this->requestStack         = $this->createStub(RequestStack::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->contactTracker       = $this->createMock(ContactTracker::class);
+        $this->contactTracker       = $this->createStub(ContactTracker::class);
         $this->em                   = $this->createMock(EntityManager::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->router               = $this->createMock(RouterInterface::class);
-        $this->translator           = $this->createMock(Translator::class);
-        $this->userHelper           = $this->createMock(UserHelper::class);
-        $this->mauticLogger         = $this->createMock(LoggerInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pointGroupModel      = $this->createMock(PointGroupModel::class);
+        $this->router               = $this->createStub(RouterInterface::class);
+        $this->translator           = $this->createStub(Translator::class);
+        $this->userHelper           = $this->createStub(UserHelper::class);
+        $this->mauticLogger         = $this->createStub(LoggerInterface::class);
+        $this->coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $this->pointGroupModel      = $this->createStub(PointGroupModel::class);
         $this->pointModel           = new PointModel(
             $this->requestStack,
             $this->ipLookupHelper,
@@ -89,7 +89,7 @@ class PointModelTest extends TestCase
         $pointProperties = ['property' => 'value'];
         $pointDelta      = 7;
         $pointGroup      = null;
-        $ip              = $this->createMock(IpAddress::class);
+        $ip              = $this->createStub(IpAddress::class);
         $this->security->method('isAnonymous')->willReturn(true);
         $this->ipLookupHelper->method('getIpAddress')->willReturn($ip);
 
@@ -107,7 +107,7 @@ class PointModelTest extends TestCase
                 $ip,
                 $pointGroup
             );
-        $eventDetails = $this->createMock(Hit::class);
+        $eventDetails = $this->createStub(Hit::class);
 
         $repository = $this->createMock(PointRepository::class);
         $this->em->expects($this->once())

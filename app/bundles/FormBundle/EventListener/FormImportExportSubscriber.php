@@ -85,7 +85,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->mergeExportData($data, $subEvent);
 
             $event->addDependencyEntity(Form::ENTITY_NAME, [
-                Form::ENTITY_NAME       => (int) $formId,
+                Form::ENTITY_NAME       => $formId,
                 Field::ENTITY_NAME      => (int) $field->getId(),
             ]);
         }
@@ -97,7 +97,7 @@ final class FormImportExportSubscriber implements EventSubscriberInterface
             $this->mergeExportData($data, $subEvent);
 
             $event->addDependencyEntity(Form::ENTITY_NAME, [
-                Form::ENTITY_NAME       => (int) $formId,
+                Form::ENTITY_NAME       => $formId,
                 Action::ENTITY_NAME     => (int) $action->getId(),
             ]);
         }

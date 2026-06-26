@@ -16,23 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CreateCustomFieldCommandTest extends TestCase
 {
-    private BackgroundService $backgroundServiceMock;
-
-    private TranslatorInterface $translatorMock;
-
-    private LeadFieldRepository $leadFieldRepositoryMock;
-
-    private PathsHelper $pathsHelperMock;
-
-    private CoreParametersHelper $coreParametersHelper;
-
     protected function setUp(): void
     {
-        $this->backgroundServiceMock   = $this->createMock(BackgroundService::class);
-        $this->translatorMock          = $this->createMock(TranslatorInterface::class);
-        $this->leadFieldRepositoryMock = $this->createMock(LeadFieldRepository::class);
-        $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
-        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]
@@ -40,11 +25,11 @@ class CreateCustomFieldCommandTest extends TestCase
     {
         $command = $this->getMockBuilder(CreateCustomFieldCommand::class)
             ->setConstructorArgs([
-                $this->backgroundServiceMock,
-                $this->translatorMock,
-                $this->leadFieldRepositoryMock,
-                $this->pathsHelperMock,
-                $this->coreParametersHelper,
+                $this->createStub(BackgroundService::class),
+                $this->createStub(TranslatorInterface::class),
+                $this->createStub(LeadFieldRepository::class),
+                $this->createStub(PathsHelper::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['completeRun', 'checkRunStatus'])
             ->getMock();

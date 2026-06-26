@@ -19,11 +19,6 @@ class PathsHelperTest extends TestCase
     private string $rootDir  = __DIR__.'/resource/paths';
 
     /**
-     * @var MockObject|UserHelper
-     */
-    private MockObject $userHelper;
-
-    /**
      * @var MockObject|CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
@@ -32,7 +27,6 @@ class PathsHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userHelper           = $this->createMock(UserHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
@@ -43,7 +37,7 @@ class PathsHelperTest extends TestCase
                 }
             );
         $this->helper = new PathsHelper(
-            $this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
+            $this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir
         );
     }
 
@@ -117,7 +111,7 @@ class PathsHelperTest extends TestCase
                 }
             );
 
-        $helper = new PathsHelper($this->userHelper, $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
+        $helper = new PathsHelper($this->createStub(UserHelper::class), $this->coreParametersHelper, $this->cacheDir, $this->logsDir, $this->rootDir);
 
         $this->assertSame($campaignImportPath, $helper->getImportCampaignsPath());
     }
@@ -127,7 +121,7 @@ class PathsHelperTest extends TestCase
         $tempPath = __DIR__.'/resource/paths/no_exist/tmp';
 
         /** @var UserHelper&MockObject $userHelper */
-        $userHelper = $this->createMock(UserHelper::class);
+        $userHelper = $this->createStub(UserHelper::class);
 
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);

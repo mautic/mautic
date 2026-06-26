@@ -20,10 +20,10 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContext(): void
     {
-        $translatorMock                   = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
-        $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
+        $translatorMock                   = $this->createStub(TranslatorInterface::class);
+        $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
+        $reportHelperMock                 = new ReportHelper($this->createStub(EventDispatcherInterface::class));
+        $fieldsBuilderMock                = $this->createStub(FieldsBuilder::class);
         $reportMock                       = $this->createMock(Report::class);
         $queryBuilder                     = $this->createMock(QueryBuilder::class);
         $reportBuilderEvent               = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'badContext', [], $reportHelperMock);
@@ -46,8 +46,8 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportBuilder(): void
     {
-        $translatorMock                   = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $translatorMock                   = $this->createStub(TranslatorInterface::class);
+        $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
 
         $leadColumns = [
@@ -74,7 +74,7 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.', 'lll.')
             ->willReturn($filterColumns);
 
-        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper($this->createMock(EventDispatcherInterface::class)));
+        $reportBuilderEvent = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'segment.membership', [], new ReportHelper($this->createStub(EventDispatcherInterface::class)));
 
         $segmentReportSubscriber = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
@@ -155,8 +155,8 @@ class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerate(): void
     {
-        $channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
+        $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
+        $fieldsBuilderMock                = $this->createStub(FieldsBuilder::class);
         $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
         $reportMock                       = $this->createMock(Report::class);
         $queryBuilder                     = $this->createMock(QueryBuilder::class);

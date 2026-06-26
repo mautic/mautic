@@ -49,7 +49,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->setServerParameter('PHP_AUTH_USER', $attacker->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
 
-        $endpoint = sprintf($endpointTemplate, (int) $foreignContact->getId());
+        $endpoint = sprintf($endpointTemplate, $foreignContact->getId());
         $this->client->request('GET', $endpoint);
 
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
@@ -124,8 +124,8 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
             array_values($legacyCollection['contacts'])
         );
 
-        self::assertContains((int) $ownContact->getId(), $legacyIds);
-        self::assertNotContains((int) $foreignContact->getId(), $legacyIds);
+        self::assertContains($ownContact->getId(), $legacyIds);
+        self::assertNotContains($foreignContact->getId(), $legacyIds);
 
         $this->client->request('GET', '/api/v2/contacts?page=1');
         self::assertResponseIsSuccessful();
@@ -140,8 +140,8 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
             $v2Collection['member']
         );
 
-        self::assertContains((int) $ownContact->getId(), $v2Ids);
-        self::assertNotContains((int) $foreignContact->getId(), $v2Ids);
+        self::assertContains($ownContact->getId(), $v2Ids);
+        self::assertNotContains($foreignContact->getId(), $v2Ids);
     }
 
     public function testViewOwnCollectionReportsOwnedTotalAcrossPagesOnApiV2(): void
@@ -167,7 +167,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         $ownedContactIds = [];
         for ($i = 1; $i <= 4; ++$i) {
-            $ownedContactIds[] = (int) $this->createContactOwnedBy($viewer, sprintf('owned.%d@example.test', $i))->getId();
+            $ownedContactIds[] = $this->createContactOwnedBy($viewer, sprintf('owned.%d@example.test', $i))->getId();
         }
 
         for ($i = 1; $i <= 12; ++$i) {
@@ -275,8 +275,8 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
             array_values($legacyCollection['contacts'])
         );
 
-        self::assertContains((int) $ownContact->getId(), $legacyIds);
-        self::assertContains((int) $foreignContact->getId(), $legacyIds);
+        self::assertContains($ownContact->getId(), $legacyIds);
+        self::assertContains($foreignContact->getId(), $legacyIds);
 
         $this->client->request('GET', '/api/v2/contacts?page=1&itemsPerPage=10');
         self::assertResponseIsSuccessful();
@@ -292,8 +292,8 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
             $collection['member']
         );
 
-        self::assertContains((int) $ownContact->getId(), $v2Ids);
-        self::assertContains((int) $foreignContact->getId(), $v2Ids);
+        self::assertContains($ownContact->getId(), $v2Ids);
+        self::assertContains($foreignContact->getId(), $v2Ids);
     }
 
     public function testViewOwnCollectionRespectsOwnerFieldAfterReassignmentOnApiV2(): void

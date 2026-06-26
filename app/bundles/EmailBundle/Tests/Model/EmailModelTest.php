@@ -73,39 +73,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $ipLookupHelper;
 
     /**
-     * @var MockObject&ThemeHelperInterface
-     */
-    private MockObject $themeHelper;
-
-    /**
-     * @var MockObject&Mailbox
-     */
-    private MockObject $mailboxHelper;
-
-    /**
      * @var MockObject&MailHelper
      */
     private MockObject $mailHelper;
-
-    /**
-     * @var MockObject&LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
-     * @var MockObject&TrackableModel
-     */
-    private MockObject $trackableModel;
-
-    /**
-     * @var MockObject&UserModel
-     */
-    private MockObject $userModel;
-
-    /**
-     * @var MockObject&UserHelper
-     */
-    private MockObject $userHelper;
 
     /**
      * @var MockObject&Translator
@@ -143,11 +113,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $frequencyRepository;
 
     /**
-     * @var MockObject&MessageQueueModel
-     */
-    private MockObject $messageModel;
-
-    /**
      * @var MockObject&CompanyModel
      */
     private MockObject $companyModel;
@@ -156,11 +121,6 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&CompanyRepository
      */
     private MockObject $companyRepository;
-
-    /**
-     * @var MockObject&DoNotContact
-     */
-    private MockObject $dncModel;
 
     private StatHelper $statHelper;
 
@@ -171,37 +131,12 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $deviceTrackerMock;
 
-    /**
-     * @var MockObject&RedirectRepository
-     */
-    private MockObject $redirectRepositoryMock;
-
-    /**
-     * @var MockObject&CacheStorageHelper
-     */
-    private MockObject $cacheStorageHelperMock;
-
-    /**
-     * @var MockObject&ContactTracker
-     */
-    private MockObject $contactTracker;
-
     private EmailModel $emailModel;
 
     /**
      * @var MockObject&DoNotContact
      */
     private MockObject $doNotContact;
-
-    /**
-     * @var MockObject&CorePermissions
-     */
-    private MockObject $corePermissions;
-
-    /**
-     * @var StatsCollectionHelper|MockObject
-     */
-    private MockObject $statsCollectionHelper;
 
     /**
      * @var MockObject&EventDispatcherInterface
@@ -218,34 +153,20 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->themeHelper              = $this->createMock(ThemeHelperInterface::class);
-        $this->mailboxHelper            = $this->createMock(Mailbox::class);
         $this->mailHelper               = $this->createMock(MailHelper::class);
-        $this->leadModel                = $this->createMock(LeadModel::class);
-        $this->trackableModel           = $this->createMock(TrackableModel::class);
-        $this->userModel                = $this->createMock(UserModel::class);
-        $this->userHelper               = $this->createMock(UserHelper::class);
         $this->translator               = $this->createMock(Translator::class);
         $this->emailEntity              = $this->createMock(Email::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
         $this->statRepository           = $this->createMock(StatRepository::class);
         $this->emailRepository          = $this->createMock(EmailRepository::class);
         $this->frequencyRepository      = $this->createMock(FrequencyRuleRepository::class);
-        $this->messageModel             = $this->createMock(MessageQueueModel::class);
         $this->companyModel             = $this->createMock(CompanyModel::class);
         $this->companyRepository        = $this->createMock(CompanyRepository::class);
-        $this->dncModel                 = $this->createMock(DoNotContact::class);
         $this->emailStatModel           = $this->createMock(EmailStatModel::class);
         $this->statHelper               = new StatHelper($this->emailStatModel);
-        $this->sendToContactModel       = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+        $this->sendToContactModel       = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->createStub(DoNotContact::class), $this->translator);
         $this->deviceTrackerMock        = $this->createMock(DeviceTracker::class);
-        $this->redirectRepositoryMock   = $this->createMock(RedirectRepository::class);
-        // @phpstan-ignore classConstant.deprecatedClass
-        $this->cacheStorageHelperMock   = $this->createMock(CacheStorageHelper::class);
-        $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
-        $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
-        $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->leadDeviceRepository     = $this->createMock(LeadDeviceRepository::class);
         $this->botRatioHelperMock       = $this->createMock(BotRatioHelper::class);
@@ -254,29 +175,29 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
-            $this->themeHelper,
-            $this->mailboxHelper,
+            $this->createStub(ThemeHelperInterface::class),
+            $this->createStub(Mailbox::class),
             $this->mailHelper,
-            $this->leadModel,
+            $this->createStub(LeadModel::class),
             $this->companyModel,
-            $this->trackableModel,
-            $this->userModel,
-            $this->messageModel,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(UserModel::class),
+            $this->createStub(MessageQueueModel::class),
             $this->sendToContactModel,
             $this->deviceTrackerMock,
-            $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock,
-            $this->contactTracker,
+            $this->createStub(RedirectRepository::class),
+            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(ContactTracker::class),
             $this->doNotContact,
-            $this->statsCollectionHelper,
-            $this->corePermissions,
+            $this->createStub(StatsCollectionHelper::class),
+            $this->createStub(CorePermissions::class),
             $this->entityManager,
             $this->eventDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->emailStatModel,
             $this->botRatioHelperMock
         );
@@ -597,29 +518,29 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $sendToContactModelMock  = $this->createMock(SendEmailToContact::class);
         $emailModel              = new EmailModel(
             $this->ipLookupHelper,
-            $this->themeHelper,
-            $this->mailboxHelper,
+            $this->createStub(ThemeHelperInterface::class),
+            $this->createStub(Mailbox::class),
             $this->mailHelper,
-            $this->leadModel,
+            $this->createStub(LeadModel::class),
             $this->companyModel,
-            $this->trackableModel,
-            $this->userModel,
-            $this->messageModel,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(UserModel::class),
+            $this->createStub(MessageQueueModel::class),
             $sendToContactModelMock,
             $this->deviceTrackerMock,
-            $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock,
-            $this->contactTracker,
+            $this->createStub(RedirectRepository::class),
+            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(ContactTracker::class),
             $this->doNotContact,
-            $this->statsCollectionHelper,
-            $this->corePermissions,
+            $this->createStub(StatsCollectionHelper::class),
+            $this->createStub(CorePermissions::class),
             $this->entityManager,
             $this->eventDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->emailStatModel,
             $this->botRatioHelperMock
         );
@@ -716,7 +637,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                     [Email::class, $this->emailRepository],
                     [Stat::class, $this->statRepository],
                     [\Mautic\LeadBundle\Entity\FrequencyRule::class, $this->frequencyRepository],
-                    [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageQueueRepository::class)],
+                    [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createStub(MessageQueueRepository::class)],
                 ]
             );
         $leadEntity = (new Lead())
@@ -728,46 +649,46 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                 $leadEntity
             );
 
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         $messageModel = new MessageQueueModel(
-            $this->leadModel,
+            $this->createStub(LeadModel::class),
             $this->companyModel,
             $coreParametersHelper,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->eventDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
-            $this->userHelper,
-            $this->createMock(LoggerInterface::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class)
         );
 
         $emailModel = new EmailModel(
             $this->ipLookupHelper,
-            $this->themeHelper,
-            $this->mailboxHelper,
+            $this->createStub(ThemeHelperInterface::class),
+            $this->createStub(Mailbox::class),
             $this->mailHelper,
-            $this->leadModel,
+            $this->createStub(LeadModel::class),
             $this->companyModel,
-            $this->trackableModel,
-            $this->userModel,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(UserModel::class),
             $messageModel,
             $this->sendToContactModel,
             $this->deviceTrackerMock,
-            $this->redirectRepositoryMock,
-            $this->cacheStorageHelperMock,
-            $this->contactTracker,
+            $this->createStub(RedirectRepository::class),
+            $this->createStub(CacheStorageHelper::class),
+            $this->createStub(ContactTracker::class),
             $this->doNotContact,
-            $this->statsCollectionHelper,
-            $this->corePermissions,
+            $this->createStub(StatsCollectionHelper::class),
+            $this->createStub(CorePermissions::class),
             $this->entityManager,
             $this->eventDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->emailStatModel,
             $this->botRatioHelperMock
         );
@@ -1075,7 +996,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         };
         $this->eventDispatcher->addListener(EmailEvents::EMAIL_PRE_SAVE, $listener);
         $this->eventDispatcher->addListener(EmailEvents::EMAIL_POST_SAVE, $listener);
-        $emailRepository = $this->createMock(EmailRepository::class);
+        $emailRepository = $this->createStub(EmailRepository::class);
         $this->entityManager->method('getRepository')->willReturn($emailRepository);
         $this->emailModel->saveEntity($email);
         $this->assertFalse($this->emailModel->isUpdatingTranslationChildren());

@@ -25,21 +25,13 @@ use Symfony\Component\Routing\Router;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
-
     private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
 
     private \PHPUnit\Framework\MockObject\MockObject $containerMock;
 
     private \PHPUnit\Framework\MockObject\MockObject $routerMock;
 
-    private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
-
     private InstallController $controller;
-
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
-
-    private \PHPUnit\Framework\MockObject\MockObject $configurator;
 
     private \PHPUnit\Framework\MockObject\MockObject $installer;
 
@@ -50,36 +42,31 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->sessionMock          = $this->createMock(Session::class);
         $this->containerMock        = $this->createMock(Container::class);
         $this->routerMock           = $this->createMock(Router::class);
-        $this->flashBagMock         = $this->createMock(FlashBagInterface::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
-
-        $this->configurator   = $this->createMock(Configurator::class);
-        $this->installer      = $this->createMock(InstallService::class);
-        $doctrine             = $this->createMock(ManagerRegistry::class);
-        $modelFactory         = $this->createMock(ModelFactory::class);
-        $userHelper           = $this->createMock(UserHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock = $this->createMock(Translator::class);
-        $flashBag             = $this->createMock(FlashBag::class);
-        $requestStack         = new RequestStack();
-        $security             = $this->createMock(CorePermissions::class);
+        $this->installer            = $this->createMock(InstallService::class);
+        $doctrine                   = $this->createMock(ManagerRegistry::class);
+        $modelFactory               = $this->createMock(ModelFactory::class);
+        $userHelper                 = $this->createMock(UserHelper::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $dispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $flashBag                   = $this->createMock(FlashBag::class);
+        $requestStack               = new RequestStack();
+        $security                   = $this->createMock(CorePermissions::class);
 
         $this->controller = new InstallController(
-            $this->configurator,
+            $this->createStub(Configurator::class),
             $this->installer,
             $doctrine,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,
             $dispatcher,
-            $this->translatorMock,
+            $this->createStub(Translator::class),
             $flashBag,
             $requestStack,
             $security
         );
         $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
+        $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
 
         $this->containerMock->method('get')
             ->with('router')
@@ -101,8 +88,8 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->controller->stepAction(
             new Request(),
-            $this->createMock(EntityManagerInterface::class),
-            $this->pathsHelper,
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(PathsHelper::class),
             InstallService::CHECK_STEP
         );
         $this->assertSame(302, $response->getStatusCode());

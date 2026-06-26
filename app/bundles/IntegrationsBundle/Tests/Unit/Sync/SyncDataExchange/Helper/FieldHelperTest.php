@@ -31,11 +31,6 @@ class FieldHelperTest extends TestCase
     private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var VariableExpresserHelperInterface&MockObject
-     */
-    private MockObject $variableExpresserHelper;
-
-    /**
      * @var ChannelListHelper&MockObject
      */
     private MockObject $channelListHelper;
@@ -57,7 +52,6 @@ class FieldHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
-        $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
         $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
         $this->channelListHelper->method('getFeatureChannels')
@@ -73,9 +67,9 @@ class FieldHelperTest extends TestCase
         $this->fieldHelper = new FieldHelper(
             $this->fieldModel,
             $this->fieldsWithUniqueIdentifier,
-            $this->variableExpresserHelper,
+            $this->createStub(VariableExpresserHelperInterface::class),
             $this->channelListHelper,
-            $this->createMock(TranslatorInterface::class),
+            $this->createStub(TranslatorInterface::class),
             $this->eventDispatcher,
             $this->objectProvider
         );

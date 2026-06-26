@@ -350,7 +350,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAll(): void
     {
         $regexpQuery = 'regexp query';
-        $eventQuery  = $this->createMock(CompositeExpression::class);
+        $eventQuery  = $this->createStub(CompositeExpression::class);
 
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -402,8 +402,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $filterField         = 'l.email';
         $regexpQueriesString = 'all regexp queries';
         $regexpQueries       = $this->createMock(CompositeExpression::class);
-        $combinedQuery       = $this->createMock(CompositeExpression::class);
-        $eventQuery          = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createStub(CompositeExpression::class);
+        $eventQuery          = $this->createStub(CompositeExpression::class);
 
         $regexpQueries->method('__toString')
             ->willReturn($regexpQueriesString);
@@ -466,7 +466,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAny(): void
     {
         $regexpQuery = 'regexp query';
-        $eventQuery  = $this->createMock(CompositeExpression::class);
+        $eventQuery  = $this->createStub(CompositeExpression::class);
 
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -518,8 +518,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $filterField         = 'l.email';
         $regexpQueriesString = 'all regexp queries';
         $regexpQueries       = $this->createMock(CompositeExpression::class);
-        $combinedQuery       = $this->createMock(CompositeExpression::class);
-        $eventQuery          = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createStub(CompositeExpression::class);
+        $eventQuery          = $this->createStub(CompositeExpression::class);
 
         $regexpQueries->method('__toString')
             ->willReturn($regexpQueriesString);

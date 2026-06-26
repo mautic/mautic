@@ -68,7 +68,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->willReturn($event);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
         $fetcher = new Fetcher($mailbox, $dispatcher, $translator);
         $fetcher->setMailboxes(array_keys($this->mailboxes))

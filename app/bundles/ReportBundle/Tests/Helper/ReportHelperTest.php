@@ -14,7 +14,7 @@ final class ReportHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->reportHelper = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $this->reportHelper = new ReportHelper($this->createStub(EventDispatcherInterface::class));
     }
 
     public function testGetStandardColumnsMethodReturnsCorrectColumns(): void

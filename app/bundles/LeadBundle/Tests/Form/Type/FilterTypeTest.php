@@ -20,7 +20,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject&FormAdjustmentsProviderInterface
      */
-    private MockObject $formAdjustmentsProvider;
+    private \PHPUnit\Framework\MockObject\Stub $formAdjustmentsProvider;
 
     /**
      * @var MockObject&ListModel
@@ -33,7 +33,7 @@ final class FilterTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->formAdjustmentsProvider = $this->createMock(FormAdjustmentsProviderInterface::class);
+        $this->formAdjustmentsProvider = $this->createStub(FormAdjustmentsProviderInterface::class);
         $this->listModel               = $this->createMock(ListModel::class);
         $this->form                    = new FilterType(
             $this->formAdjustmentsProvider,

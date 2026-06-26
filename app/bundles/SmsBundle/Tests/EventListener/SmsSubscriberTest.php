@@ -15,21 +15,18 @@ use PHPUnit\Framework\TestCase;
 
 class SmsSubscriberTest extends TestCase
 {
-    private CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
-
     private string $messageText = 'custom http://mautic.com text';
 
     private string $messageUrl = 'http://mautic.com';
 
     protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         parent::setUp();
     }
 
     public function testOnTokenReplacementWithTrackableUrls(): void
     {
-        $mockAuditLogModel = $this->createMock(AuditLogModel::class);
+        $mockAuditLogModel = $this->createStub(AuditLogModel::class);
 
         $mockTrackableModel = $this->createMock(TrackableModel::class);
         $mockTrackableModel->expects($this->any())->method('parseContentForTrackables')->willReturn([
@@ -55,7 +52,7 @@ class SmsSubscriberTest extends TestCase
             $mockPageTokenHelper,
             $mockAssetTokenHelper,
             $mockSmsHelper,
-            $this->coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertNotSame($this->messageText, $tokenReplacementEvent->getContent());
@@ -63,7 +60,7 @@ class SmsSubscriberTest extends TestCase
 
     public function testOnTokenReplacementWithDisableTrackableUrls(): void
     {
-        $mockAuditLogModel = $this->createMock(AuditLogModel::class);
+        $mockAuditLogModel = $this->createStub(AuditLogModel::class);
 
         $mockTrackableModel = $this->createMock(TrackableModel::class);
         $mockTrackableModel->expects($this->any())->method('parseContentForTrackables')->willReturn([
@@ -89,7 +86,7 @@ class SmsSubscriberTest extends TestCase
             $mockPageTokenHelper,
             $mockAssetTokenHelper,
             $mockSmsHelper,
-            $this->coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
         $subscriber->onTokenReplacement($tokenReplacementEvent);
         $this->assertSame($this->messageText, $tokenReplacementEvent->getContent());

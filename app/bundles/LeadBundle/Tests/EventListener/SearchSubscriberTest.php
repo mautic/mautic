@@ -31,16 +31,16 @@ class SearchSubscriberTest extends TestCase
     public function testOnBuildSearchCommands(): void
     {
         $contactRepository = $this->createMock(LeadRepository::class);
-        $emailRepository   = $this->createMock(EmailRepository::class);
+        $emailRepository   = $this->createStub(EmailRepository::class);
         $connection        = $this->getMockedConnection();
         $mockPlatform      = $this->createMock(AbstractPlatform::class);
         $leadModel         = $this->createMock(LeadModel::class);
-        $companyModel      = $this->createMock(CompanyModel::class);
-        $listModel         = $this->createMock(ListModel::class);
+        $companyModel      = $this->createStub(CompanyModel::class);
+        $listModel         = $this->createStub(ListModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
-        $security          = $this->createMock(CorePermissions::class);
-        $twig              = $this->createMock(Environment::class);
-        $globalSearch      = $this->createMock(GlobalSearch::class);
+        $security          = $this->createStub(CorePermissions::class);
+        $twig              = $this->createStub(Environment::class);
+        $globalSearch      = $this->createStub(GlobalSearch::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(

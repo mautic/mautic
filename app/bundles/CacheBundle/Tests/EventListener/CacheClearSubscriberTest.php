@@ -26,7 +26,7 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->adapter->method('clear')->willReturn(true);
         $this->adapter->method('commit')->willReturn(true);
-        $this->adapter->method('getCacheAdapter')->willReturn($this->createMock(AdapterInterface::class));
+        $this->adapter->method('getCacheAdapter')->willReturn($this->createStub(AdapterInterface::class));
     }
 
     public function testClear(): void

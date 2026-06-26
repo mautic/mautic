@@ -56,7 +56,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
         $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock);
-        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
+        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createStub(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($this->assetsHelperMock, $this->pathsHelperMock, $this->gravatarHelperMock, $this->defaultAvatarHelperMock);
     }

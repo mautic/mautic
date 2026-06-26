@@ -21,11 +21,6 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
-
-    /**
      * @var GenerateSchemaEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $event;
@@ -47,11 +42,10 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $this->logger                   = $this->createMock(LoggerInterface::class);
         $this->event                    = $this->createMock(GenerateSchemaEventArgs::class);
         $this->schema                   = $this->createMock(Schema::class);
         $this->table                    = $this->createMock(Table::class);
-        $this->listener                 = new DoctrineGeneratedColumnsListener($this->generatedColumnsProvider, $this->logger);
+        $this->listener                 = new DoctrineGeneratedColumnsListener($this->generatedColumnsProvider, $this->createStub(LoggerInterface::class));
 
         $generatedColumn  = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important');
         $generatedColumns = new GeneratedColumns();

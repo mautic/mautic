@@ -74,7 +74,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testMinContactId(): void
     {
-        $contactLimiter = new ContactLimiter(50, null, 4, null);
+        $contactLimiter = new ContactLimiter(50, null, 4);
 
         $qb             = new DbalQueryBuilder($this->connection);
         $this->updateQueryFromContactLimiter('l', $qb, $contactLimiter);
@@ -90,7 +90,7 @@ class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 
     public function testBatchMinContactId(): void
     {
-        $contactLimiter = new ContactLimiter(50, null, 4, null);
+        $contactLimiter = new ContactLimiter(50, null, 4);
 
         $qb             = new DbalQueryBuilder($this->connection);
         $contactLimiter->setBatchMinContactId(10);

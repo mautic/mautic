@@ -35,7 +35,7 @@ class ReportGeneratorEventTest extends TestCase
 
         $this->report                = $this->createMock(Report::class);
         $this->queryBuilder          = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper     = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $this->channelListHelper     = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
         $this->reportGeneratorEvent  = new ReportGeneratorEvent(
             $this->report,
             [], // Use the setter if you need different options

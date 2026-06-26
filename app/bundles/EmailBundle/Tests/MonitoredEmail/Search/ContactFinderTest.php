@@ -30,7 +30,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
             ->method('getContactsByEmail')
             ->willReturn([$lead]);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'contact@test.com');
@@ -65,7 +65,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $leadRepository->expects($this->never())
             ->method('getContactsByEmail');
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'test+unsubscribe_123abc@test.com');

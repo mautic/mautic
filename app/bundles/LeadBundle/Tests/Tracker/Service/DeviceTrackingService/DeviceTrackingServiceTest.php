@@ -42,7 +42,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     public function testIsTrackedTrue(): void
     {
         $trackingId  = 'randomTrackingId';
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = $this->createStub(Request::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -52,7 +52,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('getCookie')
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
-        $leadDeviceMock = $this->createMock(LeadDevice::class);
+        $leadDeviceMock = $this->createStub(LeadDevice::class);
 
         $this->security->expects($this->once())
             ->method('isAnonymous')
@@ -69,7 +69,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     public function testIsTrackedFalse(): void
     {
         $trackingId  = 'randomTrackingId';
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = $this->createStub(Request::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -95,8 +95,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     public function testGetTrackedDeviceCookie(): void
     {
         $trackingId     = 'randomTrackingId';
-        $leadDeviceMock = $this->createMock(LeadDevice::class);
-        $requestMock    = $this->createMock(Request::class);
+        $leadDeviceMock = $this->createStub(LeadDevice::class);
+        $requestMock    = $this->createStub(Request::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -123,7 +123,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     {
         $trackingId     = 'randomTrackingId';
         $requestMock    = $this->createMock(Request::class);
-        $leadDeviceMock = $this->createMock(LeadDevice::class);
+        $leadDeviceMock = $this->createStub(LeadDevice::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -190,11 +190,11 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testTrackCurrentDeviceAlreadyTracked(): void
     {
-        $leadDeviceMock        = $this->createMock(LeadDevice::class);
+        $leadDeviceMock        = $this->createStub(LeadDevice::class);
         $trackingId            = 'randomTrackingId';
-        $trackedLeadDeviceMock = $this->createMock(LeadDevice::class);
+        $trackedLeadDeviceMock = $this->createStub(LeadDevice::class);
 
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = $this->createStub(Request::class);
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($requestMock);
@@ -224,8 +224,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     public function testTrackCurrentDeviceAlreadyTrackedReplaceExistingTracking(): void
     {
         $leadDeviceMock           = $this->createMock(LeadDevice::class);
-        $trackedLeadDeviceMock    = $this->createMock(LeadDevice::class);
-        $requestMock              = $this->createMock(Request::class);
+        $trackedLeadDeviceMock    = $this->createStub(LeadDevice::class);
+        $requestMock              = $this->createStub(Request::class);
         $trackingId               = 'randomTrackingId';
         $uniqueTrackingIdentifier = '1234567890abcdefghij123';
 

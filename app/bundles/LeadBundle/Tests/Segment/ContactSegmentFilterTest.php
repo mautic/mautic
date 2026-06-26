@@ -191,7 +191,7 @@ class ContactSegmentFilterTest extends TestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilder = new QueryBuilder($this->createMock(\Doctrine\DBAL\Connection::class));
+        $queryBuilder = new QueryBuilder($this->createStub(\Doctrine\DBAL\Connection::class));
 
         $this->filterQueryBuilder->expects($this->once())
             ->method('applyQuery')

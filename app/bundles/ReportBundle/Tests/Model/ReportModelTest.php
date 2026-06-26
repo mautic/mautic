@@ -47,21 +47,21 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $translatorMock->method('trans')->withAnyParameters()->willReturnArgument(0);
 
         $this->reportModel = new ReportModel(
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(Environment::class),
-            new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(Environment::class),
+            new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class)),
             $fieldModelMock,
-            new ReportHelper($this->createMock(EventDispatcherInterface::class)),
-            $this->createMock(CsvExporter::class),
-            $this->createMock(ExcelExporter::class),
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            new ReportHelper($this->createStub(EventDispatcherInterface::class)),
+            $this->createStub(CsvExporter::class),
+            $this->createStub(ExcelExporter::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $mockDispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translatorMock,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(RequestStack::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(RequestStack::class)
         );
 
         // Do this to build the initial set of data from the subscribers that get used in all other contexts

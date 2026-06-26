@@ -14,11 +14,6 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $commonModel;
 
-    /**
-     * @var MockObject|CommonRepository<object>
-     */
-    private MockObject $commonRepository;
-
     private IteratorExportDataModel $iteratorExportDataModel;
 
     protected function setUp(): void
@@ -26,7 +21,6 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->commonModel      = $this->createMock(AbstractCommonModel::class);
-        $this->commonRepository = $this->createMock(CommonRepository::class);
         $args                   = ['limit' => 1000];
         $callback               = fn ($var) => $var;
 
@@ -40,7 +34,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
             ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => [['a'], ['b']]]);
 
-        $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
+        $this->commonModel->method('getRepository')->willReturn($this->createStub(CommonRepository::class));
 
         $this->assertSame(0, $this->iteratorExportDataModel->key());
         $this->iteratorExportDataModel->rewind();
@@ -55,7 +49,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
             ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => []]);
 
-        $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
+        $this->commonModel->method('getRepository')->willReturn($this->createStub(CommonRepository::class));
 
         $this->assertSame(0, $this->iteratorExportDataModel->key());
         $this->iteratorExportDataModel->rewind();

@@ -39,9 +39,6 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
     /** @var MockObject|LeadModel */
     protected $leadModel;
 
-    /** @var MockObject|CompanyModel */
-    protected $companyModel;
-
     /** @var MockObject|EntityManagerInterface */
     protected $entityManager;
 
@@ -51,22 +48,21 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->companyModel           = $this->createMock(CompanyModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
         $coreHelper                   = $this->createMock(CoreParametersHelper::class);
 
         $this->messageQueue = new MessageQueueModel(
             $this->leadModel,
-            $this->companyModel,
+            $this->createStub(CompanyModel::class),
             $coreHelper,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class)
         );
 
         $this->entityManager->method('getRepository')->willReturn($this->messageQueueRepository);

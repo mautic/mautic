@@ -11,7 +11,7 @@ class OneSignalApiTest extends TestCase
 {
     public function testAddMobileData(): void
     {
-        $mockOneSignalApi = $this->createMock(OneSignalApi::class);
+        $mockOneSignalApi = $this->createStub(OneSignalApi::class);
 
         $controllerReflection = (new \ReflectionClass(OneSignalApi::class));
         $method               = $controllerReflection->getMethod('addMobileData');

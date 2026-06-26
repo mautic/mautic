@@ -120,7 +120,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($qb);
 
         $translator          = $this->createMock(TranslatorInterface::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
+        $userTokenRepository = $this->createStub(UserTokenRepositoryInterface::class);
         $subscriber          = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
 
         $translator

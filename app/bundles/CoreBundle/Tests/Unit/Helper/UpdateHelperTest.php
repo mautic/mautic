@@ -556,7 +556,7 @@ class UpdateHelperTest extends TestCase
                 function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
-                    throw new RequestException('something bad happened', $request, null);
+                    throw new RequestException('something bad happened', $request);
                 }
             );
 
@@ -715,7 +715,7 @@ class UpdateHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('GET', $updateUrl)
-            ->willThrowException(new RequestException('bad', $this->createMock(RequestInterface::class), $this->response));
+            ->willThrowException(new RequestException('bad', $this->createStub(RequestInterface::class), $this->response));
 
         $this->releaseParser->expects($this->never())
             ->method('getLatestSupportedRelease');

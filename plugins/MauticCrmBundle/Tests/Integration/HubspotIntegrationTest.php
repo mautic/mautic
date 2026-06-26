@@ -10,25 +10,17 @@ use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 class HubspotIntegrationTest extends AbstractIntegrationTestCase
 {
-    /**
-     * @var MockObject&UserHelper
-     */
-    private MockObject $userHelper;
-
     private HubspotIntegration $integration;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->userHelper  = $this->createMock(UserHelper::class);
         $this->integration = new HubspotIntegration(
             $this->dispatcher,
             $this->cache,
@@ -46,7 +38,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
-            $this->userHelper
+            $this->createStub(UserHelper::class)
         );
     }
 
@@ -69,7 +61,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             )
             ->willReturn($event);
 
-        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createMock(Integration::class));
+        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
         self::assertNull($this->integration->getBearerToken());
     }
 
@@ -89,7 +81,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             )
             ->willReturn($event);
 
-        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createMock(Integration::class));
+        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
         self::assertSame($token, $this->integration->getBearerToken());
     }
 
@@ -118,7 +110,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             )
             ->willReturn($event);
 
-        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createMock(Integration::class));
+        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
         self::assertSame('key', $this->integration->getAuthenticationType());
     }
 
@@ -136,7 +128,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             )
             ->willReturn($event);
 
-        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createMock(Integration::class));
+        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
         self::assertSame('oauth2', $this->integration->getAuthenticationType());
     }
 
@@ -154,7 +146,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             )
             ->willReturn($event);
 
-        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createMock(Integration::class));
+        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
         self::assertFalse($this->integration->isAuthorized());
     }
 
@@ -172,7 +164,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
             )
             ->willReturn($event);
 
-        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createMock(Integration::class));
+        $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
         self::assertTrue($this->integration->isAuthorized());
     }
 

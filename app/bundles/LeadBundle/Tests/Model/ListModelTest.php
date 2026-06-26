@@ -77,11 +77,11 @@ class ListModelTest extends TestCase
             $this->segmentCountCacheHelper,
             $doNotContactRepositoryMock,
             $entityManagerMock,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $eventDispatcherInterfaceMock,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translatorMock,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $loggerMock
         );
     }
@@ -119,13 +119,13 @@ class ListModelTest extends TestCase
                 $requestStack,
                 $segmentCountCacheHelperMock,
                 $doNotContactRepositoryMock,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class)])
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class)])
             ->onlyMethods([])
             ->getMock();
 

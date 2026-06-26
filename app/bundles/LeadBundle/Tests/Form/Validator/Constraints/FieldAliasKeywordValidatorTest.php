@@ -22,8 +22,6 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
 
-    private \PHPUnit\Framework\MockObject\MockObject $fieldAliasHelperlMock;
-
     private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
 
     private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
@@ -40,8 +38,6 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->fieldAliasHelperlMock          = $this->createMock(FieldAliasHelper::class);
         $this->listModelMock                  = $this->createMock(ListModel::class);
         $this->executionContextMock           = $this->createMock(ExecutionContextInterface::class);
         $this->entityManagerMock              = $this->createMock(EntityManager::class);
@@ -81,7 +77,7 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->validator = new FieldAliasKeywordValidator(
             $this->listModelMock,
-            $this->fieldAliasHelperlMock,
+            $this->createStub(FieldAliasHelper::class),
             $this->entityManagerMock,
             $this->translatorMock,
             $this->contactSegmentFilterDictionary

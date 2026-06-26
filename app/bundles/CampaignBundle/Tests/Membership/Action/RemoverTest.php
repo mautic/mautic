@@ -13,18 +13,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RemoverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
-
-    /**
      * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {
-        $this->leadRepository         = $this->createMock(LeadRepository::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
     }
 
@@ -76,9 +70,9 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
             'Y-m-d',
             'H:i',
             $translator,
-            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+            $this->createStub(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
         );
 
-        return new Remover($this->leadRepository, $this->leadEventLogRepository, $translator, $dateTimeHelper);
+        return new Remover($this->createStub(LeadRepository::class), $this->leadEventLogRepository, $translator, $dateTimeHelper);
     }
 }

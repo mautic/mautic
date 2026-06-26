@@ -284,7 +284,7 @@ class ModeratedCommandTest extends TestCase
     public function testCompleteRunHandlesNullLockObject(): void
     {
         // Ensure lock object is null
-        $this->fakeModeratedCommand->setLock(null);
+        $this->fakeModeratedCommand->setLock();
 
         // Create a dummy lock file
         file_put_contents($this->lockFilePath, 'test_lock');

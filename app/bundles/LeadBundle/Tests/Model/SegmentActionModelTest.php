@@ -10,9 +10,9 @@ use Mautic\LeadBundle\Model\SegmentActionModel;
 
 class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
+    private \PHPUnit\Framework\MockObject\Stub $contactMock5;
 
-    private \PHPUnit\Framework\MockObject\MockObject $contactMock6;
+    private \PHPUnit\Framework\MockObject\Stub $contactMock6;
 
     private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
 
@@ -20,8 +20,8 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contactMock5        = $this->createMock(Lead::class);
-        $this->contactMock6        = $this->createMock(Lead::class);
+        $this->contactMock5        = $this->createStub(Lead::class);
+        $this->contactMock6        = $this->createStub(Lead::class);
         $this->contactModelMock    = $this->createMock(LeadModel::class);
         $this->actionModel         = new SegmentActionModel($this->contactModelMock);
     }

@@ -45,16 +45,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
-
     private LegacyEventDispatcher $legacyDispatcher;
 
     protected function setUp(): void
@@ -107,14 +97,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->scheduler = $this->createMock(EventScheduler::class);
-
         $contactTracker = $this->createMock(ContactTracker::class);
 
         /** @phpstan-ignore new.deprecated */
         $this->legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
-            $this->scheduler,
+            $this->createStub(EventScheduler::class),
             new NullLogger(),
             $contactTracker
         );
@@ -122,7 +110,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher = new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
-            $this->scheduler,
+            $this->createStub(EventScheduler::class),
             $this->legacyDispatcher
         );
 
@@ -164,14 +152,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->translator = $this->createMock(Translator::class);
-
         $campaignSubscriber = new CampaignSubscriber(
             $this->messageModel,
             $this->eventDispatcher,
             $this->eventCollector,
             new NullLogger(),
-            $this->translator
+            $this->createStub(Translator::class)
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);

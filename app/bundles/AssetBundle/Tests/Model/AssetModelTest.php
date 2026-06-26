@@ -40,13 +40,13 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private ContainerInterface&MockObject $container;
+    private ContainerInterface&\PHPUnit\Framework\MockObject\Stub $container;
 
     private CacheProvider $cacheProvider;
 
-    private LeadModel&MockObject $leadModel;
+    private LeadModel&\PHPUnit\Framework\MockObject\Stub $leadModel;
 
-    private CategoryModel&MockObject $categoryModel;
+    private CategoryModel&\PHPUnit\Framework\MockObject\Stub $categoryModel;
 
     private RequestStack&MockObject $requestStack;
 
@@ -66,13 +66,13 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    private MockObject&UrlGeneratorInterface $urlGenerator;
+    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
 
-    private Translator&MockObject $translator;
+    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
 
-    private UserHelper&MockObject $userHelper;
+    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
 
-    private LoggerInterface&MockObject $logger;
+    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
 
     protected function setUp(): void
     {
@@ -83,10 +83,10 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->with($this->equalTo('max_size'))
             ->willReturn('2MB');
 
-        $this->container             = $this->createMock(ContainerInterface::class);
+        $this->container             = $this->createStub(ContainerInterface::class);
         $this->cacheProvider         = new CacheProvider($this->coreParametersHelper, $this->container);
-        $this->leadModel             = $this->createMock(LeadModel::class);
-        $this->categoryModel         = $this->createMock(CategoryModel::class);
+        $this->leadModel             = $this->createStub(LeadModel::class);
+        $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($this->cacheProvider);
@@ -96,10 +96,10 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager         = $this->createMock(EntityManager::class);
         $this->corePermissions       = $this->createMock(CorePermissions::class);
         $this->eventDispatcher       = $this->createMock(EventDispatcherInterface::class);
-        $this->urlGenerator          = $this->createMock(UrlGeneratorInterface::class);
-        $this->translator            = $this->createMock(Translator::class);
-        $this->userHelper            = $this->createMock(UserHelper::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
+        $this->urlGenerator          = $this->createStub(UrlGeneratorInterface::class);
+        $this->translator            = $this->createStub(Translator::class);
+        $this->userHelper            = $this->createStub(UserHelper::class);
+        $this->logger                = $this->createStub(LoggerInterface::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,

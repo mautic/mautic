@@ -33,19 +33,9 @@ class SegmentSubscriberTest extends TestCase
      */
     private MockObject $listModel;
 
-    /**
-     * @var TranslatorInterface&MockObject
-     */
-    private MockObject $translator;
-
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private SegmentCountCacheHelper&MockObject $segmentCountCacheHelper;
-
-    /**
-     * @var SegmentUsedInCampaignsValidator&MockObject
-     */
-    private MockObject $segmentUsedInCampaignsValidator;
+    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
 
     protected function setUp(): void
     {
@@ -54,10 +44,8 @@ class SegmentSubscriberTest extends TestCase
         $this->ipLookupHelper                  = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel                   = $this->createMock(AuditLogModel::class);
         $this->listModel                       = $this->createMock(ListModel::class);
-        $this->segmentUsedInCampaignsValidator = $this->createMock(SegmentUsedInCampaignsValidator::class);
-        $this->translator                      = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
-        $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
+        $this->segmentCountCacheHelper         = $this->createStub(SegmentCountCacheHelper::class);
         $this->coreParametersHelper->method('get')->willReturnCallback(fn () => false);
     }
 
@@ -67,10 +55,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $this->assertSame(
@@ -124,10 +112,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -159,10 +147,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -214,10 +202,10 @@ class SegmentSubscriberTest extends TestCase
             $ipLookupHelper,
             $auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment = $this->createMock(LeadList::class);

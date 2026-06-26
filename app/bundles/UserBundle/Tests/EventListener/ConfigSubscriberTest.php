@@ -42,7 +42,7 @@ class ConfigSubscriberTest extends TestCase
             ->method('unsetIfEmpty')
             ->with('saml_idp_own_password');
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('<xml></xml>');
@@ -66,7 +66,7 @@ class ConfigSubscriberTest extends TestCase
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('foobar');
@@ -91,7 +91,7 @@ class ConfigSubscriberTest extends TestCase
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('-----BEGIN CERTIFICATE-----');
@@ -115,7 +115,7 @@ class ConfigSubscriberTest extends TestCase
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('foobar');
@@ -140,7 +140,7 @@ class ConfigSubscriberTest extends TestCase
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('-----BEGIN RSA PRIVATE KEY-----');
@@ -164,7 +164,7 @@ class ConfigSubscriberTest extends TestCase
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $this->configEvent->expects($this->once())
             ->method('getFileContent')
             ->willReturn('foobar');
@@ -189,7 +189,7 @@ class ConfigSubscriberTest extends TestCase
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
@@ -234,7 +234,7 @@ KEY_WRAP;
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA
@@ -280,7 +280,7 @@ KEY_WRAP;
     {
         $subscriber = new ConfigSubscriber();
 
-        $file = $this->createMock(UploadedFile::class);
+        $file = $this->createStub(UploadedFile::class);
         $key  = <<<KEY_WRAP
 -----BEGIN ENCRYPTED PRIVATE KEY-----
 MIICxjBABgkqhkiG9w0BBQ0wMzAbBgkqhkiG9w0BBQwwDgQI+tgT3QFhjEgCAggA

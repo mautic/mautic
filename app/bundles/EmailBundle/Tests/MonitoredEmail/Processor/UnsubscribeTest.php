@@ -46,11 +46,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 
@@ -87,11 +87,11 @@ class UnsubscribeTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $processor = new Unsubscribe($transport, $contactFinder, $translator, $logger, $doNotContact);
 

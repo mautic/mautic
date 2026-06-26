@@ -62,8 +62,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testBuildViewSetsViewVariables(): void
     {
         $type = new SortableValueLabelListType();
-        $form = $this->createMock(FormInterface::class);
-        $view = $this->createMock(FormView::class);
+        $form = $this->createStub(FormInterface::class);
+        $view = $this->createStub(FormView::class);
 
         $options = [
             'attr' => [
@@ -87,8 +87,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testBuildViewWithEmptyOptions(): void
     {
         $type = new SortableValueLabelListType();
-        $form = $this->createMock(FormInterface::class);
-        $view = $this->createMock(FormView::class);
+        $form = $this->createStub(FormInterface::class);
+        $view = $this->createStub(FormView::class);
 
         $options    = ['attr' => []];
         $view->vars = [];
@@ -125,7 +125,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createMock(FormBuilderInterface::class);
+        $builder       = $this->createStub(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
@@ -175,7 +175,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createMock(FormBuilderInterface::class);
+        $builder       = $this->createStub(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
         $event         = $this->createMock(FormEvent::class);
 

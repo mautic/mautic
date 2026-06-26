@@ -54,11 +54,6 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject&Logger
-     */
-    private MockObject $logger;
-
-    /**
      * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
@@ -79,7 +74,6 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->contactFinder      = $this->createMock(ContactFinder::class);
         $this->leadModel          = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $this->logger             = $this->createMock(Logger::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $this->emailAddressHelper = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
@@ -89,7 +83,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
             $this->contactFinder,
             $this->leadModel,
             $this->dispatcher,
-            $this->logger,
+            $this->createStub(Logger::class),
             $this->contactTracker,
             $this->emailAddressHelper
         );
@@ -159,7 +153,7 @@ BODY;
     {
         $trackingHash = '@Stat#';
         $stat         = $this->createMock(Stat::class);
-        $contact      = $this->createMock(Lead::class);
+        $contact      = $this->createStub(Lead::class);
 
         $this->statRepo->expects($this->once())
             ->method('findOneBy')

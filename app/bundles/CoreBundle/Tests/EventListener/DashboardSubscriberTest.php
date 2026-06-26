@@ -43,11 +43,6 @@ class DashboardSubscriberTest extends TestCase
     private MockObject $router;
 
     /**
-     * @var MockObject&CorePermissions
-     */
-    private MockObject $security;
-
-    /**
      * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
@@ -69,7 +64,6 @@ class DashboardSubscriberTest extends TestCase
         $this->auditLogModel = $this->createMock(AuditLogModel::class);
         $this->translator    = $this->createMock(TranslatorInterface::class);
         $this->router        = $this->createMock(Router::class);
-        $this->security      = $this->createMock(CorePermissions::class);
         $this->dispatcher    = $this->createMock(EventDispatcherInterface::class);
         $this->modelFactory  = $this->createMock(ModelFactory::class);
         $this->event         = $this->createMock(WidgetDetailEvent::class);
@@ -92,7 +86,7 @@ class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->security,
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );
@@ -119,7 +113,7 @@ class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->security,
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );
@@ -175,12 +169,12 @@ class DashboardSubscriberTest extends TestCase
         $nonFormModel->expects($this->once())
             ->method('getEntity')
             ->with(234)
-            ->willReturn($this->createMock(CommonEntity::class));
+            ->willReturn($this->createStub(CommonEntity::class));
         $nonEntityHasNoGetter = $this->createMock(FormModel::class);
         $nonEntityHasNoGetter->expects($this->once())
             ->method('getEntity')
             ->with(345)
-            ->willReturn($this->createMock(FormEntity::class));
+            ->willReturn($this->createStub(FormEntity::class));
         $notLead       = $this->createMock(FormModel::class);
         $anonymousUser = $this->createMock(User::class);
         $anonymousUser->method('getName')->willReturn('mautic.lead.lead.anonymous');
@@ -210,7 +204,7 @@ class DashboardSubscriberTest extends TestCase
         $exception->expects($this->once())
             ->method('getEntity')
             ->with(789)
-            ->willThrowException($this->createMock(\Exception::class));
+            ->willThrowException($this->createStub(\Exception::class));
 
         $this->modelFactory->expects(self::exactly(7))
             ->method('getModel')
@@ -224,7 +218,7 @@ class DashboardSubscriberTest extends TestCase
                 ['object.exception', $exception],
             ]);
 
-        $route           = $this->createMock(Route::class);
+        $route           = $this->createStub(Route::class);
         $routeCollection = $this->createMock(RouteCollection::class);
         $matcher         = self::exactly(5);
         $routeCollection->expects($matcher) // no null object and  exception object
@@ -267,7 +261,7 @@ class DashboardSubscriberTest extends TestCase
                 ['mautic_lead_action', ['objectAction' => 'view', 'objectId' => 567], UrlGeneratorInterface::ABSOLUTE_PATH, '/not-anonymous'],
             ]);
 
-        $iconEvent = new IconEvent($this->security);
+        $iconEvent = new IconEvent($this->createStub(CorePermissions::class));
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with($iconEvent);
@@ -293,7 +287,7 @@ class DashboardSubscriberTest extends TestCase
             $this->auditLogModel,
             $this->translator,
             $this->router,
-            $this->security,
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->modelFactory
         );

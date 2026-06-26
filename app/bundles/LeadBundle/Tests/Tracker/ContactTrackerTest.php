@@ -46,11 +46,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     private MockObject $securityMock;
 
     /**
-     * @var MockObject|Logger
-     */
-    private MockObject $loggerMock;
-
-    /**
      * @var MockObject|IpLookupHelper
      */
     private MockObject $ipLookupHelperMock;
@@ -81,7 +76,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->dispatcherMock             = $this->createMock(EventDispatcher::class);
         $this->leadFieldModelMock         = $this->createMock(FieldModel::class);
-        $this->loggerMock                 = $this->createMock(Logger::class);
         $this->ipLookupHelperMock         = $this->createMock(IpLookupHelper::class);
         $this->requestStack               = new RequestStack();
 
@@ -266,7 +260,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             $this->contactTrackingServiceMock,
             $this->deviceTrackerMock,
             $this->securityMock,
-            $this->loggerMock,
+            $this->createStub(Logger::class),
             $this->ipLookupHelperMock,
             $this->requestStack,
             $this->coreParametersHelperMock,

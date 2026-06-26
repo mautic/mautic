@@ -36,16 +36,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     private MockObject $translator;
 
-    private MockObject $kernel;
-
     private MockObject $validator;
-
-    private UserPasswordHasher $hasher;
-
-    /**
-     * @var MockObject&FixturesLoaderInterface
-     */
-    private MockObject $fixtureLoader;
 
     private InstallService $installer;
 
@@ -58,10 +49,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->kernel               = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $this->hasher               = $this->createMock(UserPasswordHasher::class);
-        $this->fixtureLoader        = $this->createMock(FixturesLoaderInterface::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -69,10 +57,10 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->pathsHelper,
             $this->entityManager,
             $this->translator,
-            $this->kernel,
+            $this->createStub(KernelInterface::class),
             $this->validator,
-            $this->hasher,
-            $this->fixtureLoader
+            $this->createStub(UserPasswordHasher::class),
+            $this->createStub(FixturesLoaderInterface::class)
         );
     }
 
@@ -104,7 +92,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             );
 
         $index = 0;
-        $step  = $this->createMock(StepInterface::class);
+        $step  = $this->createStub(StepInterface::class);
 
         $this->configurator->expects($this->once())
             ->method('getStep')
@@ -130,7 +118,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             );
 
         $index = 0;
-        $step  = $this->createMock(StepInterface::class);
+        $step  = $this->createStub(StepInterface::class);
 
         $this->configurator->expects($this->once())
             ->method('getStep')
@@ -294,7 +282,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'table_prefix' => 'mautic_',
         ];
 
-        $step = $this->createMock(StepInterface::class);
+        $step = $this->createStub(StepInterface::class);
         $this->assertEquals(['error' => null], $this->installer->createDatabaseStep($step, $dbParams));
     }
 

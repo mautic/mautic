@@ -38,7 +38,6 @@ class EmailControllerTest extends TestCase
      * @var string
      */
     public const NEW_CATEGORY_TITLE = 'New category';
-    private MockObject $translatorMock;
 
     /**
      * @var MockObject|Session
@@ -70,11 +69,6 @@ class EmailControllerTest extends TestCase
      */
     private MockObject $emailMock;
 
-    /**
-     * @var MockObject|FlashBag
-     */
-    private MockObject $flashBagMock;
-
     private EmailController $controller;
 
     /**
@@ -86,11 +80,6 @@ class EmailControllerTest extends TestCase
      * @var MockObject|FormFactory
      */
     private MockObject $formFactoryMock;
-
-    /**
-     * @var MockObject|Form
-     */
-    private MockObject $formMock;
 
     /**
      * @var MockObject|Environment
@@ -113,7 +102,6 @@ class EmailControllerTest extends TestCase
         $this->routerMock    = $this->createMock(Router::class);
         $this->modelMock     = $this->createMock(EmailModel::class);
         $this->emailMock     = $this->createMock(Email::class);
-        $this->formMock      = $this->createMock(Form::class);
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
@@ -123,8 +111,6 @@ class EmailControllerTest extends TestCase
         $helperUserMock                   = $this->createMock(UserHelper::class);
         $coreParametersHelper             = $this->createMock(CoreParametersHelper::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock             = $this->createMock(Translator::class);
-        $this->flashBagMock               = $this->createMock(FlashBag::class);
         $this->requestStack               = new RequestStack();
         $this->corePermissionsMock        = $this->createMock(CorePermissions::class);
 
@@ -139,13 +125,13 @@ class EmailControllerTest extends TestCase
             $helperUserMock,
             $coreParametersHelper,
             $this->dispatcher,
-            $this->translatorMock,
-            $this->flashBagMock,
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $this->requestStack,
             $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->createMock(FlashBagInterface::class));
+        $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
     }
 
     public function testSendActionWhenNoEntityFound(): void
@@ -267,7 +253,7 @@ class EmailControllerTest extends TestCase
                     'action' => 'someUrl',
                 ]
             )
-            ->willReturn($this->formMock);
+            ->willReturn($this->createStub(Form::class));
 
         $this->twigMock->expects($this->once())
             ->method('render')
@@ -275,7 +261,7 @@ class EmailControllerTest extends TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FakeContactHelper::class));
+        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createStub(LeadModel::class), $this->createStub(FakeContactHelper::class));
     }
 
     public function testWinnerActionForDispatchManualWinnerEvent(): void

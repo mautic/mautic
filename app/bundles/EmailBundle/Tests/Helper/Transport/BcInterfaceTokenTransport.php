@@ -26,8 +26,6 @@ class BcInterfaceTokenTransport implements TransportInterface
      */
     private $fromNames = [];
 
-    private $numberToFail;
-
     /**
      * @var mixed[]
      */
@@ -38,14 +36,8 @@ class BcInterfaceTokenTransport implements TransportInterface
      */
     private $message;
 
-    /**
-     * @param bool $validate
-     */
-    public function __construct(
-        private $validate = false,
-        $numberToFail = 1,
-    ) {
-        $this->numberToFail       = (int) $numberToFail;
+    public function __construct()
+    {
         $this->transports['main'] = $this;
     }
 

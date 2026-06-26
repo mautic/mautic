@@ -33,23 +33,23 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
 {
     public function testDelete(): void
     {
-        $requestStack          = $this->createMock(RequestStack::class);
-        $twigMock              = $this->createMock(Environment::class);
-        $themeHelper           = $this->createMock(ThemeHelperInterface::class);
-        $formActionModel       = $this->createMock(ActionModel::class);
-        $formFieldModel        = $this->createMock(FieldModel::class);
-        $fieldHelper           = $this->createMock(FormFieldHelper::class);
-        $primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
-        $leadFieldModel        = $this->createMock(LeadFieldModel::class);
+        $requestStack          = $this->createStub(RequestStack::class);
+        $twigMock              = $this->createStub(Environment::class);
+        $themeHelper           = $this->createStub(ThemeHelperInterface::class);
+        $formActionModel       = $this->createStub(ActionModel::class);
+        $formFieldModel        = $this->createStub(FieldModel::class);
+        $fieldHelper           = $this->createStub(FormFieldHelper::class);
+        $primaryCompanyHelper  = $this->createStub(PrimaryCompanyHelper::class);
+        $leadFieldModel        = $this->createStub(LeadFieldModel::class);
         $formUploaderMock      = $this->createMock(FormUploader::class);
-        $contactTracker        = $this->createMock(ContactTracker::class);
-        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
-        $tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
+        $contactTracker        = $this->createStub(ContactTracker::class);
+        $columnSchemaHelper    = $this->createStub(ColumnSchemaHelper::class);
+        $tableSchemaHelper     = $this->createStub(TableSchemaHelper::class);
         $entityManager         = $this->createMock(EntityManagerInterface::class);
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $formRepository        = $this->createMock(FormRepository::class);
         $form                  = $this->createMock(Form::class);
-        $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
+        $mappedObjectCollector = $this->createStub(MappedObjectCollectorInterface::class);
         $formModel             = new FormModel(
             $requestStack,
             $twigMock,
@@ -65,13 +65,13 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $tableSchemaHelper,
             $mappedObjectCollector,
             $entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
         $matcher = $this->exactly(2);
 

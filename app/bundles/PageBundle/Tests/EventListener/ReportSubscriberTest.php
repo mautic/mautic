@@ -34,7 +34,7 @@ class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
+    private \PHPUnit\Framework\MockObject\Stub&DncReportService $dncReportService;
 
     private ReportSubscriber $subscriber;
 
@@ -45,7 +45,7 @@ class ReportSubscriberTest extends TestCase
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService    = $this->createMock(DncReportService::class);
+        $this->dncReportService    = $this->createStub(DncReportService::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
@@ -237,7 +237,7 @@ class ReportSubscriberTest extends TestCase
             ->method('trans')
             ->willReturnArgument(0);
 
-        $mockExprBuilder = $this->createMock(ExpressionBuilder::class);
+        $mockExprBuilder = $this->createStub(ExpressionBuilder::class);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

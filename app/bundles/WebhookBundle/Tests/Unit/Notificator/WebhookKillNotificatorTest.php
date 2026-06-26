@@ -71,11 +71,6 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private ?string $modifiedBy = null;
 
-    /**
-     * @var MockObject|UserRepository
-     */
-    private $userRepositoryMock;
-
     private WebhookNotificationSender $webhookNotificationSender;
 
     private EventDispatcherInterface $eventDispatcher;
@@ -88,7 +83,6 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock        = $this->createMock(MailHelper::class);
         $this->coreParamHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->webhook               = $this->createMock(Webhook::class);
-        $this->userRepositoryMock    = $this->createMock(UserRepository::class);
         $twig                        = $this->createMock(Environment::class);
         $this->eventDispatcher       = $this->createMock(EventDispatcherInterface::class);
 
@@ -109,7 +103,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             $this->entityManagerMock,
             $this->mailHelperMock,
             $this->coreParamHelperMock,
-            $this->userRepositoryMock,
+            $this->createStub(UserRepository::class),
             $this->eventDispatcher
         );
     }
@@ -379,7 +373,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $generatedRoute = 'generatedRoute';
         $details        = 'details';
         $createdById    = 1;
-        $owner          = $this->createMock(User::class);
+        $owner          = $this->createStub(User::class);
         $ownerEmail     = 'owner@email.com';
         $modifiedBy     = null;
         $htmlUrl        = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';

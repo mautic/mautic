@@ -27,19 +27,9 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Logger
@@ -51,13 +41,11 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->leadRepo        = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
-        $this->dispatcher      = $this->createMock(EventDispatcher::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
+        $this->leadModel->method('getRepository')->willReturn($this->createStub(LeadRepository::class));
     }
 
     public function testMergeTimestamps(): void
@@ -563,7 +551,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeOwners($winner, $loser);
         $this->assertEquals($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
 
-        $winner->setOwner(null);
+        $winner->setOwner();
         $this->getMerger()->mergeOwners($winner, $loser);
 
         // Should be set to loser owner since winner owner was null
@@ -873,7 +861,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         return new ContactMerger(
             $this->leadModel,
             $this->mergeRecordRepo,
-            $this->dispatcher,
+            $this->createStub(EventDispatcher::class),
             $this->logger,
             $this->companyLeadRepo
         );

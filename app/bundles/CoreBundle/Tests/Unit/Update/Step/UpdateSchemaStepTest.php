@@ -39,11 +39,6 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
      */
     private MockObject $eventDispatcher;
 
-    /**
-     * @var MockObject&HelperSet
-     */
-    private MockObject $helperSet;
-
     private UpdateSchemaStep $step;
 
     protected function setUp(): void
@@ -52,7 +47,6 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $this->kernel         = $this->createMock(KernelInterface::class);
-        $this->helperSet      = $this->createMock(HelperSet::class);
         $this->kernel
             ->method('getBundles')
             ->willReturn([]);
@@ -65,7 +59,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn($this->helperSet);
+            ->willReturn($this->createStub(HelperSet::class));
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')

@@ -56,11 +56,6 @@ class UserModelTest extends TestCase
     private MockObject $user;
 
     /**
-     * @var MockObject&UserToken
-     */
-    private MockObject $userToken;
-
-    /**
      * @var MockObject&UserTokenServiceInterface
      */
     private MockObject $userTokenService;
@@ -83,7 +78,6 @@ class UserModelTest extends TestCase
         $this->user             = $this->createMock(User::class);
         $this->router           = $this->createMock(Router::class);
         $this->translator       = $this->createMock(Translator::class);
-        $this->userToken        = $this->createMock(UserToken::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
@@ -91,13 +85,13 @@ class UserModelTest extends TestCase
             $this->mailHelper,
             $this->userTokenService,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
             $this->router,
             $this->translator,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $this->logger,
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->twig
         );
     }
@@ -106,7 +100,7 @@ class UserModelTest extends TestCase
     {
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->userToken);
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->mailHelper
             ->method('getMailer')
@@ -117,7 +111,7 @@ class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->userToken);
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->router->expects($this->once())
             ->method('generate')

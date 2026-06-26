@@ -15,7 +15,7 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&IndexSchemaHelper $indexSchemaHelperMock;
 
-    private MockObject&Logger $loggerMock;
+    private \PHPUnit\Framework\MockObject\Stub&Logger $loggerMock;
 
     private MockObject&FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifierMock;
 
@@ -26,7 +26,7 @@ final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->indexSchemaHelperMock          = $this->createMock(IndexSchemaHelper::class);
-        $this->loggerMock                     = $this->createMock(Logger::class);
+        $this->loggerMock                     = $this->createStub(Logger::class);
         $this->fieldsWithUniqueIdentifierMock = $this->createMock(FieldsWithUniqueIdentifier::class);
         $this->customFieldIndex               = new CustomFieldIndex($this->indexSchemaHelperMock, $this->loggerMock, $this->fieldsWithUniqueIdentifierMock);
         $this->leadFieldMock                  = $this->createMock(LeadField::class);

@@ -28,11 +28,6 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $schedulerPlanner;
 
-    /**
-     * @var MockObject|ExportOption
-     */
-    private MockObject $exportOption;
-
     private ScheduleModel $scheduleModel;
 
     protected function setUp(): void
@@ -40,7 +35,6 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->schedulerRepository = $this->createMock(SchedulerRepository::class);
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->schedulerPlanner    = $this->createMock(SchedulerPlanner::class);
-        $this->exportOption        = $this->createMock(ExportOption::class);
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')
@@ -54,9 +48,9 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->schedulerRepository->expects($this->once())
             ->method('getScheduledReportsForExport')
-            ->with($this->exportOption);
+            ->with($this->createStub(ExportOption::class));
 
-        $this->scheduleModel->getScheduledReportsForExport($this->exportOption);
+        $this->scheduleModel->getScheduledReportsForExport($this->createStub(ExportOption::class));
     }
 
     public function testReportWasScheduled(): void

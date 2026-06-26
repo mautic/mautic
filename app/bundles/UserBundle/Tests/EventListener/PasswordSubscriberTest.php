@@ -31,27 +31,15 @@ final class PasswordSubscriberTest extends TestCase
      */
     private $authenticationEvent;
 
-    /**
-     * @var MockObject&PluginToken
-     */
-    private $pluginToken;
-
-    /**
-     * @var MockObject&EventDispatcherInterface
-     */
-    private $dispatcher;
-
     protected function setUp(): void
     {
-        $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
-        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel($this->dispatcher);
+        $this->passwordStrengthEstimatorModel = new PasswordStrengthEstimatorModel($this->createStub(EventDispatcherInterface::class));
         $this->passwordSubscriber             = new PasswordSubscriber($this->passwordStrengthEstimatorModel);
         $this->authenticationEvent            = $this->createMock(AuthenticationEvent::class);
-        $this->pluginToken                    = $this->createMock(PluginToken::class);
 
         $this->authenticationEvent->expects($this->any())
             ->method('getToken')
-            ->willReturn($this->pluginToken);
+            ->willReturn($this->createStub(PluginToken::class));
     }
 
     public function testThatItIsSubscribedToEvents(): void
@@ -69,10 +57,10 @@ final class PasswordSubscriberTest extends TestCase
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(
-                $this->createMock(AuthenticatorInterface::class),
+                $this->createStub(AuthenticatorInterface::class),
                 new Passport(
-                    $this->createMock(UserBadge::class),
-                    $this->createMock(CredentialsInterface::class),
+                    $this->createStub(UserBadge::class),
+                    $this->createStub(CredentialsInterface::class),
                     [$passwordStrengthBadge]
                 )
             )
@@ -85,10 +73,10 @@ final class PasswordSubscriberTest extends TestCase
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(
-                $this->createMock(AuthenticatorInterface::class),
+                $this->createStub(AuthenticatorInterface::class),
                 new Passport(
-                    $this->createMock(UserBadge::class),
-                    $this->createMock(CredentialsInterface::class),
+                    $this->createStub(UserBadge::class),
+                    $this->createStub(CredentialsInterface::class),
                     [$passwordStrengthBadge]
                 )
             )

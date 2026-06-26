@@ -117,8 +117,10 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('1:the-alias', $asset->getSlug());
 
         $assetModel = static::getContainer()->get('mautic.asset.model.asset');
+
         $this->assertInstanceOf(AssetModel::class, $assetModel);
-        $generatedUrl = $assetModel->generateUrl($asset, true, [], null);
+
+        $generatedUrl = $assetModel->generateUrl($asset, true, []);
         $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
     }
 }

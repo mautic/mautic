@@ -189,9 +189,6 @@ class SegmentCountCacheHelperTest extends TestCase
                 if ($key === 'segment.'.$segmentId.'.lead') {
                     return true;
                 }
-                if ($key === 'segment.'.$segmentId.'.lead.recount') {
-                    return false;
-                }
 
                 return false;
             });
@@ -228,9 +225,6 @@ class SegmentCountCacheHelperTest extends TestCase
             ->willReturnCallback(function ($key) use ($segmentId) {
                 if ($key === 'segment.'.$segmentId.'.lead') {
                     return true;
-                }
-                if ($key === 'segment.'.$segmentId.'.lead.recount') {
-                    return false;
                 }
 
                 return false;

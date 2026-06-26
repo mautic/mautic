@@ -20,8 +20,8 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock      = $this->createStub(FieldsBuilder::class);
+        $companyReportDataMock  = $this->createStub(CompanyReportData::class);
         $reportBuilderEventMock = $this->createMock(ReportBuilderEvent::class);
 
         $reportBuilderEventMock->expects($this->once())
@@ -38,8 +38,8 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate(): void
     {
-        $fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock    = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock        = $this->createStub(FieldsBuilder::class);
+        $companyReportDataMock    = $this->createStub(CompanyReportData::class);
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
         $reportGeneratorEventMock->expects($this->once())
@@ -56,9 +56,9 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportBuilder(): void
     {
-        $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
-        $reportHelperMock      = new ReportHelper($this->createMock(EventDispatcher::class));
+        $translatorMock        = $this->createStub(TranslatorInterface::class);
+        $channelListHelperMock = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
+        $reportHelperMock      = new ReportHelper($this->createStub(EventDispatcher::class));
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock = $this->createMock(CompanyReportData::class);
 

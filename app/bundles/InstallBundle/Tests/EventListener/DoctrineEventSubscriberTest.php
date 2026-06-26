@@ -14,21 +14,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\InstallBundle\EventListener\DoctrineEventSubscriber;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DoctrineEventSubscriberTest extends TestCase
 {
-    /**
-     * @var MockObject&EntityManagerInterface
-     */
-    private MockObject $entityManager;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
     }
 
     public function testSubscriberWillAddCorrectIndexes(): void
@@ -38,7 +30,7 @@ class DoctrineEventSubscriberTest extends TestCase
         $dateColumn = new Column('date_added', new DateTimeType());
         $table      = new Table(MAUTIC_TABLE_PREFIX.'leads', [$idColumn, $textColumn, $dateColumn]);
         $schema     = new Schema([$table]);
-        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
+        $args       = new GenerateSchemaEventArgs($this->createStub(EntityManagerInterface::class), $schema);
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 
@@ -52,7 +44,7 @@ class DoctrineEventSubscriberTest extends TestCase
     {
         $table      = new Table(MAUTIC_TABLE_PREFIX.'some_plugin_table', [new Column('id', new BigIntType())]);
         $schema     = new Schema([$table]);
-        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
+        $args       = new GenerateSchemaEventArgs($this->createStub(EntityManagerInterface::class), $schema);
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 

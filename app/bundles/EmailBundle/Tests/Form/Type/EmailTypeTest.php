@@ -26,26 +26,11 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private MockObject $translator;
 
     /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var MockObject&StageModel
-     */
-    private MockObject $stageModel;
-
-    /**
      * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
 
     private EmailType $form;
-
-    /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
 
     /**
      * @var CorePermissions&MockObject
@@ -62,26 +47,23 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $themeHelper;
 
-    private EmailDefaultsHelper&MockObject $defaultsHelper;
+    private EmailDefaultsHelper&\PHPUnit\Framework\MockObject\Stub $defaultsHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->entityManager        = $this->createMock(EntityManager::class);
-        $this->stageModel           = $this->createMock(StageModel::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->corePermissions      = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
-        $this->defaultsHelper       = $this->createMock(EmailDefaultsHelper::class);
+        $this->defaultsHelper       = $this->createStub(EmailDefaultsHelper::class);
         $this->form                 = new EmailType(
             $this->translator,
-            $this->entityManager,
-            $this->stageModel,
-            $this->coreParametersHelper,
+            $this->createStub(EntityManager::class),
+            $this->createStub(StageModel::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->themeHelper,
             $this->corePermissions,
             $this->emailConfig,

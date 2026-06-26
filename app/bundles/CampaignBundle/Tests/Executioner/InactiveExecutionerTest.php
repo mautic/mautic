@@ -24,13 +24,13 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&InactiveContactFinder $inactiveContactFinder;
 
-    private MockObject&Translator $translator;
+    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
 
     private MockObject&EventScheduler $eventScheduler;
 
     private MockObject&InactiveHelper $inactiveHelper;
 
-    private MockObject&EventExecutioner $eventExecutioner;
+    private \PHPUnit\Framework\MockObject\Stub&EventExecutioner $eventExecutioner;
 
     private MockObject&EventRedirectionHelper $redirectionHelper;
 
@@ -38,13 +38,13 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createStub(Translator::class);
 
         $this->eventScheduler = $this->createMock(EventScheduler::class);
 
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
-        $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+        $this->eventExecutioner = $this->createStub(EventExecutioner::class);
 
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
@@ -200,9 +200,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventScheduler,
             $this->inactiveHelper,
             $this->eventExecutioner,
-            $this->createMock(ProcessSignalService::class),
+            $this->createStub(ProcessSignalService::class),
             $this->redirectionHelper,
-            $this->createMock(LeadRepository::class)
+            $this->createStub(LeadRepository::class)
         );
     }
 }

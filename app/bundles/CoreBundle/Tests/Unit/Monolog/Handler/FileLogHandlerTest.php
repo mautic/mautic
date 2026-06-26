@@ -16,15 +16,9 @@ class FileLogHandlerTest extends TestCase
      */
     private MockObject $coreParametersHelper;
 
-    /**
-     * @var FormatterInterface|MockObject
-     */
-    private MockObject $formatter;
-
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->formatter            = $this->createMock(FormatterInterface::class);
     }
 
     public function testPropertiesAreSetFromCoreParametersHelperWhenDebugModeEnabled(): void
@@ -45,7 +39,7 @@ class FileLogHandlerTest extends TestCase
                 }
             );
 
-        $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
+        $handler = new FileLogHandler($this->coreParametersHelper, $this->createStub(FormatterInterface::class));
         $this->assertSame(Level::Debug, $handler->getLevel());
         $this->assertSame(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
 
@@ -73,7 +67,7 @@ class FileLogHandlerTest extends TestCase
                 }
             );
 
-        $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
+        $handler = new FileLogHandler($this->coreParametersHelper, $this->createStub(FormatterInterface::class));
         $this->assertSame(Level::Notice, $handler->getLevel());
         $this->assertNotSame(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
 

@@ -49,29 +49,9 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
     private MockObject $actionExecutioner;
 
     /**
-     * @var ConditionExecutioner&MockObject
-     */
-    private MockObject $conditionExecutioner;
-
-    /**
-     * @var DecisionExecutioner&MockObject
-     */
-    private MockObject $decisionExecutioner;
-
-    /**
-     * @var LoggerInterface&MockObject
-     */
-    private MockObject $logger;
-
-    /**
      * @var EventScheduler&MockObject
      */
     private MockObject $eventScheduler;
-
-    /**
-     * @var RemovedContactTracker&MockObject
-     */
-    private MockObject $removedContactTracker;
 
     /**
      * @var LeadRepository&MockObject
@@ -83,11 +63,6 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $eventRepository;
 
-    /**
-     * @var Translator&MockObject
-     */
-    private MockObject $translator;
-
     protected function setUp(): void
     {
         $this->eventCollector        = $this->createMock(EventCollector::class);
@@ -95,14 +70,9 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventLogger->method('persistCollection')
             ->willReturn($this->eventLogger);
         $this->actionExecutioner     = $this->createMock(ActionExecutioner::class);
-        $this->conditionExecutioner  = $this->createMock(ConditionExecutioner::class);
-        $this->decisionExecutioner   = $this->createMock(DecisionExecutioner::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
         $this->eventScheduler        = $this->createMock(EventScheduler::class);
-        $this->removedContactTracker = $this->createMock(RemovedContactTracker::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
         $this->eventRepository       = $this->createMock(EventRepository::class);
-        $this->translator            = $this->createMock(Translator::class);
     }
 
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
@@ -209,11 +179,11 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventLogger,
             $this->actionExecutioner,
-            $this->conditionExecutioner,
-            $this->decisionExecutioner,
-            $this->logger,
+            $this->createStub(ConditionExecutioner::class),
+            $this->createStub(DecisionExecutioner::class),
+            $this->createStub(LoggerInterface::class),
             $this->eventScheduler,
-            $this->removedContactTracker,
+            $this->createStub(RemovedContactTracker::class),
         );
     }
 
@@ -269,12 +239,12 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventRepository->method('getEntities')
             ->willReturn([]);
 
-        $eventScheduler = $this->createMock(EventScheduler::class);
+        $eventScheduler = $this->createStub(EventScheduler::class);
 
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $this->eventRepository,
             $this->getEventExecutioner(),
-            $this->translator,
+            $this->createStub(Translator::class),
             $this->leadRepository,
             $eventScheduler
         );

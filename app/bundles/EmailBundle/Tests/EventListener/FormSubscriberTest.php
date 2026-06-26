@@ -161,7 +161,7 @@ class FormSubscriberTest extends TestCase
 
         $action->expects($this->once())
             ->method('getForm')
-            ->willReturn($this->createMock(Form::class));
+            ->willReturn($this->createStub(Form::class));
 
         $this->emailModel->expects($this->once())
             ->method('getEntity')

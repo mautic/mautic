@@ -62,8 +62,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
             null,
             false,
             0,
-            0,
-            null
+            0
         );
 
         Assert::assertCount(1, $results);

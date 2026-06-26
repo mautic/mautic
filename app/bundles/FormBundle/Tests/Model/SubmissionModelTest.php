@@ -55,34 +55,14 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $ipLookupHelper;
 
     /**
-     * @var MockObject|Environment
-     */
-    private MockObject $twigMock;
-
-    /**
      * @var MockObject|FormModel
      */
     private MockObject $formModel;
 
     /**
-     * @var MockObject|PageModel
-     */
-    private MockObject $pageModel;
-
-    /**
-     * @var MockObject|LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
      * @var MockObject|CampaignModel
      */
     private MockObject $campaignModel;
-
-    /**
-     * @var MockObject|MembershipManager
-     */
-    private MockObject $membershipManager;
 
     /**
      * @var MockObject|LeadFieldModel
@@ -139,19 +119,9 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $leadRepository;
 
     /**
-     * @var MockObject|Logger
-     */
-    private MockObject $mockLogger;
-
-    /**
      * @var MockObject|UploadFieldValidator
      */
     private MockObject $uploadFieldValidatorMock;
-
-    /**
-     * @var MockObject|FormUploader
-     */
-    private MockObject $formUploaderMock;
 
     /**
      * @var MockObject|DeviceTrackingServiceInterface
@@ -173,11 +143,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $contactTracker;
 
-    /**
-     * @var MockObject|ContactMerger
-     */
-    private MockObject $contactMerger;
-
     private SubmissionModel $submissionModel;
 
     /**
@@ -190,12 +155,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->twigMock                 = $this->createMock(Environment::class);
         $this->formModel                = $this->createMock(FormModel::class);
-        $this->pageModel                = $this->createMock(PageModel::class);
-        $this->leadModel                = $this->createMock(LeadModel::class);
         $this->campaignModel            = $this->createMock(CampaignModel::class);
-        $this->membershipManager        = $this->createMock(MembershipManager::class);
         $this->leadFieldModel           = $this->createMock(LeadFieldModel::class);
         $this->companyModel             = $this->createMock(CompanyModel::class);
         $this->fieldHelper              = $this->createMock(FormFieldHelper::class);
@@ -207,7 +168,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'Y-m-d',
             'H:i',
             $this->translator,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->userHelper                 = $this->createMock(UserHelper::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -226,14 +187,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->method('getClassMetadata')->willReturn($classMetadata);
         $this->submissioRepository        = $this->createMock(SubmissionRepository::class);
         $this->leadRepository             = $this->createMock(LeadRepository::class);
-        $this->mockLogger                 = $this->createMock(Logger::class);
         $this->uploadFieldValidatorMock   = $this->createMock(UploadFieldValidator::class);
-        $this->formUploaderMock           = $this->createMock(FormUploader::class);
         $this->deviceTrackingService      = $this->createMock(DeviceTrackingServiceInterface::class);
         $this->file1Mock                  = $this->createMock(UploadedFile::class);
         $this->router                     = $this->createMock(RouterInterface::class);
         $this->contactTracker             = $this->createMock(ContactTracker::class);
-        $this->contactMerger              = $this->createMock(ContactMerger::class);
         $userRepository                   = $this->createMock(UserRepository::class);
 
         $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
@@ -257,31 +215,31 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
-            $this->twigMock,
+            $this->createStub(Environment::class),
             $this->formModel,
-            $this->pageModel,
-            $this->leadModel,
+            $this->createStub(PageModel::class),
+            $this->createStub(LeadModel::class),
             $this->campaignModel,
-            $this->membershipManager,
+            $this->createStub(MembershipManager::class),
             $this->leadFieldModel,
             $this->companyModel,
             $this->fieldHelper,
             $this->uploadFieldValidatorMock,
-            $this->formUploaderMock,
+            $this->createStub(FormUploader::class),
             $this->deviceTrackingService,
             new FieldValueTransformer($this->router),
             $this->dateHelper,
             $this->contactTracker,
-            $this->contactMerger,
+            $this->createStub(ContactMerger::class),
             $this->fieldsWithUniqueIdentifier,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
             $this->userHelper,
-            $this->mockLogger,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(Logger::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
@@ -319,7 +277,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->campaignModel->method('getCampaignsByForm')->willReturn([]);
 
-        $userMock = $this->createMock(UserRepository::class);
+        $userMock = $this->createStub(UserRepository::class);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
@@ -519,9 +477,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     public function getAccessibleReflectionMethod(string $name): \ReflectionMethod
     {
-        $method = $this->submissionModelReflection->getMethod($name);
-
-        return $method;
+        return $this->submissionModelReflection->getMethod($name);
     }
 
     public function testGetExportHeader(): void

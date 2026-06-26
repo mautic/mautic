@@ -88,7 +88,7 @@ class RequestStateStoreTest extends TestCase
 
     public function testGetIsHitRequestState(): void
     {
-        $state = $this->createMock(RequestState::class);
+        $state = $this->createStub(RequestState::class);
 
         $setUp = \Closure::bind(
             static function (CacheItem $item, RequestState $state): void {

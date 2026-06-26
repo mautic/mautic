@@ -12,18 +12,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $contactHelper;
-
-    /**
      * @var Configuration|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $configuration;
 
     protected function setUp(): void
     {
-        $this->contactHelper = $this->createMock(ContactHelper::class);
         $this->configuration = $this->createMock(Configuration::class);
         $this->configuration->method('getAccountSid')
             ->willReturn('123');
@@ -33,7 +27,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
+        $request          = $this->createStub(Request::class);
         $inputBag         = new InputBag([
             'AccountSid' => '123',
             'From'       => '',
@@ -48,7 +42,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
+        $request          = $this->createStub(Request::class);
         $inputBag         = new InputBag([
             'AccountSid' => '123',
             'From'       => '321',
@@ -64,7 +58,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createMock(Request::class);
+        $request          = $this->createStub(Request::class);
         $inputBag         = new InputBag([
             'AccountSid' => '321',
         ]);
@@ -96,6 +90,6 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
      */
     private function getCallback()
     {
-        return new TwilioCallback($this->contactHelper, $this->configuration);
+        return new TwilioCallback($this->createStub(ContactHelper::class), $this->configuration);
     }
 }

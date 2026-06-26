@@ -45,11 +45,11 @@ class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $processor = new FeedbackLoop($contactFinder, $translator, $logger, $doNotContact);
 

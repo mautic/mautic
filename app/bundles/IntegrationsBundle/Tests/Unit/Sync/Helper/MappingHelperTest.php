@@ -91,7 +91,7 @@ class MappingHelperTest extends TestCase
             ->method('getFieldsWithUniqueIdentifier')
             ->willReturn([]);
 
-        $mappingManual        = $this->createMock(MappingManualDAO::class);
+        $mappingManual        = $this->createStub(MappingManualDAO::class);
         $internalObjectName   = 'Contact';
         $integrationObjectDAO = new ObjectDAO('Object', 1);
 

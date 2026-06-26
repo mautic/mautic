@@ -26,11 +26,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $notificationModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Router
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Translator
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
@@ -45,8 +40,6 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->userModel = $this->createMock(UserModel::class);
 
         $this->notificationModel = $this->createMock(NotificationModel::class);
-
-        $this->router = $this->createMock(Router::class);
 
         $this->translator = $this->createMock(Translator::class);
 
@@ -192,7 +185,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToAuthor(): void
     {
         $event    = new Event();
-        $user     = $this->createMock(User::class);
+        $user     = $this->createStub(User::class);
         $this->prepareCommonMocks($event, $user);
 
         $this->coreParametersHelper
@@ -213,7 +206,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $user  = $this->createMock(User::class);
+        $user  = $this->createStub(User::class);
         $this->prepareCommonMocks($event, $user);
 
         $emails = 'a@test.co, b@test.co';
@@ -270,7 +263,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             $this->userModel,
             $this->notificationModel,
             $this->translator,
-            $this->router,
+            $this->createStub(Router::class),
             $this->coreParametersHelper
         );
     }

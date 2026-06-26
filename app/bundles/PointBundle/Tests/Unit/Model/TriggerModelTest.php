@@ -25,34 +25,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var IpLookupHelper&MockObject
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var LeadModel&MockObject
-     */
-    private MockObject $leadModel;
-
-    /**
-     * @var TriggerEventModel&MockObject
-     */
-    private MockObject $triggerEventModel;
-
-    /**
      * @var EventDispatcherInterface&MockObject
      */
     private MockObject $dispatcher;
-
-    /**
-     * @var TranslatorInterface&MockObject
-     */
-    private MockObject $translator;
 
     /**
      * @var EntityManager&MockObject
@@ -66,35 +45,25 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
     private TriggerModel $triggerModel;
 
-    /**
-     * @var ContactTracker&MockObject
-     */
-    private MockObject $contactTracker;
-
     protected function setUp(): void
     {
         parent::setUp();
-        $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->triggerEventModel      = $this->createMock(TriggerEventModel::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->translator             = $this->createMock(Translator::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
-            $this->ipLookupHelper,
-            $this->leadModel,
-            $this->triggerEventModel,
-            $this->contactTracker,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(TriggerEventModel::class),
+            $this->createStub(ContactTracker::class),
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         // reset private property cachedEvents in TriggerModel instance

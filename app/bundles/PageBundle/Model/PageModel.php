@@ -1130,13 +1130,13 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         // Use the current URL
         $isPageEvent = false;
-        if (str_contains((string) $request->server->get('REQUEST_URI'), (string) $this->router->generate('mautic_page_tracker'))) {
+        if (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker'))) {
             // Tracking pixel is used
             if ($request->server->get('QUERY_STRING')) {
                 parse_str($request->server->get('QUERY_STRING'), $query);
                 $isPageEvent = true;
             }
-        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), (string) $this->router->generate('mautic_page_tracker_cors'))) {
+        } elseif (str_contains((string) $request->server->get('REQUEST_URI'), $this->router->generate('mautic_page_tracker_cors'))) {
             $query       = $request->request->all();
             $isPageEvent = true;
         }

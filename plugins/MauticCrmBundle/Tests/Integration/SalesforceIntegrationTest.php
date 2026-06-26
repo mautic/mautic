@@ -1058,9 +1058,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         return $max;
                     }
 
-                    $createLeads = $this->getLeadsToCreate($args[2], $max);
-
-                    return $createLeads;
+                    return $this->getLeadsToCreate($args[2], $max);
                 }
             );
     }
@@ -1161,38 +1159,36 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $contactCount = 0;
         $leadCount    = 0;
 
-        if (!empty($emails)) {
-            foreach ($emails as $email) {
-                // Extact ID
-                preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
-                $object = $match[1];
+        foreach ($emails as $email) {
+            // Extact ID
+            preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
+            $object = $match[1];
 
-                if ('Lead' === $object) {
-                    if ($leadCount >= $maxLeads) {
-                        continue;
-                    }
-                    ++$leadCount;
-                } else {
-                    if ($contactCount >= $maxContacts) {
-                        continue;
-                    }
-                    ++$contactCount;
+            if ('Lead' === $object) {
+                if ($leadCount >= $maxLeads) {
+                    continue;
                 }
-
-                $id        = $match[2];
-                $records[] = [
-                    'attributes' => [
-                        'type' => $object,
-                        'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
-                    ],
-                    'Id'        => 'SF'.$id,
-                    'FirstName' => $object.$id,
-                    'LastName'  => $object.$id,
-                    'Email'     => $object.$id.'@sftest.com',
-                ];
-
-                $this->addSpecialCases($id, $records);
+                ++$leadCount;
+            } else {
+                if ($contactCount >= $maxContacts) {
+                    continue;
+                }
+                ++$contactCount;
             }
+
+            $id        = $match[2];
+            $records[] = [
+                'attributes' => [
+                    'type' => $object,
+                    'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
+                ],
+                'Id'        => 'SF'.$id,
+                'FirstName' => $object.$id,
+                'LastName'  => $object.$id,
+                'Email'     => $object.$id.'@sftest.com',
+            ];
+
+            $this->addSpecialCases($id, $records);
         }
 
         $this->returnedSfEntities = array_merge($this->returnedSfEntities, $records);

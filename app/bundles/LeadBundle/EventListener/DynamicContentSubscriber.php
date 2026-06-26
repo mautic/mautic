@@ -45,7 +45,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
      */
     private function isContactSegmentRelationshipValid(Lead $contact, string $operator, ?array $segmentIds = null): bool
     {
-        $contactId = (int) $contact->getId();
+        $contactId = $contact->getId();
 
         return match ($operator) {
             OperatorOptions::EMPTY         => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment

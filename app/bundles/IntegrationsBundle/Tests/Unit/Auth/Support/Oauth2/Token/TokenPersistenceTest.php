@@ -35,7 +35,7 @@ class TokenPersistenceTest extends TestCase
     {
         $this->expectException(IntegrationNotSetException::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $this->tokenPersistence->restoreToken($token);
     }
 
@@ -74,7 +74,7 @@ class TokenPersistenceTest extends TestCase
     {
         $this->expectException(IntegrationNotSetException::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $this->tokenPersistence->saveToken($token);
     }
 
@@ -121,7 +121,7 @@ class TokenPersistenceTest extends TestCase
     {
         $this->expectException(IntegrationNotSetException::class);
 
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
         $this->tokenPersistence->saveToken($token);
     }
 

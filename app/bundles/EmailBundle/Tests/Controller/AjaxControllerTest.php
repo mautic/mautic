@@ -51,11 +51,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     private AjaxController $controller;
 
-    /**
-     * @var MockObject&ManagerRegistry
-     */
-    private MockObject $managerRegistry;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -64,8 +59,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->containerMock    = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-
-        $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $userHelper             = $this->createMock(UserHelper::class);
         $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
@@ -76,7 +69,7 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $security               = $this->createMock(CorePermissions::class);
 
         $this->controller = new AjaxController(
-            $this->managerRegistry,
+            $this->createStub(ManagerRegistry::class),
             $this->modelFactoryMock,
             $userHelper,
             $coreParametersHelper,

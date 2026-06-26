@@ -26,29 +26,14 @@ class InactiveHelperTest extends TestCase
     private MockObject $scheduler;
 
     /**
-     * @var InactiveContactFinder|MockObject
-     */
-    private MockObject $inactiveContactFinder;
-
-    /**
      * @var LeadEventLogRepository|MockObject
      */
     private MockObject $eventLogRepository;
 
     /**
-     * @var EventRepository|MockObject
-     */
-    private MockObject $eventRepository;
-
-    /**
      * @var LeadRepository|MockObject
      */
     private MockObject $leadRepository;
-
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private MockObject $logger;
 
     private InactiveHelper $inactiveHelper;
 
@@ -57,18 +42,15 @@ class InactiveHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->scheduler             = $this->createMock(EventScheduler::class);
-        $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
         $this->eventLogRepository    = $this->createMock(LeadEventLogRepository::class);
-        $this->eventRepository       = $this->createMock(EventRepository::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
         $this->decisionHelper        = new DecisionHelper($this->leadRepository);
         $this->inactiveHelper        = new InactiveHelper(
             $this->scheduler,
-            $this->inactiveContactFinder,
+            $this->createStub(InactiveContactFinder::class),
             $this->eventLogRepository,
-            $this->eventRepository,
-            $this->logger,
+            $this->createStub(EventRepository::class),
+            $this->createStub(LoggerInterface::class),
             $this->decisionHelper
         );
     }

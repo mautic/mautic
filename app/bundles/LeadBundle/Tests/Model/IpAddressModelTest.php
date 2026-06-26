@@ -22,11 +22,6 @@ class IpAddressModelTest extends TestCase
      */
     private MockObject $entityManager;
 
-    /**
-     * @var MockObject|LoggerInterface
-     */
-    private MockObject $logger;
-
     private IpAddressModel $ipAddressModel;
 
     protected function setUp(): void
@@ -34,8 +29,7 @@ class IpAddressModelTest extends TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
-        $this->logger         = $this->createMock(LoggerInterface::class);
-        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->logger);
+        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->createStub(LoggerInterface::class));
     }
 
     /**
@@ -52,7 +46,7 @@ class IpAddressModelTest extends TestCase
     public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
         $contact      = $this->createMock(Lead::class);
-        $ipAddress    = $this->createMock(IpAddress::class);
+        $ipAddress    = $this->createStub(IpAddress::class);
         $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
 
         $contact->expects($this->exactly(1))
@@ -147,7 +141,7 @@ class IpAddressModelTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('executeStatement')
-            ->willThrowException(new UniqueConstraintViolationException($this->createMock(DriverException::class), null));
+            ->willThrowException(new UniqueConstraintViolationException($this->createStub(DriverException::class), null));
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')

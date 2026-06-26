@@ -159,7 +159,6 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
             $queryBuilder,
             $this->createNameGenerator(),
             \stdClass::class,
-            null,
         );
     }
 

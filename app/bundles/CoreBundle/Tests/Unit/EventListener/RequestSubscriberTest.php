@@ -40,7 +40,7 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->event = $this->getMockBuilder(RequestEvent::class)
             ->setConstructorArgs([
-                $this->createMock(HttpKernelInterface::class),
+                $this->createStub(HttpKernelInterface::class),
                 $this->request,
                 HttpKernelInterface::MAIN_REQUEST,
             ])->getMock();
@@ -51,7 +51,7 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->subscriber = new RequestSubscriber(
             $csrfTokenManagerMock,
-            $this->createMock(TranslatorInterface::class),
+            $this->createStub(TranslatorInterface::class),
             $twig
         );
     }

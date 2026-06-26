@@ -884,7 +884,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     public function getOriginalIsPublishedValue(): bool
     {
-        return (bool) $this->originalIsPublishedValue;
+        return $this->originalIsPublishedValue;
     }
 
     public function getCacheNamespacesToDelete(): array

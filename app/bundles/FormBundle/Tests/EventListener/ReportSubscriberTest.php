@@ -49,19 +49,9 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
     private ReportHelper $reportHelper;
 
-    /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface|MockObject
-     */
-    private MockObject $translator;
-
     private ReportSubscriber $subscriber;
 
-    private MockObject&DncReportService $dncReportService;
+    private \PHPUnit\Framework\MockObject\Stub&DncReportService $dncReportService;
 
     protected function setUp(): void
     {
@@ -73,17 +63,15 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
-        $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService     = $this->createMock(DncReportService::class);
+        $this->reportHelper         = new ReportHelper($this->createStub(EventDispatcher::class));
+        $this->dncReportService     = $this->createStub(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $this->coreParametersHelper,
-            $this->translator,
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(TranslatorInterface::class),
             $this->dncReportService
         );
     }
@@ -165,8 +153,8 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     public function testOnReportBuilderWithWrongContext(): void
     {
         $reportBuilderEvent = new ReportBuilderEvent(
-            $this->translator,
-            $this->createMock(ChannelListHelper::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(ChannelListHelper::class),
             'test',
             [],
             $this->reportHelper,
@@ -181,8 +169,8 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     public function testOnReportBuilderAddsFormAndFormResultReports(): void
     {
         $reportBuilderEvent = new ReportBuilderEvent(
-            $this->translator,
-            $this->createMock(ChannelListHelper::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(ChannelListHelper::class),
             ReportSubscriber::CONTEXT_FORM_RESULT,
             [],
             $this->reportHelper,
@@ -339,7 +327,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     {
         $mockEvent        = $this->createMock(ReportGraphEvent::class);
         $mockTrans        = $this->createMock(Translator::class);
-        $mockQueryBuilder = $this->createMock(QueryBuilder::class);
+        $mockQueryBuilder = $this->createStub(QueryBuilder::class);
         $mockChartQuery   = $this->createMock(ChartQuery::class);
 
         $mockTrans->expects($this->any())

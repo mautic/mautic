@@ -157,8 +157,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact           = $this->createMock(DoNotContact::class);
         $mockGroupModel               = $this->createMock(PointGroupModel::class);
         $this->filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class)
         );
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('getDefaultTimezone')
@@ -420,7 +420,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionUpdateLead(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $properties    = [
             'points' => 10,
         ];
