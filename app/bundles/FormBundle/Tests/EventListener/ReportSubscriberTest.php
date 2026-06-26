@@ -63,7 +63,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
     private MockObject&DncReportService $dncReportService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['form_results_data_sources'] = true;
 

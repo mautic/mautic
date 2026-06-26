@@ -137,6 +137,23 @@
             <!--/ campaign detail collapseable toggler -->
 
             {{ customContent('left.section.top', _context) }}
+            {% if securityIsGranted('lead:leads:viewown') %}
+                <div class="pa-md">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                                {
+                                    'title': 'mautic.campaign.stat.contacts'|trans,
+                                    'value': contactCount,
+                                    'tooltip': 'mautic.campaign.stat.contacts.tooltip'|trans,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.campaign_membership'|trans) ~ ':' ~ campaign.id}),
+                                    'icon': 'ri-group-line'
+                                }
+                            ]}) }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->

@@ -2,6 +2,32 @@ export const pluginId = 'grapesjs-image-link';
 
 const escapeAttrValue = (value) => String(value).replace(/"/g, '&quot;');
 
+const normalizeHref = (href) => {
+  if (!href) {
+    return href;
+  }
+  const value = String(href).trim();
+  if (!value) {
+    return value;
+  }
+  // schemes, protocol-relative, anchors/relative paths, Mautic tokens - leave as-is
+  if (
+    /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value) ||
+    value.startsWith('//') ||
+    /^[#/.]/.test(value) ||
+    value.startsWith('{')
+  ) {
+    return value;
+  }
+  // prepend https only when it looks like a domain (host.tld)
+  const host = value.split(/[/?#]/)[0];
+  const tld = host.includes('.') ? host.split('.').pop() : '';
+  if (/^[a-zA-Z]{2,}$/.test(tld)) {
+    return `https://${value}`;
+  }
+  return value;
+};
+
 const buildAttributesString = (attributes) => {
   let str = '';
 
@@ -45,7 +71,7 @@ export default (editor) => {
 
       toHTML() {
         const attributes = { ...(this.get('attributes') || {}) };
-        const href = attributes.href;
+        const href = normalizeHref(attributes.href);
 
         if (!href) {
           return originalToHTML.call(this);
