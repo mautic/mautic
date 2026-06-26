@@ -23,7 +23,7 @@ class CampaignSubscriberTest extends TestCase
 
     private CampaignSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

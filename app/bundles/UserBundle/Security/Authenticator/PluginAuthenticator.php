@@ -43,7 +43,7 @@ final class PluginAuthenticator extends AbstractAuthenticator
         return null === $this->oAuth2->getBearerToken($request) ? null : false;
     }
 
-    public function authenticate(Request $request): Passport
+    public function authenticate(Request $request): SelfValidatingPassport
     {
         $authenticatingService = $request->get('integration');
         \assert(null === $authenticatingService || is_string($authenticatingService));

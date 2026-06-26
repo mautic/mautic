@@ -10,7 +10,7 @@ final class HtmlTypeTest extends TestCase
 {
     private HtmlType $htmlType;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->htmlType = new HtmlType();

@@ -24,7 +24,7 @@ class TokenPersistenceTest extends TestCase
 
     private TokenPersistence $tokenPersistence;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->integrationsHelper = $this->createMock(IntegrationsHelper::class);
         $this->tokenPersistence   = new TokenPersistence($this->integrationsHelper);

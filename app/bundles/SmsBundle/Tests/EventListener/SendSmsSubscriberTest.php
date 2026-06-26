@@ -22,7 +22,7 @@ final class SendSmsSubscriberTest extends TestCase
 
     private MessageQueueModel&MockObject $mqmMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->subscriber = new SendSmsSubscriber(
             $this->dncRepoMock = $this->createMock(DoNotContactRepository::class),

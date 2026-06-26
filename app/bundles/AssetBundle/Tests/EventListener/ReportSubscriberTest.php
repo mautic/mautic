@@ -45,7 +45,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private ReportHelper $reportHelper;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->queryBuilder        = $this->createMock(QueryBuilder::class);
         $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));

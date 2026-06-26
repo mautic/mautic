@@ -53,7 +53,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $customFieldNotification;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->fieldModel                         = $this->createMock(FieldModel::class);
         $this->customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
