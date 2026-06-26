@@ -637,7 +637,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      *
      * @return $this
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -655,10 +655,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param ?string $description
-     *
-     * @return Email
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -692,7 +690,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -711,7 +709,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setContent($content)
+    public function setContent($content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -730,7 +728,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @param array $utmTags
      */
-    public function setUtmTags($utmTags)
+    public function setUtmTags($utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -749,7 +747,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setReadCount($readCount)
+    public function setReadCount($readCount): static
     {
         $this->readCount = $readCount;
 
@@ -772,7 +770,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setRevision($revision)
+    public function setRevision($revision): static
     {
         $this->revision = $revision;
 
@@ -790,7 +788,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setSessionId($sessionId)
+    public function setSessionId($sessionId): static
     {
         $this->sessionId = $sessionId;
 
@@ -808,7 +806,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setSubject($subject)
+    public function setSubject($subject): static
     {
         $this->isChanged('subject', $subject);
         $this->subject = $subject;
@@ -829,7 +827,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      *
      * @return $this
      */
-    public function setUseOwnerAsMailer($useOwnerAsMailer)
+    public function setUseOwnerAsMailer($useOwnerAsMailer): static
     {
         $this->useOwnerAsMailer = $useOwnerAsMailer;
 
@@ -859,10 +857,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param mixed $fromAddress
-     *
-     * @return Email
      */
-    public function setFromAddress($fromAddress)
+    public function setFromAddress($fromAddress): static
     {
         $this->isChanged('fromAddress', $fromAddress);
         $this->fromAddress = $fromAddress;
@@ -880,10 +876,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param mixed $fromName
-     *
-     * @return Email
      */
-    public function setFromName($fromName)
+    public function setFromName($fromName): static
     {
         $this->isChanged('fromName', $fromName);
         $this->fromName = $fromName;
@@ -901,10 +895,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param mixed $replyToAddress
-     *
-     * @return Email
      */
-    public function setReplyToAddress($replyToAddress)
+    public function setReplyToAddress($replyToAddress): static
     {
         $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
@@ -935,10 +927,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param mixed $bccAddress
-     *
-     * @return Email
      */
-    public function setBccAddress($bccAddress)
+    public function setBccAddress($bccAddress): static
     {
         $this->isChanged('bccAddress', $bccAddress);
         $this->bccAddress = $bccAddress;
@@ -957,7 +947,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setTemplate($template)
+    public function setTemplate($template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -980,7 +970,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -999,7 +989,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -1020,7 +1010,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
 
@@ -1038,7 +1028,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setVariantSentCount($variantSentCount)
+    public function setVariantSentCount($variantSentCount): static
     {
         $this->variantSentCount = $variantSentCount;
 
@@ -1055,10 +1045,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Add list.
-     *
-     * @return Email
      */
-    public function addList(LeadList $list)
+    public function addList(LeadList $list): static
     {
         $this->listsChangedAdd('lists', $list->getId());
         $this->lists[] = $list;
@@ -1069,7 +1057,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * Set the lists for this translation.
      */
-    public function setLists(array $lists = [])
+    public function setLists(array $lists = []): static
     {
         $lists = new ArrayCollection($lists);
         $this->listsChangedSet('lists', $this->getListKeys($lists));
@@ -1118,7 +1106,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPlainText($plainText)
+    public function setPlainText($plainText): static
     {
         $this->plainText = $plainText;
 
@@ -1154,7 +1142,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setVariantReadCount($variantReadCount)
+    public function setVariantReadCount($variantReadCount): static
     {
         $this->variantReadCount = $variantReadCount;
 
@@ -1180,7 +1168,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setCustomHtml($customHtml)
+    public function setCustomHtml($customHtml): static
     {
         $this->customHtml = $customHtml;
 
@@ -1198,7 +1186,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setUnsubscribeForm(?Form $unsubscribeForm = null)
+    public function setUnsubscribeForm(?Form $unsubscribeForm = null): static
     {
         $this->unsubscribeForm = $unsubscribeForm;
 
@@ -1216,7 +1204,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return $this
      */
-    public function setPreferenceCenter(?Page $preferenceCenter = null)
+    public function setPreferenceCenter(?Page $preferenceCenter = null): static
     {
         $this->isChanged('preferenceCenter', $preferenceCenter);
         $this->preferenceCenter = $preferenceCenter;
@@ -1234,10 +1222,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param mixed $emailType
-     *
-     * @return Email
      */
-    public function setEmailType($emailType)
+    public function setEmailType($emailType): static
     {
         $this->emailType = $emailType;
 
@@ -1246,10 +1232,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Add asset.
-     *
-     * @return Email
      */
-    public function addAssetAttachment(Asset $asset)
+    public function addAssetAttachment(Asset $asset): static
     {
         $this->assetAttachments[] = $asset;
 
@@ -1284,10 +1268,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param array $headers
-     *
-     * @return Email
      */
-    public function setHeaders($headers)
+    public function setHeaders($headers): static
     {
         $this->headers = $headers;
 
@@ -1353,7 +1335,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      *
      * @return $this
      */
-    public function setPublicPreview($publicPreview)
+    public function setPublicPreview($publicPreview): static
     {
         $this->isChanged('publicPreview', $publicPreview);
         $this->publicPreview = $publicPreview;
@@ -1366,7 +1348,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      *
      * @return $this
      */
-    public function setQueuedCount($count)
+    public function setQueuedCount($count): static
     {
         $this->queuedCount = $count;
 
@@ -1386,7 +1368,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      *
      * @return $this
      */
-    public function setPendingCount($count)
+    public function setPendingCount($count): static
     {
         $this->pendingCount = $count;
 

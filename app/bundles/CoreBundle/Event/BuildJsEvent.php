@@ -33,7 +33,7 @@ class BuildJsEvent extends Event
      *
      * @return $this
      */
-    public function appendJs($js, $section = '')
+    public function appendJs($js, $section = ''): static
     {
         if ($section && $this->debugMode) {
             $slashes = str_repeat('/', strlen($section) + 10);
