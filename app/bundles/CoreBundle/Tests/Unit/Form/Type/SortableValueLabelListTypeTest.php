@@ -54,7 +54,7 @@ final class SortableValueLabelListTypeTest extends TestCase
 
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, $this->isType('callable'));
+            ->with(FormEvents::PRE_SUBMIT, $this->isCallable());
 
         $type->buildForm($builder, []);
     }
