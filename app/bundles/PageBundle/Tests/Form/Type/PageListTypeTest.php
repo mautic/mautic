@@ -16,7 +16,7 @@ class PageListTypeTest extends TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject $pageModelMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $corePermissionsHelper = $this->createMock(CorePermissions::class);
         $this->pageModelMock   = $this->createMock(PageModel::class);

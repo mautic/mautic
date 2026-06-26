@@ -75,7 +75,7 @@ class UserModelTest extends TestCase
      */
     private MockObject $twig;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->mailHelper       = $this->createMock(MailHelper::class);
         $this->userTokenService = $this->createMock(UserTokenServiceInterface::class);

@@ -38,7 +38,7 @@ class ReportSubscriberTest extends TestCase
 
     private ReportSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

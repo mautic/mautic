@@ -9,7 +9,6 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
 // use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
@@ -59,11 +58,6 @@ return RectorConfig::configure()
         '*/Test/*',
         '*/Tests/*',
 
-        ReturnTypeFromReturnDirectArrayRector::class => [
-            // require bit test update
-            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
-        ],
-
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/SyncProcess/Direction/Integration/ObjectChangeGenerator.php',
@@ -87,7 +81,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
             // handle mocks later
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
-            __DIR__.'/app/bundles/CampaignBundle/Executioner/Scheduler/Mode/DAO/GroupExecutionDateDAO.php',
             __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
         ],
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnNullableTypeRector::class => [
