@@ -65,10 +65,8 @@ class Clearbit_Base
 
     /**
      * @param string $id
-     *
-     * @return object
      */
-    public function setWebhookId($id = null)
+    public function setWebhookId($id = null): static
     {
         $this->_webhookId = $id;
 
