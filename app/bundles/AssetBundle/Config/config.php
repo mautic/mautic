@@ -40,7 +40,7 @@ return [
             'items' => [
                 'mautic.asset.assets' => [
                     'route'    => 'mautic_asset_index',
-                    'access'   => ['asset:assets:viewown', 'asset:assets:viewother'],
+                    'access'   => ['asset:assets:viewown', 'asset:assets:viewsamerole', 'asset:assets:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 300,
                 ],

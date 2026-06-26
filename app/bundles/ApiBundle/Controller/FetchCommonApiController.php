@@ -29,6 +29,7 @@ use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -174,16 +175,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             return $this->accessDenied($e->getMessage());
         }
 
-        if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
-            && !$this->security->isGranted($this->permissionBase.':viewother')
-            && null !== $user = $userHelper->getUser()
-        ) {
-            $this->listFilters[] = [
-                'column' => $tableAlias.'.createdBy',
-                'expr'   => 'eq',
-                'value'  => $user->getId(),
-            ];
-        }
+        $this->addCreatedByListFilter($userHelper, $tableAlias);
 
         if ($publishedOnly) {
             $this->listFilters[] = [
@@ -245,6 +237,72 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
+    }
+
+    private function addCreatedByListFilter(UserHelper $userHelper, string $tableAlias): void
+    {
+        if (!$this->shouldLimitListToCurrentUser()) {
+            return;
+        }
+
+        $user = $userHelper->getUser();
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $this->listFilters[] = $this->getCreatedByListFilter($tableAlias, $this->getAllowedApiOwnerIds($user));
+    }
+
+    private function shouldLimitListToCurrentUser(): bool
+    {
+        $viewOtherPermission = $this->permissionBase.':viewother';
+
+        return $this->security->checkPermissionExists($viewOtherPermission)
+            && !$this->security->isGranted($viewOtherPermission);
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getAllowedApiOwnerIds(User $user): array
+    {
+        $userIds = [(int) $user->getId()];
+        $role    = $user->getRole();
+
+        if (null === $role) {
+            return $userIds;
+        }
+
+        $sameRolePermission = $this->permissionBase.':viewsamerole';
+        if (!$this->security->checkPermissionExists($sameRolePermission) || !$this->security->isGranted($sameRolePermission)) {
+            return $userIds;
+        }
+
+        $roleUserIds = $this->doctrine->getRepository(User::class)->findUserIdsByRole($role->getId());
+
+        return $roleUserIds ?: $userIds;
+    }
+
+    /**
+     * @param int[] $userIds
+     *
+     * @return array{column: string, expr: string, value: int|int[]}
+     */
+    private function getCreatedByListFilter(string $tableAlias, array $userIds): array
+    {
+        if (count($userIds) > 1) {
+            return [
+                'column' => $tableAlias.'.createdBy',
+                'expr'   => 'in',
+                'value'  => $userIds,
+            ];
+        }
+
+        return [
+            'column' => $tableAlias.'.createdBy',
+            'expr'   => 'eq',
+            'value'  => reset($userIds),
+        ];
     }
 
     /**

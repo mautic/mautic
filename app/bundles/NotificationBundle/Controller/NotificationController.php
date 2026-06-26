@@ -19,6 +19,10 @@ class NotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
 
+    private const PERMISSION_VIEW_OWN   = 'notification:notifications:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'notification:notifications:viewother';
+
     /**
      * @param int $page
      */
@@ -28,22 +32,10 @@ class NotificationController extends AbstractFormController
         $model = $this->getModel('notification');
 
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'notification:notifications:viewown',
-                'notification:notifications:viewother',
-                'notification:notifications:create',
-                'notification:notifications:editown',
-                'notification:notifications:editother',
-                'notification:notifications:deleteown',
-                'notification:notifications:deleteother',
-                'notification:notifications:publishown',
-                'notification:notifications:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'notification:notifications';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['notification:notifications:viewown'] && !$permissions['notification:notifications:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -73,10 +65,7 @@ class NotificationController extends AbstractFormController
             ],
         ];
 
-        if (!$permissions['notification:notifications:viewother']) {
-            $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'e.createdBy');
 
         $orderBy    = $session->get('mautic.notification.orderby', 'e.name');
         $orderByDir = $session->get('mautic.notification.orderbydir', 'DESC');
@@ -177,8 +166,8 @@ class NotificationController extends AbstractFormController
                 ]
             );
         } elseif (!$this->security->hasEntityAccess(
-            'notification:notifications:viewown',
-            'notification:notifications:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $notification->getCreatedBy()
         )
         ) {
@@ -212,8 +201,8 @@ class NotificationController extends AbstractFormController
                 'trackables'   => $trackableLinks,
                 'logs'         => $logs,
                 'permissions'  => $security->isGranted([
-                    'notification:notifications:viewown',
-                    'notification:notifications:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     'notification:notifications:create',
                     'notification:notifications:editown',
                     'notification:notifications:editother',
@@ -422,8 +411,8 @@ class NotificationController extends AbstractFormController
                 )
             );
         } elseif (!$this->security->hasEntityAccess(
-            'notification:notifications:viewown',
-            'notification:notifications:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $entity->getCreatedBy()
         )
         ) {
@@ -554,8 +543,8 @@ class NotificationController extends AbstractFormController
         if (null != $entity) {
             if (!$this->security->isGranted('notification:notifications:create')
                 || !$this->security->hasEntityAccess(
-                    'notification:notifications:viewown',
-                    'notification:notifications:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {
@@ -674,8 +663,8 @@ class NotificationController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'notification:notifications:viewown',
-                    'notification:notifications:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
                 ) {

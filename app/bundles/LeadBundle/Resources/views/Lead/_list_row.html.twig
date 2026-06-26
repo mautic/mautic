@@ -5,7 +5,7 @@
 {% set fields = item.fields %}
 <tr class="{% if highlight is defined %}warning{% endif %}">
     <td>
-        {% set hasEditAccess = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.permissionUser) %}
+        {% set hasEditAccess = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.permissionUser, permissions['lead:leads:editsamerole']|default(false)) %}
         {% set custom = [{
             'attr': {
                 'href': path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}),
@@ -46,7 +46,7 @@
             'item': item,
             'templateButtons': {
                 'edit': hasEditAccess,
-                'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], item.permissionUser),
+                'delete': securityHasEntityAccess(permissions['lead:leads:deleteown'], permissions['lead:leads:deleteother'], item.permissionUser, permissions['lead:leads:deletesamerole']|default(false)),
             },
             'routeBase': 'contact',
             'langVar': 'lead.lead',

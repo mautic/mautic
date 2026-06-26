@@ -9,8 +9,8 @@
                 'close' : securityHasEntityAccess(
                     permissions['asset:assets:viewown'],
                     permissions['asset:assets:viewother'],
-                    activeAsset.getCreatedBy()
-                ),
+                    activeAsset.getCreatedBy(),
+                    permissions['asset:assets:viewsamerole']|default(false)),
             },
             'routeBase'  : 'asset',
             'langVar'    : 'asset.asset',
@@ -32,14 +32,14 @@
                 'edit' : securityHasEntityAccess(
                     permissions['asset:assets:editown'],
                     permissions['asset:assets:editother'],
-                    activeAsset.getCreatedBy()
-                ),
+                    activeAsset.getCreatedBy(),
+                    permissions['asset:assets:editsamerole']|default(false)),
                 'clone'  : permissions['asset:assets:create'],
                 'delete' : securityHasEntityAccess(
                     permissions['asset:assets:deleteown'],
                     permissions['asset:assets:deleteother'],
-                    activeAsset.getCreatedBy()
-                ),
+                    activeAsset.getCreatedBy(),
+                    permissions['asset:assets:deletesamerole']|default(false)),
             },
             'routeBase'  : 'asset',
             'langVar'    : 'asset.asset',

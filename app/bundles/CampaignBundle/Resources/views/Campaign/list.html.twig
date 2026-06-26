@@ -157,15 +157,15 @@
                           'edit': securityHasEntityAccess(
                                 permissions['campaign:campaigns:editown'],
                                 permissions['campaign:campaigns:editother'],
-                                item.createdBy
-                              ),
+                                item.createdBy,
+                                permissions['campaign:campaigns:editsamerole']|default(false)),
                           'clone': permissions['campaign:campaigns:create'],
                           'export': enableExportPermission,
                           'delete': securityHasEntityAccess(
                                 permissions['campaign:campaigns:deleteown'],
                                 permissions['campaign:campaigns:deleteother'],
-                                item.createdBy
-                              ),
+                                item.createdBy,
+                                permissions['campaign:campaigns:deletesamerole']|default(false)),
                           },
                           'routeBase': 'campaign',
                       }) -}}

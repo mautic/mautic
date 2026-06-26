@@ -7,8 +7,8 @@
         'close': securityHasEntityAccess(
             permissions['campaign:campaigns:viewown'],
             permissions['campaign:campaigns:viewother'],
-            campaign.createdBy
-        ),
+            campaign.createdBy,
+            permissions['campaign:campaigns:viewsamerole']|default(false)),
     },
     'routeBase': 'campaign',
     'targetLabel': 'mautic.campaign.campaigns'|trans
@@ -22,7 +22,7 @@
 {% block actions %}
     {% set buttons = [] %}
 
-    {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy) and enableExportPermission is not empty%}
+    {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy, permissions['campaign:campaigns:viewsamerole']|default(false)) and enableExportPermission is not empty%}
         {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'download',
@@ -40,14 +40,14 @@
         'edit': securityHasEntityAccess(
             permissions['campaign:campaigns:editown'],
             permissions['campaign:campaigns:editother'],
-            campaign.createdBy
-        ),
+            campaign.createdBy,
+            permissions['campaign:campaigns:editsamerole']|default(false)),
         'clone': permissions['campaign:campaigns:create'],
         'delete': securityHasEntityAccess(
             permissions['campaign:campaigns:deleteown'],
             permissions['campaign:campaigns:deleteother'],
-            campaign.createdBy
-        ),
+            campaign.createdBy,
+            permissions['campaign:campaigns:deletesamerole']|default(false)),
     },
     'routeBase': 'campaign',
   }) -}}

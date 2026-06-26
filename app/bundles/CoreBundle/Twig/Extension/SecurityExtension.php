@@ -39,13 +39,14 @@ class SecurityExtension extends AbstractExtension
     /**
      * Helper function to check if the logged in user has access to an entity.
      *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
+     * @param string|bool      $ownPermission
+     * @param string|bool      $otherPermission
+     * @param User|int         $ownerId
+     * @param string|bool|null $sameRolePermission
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
+    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId, $sameRolePermission = null): bool
     {
-        return $this->securityHelper->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
+        return $this->securityHelper->hasEntityAccess($ownPermission, $otherPermission, $ownerId, $sameRolePermission);
     }
 
     /**

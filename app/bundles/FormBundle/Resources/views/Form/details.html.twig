@@ -21,7 +21,7 @@
 {{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': activeForm,
     'templateButtons': {
-        'close': securityHasEntityAccess(permissions['form:forms:viewown'], permissions['form:forms:viewother'], activeForm.createdBy),
+        'close': securityHasEntityAccess(permissions['form:forms:viewown'], permissions['form:forms:viewother'], activeForm.createdBy, permissions['form:forms:viewsamerole']|default(false)),
     },
     'routeBase': 'form',
     'langVar': 'form',
@@ -37,9 +37,9 @@
     {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'item': activeForm,
             'templateButtons': {
-                'edit': securityHasEntityAccess(permissions['form:forms:editown'], permissions['form:forms:editother'], activeForm.createdBy),
+                'edit': securityHasEntityAccess(permissions['form:forms:editown'], permissions['form:forms:editother'], activeForm.createdBy, permissions['form:forms:editsamerole']|default(false)),
                 'clone': permissions['form:forms:create'],
-                'delete': securityHasEntityAccess(permissions['form:forms:deleteown'], permissions['form:forms:deleteother'], activeForm.createdBy),
+                'delete': securityHasEntityAccess(permissions['form:forms:deleteown'], permissions['form:forms:deleteother'], activeForm.createdBy, permissions['form:forms:deletesamerole']|default(false)),
             },
             'routeBase': 'form',
             'langVar': 'form',

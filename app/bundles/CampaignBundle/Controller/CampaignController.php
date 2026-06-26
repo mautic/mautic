@@ -121,17 +121,9 @@ class CampaignController extends AbstractStandardFormController
         // set some permissions
         return (array) $this->security->isGranted(
             [
-                'campaign:campaigns:viewown',
-                'campaign:campaigns:viewother',
-                'campaign:campaigns:create',
-                'campaign:campaigns:editown',
-                'campaign:campaigns:editother',
+                ...$this->getStandardPermissionKeys('campaign:campaigns'),
                 'campaign:campaigns:cloneown',
                 'campaign:campaigns:cloneother',
-                'campaign:campaigns:deleteown',
-                'campaign:campaigns:deleteother',
-                'campaign:campaigns:publishown',
-                'campaign:campaigns:publishother',
                 'campaign:imports:create',
             ],
             'RETURN_ARRAY'
@@ -206,20 +198,10 @@ class CampaignController extends AbstractStandardFormController
     public function batchExportAction(Request $request, ExportHelper $exportHelper): JsonResponse|BinaryFileResponse|Response
     {
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'campaign:campaigns:viewown',
-                'campaign:campaigns:viewother',
-                'campaign:campaigns:create',
-                'campaign:campaigns:editown',
-                'campaign:campaigns:editother',
-                'campaign:campaigns:deleteown',
-                'campaign:campaigns:deleteother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'campaign:campaigns';
+        $permissions    = $this->getStandardPermissions($permissionBase, false);
 
-        if (!$permissions['campaign:campaigns:viewown'] && !$permissions['campaign:campaigns:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();

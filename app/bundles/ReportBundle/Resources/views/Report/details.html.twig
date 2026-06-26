@@ -46,8 +46,8 @@
             'close' : securityHasEntityAccess(
                 permissions['report:reports:viewown'],
                 permissions['report:reports:viewother'],
-                report.createdBy
-            ),
+                report.createdBy,
+                permissions['report:reports:viewsamerole']|default(false)),
         },
         'routeBase' : 'report',
         'targetLabel': 'mautic.report.reports'|trans
@@ -97,8 +97,8 @@
   {{ include('@MauticCore/Helper/page_actions.html.twig', {
           'item': report,
           'templateButtons': {
-              'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], report.createdBy),
-              'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], report.createdBy),
+              'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], report.createdBy, permissions['report:reports:editsamerole']|default(false)),
+              'delete': securityHasEntityAccess(permissions['report:reports:deleteown'], permissions['report:reports:deleteother'], report.createdBy, permissions['report:reports:deletesamerole']|default(false)),
           },
           'routeBase': 'report',
           'langVar': 'report.report',

@@ -134,7 +134,7 @@ return [
             'mautic.campaign.menu.index' => [
                 'iconClass' => 'ri-megaphone-fill',
                 'route'     => 'mautic_campaign_index',
-                'access'    => 'campaign:campaigns:view',
+                'access'    => ['campaign:campaigns:viewown', 'campaign:campaigns:viewsamerole', 'campaign:campaigns:viewother'],
                 'priority'  => 50,
             ],
         ],

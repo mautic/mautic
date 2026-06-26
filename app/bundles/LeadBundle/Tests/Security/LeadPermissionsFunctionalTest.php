@@ -25,10 +25,17 @@ final class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(1, $leadPermissionTab->count());
 
         $leadsRole = $crawler->filter('input[name="role[permissions][lead:leads][]"]');
-        $this->assertEquals(8, $leadsRole->count());
+        $this->assertEquals(11, $leadsRole->count());
+        $this->assertContains('viewsamerole', $leadsRole->extract(['value']));
+        $this->assertContains('editsamerole', $leadsRole->extract(['value']));
+        $this->assertContains('deletesamerole', $leadsRole->extract(['value']));
 
         $listsRole = $crawler->filter('input[name="role[permissions][lead:lists][]"]');
-        $this->assertEquals(10, $listsRole->count());
+        $this->assertEquals(14, $listsRole->count());
+        $this->assertContains('viewsamerole', $listsRole->extract(['value']));
+        $this->assertContains('editsamerole', $listsRole->extract(['value']));
+        $this->assertContains('deletesamerole', $listsRole->extract(['value']));
+        $this->assertContains('publishsamerole', $listsRole->extract(['value']));
 
         $fieldsRole = $crawler->filter('input[name="role[permissions][lead:fields][]"]');
         $this->assertEquals(2, $fieldsRole->count());

@@ -118,8 +118,8 @@
                         {% set edit = securityHasEntityAccess(
                             permissions['sms:smses:editown'],
                             permissions['sms:smses:editother'],
-                            item.getCreatedBy()
-                        ) %}
+                            item.getCreatedBy(),
+                            permissions['sms:smses:editsamerole']|default(false)) %}
                         {% set customButtons = [
                             {
                                 'attr' : {
@@ -143,8 +143,8 @@
                                     'delete' : securityHasEntityAccess(
                                         permissions['sms:smses:deleteown'],
                                         permissions['sms:smses:deleteother'],
-                                        item.getCreatedBy()
-                                    ),
+                                        item.getCreatedBy(),
+                                        permissions['sms:smses:deletesamerole']|default(false)),
                                 },
                                 'routeBase'     : 'sms',
                                 'customButtons' : customButtons,

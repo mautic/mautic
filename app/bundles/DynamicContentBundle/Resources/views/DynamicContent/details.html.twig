@@ -47,7 +47,7 @@
     {
         'item'            : entity,
         'templateButtons' : {
-            'close' : securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:viewown'], permissions['dynamiccontent:dynamiccontents:viewother'], entity.createdBy),
+            'close' : securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:viewown'], permissions['dynamiccontent:dynamiccontents:viewother'], entity.createdBy, permissions['dynamiccontent:dynamiccontents:viewsamerole']|default(false)),
         },
         'routeBase'       : 'dynamicContent',
         'targetLabel'     : 'mautic.dynamicContent.dynamicContents'|trans
@@ -61,9 +61,9 @@
         'item': entity,
         'customButtons': customButtons|default([]),
         'templateButtons': {
-            'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], entity.createdBy),
+            'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], entity.createdBy, permissions['dynamiccontent:dynamiccontents:editsamerole']|default(false)),
             'clone': permissions['dynamiccontent:dynamiccontents:create'],
-            'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], entity.createdBy),
+            'delete': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:deleteown'], permissions['dynamiccontent:dynamiccontents:deleteother'], entity.createdBy, permissions['dynamiccontent:dynamiccontents:deletesamerole']|default(false)),
         },
         'routeBase': 'dynamicContent',
     }) -}}

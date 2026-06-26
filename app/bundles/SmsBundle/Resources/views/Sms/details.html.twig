@@ -13,8 +13,8 @@
             'close' : securityHasEntityAccess(
                 permissions['sms:smses:viewown'],
                 permissions['sms:smses:viewother'],
-                sms.getCreatedBy()
-            ),
+                sms.getCreatedBy(),
+                permissions['sms:smses:viewsamerole']|default(false)),
         },
         'routeBase' : 'sms',
         'targetLabel': 'mautic.sms.smses'|trans
@@ -34,14 +34,14 @@
                 'edit' : securityHasEntityAccess(
                     permissions['sms:smses:editown'],
                     permissions['sms:smses:editother'],
-                    sms.getCreatedBy()
-                ),
+                    sms.getCreatedBy(),
+                    permissions['sms:smses:editsamerole']|default(false)),
                 'clone'  : permissions['sms:smses:create'],
                 'delete' : securityHasEntityAccess(
                     permissions['sms:smses:deleteown'],
                     permissions['sms:smses:deleteother'],
-                    sms.getCreatedBy()
-                ),
+                    sms.getCreatedBy(),
+                    permissions['sms:smses:deletesamerole']|default(false)),
             },
             'routeBase' : 'sms',
         }

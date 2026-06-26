@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
@@ -258,11 +259,21 @@ abstract class AbstractCommonModel implements MauticModelInterface
         $filter = $filterDTO->getFilters();
 
         if (!$this->canViewOthersEntity()) {
-            $filter['force'][] = [
-                'column' => $this->getRepository()->getTableAlias().'.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->userHelper->getUser()->getId(),
-            ];
+            if ($this->canViewSameRoleEntity()) {
+                $roleId            = $this->userHelper->getUser()->getRole()->getId();
+                $userIds           = $this->em->getRepository(User::class)->findUserIdsByRole($roleId);
+                $filter['force'][] = [
+                    'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                    'expr'   => 'in',
+                    'value'  => $userIds,
+                ];
+            } else {
+                $filter['force'][] = [
+                    'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                    'expr'   => 'eq',
+                    'value'  => $this->userHelper->getUser()->getId(),
+                ];
+            }
         }
 
         return $this->getRepository()->getEntitiesForGlobalSearch($filter);
@@ -293,6 +304,21 @@ abstract class AbstractCommonModel implements MauticModelInterface
         $permissionBase = $this->getPermissionBase();
         if ($this->security->checkPermissionExists("$permissionBase:viewother")) {
             $isGranted = $this->security->isGranted(["$permissionBase:viewother"]);
+        }
+
+        return $isGranted;
+    }
+
+    public function canViewSameRoleEntity(): bool
+    {
+        if ($this->security->isAdmin()) {
+            return true;
+        }
+
+        $isGranted      = false;
+        $permissionBase = $this->getPermissionBase();
+        if ($this->security->checkPermissionExists("$permissionBase:viewsamerole")) {
+            $isGranted = $this->security->isGranted("$permissionBase:viewsamerole");
         }
 
         return $isGranted;

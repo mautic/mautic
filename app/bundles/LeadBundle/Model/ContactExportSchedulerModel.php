@@ -90,21 +90,22 @@ class ContactExportSchedulerModel extends AbstractCommonModel
         } else {
             if ('list' !== $indexMode || (!str_contains($search, $anonymous))) {
                 // Remove anonymous leads unless requested to prevent clutter.
-                $filter['force'] = [
-                    [
-                        'column' => 'l.dateIdentified',
-                        'expr'   => 'isNotNull',
-                    ],
+                $filter['force'][] = [
+                    'column' => 'l.dateIdentified',
+                    'expr'   => 'isNotNull',
                 ];
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                // Show only owner's contacts.
-                $filter['force'] = [
-                    [
-                        'column' => 'l.owner',
-                        'expr'   => 'eq',
-                    ],
+                $ownerIds          = $this->getAllowedOwnerIds($permissions);
+                $filter['force'][] = count($ownerIds) > 1 ? [
+                    'column' => 'l.owner_id',
+                    'expr'   => 'in',
+                    'value'  => $ownerIds,
+                ] : [
+                    'column' => 'l.owner_id',
+                    'expr'   => 'eq',
+                    'value'  => reset($ownerIds),
                 ];
             }
         }
@@ -118,6 +119,27 @@ class ContactExportSchedulerModel extends AbstractCommonModel
             'withTotalCount' => true,
             'fileType'       => $fileType,
         ];
+    }
+
+    /**
+     * @param array<mixed> $permissions
+     *
+     * @return int[]
+     */
+    private function getAllowedOwnerIds(array $permissions): array
+    {
+        $user = $this->userHelper->getUser();
+        if (!is_object($user)) {
+            return [0];
+        }
+
+        if (empty($permissions['lead:leads:viewsamerole']) || null === $user->getRole()) {
+            return [(int) $user->getId()];
+        }
+
+        $userIds = $this->em->getRepository(User::class)->findUserIdsByRole((int) $user->getRole()->getId());
+
+        return $userIds ?: [(int) $user->getId()];
     }
 
     /**

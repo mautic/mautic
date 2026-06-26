@@ -22,6 +22,20 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ReportController extends FormController
 {
+    private const PERMISSION_VIEW_OWN       = 'report:reports:viewown';
+
+    private const PERMISSION_VIEW_SAME_ROLE = 'report:reports:viewsamerole';
+
+    private const PERMISSION_VIEW_OTHER     = 'report:reports:viewother';
+
+    private const PERMISSION_CREATE         = 'report:reports:create';
+
+    private const PERMISSION_DELETE_OWN     = 'report:reports:deleteown';
+
+    private const PERMISSION_DELETE_SAME_ROLE = 'report:reports:deletesamerole';
+
+    private const PERMISSION_DELETE_OTHER   = 'report:reports:deleteother';
+
     /**
      * @param int $page
      */
@@ -31,22 +45,10 @@ class ReportController extends FormController
         $model = $this->getModel('report');
 
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'report:reports:viewown',
-                'report:reports:viewother',
-                'report:reports:create',
-                'report:reports:editown',
-                'report:reports:editother',
-                'report:reports:deleteown',
-                'report:reports:deleteother',
-                'report:reports:publishown',
-                'report:reports:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'report:reports';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['report:reports:viewown'] && !$permissions['report:reports:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -60,9 +62,7 @@ class ReportController extends FormController
         $filter = ['string' => $search, 'force' => []];
         $request->getSession()->set('mautic.report.filter', $search);
 
-        if (!$permissions['report:reports:viewother']) {
-            $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'r.createdBy');
 
         if (!$this->security->isAdmin()) {
             $filter['force'][] = ['column' => 'r.source', 'expr' => 'neq', 'value' => ReportSubscriber::CONTEXT_AUDIT_LOG];
@@ -133,10 +133,10 @@ class ReportController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity) {
-            if (!$this->security->isGranted('report:reports:create')
+            if (!$this->security->isGranted(self::PERMISSION_CREATE)
                 || !$this->security->hasEntityAccess(
-                    'report:reports:viewown',
-                    'report:reports:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {
@@ -181,7 +181,7 @@ class ReportController extends FormController
                 $postActionVars,
                 $entity,
                 $objectId,
-                ['report:reports:deleteown', 'report:reports:deleteother'],
+                [self::PERMISSION_DELETE_OWN, self::PERMISSION_DELETE_OTHER, self::PERMISSION_DELETE_SAME_ROLE],
                 $model,
                 'report'
             );
@@ -248,8 +248,8 @@ class ReportController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'report:reports:deleteown',
-                    'report:reports:deleteother',
+                    self::PERMISSION_DELETE_OWN,
+                    self::PERMISSION_DELETE_OTHER,
                     $entity->getCreatedBy()
                 )
                 ) {
@@ -319,7 +319,7 @@ class ReportController extends FormController
             $postActionVars,
             $entity,
             $objectId,
-            ['report:reports:viewown', 'report:reports:viewother'],
+            [self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, self::PERMISSION_VIEW_SAME_ROLE],
             $model,
             'report'
         );
@@ -439,7 +439,7 @@ class ReportController extends FormController
 
     public function newAction(ReportModel $model, Request $request, ?Report $entity = null): Response
     {
-        if (!$this->security->isGranted('report:reports:create')) {
+        if (!$this->security->isGranted(self::PERMISSION_CREATE)) {
             $this->throwAccessDenied();
         }
 
@@ -561,7 +561,7 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        } elseif (!$security->hasEntityAccess(self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 
@@ -676,29 +676,18 @@ class ReportController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'data'             => $reportData['data'],
-                    'columns'          => $reportData['columns'],
-                    'dataColumns'      => $reportData['dataColumns'],
-                    'totalResults'     => $reportData['totalResults'],
-                    'debug'            => $reportData['debug'],
-                    'report'           => $entity,
-                    'reportPage'       => $reportPage,
-                    'graphs'           => $reportData['graphs'],
-                    'reportDataResult' => $reportDataResult,
-                    'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                    'limit'            => $reportData['limit'],
-                    'permissions'      => $security->isGranted(
-                        [
-                            'report:reports:viewown',
-                            'report:reports:viewother',
-                            'report:reports:create',
-                            'report:reports:editown',
-                            'report:reports:editother',
-                            'report:reports:deleteown',
-                            'report:reports:deleteother',
-                        ],
-                        'RETURN_ARRAY'
-                    ),
+                    'data'                   => $reportData['data'],
+                    'columns'                => $reportData['columns'],
+                    'dataColumns'            => $reportData['dataColumns'],
+                    'totalResults'           => $reportData['totalResults'],
+                    'debug'                  => $reportData['debug'],
+                    'report'                 => $entity,
+                    'reportPage'             => $reportPage,
+                    'graphs'                 => $reportData['graphs'],
+                    'reportDataResult'       => $reportDataResult,
+                    'tmpl'                   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'limit'                  => $reportData['limit'],
+                    'permissions'            => $this->getStandardPermissions('report:reports'),
                     'dateRangeForm'          => $dateRangeForm->createView(),
                     'dynamicFilterForm'      => $dynamicFilterForm->createView(),
                     'enableExportPermission' => $this->security->isAdmin() || $this->security->isGranted('report:export:enable', 'MATCH_ONE'),
@@ -751,7 +740,12 @@ class ReportController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
+        } elseif (!$this->security->hasEntityAccess(
+            $permissions[0],
+            $permissions[1],
+            $entity->getCreatedBy(),
+            $permissions[2] ?? null
+        )) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -797,7 +791,7 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        } elseif (!$security->hasEntityAccess(self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();
@@ -891,7 +885,7 @@ class ReportController extends FormController
             return $this->notFound($this->translator->trans('mautic.report.notfound', ['%id%' => $reportId]));
         }
 
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+        if (!$security->hasEntityAccess(self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER, $report->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 

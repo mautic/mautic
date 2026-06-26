@@ -165,13 +165,13 @@
                                     'edit' : securityHasEntityAccess(
                                         permissions['asset:assets:editown'],
                                         permissions['asset:assets:editother'],
-                                        item.getCreatedBy()
-                                    ),
+                                        item.getCreatedBy(),
+                                        permissions['asset:assets:editsamerole']|default(false)),
                                     'delete' : securityHasEntityAccess(
                                         permissions['asset:assets:deleteown'],
                                         permissions['asset:assets:deleteother'],
-                                        item.getCreatedBy()
-                                    ),
+                                        item.getCreatedBy(),
+                                        permissions['asset:assets:deletesamerole']|default(false)),
                                     'clone' : permissions['asset:assets:create'],
                                 },
                                 'routeBase'     : 'asset',

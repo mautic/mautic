@@ -12,19 +12,21 @@ class LeadPermissions extends AbstractPermissions
 
     public const LISTS_VIEW_OWN     = 'lead:lists:viewown';
 
-    public const LISTS_VIEW_OTHER   = 'lead:lists:viewother';
+    public const LISTS_VIEW_SAME_ROLE = 'lead:lists:viewsamerole';
 
-    public const LISTS_EDIT_OWN     = 'lead:lists:editown';
+    public const LISTS_VIEW_OTHER     = 'lead:lists:viewother';
 
-    public const LISTS_EDIT_OTHER   = 'lead:lists:editother';
+    public const LISTS_EDIT_OWN       = 'lead:lists:editown';
 
-    public const LISTS_CREATE       = 'lead:lists:create';
+    public const LISTS_EDIT_OTHER     = 'lead:lists:editother';
 
-    public const LISTS_DELETE_OWN   = 'lead:lists:deleteown';
+    public const LISTS_CREATE         = 'lead:lists:create';
 
-    public const LISTS_DELETE_OTHER = 'lead:lists:deleteother';
+    public const LISTS_DELETE_OWN     = 'lead:lists:deleteown';
 
-    public const LISTS_FULL         = 'lead:lists:full';
+    public const LISTS_DELETE_OTHER   = 'lead:lists:deleteother';
+
+    public const LISTS_FULL           = 'lead:lists:full';
 
     /**
      * @param mixed[] $params

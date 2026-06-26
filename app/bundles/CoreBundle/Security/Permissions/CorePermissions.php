@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -24,6 +25,11 @@ class CorePermissions implements ResetInterface
 
     private array $checkedPermissions = [];
 
+    /**
+     * @var array<int, int[]>
+     */
+    private array $sameRoleUserIds = [];
+
     private bool $permissionObjectsGenerated = false;
 
     public function __construct(
@@ -32,6 +38,7 @@ class CorePermissions implements ResetInterface
         private CoreParametersHelper $coreParametersHelper,
         private array $bundles,
         private array $pluginBundles,
+        private UserRepository $userRepository,
     ) {
         $this->registerPermissionClasses();
     }
@@ -39,6 +46,7 @@ class CorePermissions implements ResetInterface
     public function reset(): void
     {
         $this->permissionObjectsGenerated = false;
+        $this->sameRoleUserIds            = [];
     }
 
     public function setPermissionObject(AbstractPermissions $permissionObject): void
@@ -328,11 +336,12 @@ class CorePermissions implements ResetInterface
     /**
      * Checks if the user has access to the requested entity.
      *
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     * @param User|int    $ownerId
+     * @param string|bool      $ownPermission
+     * @param string|bool      $otherPermission
+     * @param User|int         $ownerId
+     * @param string|bool|null $sameRolePermission
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0): bool
+    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0, $sameRolePermission = null): bool
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {
@@ -340,43 +349,121 @@ class CorePermissions implements ResetInterface
             return false;
         }
 
-        if ($ownerId instanceof User) {
-            $ownerId = $ownerId->getId();
-        }
+        [$own, $other] = $this->getOwnerPermissions($ownPermission, $otherPermission);
+        $sameRole      = $this->isSameRoleGranted($ownPermission, $otherPermission, $sameRolePermission);
+        $ownerIdInt    = ($ownerId instanceof User) ? (int) $ownerId->getId() : (int) $ownerId;
 
+        return $this->hasEntityAccessForOwner($user, $ownerId, $ownerIdInt, $own, $other, $sameRole);
+    }
+
+    /**
+     * @param string|bool $ownPermission
+     * @param string|bool $otherPermission
+     *
+     * @return array{0: bool, 1: bool}
+     */
+    private function getOwnerPermissions($ownPermission, $otherPermission): array
+    {
         if (!is_bool($ownPermission) && !is_bool($otherPermission)) {
             $permissions = $this->isGranted(
                 [$ownPermission, $otherPermission],
                 'RETURN_ARRAY'
             );
 
-            $own   = $permissions[$ownPermission];
-            $other = $permissions[$otherPermission];
-        } else {
-            if (!is_bool($ownPermission)) {
-                $own = $this->isGranted($ownPermission);
-            } else {
-                $own = $ownPermission;
-            }
-
-            if (!is_bool($otherPermission)) {
-                $other = $this->isGranted($otherPermission);
-            } else {
-                $other = $otherPermission;
-            }
+            return [$permissions[$ownPermission], $permissions[$otherPermission]];
         }
 
-        $ownerId = (int) $ownerId;
+        return [
+            !is_bool($ownPermission) ? $this->isGranted($ownPermission) : $ownPermission,
+            !is_bool($otherPermission) ? $this->isGranted($otherPermission) : $otherPermission,
+        ];
+    }
 
+    /**
+     * @param string|bool      $ownPermission
+     * @param string|bool      $otherPermission
+     * @param string|bool|null $sameRolePermission
+     */
+    private function isSameRoleGranted($ownPermission, $otherPermission, $sameRolePermission): bool
+    {
+        $sameRolePermission = $this->resolveSameRolePermission($ownPermission, $otherPermission, $sameRolePermission);
+
+        if (is_bool($sameRolePermission)) {
+            return $sameRolePermission;
+        }
+
+        return null !== $sameRolePermission
+            && $this->checkPermissionExists($sameRolePermission)
+            && $this->isGranted($sameRolePermission);
+    }
+
+    /**
+     * @param string|bool      $ownPermission
+     * @param string|bool      $otherPermission
+     * @param string|bool|null $sameRolePermission
+     *
+     * @return string|bool|null
+     */
+    private function resolveSameRolePermission($ownPermission, $otherPermission, $sameRolePermission)
+    {
+        if (null !== $sameRolePermission) {
+            return $sameRolePermission;
+        }
+
+        if (!is_bool($ownPermission)) {
+            return $this->toSameRolePermission($ownPermission);
+        }
+
+        return !is_bool($otherPermission) ? $this->toSameRolePermission($otherPermission) : null;
+    }
+
+    /**
+     * @param User|int $ownerParam
+     */
+    private function hasEntityAccessForOwner(User $currentUser, $ownerParam, int $ownerId, bool $own, bool $other, bool $sameRole): bool
+    {
         if (0 === $ownerId) {
+            // Owner unknown: only 'other' should allow access. Same-role needs an owner context.
             return (bool) $other;
-        } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
-            return true;
-        } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
+        }
+
+        if (($own && (int) $currentUser->getId() === $ownerId) || ($other && (int) $currentUser->getId() !== $ownerId)) {
             return true;
         }
 
-        return false;
+        return $sameRole && $this->ownerHasSameRole($currentUser, $ownerParam, $ownerId);
+    }
+
+    /**
+     * @param User|int $ownerParam
+     */
+    private function ownerHasSameRole(User $currentUser, $ownerParam, int $ownerId): bool
+    {
+        if ($ownerParam instanceof User) {
+            return $ownerParam->getRole()
+                && $currentUser->getRole()
+                && $ownerParam->getRole()->getId() === $currentUser->getRole()->getId();
+        }
+
+        if (null === $currentUser->getRole()) {
+            return false;
+        }
+
+        $roleId = (int) $currentUser->getRole()->getId();
+        if (!array_key_exists($roleId, $this->sameRoleUserIds)) {
+            $this->sameRoleUserIds[$roleId] = $this->userRepository->findUserIdsByRole($roleId);
+        }
+
+        return in_array($ownerId, $this->sameRoleUserIds[$roleId], true);
+    }
+
+    private function toSameRolePermission(string $permission): ?string
+    {
+        if (preg_match('/(view|edit|delete|publish)(own|other)$/', $permission, $matches)) {
+            return preg_replace('/(view|edit|delete|publish)(own|other)$/', '$1samerole', $permission);
+        }
+
+        return null;
     }
 
     /**

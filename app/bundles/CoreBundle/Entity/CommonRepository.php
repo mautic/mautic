@@ -1789,20 +1789,80 @@ class CommonRepository extends ServiceEntityRepository
     private function convertOrmPropertiesToColumns(array &$filters, array $properties): void
     {
         foreach ($filters as &$f) {
-            $key   = (isset($f['col'])) ? 'col' : 'column';
-            $col   = $f[$key];
-            $alias = '';
-            if (str_contains($col, '.')) {
-                [$alias, $col] = explode('.', $col);
+            if ($this->isNestedColumnFilter($f)) {
+                $this->convertNestedOrmPropertiesToColumns($f, $properties);
+
+                continue;
             }
 
-            if (in_array($col, $properties)) {
-                $col = preg_replace('/(?<=\\w)(?=[A-Z])/', '_$1', $col);
-                $col = strtolower($col);
+            $key = $this->getFilterColumnKey($f);
+            if (null === $key) {
+                continue;
             }
 
-            $f[$key] = (!empty($alias)) ? $alias.'.'.$col : $col;
+            $f[$key] = $this->convertOrmPropertyToColumn($f[$key], $properties);
         }
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     */
+    private function isNestedColumnFilter(array $filter): bool
+    {
+        return isset($filter['expr']) && in_array($filter['expr'], ['andX', 'orX'], true);
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     * @param string[]             $properties
+     */
+    private function convertNestedOrmPropertiesToColumns(array &$filter, array $properties): void
+    {
+        if (isset($filter['val']) && is_array($filter['val'])) {
+            $this->convertOrmPropertiesToColumns($filter['val'], $properties);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     */
+    private function getFilterColumnKey(array $filter): ?string
+    {
+        if (isset($filter['col'])) {
+            return 'col';
+        }
+
+        return isset($filter['column']) ? 'column' : null;
+    }
+
+    /**
+     * @param string[] $properties
+     */
+    private function convertOrmPropertyToColumn(mixed $column, array $properties): mixed
+    {
+        if (!is_string($column)) {
+            return $column;
+        }
+
+        [$alias, $column] = $this->splitColumnAlias($column);
+
+        if (in_array($column, $properties, true)) {
+            $column = strtolower((string) preg_replace('/(?<=\\w)(?=[A-Z])/', '_', $column));
+        }
+
+        return '' !== $alias ? $alias.'.'.$column : $column;
+    }
+
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function splitColumnAlias(string $column): array
+    {
+        if (str_contains($column, '.')) {
+            return explode('.', $column, 2);
+        }
+
+        return ['', $column];
     }
 
     /**

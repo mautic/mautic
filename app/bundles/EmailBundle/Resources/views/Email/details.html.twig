@@ -12,8 +12,8 @@
                 'close' : securityHasEntityAccess(
                     permissions['email:emails:viewown'],
                     permissions['email:emails:viewother'],
-                    email.getCreatedBy()
-                ),
+                    email.getCreatedBy(),
+                    permissions['email:emails:viewsamerole']|default(false)),
             },
             'routeBase'     : 'email',
             'targetLabel': 'mautic.email.emails'|trans,
@@ -231,14 +231,15 @@
                     permissions['email:emails:editown'],
                     permissions['email:emails:editother'],
                     email.getCreatedBy(),
+                    permissions['email:emails:editsamerole']|default(false),
                 ),
                 'clone'  : permissions['email:emails:create'],
                 'abtest' : (allowAbTest and permissions['email:emails:create']),
                 'delete' : securityHasEntityAccess(
                     permissions['email:emails:deleteown'],
                     permissions['email:emails:deleteother'],
-                    email.getCreatedBy()
-                ),
+                    email.getCreatedBy(),
+                    permissions['email:emails:deletesamerole']|default(false)),
             },
             'routeBase'     : 'email',
             'customButtons' : customButtons,

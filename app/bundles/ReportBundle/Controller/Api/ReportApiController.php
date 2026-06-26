@@ -67,11 +67,7 @@ class ReportApiController extends CommonApiController
             return $this->notFound();
         }
 
-        if (
-            $this->security->checkPermissionExists($this->permissionBase.':viewother')
-            && !$this->security->isGranted($this->permissionBase.':viewother')
-            && $entity->getCreatedBy() !== $this->userHelper->getUser()->getId()
-        ) {
+        if (!$this->security->hasEntityAccess($this->permissionBase.':viewown', $this->permissionBase.':viewother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         }
 

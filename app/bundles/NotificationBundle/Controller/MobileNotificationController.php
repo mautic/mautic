@@ -19,6 +19,10 @@ class MobileNotificationController extends FormController
 {
     use EntityContactsTrait;
 
+    private const PERMISSION_VIEW_OWN   = 'notification:mobile_notifications:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'notification:mobile_notifications:viewother';
+
     /**
      * @param int $page
      */
@@ -28,22 +32,10 @@ class MobileNotificationController extends FormController
         $model = $this->getModel('notification');
 
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'notification:mobile_notifications:viewown',
-                'notification:mobile_notifications:viewother',
-                'notification:mobile_notifications:create',
-                'notification:mobile_notifications:editown',
-                'notification:mobile_notifications:editother',
-                'notification:mobile_notifications:deleteown',
-                'notification:mobile_notifications:deleteother',
-                'notification:mobile_notifications:publishown',
-                'notification:mobile_notifications:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        $permissionBase = 'notification:mobile_notifications';
+        $permissions    = $this->getStandardPermissions($permissionBase);
 
-        if (!$permissions['notification:mobile_notifications:viewown'] && !$permissions['notification:mobile_notifications:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -74,10 +66,7 @@ class MobileNotificationController extends FormController
             ],
         ];
 
-        if (!$permissions['notification:mobile_notifications:viewother']) {
-            $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'e.createdBy');
 
         $orderBy    = $session->get('mautic.mobile_notification.orderby', 'e.name');
         $orderByDir = $session->get('mautic.mobile_notification.orderbydir', 'DESC');
@@ -178,8 +167,8 @@ class MobileNotificationController extends FormController
                 ]
             );
         } elseif (!$this->security->hasEntityAccess(
-            'notification:mobile_notifications:viewown',
-            'notification:mobile_notifications:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $notification->getCreatedBy()
         )
         ) {
@@ -215,8 +204,8 @@ class MobileNotificationController extends FormController
                 'trackables'   => $trackableLinks,
                 'logs'         => $logs,
                 'permissions'  => $security->isGranted([
-                    'notification:mobile_notifications:viewown',
-                    'notification:mobile_notifications:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     'notification:mobile_notifications:create',
                     'notification:mobile_notifications:editown',
                     'notification:mobile_notifications:editother',
@@ -432,8 +421,8 @@ class MobileNotificationController extends FormController
                 )
             );
         } elseif (!$this->security->hasEntityAccess(
-            'notification:mobile_notifications:viewown',
-            'notification:mobile_notifications:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $entity->getCreatedBy()
         )
         ) {
@@ -566,8 +555,8 @@ class MobileNotificationController extends FormController
         if (null != $entity) {
             if (!$this->security->isGranted('notification:mobile_notifications:create')
                 || !$this->security->hasEntityAccess(
-                    'notification:mobile_notifications:viewown',
-                    'notification:mobile_notifications:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
             ) {
@@ -686,8 +675,8 @@ class MobileNotificationController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'notification:mobile_notifications:viewown',
-                    'notification:mobile_notifications:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
                 ) {

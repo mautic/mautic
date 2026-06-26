@@ -8,8 +8,8 @@
             'close': securityHasEntityAccess(
                 permissions['webhook:webhooks:viewown'],
                 permissions['webhook:webhooks:viewother'],
-                item.getCreatedBy()
-            ),
+                item.getCreatedBy(),
+                permissions['webhook:webhooks:viewsamerole']|default(false)),
         },
         routeBase: 'webhook',
         'targetLabel': 'mautic.webhook.webhooks'|trans
@@ -28,14 +28,14 @@
                 'edit': securityHasEntityAccess(
                     permissions['webhook:webhooks:editown'],
                     permissions['webhook:webhooks:editother'],
-                    item.getCreatedBy()
-                ),
+                    item.getCreatedBy(),
+                    permissions['webhook:webhooks:editsamerole']|default(false)),
                 'clone': permissions['webhook:webhooks:create'],
                 'delete': securityHasEntityAccess(
                     permissions['webhook:webhooks:deleteown'],
                     permissions['webhook:webhooks:deleteother'],
-                    item.getCreatedBy()
-                )
+                    item.getCreatedBy(),
+                    permissions['webhook:webhooks:deletesamerole']|default(false))
             },
             routeBase: 'webhook'
     }) -}}

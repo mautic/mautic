@@ -50,13 +50,56 @@ class ReportApiControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testReportSuccessViewSameRole(): void
+    {
+        $loginValue  = 'Maut1cR0cks!!!!!';
+        $role        = $this->createRole();
+        $user        = $this->createUser($role, $loginValue);
+        $reportOwner = $this->createUser($role, 'owner-value', 'report.owner', 'report.owner@email.com');
+        $report      = $this->createReportData($reportOwner->getId());
+
+        $this->setPermission($user, ['report:reports'=>['viewsamerole']]);
+
+        // Disable the default login.
+        $this->clientServer = [];
+        $this->setUpSymfony($this->configParams);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', $loginValue);
+
+        $this->client->request('GET', '/api/reports/'.$report->getId());
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testGetReportsIncludesSameRoleReports(): void
+    {
+        $loginValue  = 'Maut1cR0cks!!!!!';
+        $role        = $this->createRole();
+        $user        = $this->createUser($role, $loginValue);
+        $reportOwner = $this->createUser($role, 'owner-value', 'report.list.owner', 'report.list.owner@email.com');
+
+        $this->createReportData($reportOwner->getId());
+        $this->setPermission($user, ['report:reports'=>['viewsamerole']]);
+
+        // Disable the default login.
+        $this->clientServer = [];
+        $this->setUpSymfony($this->configParams);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', $loginValue);
+
+        $this->client->request('GET', '/api/reports');
+        $this->assertResponseIsSuccessful();
+        self::assertStringContainsString('Contact report', $this->client->getResponse()->getContent());
+    }
+
     /**
      * @param array<array<string>> $permissions
      */
-    private function createReportStructure(string $password, array $permissions, bool $createBy = false, bool $userIsAdmin = false): int
+    private function createReportStructure(string $plainValue, array $permissions, bool $createBy = false, bool $userIsAdmin = false): int
     {
         $role           = $this->createRole($userIsAdmin);
-        $user           = $this->createUser($role, $password);
+        $user           = $this->createUser($role, $plainValue);
         $createByIdUser = 0;
         if (!empty($createBy)) {
             $createByIdUser = $user->getId();
@@ -66,12 +109,12 @@ class ReportApiControllerTest extends MauticMysqlTestCase
         if ($permissions) {
             $this->setPermission($user, $permissions);
         }
-        // Disable the default logging in via username and password.
+        // Disable the default login.
         $this->clientServer = [];
         $this->setUpSymfony($this->configParams);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
-        $this->client->setServerParameter('PHP_AUTH_PW', $password);
+        $this->client->setServerParameter('PHP_AUTH_PW', $plainValue);
 
         return $report->getId();
     }
@@ -102,16 +145,16 @@ class ReportApiControllerTest extends MauticMysqlTestCase
         return $role;
     }
 
-    private function createUser(Role $role, string $password='mautic'): User
+    private function createUser(Role $role, string $plainValue = 'mautic', string $username = 'john.doe', string $email = 'john.doe@email.com'): User
     {
         $user = new User();
         $user->setFirstName('John');
         $user->setLastName('Doe');
-        $user->setUsername('john.doe');
-        $user->setEmail('john.doe@email.com');
+        $user->setUsername($username);
+        $user->setEmail($email);
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
         \assert($hasher instanceof PasswordHasherInterface);
-        $user->setPassword($hasher->hash($password));
+        $user->setPassword($hasher->hash($plainValue));
         $user->setRole($role);
 
         $this->em->persist($user);

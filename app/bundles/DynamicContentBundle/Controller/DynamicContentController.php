@@ -16,22 +16,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentController extends FormController
 {
+    private const PERMISSION_VIEW_OWN   = 'dynamiccontent:dynamiccontents:viewown';
+
+    private const PERMISSION_VIEW_OTHER = 'dynamiccontent:dynamiccontents:viewother';
+
     protected function getPermissions(): array
     {
-        return (array) $this->security->isGranted(
-            [
-                'dynamiccontent:dynamiccontents:viewown',
-                'dynamiccontent:dynamiccontents:viewother',
-                'dynamiccontent:dynamiccontents:create',
-                'dynamiccontent:dynamiccontents:editown',
-                'dynamiccontent:dynamiccontents:editother',
-                'dynamiccontent:dynamiccontents:deleteown',
-                'dynamiccontent:dynamiccontents:deleteother',
-                'dynamiccontent:dynamiccontents:publishown',
-                'dynamiccontent:dynamiccontents:publishother',
-            ],
-            'RETURN_ARRAY'
-        );
+        return $this->getStandardPermissions('dynamiccontent:dynamiccontents');
     }
 
     public function indexAction(Request $request, $page = 1): Response
@@ -40,7 +31,8 @@ class DynamicContentController extends FormController
 
         $permissions = $this->getPermissions();
 
-        if (!$permissions['dynamiccontent:dynamiccontents:viewown'] && !$permissions['dynamiccontent:dynamiccontents:viewother']) {
+        $permissionBase = 'dynamiccontent:dynamiccontents';
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -63,6 +55,8 @@ class DynamicContentController extends FormController
                 ['column' => 'e.translationParent', 'expr' => 'isNull'],
             ],
         ];
+
+        $this->addStandardRoleBasedFilter($filter, $permissions, $permissionBase, 'e.createdBy');
 
         $orderBy    = $request->getSession()->get('mautic.dynamicContent.orderby', 'e.name');
         $orderByDir = $request->getSession()->get('mautic.dynamicContent.orderbydir', 'DESC');
@@ -544,8 +538,8 @@ class DynamicContentController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'dynamiccontent:dynamiccontents:viewown',
-                    'dynamiccontent:dynamiccontents:viewother',
+                    self::PERMISSION_VIEW_OWN,
+                    self::PERMISSION_VIEW_OTHER,
                     $entity->getCreatedBy()
                 )
                 ) {

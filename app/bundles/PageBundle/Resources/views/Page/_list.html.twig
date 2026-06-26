@@ -93,9 +93,9 @@
                         {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
-                                    'edit': securityHasEntityAccess(permissions['page:pages:editown'], permissions['page:pages:editother'], item.createdBy),
+                                    'edit': securityHasEntityAccess(permissions['page:pages:editown'], permissions['page:pages:editother'], item.createdBy, permissions['page:pages:editsamerole']|default(false)),
                                     'clone': permissions['page:pages:create'],
-                                    'delete': securityHasEntityAccess(permissions['page:pages:deleteown'], permissions['page:pages:deleteother'], item.createdBy),
+                                    'delete': securityHasEntityAccess(permissions['page:pages:deleteown'], permissions['page:pages:deleteother'], item.createdBy, permissions['page:pages:deletesamerole']|default(false)),
                                 },
                                 'routeBase': 'page',
                                 'nameGetter': 'getTitle',

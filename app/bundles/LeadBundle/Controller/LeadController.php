@@ -65,6 +65,12 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    private const PERMISSION_VIEW_OWN       = 'lead:leads:viewown';
+
+    private const PERMISSION_VIEW_OTHER     = 'lead:leads:viewother';
+
+    private const PERMISSION_VIEW_SAME_ROLE = 'lead:leads:viewsamerole';
+
     /**
      * @param int $page
      */
@@ -75,22 +81,18 @@ class LeadController extends FormController
         $page = 1,
     ): Response {
         // set some permissions
-        $permissions = $this->security->isGranted(
-            [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
-                'lead:leads:create',
-                'lead:leads:editown',
-                'lead:leads:editother',
-                'lead:leads:deleteown',
-                'lead:leads:deleteother',
-                'lead:imports:view',
-                'lead:imports:create',
-            ],
-            'RETURN_ARRAY'
+        $permissionBase = 'lead:leads';
+        $permissions    = $this->security->isGranted(
+            array_merge(
+                $this->getStandardPermissionKeys($permissionBase, false),
+                ['lead:imports:view', 'lead:imports:create']
+            ),
+            'RETURN_ARRAY',
+            null,
+            true
         );
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, $permissionBase)) {
             $this->throwAccessDenied();
         }
 
@@ -133,8 +135,12 @@ class LeadController extends FormController
             $anonymousShowing = true;
         }
 
-        if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+        if (!$permissions[self::PERMISSION_VIEW_OTHER]) {
+            if (!empty($permissions[self::PERMISSION_VIEW_SAME_ROLE]) && $this->user->getRole()) {
+                $this->addRoleBasedFilter($filter, $permissions, self::PERMISSION_VIEW_OTHER, self::PERMISSION_VIEW_SAME_ROLE, 'l.owner_id');
+            } else {
+                $filter['force'] .= " $mine";
+            }
         }
 
         $results = $model->getEntities([
@@ -248,8 +254,9 @@ class LeadController extends FormController
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_SAME_ROLE,
+                self::PERMISSION_VIEW_OTHER,
                 'lead:leads:create',
                 'lead:leads:editown',
                 'lead:leads:editother',
@@ -258,8 +265,8 @@ class LeadController extends FormController
         );
 
         if (
-            !$permissions['lead:leads:viewown']
-            && !$permissions['lead:leads:viewother']
+            !$permissions[self::PERMISSION_VIEW_OWN]
+            && !$permissions[self::PERMISSION_VIEW_OTHER]
             && !$permissions['lead:leads:create']
             && !$permissions['lead:leads:editown']
             && !$permissions['lead:leads:editother']
@@ -376,8 +383,8 @@ class LeadController extends FormController
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
                 'lead:leads:create',
                 'lead:leads:editown',
                 'lead:leads:editother',
@@ -388,8 +395,8 @@ class LeadController extends FormController
         );
 
         if (!$this->security->hasEntityAccess(
-            'lead:leads:viewown',
-            'lead:leads:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $lead->getPermissionUser()
         )
         ) {
@@ -1396,8 +1403,8 @@ class LeadController extends FormController
 
         if (null === $lead
             || !$this->security->hasEntityAccess(
-                'lead:leads:viewown',
-                'lead:leads:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
                 $lead->getPermissionUser()
             )
         ) {
@@ -2173,8 +2180,8 @@ class LeadController extends FormController
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_OTHER,
                 'lead:leads:create',
                 'lead:leads:editown',
                 'lead:leads:editother',
@@ -2184,7 +2191,7 @@ class LeadController extends FormController
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, 'lead:leads')) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();
@@ -2223,7 +2230,7 @@ class LeadController extends FormController
                 $filter['force'] .= " !$anonymous";
             }
 
-            if (!$permissions['lead:leads:viewother']) {
+            if (!$permissions[self::PERMISSION_VIEW_OTHER]) {
                 $filter['force'] .= " $mine";
             }
         }
@@ -2283,13 +2290,14 @@ class LeadController extends FormController
         // set some permissions
         $permissions = $this->security->isGranted(
             [
-                'lead:leads:viewown',
-                'lead:leads:viewother',
+                self::PERMISSION_VIEW_OWN,
+                self::PERMISSION_VIEW_SAME_ROLE,
+                self::PERMISSION_VIEW_OTHER,
             ],
             'RETURN_ARRAY'
         );
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, 'lead:leads')) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('lead:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();
@@ -2329,9 +2337,9 @@ class LeadController extends FormController
     public function downloadExportAction(string $fileName = ''): Response
     {
         $permissions = $this->security
-            ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
+            ->isGranted([self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_SAME_ROLE, self::PERMISSION_VIEW_OTHER], 'RETURN_ARRAY');
 
-        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+        if (!$this->hasStandardViewPermission($permissions, 'lead:leads')) {
             $this->throwAccessDenied();
         }
 
@@ -2379,8 +2387,8 @@ class LeadController extends FormController
         $lead = $model->getEntity($objectId);
 
         if (!$this->security->hasEntityAccess(
-            'lead:leads:viewown',
-            'lead:leads:viewother',
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
             $lead->getPermissionUser()
         )
         ) {

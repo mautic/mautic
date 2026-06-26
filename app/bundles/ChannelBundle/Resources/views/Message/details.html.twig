@@ -12,7 +12,7 @@
     {
         'item'            : item,
         'templateButtons' : {
-            'close' : securityHasEntityAccess(permissions['channel:messages:viewown'], permissions['channel:messages:viewother'], item.getCreatedBy()),
+            'close' : securityHasEntityAccess(permissions['channel:messages:viewown'], permissions['channel:messages:viewother'], item.getCreatedBy(), permissions['channel:messages:viewsamerole']|default(false)),
         },
         'routeBase'       : 'message',
         'targetLabel'     : 'mautic.channel.messages'|trans
@@ -25,9 +25,9 @@
     {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'item': item,
         'templateButtons': {
-            'edit': securityHasEntityAccess(permissions['channel:messages:editown'], permissions['channel:messages:editother'], item.getCreatedBy()),
+            'edit': securityHasEntityAccess(permissions['channel:messages:editown'], permissions['channel:messages:editother'], item.getCreatedBy(), permissions['channel:messages:editsamerole']|default(false)),
             'clone': permissions['channel:messages:create'],
-            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteother'], item.getCreatedBy()),
+            'delete': securityHasEntityAccess(permissions['channel:messages:deleteown'], permissions['channel:messages:deleteother'], item.getCreatedBy(), permissions['channel:messages:deletesamerole']|default(false)),
         },
         'routeBase': 'message'
     }) -}}
