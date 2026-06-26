@@ -46,10 +46,8 @@ class Progress
      * Set total value.
      *
      * @param int $total
-     *
-     * @return Progress
      */
-    public function setTotal($total)
+    public function setTotal($total): static
     {
         $this->total = (int) $total;
 
@@ -73,10 +71,8 @@ class Progress
 
     /**
      * Set total value.
-     *
-     * @return Progress
      */
-    public function setDone($done)
+    public function setDone($done): static
     {
         $this->done = (int) $done;
 
@@ -94,10 +90,8 @@ class Progress
 
     /**
      * Increase done count by 1.
-     *
-     * @return Progress
      */
-    public function increase()
+    public function increase(): static
     {
         $this->setDone($this->done + 1);
 
@@ -114,10 +108,8 @@ class Progress
 
     /**
      * Bind Progress from simple array.
-     *
-     * @return Progress
      */
-    public function bindArray(array $progress)
+    public function bindArray(array $progress): static
     {
         if (isset($progress[0])) {
             $this->setDone($progress[0]);
