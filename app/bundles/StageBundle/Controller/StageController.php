@@ -653,6 +653,14 @@ final class StageController extends AbstractFormController
             ]);
         }
 
+        return $this->mergeSubmittedStages($form, $model, $secondaryStage, $postActionVars, $page);
+    }
+
+    /**
+     * @param array<string, mixed> $postActionVars
+     */
+    private function mergeSubmittedStages(FormInterface $form, StageModel $model, Stage $secondaryStage, array $postActionVars, int $page): Response
+    {
         $data         = $form->getData();
         $primaryId    = $data['stage_to_merge'];
         $primaryStage = $model->getEntity($primaryId);
@@ -667,12 +675,9 @@ final class StageController extends AbstractFormController
             ]));
         }
 
-        if ($model->isLocked($secondaryStage)) {
-            return $this->isLocked($postActionVars, $secondaryStage, 'stage');
-        }
-
-        if ($model->isLocked($primaryStage)) {
-            return $this->isLocked($postActionVars, $primaryStage, 'stage');
+        $lockedStage = $this->getLockedMergeStage($model, $secondaryStage, $primaryStage);
+        if (null !== $lockedStage) {
+            return $this->isLocked($postActionVars, $lockedStage, 'stage');
         }
 
         $model->stageMerge($primaryStage, $secondaryStage);
@@ -697,5 +702,18 @@ final class StageController extends AbstractFormController
                 ],
             ]],
         ]);
+    }
+
+    private function getLockedMergeStage(StageModel $model, Stage $secondaryStage, Stage $primaryStage): ?Stage
+    {
+        if ($model->isLocked($secondaryStage)) {
+            return $secondaryStage;
+        }
+
+        if ($model->isLocked($primaryStage)) {
+            return $primaryStage;
+        }
+
+        return null;
     }
 }

@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const COUNT_SQL_PREFIX = 'SELECT COUNT(*) FROM ';
+    private const COUNT_SQL_PREFIX    = 'SELECT COUNT(*) FROM ';
+    private const MERGE_TEST_LOG_DATE = '2026-01-01 00:00:00';
 
     public function testStageMenuString(): void
     {
@@ -78,19 +79,19 @@ class StageControllerFunctionalTest extends MauticMysqlTestCase
         $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
             'stage_id'   => $mergedStageId,
             'lead_id'    => $contactId,
-            'date_fired' => '2026-01-01 00:00:00',
+            'date_fired' => self::MERGE_TEST_LOG_DATE,
         ]);
         $connection->insert(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', [
             'lead_id'     => $contactId,
             'stage_id'    => $mergedStageId,
             'event_name'  => 'Stage changed',
             'action_name' => 'Merged stage',
-            'date_added'  => '2026-01-01 00:00:00',
+            'date_added'  => self::MERGE_TEST_LOG_DATE,
         ]);
         $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
             'stage_id'   => $primaryStageId,
             'lead_id'    => $duplicateLogContactId,
-            'date_fired' => '2026-01-01 00:00:00',
+            'date_fired' => self::MERGE_TEST_LOG_DATE,
         ]);
         $connection->insert(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', [
             'stage_id'   => $mergedStageId,

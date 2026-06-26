@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -52,8 +53,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $stageModel;
 
-    /** @var StageRepository|object */
-    private $stageRepository;
+    private StageRepository $stageRepository;
 
     /**
      * @var MockObject&CategoryModel
@@ -75,30 +75,37 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $form;
 
+    private ?string $defaultUploadDir = null;
+
     private TypeOperatorSubscriber $subscriber;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->defaultUploadDir    = $_ENV['MAUTIC_UPLOAD_DIR'] ?? null;
+        $_ENV['MAUTIC_UPLOAD_DIR'] = $this->defaultUploadDir ?? sys_get_temp_dir();
+
         $this->leadModel       = $this->createMock(LeadModel::class);
         $this->listModel       = $this->createMock(ListModel::class);
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $this->stageModel      = $this->createMock(StageModel::class);
-        $repo                  = new class {
-            /** @var array<int, array{label:string, value:int}> */
-            public array $simpleList = [];
+        $this->stageRepository = new class extends StageRepository {
+            public function __construct()
+            {
+            }
 
             /**
-             * @return array<int, array{label:string, value:int}>
+             * @param array<string, mixed> $parameters
+             *
+             * @return array<int, array{label: string, value: int}>
              */
-            public function getSimpleList(): array
+            public function getSimpleList(?CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id', $extraColumns = null, $limit = 0): array
             {
-                return $this->simpleList;
+                return [['label' => 'Stage D', 'value' => 55]];
             }
         };
-        $this->stageRepository = $repo;
         $this->categoryModel   = $this->createMock(CategoryModel::class);
         $this->assetModel      = $this->createMock(AssetModel::class);
         $this->translator      = $this->createMock(TranslatorInterface::class);
@@ -116,6 +123,17 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->stageModel->method('getRepository')->willReturn($this->stageRepository);
         $this->translator->method('trans')->willReturnArgument(0);
+    }
+
+    protected function tearDown(): void
+    {
+        if (null === $this->defaultUploadDir) {
+            unset($_ENV['MAUTIC_UPLOAD_DIR']);
+        } else {
+            $_ENV['MAUTIC_UPLOAD_DIR'] = $this->defaultUploadDir;
+        }
+
+        parent::tearDown();
     }
 
     public function testOnTypeOperatorsCollect(): void
@@ -158,8 +176,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->expects($this->once())
             ->method('getTagList')
             ->willReturn([['label' => 'Tag C', 'value' => 44]]);
-
-        $this->stageRepository->simpleList = [['label' => 'Stage D', 'value' => 55]];
 
         $this->categoryModel->expects($this->once())
             ->method('getLookupResults')
