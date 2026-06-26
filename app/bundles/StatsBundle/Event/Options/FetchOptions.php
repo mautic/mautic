@@ -16,7 +16,7 @@ class FetchOptions
      *
      * @return $this
      */
-    public function setItemId($value)
+    public function setItemId($value): static
     {
         $this->itemId = $value;
 
@@ -37,7 +37,7 @@ class FetchOptions
      *
      * @return $this
      */
-    public function setOption($key, $value)
+    public function setOption($key, $value): static
     {
         $this->options[$key] = $value;
 

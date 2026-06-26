@@ -66,7 +66,7 @@ class PostCount
      *
      * @return $this
      */
-    public function setMonitor($monitor)
+    public function setMonitor($monitor): static
     {
         $this->monitor = $monitor;
 
@@ -86,7 +86,7 @@ class PostCount
      *
      * @return $this
      */
-    public function setPostCount($postCount)
+    public function setPostCount($postCount): static
     {
         $this->postCount = $postCount;
 
@@ -104,7 +104,7 @@ class PostCount
     /**
      * @return $this
      */
-    public function setPostDate($postDate)
+    public function setPostDate($postDate): static
     {
         $this->postDate = $postDate;
 
