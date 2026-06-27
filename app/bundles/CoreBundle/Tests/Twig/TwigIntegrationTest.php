@@ -14,15 +14,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Twig\Extension\ExtensionInterface;
 
-/**
- * @see https://twig.symfony.com/doc/3.x/advanced.html#functional-tests
- */
-final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
+final class TwigIntegrationTest extends AbstractTwigIntegrationTestCase
 {
     /**
      * @return ExtensionInterface[]
      */
-    public function getExtensions(): array
+    protected function getExtensions(): array
     {
         /** @var Packages&MockObject $packagesMock */
         $packagesMock = $this->createMock(Packages::class);
@@ -50,7 +47,7 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         ];
     }
 
-    public static function getFixturesDirectory(): string
+    protected static function getFixturesDirectory(): string
     {
         return __DIR__.'/Fixtures/';
     }
