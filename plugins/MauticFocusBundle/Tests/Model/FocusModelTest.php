@@ -16,7 +16,6 @@ use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
-use PHPUnit\Framework\MockObject\Rule\InvokedCount as InvokedCountMatcher;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -98,12 +97,7 @@ class FocusModelTest extends TestCase
 
     public static function focusTypeProvider(): \Generator
     {
-<<<<<<< HEAD
-        yield ['form', new InvokedCountMatcher(1)];
-        yield ['notice', new InvokedCountMatcher(0)];
-=======
         yield ['form', new InvokedCount(1)];
         yield ['notice', new InvokedCount(0)];
->>>>>>> 9a6954bd21 (bump phpunit to 11.5)
     }
 }

@@ -7,6 +7,15 @@ use PHPUnit\Framework\TestCase;
 
 class RememberMeTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        restore_exception_handler();
+    }
+
     public function testPersistentRemembermeKey(): void
     {
         // Ensure the defaultParameters are not statically cached.

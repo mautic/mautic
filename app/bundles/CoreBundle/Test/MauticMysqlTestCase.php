@@ -31,19 +31,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function setUp(): void
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
         $this->configParams += [
             'db_driver' => 'pdo_mysql',
         ];
-=======
-        $this->configParams['db_driver'] = 'pdo_mysql';
->>>>>>> a9a9a5841f (remove final ctor method override)
-=======
-        $this->configParams += [
-            'db_driver' => 'pdo_mysql',
-        ];
->>>>>>> 479d0f7e1d (fix trait twig)
 
         $this->setUpInvoked = true;
 
@@ -101,10 +91,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->clearCache();
 
         parent::tearDown();
-
-        // The kernel boot registers an exception handler that is not removed on shutdown.
-        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
-        restore_exception_handler();
     }
 
     /**
