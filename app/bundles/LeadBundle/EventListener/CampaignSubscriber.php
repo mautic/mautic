@@ -493,7 +493,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): CampaignExecutionEvent
     {
         $lead   = $event->getLead();
         $result = false;

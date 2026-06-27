@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         // we keep it on if non PSQL
         if ('pdo_pgsql' != $this->configParams['db_driver']) {

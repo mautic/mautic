@@ -39,7 +39,7 @@ class ContactObjectSubscriberTest extends TestCase
 
     private ContactObjectSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

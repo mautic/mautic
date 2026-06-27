@@ -63,7 +63,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
     private MockObject&DncReportService $dncReportService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['form_results_data_sources'] = true;
 
@@ -133,18 +133,22 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(2))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setTables[] = $args;
+
+                return $mockEvent;
             });
 
         $mockEvent->expects($this->exactly(3))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setGraphs): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;
+
+                return $mockEvent;
             });
 
         $this->companyReportData->expects($this->once())

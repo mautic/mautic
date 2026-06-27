@@ -16,7 +16,7 @@ use Mautic\PluginBundle\Entity\Integration;
 
 class SyncServiceTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

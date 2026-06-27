@@ -43,7 +43,7 @@ class ChannelClickQueryBuilderTest extends TestCase
 
     private ChannelClickQueryBuilder $queryBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);

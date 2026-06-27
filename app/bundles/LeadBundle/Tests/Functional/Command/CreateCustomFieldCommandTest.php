@@ -17,7 +17,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -165,10 +165,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * Set name.
      *
      * @param string $name
-     *
-     * @return Role
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -188,10 +186,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 
     /**
      * Add permissions.
-     *
-     * @return Role
      */
-    public function addPermission(Permission $permissions)
+    public function addPermission(Permission $permissions): static
     {
         $permissions->setRole($this);
 
@@ -222,10 +218,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * Set description.
      *
      * @param string $description
-     *
-     * @return Role
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -247,10 +241,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      * Set isAdmin.
      *
      * @param bool $isAdmin
-     *
-     * @return Role
      */
-    public function setIsAdmin($isAdmin)
+    public function setIsAdmin($isAdmin): static
     {
         $this->isChanged('isAdmin', $isAdmin);
         $this->isAdmin = $isAdmin;
@@ -299,10 +291,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 
     /**
      * Add users.
-     *
-     * @return Role
      */
-    public function addUser(User $users)
+    public function addUser(User $users): static
     {
         $this->users[] = $users;
 

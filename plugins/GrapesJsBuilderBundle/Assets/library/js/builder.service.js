@@ -690,6 +690,7 @@ export default class BuilderService {
       this.normalizeTextComponentContainers(component)
     );
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
+    this.editor.on('mautic:code-editor-update', () => this.normalizeTextComponentContainers());
 
     // add offset to flashes container for better UI visibility when builder is on
     this.editor.on('show', () => mQuery('#flashes').addClass('alert-offset'));
@@ -1278,8 +1279,16 @@ export default class BuilderService {
       const textType = dc.getType('text');
       const originalIsComponent = textType?.model?.isComponent;
 
+      const isHeadingWrapper = (el) =>
+        el.tagName === 'DIV' &&
+        typeof el.classList !== 'undefined' &&
+        el.classList.contains('gjs-heading-wrapper');
+
       dc.addType('text', {
         isComponent(el) {
+          if (isHeadingWrapper(el)) {
+            return { type: 'text' };
+          }
           if (el.tagName === 'DIV' && el.getAttribute && el.getAttribute('data-slot') === 'text') {
             return { type: 'text' };
           }

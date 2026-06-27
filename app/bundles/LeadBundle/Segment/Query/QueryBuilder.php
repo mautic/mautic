@@ -63,7 +63,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @return $this
      */
-    public function setQueryPart($queryPartName, $value)
+    public function setQueryPart($queryPartName, $value): static
     {
         $this->resetQueryPart($queryPartName);
         $this->add($queryPartName, $value);
@@ -176,7 +176,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @throws QueryException
      */
-    public function addJoinCondition($alias, $expr)
+    public function addJoinCondition($alias, $expr): static
     {
         $result = $parts = $this->getQueryPart('join');
 
@@ -201,7 +201,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @return $this
      */
-    public function replaceJoinCondition($alias, $expr)
+    public function replaceJoinCondition($alias, $expr): static
     {
         $parts = $this->getQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
@@ -387,7 +387,7 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @return $this
      */
-    private function addLogicStack($expression)
+    private function addLogicStack($expression): static
     {
         $this->logicStack[] = $expression;
 
@@ -432,7 +432,7 @@ class QueryBuilder extends BaseQueryBuilder
      *
      * @return $this
      */
-    public function applyStackLogic()
+    public function applyStackLogic(): static
     {
         if ($this->hasLogicStack()) {
             $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());

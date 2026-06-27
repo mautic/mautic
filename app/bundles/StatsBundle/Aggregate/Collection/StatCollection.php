@@ -28,7 +28,7 @@ class StatCollection
      *
      * @throws \Exception
      */
-    public function addStat($year, $month, $day, $hour, $count)
+    public function addStat($year, $month, $day, $hour, $count): static
     {
         $this->stats
             ->getYear($year)
@@ -47,7 +47,7 @@ class StatCollection
      *
      * @throws \Exception
      */
-    public function addStatByDateTime(\DateTime $dateTime, $count)
+    public function addStatByDateTime(\DateTime $dateTime, $count): static
     {
         $dateTime->setTimezone(new \DateTimeZone('UTC'));
 
@@ -67,7 +67,7 @@ class StatCollection
      *
      * @throws \Exception
      */
-    public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count)
+    public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count): static
     {
         if (preg_match('/([0-9]{4})\\s([0-9]{2})/', $dateTimeInUTC, $matches)) {    //  Is this a week?
             $dateTimeString = CalculatorHelper::getWeekDateString($matches[1].'-'.$matches[2]);
