@@ -3,30 +3,30 @@
 declare(strict_types=1);
 
 use Page\Acceptance\EmailsPage;
+use Step\Acceptance\CategoryStep;
 use Step\Acceptance\EmailStep;
 use Step\Acceptance\SegmentStep;
 
 class EmailManagementCest
 {
-    public const ADMIN_PASSWORD = 'Maut1cR0cks!';
-    public const ADMIN_USER     = 'admin';
     public const DATE_FORMAT    = 'Y:m:d H:i:s';
 
     public function _before(AcceptanceTester $I): void
     {
-        $I->login(self::ADMIN_USER, self::ADMIN_PASSWORD);
+        $I->login();
     }
 
     public function tryToBatchChangeEmailCategory(
         AcceptanceTester $I,
         SegmentStep $segment,
         EmailStep $email,
+        CategoryStep $category,
     ): void {
         $now = date(self::DATE_FORMAT);
 
         // Arrange
         $segment->createAContactSegment('Segment '.$now);
-        $I->createACategory('Category '.$now);
+        $category->createACategory('Category '.$now);
         $email->createSegmentEmail('Email '.$now);
 
         // Act
@@ -35,7 +35,7 @@ class EmailManagementCest
         $this->selectChangeCategoryAction($I);
         $newCategoryName = $email->changeEmailCategory();
 
-        $I->ensureNotificationAppears('emails affected');
+        $I->seeNotificationAppear('emails affected');
 
         $I->reloadPage();
 

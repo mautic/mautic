@@ -1,7 +1,8 @@
 <?php
 
+declare(strict_types=1);
+
 use Facebook\WebDriver\WebDriverKeys;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Page\Acceptance\CampaignPage;
 use Page\Acceptance\ContactPage;
 use PHPUnit\Framework\Assert;
@@ -12,12 +13,11 @@ class ContactManagementCest
 {
     public function _before(AcceptanceTester $I): void
     {
-        $I->login('admin', 'Maut1cR0cks!');
+        $I->login();
     }
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        ContactStep $contact,
     ): void {
         $email               = sprintf('quickadd%s@example.com', time());
         $initialContactCount = $I->grabNumRecords('test_leads');
@@ -311,7 +311,7 @@ class ContactManagementCest
         $I->click(ContactPage::$firstCampaignFromRemoveList);
         $I->click(ContactPage::$campaignsModalSaveButton);
         $I->waitForElementNotVisible('#MauticSharedModal', 30);
-        $I->ensureNotificationAppears('2 contacts affected');
+        $I->seeNotificationAppear('2 contacts affected');
 
         // Navigate to the campaign page and click the Contacts tab
         $I->amOnPage(CampaignPage::$URL);
@@ -478,7 +478,7 @@ class ContactManagementCest
         $I->waitForElementClickable(ContactPage::$doNotContactSaveButton, 10);
         $I->click(ContactPage::$doNotContactSaveButton);
 
-        $I->ensureNotificationAppears('2 contacts affected');
+        $I->seeNotificationAppear('2 contacts affected');
 
         $I->reloadPage();
 
@@ -502,27 +502,30 @@ class ContactManagementCest
         $contact->selectOptionFromDropDownContactsPage('Import');
 
         // Wait for the import page to load
-        $I->waitForText('Import Contacts', 30, 'h1.page-header-title');
+        $I->waitForText('Import Contacts', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
         $I->seeElement(ContactPage::$importModal);
 
         // Click 'Choose file' and select a file
         $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
 
         // Click the upload button
+        $I->waitForElementClickable(ContactPage::$uploadButton, AcceptanceTester::TIMEOUT);
         $I->click(ContactPage::$uploadButton);
 
         // Wait for the new form to open
-        $I->waitForElement(ContactPage::$importForm, 30);
+        $I->waitForElement(ContactPage::$importForm, AcceptanceTester::TIMEOUT);
 
         // Fill in the form
+        $I->waitForElementVisible(ContactPage::$importFormFields, AcceptanceTester::TIMEOUT);
         $I->seeElement(ContactPage::$importFormFields);
         $contact->fillImportFormFields();
 
         // Click 'import in browser'
+        $I->waitForElementClickable(ContactPage::$importInBrowser, AcceptanceTester::TIMEOUT);
         $I->click(ContactPage::$importInBrowser);
 
         // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, 30);
+        $I->waitForElement(ContactPage::$importProgressComplete, AcceptanceTester::TIMEOUT);
         $I->see('Successful import', 'h2');
 
         // Extract the number of contacts created from the progress message

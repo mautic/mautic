@@ -1,14 +1,14 @@
 <?php
 
-namespace Acceptance;
+declare(strict_types=1);
 
 use Page\Acceptance\ThemesPage;
 
 class ThemeManagementCest
 {
-    public function _before(\AcceptanceTester $I)
+    public function _before(AcceptanceTester $I)
     {
-        $I->login('admin', 'Maut1cR0cks!');
+        $I->login();
 
         $I->click(ThemesPage::$dropDown); // gear icon
         $I->waitForElementVisible(ThemesPage::$dropDown_Themes, 30);
@@ -17,7 +17,7 @@ class ThemeManagementCest
         $I->waitForText('Themes', 30); // let the page render
     }
 
-    public function themesHaveNoBlankActions(\AcceptanceTester $I): void
+    public function themesHaveNoBlankActions(AcceptanceTester $I): void
     {
         $I->amOnPage(ThemesPage::$URL);
         $I->waitForElementVisible(ThemesPage::$themeTable, 30);

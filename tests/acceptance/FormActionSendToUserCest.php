@@ -7,8 +7,7 @@ class FormActionSendToUserCest
 {
     public function _before(AcceptanceTester $I): void
     {
-        // Login to Mautic
-        $I->login('admin', 'Maut1cR0cks!');
+        $I->login();
     }
 
     public function createFormWithSendResultsAndToken(
