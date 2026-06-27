@@ -95,6 +95,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->clearCache();
 
         parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        restore_exception_handler();
     }
 
     /**

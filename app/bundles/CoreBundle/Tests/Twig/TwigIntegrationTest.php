@@ -51,4 +51,9 @@ final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             new FormExtension(),
         ];
     }
+
+    public static function getFixturesDirectory(): string
+    {
+        return __DIR__.'/Fixtures/';
+    }
 }

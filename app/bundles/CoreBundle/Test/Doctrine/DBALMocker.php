@@ -197,6 +197,7 @@ class DBALMocker
             $queryBuilderMockBuilder = new MockBuilder($this->testCase, QueryBuilder::class);
 
             $mock = $queryBuilderMockBuilder->disableOriginalConstructor()
+<<<<<<< HEAD
                 ->onlyMethods(
                     [
                         'select',
@@ -208,6 +209,17 @@ class DBALMocker
                         'executeQuery',
                     ]
                 )
+=======
+                ->onlyMethods([
+                    'select',
+                    'from',
+                    'expr',
+                    'where',
+                    'andWhere',
+                    'setParameter',
+                    'executeQuery',
+                ])
+>>>>>>> 1a6edf158e (restore exception handler)
                 ->getMock();
 
 <<<<<<< HEAD

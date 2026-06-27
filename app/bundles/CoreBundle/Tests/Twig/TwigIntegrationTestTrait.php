@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig;
 
+use Codeception\Attribute\DataProvider;
+
 /**
  * Trait to provide PHPUnit 10 compatibility for Twig integration tests
  * This handles the static data provider requirements and legacy test overrides.
@@ -58,26 +60,26 @@ trait TwigIntegrationTestTrait
      * @param array<mixed>          $outputs
      * @param string                $deprecation
      */
-    [DataProvider('integrationTestDataProvider')]
+    #[DataProvider('integrationTestDataProvider')]
     public function testIntegration($file, $message, $condition, $templates, $exception, $outputs, $deprecation = ''): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs, $deprecation);
     }
 
-    /**
-     * Override the legacy integration test to prevent it from running
-     * We don't use legacy Twig features, so this test is not needed.
-     *
-     * @param mixed $file
-     * @param mixed $message
-     * @param mixed $condition
-     * @param mixed $templates
-     * @param mixed $exception
-     * @param mixed $outputs
-     * @param mixed $deprecation
-     */
-    public function testLegacyIntegration($file = null, $message = null, $condition = null, $templates = null, $exception = null, $outputs = null, $deprecation = ''): void
-    {
-        $this->markTestSkipped('Legacy Twig tests are not applicable to this project');
-    }
+    //    /**
+    //     * Override the legacy integration test to prevent it from running
+    //     * We don't use legacy Twig features, so this test is not needed.
+    //     *
+    //     * @param mixed $file
+    //     * @param mixed $message
+    //     * @param mixed $condition
+    //     * @param mixed $templates
+    //     * @param mixed $exception
+    //     * @param mixed $outputs
+    //     * @param mixed $deprecation
+    //     */
+    //    public function testLegacyIntegration($file = null, $message = null, $condition = null, $templates = null, $exception = null, $outputs = null, $deprecation = ''): void
+    //    {
+    //        $this->markTestSkipped('Legacy Twig tests are not applicable to this project');
+    //    }
 }
