@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Email preview</title>
+</head>
+<body>
+<script id="mjml-preview-data" type="application/json">{{ mjml|json_encode|raw }}</script>
+<script src="{{ scriptUrl }}"></script>
+<script>
+(function () {
+    const dataElement = document.getElementById('mjml-preview-data');
+
+    if (!dataElement || !window.MauticGrapesJsPreview) {
+        return;
+    }
+
+    const mjml = JSON.parse(dataElement.textContent);
+    const html = window.MauticGrapesJsPreview.render(mjml);
+
+    if (!html) {
+        document.body.textContent = mjml;
+
+        return;
+    }
+
+    document.open();
+    document.write(html);
+    document.close();
+})();
+</script>
+</body>
+</html>

@@ -5,6 +5,14 @@
   "test": "Assets/library/js/dist/builder.js",
   "targets": {
     "test": {
+      "source": "Assets/library/js/builder.js",
+      "outputFormat": "global",
+      "distDir": "Assets/library/js/dist",
+      "publicUrl": "./",
+      "includeNodeModules": true
+    },
+    "mjml-preview": {
+      "source": "Assets/library/js/mjml-preview.js",
       "outputFormat": "global",
       "distDir": "Assets/library/js/dist",
       "publicUrl": "./",
@@ -15,8 +23,8 @@
     "errorRecovery": true
   },
   "scripts": {
-    "build": "parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-source-maps",
-    "build-dev": "NODE_ENV=development parcel build Assets/library/js/builder.js --dist-dir Assets/library/js/dist --public-url ./ --no-optimize",
+    "build": "parcel build --target test --target mjml-preview --no-source-maps",
+    "build-dev": "NODE_ENV=development parcel build --target test --target mjml-preview --no-optimize",
     "remove-build": "rm -rf ./Assets/library/js/dist/* && rm -rf .parcel-cache/*",
     "rebuild": "npm run remove-build && npm run build",
     "rebuild-dev": "npm run remove-build && npm run build-dev",

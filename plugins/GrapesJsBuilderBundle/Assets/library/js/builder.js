@@ -64,6 +64,9 @@ function useBuilderForCodeMode() {
 let themeHtmlLoadCount = 0;
 let themeHtmlLoadPromise = Promise.resolve();
 let themeHtmlRequestId = 0;
+let pendingThemeHtmlReject = null;
+
+const THEME_HTML_REQUEST_SUPERSEDED = 'ThemeHtmlRequestSuperseded';
 
 function isThemeHtmlLoading() {
   return themeHtmlLoadCount > 0;
@@ -81,6 +84,55 @@ function isThemeHtmlMissing(theme) {
   const textareaHtml = mQuery('textarea.builder-html');
 
   return !textareaHtml.length || !textareaHtml.val()?.trim().length;
+}
+
+function ensureThemeHtmlFromMjml() {
+  const textareaHtml = mQuery('textarea.builder-html');
+  const textareaMjml = mQuery('textarea.builder-mjml');
+
+  if (textareaHtml.val()?.trim().length) {
+    return true;
+  }
+
+  const mjml = textareaMjml.val()?.trim();
+
+  if (!mjml?.length) {
+    return false;
+  }
+
+  const assetService = new AssetService();
+  const builder = new BuilderService(assetService);
+  const html = builder.mjmlToHtml(mjml);
+
+  if (html?.trim().length) {
+    textareaHtml.val(html);
+
+    return true;
+  }
+
+  return false;
+}
+
+function hasStoredThemeMjml() {
+  return Boolean(mQuery('textarea.builder-mjml').val()?.trim().length);
+}
+
+function resolveThemeHtmlBeforeSubmit(theme) {
+  if (isThemeHtmlLoading()) {
+    return waitForThemeHtml();
+  }
+
+  if (hasStoredThemeMjml()) {
+    ensureThemeHtmlFromMjml();
+
+    return Promise.resolve();
+  }
+
+  return setThemeHtml(theme);
+}
+
+function showThemeHtmlSaveError(translationKey) {
+  Mautic.setFlashes(Mautic.addErrorFlashMessage(Mautic.translate(translationKey)));
 }
 
 function shouldWaitForThemeHtml(theme) {
@@ -113,17 +165,36 @@ function attachThemeHtmlSubmitGuard(themeField) {
       event.stopPropagation();
       event.stopImmediatePropagation();
 
-      const themeHtmlPromise = isThemeHtmlLoading() ? waitForThemeHtml() : setThemeHtml(theme);
+      const submitAfterThemeHtml = () => {
+        ensureThemeHtmlFromMjml();
+
+        if (shouldWaitForThemeHtml(theme)) {
+          showThemeHtmlSaveError('grapesjsbuilder.builder.error.theme_html_empty');
+
+          return;
+        }
+
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+          return;
+        }
+
+        mQuery(form).trigger('submit');
+      };
+
+      const themeHtmlPromise = resolveThemeHtmlBeforeSubmit(theme);
 
       themeHtmlPromise
-        .catch(() => undefined)
-        .then(() => {
-          if (typeof form.requestSubmit === 'function') {
-            form.requestSubmit();
-            return;
+        .catch((error) => {
+          if (error?.message === THEME_HTML_REQUEST_SUPERSEDED) {
+            return waitForThemeHtml();
           }
 
-          mQuery(form).trigger('submit');
+          throw error;
+        })
+        .then(() => submitAfterThemeHtml())
+        .catch(() => {
+          showThemeHtmlSaveError('grapesjsbuilder.builder.error.theme_html_load');
         });
     },
     true
@@ -141,11 +212,18 @@ function setThemeHtml(theme) {
     return Promise.resolve();
   }
 
+  if (pendingThemeHtmlReject) {
+    pendingThemeHtmlReject(new Error(THEME_HTML_REQUEST_SUPERSEDED));
+    pendingThemeHtmlReject = null;
+  }
+
   themeHtmlLoadCount += 1;
   const requestId = ++themeHtmlRequestId;
   BuilderService.setupButtonLoadingIndicator(true);
 
   themeHtmlLoadPromise = new Promise((resolve, reject) => {
+    pendingThemeHtmlReject = reject;
+
     mQuery.ajax({
       url: mQuery('#builder_url').val(),
       data: {
@@ -155,9 +233,10 @@ function setThemeHtml(theme) {
       dataType: 'json',
       success(response) {
         if (requestId !== themeHtmlRequestId) {
-          resolve();
           return;
         }
+
+        pendingThemeHtmlReject = null;
 
         const textareaHtml = mQuery('textarea.builder-html');
         const textareaMjml = mQuery('textarea.builder-mjml');
@@ -179,16 +258,16 @@ function setThemeHtml(theme) {
         }
 
         // If MJML template, generate HTML before save
-        if (!textareaHtml.val().length && textareaMjml.val().length) {
-          const assetService = new AssetService();
-          const builder = new BuilderService(assetService);
-
-          textareaHtml.val(builder.mjmlToHtml(response.templateMjml));
-        }
+        ensureThemeHtmlFromMjml();
 
         resolve();
       },
       error(request, textStatus) {
+        if (requestId !== themeHtmlRequestId) {
+          return;
+        }
+
+        pendingThemeHtmlReject = null;
         console.log(`setThemeHtml - Request failed: ${textStatus}`);
         reject(new Error(textStatus || 'setThemeHtml failed'));
       },
