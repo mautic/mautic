@@ -13,7 +13,7 @@ use Twig\Extension\ExtensionInterface;
  */
 class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
-    use TwigIntegrationTestTrait;
+    // use TwigIntegrationTestTrait;
 
     /**
      * @return ExtensionInterface[]
@@ -23,5 +23,10 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
         return [
             new FocusBundleExtension(),
         ];
+    }
+
+    protected static function getFixturesDirectory(): string
+    {
+        return __DIR__.'/Fixtures';
     }
 }

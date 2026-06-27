@@ -19,8 +19,6 @@ use Twig\Extension\ExtensionInterface;
  */
 final class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
 {
-    use TwigIntegrationTestTrait;
-
     /**
      * @return ExtensionInterface[]
      */
