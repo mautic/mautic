@@ -439,12 +439,17 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
+        $systemTempDir = sys_get_temp_dir();
         // Create temporary zip file
         $zip     = new \ZipArchive();
-        $zipPath = tempnam(sys_get_temp_dir(), 'mautic_zip_test').'.zip';
+        $zipPath = tempnam($systemTempDir, 'mautic_zip_test').'.zip';
+
+        $asset = tempnam($systemTempDir, 'mautic_import_asset');
+        file_put_contents($asset, 'The test file');
 
         if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
             $zip->addFromString('campaign.json', json_encode(FixtureHelper::getPayload(), JSON_PRETTY_PRINT));
+            $zip->addFile($asset, 'assets/'.basename($asset));
             $zip->close();
         } else {
             $this->fail('Failed to create test ZIP file.');
@@ -463,6 +468,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Clean up file
         unlink($zipPath);
+        unlink($asset);
 
         if (201 !== $response->getStatusCode()) {
             $this->fail('Import failed with error: '.$response->getContent());

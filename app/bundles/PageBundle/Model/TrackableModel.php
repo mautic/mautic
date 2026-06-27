@@ -92,15 +92,31 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return string
      */
-    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false, $utmTags = [])
-    {
+    public function generateTrackableUrl(
+        Trackable $trackable,
+        $clickthrough = [],
+        $shortenUrl = false,
+        $utmTags = [],
+    ) {
         if (!isset($clickthrough['channel'])) {
             $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
         }
 
         $redirect = $trackable->getRedirect();
 
-        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl, $utmTags);
+        $redirectModel = $this->getRedirectModel();
+
+        $trackedUrl = $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+
+        if ([] !== $utmTags) {
+            $trackedUrl = $redirectModel->applyUtmTags($trackedUrl, $utmTags);
+        }
+
+        if ($shortenUrl) {
+            $trackedUrl = $redirectModel->shortenUrl($trackedUrl);
+        }
+
+        return $trackedUrl;
     }
 
     /**

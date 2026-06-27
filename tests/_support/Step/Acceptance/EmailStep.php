@@ -7,21 +7,36 @@ use Page\Acceptance\EmailsPage;
 class EmailStep extends \AcceptanceTester
 {
     /**
-     * Create an email with the given name.
+     * Create segment email with the given name.
      */
-    public function createAnEmail(string $name): void
+    public function createSegmentEmail(string $name): void
     {
         $I=$this;
-        $I->amOnPage(EmailsPage::$URL);
-        $I->wait(1);
-        $I->click(EmailsPage::$NEW);
-        $I->waitForElementClickable(EmailsPage::$SELECT_SEGMENT_EMAIL);
-        $I->click(EmailsPage::$SELECT_SEGMENT_EMAIL);
-        $I->fillField(EmailsPage::$SUBJECT_FIELD, $name);
-        $I->click(''.EmailsPage::$CONTACT_SEGMENT_DROPDOWN);
-        $I->waitForElementClickable(EmailsPage::$CONTACT_SEGMENT_OPTION);
-        $I->click(EmailsPage::$CONTACT_SEGMENT_OPTION);
-        $I->click(EmailsPage::$SAVE_AND_CLOSE);
+        $I->amOnPage(EmailsPage::URL);
+        $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
+        $I->click(EmailsPage::NEW_BUTTON);
+        $I->waitForElementClickable(EmailsPage::SELECT_SEGMENT_EMAIL);
+        $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
+        $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
+        $I->click(''.EmailsPage::CONTACT_SEGMENT_DROPDOWN);
+        $I->waitForElementClickable(EmailsPage::CONTACT_SEGMENT_OPTION);
+        $I->click(EmailsPage::CONTACT_SEGMENT_OPTION);
+        $I->click(EmailsPage::SAVE_AND_CLOSE);
+    }
+
+    /**
+     * Create triggered email with the given name.
+     */
+    public function createTriggeredEmail(string $name): void
+    {
+        $I=$this;
+        $I->amOnPage(EmailsPage::URL);
+        $I->waitForElementClickable(EmailsPage::NEW_BUTTON);
+        $I->click(EmailsPage::NEW_BUTTON);
+        $I->waitForElementClickable(EmailsPage::SELECT_TRIGGERED_EMAIL);
+        $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
+        $I->fillField(EmailsPage::SUBJECT_FIELD, $name);
+        $I->click(EmailsPage::SAVE_AND_CLOSE);
     }
 
     /**
@@ -33,17 +48,17 @@ class EmailStep extends \AcceptanceTester
     {
         $I = $this;
 
-        $I->waitForElementClickable(EmailsPage::$NEW_CATEGORY_DROPDOWN);
-        $I->click(EmailsPage::$NEW_CATEGORY_DROPDOWN);
+        $I->waitForElementClickable(EmailsPage::NEW_CATEGORY_DROPDOWN);
+        $I->click(EmailsPage::NEW_CATEGORY_DROPDOWN);
 
-        $I->waitForElementVisible(EmailsPage::$NEW_CATEGORY_OPTION);
-        $newCategoryName = $I->grabTextFrom(EmailsPage::$NEW_CATEGORY_OPTION);
+        $I->waitForElementVisible(EmailsPage::NEW_CATEGORY_OPTION);
+        $newCategoryName = $I->grabTextFrom(EmailsPage::NEW_CATEGORY_OPTION);
 
-        $I->waitForElementClickable(EmailsPage::$NEW_CATEGORY_OPTION);
-        $I->click(EmailsPage::$NEW_CATEGORY_OPTION);
+        $I->waitForElementClickable(EmailsPage::NEW_CATEGORY_OPTION);
+        $I->click(EmailsPage::NEW_CATEGORY_OPTION);
 
-        $I->waitForElementClickable(EmailsPage::$SAVE_BUTTON);
-        $I->click(EmailsPage::$SAVE_BUTTON);
+        $I->waitForElementClickable(EmailsPage::SAVE_BUTTON);
+        $I->click(EmailsPage::SAVE_BUTTON);
 
         return $newCategoryName;
     }

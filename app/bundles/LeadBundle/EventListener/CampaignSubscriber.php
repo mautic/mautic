@@ -534,8 +534,13 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $fieldType  = '';
                 $fieldValue = $value;
                 if (isset($fields[$field])) {
-                    $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value);
                     $fieldType  = $fields[$field]['type'];
+                    // Keep regex values unchanged so they are evaluated as patterns
+                    // Otherwise CustomFieldHelper::fieldValueTransfomer would attempt to parse
+                    // the regex as a DateTime string, which would throw an error
+                    if (!in_array($operator, [OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP])) {
+                        $fieldValue = CustomFieldHelper::fieldValueTransfomer($fields[$field], $value);
+                    }
                 }
 
                 // Preventing date/datetime fields to fail on empty/notEmpty

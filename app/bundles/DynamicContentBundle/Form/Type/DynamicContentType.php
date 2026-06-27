@@ -376,6 +376,7 @@ class DynamicContentType extends AbstractType
                 'data-editor-class'    => $editorClass,
                 'data-token-callback'  => 'email:getBuilderTokens',
                 'data-token-activator' => '{',
+                'allow-full-html'      => true,
             ],
             'required' => false,
         ]);

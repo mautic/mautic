@@ -735,9 +735,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml): void
+    public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
-        $formName          = $form->generateFormName();
+        $formName          = $formName ?? $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
         $objectsToAutoFill = ['contact', 'company'];

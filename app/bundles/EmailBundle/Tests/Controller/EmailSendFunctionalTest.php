@@ -53,8 +53,8 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         );
 
         $messages = [
-            $this->getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
-            $this->getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
+            self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0],
+            self::getMailerMessagesByToAddress('contact-flood-1@doe.com')[0],
         ];
 
         foreach ($messages as $message) {

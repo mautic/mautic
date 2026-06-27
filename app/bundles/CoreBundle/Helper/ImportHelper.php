@@ -18,7 +18,8 @@ class ImportHelper
      */
     public function readZipFile(string $filePath): array
     {
-        $tempDir      = sys_get_temp_dir();
+        // Use Mautic setting, instead of sys_get_temp_dir. The latter is considered unsafe, because other processes are able to read from the dir.
+        $tempDir      = $this->pathsHelper->getTemporaryPath();
         $zip          = new \ZipArchive();
         $jsonFilePath = null;
 
@@ -170,7 +171,7 @@ class ImportHelper
 
         $zip->close();
 
-        $mediaPath = $this->pathsHelper->getSystemPath('media').'/files/';
+        $mediaPath = $this->pathsHelper->getMediaPath().'/files/';
 
         // Process extracted files using stored file list
         foreach ($fileList as $filename) {
@@ -217,7 +218,9 @@ class ImportHelper
     private function normalizePath(string $path): string
     {
         $parts    = [];
-        $segments = explode('/', str_replace('\\', '/', $path));
+        $unixPath = str_replace('\\', '/', $path);
+        $absolute = str_starts_with($unixPath, '/');
+        $segments = explode('/', $unixPath);
 
         foreach ($segments as $segment) {
             if ('' === $segment || '.' === $segment) {
@@ -232,7 +235,7 @@ class ImportHelper
             }
         }
 
-        return implode('/', $parts);
+        return ($absolute ? '/' : '').implode('/', $parts);
     }
 
     /**
