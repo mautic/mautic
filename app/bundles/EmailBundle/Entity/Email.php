@@ -304,6 +304,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private bool $continueSending = false;
 
+    #[Groups(['email:read', 'email:write'])]
+    private bool $sendToDnc = false;
+
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private bool $isDuplicate = false;
 
@@ -382,6 +385,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addPublishDates();
         $builder->addField('continueSending', Types::BOOLEAN, [
             'columnName' => 'continue_sending',
+            'nullable'   => false,
+            'options'    => [
+                'default' => false,
+            ],
+        ]);
+        $builder->addField('sendToDnc', Types::BOOLEAN, [
+            'columnName' => 'send_to_dnc',
             'nullable'   => false,
             'options'    => [
                 'default' => false,
@@ -1127,6 +1137,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $this->isChanged('continueSending', $continueSending);
         $this->continueSending = $continueSending;
+
+        return $this;
+    }
+
+    public function getSendToDnc(): bool
+    {
+        return $this->sendToDnc;
+    }
+
+    public function setSendToDnc(bool $sendToDnc): self
+    {
+        $this->isChanged('sendToDnc', $sendToDnc);
+        $this->sendToDnc = $sendToDnc;
 
         return $this;
     }

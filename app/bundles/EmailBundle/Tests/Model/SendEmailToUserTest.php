@@ -201,7 +201,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 if (4 === $matcher->numberOfInvocations()) {
                     $this->assertSame('{invalid-token}', $parameters[0]);
 
-                    return throw new InvalidEmailException('{invalid-token}');
+                    throw new InvalidEmailException('{invalid-token}');
                 }
             });
         // Send email method
