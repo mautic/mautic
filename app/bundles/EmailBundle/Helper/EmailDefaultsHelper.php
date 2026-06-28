@@ -41,13 +41,13 @@ class EmailDefaultsHelper
         }
 
         $defaultId = $this->coreParametersHelper->get('email_default_preference_center_id');
-        if (empty($defaultId)) {
-            return null;
-        }
+        $page      = null;
 
-        $page = $this->entityManager->find(Page::class, $defaultId);
-        if (!$page instanceof Page || !$page->getIsPreferenceCenter() || !$page->isPublished()) {
-            return null;
+        if (!empty($defaultId)) {
+            $candidate = $this->entityManager->find(Page::class, $defaultId);
+            if ($candidate instanceof Page && $candidate->getIsPreferenceCenter() && $candidate->isPublished()) {
+                $page = $candidate;
+            }
         }
 
         return $page;
