@@ -192,6 +192,23 @@ final class EmailDefaultsHelperTest extends TestCase
         $this->assertNull($this->helper->resolvePreferenceCenter($email));
     }
 
+    public function testResolvePreferenceCenterReturnsNullForPublishedNonPreferenceCenterDefault(): void
+    {
+        $page = $this->createPreferenceCenterPageMock(true, false);
+
+        $this->coreParametersHelper->method('get')->willReturnMap([
+            ['email_default_preference_center_id', null, 42],
+        ]);
+
+        $this->entityManager->method('find')
+            ->with(Page::class, 42)
+            ->willReturn($page);
+
+        $email = new Email();
+
+        $this->assertNull($this->helper->resolvePreferenceCenter($email));
+    }
+
     public function testPreservesPreExistingChanges(): void
     {
         $email = new Email();
@@ -214,10 +231,10 @@ final class EmailDefaultsHelperTest extends TestCase
         $this->assertSame(['utmSource' => 'src'], $email->getUtmTags());
     }
 
-    private function createPreferenceCenterPageMock(bool $published): Page&MockObject
+    private function createPreferenceCenterPageMock(bool $published, bool $isPreferenceCenter = true): Page&MockObject
     {
         $page = $this->createMock(Page::class);
-        $page->method('getIsPreferenceCenter')->willReturn(true);
+        $page->method('getIsPreferenceCenter')->willReturn($isPreferenceCenter);
         $page->method('isPublished')->willReturn($published);
 
         return $page;
