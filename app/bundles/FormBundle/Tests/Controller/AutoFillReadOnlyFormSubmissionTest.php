@@ -134,7 +134,7 @@ final class AutoFillReadOnlyFormSubmissionTest extends MauticMysqlTestCase
         $this->assertInputCounts($crawler, 2);
 
         $readOnlyInput = $crawler->filterXPath('//input[@readonly]');
-        $readOnlyInput->each(function (Crawler $node, $i) use ($formValues) {
+        $readOnlyInput->each(function (Crawler $node, $i) use ($formValues): void {
             $this->assertStringContainsString('readonly', $node->outerHtml());
             $this->assertSame($formValues[$i], $node->attr('value'));
         });

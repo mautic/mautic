@@ -31,7 +31,7 @@ class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
         $event = new LeadBuildSearchEvent((string) $this->email->getId(), 'email_pending', $alias, false, $qb);
 
         $dispatcher = self::getContainer()->get('event_dispatcher');
-        \assert($dispatcher instanceof EventDispatcherInterface);
+        $this->assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
 
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $expectedQuery = 'l.id IN (SELECT l.id FROM '.MAUTIC_TABLE_PREFIX.'leads l WHERE (l.id IN (SELECT ll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM '.MAUTIC_TABLE_PREFIX."lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (l.id NOT IN (SELECT stat.lead_id FROM ".MAUTIC_TABLE_PREFIX.'email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id IN (:variantIds)))) AND (l.id NOT IN (SELECT mq.lead_id FROM '.MAUTIC_TABLE_PREFIX."message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN (:variantIds)))) AND (l.id NOT IN (SELECT lc.lead_id FROM ".MAUTIC_TABLE_PREFIX.'lead_categories lc INNER JOIN '.MAUTIC_TABLE_PREFIX."emails e ON e.category_id = lc.category_id WHERE (e.id = {$this->email->getId()}) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> '')))";

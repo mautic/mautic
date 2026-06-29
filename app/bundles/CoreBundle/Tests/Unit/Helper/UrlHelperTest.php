@@ -132,7 +132,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextWithHttp(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['http://mautic.org'],
             UrlHelper::getUrlsFromPlaintext('Hello there, http://mautic.org!')
         );
@@ -140,7 +140,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextSkipDefaultTokenValues(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             // 1 is skipped because it's set as the token default
             [0 => 'https://find.this', 2 => '{contactfield=website|http://skip.this}'],
             UrlHelper::getUrlsFromPlaintext(
@@ -151,7 +151,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextWith2Urls(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['http://mautic.org', 'http://mucktick.org'],
             UrlHelper::getUrlsFromPlaintext(
                 'Hello there, http://mautic.org is the correct URL. Not http://mucktick.org.'
@@ -161,7 +161,7 @@ class UrlHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUrlsFromPlaintextWithSymbols(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'https://example.org/with/square/brackets',
                 'https://example.org/square/brackets/with/slash/and/comma/',

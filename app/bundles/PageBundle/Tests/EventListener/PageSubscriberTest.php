@@ -53,7 +53,7 @@ EOF;
 
         $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
 
-        $this->assertEquals(
+        $this->assertSame(
             $event->getContent(),
             <<<EOF
 <html>

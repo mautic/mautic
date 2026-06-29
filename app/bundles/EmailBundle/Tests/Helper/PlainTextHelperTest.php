@@ -16,7 +16,7 @@ class PlainTextHelperTest extends TestCase
         $plainTextHelper->setHtml($htmlContent);
         $actualPlainText = $plainTextHelper->getText();
 
-        $this->assertEquals($expectedPlainText, $actualPlainText);
+        $this->assertSame($expectedPlainText, $actualPlainText);
     }
 
     /**
@@ -112,7 +112,7 @@ HTML,
         $plainTextHelper->setHtml($htmlContent);
         $actualPlainText = $plainTextHelper->getPreview();
 
-        $this->assertEquals($expectedPlainText, $actualPlainText);
+        $this->assertSame($expectedPlainText, $actualPlainText);
     }
 
     /**

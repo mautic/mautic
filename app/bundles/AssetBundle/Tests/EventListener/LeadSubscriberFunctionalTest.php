@@ -86,7 +86,7 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
         $download->setLead($lead);
         $download->setDateDownload(new \DateTime('2026-01-01 00:00:00'));
         $download->setCode(200);
-        $download->setTrackingId(random_int(1, 99999));
+        $download->setTrackingId((string) random_int(1, 99999));
         $this->em->persist($download);
         $this->em->flush();
 

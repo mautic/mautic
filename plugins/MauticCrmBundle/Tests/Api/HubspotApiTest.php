@@ -27,7 +27,7 @@ class HubspotApiTest extends TestCase
             ],
         ];
 
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturn(
                 [
@@ -37,7 +37,7 @@ class HubspotApiTest extends TestCase
                     ],
                 ]
             );
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getAuthenticationType')
             ->willReturn('crm');
 
@@ -66,10 +66,10 @@ class HubspotApiTest extends TestCase
             ],
         ];
 
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('makeRequest')
             ->willReturn(['error' => $response]);
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getAuthenticationType')
             ->willReturn('oauth2');
 

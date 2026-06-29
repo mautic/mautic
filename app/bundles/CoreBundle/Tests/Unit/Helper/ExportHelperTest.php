@@ -50,20 +50,19 @@ class ExportHelperTest extends TestCase
     private array $filePaths = [];
 
     private MockObject&FilePathResolver $filePathResolver;
-    private MockObject&ProcessSignalService $processSignalService;
 
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
-        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
+        $processSignalService           = $this->createMock(ProcessSignalService::class);
 
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $this->processSignalService,
+            $processSignalService,
             $this->createMock(EventDispatcherInterface::class),
         );
     }
@@ -239,7 +238,7 @@ class ExportHelperTest extends TestCase
 
         $result   = $this->exportHelper->parseLeadToExport($lead);
         $expected = $leadFieldsData + ['stage' => 'Stage 3'];
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testSupportedExportTypes(): void
@@ -394,12 +393,12 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('current')
             ->willReturnCallback(
-                fn () => $iteratorData->array[$iteratorData->position]
+                fn (): mixed => $iteratorData->array[$iteratorData->position]
             );
 
         $iteratorExportDataModelMock->method('key')
             ->willReturnCallback(
-                fn () => $iteratorData->position
+                fn (): int => $iteratorData->position
             );
 
         $iteratorExportDataModelMock->method('next')
@@ -411,7 +410,7 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('valid')
             ->willReturnCallback(
-                fn () => isset($iteratorData->array[$iteratorData->position])
+                fn (): bool => isset($iteratorData->array[$iteratorData->position])
             );
 
         return $iteratorExportDataModelMock;

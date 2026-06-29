@@ -237,8 +237,6 @@ class LeadDevice
 
     /**
      * @param string $deviceOsName
-     *
-     * @return $this
      */
     public function setDeviceOsName($deviceOsName): static
     {
@@ -257,8 +255,6 @@ class LeadDevice
 
     /**
      * @param string $deviceOsShortName
-     *
-     * @return $this
      */
     public function setDeviceOsShortName($deviceOsShortName): static
     {
@@ -277,8 +273,6 @@ class LeadDevice
 
     /**
      * @param string $deviceOsVersion
-     *
-     * @return $this
      */
     public function setDeviceOsVersion($deviceOsVersion): static
     {
@@ -297,8 +291,6 @@ class LeadDevice
 
     /**
      * @param string $deviceOsPlatform
-     *
-     * @return $this
      */
     public function setDeviceOsPlatform($deviceOsPlatform): static
     {
@@ -360,9 +352,6 @@ class LeadDevice
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;

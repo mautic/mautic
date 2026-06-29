@@ -22,17 +22,12 @@ class CookieHelperTest extends TestCase
      */
     private MockObject $requestStackMock;
 
-    /**
-     * @var Request&MockObject
-     */
-    private MockObject $requestMock;
-
     protected function setUp(): void
     {
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->requestMock      = $this->createMock(Request::class);
+        $requestMock            = $this->createMock(Request::class);
         $this->requestStackMock->method('getMainRequest')
-            ->willReturn($this->requestMock);
+            ->willReturn($requestMock);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]
@@ -49,7 +44,7 @@ class CookieHelperTest extends TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $headers = $this->createMock(ResponseHeaderBag::class);
-        $headers->expects(self::once())
+        $headers->expects($this->once())
             ->method('setCookie')
             ->willReturnCallback(static function (Cookie $cookie): void {
                 Assert::assertStringContainsString('samesite=lax', (string) $cookie);
@@ -80,7 +75,7 @@ class CookieHelperTest extends TestCase
         $cookieHelper->setCookie($cookieName, 'test');
 
         $headers = $this->createMock(ResponseHeaderBag::class);
-        $headers->expects(self::once())
+        $headers->expects($this->once())
             ->method('setCookie')
             ->willReturnCallback(static function (Cookie $cookie): void {
                 Assert::assertStringContainsString('samesite=lax', (string) $cookie);
@@ -114,7 +109,7 @@ class CookieHelperTest extends TestCase
         );
 
         $headers = $this->createMock(ResponseHeaderBag::class);
-        $headers->expects(self::once())
+        $headers->expects($this->once())
             ->method('setCookie')
             ->willReturnCallback(static function (Cookie $cookie): void {
                 Assert::assertStringContainsString('samesite=none', (string) $cookie);

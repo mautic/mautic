@@ -15,7 +15,7 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
         $utmTag = new UtmTag();
         $utmTag->setUtmContent($utmContent);
 
-        Assert::assertEquals($expected, mb_strlen($utmTag->getUtmContent()));
+        Assert::assertSame($expected, mb_strlen($utmTag->getUtmContent()));
     }
 
     /**
@@ -37,7 +37,7 @@ class UtmTagTest extends \PHPUnit\Framework\TestCase
         $utmTag->setUtmContent($utmContent);
         $utmTag->setUtmTerm($utmTerm);
 
-        $this->assertEquals($expectedResult, $utmTag->hasUtmTags());
+        $this->assertSame($expectedResult, $utmTag->hasUtmTags());
     }
 
     /**

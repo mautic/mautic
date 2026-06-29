@@ -29,10 +29,10 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
     {
         $transport = $this->configureTwilioWithArrayTransport();
         $smsModel  = $this->getContainer()->get('mautic.sms.model.sms');
-        \assert($smsModel instanceof SmsModel);
+        $this->assertInstanceOf(SmsModel::class, $smsModel);
 
         $contactModel = $this->getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $page = new Page();
         $page->setTitle('Test Page');

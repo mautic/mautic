@@ -30,7 +30,7 @@ class ConfigBuilderEventTest extends CommonMocks
         $result = $event->removeForm($form['formAlias']);
         $forms  = $event->getForms();
 
-        $this->assertEquals([], $forms);
+        $this->assertSame([], $forms);
         $this->assertTrue($result);
     }
 

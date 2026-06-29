@@ -296,6 +296,8 @@ class PageController extends FormController
             'children'           => $children,
             'properties'         => $properties,
             'criteria'           => $criteria['criteria'],
+            'winnerCriteria'     => $lastCriteria ?? '',
+            'configurationError' => $variantError,
         ];
 
         $translations = [
@@ -957,7 +959,7 @@ class PageController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'page.page');
             }
 
-            $model->convertVariant($entity);
+            $model->convertWinnerVariant($entity);
 
             $flashes[] = [
                 'type'    => 'notice',

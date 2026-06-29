@@ -24,7 +24,7 @@ class TransportCallbackTest extends TestCase
             {
             }
 
-            public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false)
+            public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, $comments = '', $persist = true, $checkCurrentStatus = true, $allowUnsubscribeOverride = false): bool
             {
                 Assert::assertSame('email', $channel);
                 Assert::assertSame(DNC::BOUNCED, $reason);

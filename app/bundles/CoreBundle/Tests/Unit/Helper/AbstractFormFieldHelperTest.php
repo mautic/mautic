@@ -258,7 +258,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($array);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testBooleanBarStringList(): void
@@ -271,7 +271,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($string);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testBooleanJsonStringList(): void
@@ -284,7 +284,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
         $actual = AbstractFormFieldHelper::parseBooleanList($string);
 
-        $this->assertEquals($expected, $actual);
+        $this->assertSame($expected, $actual);
     }
 
     public function testNumericalJsonStringList(): void

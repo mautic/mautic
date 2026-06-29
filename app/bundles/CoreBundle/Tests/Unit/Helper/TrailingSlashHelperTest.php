@@ -75,10 +75,7 @@ class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('https://test.com/s/dashboard', $this->getHelper()->getSafeRedirectUrl($request));
     }
 
-    /**
-     * @return TrailingSlashHelper
-     */
-    private function getHelper()
+    private function getHelper(): TrailingSlashHelper
     {
         return new TrailingSlashHelper($this->coreParametersHelper);
     }

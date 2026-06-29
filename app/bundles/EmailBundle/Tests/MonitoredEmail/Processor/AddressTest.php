@@ -26,6 +26,6 @@ class AddressTest extends \PHPUnit\Framework\TestCase
     {
         $hash = Address::parseAddressForStatHash('hello+bounce_123abc@test.com');
 
-        $this->assertEquals('123abc', $hash);
+        $this->assertSame('123abc', $hash);
     }
 }

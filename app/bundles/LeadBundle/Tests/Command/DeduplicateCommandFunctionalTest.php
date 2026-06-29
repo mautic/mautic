@@ -73,7 +73,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $this->saveContact('jane.gabriel@gmail.com', '4444444444'); // 5
 
         $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
-        \assert($phoneField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $phoneField);
         $phoneField->setIsUniqueIdentifer(true);
         $phoneField->setLabel('Cell phone'); // Testing also field with more words.
         $this->em->persist($phoneField);
@@ -105,7 +105,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $this->saveContact('jane.gabriel@gmail.com', '4444444444'); // 3
 
         $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
-        \assert($phoneField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $phoneField);
         $phoneField->setIsUniqueIdentifer(true);
         $phoneField->setLabel('Cell phone'); // Testing also field with more words.
         $this->em->persist($phoneField);

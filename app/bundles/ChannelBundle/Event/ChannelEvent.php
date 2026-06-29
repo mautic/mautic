@@ -32,8 +32,6 @@ class ChannelEvent extends CommonEvent
      *
      *                          ]
      *                       ]
-     *
-     * @return $this
      */
     public function addChannel($channel, array $config = []): static
     {
