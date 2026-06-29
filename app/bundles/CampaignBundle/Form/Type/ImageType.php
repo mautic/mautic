@@ -36,7 +36,7 @@ final class ImageType extends AbstractType
             ]),
         ]);
 
-        $resolver->setNormalizer('attr', static function (Options $options, $value) {
+        $resolver->setNormalizer('attr', static function (Options $options, $value): array {
             $accept = implode(',', $options['mime_types']);
 
             return array_merge(['class' => 'form-control', 'accept' => $accept], (array) $value);
