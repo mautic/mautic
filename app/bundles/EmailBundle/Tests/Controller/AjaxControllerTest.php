@@ -89,15 +89,15 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->controller->setContainer($this->containerMock);
 
         $parameterBag = $this->createMock(ContainerBagInterface::class);
-        $parameterBag->expects(self::once())
+        $parameterBag->expects($this->once())
             ->method('get')
             ->with('kernel.environment')
             ->willReturn('test');
-        $this->containerMock->expects(self::once())
+        $this->containerMock->expects($this->once())
             ->method('has')
             ->with('parameter_bag')
             ->willReturn(true);
-        $this->containerMock->expects(self::once())
+        $this->containerMock->expects($this->once())
             ->method('get')
             ->with('parameter_bag')
             ->willReturn($parameterBag);
@@ -112,7 +112,7 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->controller->sendBatchAction(new Request([], []));
 
-        $this->assertEquals('{"success":0}', $response->getContent());
+        $this->assertSame('{"success":0}', $response->getContent());
     }
 
     public function testSendBatchActionWhenIdProvidedButEmailNotPublished(): void
@@ -158,7 +158,7 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $request->setSession($this->sessionMock);
         $response = $this->controller->sendBatchAction($request);
         $expected = '{"success":1,"percent":0,"progress":[0,100],"stats":{"sent":0,"failed":0,"failedRecipients":[]}}';
-        $this->assertEquals($expected, $response->getContent());
+        $this->assertSame($expected, $response->getContent());
     }
 
     public function testSendBatchActionWhenIdProvidedAndEmailIsPublished(): void
@@ -206,6 +206,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $request->setSession($this->sessionMock);
         $response = $this->controller->sendBatchAction($request);
         $expected = '{"success":1,"percent":50,"progress":[50,100],"stats":{"sent":50,"failed":0,"failedRecipients":[]}}';
-        $this->assertEquals($expected, $response->getContent());
+        $this->assertSame($expected, $response->getContent());
     }
 }

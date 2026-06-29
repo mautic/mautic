@@ -284,13 +284,11 @@ class BuilderSubscriberTest extends TestCase
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->willReturnCallback(function ($route) use ($emailHash) {
-                return match ($route) {
-                    'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
-                    'mautic_email_webview'     => '/email/webview/'.$emailHash,
-                    'mautic_email_preview'     => '/email/preview/111',
-                    default                    => null,
-                };
+            ->willReturnCallback(fn ($route) => match ($route) {
+                'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
+                'mautic_email_webview'     => '/email/webview/'.$emailHash,
+                'mautic_email_preview'     => '/email/preview/111',
+                default                    => null,
             });
 
         $this->translator->method('trans')

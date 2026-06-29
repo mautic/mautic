@@ -208,9 +208,6 @@ class Lead
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function startNewRotation(): static
     {
         ++$this->rotation;

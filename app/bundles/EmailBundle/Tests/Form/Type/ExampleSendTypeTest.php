@@ -77,20 +77,20 @@ class ExampleSendTypeTest extends TestCase
                 return $builder;
             });
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(false);
 
         $userMock = $this->createMock(User::class);
-        $userMock->expects(self::once())
+        $userMock->expects($this->once())
             ->method('getId')
             ->willReturn($userId);
 
-        $this->userHelperMock->expects(self::once())
+        $this->userHelperMock->expects($this->once())
             ->method('getUser')
             ->willReturn($userMock);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(false);
@@ -163,20 +163,20 @@ class ExampleSendTypeTest extends TestCase
                 return $builder;
             });
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(false);
 
         $userMock = $this->createMock(User::class);
-        $userMock->expects(self::once())
+        $userMock->expects($this->once())
             ->method('getId')
             ->willReturn($userId);
 
-        $this->userHelperMock->expects(self::once())
+        $this->userHelperMock->expects($this->once())
             ->method('getUser')
             ->willReturn($userMock);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);

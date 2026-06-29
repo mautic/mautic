@@ -270,9 +270,6 @@ class Submission
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
     public function setLead(?Lead $lead = null): static
     {
         $this->lead = $lead;
@@ -288,9 +285,6 @@ class Submission
         return $this->trackingId;
     }
 
-    /**
-     * @return $this
-     */
     public function setTrackingId($trackingId): static
     {
         $this->trackingId = $trackingId;

@@ -45,7 +45,7 @@ final class PublishStateServiceTest extends MauticMysqlTestCase
         $this->saveAuditLogs($this->em, $auditLogs, $campaign);
 
         $unpublishStateService = $this->getContainer()->get(PublishStateService::class);
-        \assert($unpublishStateService instanceof PublishStateService);
+        $this->assertInstanceOf(PublishStateService::class, $unpublishStateService);
 
         Assert::assertSame($expectedunpublishedranges, array_map(
             fn (PublishStateDateRange $range) => [

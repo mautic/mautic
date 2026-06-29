@@ -16,7 +16,7 @@ class PointSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {
-        self::assertEquals(
+        self::assertSame(
             [
                 'mautic.point_on_build' => ['onPointBuild', 0],
                 'mautic.page_on_hit'    => ['onPageHit', 0],
@@ -69,10 +69,10 @@ class PointSubscriberTest extends TestCase
         $pointModel        = $this->createMock(PointModel::class);
         $pointActionHelper = $this->createMock(PointActionHelper::class);
 
-        $pageHitEvent->expects(self::once())->method('getPage')->willReturn($page);
-        $pageHitEvent->expects(self::once())->method('getHit')->willReturn($hit);
-        $pageHitEvent->expects(self::once())->method('getLead')->willReturn($lead);
-        $pointModel->expects(self::once())->method('triggerAction')->with('page.hit', $hit, null, $lead);
+        $pageHitEvent->expects($this->once())->method('getPage')->willReturn($page);
+        $pageHitEvent->expects($this->once())->method('getHit')->willReturn($hit);
+        $pageHitEvent->expects($this->once())->method('getLead')->willReturn($lead);
+        $pointModel->expects($this->once())->method('triggerAction')->with('page.hit', $hit, null, $lead);
 
         $pointSubscriber = new PointSubscriber($pointModel, $pointActionHelper);
         $pointSubscriber->onPageHit($pageHitEvent);
@@ -86,10 +86,10 @@ class PointSubscriberTest extends TestCase
         $pointModel        = $this->createMock(PointModel::class);
         $pointActionHelper = $this->createMock(PointActionHelper::class);
 
-        $pageHitEvent->expects(self::once())->method('getPage')->willReturn(null);
-        $pageHitEvent->expects(self::once())->method('getHit')->willReturn($hit);
-        $pageHitEvent->expects(self::once())->method('getLead')->willReturn($lead);
-        $pointModel->expects(self::once())->method('triggerAction')->with('url.hit', $hit, null, $lead);
+        $pageHitEvent->expects($this->once())->method('getPage')->willReturn(null);
+        $pageHitEvent->expects($this->once())->method('getHit')->willReturn($hit);
+        $pageHitEvent->expects($this->once())->method('getLead')->willReturn($lead);
+        $pointModel->expects($this->once())->method('triggerAction')->with('url.hit', $hit, null, $lead);
 
         $pointSubscriber = new PointSubscriber($pointModel, $pointActionHelper);
         $pointSubscriber->onPageHit($pageHitEvent);

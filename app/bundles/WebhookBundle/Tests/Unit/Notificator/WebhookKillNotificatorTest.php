@@ -95,7 +95,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $webhookNotificationEventMock =  $this->createMock(WebhookNotificationEvent::class);
         $webhookNotificationEventMock->method('canSend')->willReturn(true);
 
-        $twig->expects(self::once())
+        $twig->expects($this->once())
             ->method('render')
             ->willReturn($this->details);
 

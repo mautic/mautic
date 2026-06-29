@@ -64,8 +64,6 @@ trait VariantEntityTrait
 
     /**
      * Add variant.
-     *
-     * @return $this
      */
     public function addVariantChild(VariantEntityInterface $child): static
     {
@@ -120,8 +118,6 @@ trait VariantEntityTrait
      * Set variantSettings.
      *
      * @param array<mixed> $variantSettings
-     *
-     * @return $this
      */
     public function setVariantSettings(array $variantSettings): static
     {

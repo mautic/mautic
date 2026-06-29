@@ -87,7 +87,7 @@ class ApiSubscriberTest extends CommonMocks
             ->with($this->isInstanceOf(JsonResponse::class))
             ->willReturnCallback(
                 function (JsonResponse $response): void {
-                    $this->assertEquals(403, $response->getStatusCode());
+                    $this->assertSame(403, $response->getStatusCode());
                 }
             );
 

@@ -93,16 +93,16 @@ class PluginAuthenticatorTest extends TestCase
         );
 
         $authenticateResult = $authenticateResult->authenticate($request);
-        \assert($authenticateResult instanceof SelfValidatingPassport);
+        $this->assertInstanceOf(SelfValidatingPassport::class, $authenticateResult);
         self::assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
         self::assertSame($userIdentifier, $userBadge->getUserIdentifier());
         self::assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
-        \assert($pluginBadge instanceof PluginBadge);
+        $this->assertInstanceOf(PluginBadge::class, $pluginBadge);
         self::assertSame($returnedPluginToken, $pluginBadge->getPreAuthenticatedToken());
         self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
@@ -168,16 +168,15 @@ class PluginAuthenticatorTest extends TestCase
         );
 
         $authenticateResult = $pluginAuthenticator->authenticate($request);
-        \assert($authenticateResult instanceof SelfValidatingPassport);
         self::assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
+        \PHPUnit\Framework\Assert::assertInstanceOf(UserBadge::class, $userBadge);
         self::assertSame($userIdentifier, $userBadge->getUserIdentifier());
         self::assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
-        \assert($pluginBadge instanceof PluginBadge);
+        \PHPUnit\Framework\Assert::assertInstanceOf(PluginBadge::class, $pluginBadge);
         self::assertEquals(new PluginToken($firewallName, $integration, $authenticatedUser), $pluginBadge->getPreAuthenticatedToken());
         self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
@@ -203,9 +202,7 @@ class PluginAuthenticatorTest extends TestCase
         $passportUser->method('getPassword')->willReturn($encodedPassword);
         $passportUser->method('getRoles')->willReturn($roles);
 
-        $userBadge = new UserBadge('', function () use ($passportUser): UserInterface {
-            return $passportUser;
-        });
+        $userBadge = new UserBadge('', fn (): UserInterface => $passportUser);
 
         $pluginBadge = new PluginBadge(null, $pluginResponse, $authenticatingService);
 
@@ -224,7 +221,7 @@ class PluginAuthenticatorTest extends TestCase
         );
 
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::once())
+        $tokenPermissions->expects($this->once())
             ->method('setActivePermissionsOnAuthToken')
             ->with()
             ->willReturn($passportUser);
@@ -251,19 +248,19 @@ class PluginAuthenticatorTest extends TestCase
         $token        = new PluginToken(null);
 
         $authenticationHandler = $this->createMock(AuthenticationHandler::class);
-        $authenticationHandler->expects(self::once())
+        $authenticationHandler->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($request, $token)
             ->willReturn($response);
 
         $session = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('remove')
             ->with(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         $request->setSession($session);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new InteractiveLoginEvent($request, $token),
@@ -293,7 +290,7 @@ class PluginAuthenticatorTest extends TestCase
         $exception    = $this->createMock(AuthenticationException::class);
 
         $authenticationHandler = $this->createMock(AuthenticationHandler::class);
-        $authenticationHandler->expects(self::once())
+        $authenticationHandler->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($request, $exception)
             ->willReturn($response);

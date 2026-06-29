@@ -30,20 +30,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    public function __construct(?string $name = null)
-    {
-        parent::__construct($name);
-
-        // Only default to MySQL if no DB_DRIVER is not set
-        if (!isset($this->configParams['db_driver']) || empty($this->configParams['db_driver'])) {
-            $this->configParams['db_driver'] = 'pdo_mysql';
-        }
-        // Initialize default charset if no DB_CHARSET is set
-        if (!isset($this->configParams['db_charset']) || empty($this->configParams['db_charset'])) {
-            $this->configParams['db_charset'] = 'pdo_pgsql' == $this->configParams['db_driver'] ? 'UTF8' : 'utf8mb4';
-        }
-    }
-
     protected function isMysqlPlatform(): bool
     {
         // if its not PostgreSQL, we treat is as MySQL
@@ -60,6 +46,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected function setUp(): void
     {
+        // Only default to MySQL if no DB_DRIVER is not set
+        if (!isset($this->configParams['db_driver']) || empty($this->configParams['db_driver'])) {
+            $this->configParams['db_driver'] = 'pdo_mysql';
+        }
+        // Initialize default charset if no DB_CHARSET is set
+        if (!isset($this->configParams['db_charset']) || empty($this->configParams['db_charset'])) {
+            $this->configParams['db_charset'] = 'pdo_pgsql' == $this->configParams['db_driver'] ? 'UTF8' : 'utf8mb4';
+        }
+
         $this->setUpInvoked = true;
 
         parent::setUp();
@@ -577,7 +572,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function clearCache(): void
     {
         $cacheProvider = static::getContainer()->get('mautic.cache.provider');
-        \assert($cacheProvider instanceof CacheItemPoolInterface);
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }
 

@@ -62,7 +62,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $firstGroup    = reset($grouped);
         $executionDate = $firstGroup->getExecutionDate();
 
-        Assert::assertEquals($expectedScheduleDate->format('Y-m-d H:i'), $executionDate->format('Y-m-d H:i'));
+        Assert::assertSame($expectedScheduleDate->format('Y-m-d H:i'), $executionDate->format('Y-m-d H:i'));
     }
 
     /**
@@ -138,7 +138,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval         = $this->getInterval();
         $scheduledForDate = $interval->getExecutionDateTime($event, $scheduledOnDate, $scheduledOnDate);
 
-        Assert::assertEquals($expectedScheduleDate->format('Y-m-d H:i'), $scheduledForDate->format('Y-m-d H:i'));
+        Assert::assertSame($expectedScheduleDate->format('Y-m-d H:i'), $scheduledForDate->format('Y-m-d H:i'));
     }
 
     /**
@@ -276,17 +276,17 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
                 case 'America/Los_Angeles':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([1, 2], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertSame('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/North_Dakota/Center':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([3, 4], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 08:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertSame('2018-10-18 08:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/New_York':
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([5, 6, 7, 8], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertSame('2018-10-18 09:00', $executionDate->format('Y-m-d H:i'));
                     break;
             }
         }
@@ -324,7 +324,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval = $this->getInterval();
 
         Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertEquals($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        Assert::assertSame($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
@@ -361,7 +361,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval = $this->getInterval();
 
         Assert::assertFalse($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        Assert::assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectTriggerMode(): void
@@ -525,7 +525,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime('2021-11-08 17:00:00'));
         $executionDate->setTimezone(new \DateTimeZone('UTC'));
 
-        $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
+        $this->assertSame('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenForExactHour(): void
@@ -561,7 +561,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         $interval = $this->getInterval();
 
-        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        Assert::assertSame($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testIsContactSpecificExecutionDateRequiredShouldReturnFalseForNegativePathAction(): void

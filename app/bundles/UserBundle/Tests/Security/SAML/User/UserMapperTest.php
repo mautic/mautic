@@ -70,7 +70,7 @@ class UserMapperTest extends TestCase
     {
         $user = $this->mapper->getUser($this->response);
         $this->assertEquals('hello@there.com', $user->getEmail());
-        $this->assertEquals('hello@there.com', $user->getUserIdentifier());
+        $this->assertSame('hello@there.com', $user->getUserIdentifier());
         $this->assertEquals('Joe', $user->getFirstName());
         $this->assertEquals('Smith', $user->getLastName());
     }
@@ -78,6 +78,6 @@ class UserMapperTest extends TestCase
     public function testUsernameIsReturned(): void
     {
         $username = $this->mapper->getUsername($this->response);
-        $this->assertEquals('hello@there.com', $username);
+        $this->assertSame('hello@there.com', $username);
     }
 }

@@ -239,7 +239,7 @@ class ExportHelperTest extends TestCase
 
         $result   = $this->exportHelper->parseLeadToExport($lead);
         $expected = $leadFieldsData + ['stage' => 'Stage 3'];
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testSupportedExportTypes(): void

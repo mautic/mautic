@@ -96,7 +96,7 @@ class FieldHelperTest extends TestCase
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'email',
                 'mautic_internal_contact_timeline',
@@ -122,7 +122,7 @@ class FieldHelperTest extends TestCase
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'email',
                 'mautic_internal_contact_timeline',
@@ -191,13 +191,13 @@ class FieldHelperTest extends TestCase
 
     public function testGetNormalizedFieldType(): void
     {
-        $this->assertEquals(NormalizedValueDAO::BOOLEAN_TYPE, $this->fieldHelper->getNormalizedFieldType('boolean'));
-        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('date'));
-        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('datetime'));
-        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('time'));
-        $this->assertEquals(NormalizedValueDAO::FLOAT_TYPE, $this->fieldHelper->getNormalizedFieldType('number'));
-        $this->assertEquals(NormalizedValueDAO::SELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('select'));
-        $this->assertEquals(NormalizedValueDAO::MULTISELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('multiselect'));
-        $this->assertEquals(NormalizedValueDAO::STRING_TYPE, $this->fieldHelper->getNormalizedFieldType('default'));
+        $this->assertSame(NormalizedValueDAO::BOOLEAN_TYPE, $this->fieldHelper->getNormalizedFieldType('boolean'));
+        $this->assertSame(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('date'));
+        $this->assertSame(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('datetime'));
+        $this->assertSame(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('time'));
+        $this->assertSame(NormalizedValueDAO::FLOAT_TYPE, $this->fieldHelper->getNormalizedFieldType('number'));
+        $this->assertSame(NormalizedValueDAO::SELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('select'));
+        $this->assertSame(NormalizedValueDAO::MULTISELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('multiselect'));
+        $this->assertSame(NormalizedValueDAO::STRING_TYPE, $this->fieldHelper->getNormalizedFieldType('default'));
     }
 }

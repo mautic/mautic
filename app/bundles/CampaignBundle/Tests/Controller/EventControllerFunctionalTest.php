@@ -266,7 +266,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
         // Assert the field email_type === "marketing"
-        Assert::assertEquals('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
+        Assert::assertSame('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
     }
 
     public function testEventsAreNotAccessibleWithXhr(): void

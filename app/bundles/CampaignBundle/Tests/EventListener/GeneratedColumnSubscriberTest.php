@@ -56,7 +56,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
     private function createVersionProvider(bool $isMySql): VersionProviderInterface
     {
         return new class($isMySql) implements VersionProviderInterface {
-            public function __construct(private bool $isMySql)
+            public function __construct(private readonly bool $isMySql)
             {
             }
 

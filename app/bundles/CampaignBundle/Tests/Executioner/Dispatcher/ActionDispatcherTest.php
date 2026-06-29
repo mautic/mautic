@@ -107,7 +107,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     ++$dispatcCounter;
                     if (1 === $dispatcCounter) {
                         Assert::assertInstanceOf(PendingEvent::class, $event);
-                        \assert($event instanceof PendingEvent);
+                        $this->assertInstanceOf(PendingEvent::class, $event);
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     } elseif (2 === $dispatcCounter) {

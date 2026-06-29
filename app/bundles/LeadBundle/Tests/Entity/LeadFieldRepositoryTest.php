@@ -323,45 +323,45 @@ final class LeadFieldRepositoryTest extends TestCase
         $this->entityManager->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('select')
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('from')
             ->willReturnSelf();
 
         $expr = $this->createMock(Query\Expr::class);
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
         $comparison = $this->createMock(Query\Expr\Comparison::class);
-        $expr->expects(self::once())
+        $expr->expects($this->once())
             ->method('eq')
             ->willReturn($comparison);
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('where')
             ->with($comparison)
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('orderBy')
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('setMaxResults')
             ->with(1)
             ->willReturnSelf();
 
         $query = $this->createMock(AbstractQuery::class);
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
 
         $leadField = $this->createMock(LeadField::class);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('getOneOrNullResult')
             ->willReturn($leadField);
 

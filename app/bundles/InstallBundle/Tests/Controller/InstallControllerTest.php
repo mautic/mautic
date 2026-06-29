@@ -105,6 +105,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
             $this->pathsHelper,
             InstallService::CHECK_STEP
         );
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 }

@@ -108,7 +108,7 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
             ->executeQuery()
             ->fetchOne();
 
-        $this->assertEquals(1, $rotationAfterAttempt, 'Rotation must stay unchanged when re-entry is blocked.');
+        $this->assertSame(1, $rotationAfterAttempt, 'Rotation must stay unchanged when re-entry is blocked.');
 
         $this->em->clear();
 

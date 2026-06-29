@@ -236,13 +236,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactMerger              = $this->createMock(ContactMerger::class);
         $userRepository                   = $this->createMock(UserRepository::class);
 
-        $this->entityManager->method('getRepository')->willReturnCallback(function (string $class) use ($userRepository) {
-            return match ($class) {
-                Submission::class => $this->submissioRepository,
-                Lead::class       => $this->leadRepository,
-                User::class       => $userRepository,
-                default           => null,
-            };
+        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
+            Submission::class => $this->submissioRepository,
+            Lead::class       => $this->leadRepository,
+            User::class       => $userRepository,
+            default           => null,
         });
 
         $this->dispatcher->method('hasListeners')->willReturn(false);

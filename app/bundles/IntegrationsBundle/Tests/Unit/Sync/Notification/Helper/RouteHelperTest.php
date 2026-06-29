@@ -126,7 +126,7 @@ class RouteHelperTest extends TestCase
             );
 
         $link = $this->routeHelper->getLink(Contact::NAME, 1, 'Hello');
-        $this->assertEquals('<a href="route/for/id/1">Hello</a>', $link);
+        $this->assertSame('<a href="route/for/id/1">Hello</a>', $link);
     }
 
     public function testLinkCsv(): void
@@ -167,6 +167,6 @@ class RouteHelperTest extends TestCase
             });
 
         $csv = $this->routeHelper->getLinkCsv(Contact::NAME, [1, 2]);
-        $this->assertEquals('[<a href="route/for/id/1">1</a>], [<a href="route/for/id/2">2</a>]', $csv);
+        $this->assertSame('[<a href="route/for/id/1">1</a>], [<a href="route/for/id/2">2</a>]', $csv);
     }
 }

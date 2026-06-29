@@ -109,7 +109,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isMethod')
             ->willReturn(true);
 
-        $this->requestMock->expects(self::once())
+        $this->requestMock->expects($this->once())
             ->method('isXmlHttpRequest')
             ->willReturn(false);
 
@@ -224,10 +224,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $widgetService = $this->createMock(Widget::class);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('setFilter')
             ->with($this->requestMock);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('get')
             ->with((int) $widgetId)
             ->willReturn(null);
@@ -246,7 +246,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $renderedContent = 'lfsadkdhfůasfjds';
         $twig            = $this->createMock(Environment::class);
 
-        $twig->expects(self::once())
+        $twig->expects($this->once())
             ->method('render')
             ->willReturn($renderedContent);
 
@@ -254,10 +254,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $widgetService = $this->createMock(Widget::class);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('setFilter')
             ->with($this->requestMock);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('get')
             ->with((int) $widgetId)
             ->willReturn($widget);

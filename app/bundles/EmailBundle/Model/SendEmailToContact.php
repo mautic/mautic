@@ -49,8 +49,6 @@ class SendEmailToContact
 
     /**
      * @param bool $resetMailer
-     *
-     * @return $this
      */
     public function flush($resetMailer = true): static
     {
@@ -117,8 +115,6 @@ class SendEmailToContact
 
     /**
      * @param int|null $id
-     *
-     * @return $this
      */
     public function setListId($id): static
     {
@@ -128,8 +124,6 @@ class SendEmailToContact
     }
 
     /**
-     * @return $this
-     *
      * @throws FailedToSendToContactException
      */
     public function setContact(array $contact, array $tokens = []): static

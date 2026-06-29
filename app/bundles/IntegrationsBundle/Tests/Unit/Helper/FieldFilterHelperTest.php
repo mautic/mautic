@@ -17,7 +17,7 @@ class FieldFilterHelperTest extends TestCase
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         $fieldFilterHelper->filterFieldsByPage('test', 2, 3);
-        $this->assertEquals(5, $fieldFilterHelper->getTotalFieldCount());
+        $this->assertSame(5, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
         $this->assertFalse(isset($filteredFields['field1']));
@@ -33,7 +33,7 @@ class FieldFilterHelperTest extends TestCase
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         $fieldFilterHelper->filterFieldsByKeyword('test', 'three', 1);
-        $this->assertEquals(1, $fieldFilterHelper->getTotalFieldCount());
+        $this->assertSame(1, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
         $this->assertFalse(isset($filteredFields['field1']));
@@ -49,7 +49,7 @@ class FieldFilterHelperTest extends TestCase
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         $fieldFilterHelper->filterFieldsByKeyword('test', 'field', 2, 3);
-        $this->assertEquals(5, $fieldFilterHelper->getTotalFieldCount());
+        $this->assertSame(5, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
         $this->assertFalse(isset($filteredFields['field1']));

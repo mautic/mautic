@@ -126,8 +126,8 @@ class PeakInteractionTimerTest extends TestCase
         $optimalTime = $testableTimer->getOptimalTime($contactMock);
 
         // Assert that the returned DateTimeInterface is in the contact's timezone
-        $this->assertEquals($contactTimezone ?: $this->defaultTimezone, $optimalTime->getTimezone()->getName(), 'The optimal time should be in the contact\'s timezone.');
-        $this->assertEquals($expectedDate, $optimalTime->format('Y-m-d H:i:s'));
+        $this->assertSame($contactTimezone ?: $this->defaultTimezone, $optimalTime->getTimezone()->getName(), 'The optimal time should be in the contact\'s timezone.');
+        $this->assertSame($expectedDate, $optimalTime->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -172,10 +172,10 @@ class PeakInteractionTimerTest extends TestCase
         $optimalTimeAndDay = $testableTimer->getOptimalTimeAndDay($contactMock);
 
         // Assert that the returned DateTimeInterface is in the contact's timezone
-        $this->assertEquals($contactTimezone ?: $this->defaultTimezone, $optimalTimeAndDay->getTimezone()->getName(), 'The optimal time and day should be in the contact\'s timezone.');
+        $this->assertSame($contactTimezone ?: $this->defaultTimezone, $optimalTimeAndDay->getTimezone()->getName(), 'The optimal time and day should be in the contact\'s timezone.');
 
         // Assert that the date and time are as expected
-        $this->assertEquals($expectedDate, $optimalTimeAndDay->format('Y-m-d H:i:s'), 'The optimal time and day should match the expected value.');
+        $this->assertSame($expectedDate, $optimalTimeAndDay->format('Y-m-d H:i:s'), 'The optimal time and day should match the expected value.');
     }
 
     /**
@@ -232,7 +232,7 @@ class PeakInteractionTimerTest extends TestCase
         // Call getOptimalTime on the testable instance
         $optimalTime = $testableTimer->getOptimalTime($contactMock);
 
-        $this->assertEquals($expectedDate, $optimalTime->format('Y-m-d H:i:s'));
+        $this->assertSame($expectedDate, $optimalTime->format('Y-m-d H:i:s'));
     }
 
     /**
@@ -328,7 +328,7 @@ class PeakInteractionTimerTest extends TestCase
         // Call getOptimalTime on the testable instance
         $optimalTime = $testableTimer->getOptimalTimeAndDay($contactMock);
 
-        $this->assertEquals($expectedDate, $optimalTime->format('Y-m-d H:i:s'));
+        $this->assertSame($expectedDate, $optimalTime->format('Y-m-d H:i:s'));
     }
 
     /**

@@ -202,13 +202,13 @@ class ListModelTest extends TestCase
         $leadCount = 433;
 
         $this->leadListRepositoryMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getLeadCount')
             ->with($segmentId)
             ->willReturn($leadCount);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('setSegmentContactCount')
             ->with($segmentId, $leadCount);
 
@@ -218,7 +218,7 @@ class ListModelTest extends TestCase
         ];
 
         $this->contactSegmentServiceMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getNewLeadListLeadsCount')
             ->with($leadList)
             ->willReturn($newLeadsCount);
@@ -229,7 +229,7 @@ class ListModelTest extends TestCase
         ];
 
         $this->contactSegmentServiceMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getOrphanedLeadListLeadsCount')
             ->with($leadList)
             ->willReturn($orphanLeadsCount);
@@ -237,7 +237,7 @@ class ListModelTest extends TestCase
         self::assertSame(0, $this->model->rebuildListLeads($leadList));
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -257,7 +257,7 @@ class ListModelTest extends TestCase
         $this->model->removeLead($lead, $leadList);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($currentLeadCount - 1);
@@ -274,7 +274,7 @@ class ListModelTest extends TestCase
         $leadCount = 100;
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -294,7 +294,7 @@ class ListModelTest extends TestCase
         $this->model->addLead($lead, $leadList);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($currentLeadCount + 1);
@@ -311,13 +311,13 @@ class ListModelTest extends TestCase
         $leadCount = 100;
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('hasSegmentContactCount')
             ->with($segmentId)
             ->willReturn(true);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -334,13 +334,13 @@ class ListModelTest extends TestCase
         $leadCount = 100;
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('hasSegmentContactCount')
             ->with($segmentId)
             ->willReturn(false);
 
         $this->leadListRepositoryMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getLeadCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -357,14 +357,14 @@ class ListModelTest extends TestCase
         $dnc       = 3;
 
         $this->leadListRepositoryMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getLeadCount')
             ->with($segmentId)
             ->willReturn($total);
 
         $doNotContactRepository = $this->createMock(DoNotContactRepository::class);
         $doNotContactRepository
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getCount')
             ->with(null, null, null, $segmentId)
             ->willReturn($dnc);
@@ -381,7 +381,7 @@ class ListModelTest extends TestCase
     {
         $leadList  = $this->mockLeadList(765);
         $segmentId = $leadList->getId();
-        $this->leadListRepositoryMock->expects(self::once())
+        $this->leadListRepositoryMock->expects($this->once())
             ->method('leadListExists')
             ->with($segmentId)
             ->willReturn(true);
@@ -393,7 +393,7 @@ class ListModelTest extends TestCase
     {
         return new class($id) extends LeadList {
             public function __construct(
-                private int $id,
+                private readonly int $id,
             ) {
                 parent::__construct();
             }
@@ -409,7 +409,7 @@ class ListModelTest extends TestCase
     {
         return new class($id) extends Lead {
             public function __construct(
-                private int $id,
+                private readonly int $id,
             ) {
                 parent::__construct();
             }

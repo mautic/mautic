@@ -87,7 +87,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailCount(1);
 
         $email = KernelTestCase::getMailerMessage();
-        \assert($email instanceof EmailMime);
+        $this->assertInstanceOf(EmailMime::class, $email);
 
         /** @var UserHelper $userHelper */
         $userHelper = static::getContainer()->get(UserHelper::class);

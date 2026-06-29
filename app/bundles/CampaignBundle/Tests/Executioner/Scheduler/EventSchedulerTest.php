@@ -207,8 +207,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
+        $this->assertSame('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertSame('America/New_York', $executionDate->getTimezone()->getName());
     }
 
     public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
@@ -263,8 +263,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
         // It is OK to set the execution date 15 seconds in the past. It means execute right now.
-        $this->assertEquals('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
+        $this->assertSame('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertSame('America/New_York', $executionDate->getTimezone()->getName());
     }
 
     public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
@@ -319,8 +319,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
 
         $this->assertFalse($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-08-31 13:00:15', $executionDate->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
+        $this->assertSame('2018-08-31 13:00:15', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertSame('America/New_York', $executionDate->getTimezone()->getName());
     }
 
     public function testRescheduleFailuresWithRescheduleDateSet(): void

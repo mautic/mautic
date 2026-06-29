@@ -14,18 +14,12 @@ interface VariantEntityInterface
 
     public function getVariantParent(): ?VariantEntityInterface;
 
-    /**
-     * @return $this
-     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static;
 
     public function removeVariantParent(): void;
 
     public function getVariantChildren(): ArrayCollection|Collection;
 
-    /**
-     * @return $this
-     */
     public function addVariantChild(VariantEntityInterface $child): static;
 
     public function removeVariantChild(VariantEntityInterface $child): void;

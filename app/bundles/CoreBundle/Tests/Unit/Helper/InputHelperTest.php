@@ -59,7 +59,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john..doe@email.com', $clean);
+        $this->assertSame('john..doe@email.com', $clean);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The email returns value without surrounding white spaces')]
@@ -67,7 +67,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('    john.doe@email.com  ');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertSame('john.doe@email.com', $clean);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The array is cleaned')]
@@ -255,7 +255,7 @@ class InputHelperTest extends TestCase
     {
         $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
 
-        Assert::assertEquals($cleanedUrl, $outputFilename);
+        Assert::assertSame($cleanedUrl, $outputFilename);
     }
 
     /**
@@ -297,7 +297,7 @@ class InputHelperTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('minifyHTMLProvider')]
     public function testMinifyHTML(string $html, string $expected): void
     {
-        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+        $this->assertSame($expected, InputHelper::minifyHTML($html));
     }
 
     /**

@@ -41,12 +41,12 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $kernel = static::getContainer()->get('kernel');
-        \assert($kernel instanceof KernelInterface);
+        $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = $userCreator->getId();
         $customFieldNotification = self::createMock(CustomFieldNotification::class);
         $customFieldNotification
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('customFieldWasCreated')
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
@@ -60,7 +60,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             '--id'   => $leadField->getId(),
         ]);
 
-        self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        self::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
@@ -97,7 +97,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $kernel = static::getContainer()->get('kernel');
-        \assert($kernel instanceof KernelInterface);
+        $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = $userCreator->getId();
         $customFieldNotification = self::createMock(CustomFieldNotification::class);
@@ -113,7 +113,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        self::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);

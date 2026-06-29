@@ -158,6 +158,6 @@ class InactiveHelperTest extends TestCase
             $event
         );
 
-        $this->assertEquals(1, $contacts->count());
+        $this->assertCount(1, $contacts);
     }
 }

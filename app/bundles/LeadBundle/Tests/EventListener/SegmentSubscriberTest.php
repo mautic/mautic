@@ -73,7 +73,7 @@ class SegmentSubscriberTest extends TestCase
             $this->translator
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
                 LeadEvents::ON_LIST_DELETE     => ['onSegmentDelete', 0],

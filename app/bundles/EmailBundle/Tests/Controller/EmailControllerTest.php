@@ -173,12 +173,12 @@ class EmailControllerTest extends TestCase
             ->method('isPublished');
 
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testSendActionWhenEntityFoundButNotPublished(): void
@@ -210,12 +210,12 @@ class EmailControllerTest extends TestCase
             ->method('getEmailType');
 
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testThatExampleEmailsHaveTestStringInTheirSubject(): void
@@ -281,7 +281,7 @@ class EmailControllerTest extends TestCase
     public function testWinnerActionForDispatchManualWinnerEvent(): void
     {
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
 
@@ -298,7 +298,7 @@ class EmailControllerTest extends TestCase
             ->with('email:emails:editown', 'email:emails:editother', null)
             ->willReturn(true);
 
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getMethod')
             ->willReturn(Request::METHOD_POST);
 

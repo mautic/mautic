@@ -22,13 +22,11 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->translator->method('trans')
-            ->willReturnCallback(function (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string {
-                return match ($id) {
-                    'mautic.form.field.checkboxgrp.min_message.placeholder' => 'Enter minimum selection message',
-                    'mautic.form.field.checkboxgrp.max_message.placeholder' => 'Enter maximum selection message',
-                    'mautic.form.field.checkboxgrp.range.invalid'           => 'Maximum must be greater than or equal to minimum',
-                    default                                                 => $id,
-                };
+            ->willReturnCallback(fn (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string => match ($id) {
+                'mautic.form.field.checkboxgrp.min_message.placeholder' => 'Enter minimum selection message',
+                'mautic.form.field.checkboxgrp.max_message.placeholder' => 'Enter maximum selection message',
+                'mautic.form.field.checkboxgrp.range.invalid'           => 'Maximum must be greater than or equal to minimum',
+                default                                                 => $id,
             });
 
         parent::setUp();
@@ -184,7 +182,7 @@ final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 
         $errors = $form->getErrors(true);
         $this->assertInstanceOf(FormError::class, $errors[0]);
-        $this->assertEquals('Maximum must be greater than or equal to minimum', $errors[0]->getMessage());
+        $this->assertSame('Maximum must be greater than or equal to minimum', $errors[0]->getMessage());
     }
 
     public function testEmptyRangeSubmission(): void

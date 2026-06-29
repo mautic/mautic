@@ -84,7 +84,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         preg_match($resubscribeUrlPattern, $messages[0]->getHtmlBody(), $resubscribeMatches1);
 
         Assert::assertSame(20, strlen($unsubscribeMatches1[1]), $messages[0]->getHtmlBody());
-        Assert::assertEquals($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
+        Assert::assertSame($unsubscribeMatches1[1], $resubscribeMatches1[1], $messages[0]->getHtmlBody());
 
         // Second email:
         Assert::assertStringContainsString('contact-flood-1@doe.com', $messages[1]->toString());
@@ -92,10 +92,10 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         preg_match($resubscribeUrlPattern, $messages[1]->getHtmlBody(), $resubscribeMatches2);
 
         Assert::assertSame(20, strlen($unsubscribeMatches2[1]), $messages[1]->getHtmlBody());
-        Assert::assertEquals($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
+        Assert::assertSame($unsubscribeMatches2[1], $resubscribeMatches2[1], $messages[1]->getHtmlBody());
 
         // The email stat hashes cannot be the same in different emails:
-        Assert::assertNotEquals($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
+        Assert::assertNotSame($unsubscribeMatches1[1], $unsubscribeMatches2[1], $messages[0]->getHtmlBody());
     }
 
     public function testEmailSendToBatchOneContactWithMalformedClickThrough(): void
@@ -215,7 +215,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
 
         $rawMessage = self::getMailerMessagesByToAddress('contact-flood-0@doe.com')[0];
         Assert::assertInstanceOf(Message::class, $rawMessage);
-        \assert($rawMessage instanceof Message);
+        $this->assertInstanceOf(Message::class, $rawMessage);
 
         $body = quoted_printable_decode($rawMessage->getBody()->bodyToString());
         preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);

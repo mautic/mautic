@@ -94,10 +94,10 @@ class PointModelTest extends TestCase
         $this->ipLookupHelper->method('getIpAddress')->willReturn($ip);
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects(self::once())
+        $lead->expects($this->once())
             ->method('adjustPoints')
             ->with($pointDelta);
-        $lead->expects(self::once())
+        $lead->expects($this->once())
             ->method('addPointsChangeLogEntry')
             ->with(
                 'url',
@@ -110,13 +110,13 @@ class PointModelTest extends TestCase
         $eventDetails = $this->createMock(Hit::class);
 
         $repository = $this->createMock(PointRepository::class);
-        $this->em->expects(self::once())
+        $this->em->expects($this->once())
             ->method('getRepository')
             ->with(Point::class)
             ->willReturn($repository);
 
         $pointActionHelper = $this->createMock(PointActionHelper::class);
-        $pointActionHelper->expects(self::once())
+        $pointActionHelper->expects($this->once())
             ->method('validateUrlHit')
             ->with(
                 $eventDetails,
@@ -139,11 +139,11 @@ class PointModelTest extends TestCase
         $point->method('getDelta')->willReturn($pointDelta);
         $point->method('getGroup')->willReturn($pointGroup);
 
-        $repository->expects(self::once())
+        $repository->expects($this->once())
             ->method('getPublishedByType')
             ->with($type)
             ->willReturn([$point]);
-        $repository->expects(self::once())
+        $repository->expects($this->once())
             ->method('getCompletedLeadActions')
             ->willReturn([]);
         $repository->expects(self::never())
@@ -182,7 +182,7 @@ class PointModelTest extends TestCase
                 self::fail('Unknown event called: '.$eventName);
             });
 
-        $this->leadModel->expects(self::once())
+        $this->leadModel->expects($this->once())
             ->method('saveEntity')
             ->with($lead);
 

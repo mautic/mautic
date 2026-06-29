@@ -189,7 +189,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): CampaignExecutionEvent
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
     {
         /** @var Email $eventDetails */
         $eventDetails = $event->getEventDetails();
@@ -197,7 +197,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         $eventConfig  = $event->getConfig();
 
         if (null == $eventDetails) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         // check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
@@ -210,24 +212,31 @@ class CampaignSubscriber implements EventSubscriberInterface
                     if (!empty($eventConfig['urls']['list'])) {
                         $limitToUrls = (array) $eventConfig['urls']['list'];
                         if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
-                            return $event->setResult(true);
+                            $event->setResult(true);
+
+                            return;
                         }
                     } else {
-                        return $event->setResult(true);
+                        $event->setResult(true);
+
+                        return;
                     }
                 }
+                $event->setResult(false);
 
-                return $event->setResult(false);
+                return;
             } elseif ($event->checkContext('email.open')) {
-                // open decision
-                return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+                $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+
+                return;
             } elseif ($event->checkContext('email.reply')) {
-                // reply decision
-                return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+                $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+
+                return;
             }
         }
 
-        return $event->setResult(false);
+        $event->setResult(false);
     }
 
     /**

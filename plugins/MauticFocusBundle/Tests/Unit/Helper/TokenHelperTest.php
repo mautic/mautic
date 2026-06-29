@@ -64,7 +64,7 @@ class TokenHelperTest extends TestCase
         $focusItem = new Focus();
         $focusItem->setIsPublished(true);
 
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('getEntity')
             ->with($focusItemId)
             ->willReturn($focusItem);
@@ -85,12 +85,12 @@ class TokenHelperTest extends TestCase
         $focusItem->setIsPublished(false);
         $focusItem->setCreatedBy($createdById);
 
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('getEntity')
             ->with($focusItemId)
             ->willReturn($focusItem);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with(
                 'focus:items:viewown',

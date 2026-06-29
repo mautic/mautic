@@ -4,22 +4,22 @@
   "type": "project",
   "description": "Mautic Open Source Distribution",
   "funding": [
-    {
-      "type": "opencollective",
-      "url": "https://www.opencollective.com/mautic"
-    },
-    {
-      "type": "github",
-      "url": "https://github.com/sponsors/mautic"
-    }
-  ],
+        {
+            "type": "opencollective",
+            "url": "https://www.opencollective.com/mautic"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/mautic"
+        }
+    ],
   "support": {
-    "forum": "https://forum.mautic.org/c/support",
-    "docs": "https://docs.mautic.org",
-    "chat": "https://mautic.org/slack",
-    "issues": "https://github.com/mautic/mautic/issues",
-    "source": "https://github.com/mautic/mautic"
-  },
+        "forum": "https://forum.mautic.org/c/support",
+        "docs": "https://docs.mautic.org",
+        "chat": "https://mautic.org/slack",
+        "issues": "https://github.com/mautic/mautic/issues",
+        "source": "https://github.com/mautic/mautic"
+    },
   "require": {
     "composer/installers": "^2.3",
     "cweagans/composer-patches": "^1.7.3",
@@ -122,7 +122,7 @@
       "url": "app",
       "options": {
         "versions": {
-          "mautic/core-lib": "7.0.0-dev"
+            "mautic/core-lib": "7.0.0-dev"
         }
       }
     },
@@ -224,6 +224,9 @@
       "file": "app/config/parameters.yml"
     },
     "patches": {
+      "twig/twig": {
+        "Make IntegrationTestCase data providers static for PHPUnit 11": "patches/twig-integration-testcase-static-data-providers.patch"
+      },
       "doctrine/dbal": {
         "Fix PostgreSQL platform indexes query for modern PG": "patches/doctrine-dbal-pgsql-platform-indexes.patch",
         "PHP 8.5+ PDO PgSQL driver compatibility": "patches/doctrine-dbal-pgsql-php85-driver.patch"

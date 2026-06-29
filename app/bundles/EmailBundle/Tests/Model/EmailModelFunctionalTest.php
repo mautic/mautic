@@ -45,7 +45,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $emailModel = static::getContainer()->get('mautic.email.model.email');
-        \assert($emailModel instanceof EmailModel);
+        $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
 
@@ -139,7 +139,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
         return $contacts;
@@ -431,8 +431,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             $this->emulateEmailStat($lead, $email, $l['read']);
 
             if ($l['read'] && $l['click']) {
-                $hits       = rand(1, 5);
-                $uniqueHits = rand(1, $hits);
+                $hits       = random_int(1, 5);
+                $uniqueHits = random_int(1, $hits);
                 $this->emulateClick($lead, $email, $hits, $uniqueHits);
             }
         }
@@ -697,7 +697,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsNotPostponed(): void
     {
         $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        \assert($messageQueueRepository instanceof MessageQueueRepository);
+        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         Assert::assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
     }
@@ -705,7 +705,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsPostponed(Email $email, Lead $contact): void
     {
         $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        \assert($messageQueueRepository instanceof MessageQueueRepository);
+        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $queuedMessages = $messageQueueRepository->findBy([]);
         Assert::assertCount(1, $queuedMessages, 'Email should be postponed.');

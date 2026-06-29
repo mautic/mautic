@@ -73,11 +73,11 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('getRootAliases')->willReturn(['o']);
         $queryBuilder->method('expr')->willReturn(new Expr());
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('andWhere')
             ->with('o.createdBy = :generated_created_by')
             ->willReturnSelf();
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('setParameter')
             ->with('generated_created_by', 42)
             ->willReturnSelf();
@@ -104,11 +104,11 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('getRootAliases')->willReturn(['o']);
         $queryBuilder->method('expr')->willReturn(new Expr());
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('andWhere')
             ->with('(o.createdBy != :generated_created_by OR o.createdBy IS NULL)')
             ->willReturnSelf();
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('setParameter')
             ->with('generated_created_by', 7)
             ->willReturnSelf();
@@ -177,8 +177,8 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('getRootAliases')->willReturn(['o']);
         $queryBuilder->method('expr')->willReturn(new Expr());
-        $queryBuilder->expects(self::once())->method('andWhere')->willReturnSelf();
-        $queryBuilder->expects(self::once())->method('setParameter')->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('andWhere')->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('setParameter')->willReturnSelf();
 
         $this->extension->applyToCollection(
             $queryBuilder,
@@ -208,7 +208,7 @@ final class OwnershipScopedCollectionExtensionTest extends TestCase
     private function createUserWithId(int $id): UserInterface
     {
         return new class($id) implements UserInterface {
-            public function __construct(private int $id)
+            public function __construct(private readonly int $id)
             {
             }
 

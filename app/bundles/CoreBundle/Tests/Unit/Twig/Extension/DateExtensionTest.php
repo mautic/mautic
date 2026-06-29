@@ -21,7 +21,7 @@ class DateExtensionTest extends TestCase
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')
             ->willReturnCallback(function ($id, $parameters = []) {
-                if (0 === strpos($id, 'mautic.core.date.')) {
+                if (str_starts_with($id, 'mautic.core.date.')) {
                     $unit = str_replace('mautic.core.date.', '', $id);
 
                     return $parameters['%count%'].' '.$unit.($parameters['%count%'] > 1 ? 's' : '');
@@ -57,9 +57,7 @@ class DateExtensionTest extends TestCase
         $this->assertContainsOnlyInstancesOf(TwigFunction::class, $functions);
         $this->assertCount(9, $functions);
 
-        $functionNames = array_map(function (TwigFunction $function) {
-            return $function->getName();
-        }, $functions);
+        $functionNames = array_map(fn (TwigFunction $function) => $function->getName(), $functions);
 
         $this->assertContains('dateToText', $functionNames);
         $this->assertContains('dateToFull', $functionNames);

@@ -65,10 +65,10 @@ class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = $this->createMock(WidgetEntity::class);
-        $widget->expects(self::once())
+        $widget->expects($this->once())
             ->method('getId')
             ->willReturn($widgetId);
-        $widget->expects(self::once())
+        $widget->expects($this->once())
             ->method('getCreatedBy')
             ->willReturn(self::USER_ID);
 
@@ -78,20 +78,20 @@ class WidgetTest extends TestCase
             'dateTo'   => new \DateTime(),
         ];
 
-        $this->dashboardModel->expects(self::once())
+        $this->dashboardModel->expects($this->once())
             ->method('getEntity')
             ->with($widgetId)
             ->willReturn($widget);
 
-        $this->userHelper->expects(self::once())
+        $this->userHelper->expects($this->once())
             ->method('getUser')
             ->willReturn($this->user);
 
-        $this->dashboardModel->expects(self::once())
+        $this->dashboardModel->expects($this->once())
             ->method('getDefaultFilter')
             ->willReturn($filter);
 
-        $this->dashboardModel->expects(self::once())
+        $this->dashboardModel->expects($this->once())
             ->method('populateWidgetContent')
             ->with($widget, $filter);
 
@@ -103,7 +103,7 @@ class WidgetTest extends TestCase
         $widgetId = 2;
         $widget   = null;
 
-        $this->dashboardModel->expects(self::once())
+        $this->dashboardModel->expects($this->once())
             ->method('getEntity')
             ->with($widgetId)
             ->willReturn($widget);
@@ -116,13 +116,13 @@ class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = $this->createMock(WidgetEntity::class);
-        $widget->expects(self::once())
+        $widget->expects($this->once())
             ->method('getId')
             ->willReturn(null);
 
         $widget->setCreatedBy(self::USER_ID);
 
-        $this->dashboardModel->expects(self::once())
+        $this->dashboardModel->expects($this->once())
             ->method('getEntity')
             ->with($widgetId)
             ->willReturn($widget);
@@ -135,21 +135,21 @@ class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = $this->createMock(WidgetEntity::class);
-        $widget->expects(self::once())
+        $widget->expects($this->once())
             ->method('getId')
             ->willReturn($widgetId);
-        $widget->expects(self::once())
+        $widget->expects($this->once())
             ->method('getCreatedBy')
             ->willReturn(self::USER_ID + 1);
 
         $widget->setCreatedBy(self::USER_ID);
 
-        $this->dashboardModel->expects(self::once())
+        $this->dashboardModel->expects($this->once())
             ->method('getEntity')
             ->with($widgetId)
             ->willReturn($widget);
 
-        $this->userHelper->expects(self::once())
+        $this->userHelper->expects($this->once())
             ->method('getUser')
             ->willReturn($this->user);
 

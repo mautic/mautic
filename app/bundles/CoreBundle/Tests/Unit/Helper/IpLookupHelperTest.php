@@ -206,9 +206,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory->expects($this->any())
             ->method('create')
             ->willReturnCallback(
-                function () {
-                    return $this->deviceDetector;
-                }
+                fn () => $this->deviceDetector
             );
 
         $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory, null);

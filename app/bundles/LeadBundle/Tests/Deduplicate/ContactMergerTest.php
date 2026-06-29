@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
@@ -858,9 +859,8 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
     private function getCompany(int $id): Company
     {
-        $company    = new Company();
-        $reflection = new \ReflectionProperty(Company::class, 'id');
-        $reflection->setValue($company, $id);
+        $company = new Company();
+        ReflectionHelper::setValue($company, 'id', $id);
 
         return $company;
     }

@@ -167,8 +167,6 @@ class TweetStat
 
     /**
      * @param string $twitterTweetId
-     *
-     * @return $this
      */
     public function setTwitterTweetId($twitterTweetId): static
     {
@@ -236,9 +234,6 @@ class TweetStat
         return $this->favoriteCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setFavoriteCount(?int $favoriteCount): static
     {
         $this->favoriteCount = $favoriteCount;
@@ -251,9 +246,6 @@ class TweetStat
         return $this->retweetCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setRetweetCount(?int $retweetCount): static
     {
         $this->retweetCount = $retweetCount;

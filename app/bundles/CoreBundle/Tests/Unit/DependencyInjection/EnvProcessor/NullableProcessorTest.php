@@ -26,6 +26,6 @@ class NullableProcessorTest extends TestCase
 
         $value = $processor->getEnv('', 'test', $getEnv);
 
-        $this->assertEquals('foobar', $value);
+        $this->assertSame('foobar', $value);
     }
 }

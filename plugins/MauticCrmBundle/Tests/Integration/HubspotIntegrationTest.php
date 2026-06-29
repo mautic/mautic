@@ -58,10 +58,10 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testGetBearerTokenEmpty(): void
     {
         $event = $this->createMock(PluginIntegrationKeyEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getKeys')
             ->willReturn(['other' => 'data']);
-        $this->dispatcher->expects(self::once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
@@ -78,10 +78,10 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
         $token = 'token';
 
         $event = $this->createMock(PluginIntegrationKeyEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getKeys')
             ->willReturn(['other' => 'data', HubspotIntegration::ACCESS_KEY => $token]);
-        $this->dispatcher->expects(self::once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
@@ -107,10 +107,10 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testGetAuthenticationTypeNoOauthToken(): void
     {
         $event = $this->createMock(PluginIntegrationKeyEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getKeys')
             ->willReturn(['other' => 'data']);
-        $this->dispatcher->expects(self::once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
@@ -125,10 +125,10 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testGetAuthenticationTypeWithOauthToken(): void
     {
         $event = $this->createMock(PluginIntegrationKeyEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getKeys')
             ->willReturn(['other' => 'data', HubspotIntegration::ACCESS_KEY => 'token']);
-        $this->dispatcher->expects(self::once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
@@ -143,10 +143,10 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testIsAuthorizedNoOauthToken(): void
     {
         $event = $this->createMock(PluginIntegrationKeyEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getKeys')
             ->willReturn(['other' => 'data']);
-        $this->dispatcher->expects(self::once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
@@ -161,10 +161,10 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testIsAuthorizedWithOauthToken(): void
     {
         $event = $this->createMock(PluginIntegrationKeyEvent::class);
-        $event->expects(self::once())
+        $event->expects($this->once())
             ->method('getKeys')
             ->willReturn(['other' => 'data', HubspotIntegration::ACCESS_KEY => 'token']);
-        $this->dispatcher->expects(self::once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new PluginIntegrationKeyEvent($this->integration, [HubspotIntegration::ACCESS_KEY]),
@@ -198,7 +198,7 @@ class HubspotIntegrationTest extends AbstractIntegrationTestCase
     public function testAppendToFormFeatures(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::once())
+        $builder->expects($this->once())
             ->method('add')
             ->with('objects', ChoiceType::class);
 

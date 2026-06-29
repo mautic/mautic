@@ -144,7 +144,7 @@ class ModeratedCommandTest extends TestCase
             ->name('sf*')
             ->files();
 
-        $this->assertEquals(1, $finder->count());
+        $this->assertCount(1, $finder);
 
         // Complete the command
         $this->fakeModeratedCommand->forceCompleteRun();
@@ -155,7 +155,7 @@ class ModeratedCommandTest extends TestCase
             ->name('sf*')
             ->files();
 
-        $this->assertEquals(0, $finder->count());
+        $this->assertCount(0, $finder);
 
         // Cleanup
         rmdir($runDir);
@@ -189,7 +189,7 @@ class ModeratedCommandTest extends TestCase
             ->name('sf*')
             ->files();
 
-        $this->assertEquals(1, $finder->count());
+        $this->assertCount(1, $finder);
 
         // Check the file is locked
         $file        = $this->getFirstFile($finder);

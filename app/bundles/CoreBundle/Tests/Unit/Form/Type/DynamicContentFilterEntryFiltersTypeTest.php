@@ -101,7 +101,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('setRequired')
             ->with([
                 'countries',

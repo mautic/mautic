@@ -389,7 +389,7 @@ class TrackableModelTest extends TestCase
         $trackableKey = '{trackable='.$match[1].'}';
         $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
 
-        $this->assertEquals(1, count($trackables));
+        $this->assertCount(1, $trackables);
         $this->assertEquals('{contactfield=website|https://mautic.org}', $trackables[$trackableKey]->getRedirect()->getUrl());
     }
 

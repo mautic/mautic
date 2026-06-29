@@ -207,9 +207,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
         $matcher = $this->exactly(2);
 
@@ -274,9 +272,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
         $matcher = $this->exactly(2);
 
@@ -335,9 +331,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(1))
             ->method('adjudicate')
             ->willReturnCallback(
-                function ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) {
-                    return $internalInformationChangeRequest;
-                }
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
             );
 
         $this->bulkNotification->expects($this->exactly(1))

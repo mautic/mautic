@@ -38,6 +38,6 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $helper = new ConfigHelper($coreParametersHelper);
 
-        Assert::assertEquals('config', $helper->getName());
+        Assert::assertSame('config', $helper->getName());
     }
 }

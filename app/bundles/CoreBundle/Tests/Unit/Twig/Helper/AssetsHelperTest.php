@@ -51,13 +51,13 @@ class AssetsHelperTest extends TestCase
 
     public function testGetUrlWithAbsolutePath(): void
     {
-        Assert::assertEquals('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
-        Assert::assertEquals('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
+        Assert::assertSame('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
+        Assert::assertSame('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
 
         $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
-        Assert::assertEquals('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
+        Assert::assertSame('http://some.absolute/path', $this->assetHelper->getUrl('http://some.absolute/path'));
+        Assert::assertSame('https://some.absolute/path', $this->assetHelper->getUrl('https://some.absolute/path'));
     }
 
     public function testGetUrlWithRelativePath(): void
@@ -67,11 +67,11 @@ class AssetsHelperTest extends TestCase
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertEquals('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
+        Assert::assertSame('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
+        Assert::assertSame('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithRelativePathWhenMauticInSubFolder(): void
@@ -81,11 +81,11 @@ class AssetsHelperTest extends TestCase
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertEquals('http://some.mautic/m/some/path', $this->assetHelper->getUrl('some/path'));
+        Assert::assertSame('http://some.mautic/m/some/path', $this->assetHelper->getUrl('some/path'));
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('http://some.mautic/m/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
+        Assert::assertSame('http://some.mautic/m/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithRelativePathWithDevIndex(): void
@@ -95,11 +95,11 @@ class AssetsHelperTest extends TestCase
 
         $this->assetHelper->setPathsHelper($this->pathsHelper);
 
-        Assert::assertEquals('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
+        Assert::assertSame('http://some.mautic/some/path', $this->assetHelper->getUrl('some/path'));
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
+        Assert::assertSame('http://some.mautic/some/path?v'.$version, $this->assetHelper->getUrl('some/path'));
     }
 
     public function testGetUrlWithVersionAndExistingQueryPart(): void
@@ -111,9 +111,9 @@ class AssetsHelperTest extends TestCase
 
         $version = $this->setVersion($this->assetHelper);
 
-        Assert::assertEquals('/path?some&amp;v'.$version, $this->assetHelper->getUrl('/path?some'));
-        Assert::assertEquals('/path?some=65&amp;v'.$version, $this->assetHelper->getUrl('/path?some=65'));
-        Assert::assertEquals('/path?v'.$version, $this->assetHelper->getUrl('/path?v'.$version));
+        Assert::assertSame('/path?some&amp;v'.$version, $this->assetHelper->getUrl('/path?some'));
+        Assert::assertSame('/path?some=65&amp;v'.$version, $this->assetHelper->getUrl('/path?some=65'));
+        Assert::assertSame('/path?v'.$version, $this->assetHelper->getUrl('/path?v'.$version));
     }
 
     public function testGetCKEditorScripts(): void
