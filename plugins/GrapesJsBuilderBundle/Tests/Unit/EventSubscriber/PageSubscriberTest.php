@@ -40,7 +40,7 @@ final class PageSubscriberTest extends TestCase
         $page = new Page();
 
         $this->config->method('isPublished')->willReturn(true);
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('addOrEditPageEntity')
             ->with($page);
 

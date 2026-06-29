@@ -24,7 +24,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $field = new LeadField();
         $field->setType($type);
         $field->setObject('lead');
@@ -37,7 +37,7 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
         $contact->setEmail('contact@example.com');
         $contact->addUpdatedField('field1', $value);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $report = new Report();
@@ -140,6 +140,6 @@ class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
     }
 }

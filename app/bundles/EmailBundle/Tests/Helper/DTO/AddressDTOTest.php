@@ -31,7 +31,7 @@ class AddressDTOTest extends TestCase
     {
         $contact = ['other_name' => 'Thing Two'];
 
-        $this->assertEquals(
+        $this->assertSame(
             'Thing Two',
             (new AddressDTO('someone@somewhere.com', '{contactfield=other_name}'))->getNameTokenValue($contact)
         );
@@ -58,7 +58,7 @@ class AddressDTOTest extends TestCase
     {
         $contact = ['other_email' => 'other@somewhere.com'];
 
-        $this->assertEquals(
+        $this->assertSame(
             'other@somewhere.com',
             (new AddressDTO('{contactfield=other_email}', ''))->getEmailTokenValue($contact)
         );
@@ -73,30 +73,30 @@ class AddressDTOTest extends TestCase
 
         $addressDTO = new AddressDTO('{contactfield=other_email}', '{contactfield=other_name}');
 
-        $this->assertEquals('thingtwo@somewhere.com', $addressDTO->getEmailTokenValue($contact));
-        $this->assertEquals('Thing Two', $addressDTO->getNameTokenValue($contact));
+        $this->assertSame('thingtwo@somewhere.com', $addressDTO->getEmailTokenValue($contact));
+        $this->assertSame('Thing Two', $addressDTO->getNameTokenValue($contact));
     }
 
     public function testDefaultsAreReturned(): void
     {
         $addressDTO = new AddressDTO('someone@somewhere.com', 'Someone Somewhere');
 
-        $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
-        $this->assertEquals('Someone Somewhere', $addressDTO->getName());
+        $this->assertSame('someone@somewhere.com', $addressDTO->getEmail());
+        $this->assertSame('Someone Somewhere', $addressDTO->getName());
     }
 
     public function testSpecialCharactersAreDecoded(): void
     {
         $addressDTO = new AddressDTO('someone@somewhere.com', 'No Body&#39;s Business');
 
-        $this->assertEquals('someone@somewhere.com', $addressDTO->getEmail());
-        $this->assertEquals("No Body's Business", $addressDTO->getName());
+        $this->assertSame('someone@somewhere.com', $addressDTO->getEmail());
+        $this->assertSame("No Body's Business", $addressDTO->getName());
     }
 
     public function testTokenDefaultPreservesSurroundingTextWithoutContact(): void
     {
         $addressDTO = new AddressDTO('someone@somewhere.com', 'Sales - {contactfield=companyname|Default Name}');
 
-        $this->assertEquals('Sales - Default Name', $addressDTO->getNameTokenValue());
+        $this->assertSame('Sales - Default Name', $addressDTO->getNameTokenValue());
     }
 }

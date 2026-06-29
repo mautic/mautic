@@ -19,12 +19,10 @@ class ReportSchedulerSubscriber implements EventSubscriberInterface
         return [ReportEvents::REPORT_POST_SAVE => ['onReportSave', 0]];
     }
 
-    public function onReportSave(ReportEvent $event): ReportEvent
+    public function onReportSave(ReportEvent $event): void
     {
         $report = $event->getReport();
 
         $this->schedulerPlanner->computeScheduler($report);
-
-        return $event;
     }
 }

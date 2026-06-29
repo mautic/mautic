@@ -20,10 +20,10 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals($lead, $event->getLead());
         $this->assertEquals($channel, $event->getChannel());
-        $this->assertEquals($oldStatus, $event->getOldStatus());
-        $this->assertEquals($newStatus, $event->getNewStatus());
-        $this->assertEquals('contactable', $event->getOldStatusVerb());
-        $this->assertEquals('unsubscribed', $event->getNewStatusVerb());
+        $this->assertSame($oldStatus, $event->getOldStatus());
+        $this->assertSame($newStatus, $event->getNewStatus());
+        $this->assertSame('contactable', $event->getOldStatusVerb());
+        $this->assertSame('unsubscribed', $event->getNewStatusVerb());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the default verb is unsubscribed if not recongized')]
@@ -35,6 +35,6 @@ class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 
         $event = new ChannelSubscriptionChange($lead, $channel, $oldStatus, 456);
 
-        $this->assertEquals('unsubscribed', $event->getNewStatusVerb());
+        $this->assertSame('unsubscribed', $event->getNewStatusVerb());
     }
 }

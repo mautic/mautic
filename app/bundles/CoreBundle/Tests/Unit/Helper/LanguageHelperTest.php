@@ -151,7 +151,7 @@ class LanguageHelperTest extends TestCase
     public function testSupportedLanguagesAreReturned(): void
     {
         $helper = $this->getHelper();
-        $this->assertEquals(['en_US' => 'English - United States'], $helper->getSupportedLanguages());
+        $this->assertSame(['en_US' => 'English - United States'], $helper->getSupportedLanguages());
     }
 
     private function getHelper(): LanguageHelper

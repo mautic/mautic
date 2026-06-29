@@ -57,8 +57,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * @return $this
-     *
      * @throws SchemaException
      */
     public function setName($name): static
@@ -80,8 +78,6 @@ class IndexSchemaHelper
     /**
      * @param string $name
      * @param array  $options
-     *
-     * @return $this
      *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */

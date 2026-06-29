@@ -34,8 +34,6 @@ class ReportSubscriberTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
-
     private ReportSubscriber $subscriber;
 
     protected function setUp(): void
@@ -45,12 +43,12 @@ class ReportSubscriberTest extends TestCase
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService    = $this->createMock(DncReportService::class);
+        $dncReportService          = $this->createMock(DncReportService::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
             $this->translator,
-            $this->dncReportService
+            $dncReportService
         );
     }
 

@@ -26,7 +26,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ForeignValueFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
-    private RandomParameterName $randomParameter;
 
     /**
      * @var EventDispatcherInterface&MockObject
@@ -43,18 +42,18 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->randomParameter     = new RandomParameterName();
+        $randomParameter           = new RandomParameterName();
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
-            $this->randomParameter,
+            $randomParameter,
             $this->dispatcher
         );
     }
 
     public function testGetServiceId(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'mautic.lead.query.builder.foreign.value',
             $this->queryBuilder::getServiceId()
         );

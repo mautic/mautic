@@ -24,9 +24,6 @@ class Fetcher
     ) {
     }
 
-    /**
-     * @return $this
-     */
     public function setMailboxes(array $mailboxes): static
     {
         $this->mailboxes = $mailboxes;

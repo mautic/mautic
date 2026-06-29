@@ -25,8 +25,6 @@ class Installer
     /**
      * @param string $sourceDirectory
      * @param string $languageCode
-     *
-     * @return $this
      */
     public function install($sourceDirectory, $languageCode): static
     {

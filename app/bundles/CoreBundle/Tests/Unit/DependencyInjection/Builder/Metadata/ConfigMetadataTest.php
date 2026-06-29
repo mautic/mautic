@@ -55,7 +55,7 @@ class ConfigMetadataTest extends TestCase
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'extreme-ip' => [
                     'display_name' => 'Extreme-IP',

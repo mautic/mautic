@@ -19,7 +19,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ['id' => 6],
         ];
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend());
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend());
     }
 
     public function testTransformToUserIdsWithOwnerEntityButNoOwnerSetting(): void
@@ -40,7 +40,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(5);
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
     public function testTransformToUserIdsWithDifferentOwnerId(): void
@@ -63,7 +63,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(5);
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
     public function testTransformToUserIdsWithSameOwnerId(): void
@@ -85,7 +85,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(6);
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
     public function testFormatToAddressOneEmail(): void

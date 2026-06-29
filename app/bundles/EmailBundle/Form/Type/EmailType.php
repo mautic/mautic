@@ -407,26 +407,30 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isVariant): void {
-            if ($isVariant) {
-                $event->getForm()->add(
-                    'variantSettings',
-                    VariantType::class,
-                    [
-                        'label' => false,
-                    ]
-                );
-            }
+        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false): void {
+            $event->getForm()->add(
+                'variantSettings',
+                VariantType::class,
+                [
+                    'label'       => 'mautic.core.ab_test.form.abtest_settings',
+                    'required'    => false,
+                    'is_parent'   => $isParent,
+                    'is_existing' => $isExisting,
+                    'data'        => $event->getData() instanceof Email ? $event->getData()->getVariantSettings() : [],
+                ]
+            );
         };
 
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier): void {
-                $variantSettingsModifier(
-                    $event,
-                    $event->getData()->getVariantParent()
-                );
+                /** @var Email $emailEntity */
+                $emailEntity     = $event->getData();
+                $variantChildren = $emailEntity->getVariantChildren();
+                $isParent        = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
+                $isExisting      = $event->getData()->getId() > 0;
+                $variantSettingsModifier($event, $isParent, $isExisting);
             }
         );
 
@@ -435,10 +439,13 @@ class EmailType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($variantSettingsModifier): void {
                 $data = $event->getData();
-                $variantSettingsModifier(
-                    $event,
-                    !empty($data['variantParent'])
-                );
+
+                /** @var Email $emailEntity */
+                $emailEntity     = $event->getForm()->getData();
+                $variantChildren = $emailEntity->getVariantChildren();
+                $isParent        = $variantChildren && count($variantChildren) > 0;
+
+                $variantSettingsModifier($event, $isParent);
 
                 $emailType = $data['emailType'] ?? null;
 

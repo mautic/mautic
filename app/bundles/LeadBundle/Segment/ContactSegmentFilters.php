@@ -14,9 +14,6 @@ class ContactSegmentFilters implements \Iterator, \Countable
      */
     private array $contactSegmentFilters = [];
 
-    /**
-     * @return $this
-     */
     public function addContactSegmentFilter(ContactSegmentFilter $contactSegmentFilter): static
     {
         $this->contactSegmentFilters[] = $contactSegmentFilter;
