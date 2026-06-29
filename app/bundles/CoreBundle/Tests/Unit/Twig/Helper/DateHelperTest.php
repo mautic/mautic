@@ -184,11 +184,12 @@ final class DateHelperTest extends TestCase
         $this->assertSame('3 day(s) ago', $this->helper->toHumanized($threeDaysAgo));
 
         // Test months ago
-        $fourMonthsAgo = new \DateTime('-4 months', new \DateTimeZone('UTC'));
+        $monthAnchor   = new \DateTime('first day of this month 00:00:00', new \DateTimeZone('UTC'));
+        $fourMonthsAgo = (clone $monthAnchor)->modify('-4 months');
         $this->assertSame('4 month(s) ago', $this->helper->toHumanized($fourMonthsAgo));
 
         // Test years ago
-        $oneYearAgo = new \DateTime('-1 year', new \DateTimeZone('UTC'));
+        $oneYearAgo = (clone $monthAnchor)->modify('-1 year');
         $this->assertSame('1 year(s) ago', $this->helper->toHumanized($oneYearAgo));
 
         // Test minutes in future - use 10 minutes to avoid timing issues
