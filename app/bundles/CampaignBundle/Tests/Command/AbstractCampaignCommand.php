@@ -92,10 +92,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         ]);
     }
 
-    /**
-     * @return array
-     */
-    protected function getCampaignEventLogs(array $ids)
+    protected function getCampaignEventLogs(array $ids): array
     {
         $logs = $this->db->createQueryBuilder()
             ->select('l.email, l.country, event.name, event.event_type, event.type, log.*')

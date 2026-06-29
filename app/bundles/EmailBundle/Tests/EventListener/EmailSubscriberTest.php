@@ -42,24 +42,9 @@ use Twig\Environment;
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&IpLookupHelper
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var MockObject&AuditLogModel
-     */
-    private MockObject $auditLogModel;
-
-    /**
      * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
-
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
 
     /**
      * @var MockObject&MauticMessage
@@ -72,12 +57,12 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->ipLookupHelper   = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel    = $this->createMock(AuditLogModel::class);
+        $ipLookupHelper         = $this->createMock(IpLookupHelper::class);
+        $auditLogModel          = $this->createMock(AuditLogModel::class);
         $this->emailModel       = $this->createMock(EmailModel::class);
-        $this->translator       = $this->createMock(TranslatorInterface::class);
+        $translator             = $this->createMock(TranslatorInterface::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->createMock(EntityManagerInterface::class), $this->createMock(EmailDraftModel::class));
+        $this->subscriber       = new EmailSubscriber($ipLookupHelper, $auditLogModel, $this->emailModel, $translator, $this->createMock(EntityManagerInterface::class), $this->createMock(EmailDraftModel::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void

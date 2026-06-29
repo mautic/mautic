@@ -80,8 +80,6 @@ class ConditionEvent extends CampaignExecutionEvent
 
     /**
      * @deprecated 2.13.0 to be removed in 3.0; BC support
-     *
-     * @return $this
      */
     public function setResult($result): static
     {

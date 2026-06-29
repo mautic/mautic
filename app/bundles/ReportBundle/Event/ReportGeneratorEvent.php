@@ -87,9 +87,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this->options;
     }
 
-    /**
-     * @return $this
-     */
     public function setOptions(array $options): static
     {
         $this->options = array_merge($this->options, $options);

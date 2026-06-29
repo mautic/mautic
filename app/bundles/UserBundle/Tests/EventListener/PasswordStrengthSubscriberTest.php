@@ -41,11 +41,11 @@ class PasswordStrengthSubscriberTest extends TestCase
         $passport->method('hasBadge')
             ->with(PasswordCredentials::class)
             ->willReturn(true);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('getBadge')
             ->with(PasswordCredentials::class)
             ->willReturn($passwordCredentialsBadge);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('addBadge')
             ->willReturnCallback(static function (PasswordStrengthBadge $badge) use ($passport, $password): Passport {
                 self::assertSame($password, $badge->getPresentedPassword());

@@ -30,8 +30,6 @@ class TransportChain
      * @param string $alias
      * @param string $translatableAlias
      * @param string $integrationAlias
-     *
-     * @return $this
      */
     public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias): static
     {

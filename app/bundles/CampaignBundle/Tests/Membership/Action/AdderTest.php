@@ -132,10 +132,7 @@ class AdderTest extends \PHPUnit\Framework\TestCase
         $this->getAdder()->updateExistingMembership($campaignMember, true);
     }
 
-    /**
-     * @return Adder
-     */
-    private function getAdder()
+    private function getAdder(): Adder
     {
         return new Adder($this->leadRepository, $this->leadEventLogRepository);
     }

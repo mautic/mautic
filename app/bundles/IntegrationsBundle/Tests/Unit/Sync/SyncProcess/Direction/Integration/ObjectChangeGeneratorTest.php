@@ -33,7 +33,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -82,7 +82,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->valueHelper->method('getValueForIntegration')
             ->willReturnCallback(
-                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection) => $normalizedValueDAO
+                fn (NormalizedValueDAO $normalizedValueDAO, string $fieldState, string $syncDirection): NormalizedValueDAO => $normalizedValueDAO
             );
 
         $integration = 'Test';
@@ -160,10 +160,7 @@ class ObjectChangeGeneratorTest extends TestCase
         Assert::assertSame($integrationName, $objectChange->getIntegration());
     }
 
-    /**
-     * @return MappingManualDAO
-     */
-    private function getMappingManual(string $integration, string $objectName)
+    private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
         $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
@@ -176,10 +173,8 @@ class ObjectChangeGeneratorTest extends TestCase
 
     /**
      * @param bool $includeFirstNameField
-     *
-     * @return ReportDAO
      */
-    private function getInternalSyncReport($includeFirstNameField = true)
+    private function getInternalSyncReport($includeFirstNameField = true): ReportDAO
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);
@@ -196,10 +191,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $syncReport;
     }
 
-    /**
-     * @return ObjectChangeGenerator
-     */
-    private function getObjectChangeGenerator()
+    private function getObjectChangeGenerator(): ObjectChangeGenerator
     {
         return new ObjectChangeGenerator($this->valueHelper);
     }

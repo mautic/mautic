@@ -71,10 +71,7 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $this->getHelper()->handleRequest($handler, new Request());
     }
 
-    /**
-     * @return ReplyHelper
-     */
-    private function getHelper()
+    private function getHelper(): ReplyHelper
     {
         return new ReplyHelper($this->eventDispatcher, $this->logger, $this->contactTracker);
     }

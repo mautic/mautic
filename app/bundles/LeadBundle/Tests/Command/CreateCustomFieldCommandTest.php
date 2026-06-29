@@ -16,15 +16,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CreateCustomFieldCommandTest extends TestCase
 {
-    private BackgroundService $backgroundServiceMock;
+    private \PHPUnit\Framework\MockObject\MockObject $backgroundServiceMock;
 
-    private TranslatorInterface $translatorMock;
+    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
-    private LeadFieldRepository $leadFieldRepositoryMock;
+    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepositoryMock;
 
-    private PathsHelper $pathsHelperMock;
+    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
 
-    private CoreParametersHelper $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {

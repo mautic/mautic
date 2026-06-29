@@ -11,11 +11,8 @@ use Mautic\CampaignBundle\Entity\Event;
  */
 final class EventFake extends Event
 {
-    private ?int $id;
-
-    public function __construct(?int $id = null)
+    public function __construct(private ?int $id = null)
     {
-        $this->id = $id;
     }
 
     public function getId(): ?int

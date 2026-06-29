@@ -52,7 +52,7 @@ class WebhookModelTest extends TestCase
     /**
      * @var MockObject&WebhookQueueRepository
      */
-    private $webhookQueueRepository;
+    private MockObject $webhookQueueRepository;
 
     /**
      * @var MockObject&UserHelper

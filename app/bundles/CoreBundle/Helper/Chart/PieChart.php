@@ -39,8 +39,6 @@ class PieChart extends AbstractChart implements ChartInterface
      *
      * @param string $label
      * @param int    $value
-     *
-     * @return $this
      */
     public function setDataset($label, $value): static
     {

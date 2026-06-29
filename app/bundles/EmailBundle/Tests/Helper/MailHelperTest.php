@@ -410,7 +410,7 @@ class MailHelperTest extends TestCase
 
         $this->assertCount(3, $fromAddresses);
         $this->assertCount(3, $metadatas);
-        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
+        $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
 
         foreach ($metadatas as $key => $metadata) {
             $this->assertTrue(isset($metadata[$this->contacts[$key]['email']]));
@@ -499,8 +499,8 @@ class MailHelperTest extends TestCase
 
         $this->assertCount(3, $fromAddresses); // 3, not 4, because the last contact has the same owner as the first contact.
         $this->assertCount(3, $fromNames);
-        $this->assertEquals(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
-        $this->assertEquals(['owner 1', 'No Body\'s Business', 'owner 2'], $fromNames);
+        $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
+        $this->assertSame(['owner 1', 'No Body\'s Business', 'owner 2'], $fromNames);
     }
 
     public function testQueuedAdvancedFromUsesResolvedMetadataFromAddressOnFlush(): void
@@ -681,7 +681,7 @@ class MailHelperTest extends TestCase
 
         $fromAddresses = $transport->getFromAddresses();
 
-        $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
+        $this->assertSame(['override@owner.com'], array_unique($fromAddresses));
     }
 
     public function testStandardEmailFrom(): void
@@ -1275,9 +1275,7 @@ class MailHelperTest extends TestCase
 
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $this->router->method('generate')
-            ->willReturnCallback(function ($route) use ($emailSecret) {
-                return 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret;
-            });
+            ->willReturnCallback(fn ($route) => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);
@@ -1424,7 +1422,7 @@ class MailHelperTest extends TestCase
         foreach ($mailer->message->getTo() as $address) {
             $emailsTo[$address->getAddress()] = $address->getName();
         }
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'sombody@somewhere.com'     => 'test',
                 'sombodyelse@somewhere.com' => 'test',

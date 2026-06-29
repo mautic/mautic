@@ -57,7 +57,7 @@ class FieldModelFunctionalTest extends MauticMysqlTestCase
         $schemaHelper = $helper->setName($name);
 
         // The table will have four column, 'submission_id', 'form_id', 'email', and 'fname'.
-        $this->assertEquals(5, count($schemaHelper->getColumns()));
+        $this->assertCount(5, $schemaHelper->getColumns());
 
         /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.form.model.field');

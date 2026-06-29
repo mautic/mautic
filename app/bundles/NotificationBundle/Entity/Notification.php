@@ -368,8 +368,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * @param string $name
-     *
-     * @return $this
      */
     public function setName($name): static
     {
@@ -414,9 +412,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
     public function setCategory($category): static
     {
         $this->isChanged('category', $category);
@@ -517,9 +512,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->readCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setReadCount($readCount): static
     {
         $this->readCount = $readCount;
@@ -535,9 +527,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->publishDown;
     }
 
-    /**
-     * @return $this
-     */
     public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
@@ -554,9 +543,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->publishUp;
     }
 
-    /**
-     * @return $this
-     */
     public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
@@ -570,9 +556,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return ($includeVariants) ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
@@ -641,8 +624,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * @param bool $mobile
-     *
-     * @return $this
      */
     public function setMobile($mobile): static
     {
@@ -659,9 +640,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->mobileSettings ?? [];
     }
 
-    /**
-     * @return $this
-     */
     public function setMobileSettings(array $mobileSettings): static
     {
         $this->mobileSettings = $mobileSettings;

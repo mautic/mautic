@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ListModel&MockObject */
-    protected $fixture;
+    protected MockObject $fixture;
 
     protected function setUp(): void
     {

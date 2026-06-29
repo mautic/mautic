@@ -474,7 +474,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->method('getFetchQuery')
             ->with([])
             ->willReturnCallback(
-                fn () => [
+                fn (): array => [
                     'start' => '-1 week',
                     'end'   => 'now',
                 ]
@@ -517,7 +517,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->method('makeRequest')
             ->with('https://sftest.com/services/data/v38.0/composite/')
             ->willReturnCallback(
-                fn () => $this->getSalesforceCompositeResponse(func_get_arg(1))
+                fn (): array => $this->getSalesforceCompositeResponse(func_get_arg(1))
             );
 
         $sf->pushLeadActivity();
@@ -677,10 +677,10 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf->amendLeadDataBeforePush($input);
 
         self::assertSame($input, $output);
-        self::assertEquals('string', gettype($output[0]));
-        self::assertEquals('boolean', gettype($output[1]));
-        self::assertEquals('string', gettype($output[2]));
-        self::assertEquals('integer', gettype($output[3]));
+        self::assertSame('string', gettype($output[0]));
+        self::assertSame('boolean', gettype($output[1]));
+        self::assertSame('string', gettype($output[2]));
+        self::assertSame('integer', gettype($output[3]));
     }
 
     protected function setMaxInvocations(string $name, int $max): self
@@ -870,7 +870,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @return SalesforceIntegration|MockObject
      */
-    protected function getSalesforceIntegration(int $maxUpdate = 100, int $maxCreate = 200, int $maxSfLeads = 25, int $maxSfContacts = 25, ?string $updateObject = null)
+    protected function getSalesforceIntegration(int $maxUpdate = 100, int $maxCreate = 200, int $maxSfLeads = 25, int $maxSfContacts = 25, ?string $updateObject = null): MockObject
     {
         $this->setMocks();
 
