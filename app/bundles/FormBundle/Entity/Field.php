@@ -599,9 +599,6 @@ class Field implements UuidInterface
         return $this->containerAttributes;
     }
 
-    /**
-     * @return $this
-     */
     public function setContainerAttributes($containerAttributes): static
     {
         $this->containerAttributes = $containerAttributes;

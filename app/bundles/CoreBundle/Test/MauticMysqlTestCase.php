@@ -26,20 +26,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    public function __construct(?string $name = null)
-    {
-        parent::__construct($name);
-
-        $this->configParams += [
-            'db_driver' => 'pdo_mysql',
-        ];
-    }
-
     /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+
         $this->setUpInvoked = true;
 
         parent::setUp();
@@ -388,7 +383,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function clearCache(): void
     {
         $cacheProvider = static::getContainer()->get('mautic.cache.provider');
-        \assert($cacheProvider instanceof CacheItemPoolInterface);
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }
 

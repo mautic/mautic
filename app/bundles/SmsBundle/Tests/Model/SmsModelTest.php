@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
@@ -28,7 +29,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject&CacheStorageHelper */
+    /**
+     * @var MockObject&CacheStorageHelper
+     */
     private MockObject $cacheStorageHelper;
 
     private MockObject&EntityManagerInterface $entityManger;
@@ -146,7 +149,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $statRepositoryMock = $this->createMock(StatRepository::class);
 
         $sms = new Sms();
-        $this->setProperty($sms, 'id', 1);
+        ReflectionHelper::setValue($sms, 'id', 1);
         $sms->setMessage('test');
         if ($isMMS) {
             $sms->setMedia(['test,png']);
@@ -197,15 +200,11 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         if ($isMMS) {
             $this->transport->expects($this->once())
                 ->method('sendMMS')
-                ->willReturnCallback(function (RecipientCollection $recipientCollection) {
-                    return $this->setRecipientResult($recipientCollection);
-                });
+                ->willReturnCallback(fn (RecipientCollection $recipientCollection) => $this->setRecipientResult($recipientCollection));
         } else {
             $this->transport->expects($this->once())
                 ->method('sendBatchSms')
-                ->willReturnCallback(function (RecipientCollection $recipientCollection) {
-                    return $this->setRecipientResult($recipientCollection);
-                });
+                ->willReturnCallback(fn (RecipientCollection $recipientCollection) => $this->setRecipientResult($recipientCollection));
         }
 
         $results = $smsModel->sendSms($sms, [$lead1, $lead2], ['channel' => ['campaign.event', 1]]);
@@ -225,15 +224,5 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         }
 
         return $recipientCollection;
-    }
-
-    /**
-     * @param mixed $value
-     */
-    private function setProperty(object $object, string $property, $value): void
-    {
-        \Closure::bind(function (object $object) use ($property, $value) {
-            $object->$property = $value;
-        }, null, $object)($object);
     }
 }

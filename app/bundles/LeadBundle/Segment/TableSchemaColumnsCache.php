@@ -27,9 +27,6 @@ class TableSchemaColumnsCache
         return $this->cache[$tableName];
     }
 
-    /**
-     * @return $this
-     */
     public function clear(): static
     {
         $this->cache = [];

@@ -141,7 +141,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        $table = $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        $table = $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
         array_shift($table);
         array_pop($table);
 

@@ -135,10 +135,7 @@ class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($event->getIdentifiedContact());
     }
 
-    /**
-     * @return TrackingSubscriber
-     */
-    private function getSubscriber()
+    private function getSubscriber(): TrackingSubscriber
     {
         return new TrackingSubscriber($this->statRepository);
     }

@@ -13,8 +13,6 @@ class FetchOptions
 
     /**
      * @param int $value
-     *
-     * @return $this
      */
     public function setItemId($value): static
     {
@@ -34,8 +32,6 @@ class FetchOptions
     /**
      * @param string $key
      * @param mixed  $value
-     *
-     * @return $this
      */
     public function setOption($key, $value): static
     {

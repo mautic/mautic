@@ -87,7 +87,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailCount(1);
 
         $email = KernelTestCase::getMailerMessage();
-        \assert($email instanceof EmailMime);
+        $this->assertInstanceOf(EmailMime::class, $email);
 
         /** @var UserHelper $userHelper */
         $userHelper = static::getContainer()->get(UserHelper::class);
@@ -305,7 +305,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(EmailEvents::EMAIL_ON_TOGGLE_PUBLISH, function (EmailEvent $event) use (&$dispatchedEvent) {
+            ->addListener(EmailEvents::EMAIL_ON_TOGGLE_PUBLISH, function (EmailEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 

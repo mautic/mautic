@@ -81,7 +81,7 @@ final class CampaignEventDetailsTimelineFunctionalTest extends MauticMysqlTestCa
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
 
         $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->client->request('GET', sprintf('/s/contacts/view/%s', $lead1->getId()));
         $this->assertStringContainsString(

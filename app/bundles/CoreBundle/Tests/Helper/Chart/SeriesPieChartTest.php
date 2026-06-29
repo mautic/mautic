@@ -23,7 +23,7 @@ class SeriesPieChartTest extends TestCase
         $this->chart->setDataset($dataset);
 
         $this->assertSame([$dataset], $this->chart->getDatasets());
-        $this->assertEquals(60, $this->chart->getTotalCount());
+        $this->assertSame(60, $this->chart->getTotalCount());
     }
 
     public function testBuildFullLabelWithTotalCount(): void
@@ -62,6 +62,6 @@ class SeriesPieChartTest extends TestCase
     public function testSetTotalCount(): void
     {
         $this->chart->setTotalCount(150);
-        $this->assertEquals(150, $this->chart->getTotalCount());
+        $this->assertSame(150, $this->chart->getTotalCount());
     }
 }

@@ -185,12 +185,10 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper
             ->method('get')
-            ->willReturnCallback(function (string $key) {
-                return match ($key) {
-                    'do_not_submit_emails'         => ['*@blocked.com'],
-                    'blocked_free_email_providers' => [],
-                    default                        => [],
-                };
+            ->willReturnCallback(fn (string $key) => match ($key) {
+                'do_not_submit_emails'         => ['*@blocked.com'],
+                'blocked_free_email_providers' => [],
+                default                        => [],
             });
 
         $event = new ValidationEvent($field, $email);
@@ -213,12 +211,10 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper
             ->method('get')
-            ->willReturnCallback(function (string $key) {
-                return match ($key) {
-                    'do_not_submit_emails'         => [],
-                    'blocked_free_email_providers' => ['example.com'],
-                    default                        => [],
-                };
+            ->willReturnCallback(fn (string $key) => match ($key) {
+                'do_not_submit_emails'         => [],
+                'blocked_free_email_providers' => ['example.com'],
+                default                        => [],
             });
 
         $event = new ValidationEvent($field, $email);

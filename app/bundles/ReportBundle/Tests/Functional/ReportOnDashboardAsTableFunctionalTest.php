@@ -41,30 +41,24 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $crawler = new Crawler($data['widgetHtml']);
 
         $title   = $crawler->filter('.card-header h4')->text();
-        $this->assertEquals('Emails Report: table', trim($title));
+        $this->assertSame('Emails Report: table', trim($title));
 
-        $dropdownItems = $crawler->filter('.dropdown-menu li')->each(function ($node) {
-            return trim($node->text());
-        });
+        $dropdownItems = $crawler->filter('.dropdown-menu li')->each(fn ($node) => trim($node->text()));
 
         $this->assertContains('Just retrieved latest data', $dropdownItems);
         $this->assertContains('Edit', $dropdownItems);
         $this->assertContains('Remove', $dropdownItems);
 
-        $headers = $crawler->filter('table thead th')->each(function ($node) {
-            return trim($node->text());
-        });
+        $headers = $crawler->filter('table thead th')->each(fn ($node) => trim($node->text()));
 
         $expectedHeaders = ['Subject', 'Sent count', 'Read count', 'Read ratio', 'Unsubscribed ratio', 'Clicks ratio', 'Category name'];
-        $this->assertEquals($expectedHeaders, $headers);
+        $this->assertSame($expectedHeaders, $headers);
 
         $rows = $crawler->filter('table tbody tr');
 
         $this->assertCount(1, $rows);
 
-        $columns = $rows->first()->filter('td')->each(function ($td) {
-            return trim($td->text());
-        });
+        $columns = $rows->first()->filter('td')->each(fn ($td) => trim($td->text()));
 
         $expected = [
             $email->getSubject(),
@@ -79,7 +73,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($expected, $columns);
 
         $link = $crawler->filter('.pull-right a')->attr('href');
-        $this->assertEquals('/s/reports/view/'.$report->getId(), $link);
+        $this->assertSame('/s/reports/view/'.$report->getId(), $link);
     }
 
     private function createReport(): Report

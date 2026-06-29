@@ -44,7 +44,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->clear();
 
         $attacker = $this->em->getRepository(User::class)->findOneBy(['username' => 'attacker.user']);
-        \assert($attacker instanceof User);
+        $this->assertInstanceOf(User::class, $attacker);
         $this->client->getCookieJar()->clear();
         $this->client->setServerParameter('PHP_AUTH_USER', $attacker->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -105,7 +105,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->clear();
 
         $attacker = $this->em->getRepository(User::class)->findOneBy(['username' => 'attacker.collection.user']);
-        \assert($attacker instanceof User);
+        $this->assertInstanceOf(User::class, $attacker);
 
         $this->client->getCookieJar()->clear();
         $this->client->setServerParameter('PHP_AUTH_USER', $attacker->getUserIdentifier());
@@ -335,7 +335,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         // Test 1: newOwner (current owner) SHOULD see the contact
         $newOwner = $this->em->getRepository(User::class)->findOneBy(['username' => 'new.contact.owner']);
-        \assert($newOwner instanceof User);
+        $this->assertInstanceOf(User::class, $newOwner);
         $this->loginUser($newOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $newOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -355,7 +355,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         // Test 2: originalOwner (creator but no longer owner) should NOT see the contact
         $originalOwner = $this->em->getRepository(User::class)->findOneBy(['username' => 'original.contact.owner']);
-        \assert($originalOwner instanceof User);
+        $this->assertInstanceOf(User::class, $originalOwner);
         $this->loginUser($originalOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $originalOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');

@@ -24,16 +24,6 @@
     {{ include('@MauticProject/Modules/projects.html.twig', {'item': email}) }}
 {% endblock %}
 
-{% set variantContent = include('@MauticCore/Variant/index.html.twig', {
-        'activeEntity': email,
-        'variants': variants,
-        'abTestResults': abTestResults,
-        'model': 'email',
-        'actionRoute': 'mautic_email_action',
-}) %}
-
-{% set showVariants = variantContent is defined and variantContent|trim is not empty %}
-
 {% set translationContent = include('@MauticCore/Translation/index.html.twig',
     {
         'activeEntity'      : email,
@@ -52,7 +42,7 @@
 {% set customButtons = [] %}
 
 {% if not isEmbedded %}
-    {% if 'list' == emailType %}
+    {% if 'list' == emailType and not email.isEnableAbTest() %}
         {% set sendButton = {
             'attr'      : {
                 'data-toggle' : 'ajax',
@@ -61,7 +51,6 @@
             'iconClass' : 'ri-send-plane-line',
             'btnText'   : 'mautic.email.send',
             'primary'   : true,
-            'priority'  : 500,
         } %}
         {% if email.isBackgroundSending() %}
             {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
@@ -70,21 +59,20 @@
 
         {% set customButtons = customButtons|merge([sendButton]) %}
     {% endif %}
-    {% set sendButtons = [] %}
-    {% if 'list' == emailType %}
+    {% if 'list' == emailType and not email.isEnableAbTest() %}
         {% set scheduleButton = {
-            'attr': {
+            'attr' : {
                 'class'       : 'btn btn-tertiary btn-nospin',
-                'data-toggle': 'ajaxmodal',
-                'data-target': '#MauticSharedModal',
-                'href': path('mautic_email_action', {'objectAction': 'scheduleSend', 'objectId': email.getId()}),
-                'data-header': 'mautic.email.send.schedule'|trans
+                'data-toggle' : 'ajaxmodal',
+                'data-target' : '#MauticSharedModal',
+                'href'        : path('mautic_email_action', {'objectAction' : 'scheduleSend', 'objectId' : email.getId()}),
+                'data-header' : 'mautic.email.send.schedule'|trans,
             },
-            'iconClass': 'ri-calendar-schedule-line',
-            'btnText': 'mautic.email.send.schedule',
-            'primary': true,
-            'priority': 400
+            'iconClass' : 'ri-calendar-schedule-line',
+            'btnText'   : 'mautic.email.send.schedule',
+            'primary'   : true,
         } %}
+
         {% set customButtons = customButtons|merge([scheduleButton]) %}
     {% endif %}
     {% set sendExampleButton = {
@@ -98,8 +86,6 @@
         },
         'iconClass' : 'ri-mail-send-line',
         'btnText'   : 'mautic.email.send.example',
-        'primary'   : true,
-        'priority': 300
     } %}
     {% set customButtons = customButtons|merge([sendExampleButton]) %}
     {% set heatmapButton = {
@@ -146,6 +132,7 @@
 
 {# Only show A/B test button if not already a translation of an a/b test #}
 {% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
+{% set parentId = email.isEnableAbTest() and email.getVariantParent() ? email.getVariantParent().getId() : email.getId() %}
 
 {% block publishStatus %}
     {% if not isEmbedded %}
@@ -233,7 +220,6 @@
                     email.getCreatedBy(),
                 ),
                 'clone'  : permissions['email:emails:create'],
-                'abtest' : (allowAbTest and permissions['email:emails:create']),
                 'delete' : securityHasEntityAccess(
                     permissions['email:emails:deleteown'],
                     permissions['email:emails:deleteother'],
@@ -373,7 +359,7 @@
               </div>
               <!--/ email detail collapseable toggler -->
 
-              {% set isVariant = showTranslations or showVariants ?: 0 %}
+              {% set isVariant = showTranslations or (variants.children|length > 0) ?: 0 %}
               {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
               {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
@@ -479,13 +465,6 @@
                           {{ 'mautic.email.associated.contacts'|trans }}
                       </a>
                   </li>
-                  {% if showVariants %}
-                      <li>
-                          <a href="#variants-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.core.variants'|trans }}
-                          </a>
-                      </li>
-                  {% endif %}
                   {% if showTranslations %}
                       <li>
                           <a href="#translation-container" role="tab" data-toggle="tab">
@@ -513,14 +492,6 @@
                   {{ contacts | raw }}
               </div>
 
-              {% if showVariants %}
-                  <!-- #variants-container -->
-                  <div class="tab-pane bdr-w-0" id="variants-container">
-                      {{ variantContent|raw }}
-                  </div>
-                  <!--/ #variants-container -->
-              {% endif %}
-
               <!-- #translation-container -->
               {% if showTranslations %}
                   <div class="tab-pane bdr-w-0" id="translation-container">
@@ -532,7 +503,7 @@
           {{ include('@MauticCore/Modules/suggested-actions.html.twig', {
               'entity': email,
               'routeBase': 'email',
-              'showVariants': showVariants,
+              'showVariants': (variants.children|length > 0),
               'showTranslations': showTranslations,
               'allowAbTest': allowAbTest
           }) }}
@@ -541,6 +512,7 @@
 
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
+          {{ customContent('right.section.start', _context) }}
           <!-- preview URL -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">

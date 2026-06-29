@@ -51,7 +51,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         Assert::assertCount(1, $logs);
 
         $log = reset($logs);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
         Assert::assertSame(2, $log->getVersion(), 'Version should be incremented.');
 
         $this->eventExecutioner->executeLogs($event, new ArrayCollection($logs));
@@ -81,7 +81,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         Assert::assertCount(1, $logs);
 
         $log = reset($logs);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
         Assert::assertSame(1, $log->getVersion(), 'Version should be reset when execution failed.');
 
         $this->makeEventExecutionPass($listener);
@@ -126,7 +126,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     private function makeEventExecutionFail(): callable
     {
-        $listener = function (CampaignExecutionEvent $event) { // @phpstan-ignore parameter.deprecatedClass
+        $listener = function (CampaignExecutionEvent $event): void { // @phpstan-ignore parameter.deprecatedClass
             $event->setResult(false);
             $event->stopPropagation();
         };
