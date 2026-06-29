@@ -36,7 +36,7 @@ class CompanySegmentController extends AbstractStandardFormController
         \assert(is_array($permissions));
 
         if (!(bool) ($permissions['lead:leads:viewother'] ?? false) && !(bool) ($permissions['lead:leads:viewown'] ?? false)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -155,7 +155,7 @@ class CompanySegmentController extends AbstractStandardFormController
     {
         \assert(null !== $this->security);
         if (false === $this->security->isGranted($this->getPermissionBase().':viewown')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $companySegment = new CompanySegment();
@@ -238,7 +238,7 @@ class CompanySegmentController extends AbstractStandardFormController
         if (!$this->security->hasEntityAccess(
             true, $this->getPermissionBase().self::PERMISSION_EDIT_OTHER, $segment->getCreatedBy()
         )) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $postActionVars = $this->getPostActionVars($request, $objectId);
@@ -387,7 +387,7 @@ class CompanySegmentController extends AbstractStandardFormController
             $segment->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView([
@@ -469,7 +469,7 @@ class CompanySegmentController extends AbstractStandardFormController
                 true, $this->getPermissionBase().':deleteother', $segment->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             if ($model->isLocked($segment)) {
@@ -598,7 +598,7 @@ class CompanySegmentController extends AbstractStandardFormController
                 } elseif (!$this->security->hasEntityAccess(
                     true, $this->getPermissionBase().':deleteother', $segment->getCreatedBy()
                 )) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($segment)) {
                     $flashes[] = $this->isLocked($postActionVars, $segment, CompanySegmentModel::class, true);
                 } else {
@@ -642,7 +642,7 @@ class CompanySegmentController extends AbstractStandardFormController
         if (!$this->security->hasEntityAccess(
             true, $this->getPermissionBase().self::PERMISSION_EDIT_OTHER, $segment->getCreatedBy()
         )) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $postActionVars = $this->getPostActionVars($request, $objectId);
