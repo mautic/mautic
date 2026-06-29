@@ -344,8 +344,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param Collection<int, Event> $events
-     *
-     * @return $this
      */
     public function setEvents($events): static
     {
@@ -415,9 +413,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return false;
     }
 
-    /**
-     * @return $this
-     */
     public function addEvent(Event $event): static
     {
         $this->isChanged('events', $event);
@@ -427,9 +422,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function removeEvent(Event $event): static
     {
         $this->isChanged('events', $event);
@@ -481,8 +473,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param ArrayCollection<int,Log> $logs
-     *
-     * @return $this
      */
     public function addLogs($logs): static
     {
@@ -496,9 +486,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function addLog(Log $log): static
     {
         $this->logs[] = $log;
@@ -506,9 +493,6 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function removeLog(Log $log): static
     {
         $this->logs->removeElement($log);

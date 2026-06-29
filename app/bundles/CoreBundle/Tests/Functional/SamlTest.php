@@ -57,20 +57,20 @@ class SamlTest extends MauticMysqlTestCase
 
         // Select your entity ID
         $samlIdField = $configForm['config[userconfig][saml_idp_entity_id]'];
-        \assert($samlIdField instanceof ChoiceFormField);
+        $this->assertInstanceOf(ChoiceFormField::class, $samlIdField);
         $availableSamlIdOptions = $samlIdField->availableOptionValues();
         Assert::assertCount(2, $availableSamlIdOptions, print_r($availableSamlIdOptions, true));
         $samlIdField->setValue($availableSamlIdOptions[1]);
 
         $samlDefaultRoleField = $configForm['config[userconfig][saml_idp_default_role]'];
-        \assert($samlDefaultRoleField instanceof ChoiceFormField);
+        $this->assertInstanceOf(ChoiceFormField::class, $samlDefaultRoleField);
         $availableDefaultRoleOptions = $samlDefaultRoleField->availableOptionValues();
         Assert::assertCount(3, $availableDefaultRoleOptions, print_r($availableDefaultRoleOptions, true));
         $samlDefaultRoleField->setValue($availableDefaultRoleOptions[1]);
 
         // Upload the metadata.xml file
         $samlProviderMetadata = $configForm['config[userconfig][saml_idp_metadata]'];
-        \assert($samlProviderMetadata instanceof FileFormField);
+        $this->assertInstanceOf(FileFormField::class, $samlProviderMetadata);
         $samlProviderMetadata->upload($temporaryFile);
 
         // Fill in email in the fields Email, First Name and Last name (we are testing, so no problem that the actual values are not correct)
@@ -122,14 +122,14 @@ class SamlTest extends MauticMysqlTestCase
             RequestOptions::ALLOW_REDIRECTS => false,
         ]);
         $response = $guzzleClient->request(Request::METHOD_GET, $url);
-        \assert($response instanceof \GuzzleHttp\Psr7\Response);
+        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $response);
         Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         $url = $response->getHeaderLine('Location');
         Assert::assertStringContainsString('http://'.$host.':'.$port.'/simplesaml/module.php/core/loginuserpass.php?AuthState=', $url);
 
         // Get the form for authentication.
         $response = $guzzleClient->request(Request::METHOD_GET, $url);
-        \assert($response instanceof \GuzzleHttp\Psr7\Response);
+        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $response);
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
 
         $body    = (string) $response->getBody();
@@ -148,7 +148,7 @@ class SamlTest extends MauticMysqlTestCase
                 'form_params' => $form->getPhpValues(),
             ]
         );
-        \assert($response instanceof \GuzzleHttp\Psr7\Response);
+        $this->assertInstanceOf(\GuzzleHttp\Psr7\Response::class, $response);
         // Because guzzle does not support javascript the answer is a form.
         Assert::assertSame(Response::HTTP_OK, $response->getStatusCode());
 

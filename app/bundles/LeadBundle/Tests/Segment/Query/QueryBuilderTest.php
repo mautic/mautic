@@ -19,12 +19,11 @@ use PHPUnit\Framework\TestCase;
 class QueryBuilderTest extends TestCase
 {
     private QueryBuilder $queryBuilder;
-    private Connection $connection;
 
     protected function setUp(): void
     {
-        $this->connection    = $this->createConnectionFake();
-        $this->queryBuilder  = new QueryBuilder($this->connection);
+        $connection          = $this->createConnectionFake();
+        $this->queryBuilder  = new QueryBuilder($connection);
     }
 
     public function testExpr(): void

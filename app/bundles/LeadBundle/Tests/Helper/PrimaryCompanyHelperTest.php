@@ -67,10 +67,7 @@ class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['email' => 'test@test.com', 'companywebsite' => 'https://foo.com'], $profileFields);
     }
 
-    /**
-     * @return PrimaryCompanyHelper
-     */
-    private function getPrimaryCompanyHelper()
+    private function getPrimaryCompanyHelper(): PrimaryCompanyHelper
     {
         return new PrimaryCompanyHelper($this->leadRepository);
     }

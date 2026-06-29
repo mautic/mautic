@@ -26,7 +26,7 @@ class CoreParametersHelperTest extends TestCase
     {
         $this->container->method('hasParameter')
             ->willReturnCallback(
-                fn (string $key) => 'mautic.cache_path' === $key
+                fn (string $key): bool => 'mautic.cache_path' === $key
             );
 
         $this->container->expects($this->once())

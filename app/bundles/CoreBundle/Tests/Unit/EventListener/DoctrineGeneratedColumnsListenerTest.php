@@ -16,16 +16,6 @@ use Psr\Log\LoggerInterface;
 class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GeneratedColumnsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $generatedColumnsProvider;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
-
-    /**
      * @var GenerateSchemaEventArgs|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $event;
@@ -46,19 +36,19 @@ class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $this->logger                   = $this->createMock(LoggerInterface::class);
+        $generatedColumnsProvider       = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $logger                         = $this->createMock(LoggerInterface::class);
         $this->event                    = $this->createMock(GenerateSchemaEventArgs::class);
         $this->schema                   = $this->createMock(Schema::class);
         $this->table                    = $this->createMock(Table::class);
-        $this->listener                 = new DoctrineGeneratedColumnsListener($this->generatedColumnsProvider, $this->logger);
+        $this->listener                 = new DoctrineGeneratedColumnsListener($generatedColumnsProvider, $logger);
 
         $generatedColumn  = new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important');
         $generatedColumns = new GeneratedColumns();
 
         $generatedColumns->add($generatedColumn);
 
-        $this->generatedColumnsProvider->method('getGeneratedColumns')->willReturn($generatedColumns);
+        $generatedColumnsProvider->method('getGeneratedColumns')->willReturn($generatedColumns);
         $this->event->method('getSchema')->willReturn($this->schema);
     }
 

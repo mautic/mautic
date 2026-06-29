@@ -14,7 +14,7 @@ class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('basic_auth', (new HttpFactory())->getAuthType());
+        $this->assertSame('basic_auth', (new HttpFactory())->getAuthType());
     }
 
     public function testMissingUsernameThrowsException(): void

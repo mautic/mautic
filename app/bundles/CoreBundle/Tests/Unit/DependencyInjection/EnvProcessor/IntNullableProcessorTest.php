@@ -9,7 +9,7 @@ class IntNullableProcessorTest extends TestCase
 {
     public function testNullReturnedIfNullValue(): void
     {
-        $getEnv = fn (string $name) => null;
+        $getEnv = fn (string $name): null => null;
 
         $processor = new IntNullableProcessor();
 
@@ -20,7 +20,7 @@ class IntNullableProcessorTest extends TestCase
 
     public function testIntReturnedIfNotNull(): void
     {
-        $getEnv = fn (string $name) => '0';
+        $getEnv = fn (string $name): string => '0';
 
         $processor = new IntNullableProcessor();
 
@@ -31,7 +31,7 @@ class IntNullableProcessorTest extends TestCase
 
     public function testIntReturnedIfEmptyString(): void
     {
-        $getEnv = fn (string $name) => '';
+        $getEnv = fn (string $name): string => '';
 
         $processor = new IntNullableProcessor();
 
@@ -42,7 +42,7 @@ class IntNullableProcessorTest extends TestCase
 
     public function testIntReturnedIfInt(): void
     {
-        $getEnv = fn (string $name) => 12;
+        $getEnv = fn (string $name): int => 12;
 
         $processor = new IntNullableProcessor();
 

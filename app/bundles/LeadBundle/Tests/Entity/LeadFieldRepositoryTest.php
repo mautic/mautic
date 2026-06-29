@@ -113,7 +113,7 @@ final class LeadFieldRepositoryTest extends TestCase
     ): void {
         $exprCompare->expects($this->exactly(null !== $value ? 2 : 1))
             ->method('eq')
-            ->willReturnCallback(function (...$parameters) use ($fieldAlias, $value) {
+            ->willReturnCallback(function (...$parameters) use ($fieldAlias, $value): void {
                 static $invocationCount = 0;
                 ++$invocationCount;
 
@@ -220,7 +220,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $matcher = $this->exactly(2);
         $mocks['exprCompare']->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.id', $parameters[0]);
                     $this->assertSame(':lead', $parameters[1]);
@@ -233,7 +233,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $matcher = $this->exactly(2);
         $mocks['builderCompare']->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);
@@ -323,45 +323,45 @@ final class LeadFieldRepositoryTest extends TestCase
         $this->entityManager->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('select')
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('from')
             ->willReturnSelf();
 
         $expr = $this->createMock(Query\Expr::class);
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
         $comparison = $this->createMock(Query\Expr\Comparison::class);
-        $expr->expects(self::once())
+        $expr->expects($this->once())
             ->method('eq')
             ->willReturn($comparison);
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('where')
             ->with($comparison)
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('orderBy')
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('setMaxResults')
             ->with(1)
             ->willReturnSelf();
 
         $query = $this->createMock(AbstractQuery::class);
-        $queryBuilder->expects(self::once())
+        $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
 
         $leadField = $this->createMock(LeadField::class);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('getOneOrNullResult')
             ->willReturn($leadField);
 

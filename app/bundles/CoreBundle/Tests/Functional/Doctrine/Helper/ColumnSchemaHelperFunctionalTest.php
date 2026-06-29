@@ -32,7 +32,7 @@ class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $this->schemaHelper->updateColumnLength($this->field->getAlias(), $length);
 
         $column = $this->schemaHelper->getColumns()[$this->field->getAlias()];
-        \assert($column instanceof Column);
+        $this->assertInstanceOf(Column::class, $column);
 
         $this->assertEquals($length, $column->getLength(), 'Column length updated.');
     }
@@ -77,7 +77,7 @@ class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
         $field->setCharLengthLimit(64);
 
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
         $fieldModel->saveEntity($field);
         $fieldModel->getRepository()->detachEntity($field);
 

@@ -34,7 +34,7 @@ class ConfigSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
             ],

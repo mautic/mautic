@@ -202,8 +202,6 @@ class Tweet extends FormEntity
 
     /**
      * @param int $id
-     *
-     * @return $this
      */
     public function setId($id): static
     {
@@ -222,8 +220,6 @@ class Tweet extends FormEntity
 
     /**
      * @param string $name
-     *
-     * @return $this
      */
     public function setName($name): static
     {
@@ -243,8 +239,6 @@ class Tweet extends FormEntity
 
     /**
      * @param string|null $description
-     *
-     * @return $this
      */
     public function setDescription($description): static
     {
@@ -264,8 +258,6 @@ class Tweet extends FormEntity
 
     /**
      * @param string $mediaId
-     *
-     * @return $this
      */
     public function setMediaId($mediaId): static
     {
@@ -285,8 +277,6 @@ class Tweet extends FormEntity
 
     /**
      * @param string $mediaPath
-     *
-     * @return $this
      */
     public function setMediaPath($mediaPath): static
     {
@@ -306,8 +296,6 @@ class Tweet extends FormEntity
 
     /**
      * @param string $text
-     *
-     * @return $this
      */
     public function setText($text): static
     {
@@ -325,9 +313,6 @@ class Tweet extends FormEntity
         return $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setSentCount($sentCount): static
     {
         $this->isChanged('sentCount', $sentCount);
@@ -338,8 +323,6 @@ class Tweet extends FormEntity
 
     /**
      * Add 1 to sentCount.
-     *
-     * @return $this
      */
     public function sentCountUp(): static
     {
@@ -358,8 +341,6 @@ class Tweet extends FormEntity
 
     /**
      * @param int $favoriteCount
-     *
-     * @return $this
      */
     public function setFavoriteCount($favoriteCount): static
     {
@@ -379,8 +360,6 @@ class Tweet extends FormEntity
 
     /**
      * @param int $retweetCount
-     *
-     * @return $this
      */
     public function setRetweetCount($retweetCount): static
     {
@@ -400,8 +379,6 @@ class Tweet extends FormEntity
 
     /**
      * @param string $language
-     *
-     * @return $this
      */
     public function setLanguage($language): static
     {
@@ -419,9 +396,6 @@ class Tweet extends FormEntity
         return $this->asset;
     }
 
-    /**
-     * @return $this
-     */
     public function setAsset(Asset $asset): static
     {
         $this->asset = $asset;
@@ -437,9 +411,6 @@ class Tweet extends FormEntity
         return $this->page;
     }
 
-    /**
-     * @return $this
-     */
     public function setPage(Page $page): static
     {
         $this->page = $page;
@@ -455,9 +426,6 @@ class Tweet extends FormEntity
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
     public function setCategory(Category $category): static
     {
         $this->category = $category;

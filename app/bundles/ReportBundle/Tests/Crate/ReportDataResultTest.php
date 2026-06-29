@@ -157,29 +157,29 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $calc         = $reportDataResult->calcTotal('AVG', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('AVG', $valuesCount + 2, $values, 10);
 
-        $this->assertEquals(round(array_sum($values) / $valuesCount, FormatterHelper::FLOAT_PRECISION), $calc);
-        $this->assertEquals(round((array_sum($values) + 10) / ($valuesCount + 2), FormatterHelper::FLOAT_PRECISION), $calcWithPrev);
+        $this->assertSame(round(array_sum($values) / $valuesCount, FormatterHelper::FLOAT_PRECISION), $calc);
+        $this->assertSame(round((array_sum($values) + 10) / ($valuesCount + 2), FormatterHelper::FLOAT_PRECISION), $calcWithPrev);
 
         // Calc test MIN
         $calc         = $reportDataResult->calcTotal('MIN', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('MIN', $valuesCount, $values, 0);
 
-        $this->assertEquals(1, $calc);
-        $this->assertEquals(0, $calcWithPrev);
+        $this->assertSame(1, $calc);
+        $this->assertSame(0.0, $calcWithPrev);
 
         // Calc test MAX
         $calc         = $reportDataResult->calcTotal('MAX', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('MAX', $valuesCount, $values, 25);
 
-        $this->assertEquals(20, $calc);
-        $this->assertEquals(25, $calcWithPrev);
+        $this->assertSame(20, $calc);
+        $this->assertSame(25.0, $calcWithPrev);
 
         // Calc test 'default'
         $calc         = $reportDataResult->calcTotal('RANDOM', $valuesCount, $values);
         $calcWithPrev = $reportDataResult->calcTotal('RANDOM', $valuesCount, $values, 50);
 
         $this->assertNull($calc);
-        $this->assertEquals(50, $calcWithPrev);
+        $this->assertSame(50.0, $calcWithPrev);
     }
 
     public function testGetColumnKeys(): void

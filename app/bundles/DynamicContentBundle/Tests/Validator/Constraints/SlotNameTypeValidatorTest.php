@@ -14,7 +14,7 @@ class SlotNameTypeValidatorTest extends ConstraintValidatorTestCase
     /**
      * @var DynamicContentModel|MockObject
      */
-    private $dynamicContentModel;
+    private ?MockObject $dynamicContentModel = null;
 
     protected function createValidator(): SlotNameTypeValidator
     {
