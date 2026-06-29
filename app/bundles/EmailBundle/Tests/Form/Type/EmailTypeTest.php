@@ -21,21 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var MockObject&StageModel
-     */
-    private MockObject $stageModel;
-
-    /**
      * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
@@ -43,57 +28,40 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private EmailType $form;
 
     /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
-     * @var CorePermissions&MockObject
-     */
-    private MockObject $corePermissions;
-
-    /**
-     * @var EmailConfigInterface&MockObject
-     */
-    private MockObject $emailConfig;
-
-    /**
      * @var ThemeHelperInterface&MockObject
      */
     private MockObject $themeHelper;
-
-    private EmailDefaultsHelper&MockObject $defaultsHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->entityManager        = $this->createMock(EntityManager::class);
-        $this->stageModel           = $this->createMock(StageModel::class);
+        $translator                 = $this->createMock(TranslatorInterface::class);
+        $entityManager              = $this->createMock(EntityManager::class);
+        $stageModel                 = $this->createMock(StageModel::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->corePermissions      = $this->createMock(CorePermissions::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $corePermissions            = $this->createMock(CorePermissions::class);
         $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
-        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
-        $this->defaultsHelper       = $this->createMock(EmailDefaultsHelper::class);
+        $emailConfig                = $this->createMock(EmailConfigInterface::class);
+        $defaultsHelper             = $this->createMock(EmailDefaultsHelper::class);
         $this->form                 = new EmailType(
-            $this->translator,
-            $this->entityManager,
-            $this->stageModel,
-            $this->coreParametersHelper,
+            $translator,
+            $entityManager,
+            $stageModel,
+            $coreParametersHelper,
             $this->themeHelper,
-            $this->corePermissions,
-            $this->emailConfig,
-            $this->defaultsHelper,
+            $corePermissions,
+            $emailConfig,
+            $defaultsHelper,
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
         $this->formBuilder->method('add')->willReturnSelf();
         $this->formBuilder->method('addModelTransformer')->willReturnSelf();
-        $this->corePermissions->method('hasPublishAccessForEntity')->willReturn(true);
-        $this->translator->method('trans')->willReturn('translated');
-        $this->emailConfig->method('isDraftEnabled')->willReturn(false);
+        $corePermissions->method('hasPublishAccessForEntity')->willReturn(true);
+        $translator->method('trans')->willReturn('translated');
+        $emailConfig->method('isDraftEnabled')->willReturn(false);
     }
 
     public function testBuildForm(): void

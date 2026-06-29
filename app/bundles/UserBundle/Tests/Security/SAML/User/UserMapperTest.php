@@ -49,7 +49,7 @@ class UserMapperTest extends TestCase
         $statement = $this->createMock(AttributeStatement::class);
         $statement->method('getFirstAttributeByName')
             ->willReturnCallback(
-                fn ($attributeName) => match ($attributeName) {
+                fn ($attributeName): MockObject => match ($attributeName) {
                     'EmailAddress' => $emailAttribute,
                     'FirstName'    => $firstnameAttribute,
                     'LastName'     => $lastnameAttribute,

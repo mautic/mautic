@@ -85,10 +85,7 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($contactMemberDates, $contactFinder->getDatesAdded());
     }
 
-    /**
-     * @return InactiveContactFinder
-     */
-    private function getContactFinder()
+    private function getContactFinder(): InactiveContactFinder
     {
         return new InactiveContactFinder(
             $this->leadRepository,

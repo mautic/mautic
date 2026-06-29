@@ -107,7 +107,7 @@ class CampaignConditionSubscriberTest extends TestCase
         $this->validator->expects($this->once())
             ->method('validate')
             ->with($lead->getEmail(), true)
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): void {
                 // Do nothing, as the method is void
             });
 

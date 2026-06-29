@@ -58,7 +58,7 @@ class SegmentSubscriberTest extends TestCase
         $this->translator                      = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
-        $this->coreParametersHelper->method('get')->willReturnCallback(fn () => false);
+        $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
     }
 
     public function testGetSubscribedEvents(): void

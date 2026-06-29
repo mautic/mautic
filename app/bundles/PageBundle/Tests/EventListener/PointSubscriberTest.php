@@ -32,7 +32,7 @@ class PointSubscriberTest extends TestCase
         $pointActionHelper = $this->createMock(PointActionHelper::class);
         $matcher           = self::exactly(2);
 
-        $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper) {
+        $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper): void {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('page.hit', $parameters[0]);
                 $this->assertSame([

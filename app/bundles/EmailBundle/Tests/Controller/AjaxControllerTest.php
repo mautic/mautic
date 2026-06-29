@@ -35,11 +35,6 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $modelFactoryMock;
 
     /**
-     * @var MockObject|Container
-     */
-    private MockObject $containerMock;
-
-    /**
      * @var MockObject|EmailModel
      */
     private MockObject $modelMock;
@@ -51,21 +46,16 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
     private AjaxController $controller;
 
-    /**
-     * @var MockObject&ManagerRegistry
-     */
-    private MockObject $managerRegistry;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->sessionMock      = $this->createMock(Session::class);
-        $this->containerMock    = $this->createMock(Container::class);
+        $containerMock          = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
 
-        $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
+        $managerRegistry        = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock = $this->createMock(ModelFactory::class);
         $userHelper             = $this->createMock(UserHelper::class);
         $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
@@ -76,7 +66,7 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $security               = $this->createMock(CorePermissions::class);
 
         $this->controller = new AjaxController(
-            $this->managerRegistry,
+            $managerRegistry,
             $this->modelFactoryMock,
             $userHelper,
             $coreParametersHelper,
@@ -86,18 +76,20 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
             $requestStack,
             $security
         );
-        $this->controller->setContainer($this->containerMock);
+
+        $this->controller->setContainer($containerMock);
 
         $parameterBag = $this->createMock(ContainerBagInterface::class);
         $parameterBag->expects($this->once())
             ->method('get')
             ->with('kernel.environment')
             ->willReturn('test');
-        $this->containerMock->expects($this->once())
+
+        $containerMock->expects($this->once())
             ->method('has')
             ->with('parameter_bag')
             ->willReturn(true);
-        $this->containerMock->expects($this->once())
+        $containerMock->expects(self::once())
             ->method('get')
             ->with('parameter_bag')
             ->willReturn($parameterBag);

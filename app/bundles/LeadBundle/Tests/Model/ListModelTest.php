@@ -29,7 +29,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ListModelTest extends TestCase
 {
-    protected ListModel|MockObject $fixture;
+    protected ?MockObject $fixture = null;
 
     private ListModel $model;
 

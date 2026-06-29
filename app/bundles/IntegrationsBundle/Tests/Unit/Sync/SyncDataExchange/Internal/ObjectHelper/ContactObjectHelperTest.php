@@ -233,7 +233,7 @@ class ContactObjectHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $contact1->expects($matcher)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('john@doe.com', $parameters[1]);

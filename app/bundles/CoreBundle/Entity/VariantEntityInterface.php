@@ -25,11 +25,18 @@ interface VariantEntityInterface
     public function removeVariantChild(VariantEntityInterface $child): void;
 
     /**
+     * @param array<mixed> $variantSettings
+     */
+    public function setVariantSettings(array $variantSettings): static;
+
+    /**
      * @return array<mixed>
      */
     public function getVariantSettings(): array;
 
     public function getVariantStartDate(): mixed;
+
+    public function setVariantStartDate(mixed $variantStartDate): static;
 
     /**
      * @return array<int, mixed>

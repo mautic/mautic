@@ -27,7 +27,7 @@ class CampaignTestAbstract extends TestCase
     protected static string $mockName  = 'Mock name';
     protected static string $mockAlias = 'Mock alias';
     /** @var EntityManager&MockObject */
-    protected EntityManager $entityManager;
+    protected ?MockObject $entityManager = null;
 
     protected function initCampaignModel(): CampaignModel
     {

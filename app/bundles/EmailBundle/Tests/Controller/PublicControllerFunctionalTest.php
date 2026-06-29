@@ -69,7 +69,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
-        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn () => null /* exists but does nothing */);
+        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);

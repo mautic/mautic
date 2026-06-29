@@ -28,10 +28,6 @@ class BuilderSubscriberTest extends TestCase
 
     private MockObject&EmailModel $emailModel;
 
-    private MockObject&TrackableModel $trackableModel;
-
-    private MockObject&RedirectModel $redirectModel;
-
     private MockObject&TranslatorInterface $translator;
 
     private MockObject&LeadRepository $leadRepository;
@@ -40,16 +36,16 @@ class BuilderSubscriberTest extends TestCase
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
-        $this->trackableModel       = $this->createMock(TrackableModel::class);
-        $this->redirectModel        = $this->createMock(RedirectModel::class);
+        $trackableModel             = $this->createMock(TrackableModel::class);
+        $redirectModel              = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->leadRepository       = $this->createMock(LeadRepository::class);
         $fromEmailHelper            = new FromEmailHelper($this->coreParametersHelper, $this->leadRepository);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
-            $this->trackableModel,
-            $this->redirectModel,
+            $trackableModel,
+            $redirectModel,
             $this->translator,
             new MailHashHelper($this->coreParametersHelper),
             $fromEmailHelper

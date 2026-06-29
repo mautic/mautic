@@ -1335,6 +1335,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
     }
 
+    public function isSegmentEmail(): bool
+    {
+        return 'list' === $this->getEmailType();
+    }
+
     private function listsChangedAdd(string $property, ?int $id): void
     {
         $this->initListChanges($property);
@@ -1401,9 +1406,30 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $keys;
     }
 
-    public function isSegmentEmail(): bool
+    public function waitingToSendTestsEmails(int $totalLeadCountForVariants): bool
     {
-        return 'list' === $this->getEmailType();
+        return $this->getVariantSentCount(true) < $totalLeadCountForVariants && !$this->isWinner();
+    }
+
+    public function waitingToDetermineWinner(int $totalLeadCountForVariants): bool
+    {
+        $variantSentCount = $this->getVariantSentCount(true);
+
+        $isWinner = $this->isWinner();
+
+        return $variantSentCount >= $totalLeadCountForVariants && !$isWinner;
+    }
+
+    public function increaseVariantCount(): bool
+    {
+        return $this->isVariant() && !$this->isWinner();
+    }
+
+    public function isWinner(): bool
+    {
+        $variantSettings = $this->getVariantParent() ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
+
+        return true === (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
     }
 
     public function getSendingStatus(): string
@@ -1431,6 +1457,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function shouldCheckForUnpublishEmail(): bool
     {
         if ($this->isContinueSending()) {
+            return false;
+        }
+
+        if ($this->isEnableAbTest() && !$this->isWinner()) {
             return false;
         }
 

@@ -205,7 +205,7 @@ class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('expr')
                 ->willReturnCallback(
-                    fn () => new ExpressionBuilder($this->getMockConnection())
+                    fn (): ExpressionBuilder => new ExpressionBuilder($this->getMockConnection())
                 );
 
             $mock->expects(new AnyInvokedCount())

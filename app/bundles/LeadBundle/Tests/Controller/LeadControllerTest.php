@@ -860,7 +860,7 @@ EMAIL;
         $this->assertEquals($expectedCompanies, $collection->keys()->toArray());
         // Only one should be primary
         $primary = $collection->reject(
-            fn (array $company) => empty($company['is_primary'])
+            fn (array $company): bool => empty($company['is_primary'])
         );
         $this->assertCount(1, $primary);
         // Primary company name should match

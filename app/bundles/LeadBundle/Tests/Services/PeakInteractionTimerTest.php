@@ -37,22 +37,22 @@ class PeakInteractionTimerTest extends TestCase
     /**
      * @var StatRepository|MockObject
      */
-    private $statRepositoryMock;
+    private MockObject $statRepositoryMock;
 
     /**
      * @var MockObject|HitRepository
      */
-    private $hitRepositoryMock;
+    private MockObject $hitRepositoryMock;
 
     /**
      * @var MockObject|SubmissionRepository
      */
-    private $submissionRepositoryMock;
+    private MockObject $submissionRepositoryMock;
 
     /**
      * @var MockObject|CacheProviderInterface
      */
-    private $cacheProviderMock;
+    private MockObject $cacheProviderMock;
 
     private string $defaultTimezone                       = 'UTC';
     private int $peakInteractionTimerCacheTimeout         = 43800;

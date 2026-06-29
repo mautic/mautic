@@ -20,24 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EmailModel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $emailModel;
-
-    /**
-     * @var RealTimeExecutioner&\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $realTimeExecutioner;
-
-    /**
      * @var SendEmailToUser|\PHPUnit\Framework\MockObject\MockObject
      */
     private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
-
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     private CampaignSubscriber $subscriber;
 
@@ -45,18 +30,18 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->emailModel          = $this->createMock(EmailModel::class);
-        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $emailModel                = $this->createMock(EmailModel::class);
+        $realTimeExecutioner       = $this->createMock(RealTimeExecutioner::class);
         $this->sendEmailToUser     = $this->createMock(SendEmailToUser::class);
-        $this->translator          = $this->createMock(TranslatorInterface::class);
+        $translator                = $this->createMock(TranslatorInterface::class);
         $leadModel                 = $this->createMock(LeadModel::class);
         $statRepository            = $this->createMock(StatRepository::class);
 
         $this->subscriber = new CampaignSubscriber(
-            $this->emailModel,
-            $this->realTimeExecutioner,
+            $emailModel,
+            $realTimeExecutioner,
             $this->sendEmailToUser,
-            $this->translator,
+            $translator,
             $leadModel,
             $statRepository
         );

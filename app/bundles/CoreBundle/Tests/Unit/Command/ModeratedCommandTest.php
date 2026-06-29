@@ -17,7 +17,7 @@ use Symfony\Component\Lock\LockInterface;
 class ModeratedCommandTest extends TestCase
 {
     private string $lockFilePath;
-    private CoreParametersHelper|MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|InputInterface
@@ -67,7 +67,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): ?string => match ($name) {
                     'lock_mode' => 'file_lock',
                     default     => null,
                 }
@@ -83,7 +83,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|true|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
                     'bypass-locking' => true,
                     default          => null,
@@ -100,7 +100,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): bool|string|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
                     'bypass-locking' => false,
                     'force'          => true,
@@ -126,7 +126,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_PID,
                     'bypass-locking' => false,
                     default          => null,
@@ -172,7 +172,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_FLOCK,
                     'bypass-locking' => false,
                     default          => null,
@@ -223,7 +223,7 @@ class ModeratedCommandTest extends TestCase
 
         $this->input->method('getOption')
             ->willReturnCallback(
-                fn (string $name) => match ($name) {
+                fn (string $name): string|false|null => match ($name) {
                     'lock_mode'      => ModeratedCommand::MODE_REDIS,
                     'bypass-locking' => false,
                     default          => null,

@@ -79,7 +79,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'POST',
             'batchemail202-updated@email.com',
             Response::HTTP_CREATED,
-            function (Response $clientResponse, int $contactId1, int $contactId2) {
+            function (Response $clientResponse, int $contactId1, int $contactId2): void {
                 $responseArray = json_decode($clientResponse->getContent(), true);
 
                 // POST should not update by ID but always create new contact.
@@ -99,7 +99,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'POST',
             'batchemail202@email.com',
             Response::HTTP_OK,
-            function (Response $clientResponse, int $contactId1) {
+            function (Response $clientResponse, int $contactId1): void {
                 $responseArray = json_decode($clientResponse->getContent(), true);
 
                 // POST should not update by ID but always create new contact.
@@ -118,7 +118,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'PUT',
             'batchemail202-updated@email.com',
             Response::HTTP_OK,
-            function (Response $clientResponse, int $contactId1) {
+            function (Response $clientResponse, int $contactId1): void {
                 $responseArray = json_decode($clientResponse->getContent(), true);
 
                 // PUT should update by ID and overwrite the original contact values.
@@ -136,7 +136,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             'PATCH',
             'batchemail202-updated@email.com',
             Response::HTTP_OK,
-            function (Response $clientResponse, int $contactId1) {
+            function (Response $clientResponse, int $contactId1): void {
                 $responseArray = json_decode($clientResponse->getContent(), true);
 
                 // PATCH should update by ID and leave the original contact values.
@@ -1173,7 +1173,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful($clientResponse->getContent());
         $activityResponse = json_decode($clientResponse->getContent(), true);
         Assert::assertCount(2, $activityResponse['events']); // identified and dnc added events
-        $dncEvents = array_values(array_filter($activityResponse['events'], fn ($event) => 'lead.donotcontact' === $event['event']));
+        $dncEvents = array_values(array_filter($activityResponse['events'], fn ($event): bool => 'lead.donotcontact' === $event['event']));
         Assert::assertCount(1, $dncEvents);
         Assert::assertSame('Email', $dncEvents[0]['eventLabel']);
         Assert::assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
@@ -1216,7 +1216,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
                 $assetDownload->setLead($contact);
                 $assetDownload->setDateDownload(date_create('2013-03-15'));
                 $assetDownload->setCode(13);
-                $assetDownload->setTrackingId(13);
+                $assetDownload->setTrackingId('13');
                 $assetDownload->setIpAddress($ipAddress);
                 $this->em->persist($assetDownload);
             }

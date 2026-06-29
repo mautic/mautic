@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 {
-    private TranslatorInterface $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {

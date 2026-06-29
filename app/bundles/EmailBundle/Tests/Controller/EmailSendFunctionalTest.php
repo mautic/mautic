@@ -72,7 +72,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
         // Sort messages by to address as the order can differ
         usort(
             $messages,
-            static fn (MauticMessage $a, MauticMessage $b) => $a->getTo()[0]->toString() <=> $b->getTo()[0]->toString()
+            static fn (MauticMessage $a, MauticMessage $b): int => $a->getTo()[0]->toString() <=> $b->getTo()[0]->toString()
         );
 
         $unsubscribeUrlPattern = '/https?:\/\/[^\/]+\/email\/unsubscribe\/([0-9a-z]{20})/';

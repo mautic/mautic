@@ -33,11 +33,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $requestMock;
 
     /**
-     * @var MockObject|CorePermissions
-     */
-    private MockObject $securityMock;
-
-    /**
      * @var MockObject|Translator
      */
     private MockObject $translatorMock;
@@ -56,11 +51,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|RouterInterface
      */
     private MockObject $routerMock;
-
-    /**
-     * @var MockObject&FlashBag
-     */
-    private MockObject $flashBagMock;
 
     /**
      * @var MockObject|Container
@@ -84,9 +74,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
         $dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $this->flashBagMock       = $this->createMock(FlashBag::class);
+        $flashBagMock             = $this->createMock(FlashBag::class);
         $requestStack             = new RequestStack();
-        $this->securityMock       = $this->createMock(CorePermissions::class);
+        $securityMock             = $this->createMock(CorePermissions::class);
 
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
@@ -96,9 +86,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             $coreParametersHelper,
             $dispatcher,
             $this->translatorMock,
-            $this->flashBagMock,
+            $flashBagMock,
             $requestStack,
-            $this->securityMock
+            $securityMock
         );
         $this->controller->setContainer($this->containerMock);
     }

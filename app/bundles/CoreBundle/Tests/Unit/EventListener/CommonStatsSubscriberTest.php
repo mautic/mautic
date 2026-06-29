@@ -22,11 +22,6 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $security;
 
     /**
-     * @var EntityManager|MockObject
-     */
-    private MockObject $entityManager;
-
-    /**
      * @var User|MockObject
      */
     private MockObject $user;
@@ -50,7 +45,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $this->security      = $this->createMock(CorePermissions::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $entityManager       = $this->createMock(EntityManager::class);
         $this->user          = $this->createMock(User::class);
         $this->repository    = $this->createMock(CommonRepository::class);
         $this->statsEvent    = $this->createMock(StatsEvent::class);
@@ -58,7 +53,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs(
                 [
                     $this->security,
-                    $this->entityManager,
+                    $entityManager,
                 ]
             )
             ->onlyMethods([])

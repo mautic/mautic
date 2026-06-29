@@ -46,7 +46,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
-        $actualEventData = array_filter($responseData['event'], fn ($value) => in_array($value, [
+        $actualEventData = array_filter($responseData['event'], fn ($value): bool => in_array($value, [
             'name',
             'type',
             'eventType',

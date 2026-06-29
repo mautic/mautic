@@ -61,7 +61,7 @@ class ApiUserSubscriberTest extends TestCase
         $userBadge = $this->createMock(UserBadge::class);
         $userBadge->expects($this->once())
             ->method('getUserLoader')
-            ->willReturn(function () {});
+            ->willReturn(function (): void {});
         $userBadge->expects(self::never())
             ->method('setUserLoader');
 

@@ -25,21 +25,11 @@ use Symfony\Component\Routing\Router;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
-
     private \PHPUnit\Framework\MockObject\MockObject $routerMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
 
     private InstallController $controller;
 
     private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
-
-    private \PHPUnit\Framework\MockObject\MockObject $configurator;
 
     private \PHPUnit\Framework\MockObject\MockObject $installer;
 
@@ -47,41 +37,41 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->sessionMock          = $this->createMock(Session::class);
-        $this->containerMock        = $this->createMock(Container::class);
+        $sessionMock                = $this->createMock(Session::class);
+        $containerMock              = $this->createMock(Container::class);
         $this->routerMock           = $this->createMock(Router::class);
-        $this->flashBagMock         = $this->createMock(FlashBagInterface::class);
+        $flashBagMock               = $this->createMock(FlashBagInterface::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
 
-        $this->configurator   = $this->createMock(Configurator::class);
+        $configurator         = $this->createMock(Configurator::class);
         $this->installer      = $this->createMock(InstallService::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $modelFactory         = $this->createMock(ModelFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock = $this->createMock(Translator::class);
+        $translatorMock       = $this->createMock(Translator::class);
         $flashBag             = $this->createMock(FlashBag::class);
         $requestStack         = new RequestStack();
         $security             = $this->createMock(CorePermissions::class);
 
         $this->controller = new InstallController(
-            $this->configurator,
+            $configurator,
             $this->installer,
             $doctrine,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,
             $dispatcher,
-            $this->translatorMock,
+            $translatorMock,
             $flashBag,
             $requestStack,
             $security
         );
-        $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
+        $this->controller->setContainer($containerMock);
+        $sessionMock->method('getFlashBag')->willReturn($flashBagMock);
 
-        $this->containerMock->method('get')
+        $containerMock->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
     }

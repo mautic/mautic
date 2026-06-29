@@ -19,7 +19,7 @@ class DynamicContentSubscriberTest extends TestCase
     /**
      * @var LeadListRepository|MockObject
      */
-    private $segmentRepository;
+    private MockObject $segmentRepository;
 
     /**
      * @var SegmentCompanyRepository|MockObject

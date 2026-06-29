@@ -22,60 +22,35 @@ class ClientTypeTest extends TestCase
     private ClientType $clientType;
 
     /**
-     * @var MockObject&RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&ValidatorInterface
-     */
-    private MockObject $validator;
-
-    /**
-     * @var MockObject&RouterInterface
-     */
-    private MockObject $router;
-
-    /**
      * @var MockObject&FormBuilderInterface
      */
     private MockObject $builder;
-
-    /**
-     * @var MockObject&Request
-     */
-    private MockObject $request;
 
     private Client $client;
 
     protected function setUp(): void
     {
-        $this->requestStack = $this->createMock(RequestStack::class);
-        $this->translator   = $this->createMock(TranslatorInterface::class);
-        $this->validator    = $this->createMock(ValidatorInterface::class);
-        $this->router       = $this->createMock(RouterInterface::class);
+        $requestStack       = $this->createMock(RequestStack::class);
+        $translator         = $this->createMock(TranslatorInterface::class);
+        $validator          = $this->createMock(ValidatorInterface::class);
+        $router             = $this->createMock(RouterInterface::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
-        $this->request      = $this->createMock(Request::class);
+        $request            = $this->createMock(Request::class);
         $this->client       = new Client();
 
-        $this->requestStack->expects($this->once())
+        $requestStack->expects($this->once())
             ->method('getCurrentRequest')
-            ->willReturn($this->request);
+            ->willReturn($request);
 
-        $this->request->expects($this->once())
+        $request->expects($this->once())
             ->method('get')
             ->with('api_mode', null);
 
         $this->clientType = new ClientType(
-            $this->requestStack,
-            $this->translator,
-            $this->validator,
-            $this->router
+            $requestStack,
+            $translator,
+            $validator,
+            $router
         );
     }
 

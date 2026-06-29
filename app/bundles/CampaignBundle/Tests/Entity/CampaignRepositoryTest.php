@@ -23,7 +23,7 @@ class CampaignRepositoryTest extends TestCase
 
         $this->repository = $this->configureRepository(Campaign::class);
 
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new DbalQueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): DbalQueryBuilder => new DbalQueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {

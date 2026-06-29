@@ -50,7 +50,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $foreignDownload->setAsset($foreignAsset);
         $foreignDownload->setDateDownload(new \DateTime());
         $foreignDownload->setCode(200);
-        $foreignDownload->setTrackingId(789012);
+        $foreignDownload->setTrackingId('789012');
         $this->em->persist($foreignDownload);
 
         $this->em->flush();
@@ -107,7 +107,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $ownDownload->setAsset($ownAsset);
         $ownDownload->setDateDownload(new \DateTime());
         $ownDownload->setCode(200);
-        $ownDownload->setTrackingId(123456);
+        $ownDownload->setTrackingId('123456');
         $this->em->persist($ownDownload);
 
         // Create an asset owned by ownerUser
@@ -123,7 +123,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $foreignDownload->setAsset($foreignAsset);
         $foreignDownload->setDateDownload(new \DateTime());
         $foreignDownload->setCode(200);
-        $foreignDownload->setTrackingId(345678);
+        $foreignDownload->setTrackingId('345678');
         $this->em->persist($foreignDownload);
 
         $this->em->flush();
@@ -183,7 +183,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
             $download->setAsset($asset);
             $download->setDateDownload(new \DateTime());
             $download->setCode(200);
-            $download->setTrackingId(100000 + $i);
+            $download->setTrackingId((string) (100000 + $i));
             $this->em->persist($download);
         }
 
@@ -200,7 +200,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
             $download->setAsset($asset);
             $download->setDateDownload(new \DateTime());
             $download->setCode(200);
-            $download->setTrackingId(200000 + $i);
+            $download->setTrackingId((string) (200000 + $i));
             $this->em->persist($download);
         }
 

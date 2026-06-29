@@ -32,11 +32,6 @@ class ChannelClickQueryBuilderTest extends TestCase
     private MockObject $randomParameterMock;
 
     /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcherMock;
-
-    /**
      * @var Connection|MockObject
      */
     private MockObject $connectionMock;
@@ -46,11 +41,11 @@ class ChannelClickQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
-        $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
+        $dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $this->dispatcherMock
+            $dispatcherMock
         );
 
         $this->connectionMock->method('quote')

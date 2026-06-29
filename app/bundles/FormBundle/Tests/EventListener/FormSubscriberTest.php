@@ -27,7 +27,7 @@ class FormSubscriberTest extends TestCase
     /**
      * @var MailHelper&MockObject
      */
-    private MailHelper $mailer;
+    private MockObject $mailer;
 
     protected function setUp(): void
     {

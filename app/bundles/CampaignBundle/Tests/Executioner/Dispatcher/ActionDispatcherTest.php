@@ -284,10 +284,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
     }
 
-    /**
-     * @return ActionDispatcher
-     */
-    private function getEventDispatcher()
+    private function getEventDispatcher(): ActionDispatcher
     {
         return new ActionDispatcher(
             $this->dispatcher,

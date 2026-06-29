@@ -27,9 +27,9 @@ use Symfony\Component\Routing\Router;
 
 class CompanyObjectSubscriberTest extends TestCase
 {
-    private CompanyObjectHelper|MockObject $companyObjectHelper;
+    private MockObject $companyObjectHelper;
 
-    private Router|MockObject $router;
+    private MockObject $router;
 
     private CompanyObjectSubscriber $subscriber;
 
