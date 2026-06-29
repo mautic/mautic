@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -53,7 +54,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield'=> 'xxx']);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
-        $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
+        ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
         $duplicatedCompany->expects($this->exactly(0))->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, true);
     }
@@ -66,7 +67,7 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $duplicatedCompany->method('getProfileFields')->willReturn(['companyfield'=> 'xxx']);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
-        $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
+        ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
         $duplicatedCompany->expects($this->once())->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
     }
@@ -104,13 +105,15 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $duplicatedCompany->method('getProfileFields')->willReturn($data);
 
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
-        $this->setProperty($companyModel, CompanyModel::class, 'companyDeduper', $companyDeduper);
+        ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
 
         $duplicatedCompany->expects($this->exactly(2))->method('addUpdatedField');
         $companyModel->importCompany([], [], null, false, false);
     }
 
-    /** @return CompanyModel&MockObject */
+    /**
+     * @return CompanyModel&MockObject
+     */
     private function getCompanyModelForImport(): CompanyModel
     {
         $companyModel = $this->getMockBuilder(CompanyModel::class)
@@ -133,7 +136,9 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         return $companyModel;
     }
 
-    /** @return CompanyDeduper&MockObject */
+    /**
+     * @return CompanyDeduper&MockObject
+     */
     private function getCompanyDeduperForImport(Company $duplicatedCompany): CompanyDeduper
     {
         $companyDeduper = $this->createMock(CompanyDeduper::class);
@@ -141,20 +146,6 @@ class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyDeduper->method('checkForDuplicateCompanies')->willReturn([$duplicatedCompany]);
 
         return $companyDeduper;
-    }
-
-    /**
-     * Set protected property to an object.
-     *
-     * @param object $object
-     * @param string $class
-     * @param string $property
-     * @param mixed  $value
-     */
-    private function setProperty($object, $class, $property, $value): void
-    {
-        $reflectedProp = new \ReflectionProperty($class, $property);
-        $reflectedProp->setValue($object, $value);
     }
 
     public function testExtractCompanyDataFromImport(): void

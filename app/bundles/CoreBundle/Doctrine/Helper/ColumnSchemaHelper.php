@@ -50,8 +50,6 @@ class ColumnSchemaHelper
      *
      * @param bool $addPrefix
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
     public function setName($table, $addPrefix = true): static
@@ -133,8 +131,6 @@ class ColumnSchemaHelper
      *
      * @param bool $checkExists Check if table exists; pass false if this has already been done
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
     public function addColumn(array $column, $checkExists = true): static
@@ -176,8 +172,6 @@ class ColumnSchemaHelper
 
     /**
      * Drops a column from table.
-     *
-     * @return $this
      */
     public function dropColumn($columnName): static
     {

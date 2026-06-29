@@ -18,7 +18,7 @@ class LoadAssetDataTest extends MauticMysqlTestCase
             ['id' => 'DESC']
         );
         self::assertInstanceOf(Asset::class, $asset);
-        self::assertEquals('asset1', $asset->getAlias());
+        self::assertSame('asset1', $asset->getAlias());
         self::assertEquals('@TOCHANGE: Asset1 Original File Name', $asset->getOriginalFileName());
         self::assertEquals('fdb8e28357b02d12d068de3e5661832e21bc08ec.doc', $asset->getPath());
         self::assertEquals(1, $asset->getDownloadCount());
@@ -30,6 +30,6 @@ class LoadAssetDataTest extends MauticMysqlTestCase
     public function testLoadFixturesOrder(): void
     {
         $loadAssetData = new LoadAssetData();
-        self::assertEquals(10, $loadAssetData->getOrder());
+        self::assertSame(10, $loadAssetData->getOrder());
     }
 }

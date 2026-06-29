@@ -227,13 +227,11 @@ class UserModelTest extends TestCase
 
         $this->entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (UserInvite $invite) use ($email, $role): bool {
-                return $email === $invite->getEmail()
-                    && 32 === strlen((string) $invite->getTokenSelector())
-                    && str_starts_with((string) $invite->getTokenVerifierHash(), '$')
-                    && $role === $invite->getRole()
-                    && $invite->getExpiration() > new \DateTime();
-            }));
+            ->with($this->callback(fn (UserInvite $invite): bool => $email === $invite->getEmail()
+                && 32 === strlen((string) $invite->getTokenSelector())
+                && str_starts_with((string) $invite->getTokenVerifierHash(), '$')
+                && $role === $invite->getRole()
+                && $invite->getExpiration() > new \DateTime()));
 
         $this->entityManager->expects($this->once())
             ->method('flush');

@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -21,8 +20,6 @@ class ImportHelperTest extends TestCase
     private ExportHelper $exportHelper;
 
     private ImportHelper $importHelper;
-
-    private PathsHelper&MockObject $pathsHelper;
 
     /**
      * @var array<string>
@@ -43,17 +40,17 @@ class ImportHelperTest extends TestCase
 
         $systemTempDirBase = sys_get_temp_dir().'/import_helper_test';
         $this->paths[]     = $systemTempDirBase;
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper       = $this->createMock(PathsHelper::class);
 
         $testTempDir = $systemTempDirBase.'/tmp';
-        $this->pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
+        $pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
         $filesystem->mkdir($testTempDir);
 
         $mediaDir = $systemTempDirBase.'/media';
-        $this->pathsHelper->method('getMediaPath')->willReturn($mediaDir);
+        $pathsHelper->method('getMediaPath')->willReturn($mediaDir);
         $filesystem->mkdir($mediaDir);
 
-        $this->importHelper = new ImportHelper($this->pathsHelper);
+        $this->importHelper = new ImportHelper($pathsHelper);
     }
 
     protected function tearDown(): void

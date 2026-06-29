@@ -254,8 +254,6 @@ class FormEntity extends CommonEntity
      * Set dateAdded.
      *
      * @param \DateTime $dateAdded
-     *
-     * @return $this
      */
     public function setDateAdded($dateAdded): static
     {
@@ -278,8 +276,6 @@ class FormEntity extends CommonEntity
      * Set dateModified.
      *
      * @param \DateTime $dateModified
-     *
-     * @return $this
      */
     public function setDateModified($dateModified): static
     {
@@ -303,8 +299,6 @@ class FormEntity extends CommonEntity
      * Set checkedOut.
      *
      * @param \DateTime $checkedOut
-     *
-     * @return $this
      */
     public function setCheckedOut($checkedOut): static
     {
@@ -325,8 +319,6 @@ class FormEntity extends CommonEntity
 
     /**
      * @param User|int|null $createdBy
-     *
-     * @return $this
      */
     public function setCreatedBy($createdBy = null): static
     {
@@ -416,8 +408,6 @@ class FormEntity extends CommonEntity
      * Set isPublished.
      *
      * @param bool $isPublished
-     *
-     * @return $this
      */
     public function setIsPublished($isPublished): static
     {
@@ -520,8 +510,6 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $createdByUser
-     *
-     * @return $this
      */
     public function setCreatedByUser($createdByUser): static
     {
@@ -532,8 +520,6 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $modifiedByUser
-     *
-     * @return $this
      */
     public function setModifiedByUser($modifiedByUser): static
     {
@@ -544,8 +530,6 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $checkedOutByUser
-     *
-     * @return $this
      */
     public function setCheckedOutByUser($checkedOutByUser): static
     {

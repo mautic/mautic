@@ -109,13 +109,13 @@ final class PageHitValidatorTest extends TestCase
             ->willReturn(true);
 
         // mock the violation builder
-        $builder = $this->getMockBuilder('Symfony\Component\Validator\Violation\ConstraintViolationBuilder')
+        $builder = $this->getMockBuilder(\Symfony\Component\Validator\Violation\ConstraintViolationBuilder::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['addViolation'])
             ->getMock();
 
         // mock the validator context
-        $context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
+        $context = $this->getMockBuilder(\Symfony\Component\Validator\Context\ExecutionContext::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['buildViolation'])
             ->getMock();

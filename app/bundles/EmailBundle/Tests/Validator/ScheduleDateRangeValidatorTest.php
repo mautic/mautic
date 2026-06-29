@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class ScheduleDateRangeValidatorTest extends TestCase
 {
-    private ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject $context;
+    private \PHPUnit\Framework\MockObject\MockObject $context;
     private ScheduleDateRangeValidator $validator;
 
     protected function setUp(): void

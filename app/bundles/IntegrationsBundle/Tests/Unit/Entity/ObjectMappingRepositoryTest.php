@@ -32,7 +32,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->repository = $this->configureRepository(ObjectMapping::class);
 
-        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->entityManager));
+        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->entityManager));
 
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
         $this->query = $this->getMockBuilder(Query::class)

@@ -55,8 +55,6 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param string $queryPartName
      * @param mixed  $value
-     *
-     * @return $this
      */
     public function setQueryPart($queryPartName, $value): static
     {
@@ -167,8 +165,6 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * Add AND condition to existing table alias.
      *
-     * @return $this
-     *
      * @throws QueryException
      */
     public function addJoinCondition($alias, $expr): static
@@ -193,9 +189,6 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function replaceJoinCondition($alias, $expr): static
     {
         $parts = $this->getQueryPart('join');
@@ -379,9 +372,6 @@ class QueryBuilder extends BaseQueryBuilder
         return $stack;
     }
 
-    /**
-     * @return $this
-     */
     private function addLogicStack($expression): static
     {
         $this->logicStack[] = $expression;
@@ -424,8 +414,6 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Apply content of stack.
-     *
-     * @return $this
      */
     public function applyStackLogic(): static
     {

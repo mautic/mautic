@@ -14,21 +14,17 @@ class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&SessionInterface $session;
 
-    private MockObject&RequestStack $requestStack;
-
-    private MockObject&CoreParametersHelper $coreParametersHelper;
-
     private PageHelper $pageHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->session              = $this->createMock(SessionInterface::class);
-        $this->requestStack         = $this->createMock(RequestStack::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pageHelper           = new PageHelper($this->requestStack, $this->coreParametersHelper, 'mautic.test', 0);
+        $requestStack               = $this->createMock(RequestStack::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $this->pageHelper           = new PageHelper($requestStack, $coreParametersHelper, 'mautic.test', 0);
 
-        $this->requestStack->method('getSession')->willReturn($this->session);
+        $requestStack->method('getSession')->willReturn($this->session);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('PageProvider')]

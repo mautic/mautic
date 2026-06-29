@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller\Api;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -44,8 +45,8 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
-        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
-        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+        ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
+        ReflectionHelper::setValue($mailHelper, 'transport', $transport);
 
         $this->transport  = $transport;
     }
@@ -54,7 +55,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Clear owners cache (to leave a clean environment for future tests):
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
-        $this->setPrivateProperty($mailHelper, 'leadOwners', []);
+        ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
     protected function beforeBeginTransaction(): void
@@ -534,7 +535,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
 
         $user->setPassword($hasher->hash('password'));
         $this->em->persist($user);
@@ -699,15 +700,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         };
 
         $testCustomReplyTo();
-    }
-
-    /**
-     * @param mixed $value
-     */
-    private function setPrivateProperty(object $object, string $property, $value): void
-    {
-        $reflector = new \ReflectionProperty($object::class, $property);
-        $reflector->setValue($object, $value);
     }
 
     public function testGetEmails(): void

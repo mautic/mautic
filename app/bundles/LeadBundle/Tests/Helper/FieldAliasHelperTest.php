@@ -9,33 +9,29 @@ use Mautic\LeadBundle\Model\FieldModel;
 
 class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $fieldModel;
-
-    private \PHPUnit\Framework\MockObject\MockObject $fieldRepository;
-
     private FieldAliasHelper $helper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->fieldRepository = $this->createMock(LeadFieldRepository::class);
-        $this->fieldModel      = $this->getMockBuilder(FieldModel::class)
+        $fieldRepository = $this->createMock(LeadFieldRepository::class);
+        $fieldModel      = $this->getMockBuilder(FieldModel::class)
             ->onlyMethods(['cleanAlias', 'getRepository'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->fieldRepository->method('getAliases')->willReturn([
+        $fieldRepository->method('getAliases')->willReturn([
             'title',
             'firstname',
             'lastname',
         ]);
 
-        $this->fieldModel->method('cleanAlias')->willReturnCallback(fn () => func_get_args()[0]);
+        $fieldModel->method('cleanAlias')->willReturnCallback(fn (): mixed => func_get_args()[0]);
 
-        $this->fieldModel->method('getRepository')->willReturn($this->fieldRepository);
+        $fieldModel->method('getRepository')->willReturn($fieldRepository);
 
-        $this->helper = new FieldAliasHelper($this->fieldModel);
+        $this->helper = new FieldAliasHelper($fieldModel);
     }
 
     public function testDuplicatedAliasWithAliasSet(): void

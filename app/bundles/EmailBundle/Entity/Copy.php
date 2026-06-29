@@ -53,9 +53,6 @@ class Copy
         $builder->addNullableField('subject', 'text');
     }
 
-    /**
-     * @return $this
-     */
     public function setId($id): static
     {
         $this->id = $id;
