@@ -634,8 +634,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param ?string $name
-     *
-     * @return $this
      */
     public function setName($name): static
     {
@@ -687,9 +685,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
     public function setCategory($category): static
     {
         $this->isChanged('category', $category);
@@ -706,9 +701,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->content;
     }
 
-    /**
-     * @return $this
-     */
     public function setContent($content): static
     {
         $this->isChanged('content', $content);
@@ -744,9 +736,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getReadCount') : $this->readCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setReadCount($readCount): static
     {
         $this->readCount = $readCount;
@@ -767,9 +756,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->revision;
     }
 
-    /**
-     * @return $this
-     */
     public function setRevision($revision): static
     {
         $this->revision = $revision;
@@ -785,9 +771,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->sessionId;
     }
 
-    /**
-     * @return $this
-     */
     public function setSessionId($sessionId): static
     {
         $this->sessionId = $sessionId;
@@ -803,9 +786,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->subject;
     }
 
-    /**
-     * @return $this
-     */
     public function setSubject($subject): static
     {
         $this->isChanged('subject', $subject);
@@ -824,8 +804,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param bool $useOwnerAsMailer
-     *
-     * @return $this
      */
     public function setUseOwnerAsMailer($useOwnerAsMailer): static
     {
@@ -944,9 +922,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->template;
     }
 
-    /**
-     * @return $this
-     */
     public function setTemplate($template): static
     {
         $this->isChanged('template', $template);
@@ -967,9 +942,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->publishDown;
     }
 
-    /**
-     * @return $this
-     */
     public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
@@ -986,9 +958,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->publishUp;
     }
 
-    /**
-     * @return $this
-     */
     public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
@@ -1007,9 +976,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
@@ -1025,9 +991,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return ($includeVariants) ? $this->getAccumulativeVariantCount('getVariantSentCount') : $this->variantSentCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setVariantSentCount($variantSentCount): static
     {
         $this->variantSentCount = $variantSentCount;
@@ -1103,9 +1066,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->plainText;
     }
 
-    /**
-     * @return $this
-     */
     public function setPlainText($plainText): static
     {
         $this->plainText = $plainText;
@@ -1139,9 +1099,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->variantReadCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setVariantReadCount($variantReadCount): static
     {
         $this->variantReadCount = $variantReadCount;
@@ -1165,9 +1122,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->customHtml;
     }
 
-    /**
-     * @return $this
-     */
     public function setCustomHtml($customHtml): static
     {
         $this->customHtml = $customHtml;
@@ -1183,9 +1137,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->unsubscribeForm;
     }
 
-    /**
-     * @return $this
-     */
     public function setUnsubscribeForm(?Form $unsubscribeForm = null): static
     {
         $this->unsubscribeForm = $unsubscribeForm;
@@ -1201,9 +1152,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->preferenceCenter;
     }
 
-    /**
-     * @return $this
-     */
     public function setPreferenceCenter(?Page $preferenceCenter = null): static
     {
         $this->isChanged('preferenceCenter', $preferenceCenter);
@@ -1332,8 +1280,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param bool $publicPreview
-     *
-     * @return $this
      */
     public function setPublicPreview($publicPreview): static
     {
@@ -1345,8 +1291,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param int $count
-     *
-     * @return $this
      */
     public function setQueuedCount($count): static
     {
@@ -1365,8 +1309,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @param int $count
-     *
-     * @return $this
      */
     public function setPendingCount($count): static
     {
@@ -1391,6 +1333,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function isBackgroundSending(): bool
     {
         return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
+    }
+
+    public function isSegmentEmail(): bool
+    {
+        return 'list' === $this->getEmailType();
     }
 
     private function listsChangedAdd(string $property, ?int $id): void
@@ -1459,9 +1406,30 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $keys;
     }
 
-    public function isSegmentEmail(): bool
+    public function waitingToSendTestsEmails(int $totalLeadCountForVariants): bool
     {
-        return 'list' === $this->getEmailType();
+        return $this->getVariantSentCount(true) < $totalLeadCountForVariants && !$this->isWinner();
+    }
+
+    public function waitingToDetermineWinner(int $totalLeadCountForVariants): bool
+    {
+        $variantSentCount = $this->getVariantSentCount(true);
+
+        $isWinner = $this->isWinner();
+
+        return $variantSentCount >= $totalLeadCountForVariants && !$isWinner;
+    }
+
+    public function increaseVariantCount(): bool
+    {
+        return $this->isVariant() && !$this->isWinner();
+    }
+
+    public function isWinner(): bool
+    {
+        $variantSettings = $this->getVariantParent() ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
+
+        return true === (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
     }
 
     public function getSendingStatus(): string
@@ -1489,6 +1457,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function shouldCheckForUnpublishEmail(): bool
     {
         if ($this->isContinueSending()) {
+            return false;
+        }
+
+        if ($this->isEnableAbTest() && !$this->isWinner()) {
             return false;
         }
 

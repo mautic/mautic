@@ -19,12 +19,12 @@ abstract class AbstractStepTestCase extends TestCase
     /**
      * @var MockObject|InputInterface
      */
-    protected $input;
+    protected MockObject $input;
 
     /**
      * @var MockObject|OutputInterface
      */
-    protected $output;
+    protected MockObject $output;
 
     protected function setUp(): void
     {
@@ -39,5 +39,15 @@ abstract class AbstractStepTestCase extends TestCase
             ->willReturn($formatter);
 
         $this->progressBar = new ProgressBar($this->output);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
     }
 }

@@ -248,7 +248,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -265,7 +265,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
-        $this->assertEquals($this->expectedPngContent, $content);
+        $this->assertSame($this->expectedPngContent, $content);
     }
 
     /**
@@ -281,7 +281,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         ob_end_clean();
 
         $this->assertResponseIsSuccessful($content);
-        $this->assertNotEquals($this->expectedPngContent, $content);
+        $this->assertNotSame($this->expectedPngContent, $content);
         self::assertResponseIsSuccessful();
 
         PageControllerTest::assertStringContainsString(
@@ -471,7 +471,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
         // Set new permissions
         $role->setIsAdmin(false);
         $roleModel = static::getContainer()->get('mautic.user.model.role');
-        \assert($roleModel instanceof RoleModel);
+        $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();

@@ -27,7 +27,7 @@ class UserLogoutFunctionalTest extends MauticMysqlTestCase
         $user->setEmail('john.doe@email.com');
         $user->setRole($role);
         $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $this->em->persist($user);
 

@@ -110,7 +110,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $mapper->getArray());
+        $this->assertSame($expected, $mapper->getArray());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that contacts do not inherit previous contact information')]
@@ -148,7 +148,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $mapper->getArray());
+        $this->assertSame($expected, $mapper->getArray());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that array is generated according to the mapping')]
@@ -172,8 +172,8 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 'id'         => 'def',
-                'First Name' => 'FirstName2',
                 'Email'      => 'zoho2@email.com',
+                'First Name' => 'FirstName2',
                 'Last Name'  => 'LastName2',
             ],
             [
@@ -184,7 +184,7 @@ class MapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $mapper->getArray());
+        $this->assertSame($expected, $mapper->getArray());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test asking for a key returns the correct contact')]

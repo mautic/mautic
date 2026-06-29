@@ -85,10 +85,8 @@ final class ExampleIntegration extends BasicIntegration implements IntegrationIn
 
     /**
      * Likely will get this mapping out of the Integration's settings.
-     *
-     * @return array
      */
-    private function getConfiguredFieldMapping()
+    private function getConfiguredFieldMapping(): array
     {
         return [
             'first_name' => 'firstname',

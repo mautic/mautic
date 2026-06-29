@@ -36,16 +36,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
 
     private MockObject $translator;
 
-    private MockObject $kernel;
-
     private MockObject $validator;
-
-    private UserPasswordHasher $hasher;
-
-    /**
-     * @var MockObject&FixturesLoaderInterface
-     */
-    private MockObject $fixtureLoader;
 
     private InstallService $installer;
 
@@ -58,10 +49,10 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->kernel               = $this->createMock(KernelInterface::class);
+        $kernel                     = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $this->hasher               = $this->createMock(UserPasswordHasher::class);
-        $this->fixtureLoader        = $this->createMock(FixturesLoaderInterface::class);
+        $hasher                     = $this->createMock(UserPasswordHasher::class);
+        $fixtureLoader              = $this->createMock(FixturesLoaderInterface::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -69,10 +60,10 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->pathsHelper,
             $this->entityManager,
             $this->translator,
-            $this->kernel,
+            $kernel,
             $this->validator,
-            $this->hasher,
-            $this->fixtureLoader
+            $hasher,
+            $fixtureLoader
         );
     }
 
@@ -154,7 +145,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->with('test', [], null, null)
             ->willReturn('test');
 
-        $this->assertEquals($messages, $this->installer->checkRequirements($step));
+        $this->assertSame($messages, $this->installer->checkRequirements($step));
     }
 
     public function testCheckOptionalSettings(): void
@@ -171,7 +162,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->with('test', [], null, null)
             ->willReturn('test');
 
-        $this->assertEquals($messages, $this->installer->checkOptionalSettings($step));
+        $this->assertSame($messages, $this->installer->checkOptionalSettings($step));
     }
 
     public function testSaveConfigurationWhenNoCacheClear(): void
@@ -193,7 +184,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->configurator->expects($this->once())
             ->method('mergeParameters');
 
-        $this->assertEquals($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
+        $this->assertSame($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
     }
 
     public function testSaveConfigurationWhenCacheClear(): void
@@ -218,7 +209,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->cacheHelper->expects($this->once())
             ->method('refreshConfig');
 
-        $this->assertEquals($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
+        $this->assertSame($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
     }
 
     public function testValidateDatabaseParamsWhenNoRequired(): void
@@ -261,7 +252,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'user'   => 'mautic',
         ];
 
-        $this->assertEquals([], $this->installer->validateDatabaseParams($dbParams));
+        $this->assertSame([], $this->installer->validateDatabaseParams($dbParams));
     }
 
     public function testValidateDatabaseParamsWhenDriverNotValid(): void
@@ -374,6 +365,6 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             }
         });
 
-        $this->assertEquals([0 => 'password'], $this->installer->createAdminUserStep($data));
+        $this->assertSame([0 => 'password'], $this->installer->createAdminUserStep($data));
     }
 }

@@ -26,8 +26,6 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
 
     /**
      * Allow a many-to-one to be the ID.
-     *
-     * @return $this
      */
     public function isPrimaryKey(): static
     {
@@ -39,8 +37,6 @@ class AssociationBuilder extends \Doctrine\ORM\Mapping\Builder\AssociationBuilde
     /**
      * Mark this association as the parent for ownership/permission checks.
      * Used by entities that implement getPermissionUser() to delegate to a parent entity.
-     *
-     * @return $this
      */
     public function isOwnershipParent(): static
     {

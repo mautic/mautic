@@ -29,7 +29,7 @@ final class EmailStatModelTest extends TestCase
         $statRepository->expects($this->once())
             ->method('saveEntities')
             ->willReturnCallback(
-                function (array $entities) {
+                function (array $entities): void {
                     Assert::assertCount(1, $entities);
                     Assert::assertInstanceOf(StatTest::class, $entities[0]);
 

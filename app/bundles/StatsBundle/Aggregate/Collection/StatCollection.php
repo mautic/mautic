@@ -24,8 +24,6 @@ class StatCollection
      * @param int $hour
      * @param int $count
      *
-     * @return $this
-     *
      * @throws \Exception
      */
     public function addStat($year, $month, $day, $hour, $count): static
@@ -42,8 +40,6 @@ class StatCollection
 
     /**
      * @param int $count
-     *
-     * @return $this
      *
      * @throws \Exception
      */
@@ -63,8 +59,6 @@ class StatCollection
     }
 
     /**
-     * @return $this
-     *
      * @throws \Exception
      */
     public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count): static

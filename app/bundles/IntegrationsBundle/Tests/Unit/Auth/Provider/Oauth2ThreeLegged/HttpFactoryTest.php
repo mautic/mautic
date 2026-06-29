@@ -24,7 +24,7 @@ class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('oauth2_three_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth2_three_legged', (new HttpFactory())->getAuthType());
     }
 
     public function testMissingAuthorizationUrlThrowsException(): void
@@ -135,7 +135,7 @@ class HttpFactoryTest extends TestCase
          * https://github.com/guzzle/guzzle/issues/3114#issuecomment-1627228395.
          */
         /** @phpstan-ignore-next-line */
-        $this->assertEquals('https://mautic.com', (string) $client->getConfig('base_uri'));
+        $this->assertSame('https://mautic.com', (string) $client->getConfig('base_uri'));
     }
 
     public function testMissingClientIdThrowsException(): void

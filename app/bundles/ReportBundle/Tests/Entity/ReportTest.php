@@ -134,10 +134,7 @@ class ReportTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($report->isScheduledNow());
     }
 
-    /**
-     * @return Report
-     */
-    private function getInvalidReport()
+    private function getInvalidReport(): Report
     {
         $report = new Report();
         $report->setIsScheduled(true);
