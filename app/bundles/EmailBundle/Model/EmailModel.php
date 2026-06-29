@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
@@ -45,6 +46,7 @@ use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
+use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
@@ -122,6 +124,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         CoreParametersHelper $coreParametersHelper,
         private EmailStatModel $emailStatModel,
         private BotRatioHelper $botRatioHelper,
+        private AbTestSettingsService $abTestSettingsService,
+        private EmailVariantConverterService $variantConverterService,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -1243,24 +1247,29 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                 $childrenVariant = $email->getVariantChildren();
 
                 if (count($childrenVariant)) {
-                    $variantWeight = 0;
-                    $totalSent     = $emailSettings[$email->getId()]['variantCount'];
+                    $totalSent      = $emailSettings[$email->getId()]['variantCount'];
+                    $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
+
+                    // Normalize weights: AbTestSettingsService returns weights relative to totalWeight
+                    // (e.g. {319: 5, 320: 5} for totalWeight=10), but sendEmail expects weights summing to 1.0
+                    $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
 
                     foreach ($childrenVariant as $child) {
                         if ($child->isPublished()) {
-                            $variantSettings                = $child->getVariantSettings();
+                            $childWeight = $totalAbWeight > 0
+                                ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
+                                : 0;
+
                             $emailSettings[$child->getId()] = [
                                 'template'     => $child->getTemplate(),
                                 'sentCount'    => $child->getSentCount(),
                                 'variantCount' => $child->getVariantSentCount(),
                                 'isVariant'    => null !== $email->getVariantStartDate(),
-                                'weight'       => ($variantSettings['weight'] / 100),
+                                'weight'       => $childWeight,
                                 'entity'       => $child,
                                 'translations' => $child->getTranslations(true),
                                 'languages'    => ['default' => $child->getId()],
                             ];
-
-                            $variantWeight += $variantSettings['weight'];
 
                             if ($emailSettings[$child->getId()]['translations']) {
                                 // Add in the sent counts for translations of this email
@@ -1287,8 +1296,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                         }
                     }
 
-                    // set parent weight
-                    $emailSettings[$email->getId()]['weight'] = ((100 - $variantWeight) / 100);
+                    // set parent weight (normalized)
+                    $emailSettings[$email->getId()]['weight'] = $totalAbWeight > 0
+                        ? $abTestSettings['variants'][$email->getId()]['weight'] / $totalAbWeight
+                        : 1;
                 } else {
                     $emailSettings[$email->getId()]['weight'] = 1;
                 }
@@ -2446,5 +2457,112 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
         // Default to false if not found (shouldn't happen in normal operation)
         return false;
+    }
+
+    /**
+     * @return array{hours: int, minutes: int}|null
+     */
+    public function timeLeftToDetermineWinner(int $emailId, ?int $delayHours): ?array
+    {
+        if (!$delayHours) {
+            return null;
+        }
+
+        $lastSentDate = $this->getStatRepository()->getEmailSentLastDate($emailId);
+
+        if (!$lastSentDate) {
+            // No emails sent yet — fall back to variant_start_date
+            $email            = $this->getEntity($emailId);
+            [$parent]         = $email->getVariants();
+            $variantStartDate = $parent->getVariantStartDate();
+            if ($variantStartDate) {
+                $startDate = clone $variantStartDate;
+                $startDate->setTimezone(new \DateTimeZone('UTC'));
+            } else {
+                return ['hours' => $delayHours, 'minutes' => 0];
+            }
+        } else {
+            $startDate = new \DateTime($lastSentDate, new \DateTimeZone('UTC'));
+        }
+
+        $sendWinnerTime = clone $startDate;
+        $sendWinnerTime->modify("+{$delayHours} hours");
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        if ($now > $sendWinnerTime) {
+            return null;
+        }
+
+        $interval = $now->diff($sendWinnerTime);
+
+        return ['hours' => $interval->h + ($interval->days * 24), 'minutes' => $interval->i];
+    }
+
+    /**
+     * Gets emails with published variants for automatic determination of a winner variant.
+     *
+     * @return array<Email>
+     */
+    public function getEmailsToSendWinnerVariant(): array
+    {
+        $emails = $this->getRepository()->getPublishedEmailsWithVariant();
+
+        $emailsToSend = [];
+
+        foreach ($emails as $email) {
+            $variantSettings = $email->getVariantSettings();
+
+            if (array_key_exists('totalWeight', $variantSettings)
+                && array_key_exists('sendWinnerDelay', $variantSettings)
+                && $variantSettings['totalWeight'] < AbTestSettingsService::DEFAULT_TOTAL_WEIGHT
+                && $variantSettings['sendWinnerDelay'] > 0
+            ) {
+                $emailsToSend[] = $email;
+            }
+        }
+
+        return $emailsToSend;
+    }
+
+    public function isReadyToSendWinner(int $emailId, int $delayHours): bool
+    {
+        $lastSentDate = $this->getStatRepository()->getEmailSentLastDate($emailId);
+
+        if (!$lastSentDate) {
+            return false;
+        }
+
+        $sendWinnerTime = new \DateTime($lastSentDate, new \DateTimeZone('UTC'));
+        $sendWinnerTime->modify("+{$delayHours} hours");
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return $now > $sendWinnerTime;
+    }
+
+    public function convertWinnerVariant(Email $entity): void
+    {
+        // let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        try {
+            $oldParent = $entity->getVariantParent();
+
+            $this->variantConverterService->convertWinnerVariant($entity);
+
+            if ($oldParent instanceof Email) {
+                $entity->setPublishUp($oldParent->getPublishUp());
+                $entity->setPublishDown($oldParent->getPublishDown());
+                $entity->setContinueSending($oldParent->getContinueSending());
+            }
+
+            /** @var iterable<Email> $save */
+            $save = $this->variantConverterService->getUpdatedVariants();
+
+            $this->getRepository()->saveEntities($save);
+        } finally {
+            $this->inConversion = false;
+        }
     }
 }

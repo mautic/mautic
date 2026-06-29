@@ -2,13 +2,16 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
 class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private array $lead = [
         'firstname' => 'Bob',
         'lastname'  => 'Smith',
@@ -25,8 +28,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $reflectionProperty = new \ReflectionProperty(TokenHelper::class, 'parameters');
-        $reflectionProperty->setValue(null, [
+        ReflectionHelper::setStaticValue(TokenHelper::class, 'parameters', [
             'date_format_dateonly' => 'F j, Y',
             'date_format_timeonly' => 'g:i a',
         ]);
@@ -46,8 +48,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getFields')
             ->willReturn($fields);
 
-        $reflectionProperty = new \ReflectionProperty(LeadRepository::class, 'leadFieldRepository');
-        $reflectionProperty->setValue(null, $leadFieldRepository);
+        ReflectionHelper::setStaticValue(LeadRepository::class, 'leadFieldRepository', $leadFieldRepository);
 
         parent::setUp();
     }

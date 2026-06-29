@@ -910,8 +910,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Reset point changes.
-     *
-     * @return $this
      */
     public function resetPointChanges(): static
     {
@@ -1049,8 +1047,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param bool $enabled
      * @param bool $mobile
-     *
-     * @return $this
      */
     public function addPushIDEntry($identifier, $enabled = true, $mobile = false): static
     {
@@ -1079,9 +1075,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function addPushID(PushID $pushID): static
     {
         $this->pushIds[] = $pushID;
@@ -1102,9 +1095,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->pushIds;
     }
 
-    /**
-     * @return $this
-     */
     public function addEventLog(LeadEventLog $log): static
     {
         $this->eventLog[] = $log;
@@ -1129,9 +1119,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->eventLog->matching($criteria)->first() ?: null;
     }
 
-    /**
-     * @return $this
-     */
     public function addDoNotContactEntry(DoNotContact $doNotContact): static
     {
         $this->changes['dnc_channel_status'][$doNotContact->getChannel()] = [
@@ -1379,8 +1366,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set tags.
-     *
-     * @return $this
      */
     public function setTags($tags): static
     {
@@ -1401,8 +1386,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
 
     /**
      * Set utm tags.
-     *
-     * @return $this
      */
     public function setUtmTags($utmTags): static
     {
@@ -1856,9 +1839,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->channelRules;
     }
 
-    /**
-     * @return $this
-     */
     public function setChannelRules(array $rules): static
     {
         $this->channelRules = $rules;

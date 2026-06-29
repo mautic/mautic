@@ -112,7 +112,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $callbackCounter = 0;
         $this->scheduler->expects($this->exactly(4))
             ->method('validateAndScheduleEventForContacts')
-            ->willReturnCallback(function () use (&$callbackCounter) {
+            ->willReturnCallback(function () use (&$callbackCounter): void {
                 ++$callbackCounter;
                 if (in_array($callbackCounter, [3, 4])) {
                     throw new NotSchedulableException();
@@ -120,7 +120,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             });
 
         $this->executioner->expects($this->exactly(1))
-            ->method('executeEventsForContacts')->willReturnCallback(function (...$parameters) {
+            ->method('executeEventsForContacts')->willReturnCallback(function (...$parameters): void {
                 $this->assertCount(2, $parameters[0]);
                 $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
                 $this->assertInstanceOf(Counter::class, $parameters[2]);

@@ -31,7 +31,7 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function onCampaignTriggerHasActiveCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerHasActiveCondition(CampaignExecutionEvent $event): void
     {
         if (!$event->checkContext('notification.has.active')) {
             return;
@@ -41,10 +41,12 @@ class CampaignConditionSubscriber implements EventSubscriberInterface
         /** @var PushID $pushID */
         foreach ($pushIds as $pushID) {
             if ($pushID->isEnabled()) {
-                return $event->setResult(true);
+                $event->setResult(true);
+
+                return;
             }
         }
 
-        return $event->setResult(false);
+        $event->setResult(false);
     }
 }

@@ -36,7 +36,7 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($leadField);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
-        $this->assertEquals(1, count($fields));
+        $this->assertCount(1, $fields);
     }
 
     public function testGetLeadCustomFieldsSchemaDetails(): void
@@ -53,6 +53,6 @@ final class FieldModelCustomFieldsFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($leadField);
 
         $schemas = $fieldModel->getLeadFieldCustomFieldSchemaDetails();
-        $this->assertEquals(1, count($schemas));
+        $this->assertCount(1, $schemas);
     }
 }

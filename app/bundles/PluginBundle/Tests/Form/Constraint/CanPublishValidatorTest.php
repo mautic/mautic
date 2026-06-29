@@ -20,12 +20,12 @@ class CanPublishValidatorTest extends TestCase
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var MockObject|PluginIsPublishedEvent
      */
-    private $event;
+    private MockObject $event;
     private CanPublishValidator $canPublishValidator;
 
     protected function setUp(): void

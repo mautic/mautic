@@ -19,12 +19,12 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $this->configureTwilioWithArrayTransport();
 
         $integration = $this->getContainer()->get('mautic.integration.twilio');
-        \assert($integration instanceof TwilioIntegration);
+        $this->assertInstanceOf(TwilioIntegration::class, $integration);
 
         $integrationRepository = $this->em->getRepository(Integration::class);
 
         $integrationConfig = $integrationRepository->findOneBy(['name' => $integration->getName()]);
-        \assert($integrationConfig instanceof Integration);
+        $this->assertInstanceOf(Integration::class, $integrationConfig);
         Assert::assertSame('messaging_sid', $integrationConfig->getFeatureSettings()['messaging_service_sid']);
     }
 }

@@ -104,7 +104,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
         $listModel = $this->getContainer()->get('mautic.lead.model.list');
-        \assert($listModel instanceof ListModel);
+        $this->assertInstanceOf(ListModel::class, $listModel);
 
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
         self::assertSame(5, $leadCount);
@@ -128,7 +128,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     {
         // Add 5 contacts
         $contactRepo = $this->em->getRepository(Lead::class);
-        \assert($contactRepo instanceof LeadRepository);
+        $this->assertInstanceOf(LeadRepository::class, $contactRepo);
 
         $contacts = [];
 
@@ -149,7 +149,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     private function saveSegment(string $name, string $alias, array $filters): LeadList
     {
         $segmentRepo = $this->em->getRepository(LeadList::class);
-        \assert($segmentRepo instanceof LeadListRepository);
+        $this->assertInstanceOf(LeadListRepository::class, $segmentRepo);
         $segment     = new LeadList();
         $segment->setName($name)
             ->setPublicName($name)

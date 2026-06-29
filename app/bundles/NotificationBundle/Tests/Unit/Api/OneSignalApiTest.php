@@ -18,23 +18,23 @@ class OneSignalApiTest extends TestCase
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_subtitle' => 'test']]);
-        $this->assertEquals(['subtitle' => ['en' => 'test']], $data);
+        $this->assertSame(['subtitle' => ['en' => 'test']], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_sound' => 'test']]);
-        $this->assertEquals(['ios_sound' => 'test'], $data);
+        $this->assertSame(['ios_sound' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_sound' => '']]);
-        $this->assertEquals(['ios_sound' => 'default'], $data);
+        $this->assertSame(['ios_sound' => 'default'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_badges' => 'test']]);
-        $this->assertEquals(['ios_badgeType' => 'test'], $data);
+        $this->assertSame(['ios_badgeType' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_badgeCount' => '5']]);
-        $this->assertEquals(['ios_badgeCount' => 5], $data);
+        $this->assertSame(['ios_badgeCount' => 5], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['ios_contentAvailable' => true]]);
@@ -46,35 +46,35 @@ class OneSignalApiTest extends TestCase
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_sound' => 'test']]);
-        $this->assertEquals(['android_sound' => 'test'], $data);
+        $this->assertSame(['android_sound' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_small_icon' => 'test']]);
-        $this->assertEquals(['small_icon' => 'test'], $data);
+        $this->assertSame(['small_icon' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_large_icon' => 'test']]);
-        $this->assertEquals(['large_icon' => 'test'], $data);
+        $this->assertSame(['large_icon' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_big_picture' => 'test']]);
-        $this->assertEquals(['big_picture' => 'test'], $data);
+        $this->assertSame(['big_picture' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_led_color' => 'test']]);
-        $this->assertEquals(['android_led_color' => 'FFTEST'], $data);
+        $this->assertSame(['android_led_color' => 'FFTEST'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_accent_color' => 'test']]);
-        $this->assertEquals(['android_accent_color' => 'FFTEST'], $data);
+        $this->assertSame(['android_accent_color' => 'FFTEST'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_group_key' => 'test']]);
-        $this->assertEquals(['android_group' => 'test'], $data);
+        $this->assertSame(['android_group' => 'test'], $data);
 
         $data = [];
         $method->invokeArgs($mockOneSignalApi, [&$data, ['android_lockscreen_visibility' => 1]]);
-        $this->assertEquals(['android_visibility' => 1], $data);
+        $this->assertSame(['android_visibility' => 1], $data);
 
         $data         = [];
         $mobileConfig = ['additional_data' => ['list' => [
@@ -84,6 +84,6 @@ class OneSignalApiTest extends TestCase
         ],
         ];
         $method->invokeArgs($mockOneSignalApi, [&$data, $mobileConfig]);
-        $this->assertEquals(['data' => ['a' => 1, 'b' => 2]], $data);
+        $this->assertSame(['data' => ['a' => 1, 'b' => 2]], $data);
     }
 }

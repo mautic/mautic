@@ -102,7 +102,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $fieldRepository = $this->em->getRepository(LeadField::class);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
-        \assert($emailField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $emailField);
         Assert::assertSame('Email', $emailField->getLabel());
     }
 

@@ -12,7 +12,6 @@ class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
 {
     private WidgetDetailEvent $widgetDetailEvent;
     private MockObject $translator;
-    private MockObject $security;
     private MockObject $widget;
 
     protected function setUp(): void
@@ -20,12 +19,12 @@ class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->translator            = $this->createMock(Translator::class);
-        $this->security              = $this->createMock(CorePermissions::class);
+        $security                    = $this->createMock(CorePermissions::class);
         $this->widget                = $this->createMock(Widget::class);
 
         $this->widgetDetailEvent = new WidgetDetailEvent(
             $this->translator,
-            $this->security,
+            $security,
             $this->widget
         );
     }

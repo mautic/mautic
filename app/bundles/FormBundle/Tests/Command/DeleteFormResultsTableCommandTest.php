@@ -62,7 +62,7 @@ class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
 
         $commandTester->execute([]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
         $outputMessage = $commandTester->getDisplay();
         $message       = "Dropped {$deletedForms} form results table whose forms have been deleted";
 
