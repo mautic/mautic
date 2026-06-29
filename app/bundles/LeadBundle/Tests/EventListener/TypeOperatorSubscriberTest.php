@@ -51,11 +51,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $emailModel;
 
     /**
-     * @var MockObject&StageModel
-     */
-    private MockObject $stageModel;
-
-    /**
      * @var MockObject&StageRepository
      */
     private MockObject $stageRepository;
@@ -69,26 +64,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&AssetModel
      */
     private MockObject $assetModel;
-
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&CompanySegmentModel
-     */
-    private MockObject $companySegmentModel;
-
-    /**
-     * @var MockObject&FieldChoicesProviderInterface
-     */
-    private MockObject $fieldChoicesProvider;
-
-    /**
-     * @var MockObject&TypeOperatorProviderInterface
-     */
-    private MockObject $typeOperatorProvider;
 
     /**
      * @var MockObject&FormInterface<FormInterface<mixed>>
@@ -105,31 +80,31 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listModel             = $this->createMock(ListModel::class);
         $this->campaignModel         = $this->createMock(CampaignModel::class);
         $this->emailModel            = $this->createMock(EmailModel::class);
-        $this->stageModel            = $this->createMock(StageModel::class);
+        $stageModel                  = $this->createMock(StageModel::class);
         $this->stageRepository       = $this->createMock(StageRepository::class);
         $this->categoryModel         = $this->createMock(CategoryModel::class);
         $this->assetModel            = $this->createMock(AssetModel::class);
-        $this->translator            = $this->createMock(TranslatorInterface::class);
-        $this->companySegmentModel   = $this->createMock(CompanySegmentModel::class);
-        $this->fieldChoicesProvider  = $this->createMock(FieldChoicesProviderInterface::class);
-        $this->typeOperatorProvider  = $this->createMock(TypeOperatorProviderInterface::class);
+        $translator                  = $this->createMock(TranslatorInterface::class);
+        $companySegmentModel         = $this->createMock(CompanySegmentModel::class);
+        $fieldChoicesProvider        = $this->createMock(FieldChoicesProviderInterface::class);
+        $typeOperatorProvider        = $this->createMock(TypeOperatorProviderInterface::class);
         $this->form                  = $this->createMock(FormInterface::class);
         $this->subscriber            = new TypeOperatorSubscriber(
             $this->leadModel,
             $this->listModel,
             $this->campaignModel,
             $this->emailModel,
-            $this->stageModel,
+            $stageModel,
             $this->categoryModel,
             $this->assetModel,
-            $this->translator,
-            $this->companySegmentModel,
-            $this->fieldChoicesProvider,
-            $this->typeOperatorProvider
+            $translator,
+            $companySegmentModel,
+            $fieldChoicesProvider,
+            $typeOperatorProvider
         );
 
-        $this->stageModel->method('getRepository')->willReturn($this->stageRepository);
-        $this->translator->method('trans')->willReturnArgument(0);
+        $stageModel->method('getRepository')->willReturn($this->stageRepository);
+        $translator->method('trans')->willReturnArgument(0);
     }
 
     public function testOnTypeOperatorsCollect(): void

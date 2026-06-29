@@ -78,7 +78,7 @@ trait BaseBatchLimiterTrait
         }
 
         $ids = array_unique(array_filter(array_map(
-            fn ($id) => (string) (int) $id,
+            fn ($id): string => (string) (int) $id,
             (array) $batchLimiters['ids']
         )));
 

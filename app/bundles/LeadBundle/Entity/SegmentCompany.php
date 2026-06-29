@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class SegmentCompany
 {
     public const TABLE_NAME     = 'company_segments_companies';
+
     public const RELATIONS_NAME = 'css';
 
     private CompanySegment $companySegment;

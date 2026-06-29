@@ -47,7 +47,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class CompanySegment extends FormEntity
 {
     public const TABLE_NAME    = 'company_segments';
+
     public const LINKED_ENTITY = 'company';
+
     public const DEFAULT_ALIAS = 'cs';
 
     private ?int $id = null;

@@ -55,6 +55,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class CompanySegmentModel extends FormModel
 {
     public const PROPERTIES_FIELD = CompanySegment::TABLE_NAME;
+
     public const SEARCH_COMMAND   = 'mautic.company_segments.searchcommand.list';
 
     /**
