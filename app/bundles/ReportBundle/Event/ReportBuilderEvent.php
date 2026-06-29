@@ -269,8 +269,6 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * @param array $options
-     *
-     * @return $this
      */
     public function addGraph($context, $type, $graphId, $options = []): static
     {

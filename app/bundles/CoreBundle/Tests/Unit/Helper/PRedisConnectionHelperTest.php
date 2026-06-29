@@ -55,8 +55,9 @@ class PRedisConnectionHelperTest extends TestCase
         ];
         Assert::assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration));
 
-        $result['prefix'] = 'prf:';
-        Assert::assertEquals($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'prf:'));
+        // use as first item in array
+        $result = ['prefix' => 'prf:'] + $result;
+        Assert::assertSame($result, PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'prf:'));
 
         $redisConfiguration = [
             'password' => 'secretpass',
@@ -73,7 +74,7 @@ class PRedisConnectionHelperTest extends TestCase
         $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix]);
         $options = $client->getOptions();
 
-        \assert($options->prefix instanceof KeyPrefixProcessor);
+        $this->assertInstanceOf(KeyPrefixProcessor::class, $options->prefix);
         Assert::assertSame($prefix, $options->prefix->getPrefix());
         Assert::assertNull($options->aggregate);
 
@@ -84,7 +85,7 @@ class PRedisConnectionHelperTest extends TestCase
 
         if ($connection instanceof RedisCluster || $connection instanceof PredisCluster) {
             $clusterStrategy = $connection->getClusterStrategy();
-            \assert($clusterStrategy instanceof ClusterStrategy);
+            $this->assertInstanceOf(ClusterStrategy::class, $clusterStrategy);
 
             Assert::assertContains(Unlink::ID, $clusterStrategy->getSupportedCommands());
         }
@@ -96,7 +97,7 @@ class PRedisConnectionHelperTest extends TestCase
         $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix, 'replication' => 'sentinel']);
         $options = $client->getOptions();
 
-        \assert($options->prefix instanceof KeyPrefixProcessor);
+        $this->assertInstanceOf(KeyPrefixProcessor::class, $options->prefix);
         Assert::assertSame($prefix, $options->prefix->getPrefix());
         Assert::assertIsCallable($options->aggregate);
 

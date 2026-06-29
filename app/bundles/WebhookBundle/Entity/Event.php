@@ -92,9 +92,6 @@ class Event
         return $this->webhook;
     }
 
-    /**
-     * @return $this
-     */
     public function setWebhook(Webhook $webhook): static
     {
         $this->webhook = $webhook;

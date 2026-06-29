@@ -30,7 +30,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
      */
     public function testEmailContactsGridWithValidPermissions(): void
     {
-        list($email, $contactOne, $contactTwo) = $this->setupData();
+        [$email, $contactOne, $contactTwo] = $this->setupData();
 
         // create users
         $nonAdminUser = $this->createUserWithPermission([
@@ -69,7 +69,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
     public function testEmailContactsGridWithIncompletePermissions(): void
     {
         /** @var Email $email */
-        list($email, $contactOne, $contactTwo) = $this->setupData();
+        [$email, $contactOne, $contactTwo] = $this->setupData();
 
         // create users
         $nonAdminUser = $this->createUserWithPermission([

@@ -280,8 +280,6 @@ class MailHelper
 
     /**
      * @param bool $cleanSlate
-     *
-     * @return $this
      */
     public function getMailer($cleanSlate = true): static
     {

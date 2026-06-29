@@ -64,7 +64,7 @@ final class ErrorHandlerTest extends TestCase
         self::assertStringContainsString('<div class="container">', $content);
         self::assertStringContainsString('<div class="alert alert-danger">', $content);
         self::assertStringContainsString('<div id="previous"></div>', $content);
-        self::assertStringNotContainsString('Twig\\Error\\LoaderError', $content);
+        self::assertStringNotContainsString(\Twig\Error\LoaderError::class, $content);
         self::assertStringNotContainsString('directory does not exist', $content);
     }
 }

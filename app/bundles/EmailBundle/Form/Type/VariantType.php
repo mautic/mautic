@@ -2,68 +2,131 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @extends AbstractType<mixed>
  */
 class VariantType extends AbstractType
 {
+    public const DEFAULT_WINNER_DELAY = 24;
+
+    public const DEFAULT_WEIGHT       = 10;
+
     public function __construct(
         private EmailModel $emailModel,
+        private TranslatorInterface $translator,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('weight',
-            IntegerType::class,
+        $builder->add(
+            'enableAbTest',
+            YesNoButtonGroupType::class,
             [
-                'label'      => 'mautic.core.ab_test.form.traffic_weight',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'label' => 'mautic.core.ab_test.form.enable',
+                'attr'  => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.ab_test.form.traffic_weight.help',
-                ],
-                'constraints' => [
-                    new NotBlank(
-                        ['message' => 'mautic.email.variant.weight.notblank']
-                    ),
                 ],
             ]
         );
 
+        $builder->add('weight', IntegerType::class, [
+            'label'      => 'mautic.core.ab_test.form.traffic_weight',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class'           => 'form-control',
+                'tooltip'         => 'mautic.core.ab_test.form.traffic_weight.help',
+                'postaddon_text'  => '%',
+            ],
+        ]);
+
+        $attr = [
+            'class'    => 'form-control',
+            'tooltip'  => 'mautic.core.ab_test.form.traffic_total_weight.help',
+        ];
+
+        if (true === $options['is_parent'] && false === $options['is_existing']) {
+            $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
+        }
+
+        $builder->add('totalWeight', IntegerType::class, [
+            'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => $attr + ['postaddon_text'  => '%'],
+            'constraints' => new Assert\Range([
+                'min' => 0,
+                'max' => 100,
+            ]),
+        ]);
+
+        $attr = [
+            'class'    => 'form-control',
+            'tooltip'  => 'mautic.core.ab_test.form.send_winner_delay.help',
+        ];
+
+        if (true === $options['is_parent'] && false === $options['is_existing']) {
+            $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
+        }
+
+        $builder->add('sendWinnerDelay', IntegerType::class, [
+            'label'       => 'mautic.core.ab_test.form.send_winner_delay',
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => $attr + ['postaddon_text'  => $this->translator->trans('mautic.core.time.hours')],
+            'constraints' => new Assert\Range([
+                'min' => 1,
+                'max' => 480,
+            ]),
+            'data' => $options['data']['sendWinnerDelay'] ?? self::DEFAULT_WINNER_DELAY,
+        ]);
+
         $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
         if (!empty($abTestWinnerCriteria)) {
-            $criteria = $abTestWinnerCriteria['criteria'];
-            $choices  = $abTestWinnerCriteria['choices'];
+            $criteria    = $abTestWinnerCriteria['criteria'];
+            $choices     = $abTestWinnerCriteria['choices'];
+            $constraints = [];
+
+            if ($options['is_parent']) {
+                $constraints[] = new NotBlank(
+                    ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                );
+            }
+
+            $attr = [
+                'class'    => 'form-control',
+                'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
+            ];
+            if (true === $options['is_parent'] && false === $options['is_existing']) {
+                $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
+            }
 
             $builder->add(
                 'winnerCriteria',
-                ChoiceType::class, [
-                    'label'             => 'mautic.core.ab_test.form.winner',
-                    'label_attr'        => ['class' => 'control-label'],
-                    'attr'              => [
-                        'class'    => 'form-control',
-                        'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
-                    ],
+                ChoiceType::class,
+                [
+                    'label'       => 'mautic.core.ab_test.form.winner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => $attr,
                     'expanded'    => false,
                     'multiple'    => false,
                     'choices'     => $choices,
                     'placeholder' => 'mautic.core.form.chooseone',
-                    'constraints' => [
-                        new NotBlank(
-                            ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
-                        ),
-                    ],
+                    'constraints' => $constraints,
                 ]
             );
 
@@ -77,18 +140,49 @@ class VariantType extends AbstractType
                             'required' => false,
                             'label'    => false,
                         ];
-                        if (!empty($criteria[$data]['formTypeOptions'])) {
-                            $formTypeOptions = array_merge($formTypeOptions, $criteria[$data]['formTypeOptions']);
+                        if (!empty($criteria[$data['winnerCriteria']]['formTypeOptions'])) {
+                            $formTypeOptions = array_merge($formTypeOptions, $criteria[$data['winnerCriteria']]['formTypeOptions']);
                         }
-                        $form->add('properties', $criteria[$data]['formType'], $formTypeOptions);
+                        $form->add('properties', $criteria[$data['winnerCriteria']]['formType'], $formTypeOptions);
                     }
                 }
             });
+        }
+
+        if (true === $options['add_buttons']) {
+            $builder->add(
+                'buttons',
+                FormButtonsType::class,
+                [
+                    'cancel_text'   => 'mautic.core.close',
+                    'apply_text'    => false,
+                ]
+            );
         }
     }
 
     public function getBlockPrefix(): string
     {
         return 'emailvariant';
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'is_parent'         => true,
+            'is_existing'       => false,
+            'add_buttons'       => false,
+            'validation_groups' => function (Form $form): array {
+                $data = $form->getData();
+
+                $groups = ['Default'];
+
+                if ($data['enableAbTest']) {
+                    $groups[] = 'variant';
+                }
+
+                return $groups;
+            },
+        ]);
     }
 }

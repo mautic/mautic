@@ -33,37 +33,13 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private EventDispatcher $dispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MessageModel
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $messageModel;
-
-    private ActionDispatcher $eventDispatcher;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventCollector
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $eventCollector;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Translator
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventScheduler
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $scheduler;
-
-    private LegacyEventDispatcher $legacyDispatcher;
-
     protected function setUp(): void
     {
         $this->dispatcher = new EventDispatcher();
 
-        $this->messageModel = $this->createMock(MessageModel::class);
+        $messageModel = $this->createMock(MessageModel::class);
 
-        $this->messageModel->method('getChannels')
+        $messageModel->method('getChannels')
             ->willReturn(
                 [
                     'email' => [
@@ -89,7 +65,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->messageModel->method('getMessageChannels')
+        $messageModel->method('getMessageChannels')
             ->willReturn(
                 [
                     'email' => [
@@ -107,28 +83,28 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->scheduler = $this->createMock(EventScheduler::class);
+        $scheduler = $this->createMock(EventScheduler::class);
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
         /** @phpstan-ignore new.deprecated */
-        $this->legacyDispatcher = new LegacyEventDispatcher(
+        $legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
-            $this->scheduler,
+            $scheduler,
             new NullLogger(),
             $contactTracker
         );
 
-        $this->eventDispatcher = new ActionDispatcher(
+        $eventDispatcher = new ActionDispatcher(
             $this->dispatcher,
             new NullLogger(),
-            $this->scheduler,
-            $this->legacyDispatcher
+            $scheduler,
+            $legacyDispatcher
         );
 
-        $this->eventCollector = $this->createMock(EventCollector::class);
+        $eventCollector = $this->createMock(EventCollector::class);
 
-        $this->eventCollector->method('getEventConfig')
+        $eventCollector->method('getEventConfig')
             ->willReturnCallback(
                 function (Event $event) {
                     switch ($event->getType()) {
@@ -164,14 +140,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(Translator::class);
 
         $campaignSubscriber = new CampaignSubscriber(
-            $this->messageModel,
-            $this->eventDispatcher,
-            $this->eventCollector,
+            $messageModel,
+            $eventDispatcher,
+            $eventCollector,
             new NullLogger(),
-            $this->translator
+            $translator
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
@@ -266,7 +242,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return Event|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getEvent()
+    private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
     {
         $event = $this->getMockBuilder(Event::class)
             ->onlyMethods(['getId'])
@@ -312,10 +288,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         return $event;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    private function getLogs()
+    private function getLogs(): ArrayCollection
     {
         $lead = $this->createMock(Lead::class);
         $lead->method('getId')

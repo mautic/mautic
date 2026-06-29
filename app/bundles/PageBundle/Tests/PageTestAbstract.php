@@ -47,7 +47,7 @@ class PageTestAbstract extends TestCase
     /**
      * @var Router|MockObject
      */
-    protected $router;
+    protected ?MockObject $router = null;
 
     protected CorePermissions&MockObject $security;
 
@@ -153,6 +153,7 @@ class PageTestAbstract extends TestCase
             $contactTracker,
             $coreParametersHelper,
             $this->contactRequestHelper,
+            $this->createMock(\Mautic\CoreBundle\Model\AbTest\VariantConverterService::class),
             $entityManager,
             $this->security = $this->createMock(CorePermissions::class),
             $dispatcher,
@@ -171,7 +172,7 @@ class PageTestAbstract extends TestCase
     /**
      * @return RedirectModel
      */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): MockObject
     {
         $shortener = $this->createMock(Shortener::class);
 

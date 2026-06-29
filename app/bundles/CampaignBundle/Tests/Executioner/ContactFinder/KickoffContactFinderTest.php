@@ -77,10 +77,7 @@ class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($foundContacts, $this->getContactFinder()->getContacts(1, $limiter));
     }
 
-    /**
-     * @return KickoffContactFinder
-     */
-    private function getContactFinder()
+    private function getContactFinder(): KickoffContactFinder
     {
         return new KickoffContactFinder(
             $this->leadRepository,

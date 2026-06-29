@@ -336,9 +336,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->name;
     }
 
-    /**
-     * @return $this
-     */
     public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
@@ -352,9 +349,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->description;
     }
 
-    /**
-     * @return $this
-     */
     public function setDescription(?string $description): static
     {
         $this->description = $description;
@@ -379,9 +373,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
     public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
@@ -400,8 +391,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return $this
      */
     public function setPublishUp($publishUp): static
     {
@@ -421,8 +410,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return $this
      */
     public function setPublishDown($publishDown): static
     {
@@ -442,8 +429,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param string $content
-     *
-     * @return $this
      */
     public function setContent($content): static
     {
@@ -463,9 +448,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $includeVariants ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
@@ -491,8 +473,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param bool $isCampaignBased
-     *
-     * @return $this
      */
     public function setIsCampaignBased($isCampaignBased): static
     {
@@ -512,8 +492,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param string $slotName
-     *
-     * @return $this
      */
     public function setSlotName($slotName): static
     {

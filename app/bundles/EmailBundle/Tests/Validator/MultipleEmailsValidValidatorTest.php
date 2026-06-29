@@ -33,7 +33,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
         $matcher            = $this->exactly(2);
 
         $emailValidatorMock->expects($matcher)
-            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('john@don.com', $parameters[0]);
                 }

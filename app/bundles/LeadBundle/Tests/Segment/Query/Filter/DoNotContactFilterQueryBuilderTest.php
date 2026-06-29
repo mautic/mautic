@@ -65,12 +65,12 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
              * @noinspection PhpMissingParentConstructorInspection
              */
             public function __construct(
-                private string $operator,
-                private string $parameterValue,
+                private readonly string $operator,
+                private readonly string $parameterValue,
                 /**
                  * @var array<string, mixed>
                  */
-                private array $batchLimiters,
+                private readonly array $batchLimiters,
             ) {
             }
 

@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CoreBundle\Test\IsolatedTestTrait;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -33,7 +34,7 @@ final class EventRedirectionHelperTest extends TestCase
         $deletedEvent->setRedirectEvent($redirectEvent);
 
         $events = new ArrayCollection([$deletedEvent, $redirectEvent]);
-        $this->setPrivateProperty($campaign, 'events', $events);
+        ReflectionHelper::setValue($campaign, 'events', $events);
 
         $logs   = new ArrayCollection([0 => $deletedEvent]);
         $logger = $this->createMock(LoggerInterface::class);
@@ -89,7 +90,7 @@ final class EventRedirectionHelperTest extends TestCase
         $deletedEvent->method('getRedirectEvent')->willReturn(null);
 
         $events = new ArrayCollection([$deletedEvent]);
-        $this->setPrivateProperty($campaign, 'events', $events);
+        ReflectionHelper::setValue($campaign, 'events', $events);
 
         $logs = new ArrayCollection([0 => $deletedEvent]);
 
@@ -112,22 +113,22 @@ final class EventRedirectionHelperTest extends TestCase
         $campaign = new Campaign();
 
         $deletedEvent = new Event();
-        $this->setPrivateProperty($deletedEvent, 'id', 1);
+        ReflectionHelper::setValue($deletedEvent, 'id', 1);
         $deletedEvent->setDeleted(new \DateTime());
         $deletedEvent->setCampaign($campaign);
 
         $redirectEvent = new Event();
-        $this->setPrivateProperty($redirectEvent, 'id', 2);
+        ReflectionHelper::setValue($redirectEvent, 'id', 2);
         $redirectEvent->setCampaign($campaign);
 
         $deletedEvent->setRedirectEvent($redirectEvent);
 
         $otherEvent = new Event();
-        $this->setPrivateProperty($otherEvent, 'id', 3);
+        ReflectionHelper::setValue($otherEvent, 'id', 3);
         $otherEvent->setCampaign($campaign);
 
         $events = new ArrayCollection([$deletedEvent, $redirectEvent, $otherEvent]);
-        $this->setPrivateProperty($campaign, 'events', $events);
+        ReflectionHelper::setValue($campaign, 'events', $events);
 
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -154,24 +155,24 @@ final class EventRedirectionHelperTest extends TestCase
         $campaign = new Campaign();
 
         $event1 = new Event();
-        $this->setPrivateProperty($event1, 'id', 1);
+        ReflectionHelper::setValue($event1, 'id', 1);
         $event1->setDeleted(new \DateTime());
         $event1->setCampaign($campaign);
 
         $event2 = new Event();
-        $this->setPrivateProperty($event2, 'id', 2);
+        ReflectionHelper::setValue($event2, 'id', 2);
         $event2->setDeleted(new \DateTime());
         $event2->setCampaign($campaign);
 
         $event3 = new Event();
-        $this->setPrivateProperty($event3, 'id', 3);
+        ReflectionHelper::setValue($event3, 'id', 3);
         $event3->setCampaign($campaign);
 
         $event1->setRedirectEvent($event2);
         $event2->setRedirectEvent($event3);
 
         $events = new ArrayCollection([$event1, $event2, $event3]);
-        $this->setPrivateProperty($campaign, 'events', $events);
+        ReflectionHelper::setValue($campaign, 'events', $events);
 
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -201,7 +202,7 @@ final class EventRedirectionHelperTest extends TestCase
         $campaign = new Campaign();
 
         $event = new Event();
-        $this->setPrivateProperty($event, 'id', 1);
+        ReflectionHelper::setValue($event, 'id', 1);
         $event->setDeleted(new \DateTime());
         $event->setCampaign($campaign);
 
@@ -226,10 +227,10 @@ final class EventRedirectionHelperTest extends TestCase
         $campaign = new Campaign();
 
         $event = new Event();
-        $this->setPrivateProperty($event, 'id', 1);
+        ReflectionHelper::setValue($event, 'id', 1);
 
         $targetEvent = new Event();
-        $this->setPrivateProperty($targetEvent, 'id', 2);
+        ReflectionHelper::setValue($targetEvent, 'id', 2);
         $targetEvent->setCampaign($campaign);
 
         $event->setRedirectEvent($targetEvent);
@@ -255,20 +256,8 @@ final class EventRedirectionHelperTest extends TestCase
     private function createEventWithId(int $id): Event
     {
         $event = new Event();
-        $this->setPrivateProperty($event, 'id', $id);
+        ReflectionHelper::setValue($event, 'id', $id);
 
         return $event;
-    }
-
-    /**
-     * Helper method to set private or protected properties on an object using reflection.
-     *
-     * @param mixed $value The value to set on the property
-     */
-    private function setPrivateProperty(object $object, string $property, $value): void
-    {
-        $reflection = new \ReflectionClass($object);
-        $prop       = $reflection->getProperty($property);
-        $prop->setValue($object, $value);
     }
 }

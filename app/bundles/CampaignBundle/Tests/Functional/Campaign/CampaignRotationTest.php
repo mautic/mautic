@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +29,6 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
     private Lead $lead;
 
-    private ContactTracker $contactTracker;
-
     private LeadRepository $campaignLeadRepository;
 
     private LeadEventLogRepository $leadEventLogRepository;
@@ -47,7 +44,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->contactTracker         = static::getContainer()->get('mautic.tracker.contact');
+        $contactTracker               = static::getContainer()->get('mautic.tracker.contact');
         $this->campaignLeadRepository = static::getContainer()->get('mautic.campaign.repository.lead');
         $this->leadEventLogRepository = static::getContainer()->get('mautic.campaign.repository.lead_event_log');
 
@@ -64,7 +61,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
         $flashBagMock->method('all')
             ->willReturn([]);
 
-        $this->contactTracker->setSystemContact($this->lead);
+        $contactTracker->setSystemContact($this->lead);
     }
 
     public function testTwoCampaignsWithPageHitEventsDoNotInterfereWithEachOthersRotation(): void

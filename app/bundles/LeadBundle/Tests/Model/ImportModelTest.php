@@ -379,7 +379,7 @@ class ImportModelTest extends StandardImportTestHelper
         Assert::assertEquals(512, $import->getLastLineImported());
 
         // Excluding the header but including the empty row in 512, there are 511 rows
-        Assert::assertEquals(511, $import->getProcessedRows());
+        Assert::assertSame(511, $import->getProcessedRows());
 
         $import->end();
     }

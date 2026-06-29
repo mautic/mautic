@@ -36,10 +36,7 @@ class CollectorTest extends TestCase
         $this->assertEquals(210, $year->getSum());
     }
 
-    /**
-     * @return Collector
-     */
-    private function getCollector()
+    private function getCollector(): Collector
     {
         return new Collector($this->eventDispatcher);
     }
