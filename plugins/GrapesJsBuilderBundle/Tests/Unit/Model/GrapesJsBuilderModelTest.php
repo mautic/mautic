@@ -73,7 +73,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
-                private GrapesJsBuilderRepository $grapesJsBuilderRepository,
+                private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
             ) {
             }
 
@@ -176,7 +176,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
         /** @phpstan-ignore class.extendsFinalByPhpDoc */
         $entityManager = new class($grapesJsBuilderRepository) extends EntityManager {
             public function __construct(
-                private GrapesJsBuilderRepository $grapesJsBuilderRepository,
+                private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
             ) {
             }
 
@@ -214,7 +214,7 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
     {
         return new class($emailRepository) extends EmailModel {
             public function __construct(
-                private EmailRepository $emailRepository,
+                private readonly EmailRepository $emailRepository,
             ) {
             }
 

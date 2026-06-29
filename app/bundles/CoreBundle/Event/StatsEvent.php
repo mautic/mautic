@@ -136,9 +136,6 @@ class StatsEvent extends Event
         return $this->select;
     }
 
-    /**
-     * @return $this
-     */
     public function setSelect(?array $select = null): static
     {
         $this->select = $select;
@@ -180,9 +177,6 @@ class StatsEvent extends Event
         return $this->where;
     }
 
-    /**
-     * @return $this
-     */
     public function addWhere(array $where): static
     {
         $this->where[] = $where;

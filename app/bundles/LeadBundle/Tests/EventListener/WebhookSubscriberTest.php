@@ -21,9 +21,9 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 
-    private LeadModel|\PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
-    private WebhookModel|\PHPUnit\Framework\MockObject\MockObject $mockModel;
+    private \PHPUnit\Framework\MockObject\MockObject $mockModel;
 
     protected function setUp(): void
     {
@@ -38,7 +38,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_new' === $type
+                    fn ($type): bool => LeadEvents::LEAD_POST_SAVE.'_new' === $type
                 )
             );
 
@@ -61,7 +61,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    fn ($type) => LeadEvents::LEAD_POST_SAVE.'_update' === $type
+                    fn ($type): bool => LeadEvents::LEAD_POST_SAVE.'_update' === $type
                 )
             );
 

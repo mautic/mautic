@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
@@ -431,7 +432,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     public function testImportWithTagsInCsvFile(): void
     {
         $mockLeadModel = $this->createMockLeadModelStub(['saveEntity', 'checkForDuplicateContact', 'modifyTags']);
-        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        ReflectionHelper::setValue($mockLeadModel, 'leadFieldModel', $this->fieldModelMock);
         $this->setupMockLeadModelForImport($mockLeadModel);
 
         $mockLeadModel->expects($this->once())->method('checkForDuplicateContact')->willReturn(new Lead());
@@ -450,7 +451,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead->setId(21);
 
         $mockLeadModel = $this->createMockLeadModelStub(['saveEntity', 'getEntity']);
-        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
+        ReflectionHelper::setValue($mockLeadModel, 'leadFieldModel', $this->fieldModelMock);
         $this->setupMockLeadModelForImport($mockLeadModel);
 
         $mockLeadModel->expects($this->once())->method('getEntity')->willReturn($lead);
@@ -630,20 +631,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->import($fields, $data);
     }
 
-    /**
-     * Set protected property to an object.
-     *
-     * @param object $object
-     * @param string $class
-     * @param string $property
-     * @param mixed  $value
-     */
-    private function setProperty($object, $class, $property, $value): void
-    {
-        $reflectedProp = new \ReflectionProperty($class, $property);
-        $reflectedProp->setValue($object, $value);
-    }
-
     private function mockGetLeadRepository(): void
     {
         $this->entityManagerMock->expects($this->any())
@@ -691,7 +678,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         return new class($id) extends Lead {
             public function __construct(
-                private int $id,
+                private readonly int $id,
             ) {
                 parent::__construct();
             }
@@ -837,8 +824,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         $mockCompanyModel = $this->createMockCompanyModelForImport();
 
-        $this->setProperty($mockLeadModel, LeadModel::class, 'companyModel', $mockCompanyModel);
-        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFields', [
+        ReflectionHelper::setValue($mockLeadModel, 'companyModel', $mockCompanyModel);
+        ReflectionHelper::setValue($mockLeadModel, 'leadFields', [
             ['alias' => 'email', 'type' => 'email', 'defaultValue' => ''],
         ]);
     }
@@ -857,9 +844,8 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($this->leadRepositoryMock);
 
-        $this->setProperty($mockLeadModel, LeadModel::class, 'leadFieldModel', $this->fieldModelMock);
-        $this->setProperty($mockLeadModel, LeadModel::class,
-            'fieldsWithUniqueIdentifier', $this->fieldsWithUniqueIdentifier);
+        ReflectionHelper::setValue($mockLeadModel, 'leadFieldModel', $this->fieldModelMock);
+        ReflectionHelper::setValue($mockLeadModel, 'fieldsWithUniqueIdentifier', $this->fieldsWithUniqueIdentifier);
 
         return $mockLeadModel;
     }

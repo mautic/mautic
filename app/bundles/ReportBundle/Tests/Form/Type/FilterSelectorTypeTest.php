@@ -50,7 +50,7 @@ final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
                 function (...$parameters) use ($matcher1) {
                     if (1 === $matcher1->numberOfInvocations()) {
                         $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
-                        $callback = function (callable $formModifier) {
+                        $callback = function (callable $formModifier): void {
                             /** @var FormInterface<FormBuilderInterface>&MockObject $form */
                             $form = $this->createMock(FormInterface::class);
                             $data = [

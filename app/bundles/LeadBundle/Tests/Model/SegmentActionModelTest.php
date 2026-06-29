@@ -123,7 +123,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('addToLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments) {
+            ->method('addToLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);
@@ -166,7 +166,7 @@ class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('removeFromLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments) {
+            ->method('removeFromLists')->willReturnCallback(function (...$parameters) use ($matcher, $segments): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($segments, $parameters[1]);

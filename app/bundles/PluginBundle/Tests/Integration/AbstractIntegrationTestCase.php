@@ -27,82 +27,82 @@ class AbstractIntegrationTestCase extends TestCase
     /**
      * @var EventDispatcherInterface&MockObject
      */
-    protected $dispatcher;
+    protected MockObject $dispatcher;
 
     /**
      * @var CacheStorageHelper&MockObject
      */
-    protected $cache;
+    protected MockObject $cache;
 
     /**
      * @var EntityManager&MockObject
      */
-    protected $em;
+    protected MockObject $em;
 
     /**
      * @var Session&MockObject
      */
-    protected $session;
+    protected MockObject $session;
 
     /**
      * @var RequestStack&MockObject
      */
-    protected $request;
+    protected MockObject $request;
 
     /**
      * @var Router&MockObject
      */
-    protected $router;
+    protected MockObject $router;
 
     /**
      * @var TranslatorInterface&MockObject
      */
-    protected $translator;
+    protected MockObject $translator;
 
     /**
      * @var Logger&MockObject
      */
-    protected $logger;
+    protected MockObject $logger;
 
     /**
      * @var EncryptionHelper&MockObject
      */
-    protected $encryptionHelper;
+    protected MockObject $encryptionHelper;
 
     /**
      * @var LeadModel&MockObject
      */
-    protected $leadModel;
+    protected MockObject $leadModel;
 
     /**
      * @var CompanyModel&MockObject
      */
-    protected $companyModel;
+    protected MockObject $companyModel;
 
     /**
      * @var PathsHelper&MockObject
      */
-    protected $pathsHelper;
+    protected MockObject $pathsHelper;
 
     /**
      * @var NotificationModel&MockObject
      */
-    protected $notificationModel;
+    protected MockObject $notificationModel;
 
     /**
      * @var FieldModel&MockObject
      */
-    protected $fieldModel;
+    protected MockObject $fieldModel;
 
     /**
      * @var IntegrationEntityModel&MockObject
      */
-    protected $integrationEntityModel;
+    protected MockObject $integrationEntityModel;
 
     /**
      * @var DoNotContact&MockObject
      */
-    protected $doNotContact;
+    protected MockObject $doNotContact;
 
     /**
      * @var MockObject&FieldsWithUniqueIdentifier

@@ -22,23 +22,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $eventDispatcherMock;
 
-    private ContactSegmentFilterDictionary $contactSegmentFilterDictionary;
-
-    /**
-     * @var MockObject|BaseDecorator
-     */
-    private MockObject $baseDecorator;
-
-    /**
-     * @var MockObject|CustomMappedDecorator
-     */
-    private MockObject $customMappedDecorator;
-
-    /**
-     * @var MockObject|CompanyDecorator
-     */
-    private MockObject $companyDecorator;
-
     /**
      * @var MockObject|DateOptionFactory
      */
@@ -51,17 +34,17 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->eventDispatcherMock            = $this->createMock(EventDispatcherInterface::class);
-        $this->contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
-        $this->baseDecorator                  = $this->createMock(BaseDecorator::class);
-        $this->customMappedDecorator          = $this->createMock(CustomMappedDecorator::class);
-        $this->companyDecorator               = $this->createMock(CompanyDecorator::class);
+        $contactSegmentFilterDictionary       = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
+        $baseDecorator                        = $this->createMock(BaseDecorator::class);
+        $customMappedDecorator                = $this->createMock(CustomMappedDecorator::class);
+        $companyDecorator                     = $this->createMock(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
-            $this->contactSegmentFilterDictionary,
-            $this->baseDecorator,
-            $this->customMappedDecorator,
+            $contactSegmentFilterDictionary,
+            $baseDecorator,
+            $customMappedDecorator,
             $this->dateOptionFactory,
-            $this->companyDecorator,
+            $companyDecorator,
             $this->eventDispatcherMock);
     }
 

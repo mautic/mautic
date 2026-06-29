@@ -42,17 +42,17 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['delete_segment_in_background']               = false;
         parent::setUp();
         $this->listModel = static::getContainer()->get('mautic.lead.model.list');
-        \assert($this->listModel instanceof ListModel);
+        $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
-        \assert($this->listRepo instanceof LeadListRepository);
+        $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($leadModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
         $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
         $this->leadRepo                = $leadModel->getRepository();
-        \assert($this->leadRepo instanceof LeadRepository);
+        $this->assertInstanceOf(LeadRepository::class, $this->leadRepo);
         $this->prefix                  = self::getContainer()->getParameter('mautic.db_table_prefix');
         $this->translator              = self::getContainer()->get('translator');
-        \assert($this->translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $this->translator);
     }
 
     public function testBCSegmentWithPageHitInLeadObject(): void
@@ -100,7 +100,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $project->setName('Test Project');
 
         $projectModel = self::getContainer()->get(ProjectModel::class);
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
         $projectModel->saveEntity($project);
 
         $this->em->clear();
@@ -669,7 +669,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Check segment count UI for no contacts.
         $crawler            = $this->client->request(Request::METHOD_GET, '/s/segments');
         $leadListsTableRows = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr");
-        $this->assertEquals(2, $leadListsTableRows->count());
+        $this->assertCount(2, $leadListsTableRows);
 
         // Find rows by segment name to avoid relying on table order
         $rowWithFilters    = null;
@@ -689,11 +689,11 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         // Lead List 1 (with filters) should have the filter icon
         $filterIconCount = $rowWithFilters->filterXPath('.//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
-        $this->assertEquals(1, $filterIconCount);
+        $this->assertSame(1, $filterIconCount);
 
         // Lead List 2 (without filters) should NOT have the filter icon
         $filterIconCount = $rowWithoutFilters->filterXPath('.//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();
-        $this->assertEquals(0, $filterIconCount);
+        $this->assertSame(0, $filterIconCount);
     }
 
     public function testUnpublishedSegmentDoesNotShowRebuildingLabel(): void
@@ -755,15 +755,15 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $warningSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Warning-Segment')]");
         $warningIcon       = $warningSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
-        $this->assertEquals(1, $warningIcon->count());
+        $this->assertCount(1, $warningIcon);
 
         $freshSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Fresh-Segment')]");
         $warningIcon     = $freshSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
-        $this->assertEquals(0, $warningIcon->count());
+        $this->assertCount(0, $warningIcon);
 
         $unpublishedSegmentRow = $crawler->filterXPath("//table[@id='leadListTable']//tbody//tr[contains(., 'TEST-Unpublished-Segment')]");
         $warningIcon           = $unpublishedSegmentRow->filterXPath('.//i[@class="text-danger ri-error-warning-line fs-14"]');
-        $this->assertEquals(0, $warningIcon->count());
+        $this->assertCount(0, $warningIcon);
     }
 
     public function testBatchDeleteWithEmptyMembership(): void

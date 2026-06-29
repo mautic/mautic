@@ -74,6 +74,6 @@ final class ReportHelperTest extends TestCase
             ],
         ];
 
-        $this->assertEquals($expectedColumnns, $columns);
+        $this->assertSame($expectedColumnns, $columns);
     }
 }

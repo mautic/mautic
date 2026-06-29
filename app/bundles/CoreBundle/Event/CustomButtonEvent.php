@@ -43,8 +43,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
 
     /**
      * Add an array of buttons.
-     *
-     * @return $this
      */
     public function addButtons(array $buttons, $location = null, $route = null): static
     {
@@ -68,8 +66,6 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
      *
      * @param string|null $location
      * @param string|null $route
-     *
-     * @return $this
      */
     public function addButton(array $button, $location = null, $route = null): static
     {

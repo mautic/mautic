@@ -92,10 +92,10 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->clear();
 
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
-        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
+        $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         Assert::assertTrue($log->getIsScheduled());
 
@@ -114,7 +114,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         Assert::assertTrue($log->getIsScheduled());
         Assert::assertArrayHasKey('triggerDateLog', $log->getMetadata());
@@ -141,10 +141,10 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $this->em->clear();
 
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
-        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
+        $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         Assert::assertTrue($log->getIsScheduled());
 
@@ -163,7 +163,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         Assert::assertStringContainsString('0 total events were scheduled', $commandResult->getDisplay());
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         Assert::assertTrue($log->getIsScheduled());
         Assert::assertArrayHasKey('triggerDateLog', $log->getMetadata());
@@ -188,10 +188,10 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         Assert::assertStringContainsString('1 total event was scheduled', $commandResult->getDisplay());
 
         $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
-        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
+        $this->assertInstanceOf(LeadEventLogRepository::class, $leadEventLogRepository);
 
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
-        \assert($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
 
         Assert::assertTrue($log->getIsScheduled());
 
