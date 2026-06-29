@@ -28,7 +28,7 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
-        $this->assertEquals('like', $filterDecorator->getOperator($contactSegmentFilterCrate));
+        $this->assertSame('like', $filterDecorator->getOperator($contactSegmentFilterCrate));
     }
 
     public function testGetParameterValue(): void

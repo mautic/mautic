@@ -93,11 +93,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $urlParts   = parse_url($currentUrl);
         parse_str($urlParts['query'], $queryParams);
 
-        $this->assertEquals('/test-form-redirect-target-page', $urlParts['path']);
+        $this->assertSame('/test-form-redirect-target-page', $urlParts['path']);
         // Test that the redirect didn't remove any additional URL parts
-        $this->assertEquals('john@doe.com', $queryParams['email']);
+        $this->assertSame('john@doe.com', $queryParams['email']);
         $this->assertGreaterThan(0, (int) $queryParams['lead']);
-        $this->assertEquals('bar', $queryParams['foo']);
+        $this->assertSame('bar', $queryParams['foo']);
     }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
@@ -592,7 +592,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
@@ -890,7 +890,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contactCompanies = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('total', $contactCompanies);
         $this->assertArrayHasKey('companies', $contactCompanies);
-        $this->assertEquals(1, count($contactCompanies['companies']));
+        $this->assertCount(1, $contactCompanies['companies']);
 
         // Check company details
         $this->assertEquals($expectedData['company_name'], $contactCompanies['companies'][0]['companyname']);

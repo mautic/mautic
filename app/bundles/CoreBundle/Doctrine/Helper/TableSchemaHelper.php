@@ -55,8 +55,6 @@ class TableSchemaHelper
     /**
      * Add an array of tables to db.
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
     public function addTables(array $tables): static
@@ -97,8 +95,6 @@ class TableSchemaHelper
      *                     'primaryKey' => array(),
      *                     'uniqueIndex' => array()
      *                     )
-     *
-     * @return $this
      *
      * @throws SchemaException
      */
@@ -151,8 +147,6 @@ class TableSchemaHelper
     }
 
     /**
-     * @return $this
-     *
      * @throws SchemaException
      */
     public function deleteTable($table): static

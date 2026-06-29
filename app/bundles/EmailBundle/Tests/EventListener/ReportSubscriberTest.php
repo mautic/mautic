@@ -42,19 +42,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $companyReportDataMock;
 
     /**
-     * @var MockObject|StatRepository
-     */
-    private MockObject $statRepository;
-
-    /**
      * @var MockObject|EmailRepository
      */
     private MockObject $emailRepository;
-
-    /**
-     * @var MockObject&GeneratedColumnsProviderInterface
-     */
-    private MockObject $generatedColumnsProvider;
 
     /**
      * @var MockObject|Report
@@ -72,30 +62,25 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $fieldsBuilderMock;
 
-    /**
-     * @var MockObject|DncReportService
-     */
-    private MockObject $dncReportService;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->connectionMock            = $this->getMockedConnection();
         $this->companyReportDataMock     = $this->createMock(CompanyReportData::class);
-        $this->statRepository            = $this->createMock(StatRepository::class);
+        $statRepository                  = $this->createMock(StatRepository::class);
         $this->emailRepository           = $this->createMock(EmailRepository::class);
-        $this->generatedColumnsProvider  = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $generatedColumnsProvider        = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
-        $this->dncReportService          = $this->createMock(DncReportService::class);
+        $dncReportService                = $this->createMock(DncReportService::class);
         $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
-            $this->statRepository,
+            $statRepository,
             $this->emailRepository,
-            $this->generatedColumnsProvider,
+            $generatedColumnsProvider,
             $this->fieldsBuilderMock,
-            $this->dncReportService,
+            $dncReportService,
         );
 
         $this->report             = $this->createMock(Report::class);

@@ -18,16 +18,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class NotificationSendTypeTest extends TypeTestCase
 {
-    private RouterInterface $router;
+    private MockObject $router;
 
-    private TranslatorInterface $translator;
+    private MockObject $translator;
 
-    private Connection $connection;
+    private MockObject $connection;
 
     /**
      * @var ModelFactory<object>&MockObject
      */
-    private ModelFactory $modelFactory;
+    private MockObject $modelFactory;
 
     protected function setUp(): void
     {

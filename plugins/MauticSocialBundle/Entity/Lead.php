@@ -49,9 +49,6 @@ class Lead
         return $this->dateAdded;
     }
 
-    /**
-     * @return $this
-     */
     public function setDateAdded($dateAdded): static
     {
         $this->dateAdded = $dateAdded;
@@ -67,9 +64,6 @@ class Lead
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
     public function setLead($lead): static
     {
         $this->lead = $lead;
@@ -85,9 +79,6 @@ class Lead
         return $this->monitor;
     }
 
-    /**
-     * @return $this
-     */
     public function setMonitor($monitor): static
     {
         $this->monitor = $monitor;

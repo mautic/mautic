@@ -50,18 +50,11 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     private ReportHelper $reportHelper;
 
     /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
      * @var TranslatorInterface|MockObject
      */
     private MockObject $translator;
 
     private ReportSubscriber $subscriber;
-
-    private MockObject&DncReportService $dncReportService;
 
     protected function setUp(): void
     {
@@ -74,17 +67,17 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
         $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService     = $this->createMock(DncReportService::class);
+        $dncReportService           = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $this->coreParametersHelper,
+            $coreParametersHelper,
             $this->translator,
-            $this->dncReportService
+            $dncReportService
         );
     }
 

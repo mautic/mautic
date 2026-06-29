@@ -30,7 +30,7 @@ class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
     {
         $configAccessor = new ConfigAccessor($this->config);
 
-        $this->assertEquals('path_user', $configAccessor->getKey());
+        $this->assertSame('path_user', $configAccessor->getKey());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test its considered configured if we have a host and a folder')]

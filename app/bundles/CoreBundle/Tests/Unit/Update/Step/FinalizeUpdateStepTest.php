@@ -29,16 +29,6 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
     private MockObject $session;
 
     /**
-     * @var MockObject&Request
-     */
-    private MockObject $request;
-
-    /**
-     * @var MockObject&RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
      * @var MockObject&AppVersion
      */
     private MockObject $appVersion;
@@ -52,16 +42,16 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
         $this->translator   = $this->createMock(TranslatorInterface::class);
         $this->pathsHelper  = $this->createMock(PathsHelper::class);
         $this->session      = $this->createMock(Session::class);
-        $this->requestStack = $this->createMock(RequestStack::class);
+        $requestStack       = $this->createMock(RequestStack::class);
         $this->appVersion   = $this->createMock(AppVersion::class);
-        $this->request      = $this->createMock(Request::class);
+        $request            = $this->createMock(Request::class);
 
-        $this->request->method('hasSession')->willReturn(true);
-        $this->request->method('getSession')->willReturn($this->session);
-        $this->requestStack->method('getSession')->willReturn($this->session);
-        $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
+        $request->method('hasSession')->willReturn(true);
+        $request->method('getSession')->willReturn($this->session);
+        $requestStack->method('getSession')->willReturn($this->session);
+        $requestStack->method('getCurrentRequest')->willReturn($request);
 
-        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $this->requestStack, $this->appVersion);
+        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $requestStack, $this->appVersion);
     }
 
     public function testFinalizationCleansUpFiles(): void
@@ -105,7 +95,7 @@ class FinalizeUpdateStepTest extends AbstractStepTestCase
         $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
         $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
 
-        $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
+        $this->assertSame($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
 
     public function testFinalizationWithPostUpgradeMessage(): void

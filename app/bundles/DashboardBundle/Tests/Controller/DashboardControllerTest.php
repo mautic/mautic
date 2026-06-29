@@ -33,11 +33,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private MockObject $requestMock;
 
     /**
-     * @var MockObject|CorePermissions
-     */
-    private MockObject $securityMock;
-
-    /**
      * @var MockObject|Translator
      */
     private MockObject $translatorMock;
@@ -56,11 +51,6 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|RouterInterface
      */
     private MockObject $routerMock;
-
-    /**
-     * @var MockObject&FlashBag
-     */
-    private MockObject $flashBagMock;
 
     /**
      * @var MockObject|Container
@@ -84,9 +74,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
         $dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $this->flashBagMock       = $this->createMock(FlashBag::class);
+        $flashBagMock             = $this->createMock(FlashBag::class);
         $requestStack             = new RequestStack();
-        $this->securityMock       = $this->createMock(CorePermissions::class);
+        $securityMock             = $this->createMock(CorePermissions::class);
 
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
@@ -96,9 +86,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             $coreParametersHelper,
             $dispatcher,
             $this->translatorMock,
-            $this->flashBagMock,
+            $flashBagMock,
             $requestStack,
-            $this->securityMock
+            $securityMock
         );
         $this->controller->setContainer($this->containerMock);
     }
@@ -109,7 +99,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isMethod')
             ->willReturn(true);
 
-        $this->requestMock->expects(self::once())
+        $this->requestMock->expects($this->once())
             ->method('isXmlHttpRequest')
             ->willReturn(false);
 
@@ -224,10 +214,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $widgetService = $this->createMock(Widget::class);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('setFilter')
             ->with($this->requestMock);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('get')
             ->with((int) $widgetId)
             ->willReturn(null);
@@ -246,7 +236,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $renderedContent = 'lfsadkdhfůasfjds';
         $twig            = $this->createMock(Environment::class);
 
-        $twig->expects(self::once())
+        $twig->expects($this->once())
             ->method('render')
             ->willReturn($renderedContent);
 
@@ -254,10 +244,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $widgetService = $this->createMock(Widget::class);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('setFilter')
             ->with($this->requestMock);
-        $widgetService->expects(self::once())
+        $widgetService->expects($this->once())
             ->method('get')
             ->with((int) $widgetId)
             ->willReturn($widget);

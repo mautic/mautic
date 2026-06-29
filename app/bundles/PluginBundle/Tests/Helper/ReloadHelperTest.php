@@ -81,7 +81,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $disabledPlugins = $this->helper->disableMissingPlugins($this->sampleAllPlugins, $sampleInstalledPlugins);
 
-        $this->assertEquals(1, count($disabledPlugins));
+        $this->assertCount(1, $disabledPlugins);
         $this->assertEquals('Happier Integration', $disabledPlugins['MauticHappierBundle']->getName());
         $this->assertTrue((bool) $disabledPlugins['MauticHappierBundle']->getIsMissing());
     }
@@ -96,7 +96,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $enabledPlugins = $this->helper->enableFoundPlugins($this->sampleAllPlugins, $sampleInstalledPlugins);
 
-        $this->assertEquals(1, count($enabledPlugins));
+        $this->assertCount(1, $enabledPlugins);
         $this->assertEquals('Zapier Integration', $enabledPlugins['MauticZapierBundle']->getName());
         $this->assertFalse((bool) $enabledPlugins['MauticZapierBundle']->getIsMissing());
     }
@@ -121,7 +121,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_UPDATE);
         $updatedPlugins = $this->helper->updatePlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
-        $this->assertEquals(1, count($updatedPlugins));
+        $this->assertCount(1, $updatedPlugins);
         $this->assertEquals('Zapier Integration', $updatedPlugins['MauticZapierBundle']->getName());
         $this->assertEquals('1.0.1', $updatedPlugins['MauticZapierBundle']->getVersion());
         $this->assertEquals('Updated description', $updatedPlugins['MauticZapierBundle']->getDescription());
@@ -141,7 +141,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $installedPlugins = $this->helper->installPlugins($this->sampleAllPlugins, $sampleInstalledPlugins, $this->sampleMetaData, $this->sampleSchemas);
 
-        $this->assertEquals(1, count($installedPlugins));
+        $this->assertCount(1, $installedPlugins);
         $this->assertEquals('Zapier Integration', $installedPlugins['MauticZapierBundle']->getName());
         $this->assertEquals('1.0', $installedPlugins['MauticZapierBundle']->getVersion());
         $this->assertEquals('MauticZapierBundle', $installedPlugins['MauticZapierBundle']->getBundle());

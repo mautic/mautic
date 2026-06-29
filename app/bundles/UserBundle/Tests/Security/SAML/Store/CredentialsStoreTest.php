@@ -27,7 +27,7 @@ class CredentialsStoreTest extends TestCase
     {
         $store = new CredentialsStore($this->coreParametersHelper, 'foobar');
 
-        $this->assertEquals([], $store->getByEntityId('barfoo'));
+        $this->assertSame([], $store->getByEntityId('barfoo'));
     }
 
     public function testDefaultCredentialsAreUsedIfSamlIsDisabled(): void

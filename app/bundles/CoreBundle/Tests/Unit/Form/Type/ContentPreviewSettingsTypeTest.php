@@ -68,7 +68,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
                 [
@@ -79,15 +79,15 @@ class ContentPreviewSettingsTypeTest extends TestCase
                 ]
             );
 
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('setRequired')
             ->with(['type', 'objectId']);
 
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('addAllowedValues')
             ->with('type', [ContentPreviewSettingsType::TYPE_PAGE, ContentPreviewSettingsType::TYPE_EMAIL]);
 
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('addAllowedTypes')
             ->with('objectId', 'int');
 
@@ -128,7 +128,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::once();
+        $matcher = $this->once();
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
@@ -141,7 +141,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
                 }
             );
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(true);
         $this->security->expects(self::never())
@@ -164,20 +164,20 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(false);
 
         $userMock = $this->createMock(User::class);
-        $userMock->expects(self::once())
+        $userMock->expects($this->once())
             ->method('getId')
             ->willReturn($userId);
 
-        $this->userHelperMock->expects(self::once())
+        $this->userHelperMock->expects($this->once())
             ->method('getUser')
             ->willReturn($userMock);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(false);
@@ -201,7 +201,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(true);
         $this->security->expects(self::never())
@@ -223,7 +223,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::once();
+        $matcher = $this->once();
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
@@ -253,20 +253,20 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(false);
 
         $userMock = $this->createMock(User::class);
-        $userMock->expects(self::once())
+        $userMock->expects($this->once())
             ->method('getId')
             ->willReturn($userId);
 
-        $this->userHelperMock->expects(self::once())
+        $this->userHelperMock->expects($this->once())
             ->method('getUser')
             ->willReturn($userMock);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with('lead:leads:viewown', 'lead:leads:viewother', $userId)
             ->willReturn(true);
@@ -287,7 +287,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::once();
+        $matcher = $this->once();
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
@@ -359,7 +359,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
             ],
         ];
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('isAdmin')
             ->willReturn(true);
         $this->security->expects(self::never())

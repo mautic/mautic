@@ -78,7 +78,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $assetDownload->setLead($contact);
         $assetDownload->setDateDownload(new \DateTime());
         $assetDownload->setCode(200);
-        $assetDownload->setTrackingId(random_int(1, 99999));
+        $assetDownload->setTrackingId((string) random_int(1, 99999));
         $this->em->persist($assetDownload);
         $this->em->flush();
 
