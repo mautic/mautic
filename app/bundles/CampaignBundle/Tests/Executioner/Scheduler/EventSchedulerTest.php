@@ -50,16 +50,6 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $dispatcher;
 
-    /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private MockObject $coreParamtersHelper;
-
-    /**
-     * @var PeakInteractionTimer|MockObject
-     */
-    private MockObject $peakInteractionTimer;
-
     private EventScheduler $scheduler;
 
     /**
@@ -70,14 +60,14 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->logger              = new NullLogger();
-        $this->coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->coreParamtersHelper->method('getDefaultTimezone')
+        $coreParamtersHelper       = $this->createMock(CoreParametersHelper::class);
+        $coreParamtersHelper->method('getDefaultTimezone')
             ->willReturn('America/New_York');
         $this->eventLogger                = $this->createMock(EventLogger::class);
-        $this->peakInteractionTimer       = $this->createMock(PeakInteractionTimer::class);
-        $this->intervalScheduler          = new Interval($this->logger, $this->coreParamtersHelper);
+        $peakInteractionTimer             = $this->createMock(PeakInteractionTimer::class);
+        $this->intervalScheduler          = new Interval($this->logger, $coreParamtersHelper);
         $this->dateTimeScheduler          = new DateTime($this->logger);
-        $this->optimizedScheduler         = new Optimized($this->peakInteractionTimer);
+        $this->optimizedScheduler         = new Optimized($peakInteractionTimer);
         $this->eventCollector             = $this->createMock(EventCollector::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
         $this->publishStateService        = $this->createMock(PublishStateService::class);
@@ -89,7 +79,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
-            $this->coreParamtersHelper,
+            $coreParamtersHelper,
             $this->createMock(OptimisticLockServiceInterface::class),
             $this->publishStateService
         );
@@ -207,8 +197,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
+        $this->assertSame('2018-08-31 17:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertSame('America/New_York', $executionDate->getTimezone()->getName());
     }
 
     public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
@@ -263,8 +253,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
         $this->assertTrue($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
         // It is OK to set the execution date 15 seconds in the past. It means execute right now.
-        $this->assertEquals('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
+        $this->assertSame('2018-08-31 13:00:00', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertSame('America/New_York', $executionDate->getTimezone()->getName());
     }
 
     public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
@@ -319,8 +309,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $executionDate = $this->scheduler->validateExecutionDateTime($log, $simulatedNow);
 
         $this->assertFalse($this->scheduler->shouldSchedule($executionDate, $simulatedNow));
-        $this->assertEquals('2018-08-31 13:00:15', $executionDate->format('Y-m-d H:i:s'));
-        $this->assertEquals('America/New_York', $executionDate->getTimezone()->getName());
+        $this->assertSame('2018-08-31 13:00:15', $executionDate->format('Y-m-d H:i:s'));
+        $this->assertSame('America/New_York', $executionDate->getTimezone()->getName());
     }
 
     public function testRescheduleFailuresWithRescheduleDateSet(): void
@@ -356,7 +346,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now) {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $callback = function (ScheduledBatchEvent $event) use ($now) {
+                    $callback = function (ScheduledBatchEvent $event) use ($now): void {
                         // The first log was scheduled to 10 minutes.
                         Assert::assertCount(1, $event->getScheduled());
                         Assert::assertGreaterThan($now->modify('+9 minutes'), $event->getScheduled()->first()->getTriggerDate());
@@ -366,7 +356,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $callback = function (ScheduledBatchEvent $event) use ($now) {
+                    $callback = function (ScheduledBatchEvent $event) use ($now): void {
                         // The second log was not scheduled so the default interval is used.
                         Assert::assertCount(1, $event->getScheduled());
                         Assert::assertGreaterThan($now->modify('+59 minutes'), $event->getScheduled()->first()->getTriggerDate());
@@ -376,7 +366,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame(CampaignEvents::ON_EVENT_SCHEDULED_BATCH, $parameters[1]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    $callback = function (ScheduledBatchEvent $event) {
+                    $callback = function (ScheduledBatchEvent $event): void {
                         Assert::assertCount(2, $event->getScheduled());
                     };
                     $callback($parameters[0]);

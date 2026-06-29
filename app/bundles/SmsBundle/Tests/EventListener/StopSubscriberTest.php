@@ -33,10 +33,7 @@ class StopSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->StopSubscriber()->onReply($event);
     }
 
-    /**
-     * @return StopSubscriber
-     */
-    private function StopSubscriber()
+    private function StopSubscriber(): StopSubscriber
     {
         return new StopSubscriber($this->doNotContactModel);
     }

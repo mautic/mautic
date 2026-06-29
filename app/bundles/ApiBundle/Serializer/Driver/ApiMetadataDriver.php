@@ -52,8 +52,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the root (base key).
-     *
-     * @return $this
      */
     public function setRoot($root): static
     {
@@ -64,8 +62,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set prefix for the List and Details groups.
-     *
-     * @return $this
      */
     public function setGroupPrefix(string $name): static
     {
@@ -76,8 +72,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the default version for the properties if different than 1.0.
-     *
-     * @return $this
      */
     public function setDefaultVersion(string $version): static
     {
@@ -88,8 +82,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create a new property.
-     *
-     * @return $this
      */
     public function createProperty($name): static
     {
@@ -106,8 +98,6 @@ class ApiMetadataDriver implements DriverInterface
      * Add property and set default version and Details group.
      *
      * @param bool $useGetter
-     *
-     * @return $this
      */
     public function addProperty($name, $serializedName = null, $useGetter = false): static
     {
@@ -138,8 +128,6 @@ class ApiMetadataDriver implements DriverInterface
      *
      * @param bool|false $addToListGroup
      * @param bool|false $useGetter
-     *
-     * @return $this
      */
     public function addProperties(array $properties, $addToListGroup = false, $useGetter = false): static
     {
@@ -162,8 +150,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Create properties and add to the List group.
-     *
-     * @return $this
      */
     public function addListProperties(array $properties): static
     {
@@ -172,9 +158,6 @@ class ApiMetadataDriver implements DriverInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setSinceVersion($version, $property = null): static
     {
         if (null === $property) {
@@ -186,9 +169,6 @@ class ApiMetadataDriver implements DriverInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setUntilVersion($version, $property = null): static
     {
         if (null === $property) {
@@ -200,9 +180,6 @@ class ApiMetadataDriver implements DriverInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setSerializedName($name, $property = null): static
     {
         if (null === $property) {
@@ -216,8 +193,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set the groups a property belongs to.
-     *
-     * @return $this
      */
     public function setGroups($groups, $property = null): static
     {
@@ -238,8 +213,6 @@ class ApiMetadataDriver implements DriverInterface
      * Add a group the property belongs to.
      *
      * @param mixed $property
-     *
-     * @return $this
      */
     public function addGroup($group, $property = null): static
     {
@@ -260,8 +233,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Add property to the List group.
-     *
-     * @return $this
      */
     public function inListGroup(): static
     {
@@ -273,8 +244,6 @@ class ApiMetadataDriver implements DriverInterface
 
     /**
      * Set max depth for the property if an association.
-     *
-     * @return $this
      */
     public function setMaxDepth($depth, $property = null): static
     {

@@ -266,7 +266,7 @@ class Download
     }
 
     /**
-     * @param int $trackingId
+     * @param string $trackingId
      */
     public function setTrackingId($trackingId): static
     {

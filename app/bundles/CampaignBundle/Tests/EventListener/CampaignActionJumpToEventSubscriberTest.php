@@ -43,7 +43,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $eventRepository = new class($campaign) extends EventRepository {
             public function __construct(
-                private Campaign $campaign,
+                private readonly Campaign $campaign,
             ) {
             }
 
@@ -161,7 +161,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
         $eventRepository = new class($campaign) extends EventRepository {
             public function __construct(
-                private Campaign $campaign,
+                private readonly Campaign $campaign,
             ) {
             }
 
@@ -193,7 +193,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
                 return [
                     new class extends Event {
-                        public function getId()
+                        public function getId(): int
                         {
                             return 222;
                         }

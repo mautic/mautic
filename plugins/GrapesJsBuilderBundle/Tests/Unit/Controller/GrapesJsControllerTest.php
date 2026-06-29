@@ -92,8 +92,8 @@ final class GrapesJsControllerTest extends TestCase
     {
         return new class($security, $entity) extends GrapesJsController {
             public function __construct(
-                private CorePermissions $testSecurity,
-                private ?Email $testEntity,
+                private readonly CorePermissions $testSecurity,
+                private readonly ?Email $testEntity,
             ) {
                 $this->security = $this->testSecurity;
                 $this->setContainer(new Container());
@@ -106,7 +106,7 @@ final class GrapesJsControllerTest extends TestCase
             {
                 return new class($this->testEntity) extends AbstractCommonModel {
                     public function __construct(
-                        private ?Email $entity,
+                        private readonly ?Email $entity,
                     ) {
                     }
 

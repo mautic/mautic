@@ -25,7 +25,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
             $this->subscriber->getSubscribedEvents()
         );

@@ -53,7 +53,7 @@ class ProcessSignalServiceTest extends TestCase
     {
         $beforeCallbackCalled = false;
 
-        $this->processSignalService->registerSignalHandler(function () use (&$beforeCallbackCalled) {
+        $this->processSignalService->registerSignalHandler(function () use (&$beforeCallbackCalled): void {
             $beforeCallbackCalled = true;
         }, $signals);
 

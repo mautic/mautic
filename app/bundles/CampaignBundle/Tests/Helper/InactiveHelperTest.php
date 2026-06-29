@@ -26,50 +26,33 @@ class InactiveHelperTest extends TestCase
     private MockObject $scheduler;
 
     /**
-     * @var InactiveContactFinder|MockObject
-     */
-    private MockObject $inactiveContactFinder;
-
-    /**
      * @var LeadEventLogRepository|MockObject
      */
     private MockObject $eventLogRepository;
-
-    /**
-     * @var EventRepository|MockObject
-     */
-    private MockObject $eventRepository;
 
     /**
      * @var LeadRepository|MockObject
      */
     private MockObject $leadRepository;
 
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private MockObject $logger;
-
     private InactiveHelper $inactiveHelper;
-
-    private DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {
         $this->scheduler             = $this->createMock(EventScheduler::class);
-        $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
+        $inactiveContactFinder       = $this->createMock(InactiveContactFinder::class);
         $this->eventLogRepository    = $this->createMock(LeadEventLogRepository::class);
-        $this->eventRepository       = $this->createMock(EventRepository::class);
+        $eventRepository             = $this->createMock(EventRepository::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
-        $this->decisionHelper        = new DecisionHelper($this->leadRepository);
+        $logger                      = $this->createMock(LoggerInterface::class);
+        $decisionHelper              = new DecisionHelper($this->leadRepository);
         $this->inactiveHelper        = new InactiveHelper(
             $this->scheduler,
-            $this->inactiveContactFinder,
+            $inactiveContactFinder,
             $this->eventLogRepository,
-            $this->eventRepository,
-            $this->logger,
-            $this->decisionHelper
+            $eventRepository,
+            $logger,
+            $decisionHelper
         );
     }
 
@@ -158,6 +141,6 @@ class InactiveHelperTest extends TestCase
             $event
         );
 
-        $this->assertEquals(1, $contacts->count());
+        $this->assertCount(1, $contacts);
     }
 }

@@ -61,13 +61,13 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('config[buttons][save]')->form();
-        Assert::assertEquals($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
-        Assert::assertEquals($data['host'], $form['config[emailconfig][mailer_dsn][host]']->getValue());
-        Assert::assertEquals($data['port'], $form['config[emailconfig][mailer_dsn][port]']->getValue());
-        Assert::assertEquals($data['path'], $form['config[emailconfig][mailer_dsn][path]']->getValue());
-        Assert::assertEquals($data['user'], $form['config[emailconfig][mailer_dsn][user]']->getValue());
-        Assert::assertEquals('🔒', $form['config[emailconfig][mailer_dsn][password]']->getValue());
-        Assert::assertEquals($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
+        Assert::assertSame($data['scheme'], $form['config[emailconfig][mailer_dsn][scheme]']->getValue());
+        Assert::assertSame($data['host'], $form['config[emailconfig][mailer_dsn][host]']->getValue());
+        Assert::assertSame($data['port'], $form['config[emailconfig][mailer_dsn][port]']->getValue());
+        Assert::assertSame($data['path'], $form['config[emailconfig][mailer_dsn][path]']->getValue());
+        Assert::assertSame($data['user'], $form['config[emailconfig][mailer_dsn][user]']->getValue());
+        Assert::assertSame('🔒', $form['config[emailconfig][mailer_dsn][password]']->getValue());
+        Assert::assertSame($data['type'], $form['config[emailconfig][mailer_dsn][options][list][0][value]']->getValue());
     }
 
     /**

@@ -210,7 +210,7 @@ class FieldModelTest extends MauticMysqlTestCase
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
-        $this->assertEquals('alias_2', $result);
+        $this->assertSame('alias_2', $result);
     }
 
     public function testIsUsedField(): void

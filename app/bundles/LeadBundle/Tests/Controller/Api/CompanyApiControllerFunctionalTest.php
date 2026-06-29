@@ -420,7 +420,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $fieldRepository   = $this->em->getRepository(LeadField::class);
         $companyEmailField = $fieldRepository->findOneBy(['alias' => 'companyemail']);
-        \assert($companyEmailField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $companyEmailField);
         $companyEmailField->setIsUniqueIdentifer(true);
         $this->em->persist($companyEmailField);
         $this->em->flush();
