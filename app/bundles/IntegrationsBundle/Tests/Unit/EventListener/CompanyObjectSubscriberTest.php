@@ -27,9 +27,9 @@ use Symfony\Component\Routing\Router;
 
 class CompanyObjectSubscriberTest extends TestCase
 {
-    private CompanyObjectHelper|MockObject $companyObjectHelper;
+    private MockObject $companyObjectHelper;
 
-    private Router|MockObject $router;
+    private MockObject $router;
 
     private CompanyObjectSubscriber $subscriber;
 
@@ -47,7 +47,7 @@ class CompanyObjectSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
                 IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateCompanies', 0],

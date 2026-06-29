@@ -27,7 +27,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->inactiveExecutioner = self::getContainer()->get('mautic.campaign.executioner.inactive');
-        \assert($this->inactiveExecutioner instanceof InactiveExecutioner);
+        $this->assertInstanceOf(InactiveExecutioner::class, $this->inactiveExecutioner);
     }
 
     public function testDecisionRedirectionToAlreadyExecutedAction(): void
@@ -211,7 +211,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Assertions - verify basic redirection to condition works
         $this->assertGreaterThan(0, count($redirectConditionLogs), 'Expected redirect condition to be executed');
-        $this->assertEquals(0, count($originalNegativeActionLogs),
+        $this->assertCount(0, $originalNegativeActionLogs,
             'Original decision negative action should NOT be executed');
 
         // Verify execution counters

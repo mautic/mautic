@@ -223,6 +223,10 @@
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
     },
-    "patches": {}
+    "patches": {
+      "twig/twig": {
+        "Make IntegrationTestCase data providers static for PHPUnit 11": "patches/twig-integration-testcase-static-data-providers.patch"
+      }
+    }
   }
 }

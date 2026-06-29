@@ -18,12 +18,12 @@ class FormSubscriberTest extends TestCase
     /**
      * @var MockObject|EmailModel
      */
-    protected $emailModel;
+    protected MockObject $emailModel;
 
     /**
      * @var MockObject|ContactTracker
      */
-    protected $contactTracker;
+    protected MockObject $contactTracker;
 
     /**
      * @var FormSubscriber

@@ -26,27 +26,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $client;
 
-    /**
-     * @var MockObject|CompanyModel
-     */
-    private MockObject $companyModel;
-
-    /**
-     * @var MockObject|CompanyRepository
-     */
-    private MockObject $companyRepository;
-
-    /**
-     * @var ArrayCollection<int,IpAddress>
-     */
-    private ArrayCollection $ipCollection;
-
     private CampaignHelper $campaignHelper;
-
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
 
     protected function setUp(): void
     {
@@ -54,22 +34,22 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->contact           = $this->createMock(Lead::class);
         $this->client            = $this->createMock(Client::class);
-        $this->companyModel      = $this->createMock(CompanyModel::class);
-        $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
-        $this->ipCollection      = new ArrayCollection();
-        $this->companyRepository = $this->getMockBuilder(CompanyRepository::class)
+        $companyModel            = $this->createMock(CompanyModel::class);
+        $dispatcher              = $this->createMock(EventDispatcherInterface::class);
+        $ipCollection            = new ArrayCollection();
+        $companyRepository       = $this->getMockBuilder(CompanyRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getCompaniesByLeadId'])
             ->getMock();
 
-        $this->companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
+        $companyRepository->method('getCompaniesByLeadId')->willReturn([new Company()]);
 
-        $this->companyModel->method('getRepository')->willReturn($this->companyRepository);
+        $companyModel->method('getRepository')->willReturn($companyRepository);
 
-        $this->campaignHelper = new CampaignHelper($this->client, $this->companyModel, $this->dispatcher);
+        $this->campaignHelper = new CampaignHelper($this->client, $companyModel, $dispatcher);
 
-        $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
-        $this->ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
+        $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
+        $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
 
         $this->contact->expects($this->once())
             ->method('getProfileFields')
@@ -77,7 +57,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->contact->expects($this->once())
             ->method('getIpAddresses')
-            ->willReturn($this->ipCollection);
+            ->willReturn($ipCollection);
     }
 
     public function testFireWebhookWithGet(): void

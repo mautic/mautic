@@ -29,15 +29,13 @@ class CampaignEventSubscriberTest extends TestCase
 {
     private CampaignEventSubscriber $fixture;
 
-    private EventRepository|MockObject $eventRepo;
+    private MockObject $eventRepo;
 
-    private MockObject|CampaignModel $campaignModelMock;
+    private MockObject $campaignModelMock;
 
-    private MockObject|LeadEventLogRepository $leadEventLogRepositoryMock;
+    private MockObject $leadEventLogRepositoryMock;
 
-    private MockObject|EventDispatcherInterface $eventDispatcherMock;
-
-    private DateHelper $dateHelper;
+    private MockObject $eventDispatcherMock;
 
     protected function setUp(): void
     {
@@ -45,7 +43,7 @@ class CampaignEventSubscriberTest extends TestCase
         $this->campaignModelMock          = $this->createMock(CampaignModel::class);
         $this->leadEventLogRepositoryMock = $this->createMock(LeadEventLogRepository::class);
         $this->eventDispatcherMock        = $this->createMock(EventDispatcherInterface::class);
-        $this->dateHelper                 = new DateHelper(
+        $dateHelper                       = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
@@ -58,7 +56,7 @@ class CampaignEventSubscriberTest extends TestCase
             $this->campaignModelMock,
             $this->leadEventLogRepositoryMock,
             $this->eventDispatcherMock,
-            $this->dateHelper
+            $dateHelper
         );
     }
 

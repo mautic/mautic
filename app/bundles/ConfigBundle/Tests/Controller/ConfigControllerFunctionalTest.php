@@ -85,8 +85,8 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
-        Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
+        Assert::assertSame($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
+        Assert::assertSame($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }
 
     private function getConfigPath(): string
@@ -233,10 +233,10 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
 
-        Assert::assertEquals($send_notification_to_author, $form['config[notification_config][campaign_send_notification_to_author]']->getValue());
-        Assert::assertEquals($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
-        Assert::assertEquals($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
-        Assert::assertEquals($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+        Assert::assertSame($send_notification_to_author, $form['config[notification_config][campaign_send_notification_to_author]']->getValue());
+        Assert::assertSame($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
+        Assert::assertSame($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
+        Assert::assertSame($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
     }
 
     public function testUserAndSystemLocale(): void

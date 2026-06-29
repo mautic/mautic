@@ -97,34 +97,34 @@ class PublicControllerTest extends TestCase
         // C = 25%
 
         // A = 0/50; B = 0/25; C = 0/25
-        $this->assertEquals('pageA', $this->getVariantContent(0, 0, 0));
+        $this->assertSame('pageA', $this->getVariantContent(0, 0, 0));
 
         // A = 100/50; B = 0/25; C = 0/25
-        $this->assertEquals('pageB', $this->getVariantContent(1, 0, 0));
+        $this->assertSame('pageB', $this->getVariantContent(1, 0, 0));
 
         // A = 50/50; B = 50/25; C = 0/25;
-        $this->assertEquals('pageC', $this->getVariantContent(1, 1, 0));
+        $this->assertSame('pageC', $this->getVariantContent(1, 1, 0));
 
         // A = 33/50; B = 33/25; C = 33/25;
-        $this->assertEquals('pageA', $this->getVariantContent(1, 1, 1));
+        $this->assertSame('pageA', $this->getVariantContent(1, 1, 1));
 
         // A = 66/50; B = 33/25; C = 0/25
-        $this->assertEquals('pageC', $this->getVariantContent(2, 1, 0));
+        $this->assertSame('pageC', $this->getVariantContent(2, 1, 0));
 
         // A = 50/50; B = 25/25; C = 25/25
-        $this->assertEquals('pageA', $this->getVariantContent(2, 1, 1));
+        $this->assertSame('pageA', $this->getVariantContent(2, 1, 1));
 
         // A = 33/50; B = 66/50; C = 0/25
-        $this->assertEquals('pageC', $this->getVariantContent(1, 2, 0));
+        $this->assertSame('pageC', $this->getVariantContent(1, 2, 0));
 
         // A = 25/50; B = 50/50; C = 25/25
-        $this->assertEquals('pageA', $this->getVariantContent(1, 2, 1));
+        $this->assertSame('pageA', $this->getVariantContent(1, 2, 1));
 
         // A = 55/50; B = 18/25; C = 27/25
-        $this->assertEquals('pageB', $this->getVariantContent(6, 2, 3));
+        $this->assertSame('pageB', $this->getVariantContent(6, 2, 3));
 
         // A = 50/50; B = 25/25; C = 25/25
-        $this->assertEquals('pageA', $this->getVariantContent(6, 3, 3));
+        $this->assertSame('pageA', $this->getVariantContent(6, 3, 3));
     }
 
     private function getVariantContent(int $aCount, int $bCount, int $cCount): string
@@ -253,25 +253,25 @@ class PublicControllerTest extends TestCase
         $clickTrough = 'someClickTroughValue';
         $redirectUrl = 'https://someurl.test/';
 
-        $this->redirectModel->expects(self::once())
+        $this->redirectModel->expects($this->once())
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->redirect->expects(self::once())
+        $this->redirect->expects($this->once())
             ->method('isPublished')
             ->with(false)
             ->willReturn(true);
 
-        $this->redirect->expects(self::once())
+        $this->redirect->expects($this->once())
             ->method('getUrl')
             ->willReturn($redirectUrl);
 
-        $this->ipLookupHelper->expects(self::once())
+        $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddress')
             ->willReturn($this->ipAddress);
 
-        $this->ipAddress->expects(self::once())
+        $this->ipAddress->expects($this->once())
             ->method('isTrackable')
             ->willReturn(true);
 
@@ -287,12 +287,12 @@ class PublicControllerTest extends TestCase
             ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
-        $this->router->expects(self::once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->willReturn('/asset/');
 
         $this->internalContainer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('get')
             ->willReturnMap([
                 ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->router],
@@ -332,25 +332,25 @@ class PublicControllerTest extends TestCase
         $redirectId   = 'dummy_redirect_id';
         $clickThrough = 'dummy_click_through';
 
-        $this->redirectModel->expects(self::once())
+        $this->redirectModel->expects($this->once())
             ->method('getRedirectById')
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->redirect->expects(self::once())
+        $this->redirect->expects($this->once())
             ->method('isPublished')
             ->with(false)
             ->willReturn(true);
 
-        $this->redirect->expects(self::once())
+        $this->redirect->expects($this->once())
             ->method('getUrl')
             ->willReturn($redirectUrl);
 
-        $this->ipLookupHelper->expects(self::once())
+        $this->ipLookupHelper->expects($this->once())
             ->method('getIpAddress')
             ->willReturn($this->ipAddress);
 
-        $this->ipAddress->expects(self::once())
+        $this->ipAddress->expects($this->once())
             ->method('isTrackable')
             ->willReturn(true);
 
@@ -366,13 +366,13 @@ class PublicControllerTest extends TestCase
             ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
-        $this->router->expects(self::once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with('mautic_asset_download')
             ->willReturn('/asset');
 
         $this->internalContainer
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('get')
             ->willReturnMap([
                 ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->router],

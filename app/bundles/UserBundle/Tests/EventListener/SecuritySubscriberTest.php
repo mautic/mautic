@@ -17,7 +17,7 @@ class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
         $auditLogModel  = $this->createMock(AuditLogModel::class);
         $subscriber     = new SecuritySubscriber($ipLookupHelper, $auditLogModel);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 UserEvents::USER_LOGIN => ['onSecurityInteractiveLogin', 0],
             ],

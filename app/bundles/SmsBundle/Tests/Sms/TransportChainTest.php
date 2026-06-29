@@ -79,7 +79,7 @@ final class TransportChainTest extends MauticMysqlTestCase
             $this->transportChain->sendSms($lead, 'Yeah');
         } catch (\Exception $e) {
             $message = $e->getMessage();
-            $this->assertEquals('Primary SMS transport is not enabled', $message);
+            $this->assertSame('Primary SMS transport is not enabled', $message);
         }
     }
 
@@ -126,7 +126,7 @@ final class TransportChainTest extends MauticMysqlTestCase
             {
                 $transports = $this->getTransports();
 
-                return array_map(fn ($v) => $v['service'], $transports);
+                return array_map(fn ($v): TransportInterface => $v['service'], $transports);
             }
         };
 
@@ -157,6 +157,6 @@ final class TransportChainTest extends MauticMysqlTestCase
             }
         }
 
-        self::assertEquals(2, $sentCount);
+        self::assertSame(2, $sentCount);
     }
 }

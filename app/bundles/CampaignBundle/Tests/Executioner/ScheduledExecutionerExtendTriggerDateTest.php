@@ -87,7 +87,7 @@ final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCo
         $this->assertSame(0, $commandTester->getStatusCode());
 
         $eventLog = $this->em->find(LeadEventLog::class, $logId);
-        \assert($eventLog instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $eventLog);
 
         Assert::assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
         Assert::assertSame($expectedIsScheduled, $eventLog->getIsScheduled());

@@ -15,23 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContactSegmentFilterDictionary|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $contactSegmentFilterDictionary;
-
-    private \PHPUnit\Framework\MockObject\MockObject $listModelMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $fieldAliasHelperlMock;
-
     private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 
     private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
 
@@ -41,19 +25,19 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->fieldAliasHelperlMock          = $this->createMock(FieldAliasHelper::class);
-        $this->listModelMock                  = $this->createMock(ListModel::class);
+        $fieldAliasHelperlMock                = $this->createMock(FieldAliasHelper::class);
+        $listModelMock                        = $this->createMock(ListModel::class);
         $this->executionContextMock           = $this->createMock(ExecutionContextInterface::class);
-        $this->entityManagerMock              = $this->createMock(EntityManager::class);
+        $entityManagerMock                    = $this->createMock(EntityManager::class);
         $this->unitOfWorkMock                 = $this->createMock(UnitOfWork::class);
-        $this->translatorMock                 = $this->createMock(TranslatorInterface::class);
-        $this->contactSegmentFilterDictionary = $this->createMock(ContactSegmentFilterDictionary::class);
+        $translatorMock                       = $this->createMock(TranslatorInterface::class);
+        $contactSegmentFilterDictionary       = $this->createMock(ContactSegmentFilterDictionary::class);
 
-        $this->entityManagerMock
+        $entityManagerMock
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWorkMock);
 
-        $this->listModelMock->method('getChoiceFields')
+        $listModelMock->method('getChoiceFields')
             ->willReturn(
                 [
                     'lead' => [
@@ -73,18 +57,18 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->contactSegmentFilterDictionary->method('getFilters')->willReturn(
+        $contactSegmentFilterDictionary->method('getFilters')->willReturn(
             []
         );
 
-        $this->translatorMock->method('trans')->willReturn('');
+        $translatorMock->method('trans')->willReturn('');
 
         $this->validator = new FieldAliasKeywordValidator(
-            $this->listModelMock,
-            $this->fieldAliasHelperlMock,
-            $this->entityManagerMock,
-            $this->translatorMock,
-            $this->contactSegmentFilterDictionary
+            $listModelMock,
+            $fieldAliasHelperlMock,
+            $entityManagerMock,
+            $translatorMock,
+            $contactSegmentFilterDictionary
         );
         $this->validator->initialize($this->executionContextMock);
     }

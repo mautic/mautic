@@ -7,6 +7,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -190,7 +191,8 @@ class EmailRepository extends CommonRepository
                 $dncQb->expr()->and(
                     $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
                     $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
-                ));
+                )
+            );
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -427,7 +429,6 @@ class EmailRepository extends CommonRepository
         }
 
         if ($topLevel) {
-            // BC layer
             if (true === $topLevel || '1' === $topLevel) {
                 $topLevel = ['variant', 'translation'];
             } elseif (is_string($topLevel)) {
@@ -438,7 +439,7 @@ class EmailRepository extends CommonRepository
                 match ($type) {
                     'variant'     => $q->andWhere($q->expr()->isNull('e.variantParent')),
                     'translation' => $q->andWhere($q->expr()->isNull('e.translationParent')),
-                    default       => null, // BC: ignore unknown values
+                    default       => null,
                 };
             }
         }
@@ -712,6 +713,35 @@ class EmailRepository extends CommonRepository
             ->executeStatement();
     }
 
+    /**
+     * Clones email list cross-reference records and updates child emails to match the parent email.
+     *
+     * @param Email $entity the parent email entity
+     */
+    public function cloneFromParentToVariant(Email $entity): void
+    {
+        /** @var Email $parent */
+        $parent    = $entity->getVariantParent() ?: $entity;
+        $hasParent = $entity->getVariantParent() instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface;
+
+        if ($hasParent) {
+            $entity->setPublishUp($parent->getPublishUp());
+            $entity->setPublishDown($parent->getPublishDown());
+            $entity->setIsPublished($parent->getIsPublished());
+            $entity->setLists($parent->getLists()->toArray());
+        } else {
+            $variantsToUpdateFromParent = $entity->getVariantChildren()->toArray();
+            foreach ($variantsToUpdateFromParent as $variant) {
+                \assert($variant instanceof Email);
+                $variant->setPublishUp($parent->getPublishUp());
+                $variant->setPublishDown($parent->getPublishDown());
+                $variant->setIsPublished($parent->getIsPublished());
+                $variant->setLists(!empty($parent->getLists()) ? $parent->getLists()->toArray() : []);
+            }
+            $this->saveEntities($variantsToUpdateFromParent);
+        }
+    }
+
     public function upCountSent(int $id, int $increaseBy = 1, bool $variant = false): void
     {
         if ($increaseBy <= 0) {
@@ -876,5 +906,26 @@ class EmailRepository extends CommonRepository
             ->setParameter('excludedListIds', $excludedListIds, ArrayParameterType::INTEGER);
 
         return $queryBuilder;
+    }
+
+    /**
+     * Gets emails with published variants.
+     *
+     * @return array<Email>
+     */
+    public function getPublishedEmailsWithVariant(): array
+    {
+        $qb   = $this->getEntityManager()->createQueryBuilder();
+        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+
+        $qb->select($this->getTableAlias())
+            ->from(Email::class, $this->getTableAlias())
+            ->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                $qb->expr()->eq('v.isPublished', true)
+            ))
+            ->where($expr);
+
+        return $qb->getQuery()->getResult();
     }
 }

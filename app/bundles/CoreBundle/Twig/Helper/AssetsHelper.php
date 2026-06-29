@@ -156,8 +156,6 @@ final class AssetsHelper
      * injecting/fetching assets for a different context.
      *
      * @param string $context
-     *
-     * @return $this
      */
     public function setContext($context = self::CONTEXT_APP): self
     {
@@ -176,8 +174,6 @@ final class AssetsHelper
      * @param string                       $location
      * @param bool                         $async
      * @param string                       $name
-     *
-     * @return $this
      */
     public function addScript($script, $location = 'head', $async = false, $name = null): self
     {
@@ -215,8 +211,6 @@ final class AssetsHelper
      *
      * @param string $script
      * @param string $location
-     *
-     * @return $this
      */
     public function addScriptDeclaration($script, $location = 'head'): self
     {
@@ -240,8 +234,6 @@ final class AssetsHelper
      * Adds a stylesheet to be loaded in the template header.
      *
      * @param string|array<string, string> $stylesheet
-     *
-     * @return $this
      */
     public function addStylesheet($stylesheet): self
     {
@@ -270,8 +262,6 @@ final class AssetsHelper
      * Add style tag to the header.
      *
      * @param string $styles
-     *
-     * @return $this
      */
     public function addStyleDeclaration($styles): self
     {
@@ -291,8 +281,6 @@ final class AssetsHelper
      *
      * @param string $declaration
      * @param string $location
-     *
-     * @return $this
      */
     public function addCustomDeclaration($declaration, $location = 'head'): self
     {

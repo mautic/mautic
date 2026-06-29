@@ -49,6 +49,6 @@ class TokenDtoTest extends TestCase
     public function testToString(string $name, string|int $value, string $expected): void
     {
         $tokenDto = new TokenDto($name, $value);
-        self::assertEquals($expected, $tokenDto->toString());
+        self::assertSame($expected, $tokenDto->toString());
     }
 }
