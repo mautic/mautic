@@ -22,26 +22,24 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 {
     private CorePermissions $corePermissions;
 
-    /**
-     * @var MockObject|CoreParametersHelper
-     */
-    private MockObject $coreParametersHelper;
+    private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    /**
-     * @var MockObject|UserRepository
-     */
-    private MockObject $userRepository;
+    private UserHelper&MockObject $userHelper;
+
+    private TranslatorInterface&MockObject $translator;
+
+    private UserRepository&MockObject $userRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $userHelper                 = $this->createMock(UserHelper::class);
-        $translator                 = $this->createMock(TranslatorInterface::class);
+        $this->userHelper           = $this->createMock(UserHelper::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->userRepository       = $this->createMock(UserRepository::class);
         $this->corePermissions      = new CorePermissions(
-            $userHelper,
-            $translator,
+            $this->userHelper,
+            $this->translator,
             $this->coreParametersHelper,
             [
                 $this->mockBundleArray(ApiPermissions::class),
