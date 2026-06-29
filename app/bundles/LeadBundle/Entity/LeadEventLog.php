@@ -132,10 +132,8 @@ class LeadEventLog
 
     /**
      * Set lead.
-     *
-     * @return LeadEventLog
      */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -156,10 +154,8 @@ class LeadEventLog
      * Set userId.
      *
      * @param int $userId
-     *
-     * @return LeadEventLog
      */
-    public function setUserId($userId)
+    public function setUserId($userId): static
     {
         $this->userId = $userId;
 
@@ -180,10 +176,8 @@ class LeadEventLog
      * Set object.
      *
      * @param string $object
-     *
-     * @return LeadEventLog
      */
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->object = $object;
 
@@ -204,10 +198,8 @@ class LeadEventLog
      * Set objectId.
      *
      * @param int $objectId
-     *
-     * @return LeadEventLog
      */
-    public function setObjectId($objectId)
+    public function setObjectId($objectId): static
     {
         $this->objectId = $objectId;
 
@@ -228,10 +220,8 @@ class LeadEventLog
      * Set action.
      *
      * @param string $action
-     *
-     * @return LeadEventLog
      */
-    public function setAction($action)
+    public function setAction($action): static
     {
         $this->action = $action;
 
@@ -250,10 +240,8 @@ class LeadEventLog
 
     /**
      * Set properties.
-     *
-     * @return LeadEventLog
      */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         $this->properties = $properties;
 
@@ -265,10 +253,8 @@ class LeadEventLog
      *
      * @param string $key
      * @param string $value
-     *
-     * @return LeadEventLog
      */
-    public function addProperty($key, $value)
+    public function addProperty($key, $value): static
     {
         $this->properties[$key] = $value;
 
@@ -289,10 +275,8 @@ class LeadEventLog
      * Set dateAdded.
      *
      * @param \DateTime $dateAdded
-     *
-     * @return LeadEventLog
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -313,10 +297,8 @@ class LeadEventLog
      * Set bundle.
      *
      * @param string $bundle
-     *
-     * @return LeadEventLog
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): static
     {
         $this->bundle = $bundle;
 
@@ -337,10 +319,8 @@ class LeadEventLog
      * Set userName.
      *
      * @param string $userName
-     *
-     * @return LeadEventLog
      */
-    public function setUserName($userName)
+    public function setUserName($userName): static
     {
         $this->userName = $userName;
 

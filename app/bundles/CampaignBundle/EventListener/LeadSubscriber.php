@@ -61,11 +61,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 
-    /**
-     * @param string $eventTypeKey
-     * @param string $eventTypeName
-     */
-    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineEvents(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup('campaignList');

@@ -52,7 +52,7 @@ class ContentExtension extends AbstractExtension
      */
     public function sortEditorFonts(array $fonts): array
     {
-        usort($fonts, static function ($fontA, $fontB): int {
+        usort($fonts, static function (array $fontA, array $fontB): int {
             $fontAName = $fontA['name'] ?? '';
             $fontBName = $fontB['name'] ?? '';
 

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->useCleanupRollback = false;
         parent::setUp();

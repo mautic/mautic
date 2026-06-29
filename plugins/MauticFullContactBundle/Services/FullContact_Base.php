@@ -55,7 +55,7 @@ class FullContact_Base
     /**
      * @param mixed[] $hdr
      */
-    private function _update_rate_limit($hdr): void
+    private function _update_rate_limit(array $hdr): void
     {
         $remaining            = (float) $hdr['X-Rate-Limit-Remaining'];
         $reset                = (float) $hdr['X-Rate-Limit-Reset'];
@@ -85,10 +85,8 @@ class FullContact_Base
      * @param string $url
      * @param string $id
      * @param bool   $json
-     *
-     * @return object
      */
-    public function setWebhookUrl($url, $id = null, $json = false)
+    public function setWebhookUrl($url, $id = null, $json = false): static
     {
         $this->_webhookUrl  = $url;
         $this->_webhookId   = $id;

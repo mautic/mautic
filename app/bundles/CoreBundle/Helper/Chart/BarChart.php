@@ -33,7 +33,7 @@ class BarChart extends AbstractChart implements ChartInterface
      *
      * @return $this
      */
-    public function setDataset($label, array $data, $order = null)
+    public function setDataset($label, array $data, $order = null): static
     {
         $datasetId = count($this->datasets);
 

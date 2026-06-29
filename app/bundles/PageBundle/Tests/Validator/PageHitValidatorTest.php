@@ -19,7 +19,7 @@ final class PageHitValidatorTest extends TestCase
 
     private MockObject&Constraint $constraintMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

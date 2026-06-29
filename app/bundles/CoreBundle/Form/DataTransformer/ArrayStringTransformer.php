@@ -33,7 +33,7 @@ class ArrayStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform(mixed $string): mixed
     {
-        if (!$string) {
+        if (null === $string || '' === $string) {
             return [];
         }
 

@@ -21,7 +21,7 @@ class BatchControllerTest extends MauticMysqlTestCase
      */
     private array $leads;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $tags = [

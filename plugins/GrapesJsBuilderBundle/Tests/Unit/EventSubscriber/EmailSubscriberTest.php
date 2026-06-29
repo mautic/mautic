@@ -29,7 +29,7 @@ final class EmailSubscriberTest extends TestCase
     private EmailConfigInterface|MockObject $emailConfig;
     private EmailSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->config               = $this->createMock(Config::class);
         $this->grapesJsBuilderModel = $this->createMock(GrapesJsBuilderModel::class);

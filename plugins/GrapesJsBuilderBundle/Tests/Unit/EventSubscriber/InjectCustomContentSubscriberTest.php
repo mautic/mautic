@@ -29,7 +29,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
     /** @var MockObject&RouterInterface */
     private MockObject $router;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->config = $this->createMock(Config::class);
         $this->model  = $this->createMock(GrapesJsBuilderModel::class);

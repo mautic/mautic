@@ -992,7 +992,7 @@ class LeadModel extends FormModel
      *
      * @return $this
      */
-    public function addToStages($lead, $stage, $manuallyAdded = true)
+    public function addToStages($lead, $stage, $manuallyAdded = true): static
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -1015,7 +1015,7 @@ class LeadModel extends FormModel
      *
      * @return $this
      */
-    public function removeFromStages($lead, $stage, $manuallyRemoved = true)
+    public function removeFromStages($lead, $stage, $manuallyRemoved = true): static
     {
         $lead->setStage(null);
         $lead->stageChangeLogEntry(
@@ -2262,9 +2262,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @return mixed[]
+     * @return array{oldPrimary: int|false, newPrimary: int|false}
      */
-    public function setPrimaryCompany($companyId, $leadId)
+    public function setPrimaryCompany($companyId, $leadId): array
     {
         $companyArray      = [];
         $oldPrimaryCompany = $newPrimaryCompany = false;
@@ -2498,7 +2498,7 @@ class LeadModel extends FormModel
                     ? $field['properties']
                     : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
 
-                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
+                $flattenedAllowedValues = array_map(fn (array $item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 
                 $fieldValue = $entity->getFieldValue($field['alias'], $group);
                 if (!empty($allowedValues['list']) && !in_array($fieldValue, $flattenedAllowedValues)) {
