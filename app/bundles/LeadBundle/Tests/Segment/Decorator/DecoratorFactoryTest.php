@@ -36,7 +36,7 @@ final class DecoratorFactoryTest extends TestCase
         $contactSegmentFilterDictionary       = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
         $baseDecorator                        = $this->createMock(BaseDecorator::class);
         $customMappedDecorator                = $this->createMock(CustomMappedDecorator::class);
-        $this->companyDecorator              = $this->createMock(CompanyDecorator::class);
+        $this->companyDecorator               = $this->createMock(CompanyDecorator::class);
         $this->dateOptionFactory              = $this->createMock(DateOptionFactory::class);
         $this->decoratorFactory               = new DecoratorFactory(
             $contactSegmentFilterDictionary,
