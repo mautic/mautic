@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class IndexHelper
 {
     public const MAX_COUNT_ALLOWED = 64;
+
     /**
      * @var bool|array<string>
      */
@@ -79,7 +80,7 @@ class IndexHelper
         $indexes = $stmt->executeQuery()->fetchAllAssociative();
 
         $this->indexedColumns = array_map(
-            fn ($index): mixed => $index['Column_name'],
+            fn (array $index): mixed => $index['Column_name'],
             $indexes
         );
 

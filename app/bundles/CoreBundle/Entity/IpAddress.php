@@ -106,10 +106,7 @@ class IpAddress
         return $this->id;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress($ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -126,10 +123,8 @@ class IpAddress
 
     /**
      * @param array<string,string> $ipDetails
-     *
-     * @return IpAddress
      */
-    public function setIpDetails($ipDetails)
+    public function setIpDetails($ipDetails): static
     {
         $this->ipDetails = $ipDetails;
 

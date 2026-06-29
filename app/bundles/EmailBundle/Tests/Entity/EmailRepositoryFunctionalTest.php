@@ -197,7 +197,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];
-        $expectedLeadIds = array_map(fn (int $id) => (string) $id, $expectedLeadIds);
+        $expectedLeadIds = array_map(fn (int $id): string => (string) $id, $expectedLeadIds);
         sort($expectedLeadIds);
 
         Assert::assertSame($expectedLeadIds, $actualLeadIds);

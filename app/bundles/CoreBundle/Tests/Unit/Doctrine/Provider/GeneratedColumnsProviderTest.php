@@ -18,12 +18,12 @@ final class GeneratedColumnsProviderTest extends TestCase
     /**
      * @var MockObject|VersionProviderInterface
      */
-    private $versionProvider;
+    private MockObject $versionProvider;
 
     /**
      * @var MockObject|EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
     /**
      * @var GeneratedColumnsProvider

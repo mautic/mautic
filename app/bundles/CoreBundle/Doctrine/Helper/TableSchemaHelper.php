@@ -55,11 +55,9 @@ class TableSchemaHelper
     /**
      * Add an array of tables to db.
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
-    public function addTables(array $tables)
+    public function addTables(array $tables): static
     {
         // ensure none of the tables exist before manipulating the schema
         foreach ($tables as $table) {
@@ -98,18 +96,16 @@ class TableSchemaHelper
      *                     'uniqueIndex' => array()
      *                     )
      *
-     * @return $this
-     *
      * @throws SchemaException
      */
-    public function addTable(array $table, $checkExists = true, $dropExisting = false)
+    public function addTable(array $table, $checkExists = true, $dropExisting = false): static
     {
         if (empty($table['name'])) {
             throw new SchemaException('Table is missing required name key.');
         }
 
         if ($checkExists || $dropExisting) {
-            $throwException = ($dropExisting) ? false : true;
+            $throwException = !(bool) $dropExisting;
             if ($this->checkTableExists($table['name'], $throwException) && $dropExisting) {
                 $this->deleteTable($table['name']);
             }
@@ -151,11 +147,9 @@ class TableSchemaHelper
     }
 
     /**
-     * @return $this
-     *
      * @throws SchemaException
      */
-    public function deleteTable($table)
+    public function deleteTable($table): static
     {
         if ($this->checkTableExists($table)) {
             $this->dropTables[] = $table;

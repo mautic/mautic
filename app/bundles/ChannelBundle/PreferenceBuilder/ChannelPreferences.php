@@ -20,10 +20,8 @@ class ChannelPreferences
 
     /**
      * @param int $priority
-     *
-     * @return $this
      */
-    public function addPriority($priority)
+    public function addPriority($priority): static
     {
         $priority = (int) $priority;
 
@@ -36,10 +34,8 @@ class ChannelPreferences
 
     /**
      * @param int $priority
-     *
-     * @return $this
      */
-    public function addLog(LeadEventLog $log, $priority)
+    public function addLog(LeadEventLog $log, $priority): static
     {
         $priority = (int) $priority;
 
@@ -58,10 +54,8 @@ class ChannelPreferences
 
     /**
      * Removes a log from all prioritized groups.
-     *
-     * @return $this
      */
-    public function removeLog(LeadEventLog $log)
+    public function removeLog(LeadEventLog $log): static
     {
         foreach ($this->organizedByPriority as $logs) {
             /** @var ArrayCollection<int, LeadEventLog> $logs */

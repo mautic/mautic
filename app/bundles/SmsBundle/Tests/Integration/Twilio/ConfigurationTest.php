@@ -117,10 +117,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->getConfiguration()->getMessagingServiceSid();
     }
 
-    /**
-     * @return Configuration
-     */
-    private function getConfiguration()
+    private function getConfiguration(): Configuration
     {
         return new Configuration($this->integrationHelper);
     }

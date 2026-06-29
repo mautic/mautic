@@ -16,12 +16,12 @@ class InstagramIntegrationTest extends AbstractIntegrationTestCase
     /**
      * @var Translator&MockObject
      */
-    protected $coreTranslator;
+    protected MockObject $coreTranslator;
 
     /**
      * @var IntegrationHelper&MockObject
      */
-    protected $integrationHelper;
+    protected MockObject $integrationHelper;
 
     protected function setUp(): void
     {

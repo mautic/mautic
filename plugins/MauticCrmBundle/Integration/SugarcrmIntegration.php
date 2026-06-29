@@ -256,11 +256,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
      * @throws \Exception
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $sugarFields       = [];
         $silenceExceptions = $settings['silence_exceptions'] ?? true;
@@ -448,12 +446,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return int|null
-     *
      * @throws \Exception
      *                    To be modified
      */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity($params = []): ?int
     {
         $executed = null;
 
@@ -1765,11 +1761,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         // Regular Express to check SugarCRM/SuiteCRM Multi-Select format below
         // example format: '^choice1^,^choice2^,^choice_3^'
         $regex = '/(\^)(?:([A-Za-z0-9\-\_]+))(\^)/';
-        if (preg_match($regex, $stringToCheck)) {
-            return true;
-        }
 
-        return false;
+        return (bool) preg_match($regex, $stringToCheck);
     }
 
     /**

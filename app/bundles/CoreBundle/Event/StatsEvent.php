@@ -110,10 +110,8 @@ class StatsEvent extends Event
      * Set the source repository to fetch the results from.
      *
      * @param CommonRepository<object> $repository
-     *
-     * @return string
      */
-    public function setRepository(CommonRepository $repository, array $permissions = [])
+    public function setRepository(CommonRepository $repository, array $permissions = []): static
     {
         $this->repository = $repository;
         $this->setResults(
@@ -138,10 +136,7 @@ class StatsEvent extends Event
         return $this->select;
     }
 
-    /**
-     * @return $this
-     */
-    public function setSelect(?array $select = null)
+    public function setSelect(?array $select = null): static
     {
         $this->select = $select;
 
@@ -182,10 +177,7 @@ class StatsEvent extends Event
         return $this->where;
     }
 
-    /**
-     * @return $this
-     */
-    public function addWhere(array $where)
+    public function addWhere(array $where): static
     {
         $this->where[] = $where;
 

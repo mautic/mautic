@@ -95,7 +95,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $new         = $options['data']->getId() ? false : true;
+        $new         = !(bool) $options['data']->getId();
         $type        = $options['data']->getType();
         $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;

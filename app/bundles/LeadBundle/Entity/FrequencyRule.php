@@ -141,10 +141,8 @@ class FrequencyRule extends CommonEntity
 
     /**
      * @param Lead $lead
-     *
-     * @return FrequencyRule
      */
-    public function setLead($lead)
+    public function setLead($lead): static
     {
         $this->lead = $lead;
 
@@ -161,10 +159,8 @@ class FrequencyRule extends CommonEntity
 
     /**
      * @param \DateTimeInterface $dateAdded
-     *
-     * @return FrequencyRule
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): static
     {
         $this->isChanged('dateAdded', $dateAdded);
 
@@ -183,10 +179,8 @@ class FrequencyRule extends CommonEntity
 
     /**
      * @param int|null $frequencyNumber
-     *
-     * @return FrequencyRule
      */
-    public function setFrequencyNumber($frequencyNumber)
+    public function setFrequencyNumber($frequencyNumber): static
     {
         $this->isChanged('frequencyNumber', $frequencyNumber);
 
@@ -205,10 +199,8 @@ class FrequencyRule extends CommonEntity
 
     /**
      * @param string|null $frequencyTime
-     *
-     * @return FrequencyRule
      */
-    public function setFrequencyTime($frequencyTime)
+    public function setFrequencyTime($frequencyTime): static
     {
         $this->isChanged('frequencyTime', $frequencyTime);
 
@@ -227,10 +219,8 @@ class FrequencyRule extends CommonEntity
 
     /**
      * @param string $channel
-     *
-     * @return FrequencyRule
      */
-    public function setChannel($channel)
+    public function setChannel($channel): static
     {
         $this->isChanged('channel', $channel);
 
@@ -249,12 +239,7 @@ class FrequencyRule extends CommonEntity
         return $this->preferredChannel;
     }
 
-    /**
-     * @param bool $preferredChannel
-     *
-     * @return FrequencyRule
-     */
-    public function setPreferredChannel($preferredChannel)
+    public function setPreferredChannel(bool $preferredChannel): static
     {
         $this->isChanged('preferredChannel', $preferredChannel);
 
@@ -271,10 +256,7 @@ class FrequencyRule extends CommonEntity
         return $this->pauseFromDate;
     }
 
-    /**
-     * @return FrequencyRule
-     */
-    public function setPauseFromDate(?\DateTime $pauseFromDate = null)
+    public function setPauseFromDate(?\DateTime $pauseFromDate = null): static
     {
         $this->isChanged('pauseFromDate', $pauseFromDate);
 
@@ -291,10 +273,7 @@ class FrequencyRule extends CommonEntity
         return $this->pauseToDate;
     }
 
-    /**
-     * @return FrequencyRule
-     */
-    public function setPauseToDate(?\DateTime $pauseToDate = null)
+    public function setPauseToDate(?\DateTime $pauseToDate = null): static
     {
         $this->isChanged('pauseToDate', $pauseToDate);
 

@@ -87,10 +87,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this->options;
     }
 
-    /**
-     * @return $this
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         $this->options = array_merge($this->options, $options);
 
@@ -383,11 +380,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function hasGroupBy(): bool
     {
-        if (!empty($this->getReport()->getGroupBy())) {
-            return true;
-        }
-
-        return false;
+        return !empty($this->getReport()->getGroupBy());
     }
 
     public function createParameterName(): string

@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraint;
 class LeadListAccess extends Constraint
 {
     public string $message  = 'mautic.lead.lists.failed';
+
     public bool $allowEmpty = false;
 
     public function validatedBy(): string

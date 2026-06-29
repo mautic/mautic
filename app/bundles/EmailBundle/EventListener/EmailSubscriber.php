@@ -20,8 +20,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailSubscriber implements EventSubscriberInterface
 {
     public const PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
+
     public const PREHEADER_HTML_ELEMENT_AFTER   = '</div>';
+
     public const PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
+
     public const PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
 
     private const RETRY_COUNT = 3;
@@ -39,6 +42,7 @@ class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            EmailEvents::EMAIL_PRE_SAVE       => ['cloneParentEmailDataForVariant', 0],
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_ON_SEND        => ['onEmailSendAddPreheaderText', 200],
             EmailEvents::EMAIL_ON_DISPLAY     => ['onEmailSendAddPreheaderText', 200],
@@ -48,6 +52,14 @@ class EmailSubscriber implements EventSubscriberInterface
             EmailEvents::ON_EMAIL_EDIT_SUBMIT => ['manageEmailDraft'],
             EmailEvents::EMAIL_PRE_DELETE     => ['deleteEmailDraft'],
         ];
+    }
+
+    public function cloneParentEmailDataForVariant(EmailEvent $event): void
+    {
+        $email = $event->getEmail();
+        if ($email->isVariant()) {
+            $this->emailModel->getRepository()->cloneFromParentToVariant($email);
+        }
     }
 
     /**

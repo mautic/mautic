@@ -152,7 +152,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -319,7 +319,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
@@ -881,7 +881,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html): void
+    private function loadHTML(\DOMDocument &$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -895,7 +895,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    private function saveHTML($dom, $html)
+    private function saveHTML(\DOMDocument $dom, $html): string|false|null
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
@@ -954,7 +954,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Generate dom manipulation javascript to include all script.
      */
-    private function generateJsScript($html): string
+    private function generateJsScript(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();

@@ -336,12 +336,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function setName($name)
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -354,12 +349,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->description;
     }
 
-    /**
-     * @param string $description
-     *
-     * @return $this
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -383,12 +373,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->category;
     }
 
-    /**
-     * @param Category $category
-     *
-     * @return $this
-     */
-    public function setCategory($category)
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -406,10 +391,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return $this
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -427,10 +410,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return $this
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -448,10 +429,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param string $content
-     *
-     * @return $this
      */
-    public function setContent($content)
+    public function setContent($content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -469,10 +448,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $includeVariants ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
 
@@ -497,10 +473,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param bool $isCampaignBased
-     *
-     * @return $this
      */
-    public function setIsCampaignBased($isCampaignBased)
+    public function setIsCampaignBased($isCampaignBased): static
     {
         $this->isChanged('isCampaignBased', $isCampaignBased);
         $this->isCampaignBased = $isCampaignBased;
@@ -518,10 +492,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param string $slotName
-     *
-     * @return $this
      */
-    public function setSlotName($slotName)
+    public function setSlotName($slotName): static
     {
         $this->isChanged('slotName', $slotName);
         $this->slotName = $slotName;
@@ -539,10 +511,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         }
     }
 
-    /**
-     * @return DynamicContent
-     */
-    public function setUtmTags(array $utmTags)
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;

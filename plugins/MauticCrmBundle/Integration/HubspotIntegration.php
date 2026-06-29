@@ -643,17 +643,13 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    private function getReadOnlyFields($object): array
+    private function getReadOnlyFields(string $object): array
     {
         $fields = ArrayHelper::getValue($object, $this->getAvailableLeadFields(), []);
 
         return array_filter(
             $fields,
-            function ($field) {
-                if (!empty($field['readOnly'])) {
-                    return $field;
-                }
-            }
+            fn (array $field): bool => !empty($field['readOnly'])
         );
     }
 }

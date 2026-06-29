@@ -14,6 +14,8 @@ trait VariantModelTrait
 
     /**
      * Converts a variant to the main item and the original main item a variant.
+     *
+     * @deprecated use VariantConverterService instead
      */
     public function convertVariant(VariantEntityInterface $entity): void
     {
@@ -99,9 +101,7 @@ trait VariantModelTrait
 
             // Reset the variant
             if (!empty($changes) && empty($this->inConversion)) {
-                if (method_exists($entity, 'setVariantStartDate')) {
-                    $entity->setVariantStartDate($variantStartDate);
-                }
+                $entity->setVariantStartDate($variantStartDate);
 
                 // Reset counters
                 foreach ($resetVariantCounterMethods as $method) {

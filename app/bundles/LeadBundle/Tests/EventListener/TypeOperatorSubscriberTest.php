@@ -48,11 +48,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $emailModel;
 
     /**
-     * @var MockObject&StageModel
-     */
-    private MockObject $stageModel;
-
-    /**
      * @var MockObject&StageRepository
      */
     private MockObject $stageRepository;
@@ -66,11 +61,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&AssetModel
      */
     private MockObject $assetModel;
-
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
 
     /**
      * @var MockObject&FormInterface<FormInterface<mixed>>
@@ -87,25 +77,25 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listModel       = $this->createMock(ListModel::class);
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
-        $this->stageModel      = $this->createMock(StageModel::class);
+        $stageModel            = $this->createMock(StageModel::class);
         $this->stageRepository = $this->createMock(StageRepository::class);
         $this->categoryModel   = $this->createMock(CategoryModel::class);
         $this->assetModel      = $this->createMock(AssetModel::class);
-        $this->translator      = $this->createMock(TranslatorInterface::class);
+        $translator            = $this->createMock(TranslatorInterface::class);
         $this->form            = $this->createMock(FormInterface::class);
         $this->subscriber      = new TypeOperatorSubscriber(
             $this->leadModel,
             $this->listModel,
             $this->campaignModel,
             $this->emailModel,
-            $this->stageModel,
+            $stageModel,
             $this->categoryModel,
             $this->assetModel,
-            $this->translator
+            $translator
         );
 
-        $this->stageModel->method('getRepository')->willReturn($this->stageRepository);
-        $this->translator->method('trans')->willReturnArgument(0);
+        $stageModel->method('getRepository')->willReturn($this->stageRepository);
+        $translator->method('trans')->willReturnArgument(0);
     }
 
     public function testOnTypeOperatorsCollect(): void
@@ -285,7 +275,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(
                             [
@@ -303,7 +293,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('filter', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(['class' => 'form-control'], $options['attr']);
                     };
@@ -337,7 +327,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(
                             [
@@ -356,7 +346,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('filter', $parameters[0]);
                     $this->assertSame(HiddenType::class, $parameters[1]);
-                    $callback = function (array $options) {
+                    $callback = function (array $options): void {
                         $this->assertSame('', $options['data']);
                         $this->assertSame(['class' => 'form-control'], $options['attr']);
                     };

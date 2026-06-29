@@ -50,12 +50,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return $queryBuilder;
     }
 
-    /**
-     * @param RandomParameterName $parameterNameGenerator
-     *
-     * @return BaseFilterQueryBuilder
-     */
-    public function setParameterNameGenerator($parameterNameGenerator)
+    public function setParameterNameGenerator(RandomParameterName $parameterNameGenerator): static
     {
         $this->parameterNameGenerator = $parameterNameGenerator;
 

@@ -28,56 +28,48 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class PointModelTest extends TestCase
 {
-    private RequestStack&MockObject $requestStack;
     private IpLookupHelper&MockObject $ipLookupHelper;
     private LeadModel&MockObject $leadModel;
-    private ContactTracker&MockObject $contactTracker;
     private EntityManager&MockObject $em;
     private CorePermissions&MockObject $security;
     private EventDispatcherInterface&MockObject $dispatcher;
-    private UrlGeneratorInterface&MockObject $router;
     private Translator&MockObject $translator;
-    private UserHelper&MockObject $userHelper;
-    private LoggerInterface&MockObject $mauticLogger;
-    private CoreParametersHelper&MockObject $coreParametersHelper;
-    private PointGroupModel&MockObject $pointGroupModel;
     private PointModel $pointModel;
 
     protected function setUp(): void
     {
-        $this->requestStack         = $this->createMock(RequestStack::class);
+        $requestStack               = $this->createMock(RequestStack::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
-        $this->contactTracker       = $this->createMock(ContactTracker::class);
+        $contactTracker             = $this->createMock(ContactTracker::class);
         $this->em                   = $this->createMock(EntityManager::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->router               = $this->createMock(RouterInterface::class);
+        $router                     = $this->createMock(RouterInterface::class);
         $this->translator           = $this->createMock(Translator::class);
-        $this->userHelper           = $this->createMock(UserHelper::class);
-        $this->mauticLogger         = $this->createMock(LoggerInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->pointGroupModel      = $this->createMock(PointGroupModel::class);
+        $userHelper                 = $this->createMock(UserHelper::class);
+        $mauticLogger               = $this->createMock(LoggerInterface::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $pointGroupModel            = $this->createMock(PointGroupModel::class);
         $this->pointModel           = new PointModel(
-            $this->requestStack,
+            $requestStack,
             $this->ipLookupHelper,
             $this->leadModel,
-            $this->contactTracker,
+            $contactTracker,
             $this->em,
             $this->security,
             $this->dispatcher,
-            $this->router,
+            $router,
             $this->translator,
-            $this->userHelper,
-            $this->mauticLogger,
-            $this->coreParametersHelper,
-            $this->pointGroupModel,
+            $userHelper,
+            $mauticLogger,
+            $coreParametersHelper,
+            $pointGroupModel,
         );
     }
 
@@ -94,10 +86,10 @@ class PointModelTest extends TestCase
         $this->ipLookupHelper->method('getIpAddress')->willReturn($ip);
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects(self::once())
+        $lead->expects($this->once())
             ->method('adjustPoints')
             ->with($pointDelta);
-        $lead->expects(self::once())
+        $lead->expects($this->once())
             ->method('addPointsChangeLogEntry')
             ->with(
                 'url',
@@ -110,13 +102,13 @@ class PointModelTest extends TestCase
         $eventDetails = $this->createMock(Hit::class);
 
         $repository = $this->createMock(PointRepository::class);
-        $this->em->expects(self::once())
+        $this->em->expects($this->once())
             ->method('getRepository')
             ->with(Point::class)
             ->willReturn($repository);
 
         $pointActionHelper = $this->createMock(PointActionHelper::class);
-        $pointActionHelper->expects(self::once())
+        $pointActionHelper->expects($this->once())
             ->method('validateUrlHit')
             ->with(
                 $eventDetails,
@@ -139,11 +131,11 @@ class PointModelTest extends TestCase
         $point->method('getDelta')->willReturn($pointDelta);
         $point->method('getGroup')->willReturn($pointGroup);
 
-        $repository->expects(self::once())
+        $repository->expects($this->once())
             ->method('getPublishedByType')
             ->with($type)
             ->willReturn([$point]);
-        $repository->expects(self::once())
+        $repository->expects($this->once())
             ->method('getCompletedLeadActions')
             ->willReturn([]);
         $repository->expects(self::never())
@@ -182,7 +174,7 @@ class PointModelTest extends TestCase
                 self::fail('Unknown event called: '.$eventName);
             });
 
-        $this->leadModel->expects(self::once())
+        $this->leadModel->expects($this->once())
             ->method('saveEntity')
             ->with($lead);
 

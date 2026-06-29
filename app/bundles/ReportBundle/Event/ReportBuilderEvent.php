@@ -54,10 +54,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @param string $context Context for data
      * @param array  $data    Data array for the table
-     *
-     * @return ReportBuilderEvent
      */
-    public function addTable($context, array $data, $group = null)
+    public function addTable($context, array $data, $group = null): static
     {
         $data['group'] = (null == $group) ? $context : $group;
 
@@ -271,10 +269,8 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     /**
      * @param array $options
-     *
-     * @return $this
      */
-    public function addGraph($context, $type, $graphId, $options = [])
+    public function addGraph($context, $type, $graphId, $options = []): static
     {
         if (in_array($type, $this->supportedGraphs)) {
             $this->graphArray[$context][$graphId] = [

@@ -31,7 +31,7 @@ class InstallSchemaTest extends TestCase
      */
     private AbstractSchemaManager $schemaManager;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         EnvLoader::load();
@@ -65,7 +65,7 @@ class InstallSchemaTest extends TestCase
         $this->schemaManager->createTable($t);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 

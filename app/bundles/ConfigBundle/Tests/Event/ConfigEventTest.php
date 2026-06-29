@@ -38,12 +38,12 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $paramBag = $this->createMock(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
-        $this->assertEquals([], $event->getPreservedFields());
+        $this->assertSame([], $event->getPreservedFields());
 
         $preserved = 'preserved';
         $result    = [$preserved];
         $event->unsetIfEmpty($preserved);
-        $this->assertEquals($result, $event->getPreservedFields());
+        $this->assertSame($result, $event->getPreservedFields());
 
         $preserved = ['preserved' => 'value'];
         $result    = array_merge($result, $preserved);
@@ -57,18 +57,18 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $paramBag = $this->createMock(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
-        $this->assertEquals([], $event->getErrors());
+        $this->assertSame([], $event->getErrors());
 
         $message  = 'message';
         $messages = [$message => []];
         $this->assertEquals($event, $event->setError($message));
-        $this->assertEquals($messages, $event->getErrors());
+        $this->assertSame($messages, $event->getErrors());
 
         $message     = 'message';
         $messageVars = ['var' => 'value'];
         $messages    = [$message => $messageVars];
         $this->assertEquals($event, $event->setError($message, $messageVars));
-        $this->assertEquals($messages, $event->getErrors());
+        $this->assertSame($messages, $event->getErrors());
 
         $message                   = 'message';
         $messageVars               = ['var' => 'value'];
@@ -79,7 +79,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
             $messageVars,
         ];
         $this->assertEquals($event, $event->setError($message, $messageVars, $key, $field));
-        $this->assertEquals($fieldErrors, $event->getFieldErrors());
+        $this->assertSame($fieldErrors, $event->getFieldErrors());
     }
 
     public function testGetFileContent(): void
@@ -98,7 +98,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
             ->method('getRealPath')
             ->willReturn($realPath);
 
-        $this->assertEquals($fileContent, $event->getFileContent($uploadedFile));
+        $this->assertSame($fileContent, $event->getFileContent($uploadedFile));
         $this->assertFalse(file_exists($realPath));
     }
 
@@ -110,7 +110,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
 
         $string = 'řčžýřžýčř';
         $result = 'xZnEjcW+w73FmcW+w73EjcWZ';
-        $this->assertEquals($result, $event->encodeFileContents($string));
+        $this->assertSame($result, $event->encodeFileContents($string));
     }
 
     public function testNormalizedDataGetSet(): void
@@ -122,7 +122,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $origNormData = ['orig'];
 
         $this->assertInstanceOf(ConfigEvent::class, $event->setOriginalNormData($origNormData));
-        $this->assertEquals($origNormData, $event->getOriginalNormData());
+        $this->assertSame($origNormData, $event->getOriginalNormData());
 
         $normData = ['norm'];
 

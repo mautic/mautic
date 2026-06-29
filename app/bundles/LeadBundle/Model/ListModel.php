@@ -125,7 +125,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         // set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
@@ -289,7 +289,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadListEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

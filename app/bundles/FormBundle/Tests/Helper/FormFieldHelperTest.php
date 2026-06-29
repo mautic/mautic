@@ -205,10 +205,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $name
      * @param string $type
-     *
-     * @return Field
      */
-    protected static function getField($name, $type)
+    protected static function getField($name, $type): Field
     {
         $field = new Field();
 
@@ -221,10 +219,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $name
-     *
-     * @return string
      */
-    private static function getAliasFromName($name)
+    private static function getAliasFromName($name): string
     {
         return strtolower(str_replace(' ', '', $name));
     }

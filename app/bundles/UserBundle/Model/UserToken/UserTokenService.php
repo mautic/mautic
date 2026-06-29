@@ -16,10 +16,8 @@ final class UserTokenService implements UserTokenServiceInterface
 
     /**
      * @param int $secretLength
-     *
-     * @return UserToken
      */
-    public function generateSecret(UserToken $token, $secretLength = 32)
+    public function generateSecret(UserToken $token, $secretLength = 32): UserToken
     {
         do {
             $randomSecret   = $this->randomHelper->generate($secretLength);

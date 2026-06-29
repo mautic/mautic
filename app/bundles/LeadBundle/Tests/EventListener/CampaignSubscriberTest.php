@@ -127,24 +127,22 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var LeadModel|MockObject
      */
-    private $mockLeadModel;
+    private MockObject $mockLeadModel;
 
     /**
      * @var CompanyModel|MockObject
      */
-    private $mockCompanyModel;
+    private MockObject $mockCompanyModel;
 
     /**
      * @var CampaignSubscriber
      */
     private $subscriber;
 
-    private FilterOperatorProvider $filterOperatorProvider;
-
     /**
      * @var DoNotContact|MockObject
      */
-    private $doNotContact;
+    private MockObject $doNotContact;
 
     protected function setUp(): void
     {
@@ -156,7 +154,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCampaignModel            = $this->createMock(CampaignModel::class);
         $this->doNotContact           = $this->createMock(DoNotContact::class);
         $mockGroupModel               = $this->createMock(PointGroupModel::class);
-        $this->filterOperatorProvider = new FilterOperatorProvider(
+        $filterOperatorProvider       = new FilterOperatorProvider(
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(TranslatorInterface::class)
         );
@@ -174,7 +172,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCoreParametersHelper,
             $this->doNotContact,
             $mockGroupModel,
-            $this->filterOperatorProvider
+            $filterOperatorProvider
         );
     }
 
@@ -220,11 +218,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
 
-        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
-            function () use ($lead): void {
-                $lead->setPrimaryCompany($this->configTo);
-            }
-        );
+        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')
+            ->willReturnCallback(
+                function () use ($lead): array {
+                    $lead->setPrimaryCompany($this->configTo);
+
+                    return ['oldPrimary' => $this->configTo['id'], 'newPrimary' => $this->configTo['id']];
+                }
+            );
 
         $args = [
             'lead'  => $lead,

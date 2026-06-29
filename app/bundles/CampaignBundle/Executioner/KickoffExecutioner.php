@@ -52,14 +52,12 @@ class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;

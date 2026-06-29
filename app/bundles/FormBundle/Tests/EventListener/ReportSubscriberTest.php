@@ -50,20 +50,13 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     private ReportHelper $reportHelper;
 
     /**
-     * @var CoreParametersHelper|MockObject
-     */
-    private MockObject $coreParametersHelper;
-
-    /**
      * @var TranslatorInterface|MockObject
      */
     private MockObject $translator;
 
     private ReportSubscriber $subscriber;
 
-    private MockObject&DncReportService $dncReportService;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['form_results_data_sources'] = true;
 
@@ -74,17 +67,17 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
         $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService     = $this->createMock(DncReportService::class);
+        $dncReportService           = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $this->coreParametersHelper,
+            $coreParametersHelper,
             $this->translator,
-            $this->dncReportService
+            $dncReportService
         );
     }
 
@@ -133,18 +126,22 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(2))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setTables[] = $args;
+
+                return $mockEvent;
             });
 
         $mockEvent->expects($this->exactly(3))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setGraphs): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;
+
+                return $mockEvent;
             });
 
         $this->companyReportData->expects($this->once())

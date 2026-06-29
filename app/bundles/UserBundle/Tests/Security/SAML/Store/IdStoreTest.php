@@ -38,7 +38,7 @@ class IdStoreTest extends TestCase
             ->willReturnCallback(function (IdEntry $idEntry) use ($expiry): void {
                 $this->assertEquals('foobar', $idEntry->getEntityId());
                 $this->assertEquals('abc', $idEntry->getId());
-                $this->assertEquals($expiry->getTimestamp(), $idEntry->getExpiryTime()->getTimestamp());
+                $this->assertSame($expiry->getTimestamp(), $idEntry->getExpiryTime()->getTimestamp());
             });
 
         $this->store->set('foobar', 'abc', $expiry);

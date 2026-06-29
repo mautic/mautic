@@ -32,10 +32,8 @@ class ConfigBuilderEvent extends Event
 
     /**
      * Set new form to the forms array.
-     *
-     * @return $this
      */
-    public function addForm(array $form)
+    public function addForm(array $form): static
     {
         if (isset($form['formTheme'])) {
             $this->formThemes[] = $form['formTheme'];
@@ -98,10 +96,7 @@ class ConfigBuilderEvent extends Event
         return [];
     }
 
-    /**
-     * @return $this
-     */
-    public function addFileFields($fields)
+    public function addFileFields($fields): static
     {
         $this->encodedFields = array_merge($this->encodedFields, (array) $fields);
 

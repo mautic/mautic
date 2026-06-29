@@ -30,10 +30,8 @@ class TransportChain
      * @param string $alias
      * @param string $translatableAlias
      * @param string $integrationAlias
-     *
-     * @return $this
      */
-    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias)
+    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias): static
     {
         $this->transports[$alias]['alias']            = $translatableAlias;
         $this->transports[$alias]['integrationAlias'] = $integrationAlias;
@@ -141,7 +139,7 @@ class TransportChain
      *
      * @return array<string, array{alias: string, integrationAlias: string, service: TransportInterface, published?: bool}>
      */
-    public function getTransports()
+    public function getTransports(): array
     {
         return $this->transports;
     }
