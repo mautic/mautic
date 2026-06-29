@@ -261,10 +261,7 @@ class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
     }
 
-    /**
-     * @return NotificationHelper
-     */
-    private function getNotificationHelper()
+    private function getNotificationHelper(): NotificationHelper
     {
         return new NotificationHelper(
             $this->userModel,

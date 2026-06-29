@@ -87,14 +87,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contact  = $this->createContact('blabla@contact.email');
 
         $userRepository = $this->em->getRepository(User::class);
-        \assert($userRepository instanceof UserRepository);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
         $roleRepository = $this->em->getRepository(Role::class);
-        \assert($roleRepository instanceof RoleRepository);
+        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
         $roleRepository->saveEntity($role);
 
         $user = new User();

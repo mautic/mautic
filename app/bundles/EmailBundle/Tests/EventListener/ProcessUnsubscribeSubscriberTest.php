@@ -10,29 +10,18 @@ use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
-use PHPUnit\Framework\MockObject\MockObject;
 
 final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&Unsubscribe
-     */
-    private MockObject $unsubscribe;
-
-    /**
-     * @var MockObject&FeedbackLoop
-     */
-    private MockObject $feedbackLoop;
-
     private ProcessUnsubscribeSubscriber $subscriber;
 
     protected function setup(): void
     {
         parent::setUp();
 
-        $this->unsubscribe      = $this->createMock(Unsubscribe::class);
-        $this->feedbackLoop     = $this->createMock(FeedbackLoop::class);
-        $this->subscriber       = new ProcessUnsubscribeSubscriber($this->unsubscribe, $this->feedbackLoop, $this->createMock(CoreParametersHelper::class));
+        $unsubscribe            = $this->createMock(Unsubscribe::class);
+        $feedbackLoop           = $this->createMock(FeedbackLoop::class);
+        $this->subscriber       = new ProcessUnsubscribeSubscriber($unsubscribe, $feedbackLoop, $this->createMock(CoreParametersHelper::class));
     }
 
     public function testOnEmailSend(): void
@@ -47,7 +36,7 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
         $callCount = 0;
         $helper->expects($this->exactly(2))
             ->method('addCustomHeader')
-            ->willReturnCallback(function ($headerName, $headerValue) use (&$callCount) {
+            ->willReturnCallback(function ($headerName, $headerValue) use (&$callCount): void {
                 if (0 === $callCount++) {
                     $this->assertSame('List-Unsubscribe', $headerName);
                     $this->assertSame('<https://example.com/email/unsubscribe/65cf64d8cb367903848157>, <mailto:unsubscribe@example.com>', $headerValue);

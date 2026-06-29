@@ -53,7 +53,7 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(3);
 
         foreach ($this->getMailerMessages() as $message) {
-            \assert($message instanceof MauticMessage);
+            $this->assertInstanceOf(MauticMessage::class, $message);
             $clickThrough = $this->parseClickThrough($message->getHtmlBody());
             $email        = $message->getTo()[0]->getAddress();
             Assert::assertSame((string) $leads[$email]->getId(), $clickThrough['lead'], '"lead" parameter within the click through should match the contact\'s ID.');

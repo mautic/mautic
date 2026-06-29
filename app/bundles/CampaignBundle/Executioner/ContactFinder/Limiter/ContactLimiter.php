@@ -94,8 +94,6 @@ class ContactLimiter
     /**
      * @param int $id
      *
-     * @return $this
-     *
      * @throws NoContactsFoundException
      */
     public function setBatchMinContactId($id): static
@@ -120,9 +118,6 @@ class ContactLimiter
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function resetBatchMinContactId(): static
     {
         $this->batchMinContactId =  null;
@@ -168,8 +163,6 @@ class ContactLimiter
     }
 
     /**
-     * @return $this
-     *
      * @throws \Exception
      */
     public function reduceCampaignLimitRemaining($reduction): static
@@ -184,9 +177,6 @@ class ContactLimiter
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function resetCampaignLimitRemaining(): static
     {
         $this->campaignLimitUsed = 0;

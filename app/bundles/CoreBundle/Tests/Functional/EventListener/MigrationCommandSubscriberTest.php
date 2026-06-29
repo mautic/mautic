@@ -39,13 +39,13 @@ final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
     {
         $this->createTables();
 
-        $this->eventDispatcher->addListener(CoreEvents::ON_GENERATED_COLUMNS_BUILD, function (GeneratedColumnsEvent $event) {
+        $this->eventDispatcher->addListener(CoreEvents::ON_GENERATED_COLUMNS_BUILD, function (GeneratedColumnsEvent $event): void {
             $event->addGeneratedColumn(new GeneratedColumn('test_first', 'generated_name_one', 'CHAR(2)', 'SUBSTRING(name, 1, 2)'));
             $event->addGeneratedColumn(new GeneratedColumn('test_first', 'generated_name_two', 'CHAR(2)', 'SUBSTRING(name, 3, 2)'));
             $event->addGeneratedColumn(new GeneratedColumn('test_first', 'generated_name_three', 'CHAR(2)', 'SUBSTRING(name, 5, 2)'));
         });
 
-        $this->eventDispatcher->addListener(CoreEvents::ON_GENERATED_COLUMNS_BUILD, function (GeneratedColumnsEvent $event) {
+        $this->eventDispatcher->addListener(CoreEvents::ON_GENERATED_COLUMNS_BUILD, function (GeneratedColumnsEvent $event): void {
             $generatedColumn = new GeneratedColumn('test_second', 'generated_date_year', 'YEAR', 'YEAR(date_added)');
             $generatedColumn->prependIndexColumn('campaign_id');
             $generatedColumn->addIndexColumn('id');

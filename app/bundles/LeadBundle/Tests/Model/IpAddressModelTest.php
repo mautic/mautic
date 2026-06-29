@@ -22,11 +22,6 @@ class IpAddressModelTest extends TestCase
      */
     private MockObject $entityManager;
 
-    /**
-     * @var MockObject|LoggerInterface
-     */
-    private MockObject $logger;
-
     private IpAddressModel $ipAddressModel;
 
     protected function setUp(): void
@@ -34,8 +29,8 @@ class IpAddressModelTest extends TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
-        $this->logger         = $this->createMock(LoggerInterface::class);
-        $this->ipAddressModel = new IpAddressModel($this->entityManager, $this->logger);
+        $logger               = $this->createMock(LoggerInterface::class);
+        $this->ipAddressModel = new IpAddressModel($this->entityManager, $logger);
     }
 
     /**

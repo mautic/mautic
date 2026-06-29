@@ -42,9 +42,6 @@ class ListPreProcessListEvent extends CommonEvent
         return $this->result;
     }
 
-    /**
-     * @return $this
-     */
     public function setResult($result): static
     {
         $this->result = $result;

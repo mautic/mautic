@@ -36,7 +36,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $event->expects($matcher)
-            ->method('addEvent')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addEvent')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(EmailEvents::EMAIL_ON_SEND, $parameters[0]);
                     $this->assertSame([

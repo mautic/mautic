@@ -23,9 +23,9 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
     {
         $page    = $this->createNewPage();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/edit/{$page->getId()}");
-        Assert::assertEquals(0, $crawler->selectButton('Save as Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Discard Draft')->count());
+        Assert::assertCount(0, $crawler->selectButton('Save as Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Apply Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testPageDraftConfigured(): void
@@ -33,9 +33,9 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $page    = $this->createNewPage();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/pages/edit/{$page->getId()}");
 
-        Assert::assertEquals(1, $crawler->selectButton('Save as Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Discard Draft')->count());
+        Assert::assertCount(1, $crawler->selectButton('Save as Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Apply Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testCheckDraftInList(): void
@@ -53,10 +53,10 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $page = $this->createNewPage();
         $this->saveDraft($page);
         $crawler = $this->client->request(Request::METHOD_GET, "/page/preview/{$page->getId()}");
-        $this->assertEquals('Test html', $crawler->filter('body')->text());
+        $this->assertSame('Test html', $crawler->filter('body')->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/page/preview/{$page->getId()}/draft");
-        $this->assertEquals('Test html Draft', $crawler->filter('body')->text());
+        $this->assertSame('Test html Draft', $crawler->filter('body')->text());
     }
 
     public function testSaveDraftAndApplyDraft(): void

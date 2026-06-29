@@ -149,7 +149,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     {
         $leadIds = [];
         foreach ($campaignEventLogs as $log) {
-            \assert($log instanceof LeadEventLog);
+            $this->assertInstanceOf(LeadEventLog::class, $log);
             $leadIds[] = $log->getLead()->getId();
         }
 

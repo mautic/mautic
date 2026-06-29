@@ -56,7 +56,7 @@ class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends MauticMys
 
         $commandTester->execute([]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
         $outputMessage = $commandTester->getDisplay();
         $this->assertStringContainsString("Total Removed Records from form results table = {$timesFormSubmitted}", $outputMessage);
     }

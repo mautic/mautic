@@ -42,7 +42,7 @@ class EntityMetadataTest extends TestCase
             $entityMetadata->getOrmConfig()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'namespace_prefix' => 'Mautic\\CoreBundle\\Entity',
                 'path'             => '@MauticCoreBundle/Entity',

@@ -22,10 +22,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldTypeTest extends TypeTestCase
 {
-    private TranslatorInterface $translator;
-    private ObjectCollectorInterface $objectCollector;
-    private FieldCollectorInterface $fieldCollector;
-    private AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $objectCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $fieldCollector;
+    private \PHPUnit\Framework\MockObject\MockObject $mappedFieldCollector;
 
     protected function setUp(): void
     {

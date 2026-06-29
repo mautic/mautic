@@ -91,10 +91,7 @@ class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Hello', $this->getCallback()->getMessage($request));
     }
 
-    /**
-     * @return TwilioCallback
-     */
-    private function getCallback()
+    private function getCallback(): TwilioCallback
     {
         return new TwilioCallback($this->contactHelper, $this->configuration);
     }

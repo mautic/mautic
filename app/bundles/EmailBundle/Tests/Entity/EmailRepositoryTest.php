@@ -24,7 +24,7 @@ class EmailRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = $this->configureRepository(Email::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
@@ -239,7 +239,7 @@ class EmailRepositoryTest extends TestCase
 
         $result = $this->repo->getSentReadNotReadCount($queryBuilder);
 
-        $this->assertEquals([
+        $this->assertSame([
             'sent_count' => 100,
             'read_count' => 60,
             'not_read'   => 40,
@@ -276,9 +276,9 @@ class EmailRepositoryTest extends TestCase
 
         $result = $this->repo->getSentReadNotReadCount($queryBuilder);
 
-        $this->assertEquals([
-            'sent_count' => 0,
+        $this->assertSame([
             'read_count' => 0,
+            'sent_count' => 0,
             'not_read'   => 0,
         ], $result);
     }
