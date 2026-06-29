@@ -10,7 +10,6 @@ import grapesjstouch from 'grapesjs-touch';
 import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
-import grapesjstypography from './plugins/grapesjs.typography';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
 import grapesjsImageLink from './plugins/grapesjs-image-link';
@@ -1224,7 +1223,6 @@ export default class BuilderService {
         grapesjspostcss,
         grapesjsmautic,
         grapesjsckeditor,
-        grapesjstypography,
         ...BuilderService.getPluginNames('email-mjml'),
       ],
       pluginsOpts: {
@@ -1253,7 +1251,6 @@ export default class BuilderService {
           inline_toolbar_max_width: '445px',
           theme_alias: BuilderService.getActiveThemeAlias(),
         },
-        [grapesjstypography]: { mode: 'email-mjml' },
         ...BuilderService.getPluginOptions('email-mjml'),
       },
     });
