@@ -46,7 +46,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
-        \assert($message instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString(
@@ -70,7 +70,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
-        \assert($message instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
@@ -142,7 +142,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
-        \assert($message instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
@@ -234,7 +234,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
-        \assert($message instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString('Variant 1 Dynamic Content', $message->getBody()->toString());
@@ -326,7 +326,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
-        \assert($message instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());

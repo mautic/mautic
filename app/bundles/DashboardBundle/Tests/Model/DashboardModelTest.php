@@ -62,7 +62,7 @@ final class DashboardModelTest extends TestCase
         $dateFrom    = new \DateTime($dateFromStr);
         $dateTo      = new \DateTime('23:59:59'); // till end of the 'to' date selected
 
-        $this->coreParametersHelper->expects(self::once())
+        $this->coreParametersHelper->expects($this->once())
             ->method('get')
             ->with('default_daterange_filter', $dateFromStr)
             ->willReturn($dateFromStr);
@@ -97,12 +97,12 @@ final class DashboardModelTest extends TestCase
         $widgetEventFactory->method('create')->willReturn($event);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->willThrowException($exception);
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(self::once())
+        $logger->expects($this->once())
             ->method('error')
             ->with(
                 self::stringContains('failed to load'),

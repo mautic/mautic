@@ -105,9 +105,9 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
 
         $doNotSellList = new MaxMindDoNotSellList($this->coreParamsHelperMock);
 
-        $this->assertEquals($this->badFilePath, $doNotSellList->getListPath());
+        $this->assertSame($this->badFilePath, $doNotSellList->getListPath());
         $this->assertFalse($doNotSellList->loadList());
-        $this->assertEquals([], $doNotSellList->getList());
+        $this->assertSame([], $doNotSellList->getList());
     }
 
     /**
@@ -123,7 +123,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
         $doNotSellList = new MaxMindDoNotSellList($this->coreParamsHelperMock);
         $doNotSellList->loadList();
 
-        $this->assertEquals($this->goodFilePath, $doNotSellList->getListPath());
+        $this->assertSame($this->goodFilePath, $doNotSellList->getListPath());
 
         $goodData = json_decode($this->goodData, true)['exclusions'];
         $this->assertEquals($goodData, $doNotSellList->getList());

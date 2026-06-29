@@ -204,9 +204,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'];
-            },
+            fn ($contact): bool => empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'],
         ];
 
         // to test multiple excluding values
@@ -215,11 +213,8 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return
-                    empty($contact->getFields())
-                    || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
-            },
+            fn ($contact): bool => empty($contact->getFields())
+            || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
         ];
 
         // to test including filter, should NOT contain blank values
@@ -229,9 +224,7 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'];
-            },
+            fn ($contact): bool => !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'],
         ];
 
         // to test multiple including values
@@ -240,11 +233,8 @@ class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            function ($contact): bool {
-                return
-                    !empty($contact->getFields())
-                    && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']);
-            },
+            fn ($contact): bool => !empty($contact->getFields())
+            && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
         ];
     }
 }

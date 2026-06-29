@@ -23,10 +23,10 @@ class IntegrationTokenFactoryTest extends TestCase
 
         $token = $factory($data);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
-        $this->assertEquals(time() + 10, $token->getExpiresAt());
+        $this->assertSame(time() + 10, $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithExpiresAt(): void
@@ -40,10 +40,10 @@ class IntegrationTokenFactoryTest extends TestCase
 
         $token = $factory($data);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
-        $this->assertEquals($data['expires_at'], $token->getExpiresAt());
+        $this->assertSame($data['expires_at'], $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithExpires(): void
@@ -57,10 +57,10 @@ class IntegrationTokenFactoryTest extends TestCase
 
         $token = $factory($data);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
-        $this->assertEquals(time() + 10, $token->getExpiresAt());
+        $this->assertSame(time() + 10, $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithDefaultExpires(): void
@@ -73,10 +73,10 @@ class IntegrationTokenFactoryTest extends TestCase
 
         $token = $factory($data);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
-        $this->assertEquals(time() + 100, $token->getExpiresAt());
+        $this->assertSame(time() + 100, $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithUnexpiredTokenByDefault(): void
@@ -89,10 +89,10 @@ class IntegrationTokenFactoryTest extends TestCase
 
         $token = $factory($data);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
-        $this->assertEquals(0, $token->getExpiresAt());
+        $this->assertSame(0, $token->getExpiresAt());
     }
 
     public function testTokenGeneratedWithPreviousRefreshToken(): void
@@ -105,8 +105,8 @@ class IntegrationTokenFactoryTest extends TestCase
         $previousToken = new IntegrationToken('789', '456');
         $token         = $factory($data, $previousToken);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($previousToken->getRefreshToken(), $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($previousToken->getRefreshToken(), $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
     }
 
@@ -122,9 +122,9 @@ class IntegrationTokenFactoryTest extends TestCase
 
         $token = $factory($data);
 
-        $this->assertEquals($data['access_token'], $token->getAccessToken());
-        $this->assertEquals($data['refresh_token'], $token->getRefreshToken());
+        $this->assertSame($data['access_token'], $token->getAccessToken());
+        $this->assertSame($data['refresh_token'], $token->getRefreshToken());
         $this->assertFalse($token->isExpired());
-        $this->assertEquals(['foo' => 'bar'], $token->getExtraData());
+        $this->assertSame(['foo' => 'bar'], $token->getExtraData());
     }
 }

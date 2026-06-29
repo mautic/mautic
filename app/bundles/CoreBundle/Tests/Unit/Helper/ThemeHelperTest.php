@@ -188,7 +188,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/page.html.twig');
-        $this->assertEquals('@themes/_1-2-1-2-column/html/page.html.twig', $template);
+        $this->assertSame('@themes/_1-2-1-2-column/html/page.html.twig', $template);
     }
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
@@ -223,8 +223,8 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/page.html.twig');
-        $this->assertNotEquals('@themes/nature/page.html.twig', $template);
-        $this->assertNotEquals('@themes/goldstar/page.html.twig', $template);
+        $this->assertNotSame('@themes/nature/page.html.twig', $template);
+        $this->assertNotSame('@themes/goldstar/page.html.twig', $template);
         $this->assertStringContainsString('/page.html.twig', $template);
     }
 
@@ -236,7 +236,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath($name, $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
@@ -330,7 +330,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath($name, $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 

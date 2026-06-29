@@ -18,10 +18,10 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactFound(): void
     {
         $model = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($model instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $model);
 
         $merger = static::getContainer()->get('mautic.lead.merger');
-        \assert($merger instanceof ContactMerger);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         $bob = new Lead();
         $bob->setFirstname('Bob')
@@ -41,11 +41,11 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Bob should have been merged into Jane
         $jane = $model->getEntity($janeId);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertSame($janeId, $jane->getId());
 
         // If Bob is queried, Jane should be returned
         $jane = $model->getEntity($bobId);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertSame($janeId, $jane->getId());
 
         // Merge Jane into a third contact
         $joey = new Lead();
@@ -59,7 +59,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Query for Bob which should now return Joey
         $joey = $model->getEntity($bobId);
-        $this->assertEquals($joeyId, $joey->getId());
+        $this->assertSame($joeyId, $joey->getId());
 
         // If Joey is deleted, querying for Bob or Jane should result in null
         $model->deleteEntity($joey);
@@ -72,13 +72,13 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactsPointsAreAccurate(): void
     {
         $model = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($model instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $model);
 
         $em = static::getContainer()->get('doctrine.orm.entity_manager');
-        \assert($em instanceof EntityManager);
+        $this->assertInstanceOf(EntityManager::class, $em);
 
         $merger = static::getContainer()->get('mautic.lead.merger');
-        \assert($merger instanceof ContactMerger);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         // Startout Jane with 50 points
         $jane = new Lead();
@@ -108,7 +108,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(50, $jane->getPoints());
         // Jane should come out of the merge as Jane
         $jane = $merger->merge($jane, $visitor);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertSame($janeId, $jane->getId());
         // Jane should now have 53 points
         $this->assertEquals(53, $jane->getPoints());
         $em->detach($jane);
@@ -128,7 +128,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         // Jane again identifies herself, gets merged into the new visitor and so should now have a total of 56 points
         $jane = $model->getEntity($janeId);
         $jane = $merger->merge($jane, $visitor2);
-        $this->assertEquals($janeId, $jane->getId());
+        $this->assertSame($janeId, $jane->getId());
         $em->detach($jane);
         $em->detach($visitor2);
         $jane = $model->getEntity($jane->getId());
@@ -139,16 +139,16 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactKeepsCompanyAssociations(): void
     {
         $model = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($model instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $model);
 
         $companyModel = static::getContainer()->get('mautic.lead.model.company');
-        \assert($companyModel instanceof CompanyModel);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $merger = static::getContainer()->get('mautic.lead.merger');
-        \assert($merger instanceof ContactMerger);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
 
         $companyLeadRepository = static::getContainer()->get('mautic.lead.repository.company_lead');
-        \assert($companyLeadRepository instanceof CompanyLeadRepository);
+        $this->assertInstanceOf(CompanyLeadRepository::class, $companyLeadRepository);
 
         // Jane is a known contact associated with a primary company
         $jane = new Lead();

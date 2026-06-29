@@ -71,7 +71,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 42 should have been send down the non-action path (red) of the condition
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[11]);
-        $this->assertEquals(42, $nonActionCount);
+        $this->assertSame(42, $nonActionCount);
 
         // 8 contacts are from the US and should be labeled with US:Action
         $this->assertCount(8, $byEvent[12]);
@@ -150,7 +150,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 25 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(25, $nonActionCount);
+        $this->assertSame(25, $nonActionCount);
 
         // A condition should be logged as evaluated for each of the 25 contacts
         $this->assertCount(25, $byEvent[4]);
@@ -237,7 +237,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 1 should have been send down the non-action path (red) of the condition
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[11]);
-        $this->assertEquals(1, $nonActionCount);
+        $this->assertSame(1, $nonActionCount);
 
         // 0 contacts are from the US and should be labeled with US:Action
         $this->assertCount(0, $byEvent[12]);
@@ -317,7 +317,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 0 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(0, $nonActionCount);
+        $this->assertSame(0, $nonActionCount);
 
         // There should be no inactive events
         $this->assertCount(0, $byEvent[4]);
@@ -398,7 +398,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 4 should have been send down the non-action path (red) of the condition
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[11]);
-        $this->assertEquals(4, $nonActionCount);
+        $this->assertSame(4, $nonActionCount);
 
         // 1 contacts are from the US and should be labeled with US:Action
         $this->assertCount(1, $byEvent[12]);
@@ -477,7 +477,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 3 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(3, $nonActionCount);
+        $this->assertSame(3, $nonActionCount);
 
         // A condition should be logged as evaluated for each of the 3 contacts
         $this->assertCount(3, $byEvent[4]);
@@ -550,13 +550,13 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(0, $count);
+        self::assertSame(0, $count);
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
+        self::assertSame(50, $count);
     }
 
     public function testCampaignActionChangeMembership(): void
@@ -714,7 +714,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $segmentMemberRepo->deleteEntities($segmentMemberRepo->findAll());
 
         $campaign = $campaignRepo->find(1); // Created in parent::setUp()
-        \assert($campaign instanceof Campaign);
+        $this->assertInstanceOf(Campaign::class, $campaign);
 
         $campaign->setAllowRestart(true);
 
@@ -759,7 +759,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         }
 
         // check if the new campaign processed first
-        $this->assertEquals("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
+        $this->assertSame("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
     }
 
     /**
@@ -771,7 +771,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
+        self::assertSame(50, $count);
     }
 
     /** @return array<string, int> */
@@ -873,7 +873,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $eventLog = $this->em->find(LeadEventLog::class, $logId);
-        \assert($eventLog instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $eventLog);
 
         Assert::assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
         Assert::assertSame($expectedIsScheduled, $eventLog->getIsScheduled());

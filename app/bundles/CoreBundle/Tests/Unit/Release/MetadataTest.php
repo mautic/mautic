@@ -21,17 +21,17 @@ class MetadataTest extends TestCase
 
         $metadata = new Metadata($releaseMetadata);
 
-        $this->assertEquals($releaseMetadata['version'], $metadata->getVersion());
-        $this->assertEquals(3, $metadata->getMajorVersion());
-        $this->assertEquals(2, $metadata->getMinorVersion());
-        $this->assertEquals(1, $metadata->getPatchVersion());
-        $this->assertEquals('', $metadata->getExtraVersion());
-        $this->assertEquals($releaseMetadata['stability'], $metadata->getStability());
-        $this->assertEquals($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
-        $this->assertEquals($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
-        $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
+        $this->assertSame($releaseMetadata['version'], $metadata->getVersion());
+        $this->assertSame(3, $metadata->getMajorVersion());
+        $this->assertSame(2, $metadata->getMinorVersion());
+        $this->assertSame(1, $metadata->getPatchVersion());
+        $this->assertSame('', $metadata->getExtraVersion());
+        $this->assertSame($releaseMetadata['stability'], $metadata->getStability());
+        $this->assertSame($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
+        $this->assertSame($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
+        $this->assertSame($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
     }
 
     public function testStableReleaseWithoutPhpVersionWarning(): void
@@ -47,17 +47,17 @@ class MetadataTest extends TestCase
 
         $metadata = new Metadata($releaseMetadata);
 
-        $this->assertEquals($releaseMetadata['version'], $metadata->getVersion());
-        $this->assertEquals(3, $metadata->getMajorVersion());
-        $this->assertEquals(2, $metadata->getMinorVersion());
-        $this->assertEquals(1, $metadata->getPatchVersion());
-        $this->assertEquals('', $metadata->getExtraVersion());
-        $this->assertEquals($releaseMetadata['stability'], $metadata->getStability());
-        $this->assertEquals($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
-        $this->assertEquals('', $metadata->getShowPHPVersionWarningIfUnder());
-        $this->assertEquals($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
-        $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
+        $this->assertSame($releaseMetadata['version'], $metadata->getVersion());
+        $this->assertSame(3, $metadata->getMajorVersion());
+        $this->assertSame(2, $metadata->getMinorVersion());
+        $this->assertSame(1, $metadata->getPatchVersion());
+        $this->assertSame('', $metadata->getExtraVersion());
+        $this->assertSame($releaseMetadata['stability'], $metadata->getStability());
+        $this->assertSame($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
+        $this->assertSame('', $metadata->getShowPHPVersionWarningIfUnder());
+        $this->assertSame($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
+        $this->assertSame($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
     }
 
     public function testExtraVersionFound(): void
@@ -76,19 +76,19 @@ class MetadataTest extends TestCase
 
         $metadata = new Metadata($releaseMetadata);
 
-        $this->assertEquals($releaseMetadata['version'], $metadata->getVersion());
-        $this->assertEquals(3, $metadata->getMajorVersion());
-        $this->assertEquals(2, $metadata->getMinorVersion());
-        $this->assertEquals(1, $metadata->getPatchVersion());
-        $this->assertEquals('beta', $metadata->getExtraVersion());
-        $this->assertEquals($releaseMetadata['stability'], $metadata->getStability());
-        $this->assertEquals($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
-        $this->assertEquals($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
-        $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
-        $this->assertEquals($releaseMetadata['minimum_mysql_version'], $metadata->getMinSupportedMySqlVersion());
-        $this->assertEquals($releaseMetadata['minimum_mariadb_version'], $metadata->getMinSupportedMariaDbVersion());
+        $this->assertSame($releaseMetadata['version'], $metadata->getVersion());
+        $this->assertSame(3, $metadata->getMajorVersion());
+        $this->assertSame(2, $metadata->getMinorVersion());
+        $this->assertSame(1, $metadata->getPatchVersion());
+        $this->assertSame('beta', $metadata->getExtraVersion());
+        $this->assertSame($releaseMetadata['stability'], $metadata->getStability());
+        $this->assertSame($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
+        $this->assertSame($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
+        $this->assertSame($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
+        $this->assertSame($releaseMetadata['minimum_mysql_version'], $metadata->getMinSupportedMySqlVersion());
+        $this->assertSame($releaseMetadata['minimum_mariadb_version'], $metadata->getMinSupportedMariaDbVersion());
     }
 
     public function testLongerExtraVersionFound(): void
@@ -105,18 +105,18 @@ class MetadataTest extends TestCase
             'minimum_mariadb_version'           => '10.3.5',
         ];
         $metadata = new Metadata($releaseMetadata);
-        $this->assertEquals($releaseMetadata['version'], $metadata->getVersion());
-        $this->assertEquals(3, $metadata->getMajorVersion());
-        $this->assertEquals(2, $metadata->getMinorVersion());
-        $this->assertEquals(1, $metadata->getPatchVersion());
-        $this->assertEquals('xxx-yyy', $metadata->getExtraVersion());
-        $this->assertEquals($releaseMetadata['stability'], $metadata->getStability());
-        $this->assertEquals($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
-        $this->assertEquals($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
-        $this->assertEquals($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
-        $this->assertEquals($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
-        $this->assertEquals($releaseMetadata['minimum_mysql_version'], $metadata->getMinSupportedMySqlVersion());
-        $this->assertEquals($releaseMetadata['minimum_mariadb_version'], $metadata->getMinSupportedMariaDbVersion());
+        $this->assertSame($releaseMetadata['version'], $metadata->getVersion());
+        $this->assertSame(3, $metadata->getMajorVersion());
+        $this->assertSame(2, $metadata->getMinorVersion());
+        $this->assertSame(1, $metadata->getPatchVersion());
+        $this->assertSame('xxx-yyy', $metadata->getExtraVersion());
+        $this->assertSame($releaseMetadata['stability'], $metadata->getStability());
+        $this->assertSame($releaseMetadata['minimum_php_version'], $metadata->getMinSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['maximum_php_version'], $metadata->getMaxSupportedPHPVersion());
+        $this->assertSame($releaseMetadata['show_php_version_warning_if_under'], $metadata->getShowPHPVersionWarningIfUnder());
+        $this->assertSame($releaseMetadata['minimum_mautic_version'], $metadata->getMinSupportedMauticVersion());
+        $this->assertSame($releaseMetadata['announcement_url'], $metadata->getAnnouncementUrl());
+        $this->assertSame($releaseMetadata['minimum_mysql_version'], $metadata->getMinSupportedMySqlVersion());
+        $this->assertSame($releaseMetadata['minimum_mariadb_version'], $metadata->getMinSupportedMariaDbVersion());
     }
 }

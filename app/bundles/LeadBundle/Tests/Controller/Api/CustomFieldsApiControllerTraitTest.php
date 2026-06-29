@@ -29,19 +29,16 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ->willReturn($result);
 
         $modelFake = $this->createMock(FieldModel::class);
-        $modelFake->expects(self::once())
+        $modelFake->expects($this->once())
             ->method('getEntities')
             ->willReturn($paginator);
 
         $controller = new class($modelFake) {
             use CustomFieldsApiControllerTrait;
-
-            private object $model;
             private string $entityNameOne = 'lead';
 
-            public function __construct(object $modelFake)
+            public function __construct(private object $model)
             {
-                $this->model = $modelFake;
             }
 
             /**
