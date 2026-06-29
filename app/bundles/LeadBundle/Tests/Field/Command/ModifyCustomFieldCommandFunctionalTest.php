@@ -30,7 +30,7 @@ final class ModifyCustomFieldCommandFunctionalTest extends MauticMysqlTestCase
     public function testUpdateCustomFieldsRunsIntoException(): void
     {
         $commandTester = $this->testSymfonyCommand('mautic:fields:modify', [
-            'csv-path' => dirname(__FILE__).'/random.csv',
+            'csv-path' => __DIR__.'/random.csv',
         ]);
 
         $this->assertSame(Command::FAILURE, $commandTester->getStatusCode());

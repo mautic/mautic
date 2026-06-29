@@ -314,8 +314,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     /**
      * @param string $name
-     *
-     * @return $this
      */
     public function setName($name): static
     {
@@ -358,9 +356,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
     public function setCategory($category): static
     {
         $this->isChanged('category', $category);
@@ -394,9 +389,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->publishDown;
     }
 
-    /**
-     * @return $this
-     */
     public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
@@ -413,9 +405,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->publishUp;
     }
 
-    /**
-     * @return $this
-     */
     public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
@@ -429,9 +418,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return ($includeVariants) ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
     public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;

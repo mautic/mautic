@@ -107,8 +107,6 @@ final class ButtonHelper
 
     /**
      * @param array<array<string,mixed>> $buttons
-     *
-     * @return $this
      */
     public function addButtons(array $buttons): self
     {
@@ -120,8 +118,6 @@ final class ButtonHelper
 
     /**
      * @param array<string,mixed> $button
-     *
-     * @return $this
      */
     public function addButton(array $button): self
     {
@@ -134,8 +130,6 @@ final class ButtonHelper
     /**
      * @param string|null $wrapOpeningTag
      * @param string|null $wrapClosingTag
-     *
-     * @return $this
      */
     public function setWrappingTags($wrapOpeningTag, $wrapClosingTag): self
     {
@@ -145,9 +139,6 @@ final class ButtonHelper
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setGroupType(string $groupType): self
     {
         $this->groupType = $groupType;
@@ -157,8 +148,6 @@ final class ButtonHelper
 
     /**
      * @param string|null $menuLink
-     *
-     * @return $this
      */
     public function setMenuLink($menuLink): self
     {
@@ -228,8 +217,6 @@ final class ButtonHelper
      * Reset the buttons.
      *
      * @param string $buttonCount
-     *
-     * @return $this
      */
     public function reset(Request $request, $buttonCount, string $groupType = self::TYPE_GROUP, $item = null): self
     {
@@ -325,9 +312,6 @@ final class ButtonHelper
         return $buttons;
     }
 
-    /**
-     * @return $this
-     */
     private function fetchCustomButtons(): self
     {
         if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {

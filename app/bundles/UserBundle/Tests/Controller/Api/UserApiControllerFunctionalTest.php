@@ -183,7 +183,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
         $this->em->persist($user);
@@ -243,7 +243,7 @@ class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 
             // Verify the password was hashed correctly by checking if we can verify it
             $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-            \assert($hasher instanceof PasswordHasherInterface);
+            $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
             $this->assertTrue(
                 $hasher->verify($user->getPassword(), $userData['plainPassword']),
                 'Password should be properly hashed and verifiable'

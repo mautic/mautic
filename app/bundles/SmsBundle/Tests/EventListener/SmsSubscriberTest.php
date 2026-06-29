@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class SmsSubscriberTest extends TestCase
 {
-    private CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     private string $messageText = 'custom http://mautic.com text';
 

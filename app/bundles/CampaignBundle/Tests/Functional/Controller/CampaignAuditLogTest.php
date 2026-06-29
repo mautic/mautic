@@ -102,7 +102,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated'),

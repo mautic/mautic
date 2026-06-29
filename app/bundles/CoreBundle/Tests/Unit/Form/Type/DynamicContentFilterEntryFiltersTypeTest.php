@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -17,25 +16,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 {
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var ListModel&MockObject
-     */
-    private MockObject $listModel;
-
     private DynamicContentFilterEntryFiltersType $form;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->listModel  = $this->createMock(ListModel::class);
-        $this->form       =  new DynamicContentFilterEntryFiltersType($this->translator, $this->listModel);
+        $translator       = $this->createMock(TranslatorInterface::class);
+        $listModel        = $this->createMock(ListModel::class);
+        $this->form       =  new DynamicContentFilterEntryFiltersType($translator, $listModel);
     }
 
     public function testBuildForm(): void
@@ -101,7 +90,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('setRequired')
             ->with([
                 'countries',

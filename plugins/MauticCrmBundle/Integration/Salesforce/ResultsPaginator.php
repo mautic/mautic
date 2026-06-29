@@ -36,8 +36,6 @@ class ResultsPaginator
     }
 
     /**
-     * @return $this
-     *
      * @throws ApiErrorException
      */
     public function setResults(array $results): static

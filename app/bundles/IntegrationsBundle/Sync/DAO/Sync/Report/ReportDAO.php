@@ -35,9 +35,6 @@ class ReportDAO
         return $this->integration;
     }
 
-    /**
-     * @return $this
-     */
     public function addObject(ObjectDAO $objectDAO): static
     {
         if (!isset($this->objects[$objectDAO->getObject()])) {

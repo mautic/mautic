@@ -30,8 +30,6 @@ class BarChart extends AbstractChart implements ChartInterface
      *
      * @param string $label
      * @param int    $order
-     *
-     * @return $this
      */
     public function setDataset($label, array $data, $order = null): static
     {

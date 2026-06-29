@@ -24,18 +24,18 @@ class DetailsTypeTest extends TestCase
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
             ->willReturn(['hide_keys' => ['key1', 'key3']]);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getRequiredKeyFields')
             ->willReturn(['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3', 'key4' => 'value4']);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('decryptApiKeys')
             ->willReturn([]);
         $integrationObject->expects(self::never())
             ->method('isAuthorized');
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getSupportedFeatures')
             ->willReturn([]);
 
@@ -74,7 +74,7 @@ class DetailsTypeTest extends TestCase
                 return $builder;
             });
 
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('modifyForm')
             ->with($builder, $options);
 
@@ -93,19 +93,19 @@ class DetailsTypeTest extends TestCase
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
             ->willReturn(['hide_keys' => ['key3'], 'requires_authorization' => true]);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getRequiredKeyFields')
             ->willReturn(['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3', 'key4' => 'value4']);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('decryptApiKeys')
             ->willReturn(['decrypted']);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('isAuthorized')
             ->willReturn($isAuthorized);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getSupportedFeatures')
             ->willReturn([]);
 
@@ -147,7 +147,7 @@ class DetailsTypeTest extends TestCase
                 return $builder;
             });
 
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('modifyForm')
             ->with($builder, $options);
 
@@ -175,28 +175,28 @@ class DetailsTypeTest extends TestCase
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
             ->willReturn(['hide_keys' => ['key1']]);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getRequiredKeyFields')
             ->willReturn(['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3', 'key4' => 'value4']);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('decryptApiKeys')
             ->willReturn(['decrypted']);
         $integrationObject->expects(self::never())
             ->method('isAuthorized');
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getSupportedFeatures')
             ->willReturn(['non-configured']);
 
         $integration = $this->createMock(Integration::class);
         $integration->method('getApiKeys')
             ->willReturn([]);
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getId')
             ->willReturn($integrationId);
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getSupportedFeatures')
             ->willReturn(['configured']);
 
@@ -232,7 +232,7 @@ class DetailsTypeTest extends TestCase
                 return $builder;
             });
 
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('modifyForm')
             ->with($builder, $options);
 
@@ -258,18 +258,18 @@ class DetailsTypeTest extends TestCase
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationObject = $this->createMock(AbstractIntegration::class);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getFormDisplaySettings')
             ->willReturn([]);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getRequiredKeyFields')
             ->willReturn(['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3', 'key4' => 'value4']);
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('decryptApiKeys')
             ->willReturn(['decrypted']);
         $integrationObject->expects(self::never())
             ->method('isAuthorized');
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('getSupportedFeatures');
 
         $integration = $this->createMock(Integration::class);
@@ -284,7 +284,7 @@ class DetailsTypeTest extends TestCase
         $options['data']               = $integration;
 
         $calls = 0;
-        $builder->expects(self::once())
+        $builder->expects($this->once())
             ->method('setAction')
             ->with($action);
         $builder->expects(self::atLeastOnce())
@@ -308,7 +308,7 @@ class DetailsTypeTest extends TestCase
                 return $builder;
             });
 
-        $integrationObject->expects(self::once())
+        $integrationObject->expects($this->once())
             ->method('modifyForm')
             ->with($builder, $options);
 

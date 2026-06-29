@@ -54,6 +54,6 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
             'params'   => [],
             'template' => 'the water spout',
         ];
-        $this->assertEquals($expected, $widget->toArray());
+        $this->assertSame($expected, $widget->toArray());
     }
 }

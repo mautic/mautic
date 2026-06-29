@@ -29,7 +29,7 @@ class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('oauth2_two_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth2_two_legged', (new HttpFactory())->getAuthType());
     }
 
     public function testInvalidCredentialsThrowsException(): void

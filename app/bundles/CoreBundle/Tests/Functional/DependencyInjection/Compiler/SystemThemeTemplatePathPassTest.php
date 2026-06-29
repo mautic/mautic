@@ -20,7 +20,7 @@ class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
         // This test require cache to be cleared
         // as the template override must exist before the cache is generated.
         $pathsHelper = static::getContainer()->get('mautic.helper.paths');
-        \assert($pathsHelper instanceof PathsHelper);
+        $this->assertInstanceOf(PathsHelper::class, $pathsHelper);
         $cacheDir    = $pathsHelper->getCachePath();
 
         $filesystem = new Filesystem();

@@ -140,8 +140,6 @@ class CampaignExecutionEvent extends Event
 
     /**
      * @param bool|mixed[]|string|null $result
-     *
-     * @return $this
      */
     public function setResult($result): static
     {
@@ -154,8 +152,6 @@ class CampaignExecutionEvent extends Event
      * Set the result to failed.
      *
      * @param string|null $reason
-     *
-     * @return $this
      */
     public function setFailed($reason = null): static
     {
@@ -177,8 +173,6 @@ class CampaignExecutionEvent extends Event
 
     /**
      * Set a custom log entry to override auto-handling of the log entry.
-     *
-     * @return $this
      */
     public function setLogEntry(LeadEventLog $log): static
     {
