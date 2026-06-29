@@ -33,34 +33,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SyncProcessTest extends TestCase
 {
     /**
-     * @var MockObject|MappingManualDAO
-     */
-    private MockObject $mappingManualDAO;
-
-    /**
      * @var MockObject|MauticSyncDataExchange
      */
     private MockObject $internalSyncDataExchange;
 
     /**
-     * @var MockObject|SyncDataExchangeInterface
-     */
-    private MockObject $integrationSyncDataExchange;
-
-    /**
      * @var MockObject|SyncDateHelper
      */
     private MockObject $syncDateHelper;
-
-    /**
-     * @var MockObject|MappingHelper
-     */
-    private MockObject $mappingHelper;
-
-    /**
-     * @var MockObject|RelationsHelper
-     */
-    private MockObject $relationsHelper;
 
     /**
      * @var MockObject|IntegrationSyncProcess
@@ -78,50 +58,40 @@ class SyncProcessTest extends TestCase
     private MockObject $eventDispatcher;
 
     /**
-     * @var MockObject|Notifier
-     */
-    private MockObject $notifier;
-
-    /**
      * @var MockObject|InputOptionsDAO
      */
     private MockObject $inputOptionsDAO;
-
-    /**
-     * @var MockObject|SyncServiceInterface
-     */
-    private MockObject $syncService;
 
     private SyncProcess $syncProcess;
 
     protected function setUp(): void
     {
         $this->syncDateHelper              = $this->createMock(SyncDateHelper::class);
-        $this->mappingHelper               = $this->createMock(MappingHelper::class);
-        $this->relationsHelper             = $this->createMock(RelationsHelper::class);
+        $mappingHelper                     = $this->createMock(MappingHelper::class);
+        $relationsHelper                   = $this->createMock(RelationsHelper::class);
         $this->integrationSyncProcess      = $this->createMock(IntegrationSyncProcess::class);
         $this->mauticSyncProcess           = $this->createMock(MauticSyncProcess::class);
         $this->eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->notifier                    = $this->createMock(Notifier::class);
-        $this->mappingManualDAO            = $this->createMock(MappingManualDAO::class);
-        $this->integrationSyncDataExchange = $this->createMock(SyncDataExchangeInterface::class);
+        $notifier                          = $this->createMock(Notifier::class);
+        $mappingManualDAO                  = $this->createMock(MappingManualDAO::class);
+        $integrationSyncDataExchange       = $this->createMock(SyncDataExchangeInterface::class);
         $this->internalSyncDataExchange    = $this->createMock(MauticSyncDataExchange::class);
         $this->inputOptionsDAO             = $this->createMock(InputOptionsDAO::class);
-        $this->syncService                 = $this->createMock(SyncServiceInterface::class);
+        $syncService                       = $this->createMock(SyncServiceInterface::class);
 
         $this->syncProcess = new SyncProcess(
             $this->syncDateHelper,
-            $this->mappingHelper,
-            $this->relationsHelper,
+            $mappingHelper,
+            $relationsHelper,
             $this->integrationSyncProcess,
             $this->mauticSyncProcess,
             $this->eventDispatcher,
-            $this->notifier,
-            $this->mappingManualDAO,
+            $notifier,
+            $mappingManualDAO,
             $this->internalSyncDataExchange,
-            $this->integrationSyncDataExchange,
+            $integrationSyncDataExchange,
             $this->inputOptionsDAO,
-            $this->syncService
+            $syncService
         );
     }
 
@@ -190,7 +160,7 @@ class SyncProcessTest extends TestCase
         $this->eventDispatcher->expects($matcher)
             ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $callback = function (CompletedSyncIterationEvent $event) {
+                    $callback = function (CompletedSyncIterationEvent $event): void {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
                         Assert::assertCount(1, $orderResult->getNewObjectMappings('foo'));
@@ -201,7 +171,7 @@ class SyncProcessTest extends TestCase
                     $this->assertSame(IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $callback = function (CompletedSyncIterationEvent $event) {
+                    $callback = function (CompletedSyncIterationEvent $event): void {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
                         Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));

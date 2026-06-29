@@ -17,9 +17,9 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var DeviceDetector|(DeviceDetector&object&\PHPUnit\Framework\MockObject\MockObject)|(DeviceDetector&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
      */
-    private DeviceDetector|\PHPUnit\Framework\MockObject\MockObject $deviceDetector;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceDetector;
 
-    private DeviceDetectorFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
+    private \PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
 
     protected function setUp(): void
     {
@@ -206,9 +206,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory->expects($this->any())
             ->method('create')
             ->willReturnCallback(
-                function () {
-                    return $this->deviceDetector;
-                }
+                fn () => $this->deviceDetector
             );
 
         $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory, null);

@@ -769,8 +769,6 @@ class Import extends FormEntity
      * Overwrite this method so we could change import status based on it.
      *
      * @param bool $isPublished
-     *
-     * @return $this
      */
     public function setIsPublished($isPublished): static
     {

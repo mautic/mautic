@@ -13,7 +13,7 @@ class FieldsWithUniqueIdentifierTest extends TestCase
     /**
      * @var MockObject|FieldList
      */
-    private $fieldList;
+    private MockObject $fieldList;
 
     /**
      * @var FieldsWithUniqueIdentifier

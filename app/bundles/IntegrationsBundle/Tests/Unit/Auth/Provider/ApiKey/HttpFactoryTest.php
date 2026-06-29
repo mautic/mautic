@@ -17,7 +17,7 @@ class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('api_key', (new HttpFactory())->getAuthType());
+        $this->assertSame('api_key', (new HttpFactory())->getAuthType());
     }
 
     public function testInvalidCredentialsThrowsException(): void

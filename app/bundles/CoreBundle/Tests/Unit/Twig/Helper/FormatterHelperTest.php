@@ -16,14 +16,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
-    private DateHelper $dateHelper;
-
     private FormatterHelper $formatterHelper;
-
-    /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
 
     private string $previousTimeZone;
 
@@ -31,16 +24,16 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->dateHelper           = new DateHelper(
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $dateHelper                 = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $this->translator,
-            $this->coreParametersHelper
+            $coreParametersHelper
         );
-        $this->formatterHelper               = new FormatterHelper($this->dateHelper, $this->translator);
+        $this->formatterHelper               = new FormatterHelper($dateHelper, $this->translator);
     }
 
     protected function tearDown(): void
@@ -88,7 +81,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $result = $this->formatterHelper->_(1.55, 'float');
 
         $this->assertEquals('1.5500', $result);
-        $this->assertEquals('string', gettype($result));
+        $this->assertSame('string', gettype($result));
     }
 
     public function testIntFormat(): void
@@ -96,7 +89,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $result = $this->formatterHelper->_(10, 'int');
 
         $this->assertSame('10', $result);
-        $this->assertEquals('string', gettype($result));
+        $this->assertSame('string', gettype($result));
     }
 
     /**

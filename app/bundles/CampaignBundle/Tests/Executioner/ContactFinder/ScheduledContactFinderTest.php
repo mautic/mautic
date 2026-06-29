@@ -125,10 +125,7 @@ class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->hydrateContacts(new ArrayCollection());
     }
 
-    /**
-     * @return ScheduledContactFinder
-     */
-    private function getContactFinder()
+    private function getContactFinder(): ScheduledContactFinder
     {
         return new ScheduledContactFinder(
             $this->leadRepository,

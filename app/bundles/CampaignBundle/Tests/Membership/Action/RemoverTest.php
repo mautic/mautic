@@ -64,10 +64,7 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
         $this->getRemover()->updateExistingMembership($campaignMember, false);
     }
 
-    /**
-     * @return Remover
-     */
-    private function getRemover()
+    private function getRemover(): Remover
     {
         $translator     = $this->createMock(TranslatorInterface::class);
         $dateTimeHelper = new DateHelper(

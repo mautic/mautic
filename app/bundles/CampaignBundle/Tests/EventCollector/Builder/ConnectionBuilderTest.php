@@ -110,6 +110,6 @@ class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, $results);
+        $this->assertSame($expected, $results);
     }
 }

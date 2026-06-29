@@ -132,7 +132,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $this->redirectModel        = $this->createMock(RedirectModel::class);
 
         $this->sMimeHelper->method('signContent')
-            ->willReturnCallback(fn (MauticMessage $message) => $message);
+            ->willReturnCallback(fn (MauticMessage $message): MauticMessage => $message);
 
         $this->fromEmaiHelper->method('getFrom')
             ->willReturn(new AddressDTO('someone@somewhere.com'));
@@ -181,7 +181,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->mailHelper->method('addTo')
             ->willReturnCallback(
-                fn ($email) => '@bad.com' !== $email
+                fn ($email): bool => '@bad.com' !== $email
             );
         $this->mailHelper->method('queue')
             ->willReturn([true, []]);
@@ -243,7 +243,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new AddressDTO('someone@somewhere.com'));
 
         $this->coreParametersHelper->method('get')->willReturnCallback(
-            fn ($param) => match ($param) {
+            fn ($param): string => match ($param) {
                 'mailer_from_email' => 'nobody@nowhere.com',
                 'secret_key'        => 'secret',
                 default             => '',
@@ -351,7 +351,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         // Mock factory to remove when factory is completely gone.
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn ($param) => match ($param) {
+                fn ($param): string => match ($param) {
                     default => '',
                 }
             );
@@ -455,7 +455,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn ($param) => match ($param) {
+                fn ($param): string => match ($param) {
                     default => '',
                 }
             );
@@ -574,7 +574,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
-                fn ($param) => match ($param) {
+                fn ($param): string => match ($param) {
                     default => '',
                 }
             );

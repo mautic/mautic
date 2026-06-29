@@ -283,7 +283,7 @@ class LeadSubscriberTest extends CommonMocks
 
         // This method will be called exactly once per set of changes
         $this->auditLogModel->expects($matcher)
-            ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3) {
+            ->method('writeToLog')->willReturnCallback(function (...$parameters) use ($matcher, $lead, $lead2, $lead3): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'bundle'    => 'lead',

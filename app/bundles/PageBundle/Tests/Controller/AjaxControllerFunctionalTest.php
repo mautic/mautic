@@ -31,7 +31,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent) {
+            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 

@@ -41,9 +41,9 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $method     = $reflection->getMethod('prepareDbalFieldsForSave');
         $method->invokeArgs($trait, [&$fields]);
 
-        $this->assertEquals(1, $fields['true']);
-        $this->assertEquals(0, $fields['false']);
-        $this->assertEquals('blah', $fields['string']);
+        $this->assertSame(1, $fields['true']);
+        $this->assertSame(0, $fields['false']);
+        $this->assertSame('blah', $fields['string']);
     }
 
     /**
@@ -144,11 +144,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('setParameter')
             ->with('emails', $emails, ArrayParameterType::STRING)
             ->willReturn($query);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('getArrayResult')
             ->willReturn([
                 0 => [
@@ -159,11 +159,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->entityManager->expects(self::once())
+        $this->entityManager->expects($this->once())
             ->method('createQuery')
             ->willReturn($query);
 
-        self::assertEquals(
+        self::assertSame(
             [1, 2],
             $this->repository->getContactIdsByEmails($emails)
         );

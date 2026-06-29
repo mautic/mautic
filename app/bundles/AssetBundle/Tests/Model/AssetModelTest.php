@@ -40,10 +40,6 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private ContainerInterface&MockObject $container;
-
-    private CacheProvider $cacheProvider;
-
     private LeadModel&MockObject $leadModel;
 
     private CategoryModel&MockObject $categoryModel;
@@ -83,13 +79,13 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->with($this->equalTo('max_size'))
             ->willReturn('2MB');
 
-        $this->container             = $this->createMock(ContainerInterface::class);
-        $this->cacheProvider         = new CacheProvider($this->coreParametersHelper, $this->container);
+        $container                   = $this->createMock(ContainerInterface::class);
+        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $container);
         $this->leadModel             = $this->createMock(LeadModel::class);
         $this->categoryModel         = $this->createMock(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
-        $this->deviceDetectorFactory = new DeviceDetectorFactory($this->cacheProvider);
+        $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
         $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);

@@ -215,9 +215,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
      */
     private function assertEmailLists(array $expectedListIds, Collection $collection): void
     {
-        $this->assertArrayValuesEquals($expectedListIds, $collection->map(function (LeadList $leadList) {
-            return $leadList->getId();
-        })->toArray());
+        $this->assertArrayValuesEquals($expectedListIds, $collection->map(fn (LeadList $leadList) => $leadList->getId())->toArray());
     }
 
     private function createEmail(): Email

@@ -10,6 +10,6 @@ class EmailAddressTest extends \PHPUnit\Framework\TestCase
     public function testValidateBy(): void
     {
         $constraint = new EmailAddress();
-        $this->assertEquals(EmailAddressValidator::class, $constraint->validatedBy());
+        $this->assertSame(EmailAddressValidator::class, $constraint->validatedBy());
     }
 }

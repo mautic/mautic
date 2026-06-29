@@ -26,45 +26,45 @@ class IntegrationsListTypeTest extends TestCase
         $pluginName = 'plugin name';
 
         $integration1 = $this->createMock(Integration::class);
-        $integration1->expects(self::once())
+        $integration1->expects($this->once())
             ->method('isPublished')
             ->willReturn(false);
         $integration1->expects(self::never())
             ->method('getPlugin');
 
         $plugin = $this->createMock(Plugin::class);
-        $plugin->expects(self::once())
+        $plugin->expects($this->once())
             ->method('getName')
             ->willReturn($pluginName);
 
         $integration2 = $this->createMock(Integration::class);
-        $integration2->expects(self::once())
+        $integration2->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
-        $integration2->expects(self::once())
+        $integration2->expects($this->once())
             ->method('getPlugin')
             ->willReturn($plugin);
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
-        $integrationInstance1->expects(self::once())
+        $integrationInstance1->expects($this->once())
             ->method('getIntegrationSettings')
             ->willReturn($integration1);
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance2 = $this->createMock(AbstractIntegration::class);
-        $integrationInstance2->expects(self::once())
+        $integrationInstance2->expects($this->once())
             ->method('getIntegrationSettings')
             ->willReturn($integration2);
-        $integrationInstance2->expects(self::once())
+        $integrationInstance2->expects($this->once())
             ->method('getDisplayName')
             ->willReturn('Integration 2');
-        $integrationInstance2->expects(self::once())
+        $integrationInstance2->expects($this->once())
             ->method('getName')
             ->willReturn('integration-2');
 
         $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $integrationHelper->expects(self::once())
+        $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with(null, 'features', true)
             ->willReturn(['integration1' => $integrationInstance1, 'integration2' => $integrationInstance2]);
@@ -105,10 +105,10 @@ class IntegrationsListTypeTest extends TestCase
         $data = [];
 
         $formEvent = $this->createMock(FormEvent::class);
-        $formEvent->expects(self::once())
+        $formEvent->expects($this->once())
             ->method('getForm')
             ->willReturn($form);
-        $formEvent->expects(self::once())
+        $formEvent->expects($this->once())
             ->method('getData')
             ->willReturn($data);
 
@@ -159,45 +159,45 @@ class IntegrationsListTypeTest extends TestCase
         $pluginName = 'plugin name';
 
         $integration1 = $this->createMock(Integration::class);
-        $integration1->expects(self::once())
+        $integration1->expects($this->once())
             ->method('isPublished')
             ->willReturn(false);
         $integration1->expects(self::never())
             ->method('getPlugin');
 
         $plugin = $this->createMock(Plugin::class);
-        $plugin->expects(self::once())
+        $plugin->expects($this->once())
             ->method('getName')
             ->willReturn($pluginName);
 
         $integration2 = $this->createMock(Integration::class);
-        $integration2->expects(self::once())
+        $integration2->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
-        $integration2->expects(self::once())
+        $integration2->expects($this->once())
             ->method('getPlugin')
             ->willReturn($plugin);
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
-        $integrationInstance1->expects(self::once())
+        $integrationInstance1->expects($this->once())
             ->method('getIntegrationSettings')
             ->willReturn($integration1);
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance2 = $this->createMock(AbstractIntegration::class);
-        $integrationInstance2->expects(self::once())
+        $integrationInstance2->expects($this->once())
             ->method('getIntegrationSettings')
             ->willReturn($integration2);
-        $integrationInstance2->expects(self::once())
+        $integrationInstance2->expects($this->once())
             ->method('getDisplayName')
             ->willReturn('Integration 2');
-        $integrationInstance2->expects(self::once())
+        $integrationInstance2->expects($this->once())
             ->method('getName')
             ->willReturn('integration-2');
 
         $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $integrationHelper->expects(self::once())
+        $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
             ->with(null, 'features', true)
             ->willReturn(['integration1' => $integrationInstance1, 'integration2' => $integrationInstance2]);
@@ -256,7 +256,7 @@ class IntegrationsListTypeTest extends TestCase
 
         $callsBuilder = 0;
         $builder      = $this->createMock(FormBuilderInterface::class);
-        \assert($builder instanceof FormBuilderInterface);
+        \PHPUnit\Framework\Assert::assertInstanceOf(FormBuilderInterface::class, $builder);
         $builder->method('add')
             ->willReturnCallback(static function (string $key, string $fieldFQCN, array $options) use ($pluginName, &$callsBuilder, $builder): FormBuilderInterface {
                 if ('integration' === $key) {

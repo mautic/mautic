@@ -14,7 +14,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $user->setCurrentPassword('currentPass');
 
         $user = unserialize(serialize($user));
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->assertSame('testUser', $user->getUsername());
         $this->assertNull($user->getPlainPassword());

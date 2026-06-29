@@ -6,9 +6,6 @@ class StatDAO
 {
     private array $stats = [];
 
-    /**
-     * @return $this
-     */
     public function addStat($key, $value): static
     {
         if (!isset($this->stats[$key])) {
