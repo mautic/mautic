@@ -79,7 +79,7 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->formBuilder->method('addEventListener')
             ->willReturnCallback(
-                function (string $eventName, callable $listener) use ($report) {
+                function (string $eventName, callable $listener) use ($report): MockObject {
                     if (FormEvents::PRE_SET_DATA === $eventName) {
                         $form      = $this->createMock(FormInterface::class);
                         $formEvent = new FormEvent($form, $report);

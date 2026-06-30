@@ -166,7 +166,7 @@ class ConfigFormTest extends KernelTestCase
                 'MauticCrmBundle' => ['id' => 1],
             ]);
 
-        $integrationHelper = new IntegrationHelper(
+        return new IntegrationHelper(
             self::getContainer(),
             $entityManager,
             $pathsHelper,
@@ -175,7 +175,5 @@ class ConfigFormTest extends KernelTestCase
             $twig,
             $pluginModel
         );
-
-        return $integrationHelper;
     }
 }

@@ -11,17 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateTranslationsStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|LanguageHelper
+     * @var MockObject&LanguageHelper
      */
     private MockObject $languageHelper;
 
     /**
-     * @var MockObject|LoggerInterface
+     * @var MockObject&LoggerInterface
      */
     private MockObject $logger;
 

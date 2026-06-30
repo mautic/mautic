@@ -56,7 +56,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testClear(): void
     {
-        $csvExporter = $this->createMock(CsvExporter::class);
+        $csvExporter = $this->createStub(CsvExporter::class);
 
         $exportHandler = $this->createMock(ExportHandler::class);
 
@@ -75,7 +75,7 @@ class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilePath(): void
     {
-        $csvExporter = $this->createMock(CsvExporter::class);
+        $csvExporter = $this->createStub(CsvExporter::class);
 
         $exportHandler = $this->createMock(ExportHandler::class);
 

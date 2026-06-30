@@ -13,7 +13,9 @@ use PHPUnit\Framework\TestCase;
 class UTCDateTimeImmutableTypeTest extends TestCase
 {
     private string $previousTimeZone;
+
     private UTCDateTimeImmutableType $type;
+
     private MySQL80Platform $platform;
 
     protected function setUp(): void

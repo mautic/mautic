@@ -18,8 +18,14 @@ class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
+    /**
+     * @var MockObject&Client
+     */
     protected MockObject $mockHttp;
 
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     protected MockObject $mockCoreParamsHelper;
 
     protected function setUp(): void

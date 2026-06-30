@@ -19,8 +19,8 @@ class DecisionExecutioner implements EventInterface
     public const TYPE = 'decision';
 
     public function __construct(
-        private EventLogger $eventLogger,
-        private DecisionDispatcher $dispatcher,
+        private readonly EventLogger $eventLogger,
+        private readonly DecisionDispatcher $dispatcher,
     ) {
     }
 

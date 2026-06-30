@@ -372,7 +372,7 @@ trait VariantEntityTrait
      */
     protected function appendTranslationEntityIds(object $entity, array &$ids, bool $publishedOnly): void
     {
-        if (!($entity instanceof TranslationEntityInterface && method_exists($this, 'getTranslations'))) {
+        if (!$entity instanceof TranslationEntityInterface || !method_exists($this, 'getTranslations')) {
             return;
         }
 

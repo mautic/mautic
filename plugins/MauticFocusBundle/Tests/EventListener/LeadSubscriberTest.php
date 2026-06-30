@@ -21,22 +21,22 @@ use Symfony\Component\Routing\RouterInterface;
 class LeadSubscriberTest extends CommonMocks
 {
     /**
-     * @var Translator|MockObject
+     * @var MockObject&Translator
      */
     private MockObject $translator;
 
     /**
-     * @var RouterInterface|MockObject
+     * @var RouterInterface|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $router;
+    private \PHPUnit\Framework\MockObject\Stub $router;
 
     /**
-     * @var FocusModel|(FocusModel&MockObject)|MockObject
+     * @var MockObject&FocusModel
      */
     private MockObject $focusModel;
 
     /**
-     * @var StatRepository|(StatRepository&MockObject)|MockObject
+     * @var MockObject&StatRepository
      */
     private MockObject $statRepository;
 
@@ -58,7 +58,7 @@ class LeadSubscriberTest extends CommonMocks
     protected function setUp(): void
     {
         $this->translator     = $this->createMock(Translator::class);
-        $this->router         = $this->createMock(RouterInterface::class);
+        $this->router         = $this->createStub(RouterInterface::class);
         $this->focusModel     = $this->createMock(FocusModel::class);
         $this->statRepository = $this->createMock(StatRepository::class);
         $matcher              = $this->any();

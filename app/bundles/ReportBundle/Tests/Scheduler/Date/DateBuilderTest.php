@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class DateBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|SchedulerBuilder
+     * @var MockObject&SchedulerBuilder
      */
     private MockObject $schedulerBuilder;
 

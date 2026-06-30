@@ -24,10 +24,10 @@ use Symfony\Component\HttpFoundation\Response;
 class ListController extends CommonController
 {
     public function __construct(
-        private PluginCollector $pluginCollector,
-        private RouteProvider $routeProvider,
+        private readonly PluginCollector $pluginCollector,
+        private readonly RouteProvider $routeProvider,
         ManagerRegistry $doctrine,
-        private Config $config,
+        private readonly Config $config,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,

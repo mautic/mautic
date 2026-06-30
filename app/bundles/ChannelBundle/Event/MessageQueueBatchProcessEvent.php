@@ -11,7 +11,7 @@ class MessageQueueBatchProcessEvent extends Event
      * @param MessageQueue[] $messages
      */
     public function __construct(
-        private array $messages,
+        private readonly array $messages,
         private $channel,
         private $channelId,
     ) {

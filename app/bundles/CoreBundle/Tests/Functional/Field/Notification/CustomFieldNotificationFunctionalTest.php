@@ -15,8 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private TranslatorInterface $translator;
+
     private CustomFieldNotification $notifier;
+
     private LeadField $leadField;
 
     protected function setUp(): void

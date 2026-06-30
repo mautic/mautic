@@ -30,7 +30,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testBooleanWithPrepareDbalFieldsForSave(): void
     {
-        $trait  = $this->createMock(LeadRepository::class);
+        $trait  = $this->createStub(LeadRepository::class);
         $fields = [
             'true'   => true,
             'false'  => false,

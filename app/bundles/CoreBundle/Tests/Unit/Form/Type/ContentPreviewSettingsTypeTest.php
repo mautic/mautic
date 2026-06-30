@@ -27,12 +27,12 @@ class ContentPreviewSettingsTypeTest extends TestCase
     private MockObject $translator;
 
     /**
-     * @var CorePermissions&MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var UserHelper&MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelperMock;
 
@@ -132,7 +132,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $builder) {
+                function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         self::assertEquals($this->contactFieldDefinition, $parameters);
                     }
@@ -227,7 +227,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $builder) {
+                function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         self::assertEquals($this->contactFieldDefinition, $parameters);
                     }
@@ -291,7 +291,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $builder->expects($matcher)
             ->method('add')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher, $builder) {
+                function (...$parameters) use ($matcher, $builder): MockObject {
                     if (1 === $matcher->numberOfInvocations()) {
                         self::assertEquals($this->contactFieldDefinition, $parameters);
                     }
@@ -393,7 +393,7 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
         $matcher     = self::exactly(3);
         $formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $expectedTranslationChoices, $parentEmailId, $expectedVariantChoices, $formBuilder) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $expectedTranslationChoices, $parentEmailId, $expectedVariantChoices, $formBuilder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('translation', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);

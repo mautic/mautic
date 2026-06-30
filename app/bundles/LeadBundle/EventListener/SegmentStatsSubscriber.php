@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentStatsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $leadListRepository)
+    public function __construct(private readonly LeadListRepository $leadListRepository)
     {
     }
 

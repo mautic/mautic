@@ -570,7 +570,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactId = $contact->getId();
 
         // Create an email:
-        $createEmail = function () use ($segment) {
+        $createEmail = function () use ($segment): Email {
             $email = new Email();
             $email->setName('API email');
             $email->setSubject('Email created via API test');
