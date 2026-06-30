@@ -110,11 +110,16 @@ class LookupHelper
         }
     }
 
+    /**
+     * @return array{notify: mixed, entity: mixed}|false
+     */
     public function validateRequest($oid, $type): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+
+        $entity = null;
 
         switch ($type) {
             case 'person':

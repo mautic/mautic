@@ -15,6 +15,8 @@ class EncryptionService
 
     /**
      * @param mixed $keys
+     *
+     * @return string|string[]
      */
     public function encrypt($keys): string|array
     {

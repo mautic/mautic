@@ -11,10 +11,8 @@ class UrlHelper
      *
      * @param string $url
      * @param string $appendQueryString
-     *
-     * @return string
      */
-    public static function appendQueryToUrl($url, $appendQueryString): string|array
+    public static function appendQueryToUrl($url, $appendQueryString): string
     {
         $query     = parse_url($url, PHP_URL_QUERY);
 

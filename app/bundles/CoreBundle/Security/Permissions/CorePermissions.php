@@ -74,8 +74,6 @@ class CorePermissions implements ResetInterface
      * @param string $bundle         can be either short bundle name or full path to the permissions class
      * @param bool   $throwException
      *
-     * @return AbstractPermissions
-     *
      * @throws \InvalidArgumentException
      */
     public function getPermissionObject($bundle, $throwException = true): false|AbstractPermissions
