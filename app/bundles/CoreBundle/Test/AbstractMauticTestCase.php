@@ -93,6 +93,16 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
+    }
+
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
@@ -104,7 +114,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->followRedirects(true);
 
         $this->em = static::getContainer()->get('doctrine')->getManager();
-        \assert($this->em instanceof EntityManagerInterface);
+        $this->assertInstanceOf(EntityManagerInterface::class, $this->em);
         $this->connection = $this->em->getConnection();
         $this->router     = static::getContainer()->get('router');
         $scheme           = $this->router->getContext()->getScheme();

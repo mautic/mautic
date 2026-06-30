@@ -280,9 +280,6 @@ class ObjectMapping
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function appendToInternalStorage($key, $value): static
     {
         $this->internalStorage[$key] = $value;

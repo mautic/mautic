@@ -32,7 +32,7 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $companyModel
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 LeadEvents::COMPANY_PRE_SAVE    => ['onCompanyPreSave', 0],
                 LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],

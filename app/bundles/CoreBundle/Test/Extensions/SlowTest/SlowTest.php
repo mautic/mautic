@@ -29,9 +29,9 @@ class SlowTest implements Extension
      */
     private array $classes = [];
 
-    private bool $enabled;
+    private readonly bool $enabled;
 
-    private float $threshold;
+    private readonly float $threshold;
 
     private ?HRTime $time = null;
 

@@ -77,8 +77,6 @@ class ContactMerger
 
     /**
      * Merge timestamps.
-     *
-     * @return $this
      */
     public function mergeTimestamps(Lead $winner, Lead $loser): static
     {
@@ -102,8 +100,6 @@ class ContactMerger
 
     /**
      * Merge IP history into the winner.
-     *
-     * @return $this
      */
     public function mergeIpAddressHistory(Lead $winner, Lead $loser): static
     {
@@ -120,8 +116,6 @@ class ContactMerger
 
     /**
      * Merge custom field data into winner.
-     *
-     * @return $this
      */
     public function mergeFieldData(Lead $winner, Lead $loser): static
     {
@@ -180,8 +174,6 @@ class ContactMerger
 
     /**
      * Merge owners if the winner isn't already assigned an owner.
-     *
-     * @return $this
      */
     public function mergeOwners(Lead $winner, Lead $loser): static
     {
@@ -199,8 +191,6 @@ class ContactMerger
 
     /**
      * Sum points from both contacts.
-     *
-     * @return $this
      */
     public function mergePoints(Lead $winner, Lead $loser): static
     {
@@ -218,8 +208,6 @@ class ContactMerger
 
     /**
      * Merge tags from loser into winner.
-     *
-     * @return $this
      */
     public function mergeTags(Lead $winner, Lead $loser): static
     {
@@ -285,8 +273,6 @@ class ContactMerger
 
     /**
      * Merge past merge records into the winner.
-     *
-     * @return $this
      */
     private function updateMergeRecords(Lead $winner, Lead $loser): static
     {

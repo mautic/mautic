@@ -25,17 +25,27 @@ class ConfigFormTest extends KernelTestCase
         self::bootKernel();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
+    }
+
     public function testConfigForm(): void
     {
         $plugins = $this->getIntegrationObject()->getIntegrationObjects();
 
-        foreach ($plugins as $name => $s) {
-            $featureSettings = $s->getFormSettings();
+        foreach ($plugins as $plugin) {
+            $featureSettings = $plugin->getFormSettings();
 
             $this->assertArrayHasKey('requires_callback', $featureSettings);
             $this->assertArrayHasKey('requires_authorization', $featureSettings);
             if ($featureSettings['requires_callback']) {
-                $this->assertNotEmpty($s->getAuthCallbackUrl());
+                $this->assertNotEmpty($plugin->getAuthCallbackUrl());
             }
         }
     }

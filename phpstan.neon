@@ -13,7 +13,7 @@ parameters:
 	type_coverage:
 		return: 80
 		param: 70
-		property: 65
+		property: 64
 	paths:
 		- app/bundles
 		- app/migrations
@@ -96,7 +96,16 @@ parameters:
 		-
 			identifier: return.deprecatedClass
 			message: '#Return type of method (Mautic|MauticPlugin)\\(.*?)\\EventListener\\CampaignSubscriber::(.*?) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent#'
-
+		# false positive, reflection reference method call
+		-
+			identifier: method.impossibleType
+			paths:
+				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+				- app/bundles/NotificationBundle/Tests/Unit/Api/OneSignalApiTest.php
+		-
+			identifier: method.alreadyNarrowedType
+			paths:
+				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

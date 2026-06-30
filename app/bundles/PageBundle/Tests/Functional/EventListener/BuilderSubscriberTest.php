@@ -69,7 +69,7 @@ class BuilderSubscriberTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $mailHashHelper = static::getContainer()->get(MailHashHelper::class);
-        \assert($mailHashHelper instanceof MailHashHelper);
+        $this->assertInstanceOf(MailHashHelper::class, $mailHashHelper);
 
         $unsubscribeUrl = $this->router->generate('mautic_email_unsubscribe', [
             'idHash'     => $emailStat->getTrackingHash(),

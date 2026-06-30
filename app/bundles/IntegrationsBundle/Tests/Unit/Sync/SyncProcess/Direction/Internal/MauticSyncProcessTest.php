@@ -186,7 +186,7 @@ class MauticSyncProcessTest extends TestCase
             ->willThrowException(new ObjectDeletedException());
 
         $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
-        self::assertEquals([], $syncOrder->getIdentifiedObjects());
+        self::assertSame([], $syncOrder->getIdentifiedObjects());
     }
 
     public function testGetSyncOrderObjectSkipped(): void
@@ -226,7 +226,7 @@ class MauticSyncProcessTest extends TestCase
 
         $syncOrder = $this->createMauticSyncProcess($mappingManual)->getSyncOrder($syncReport);
 
-        self::assertEquals([], $syncOrder->getIdentifiedObjects());
+        self::assertSame([], $syncOrder->getIdentifiedObjects());
     }
 
     public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void

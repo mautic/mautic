@@ -231,7 +231,7 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getReportGeneratorEventMock()
+    private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
     {
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
@@ -246,7 +246,7 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getQueryBuilderMock()
+    private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 

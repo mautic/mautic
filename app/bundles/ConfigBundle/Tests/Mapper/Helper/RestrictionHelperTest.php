@@ -33,7 +33,7 @@ class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->assertEquals($expected, RestrictionHelper::prepareRestrictions($this->restrictedFields));
+        $this->assertSame($expected, RestrictionHelper::prepareRestrictions($this->restrictedFields));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Ensure a restrictions are recursively applied')]

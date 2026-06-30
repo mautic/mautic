@@ -36,7 +36,7 @@ final class ListControllerTest extends MauticMysqlTestCase
                 'Mautic Do Not Contact Extras Bundle',
             ],
             array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                fn (string $dirtyPackageName): string => trim($dirtyPackageName),
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );

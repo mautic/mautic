@@ -37,7 +37,7 @@ class ConfigSubscriberTest extends TestCase
         ];
 
         $this->configBuilderEvent->method('getParametersFromConfig')
-            ->willReturnCallback(fn (string $bundle) => match ($bundle) {
+            ->willReturnCallback(fn (string $bundle): array => match ($bundle) {
                 'MauticLeadBundle' => $leadBundleParameters,
                 default            => [],
             });

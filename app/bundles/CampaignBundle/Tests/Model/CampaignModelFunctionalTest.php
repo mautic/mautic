@@ -130,8 +130,8 @@ class CampaignModelFunctionalTest extends MauticMysqlTestCase
                 $this->emulateEmailStat($value['lead'], $email, $value['read'], $event->getId());
 
                 if ($value['read'] && $value['click']) {
-                    $hits       = rand(1, 5);
-                    $uniqueHits = rand(1, $hits);
+                    $hits       = random_int(1, 5);
+                    $uniqueHits = random_int(1, $hits);
                     $this->emulateClick($value['lead'], $email, $hits, $uniqueHits);
                 }
             }

@@ -33,7 +33,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertUploadSuccessful($uploadedFiles);
 
         $newAssetCount = $this->getAssetCount();
-        $this->assertEquals($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
+        $this->assertSame($initialAssetCount + self::IMAGE_COUNT, $newAssetCount);
 
         $this->testPagination($newAssetCount);
         $this->testRecentlyAddedFilesAppearFirst($uploadedFiles);
@@ -41,7 +41,7 @@ final class FileManagerControllerFunctionalTest extends MauticMysqlTestCase
         $this->deleteUploadedFiles($uploadedFiles);
 
         $finalAssetCount = $this->getAssetCount();
-        $this->assertEquals($initialAssetCount, $finalAssetCount);
+        $this->assertSame($initialAssetCount, $finalAssetCount);
     }
 
     public function testUploadedSvgIsReturnedInMediaList(): void

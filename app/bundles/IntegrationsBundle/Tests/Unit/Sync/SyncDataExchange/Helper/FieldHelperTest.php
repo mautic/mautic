@@ -31,18 +31,6 @@ class FieldHelperTest extends TestCase
     private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var VariableExpresserHelperInterface&MockObject
-     */
-    private MockObject $variableExpresserHelper;
-
-    /**
-     * @var ChannelListHelper&MockObject
-     */
-    private MockObject $channelListHelper;
-
-    private MockObject $eventDispatcher;
-
-    /**
      * @var MauticSyncFieldsLoadEvent&MockObject
      */
     private MockObject $mauticSyncFieldsLoadEvent;
@@ -57,15 +45,15 @@ class FieldHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
-        $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
+        $variableExpresserHelper       = $this->createMock(VariableExpresserHelperInterface::class);
+        $channelListHelper             = $this->createMock(ChannelListHelper::class);
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
-        $this->channelListHelper->method('getFeatureChannels')
+        $channelListHelper->method('getFeatureChannels')
             ->willReturn(['Email' => 'email']);
 
         $this->mauticSyncFieldsLoadEvent = $this->createMock(MauticSyncFieldsLoadEvent::class);
-        $this->eventDispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->eventDispatcher->method('dispatch')
+        $eventDispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->method('dispatch')
             ->willReturn($this->mauticSyncFieldsLoadEvent);
 
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -73,10 +61,10 @@ class FieldHelperTest extends TestCase
         $this->fieldHelper = new FieldHelper(
             $this->fieldModel,
             $this->fieldsWithUniqueIdentifier,
-            $this->variableExpresserHelper,
-            $this->channelListHelper,
+            $variableExpresserHelper,
+            $channelListHelper,
             $this->createMock(TranslatorInterface::class),
-            $this->eventDispatcher,
+            $eventDispatcher,
             $this->objectProvider
         );
     }
@@ -96,7 +84,7 @@ class FieldHelperTest extends TestCase
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'email',
                 'mautic_internal_contact_timeline',
@@ -122,7 +110,7 @@ class FieldHelperTest extends TestCase
 
         $fields = $this->fieldHelper->getSyncFields($objectName);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'email',
                 'mautic_internal_contact_timeline',
@@ -191,13 +179,13 @@ class FieldHelperTest extends TestCase
 
     public function testGetNormalizedFieldType(): void
     {
-        $this->assertEquals(NormalizedValueDAO::BOOLEAN_TYPE, $this->fieldHelper->getNormalizedFieldType('boolean'));
-        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('date'));
-        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('datetime'));
-        $this->assertEquals(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('time'));
-        $this->assertEquals(NormalizedValueDAO::FLOAT_TYPE, $this->fieldHelper->getNormalizedFieldType('number'));
-        $this->assertEquals(NormalizedValueDAO::SELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('select'));
-        $this->assertEquals(NormalizedValueDAO::MULTISELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('multiselect'));
-        $this->assertEquals(NormalizedValueDAO::STRING_TYPE, $this->fieldHelper->getNormalizedFieldType('default'));
+        $this->assertSame(NormalizedValueDAO::BOOLEAN_TYPE, $this->fieldHelper->getNormalizedFieldType('boolean'));
+        $this->assertSame(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('date'));
+        $this->assertSame(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('datetime'));
+        $this->assertSame(NormalizedValueDAO::DATETIME_TYPE, $this->fieldHelper->getNormalizedFieldType('time'));
+        $this->assertSame(NormalizedValueDAO::FLOAT_TYPE, $this->fieldHelper->getNormalizedFieldType('number'));
+        $this->assertSame(NormalizedValueDAO::SELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('select'));
+        $this->assertSame(NormalizedValueDAO::MULTISELECT_TYPE, $this->fieldHelper->getNormalizedFieldType('multiselect'));
+        $this->assertSame(NormalizedValueDAO::STRING_TYPE, $this->fieldHelper->getNormalizedFieldType('default'));
     }
 }

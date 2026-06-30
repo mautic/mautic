@@ -106,9 +106,6 @@ class IpAddress
         return $this->id;
     }
 
-    /**
-     * @return $this
-     */
     public function setIpAddress($ipAddress): static
     {
         $this->ipAddress = $ipAddress;

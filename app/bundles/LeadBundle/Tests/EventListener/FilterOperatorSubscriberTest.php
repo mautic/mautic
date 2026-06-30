@@ -22,8 +22,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends TestCase
 {
-    private OperatorOptions $operatorOptions;
-
     /**
      * @var MockObject|LeadFieldRepository
      */
@@ -50,14 +48,14 @@ final class FilterOperatorSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $this->operatorOptions      = new OperatorOptions();
+        $operatorOptions            = new OperatorOptions();
         $this->leadFieldRepository  = $this->createMock(LeadFieldRepository::class);
         $this->typeOperatorProvider = $this->createMock(TypeOperatorProviderInterface::class);
         $this->fieldChoicesProvider = $this->createMock(FieldChoicesProviderInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
 
         $this->subscriber = new FilterOperatorSubscriber(
-            $this->operatorOptions,
+            $operatorOptions,
             $this->leadFieldRepository,
             $this->typeOperatorProvider,
             $this->fieldChoicesProvider,

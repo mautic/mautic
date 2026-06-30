@@ -81,7 +81,7 @@ class EventLoggerTest extends TestCase
 
         $persistedLogs = $logger->persistQueuedLogs();
 
-        $this->assertEquals($persistedLogs->count(), $logCollection->count());
+        $this->assertCount($persistedLogs->count(), $logCollection);
         $this->assertEquals($logCollection->getValues(), $persistedLogs->getValues());
     }
 
