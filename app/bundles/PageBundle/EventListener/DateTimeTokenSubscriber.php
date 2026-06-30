@@ -14,10 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private DateTimeToken $dateTokenHelper,
-        private CorePermissions $security,
-        private ContactTracker $contactTracker,
+        private readonly TranslatorInterface $translator,
+        private readonly DateTimeToken $dateTokenHelper,
+        private readonly CorePermissions $security,
+        private readonly ContactTracker $contactTracker,
     ) {
     }
 

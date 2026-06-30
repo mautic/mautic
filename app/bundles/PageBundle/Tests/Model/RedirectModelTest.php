@@ -41,7 +41,7 @@ class RedirectModelTest extends PageTestAbstract
 
     public function testRedirectGenerationEvent(): void
     {
-        $shortener = $this->createMock(Shortener::class);
+        $shortener = $this->createStub(Shortener::class);
 
         $dispatcher = new EventDispatcher();
 
@@ -54,14 +54,14 @@ class RedirectModelTest extends PageTestAbstract
             ->willReturn($url);
 
         $model = new RedirectModel(
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
             $router,
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
             $shortener
         );
 

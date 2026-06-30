@@ -57,7 +57,7 @@ final class TokenSorter
      *
      * @var array<string, int>
      */
-    private array $labelPrefixCategories;
+    private readonly array $labelPrefixCategories;
 
     public function __construct(TranslatorInterface $translator)
     {

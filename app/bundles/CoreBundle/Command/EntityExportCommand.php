@@ -19,8 +19,8 @@ final class EntityExportCommand extends ModeratedCommand
     public const COMMAND_NAME = 'mautic:entity:export';
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private ExportHelper $exportHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly ExportHelper $exportHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {

@@ -14,7 +14,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
     private $entityDescriptor;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

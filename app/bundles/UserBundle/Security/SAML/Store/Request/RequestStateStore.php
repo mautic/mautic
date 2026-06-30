@@ -10,9 +10,9 @@ use Mautic\CacheBundle\Cache\CacheProviderInterface;
 
 class RequestStateStore extends AbstractRequestStateArrayStore
 {
-    private string $prefix;
+    private readonly string $prefix;
 
-    public function __construct(private CacheProviderInterface $cacheProvider, string $prefix, string $suffix)
+    public function __construct(private readonly CacheProviderInterface $cacheProvider, string $prefix, string $suffix)
     {
         $this->prefix = $prefix.$suffix;
     }

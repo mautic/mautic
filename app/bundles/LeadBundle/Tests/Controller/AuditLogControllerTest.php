@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class AuditLogControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const SALES_USER = 'sales';
 
     /**

@@ -19,12 +19,12 @@ class LeadSubscriberTest extends TestCase
     private LeadSubscriber $subscriber;
 
     /**
-     * @var IntegrationEntityRepository|MockObject
+     * @var MockObject&IntegrationEntityRepository
      */
     private MockObject $integrationEntityRepository;
 
     /**
-     * @var IntegrationRepository|MockObject
+     * @var MockObject&IntegrationRepository
      */
     private MockObject $integrationRepository;
 

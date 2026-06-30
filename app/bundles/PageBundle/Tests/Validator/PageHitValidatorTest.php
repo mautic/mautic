@@ -17,14 +17,14 @@ final class PageHitValidatorTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
-    private MockObject&Constraint $constraintMock;
+    private \PHPUnit\Framework\MockObject\Stub&Constraint $constraintMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
-        $this->constraintMock           = $this->createMock(Constraint::class);
+        $this->constraintMock           = $this->createStub(Constraint::class);
     }
 
     public function testWhenPageHitValidatorIsDisabled(): void

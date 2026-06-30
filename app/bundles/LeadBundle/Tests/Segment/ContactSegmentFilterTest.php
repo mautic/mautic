@@ -8,7 +8,6 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use Mautic\LeadBundle\Segment\Decorator\CompanyDecorator;
-use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -21,17 +20,17 @@ class ContactSegmentFilterTest extends TestCase
     private ContactSegmentFilterCrate $contactSegmentFilterCrate;
 
     /**
-     * @var FilterDecoratorInterface&MockObject
+     * @var MockObject&BaseDecorator
      */
     private MockObject $filterDecorator;
 
     /**
-     * @var TableSchemaColumnsCache|MockObject
+     * @var MockObject&TableSchemaColumnsCache
      */
     private MockObject $tableSchemaColumnCache;
 
     /**
-     * @var FilterQueryBuilderInterface&MockObject
+     * @var MockObject&FilterQueryBuilderInterface
      */
     private MockObject $filterQueryBuilder;
 
@@ -191,7 +190,7 @@ class ContactSegmentFilterTest extends TestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilder = new QueryBuilder($this->createMock(\Doctrine\DBAL\Connection::class));
+        $queryBuilder = new QueryBuilder($this->createStub(\Doctrine\DBAL\Connection::class));
 
         $this->filterQueryBuilder->expects($this->once())
             ->method('applyQuery')

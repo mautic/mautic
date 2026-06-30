@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Router;
 class FieldBuilderTest extends TestCase
 {
     /**
-     * @var Router|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Router
      */
     private \PHPUnit\Framework\MockObject\MockObject $router;
 
@@ -27,7 +27,7 @@ class FieldBuilderTest extends TestCase
     private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
     /**
-     * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ContactObjectHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
 

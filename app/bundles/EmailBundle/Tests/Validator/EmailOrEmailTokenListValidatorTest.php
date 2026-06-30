@@ -250,7 +250,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield|jane@doe.com}',
             1,
-            function (string $alias) {
+            function (string $alias): null {
                 Assert::assertSame('somefield', $alias);
 
                 return null;
@@ -271,7 +271,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield}',
             1,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();
@@ -296,7 +296,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield|jane@doe.com}, jone@doe.email, {contactfield=somefield}',
             0,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();
@@ -314,7 +314,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'jone@doe.email {contactfield=somefield}',
             1,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();

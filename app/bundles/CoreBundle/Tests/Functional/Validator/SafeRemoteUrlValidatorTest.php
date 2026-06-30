@@ -34,7 +34,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $this->expectExceptionMessageMatches('/Expected argument of type "Mautic\\\\CoreBundle\\\\Validator\\\\SafeRemoteUrl"/');
 
         $validator  = new SafeRemoteUrlValidator(self::getContainer()->get('mautic.helper.core_parameters'));
-        $validator->initialize($this->createMock(ExecutionContextInterface::class));
+        $validator->initialize($this->createStub(ExecutionContextInterface::class));
         $validator->validate('value', new Constraints\NotBlank());
     }
 

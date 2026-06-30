@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
+
     private EmailFixturesHelper $emailFixturesHelper;
 
     protected function setUp(): void

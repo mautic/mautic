@@ -42,9 +42,9 @@ class ThemeHelper implements ThemeHelperInterface
      */
     private array $themeHelpers = [];
 
-    private Filesystem $filesystem;
+    private readonly Filesystem $filesystem;
 
-    private Finder $finder;
+    private readonly Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
 
@@ -105,13 +105,13 @@ class ThemeHelper implements ThemeHelperInterface
     private array $hiddenThemes = [];
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private Environment $twig,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly Environment $twig,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;

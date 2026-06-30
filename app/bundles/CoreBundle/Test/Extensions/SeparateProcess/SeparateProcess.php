@@ -18,7 +18,9 @@ use PHPUnit\TextUI\Configuration\Configuration;
 class SeparateProcess implements Extension
 {
     private bool $prepared          = false;
+
     private bool $preparationFailed = false;
+
     /**
      * @var array<string,string[]>
      */

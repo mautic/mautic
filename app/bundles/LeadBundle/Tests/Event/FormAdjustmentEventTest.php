@@ -6,21 +6,20 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&FormInterface<FormInterface<mixed>>
+     * @var \PHPUnit\Framework\MockObject\Stub&FormInterface<FormInterface<mixed>>
      */
-    private MockObject $form;
+    private \PHPUnit\Framework\MockObject\Stub $form;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->form = $this->createMock(FormInterface::class);
+        $this->form = $this->createStub(FormInterface::class);
     }
 
     public function testConstructGettersSetters(): void

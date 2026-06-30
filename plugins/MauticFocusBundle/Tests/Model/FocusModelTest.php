@@ -26,43 +26,43 @@ use Twig\Environment;
 class FocusModelTest extends TestCase
 {
     /**
-     * @var ContactTracker|MockObject
+     * @var ContactTracker|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\Stub $contactTracker;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var \PHPUnit\Framework\MockObject\Stub|EventDispatcherInterface
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\Stub $dispatcher;
 
     /**
-     * @var FormModel|MockObject
+     * @var MockObject&FormModel
      */
     private MockObject $formModel;
 
     /**
-     * @var FieldModel|MockObject
+     * @var FieldModel|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $leadFieldModel;
+    private \PHPUnit\Framework\MockObject\Stub $leadFieldModel;
 
     /**
-     * @var Environment|mixed|MockObject
+     * @var Environment|mixed|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $twig;
+    private \PHPUnit\Framework\MockObject\Stub $twig;
 
     /**
-     * @var TrackableModel|mixed|MockObject
+     * @var TrackableModel|mixed|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $trackableModel;
+    private \PHPUnit\Framework\MockObject\Stub $trackableModel;
 
     protected function setUp(): void
     {
         $this->formModel      = $this->createMock(FormModel::class);
-        $this->trackableModel = $this->createMock(TrackableModel::class);
-        $this->twig           = $this->createMock(Environment::class);
-        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
-        $this->leadFieldModel = $this->createMock(FieldModel::class);
-        $this->contactTracker = $this->createMock(ContactTracker::class);
+        $this->trackableModel = $this->createStub(TrackableModel::class);
+        $this->twig           = $this->createStub(Environment::class);
+        $this->dispatcher     = $this->createStub(EventDispatcherInterface::class);
+        $this->leadFieldModel = $this->createStub(FieldModel::class);
+        $this->contactTracker = $this->createStub(ContactTracker::class);
         parent::setUp();
     }
 
@@ -79,14 +79,14 @@ class FocusModelTest extends TestCase
             $this->twig,
             $this->leadFieldModel,
             $this->contactTracker,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
         $focus = [
             'form' => 'xxx',

@@ -209,14 +209,12 @@ final class CampaignSubscriberTest extends TestCase
 
             public function getStage(): Stage
             {
-                $stage = new class extends Stage {
+                return new class extends Stage {
                     public function getId(): int
                     {
                         return 123;
                     }
                 };
-
-                return $stage;
             }
         };
         $campaign = new Campaign();

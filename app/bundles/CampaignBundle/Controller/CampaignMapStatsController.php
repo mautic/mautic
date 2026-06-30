@@ -32,7 +32,7 @@ class CampaignMapStatsController extends AbstractController
 
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
-    public function __construct(private CampaignModel $model)
+    public function __construct(private readonly CampaignModel $model)
     {
     }
 

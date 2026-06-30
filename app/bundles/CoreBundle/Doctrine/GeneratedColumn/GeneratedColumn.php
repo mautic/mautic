@@ -6,9 +6,9 @@ namespace Mautic\CoreBundle\Doctrine\GeneratedColumn;
 
 final class GeneratedColumn implements GeneratedColumnInterface
 {
-    private string $tablePrefix;
+    private readonly string $tablePrefix;
 
-    private string $columnName;
+    private readonly string $columnName;
 
     private bool $stored = false;
 
@@ -21,10 +21,10 @@ final class GeneratedColumn implements GeneratedColumnInterface
     private ?string $filterDateColumn = null;
 
     public function __construct(
-        private string $tableName,
+        private readonly string $tableName,
         string $columnName,
-        private string $columnType,
-        private string $as,
+        private readonly string $columnType,
+        private readonly string $as,
     ) {
         $this->indexColumns[] = $columnName;
         $this->tablePrefix    = (string) MAUTIC_TABLE_PREFIX;
