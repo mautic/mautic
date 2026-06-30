@@ -22,22 +22,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|CustomFieldValidator
+     * @var MockObject&CustomFieldValidator
      */
     private MockObject $customFieldValidator;
 
     /**
-     * @var MockObject|EmailValidator
+     * @var MockObject&EmailValidator
      */
     private MockObject $emailValidator;
 
@@ -167,7 +167,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (TokenReplacementEvent $event) use ($lead) {
+                    function (TokenReplacementEvent $event) use ($lead): true {
                         Assert::assertSame('{contactfield=active-field}', $event->getContent());
                         Assert::assertSame($lead, $event->getLead());
 

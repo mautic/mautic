@@ -37,9 +37,9 @@ class FormSubscriber implements EventSubscriberInterface
         protected ContactTracker $contactTracker,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadFieldRepository $leadFieldRepository,
-        private PointGroupModel $groupModel,
-        private DoNotContact $doNotContact,
-        private FieldModel $leadFieldModel,
+        private readonly PointGroupModel $groupModel,
+        private readonly DoNotContact $doNotContact,
+        private readonly FieldModel $leadFieldModel,
     ) {
     }
 

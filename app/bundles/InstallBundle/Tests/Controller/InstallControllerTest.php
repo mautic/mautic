@@ -25,12 +25,21 @@ use Symfony\Component\Routing\Router;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     */
     private \PHPUnit\Framework\MockObject\MockObject $routerMock;
 
     private InstallController $controller;
 
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&PathsHelper
+     */
+    private \PHPUnit\Framework\MockObject\Stub $pathsHelper;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&InstallService
+     */
     private \PHPUnit\Framework\MockObject\MockObject $installer;
 
     protected function setUp(): void
@@ -41,7 +50,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $containerMock              = $this->createMock(Container::class);
         $this->routerMock           = $this->createMock(Router::class);
         $flashBagMock               = $this->createMock(FlashBagInterface::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->pathsHelper          = $this->createStub(PathsHelper::class);
 
         $configurator         = $this->createMock(Configurator::class);
         $this->installer      = $this->createMock(InstallService::class);
@@ -91,7 +100,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->controller->stepAction(
             new Request(),
-            $this->createMock(EntityManagerInterface::class),
+            $this->createStub(EntityManagerInterface::class),
             $this->pathsHelper,
             InstallService::CHECK_STEP
         );

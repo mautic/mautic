@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
 class ReportDataResult
 {
-    private int $totalResults;
+    private readonly int $totalResults;
 
     /**
      * @var array
@@ -27,13 +27,13 @@ class ReportDataResult
      */
     private array $graphs = [];
 
-    private ?\DateTime $dateFrom;
+    private readonly ?\DateTime $dateFrom;
 
-    private ?\DateTime $dateTo;
+    private readonly ?\DateTime $dateTo;
 
-    private ?int $limit;
+    private readonly ?int $limit;
 
-    private int $page;
+    private readonly int $page;
 
     /**
      * @param array<mixed> $data
@@ -42,8 +42,8 @@ class ReportDataResult
     public function __construct(
         array $data,
         private array $totals = [],
-        private int $preBatchSize = 0,
-        private bool $isLastBatch = true,
+        private readonly int $preBatchSize = 0,
+        private readonly bool $isLastBatch = true,
     ) {
         if (
             !array_key_exists('data', $data)

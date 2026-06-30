@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class CustomFieldSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FieldRepository $fieldRepository,
-        private FormModel $formModel,
+        private readonly FieldRepository $fieldRepository,
+        private readonly FormModel $formModel,
     ) {
     }
 

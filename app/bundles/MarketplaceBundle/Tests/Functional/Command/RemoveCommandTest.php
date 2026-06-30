@@ -9,22 +9,21 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
     /**
-     * @var MockObject&LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\Stub&LoggerInterface
      */
-    private MockObject $logger;
+    private \PHPUnit\Framework\MockObject\Stub $logger;
 
     private string $packageName;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->logger      = $this->createMock(LoggerInterface::class);
+        $this->logger      = $this->createStub(LoggerInterface::class);
         $this->packageName = 'koco/mautic-recaptcha-bundle';
     }
 

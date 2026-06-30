@@ -23,12 +23,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class EventModelTest extends TestCase
 {
     /**
-     * @var EventRepository&MockObject
+     * @var MockObject&EventRepository
      */
     private MockObject $eventRepositoryMock;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcherMock;
 
@@ -42,13 +42,13 @@ class EventModelTest extends TestCase
 
         $this->eventModel          = new EventModel(
             $entityManagerMock,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcherMock,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $entityManagerMock

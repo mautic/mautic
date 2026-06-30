@@ -36,22 +36,22 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $message;
 
-    /** @var MockObject|LeadModel */
+    /** @var MockObject&LeadModel */
     protected MockObject $leadModel;
 
-    /** @var MockObject|CompanyModel */
-    protected MockObject $companyModel;
+    /** @var \PHPUnit\Framework\MockObject\Stub|CompanyModel */
+    protected \PHPUnit\Framework\MockObject\Stub $companyModel;
 
-    /** @var MockObject|EntityManagerInterface */
+    /** @var MockObject&EntityManagerInterface */
     protected MockObject $entityManager;
 
-    /** @var MockObject|MessageQueueRepository */
+    /** @var MockObject&MessageQueueRepository */
     protected MockObject $messageQueueRepository;
 
     protected function setUp(): void
     {
         $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->companyModel           = $this->createMock(CompanyModel::class);
+        $this->companyModel           = $this->createStub(CompanyModel::class);
         $this->entityManager          = $this->createMock(EntityManagerInterface::class);
         $this->messageQueueRepository = $this->createMock(MessageQueueRepository::class);
         $coreHelper                   = $this->createMock(CoreParametersHelper::class);
@@ -61,12 +61,12 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
             $this->companyModel,
             $coreHelper,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class)
         );
 
         $this->entityManager->method('getRepository')->willReturn($this->messageQueueRepository);

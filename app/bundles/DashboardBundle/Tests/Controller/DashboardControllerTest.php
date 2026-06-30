@@ -28,32 +28,32 @@ use Twig\Environment;
 class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Request
+     * @var MockObject&Request
      */
     private MockObject $requestMock;
 
     /**
-     * @var MockObject|Translator
+     * @var MockObject&Translator
      */
     private MockObject $translatorMock;
 
     /**
-     * @var MockObject|ModelFactory<DashboardModel>
+     * @var MockObject&ModelFactory
      */
     private MockObject $modelFactoryMock;
 
     /**
-     * @var MockObject|DashboardModel
+     * @var MockObject&DashboardModel
      */
     private MockObject $dashboardModelMock;
 
     /**
-     * @var MockObject|RouterInterface
+     * @var MockObject&RouterInterface
      */
     private MockObject $routerMock;
 
     /**
-     * @var MockObject|Container
+     * @var MockObject&Container
      */
     private MockObject $containerMock;
 
@@ -134,7 +134,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestMock->method('get')->willReturn('mockName');
 
         $this->containerMock->expects($this->exactly(2))
-            ->method('get')->willReturnCallback(function (...$parameters) {
+            ->method('get')->willReturnCallback(function (...$parameters): MockObject {
                 $this->assertSame('router', $parameters[0]);
 
                 return $this->routerMock;
@@ -202,13 +202,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), $this->createMock(Environment::class), 1);
+        $this->controller->widgetAction($this->requestMock, $this->createStub(Widget::class), $this->createStub(Environment::class), 1);
     }
 
     public function testWidgetNotFound(): void
     {
         $widgetId = '1';
-        $twig     = $this->createMock(Environment::class);
+        $twig     = $this->createStub(Environment::class);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);

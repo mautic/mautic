@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ClientController extends AbstractStandardFormController
 {
     public function __construct(
-        private ClientModel $clientModel,
+        private readonly ClientModel $clientModel,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,

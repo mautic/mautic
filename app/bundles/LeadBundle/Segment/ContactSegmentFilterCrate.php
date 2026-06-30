@@ -42,7 +42,7 @@ class ContactSegmentFilterCrate // NOSONAR Existing segment filter value object 
      */
     private $operator;
 
-    private array $sourceArray;
+    private readonly array $sourceArray;
 
     private $nullValue;
 

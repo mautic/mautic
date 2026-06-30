@@ -18,12 +18,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcherMock;
 
     /**
-     * @var MockObject|DateOptionFactory
+     * @var MockObject&DateOptionFactory
      */
     private MockObject $dateOptionFactory;
 
@@ -106,7 +106,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testDateDecoratorWhenNoSubscriberProvidesDecorator(): void
     {
-        $filterDecoratorInterface  = $this->createMock(FilterDecoratorInterface::class);
+        $filterDecoratorInterface  = $this->createStub(FilterDecoratorInterface::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date']);
 
         $this->dateOptionFactory->expects($this->once())
@@ -118,7 +118,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate) {
+                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate): true {
                         $this->assertNull($event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 
@@ -136,7 +136,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testDateDecoratorWhenSubscriberProvidesDecorator(): void
     {
-        $filterDecoratorInterface  = $this->createMock(FilterDecoratorInterface::class);
+        $filterDecoratorInterface  = $this->createStub(FilterDecoratorInterface::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date']);
 
         $this->dateOptionFactory->expects($this->never())
@@ -146,7 +146,7 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface) {
+                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface): true {
                         $this->assertNull($event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 

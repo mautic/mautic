@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class ReportCleanupTest extends TestCase
 {
+    /**
+     * @var MockObject&FileHandler
+     */
     private MockObject $fileHandler;
 
     private ReportCleanup $cleanup;

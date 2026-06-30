@@ -21,10 +21,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ActionDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
-        private EventScheduler $scheduler,
-        private LegacyEventDispatcher $legacyDispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly EventScheduler $scheduler,
+        private readonly LegacyEventDispatcher $legacyDispatcher,
     ) {
     }
 

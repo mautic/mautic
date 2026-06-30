@@ -26,7 +26,7 @@ class CacheInvalidateSubscriber
 
     public function __construct(
         #[Autowire(service: 'doctrine.orm.default_configuration')]
-        private Configuration $ormConfiguration,
+        private readonly Configuration $ormConfiguration,
     ) {
     }
 

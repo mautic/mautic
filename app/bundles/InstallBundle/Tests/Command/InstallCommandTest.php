@@ -43,7 +43,7 @@ class InstallCommandTest extends TestCase
         $inputDefinition->method('getOptions')->willReturn([]);
         $inputDefinition->method('getArguments')->willReturn([]);
 
-        $application->method('getHelperSet')->willReturn($this->createMock(HelperSet::class));
+        $application->method('getHelperSet')->willReturn($this->createStub(HelperSet::class));
         $application->method('getDefinition')->willReturn($inputDefinition);
         $application->method('find')->willReturn($command);
 
@@ -66,7 +66,7 @@ class InstallCommandTest extends TestCase
     {
         $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(false);
 
-        $this->doctrineRegistry->method('getConnection')->willReturn($this->createMock(ConnectionWrapper::class));
+        $this->doctrineRegistry->method('getConnection')->willReturn($this->createStub(ConnectionWrapper::class));
 
         $input = new ArrayInput(
             [

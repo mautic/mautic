@@ -48,10 +48,10 @@ class FieldType extends AbstractType
     ];
 
     public function __construct(
-        private EntityManagerInterface $em,
-        private Translator $translator,
-        private IdentifierFields $identifierFields,
-        private IndexHelper $indexHelper,
+        private readonly EntityManagerInterface $em,
+        private readonly Translator $translator,
+        private readonly IdentifierFields $identifierFields,
+        private readonly IndexHelper $indexHelper,
     ) {
     }
 

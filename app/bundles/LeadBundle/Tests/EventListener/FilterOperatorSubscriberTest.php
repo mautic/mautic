@@ -23,22 +23,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FilterOperatorSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|LeadFieldRepository
+     * @var MockObject&LeadFieldRepository
      */
     private MockObject $leadFieldRepository;
 
     /**
-     * @var MockObject|TypeOperatorProviderInterface
+     * @var MockObject&TypeOperatorProviderInterface
      */
     private MockObject $typeOperatorProvider;
 
     /**
-     * @var MockObject|FieldChoicesProviderInterface
+     * @var MockObject&FieldChoicesProviderInterface
      */
     private MockObject $fieldChoicesProvider;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 

@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Config $config)
+    public function __construct(private readonly Config $config)
     {
     }
 
