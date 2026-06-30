@@ -662,7 +662,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public static function leadFieldOrderChoiceListProvider(): \Generator
     {
         yield ['lead', 'core', ['Fax', 'Website']];
-        yield ['lead', 'social', ['Facebook', 'Foursquare', 'Instagram']];
+        yield ['lead', 'social', ['Facebook', 'Instagram', 'TikTok', 'X', 'YouTube']];
         yield ['company', 'core', []];
     }
 
