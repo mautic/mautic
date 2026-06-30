@@ -38,61 +38,6 @@ use Twig\Environment;
 class FormModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
-     * @var MockObject&Environment
-     */
-    private MockObject $twigMock;
-
-    /**
-     * @var MockObject&ThemeHelper
-     */
-    private MockObject $themeHelper;
-
-    /**
-     * @var MockObject&ActionModel
-     */
-    private MockObject $formActionModel;
-
-    /**
-     * @var MockObject&FieldModel
-     */
-    private MockObject $formFieldModel;
-
-    /**
-     * @var MockObject&EventDispatcher
-     */
-    private MockObject $dispatcher;
-
-    /**
-     * @var MockObject&Translator
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject&EntityManager
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var MockObject&FormUploader
-     */
-    private MockObject $formUploaderMock;
-
-    /**
-     * @var MockObject&ColumnSchemaHelper
-     */
-    private MockObject $columnSchemaHelper;
-
-    /**
-     * @var MockObject&TableSchemaHelper
-     */
-    private MockObject $tableSchemaHelper;
-
-    /**
      * @var MockObject&FormRepository
      */
     private MockObject $formRepository;
@@ -117,11 +62,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $primaryCompanyHelper;
 
-    /**
-     * @var MockObject&MappedObjectCollectorInterface
-     */
-    private MockObject $mappedObjectCollector;
-
     private FormModel $formModel;
 
     protected function setUp(): void
@@ -130,25 +70,25 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $_ENV['MAUTIC_UPLOAD_DIR'] = sys_get_temp_dir();
         }
 
-        $this->requestStack          = $this->createMock(RequestStack::class);
-        $this->twigMock              = $this->createMock(Environment::class);
-        $this->themeHelper           = $this->createMock(ThemeHelper::class);
-        $this->formActionModel       = $this->createMock(ActionModel::class);
-        $this->formFieldModel        = $this->createMock(FieldModel::class);
+        $requestStack                = $this->createMock(RequestStack::class);
+        $twigMock                    = $this->createMock(Environment::class);
+        $themeHelper                 = $this->createMock(ThemeHelper::class);
+        $formActionModel             = $this->createMock(ActionModel::class);
+        $formFieldModel              = $this->createMock(FieldModel::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
-        $this->dispatcher            = $this->createMock(EventDispatcher::class);
-        $this->translator            = $this->createMock(Translator::class);
-        $this->entityManager         = $this->createMock(EntityManager::class);
-        $this->formUploaderMock      = $this->createMock(FormUploader::class);
+        $dispatcher                  = $this->createMock(EventDispatcher::class);
+        $translator                  = $this->createMock(Translator::class);
+        $entityManager               = $this->createMock(EntityManager::class);
+        $formUploaderMock            = $this->createMock(FormUploader::class);
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
-        $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
-        $this->tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
-        $this->mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
+        $columnSchemaHelper          = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper           = $this->createMock(TableSchemaHelper::class);
+        $mappedObjectCollector       = $this->createMock(MappedObjectCollectorInterface::class);
 
-        $this->entityManager->expects($this
+        $entityManager->expects($this
             ->any())
             ->method('getRepository')
             ->willReturnMap(
@@ -158,24 +98,24 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->formModel = new FormModel(
-            $this->requestStack,
-            $this->twigMock,
-            $this->themeHelper,
-            $this->formActionModel,
-            $this->formFieldModel,
+            $requestStack,
+            $twigMock,
+            $themeHelper,
+            $formActionModel,
+            $formFieldModel,
             $this->fieldHelper,
             $this->primaryCompanyHelper,
             $this->leadFieldModel,
-            $this->formUploaderMock,
+            $formUploaderMock,
             $this->contactTracker,
-            $this->columnSchemaHelper,
-            $this->tableSchemaHelper,
-            $this->mappedObjectCollector,
-            $this->entityManager,
+            $columnSchemaHelper,
+            $tableSchemaHelper,
+            $mappedObjectCollector,
+            $entityManager,
             $this->createMock(CorePermissions::class),
-            $this->dispatcher,
+            $dispatcher,
             $this->createMock(UrlGeneratorInterface::class),
-            $this->translator,
+            $translator,
             $this->createMock(UserHelper::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(CoreParametersHelper::class)

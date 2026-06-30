@@ -166,7 +166,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $this->client->xmlHttpRequest(Request::METHOD_GET, "/s/dashboard/widget/{$widget->getId()}");
         $this->assertResponseIsSuccessful();
-        $printResponse = fn () => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
+        $printResponse = fn (): string => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
         Assert::assertStringContainsString('created', $printResponse());
         Assert::assertStringContainsString('deleted', $printResponse());
     }
@@ -199,7 +199,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $crawler      = new Crawler($doc);
         $crawlerTable = $crawler->filter('table')->first();
 
-        return array_slice($crawlerTable->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text()))), 1);
+        return array_slice($crawlerTable->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text()))), 1);
     }
 
     public function testUpcomingEmailsWidget(): void

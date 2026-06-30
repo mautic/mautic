@@ -20,11 +20,6 @@ class ApiSubscriberTest extends CommonMocks
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Translator&MockObject
-     */
-    private MockObject $translator;
-
-    /**
      * @var Request&MockObject
      */
     private MockObject $request;
@@ -41,13 +36,13 @@ class ApiSubscriberTest extends CommonMocks
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createMock(Translator::class);
+        $translator                 = $this->createMock(Translator::class);
         $this->request              = $this->createMock(Request::class);
         $this->request->headers     = new HeaderBag();
         $this->event                = $this->createMock(RequestEvent::class);
         $this->subscriber           = new ApiSubscriber(
             $this->coreParametersHelper,
-            $this->translator
+            $translator
         );
     }
 

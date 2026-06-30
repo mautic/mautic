@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
@@ -27,10 +28,20 @@ trait VariantEntityTrait
     private $variantParent;
 
     /**
+     * @var array<string>
+     */
+    private array $variantSettingsKeys = ['weight', 'winnerCriteria'];
+
+    /**
+     * @var array<string>
+     */
+    private array $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerDelay'];
+
+    /**
      * @var array<mixed>|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantSettings = [];
+    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
     /**
      * @var \DateTimeInterface|null
@@ -49,6 +60,7 @@ trait VariantEntityTrait
             ->setIndexBy('id')
             ->setOrderBy(['isPublished' => 'DESC'])
             ->mappedBy('variantParent')
+            ->cascadePersist()
             ->build();
 
         $builder->createField('variantSettings', 'array')
@@ -125,7 +137,13 @@ trait VariantEntityTrait
             $this->isChanged('variantSettings', $variantSettings);
         }
 
-        $this->variantSettings = $variantSettings;
+        $this->variantSettings = [];
+
+        foreach ($this->getSettingsKeys() as $key) {
+            if (array_key_exists($key, $variantSettings)) {
+                $this->variantSettings[$key] = $variantSettings[$key];
+            }
+        }
 
         return $this;
     }
@@ -169,6 +187,11 @@ trait VariantEntityTrait
         }
 
         return !empty($parent) || count($children);
+    }
+
+    public function isParent(): bool
+    {
+        return $this->isVariant() && empty($this->getVariantParent());
     }
 
     /**
@@ -241,6 +264,81 @@ trait VariantEntityTrait
         }
 
         return array_unique($ids);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getSettingsKeys(): array
+    {
+        if ($this->getVariantParent()) {
+            return $this->variantSettingsKeys;
+        }
+
+        return $this->parentSettingsKeys;
+    }
+
+    public function clearVariantSettings(): void
+    {
+        if (!$this->getVariantParent()) {
+            $this->variantSettings = [
+                'enableAbTest' => false,
+                'totalWeight'  => AbTestSettingsService::DEFAULT_AB_WEIGHT,
+            ];
+        } else {
+            $this->variantSettings = [];
+        }
+    }
+
+    public function isEnableAbTest(): bool
+    {
+        if ($this->getVariantParent()) {
+            return (bool) ($this->getVariantParent()->getVariantSettings()['enableAbTest'] ?? false);
+        }
+
+        return (bool) ($this->getVariantSettings()['enableAbTest'] ?? false);
+    }
+
+    public function getVariantsPendingCount(int $pendingCount): int
+    {
+        if (!$this->isEnableAbTest()) {
+            return $pendingCount;
+        }
+
+        $pendingCount += (int) (method_exists($this, 'getVariantSentCount') ? $this->getVariantSentCount(true) : 0);
+
+        $totalWeight = $this->variantSettings['totalWeight'] ?? null;
+        if ($this->getVariantParent()) {
+            $totalWeight = $this->getVariantParent()->getVariantSettings()['totalWeight'] ?? null;
+        }
+        $totalWeight = (int) ($totalWeight ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
+
+        $variants           = $this->getVariantChildren();
+        $variantCount       = count($variants) + 1;
+        $singleVariantCount = (int) ceil(($pendingCount / $variantCount) * ($totalWeight / 100));
+
+        return $singleVariantCount * $variantCount;
+    }
+
+    public function getVariantEndDate(): ?\DateTime
+    {
+        /** @var \DateTime $startDate */
+        $startDate  = $this->getVariantStartDate();
+        $delayHours = $this->getSendWinnerDelay();
+
+        if (null === $startDate || 0 === $delayHours) {
+            return null;
+        }
+
+        $endDate = clone $startDate;
+        $endDate->modify("+$delayHours hours");
+
+        return $endDate;
+    }
+
+    private function getSendWinnerDelay(): int
+    {
+        return (int) ($this->getVariantSettings()['sendWinnerDelay'] ?? null);
     }
 
     protected function getAccumulativeVariantCount(string $getter): mixed

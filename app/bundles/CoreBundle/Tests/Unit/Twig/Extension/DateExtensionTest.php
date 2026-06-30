@@ -13,7 +13,6 @@ use Twig\TwigFunction;
 
 class DateExtensionTest extends TestCase
 {
-    private DateHelper $dateHelper;
     private DateExtension $dateExtension;
 
     protected function setUp(): void
@@ -32,7 +31,7 @@ class DateExtensionTest extends TestCase
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $this->dateHelper = new DateHelper(
+        $dateHelper = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
@@ -41,7 +40,7 @@ class DateExtensionTest extends TestCase
             $coreParametersHelper
         );
 
-        $this->dateExtension = new DateExtension($this->dateHelper);
+        $this->dateExtension = new DateExtension($dateHelper);
     }
 
     // Add this method to allow injection of a mocked DateHelper

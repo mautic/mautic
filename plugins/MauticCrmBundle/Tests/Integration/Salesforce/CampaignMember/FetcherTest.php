@@ -193,10 +193,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Organizer
-     */
-    private function getOrgnanizer()
+    private function getOrgnanizer(): Organizer
     {
         $records = [
             [

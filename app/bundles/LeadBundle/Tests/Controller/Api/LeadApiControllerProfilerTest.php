@@ -94,7 +94,7 @@ final class LeadApiControllerProfilerTest extends MauticMysqlTestCase
 
         return array_filter(
             $allQueries,
-            fn (array $query) => str_starts_with($query['sql'], 'SELECT COUNT(l.id) as count FROM '.MAUTIC_TABLE_PREFIX.'leads l')
+            fn (array $query): bool => str_starts_with($query['sql'], 'SELECT COUNT(l.id) as count FROM '.MAUTIC_TABLE_PREFIX.'leads l')
         );
     }
 }

@@ -58,7 +58,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
                 ],
             ],
         ]);
-        $leadFields = array_filter($lead->getFields(true), fn ($value) => isset($value['value']));
+        $leadFields = array_filter($lead->getFields(true), fn ($value): bool => isset($value['value']));
         $leadFields = array_keys($leadFields);
 
         // get expected core labels

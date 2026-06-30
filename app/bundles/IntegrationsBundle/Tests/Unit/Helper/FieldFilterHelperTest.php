@@ -62,7 +62,7 @@ class FieldFilterHelperTest extends TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|ConfigFormSyncInterface
      */
-    private function getIntegrationObject()
+    private function getIntegrationObject(): \PHPUnit\Framework\MockObject\MockObject
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getLabel')

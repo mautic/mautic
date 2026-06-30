@@ -35,7 +35,7 @@ class ExampleSendTypeTest extends TestCase
     /**
      * @var UserHelper|MockObject
      */
-    private $userHelperMock;
+    private MockObject $userHelperMock;
 
     protected function setUp(): void
     {

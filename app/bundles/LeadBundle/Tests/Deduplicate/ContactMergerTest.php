@@ -27,11 +27,6 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
@@ -51,13 +46,13 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->leadRepo        = $this->createMock(LeadRepository::class);
+        $leadRepo              = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
         $this->dispatcher      = $this->createMock(EventDispatcher::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
+        $this->leadModel->method('getRepository')->willReturn($leadRepo);
     }
 
     public function testMergeTimestamps(): void
@@ -528,7 +523,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $matcher3 = $this->exactly(3);
 
         $winner->expects($matcher3)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3): void {
                 if (1 === $matcher3->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('winner@test.com', $parameters[1]);
@@ -865,10 +860,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         return $company;
     }
 
-    /**
-     * @return ContactMerger
-     */
-    private function getMerger()
+    private function getMerger(): ContactMerger
     {
         return new ContactMerger(
             $this->leadModel,

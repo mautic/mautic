@@ -9,7 +9,7 @@ class NullableProcessorTest extends TestCase
 {
     public function testNullReturnedIfEmptyString(): void
     {
-        $getEnv = fn (string $name) => '';
+        $getEnv = fn (string $name): string => '';
 
         $processor = new NullableProcessor();
 
@@ -20,7 +20,7 @@ class NullableProcessorTest extends TestCase
 
     public function testValueReturnedIfNotEmptyString(): void
     {
-        $getEnv = fn (string $name) => 'foobar';
+        $getEnv = fn (string $name): string => 'foobar';
 
         $processor = new NullableProcessor();
 

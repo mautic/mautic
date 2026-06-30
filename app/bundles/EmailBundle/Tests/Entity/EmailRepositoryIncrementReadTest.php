@@ -16,8 +16,6 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 
     private QueryBuilder $queryBuilder;
 
-    private QueryBuilder $subQueryBuilder;
-
     /**
      * @var EmailRepository|object
      */
@@ -28,10 +26,10 @@ class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->repo             = $this->configureRepository(Email::class);
         $this->queryBuilder     = new QueryBuilder($this->connection);
-        $this->subQueryBuilder  = new QueryBuilder($this->connection);
+        $subQueryBuilder        = new QueryBuilder($this->connection);
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
             $this->queryBuilder,
-            $this->subQueryBuilder
+            $subQueryBuilder
         );
     }
 

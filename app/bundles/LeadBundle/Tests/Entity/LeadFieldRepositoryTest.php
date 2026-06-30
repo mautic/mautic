@@ -113,7 +113,7 @@ final class LeadFieldRepositoryTest extends TestCase
     ): void {
         $exprCompare->expects($this->exactly(null !== $value ? 2 : 1))
             ->method('eq')
-            ->willReturnCallback(function (...$parameters) use ($fieldAlias, $value) {
+            ->willReturnCallback(function (...$parameters) use ($fieldAlias, $value): void {
                 static $invocationCount = 0;
                 ++$invocationCount;
 
@@ -220,7 +220,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $matcher = $this->exactly(2);
         $mocks['exprCompare']->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.id', $parameters[0]);
                     $this->assertSame(':lead', $parameters[1]);
@@ -233,7 +233,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $matcher = $this->exactly(2);
         $mocks['builderCompare']->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);

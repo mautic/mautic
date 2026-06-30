@@ -16,10 +16,10 @@ use PHPUnit\Framework\TestCase;
 class FromEmailHelperTest extends TestCase
 {
     /** @var CoreParametersHelper&MockObject */
-    private $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     /** @var LeadRepository&MockObject */
-    private $leadRepository;
+    private MockObject $leadRepository;
 
     protected function setUp(): void
     {

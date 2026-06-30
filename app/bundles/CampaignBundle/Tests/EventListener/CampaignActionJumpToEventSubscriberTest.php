@@ -193,7 +193,7 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
 
                 return [
                     new class extends Event {
-                        public function getId()
+                        public function getId(): int
                         {
                             return 222;
                         }

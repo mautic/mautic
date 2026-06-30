@@ -276,7 +276,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->any();
 
         $this->cookieHelperMock->expects($matcher)->method('setCookie')
-            ->willReturnCallback(function (...$parameters) use ($matcher, $uniqueTrackingIdentifier) {
+            ->willReturnCallback(function (...$parameters) use ($matcher, $uniqueTrackingIdentifier): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_device_id', $parameters[0]);
                     $this->assertSame($uniqueTrackingIdentifier, $parameters[1]);
@@ -335,7 +335,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
         $matcher = $this->any();
         $this->cookieHelperMock->expects($matcher)->method('setCookie')
-            ->willReturnCallback(function (...$parameters) use ($matcher, $uniqueTrackingIdentifier) {
+            ->willReturnCallback(function (...$parameters) use ($matcher, $uniqueTrackingIdentifier): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_device_id', $parameters[0]);
                     $this->assertSame($uniqueTrackingIdentifier, $parameters[1]);

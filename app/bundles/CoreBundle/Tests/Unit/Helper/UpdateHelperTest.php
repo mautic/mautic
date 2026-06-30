@@ -24,11 +24,6 @@ use Psr\Http\Message\StreamInterface;
 class UpdateHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper|MockObject
-     */
-    private MockObject $pathsHelper;
-
-    /**
      * @var Logger|MockObject
      */
     private MockObject $logger;
@@ -67,8 +62,8 @@ class UpdateHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
-        $this->pathsHelper->method('getSystemPath')
+        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper->method('getSystemPath')
             ->with('cache')
             ->willReturn(__DIR__.'/resource/update/tmp');
 
@@ -85,7 +80,7 @@ class UpdateHelperTest extends TestCase
         $this->client = $this->createMock(Client::class);
 
         $this->helper = new UpdateHelper(
-            $this->pathsHelper,
+            $pathsHelper,
             $this->logger,
             $this->coreParametersHelper,
             $this->client, $this->releaseParser,
@@ -843,7 +838,7 @@ class UpdateHelperTest extends TestCase
 
         foreach ($results as $result) {
             if (!empty($result->errors)) {
-                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $error->key, $result->errors));
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $error->key, $result->errors));
             }
         }
 
@@ -868,7 +863,7 @@ class UpdateHelperTest extends TestCase
 
         foreach ($results as $result) {
             if (!empty($result->errors)) {
-                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $error->key, $result->errors));
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $error->key, $result->errors));
             }
         }
 

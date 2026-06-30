@@ -39,8 +39,6 @@ class ReportSubscriberTest extends TestCase
 
     private \PHPUnit\Framework\MockObject\MockObject&VersionProvider $versionProvider;
 
-    private \PHPUnit\Framework\MockObject\MockObject&DncReportService $dncReportService;
-
     private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     private ReportSubscriber $subscriber;
@@ -52,14 +50,14 @@ class ReportSubscriberTest extends TestCase
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
+        $dncReportService          = $this->createMock(DncReportService::class);
         $this->versionProvider     = $this->createMock(VersionProvider::class);
-        $this->dncReportService    = $this->createMock(DncReportService::class);
         $this->connection          = $this->createMock(Connection::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
             $this->translator,
-            $this->dncReportService,
+            $dncReportService,
             $this->versionProvider,
         );
 

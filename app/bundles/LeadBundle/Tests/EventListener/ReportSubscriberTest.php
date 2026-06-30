@@ -45,21 +45,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $leadFieldModelMock;
 
     /**
-     * @var MockObject|StageModel
-     */
-    private MockObject $stageModelMock;
-
-    /**
-     * @var MockObject|CampaignModel
-     */
-    private MockObject $campaignModelMock;
-
-    /**
-     * @var MockObject|EventCollector
-     */
-    private MockObject $eventCollectorMock;
-
-    /**
      * @var MockObject|CompanyModel
      */
     private MockObject $companyModelMock;
@@ -89,11 +74,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private ReportHelper $reportHelperMock;
 
     /**
-     * @var MockObject|CampaignRepository
-     */
-    private MockObject $campaignRepositoryMock;
-
-    /**
      * @var MockObject|ReportBuilderEvent
      */
     private MockObject $reportBuilderEventMock;
@@ -102,11 +82,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|QueryBuilder
      */
     private MockObject $queryBuilderMock;
-
-    /**
-     * @var MockObject|ExpressionBuilder
-     */
-    private MockObject $expressionBuilderMock;
 
     /**
      * @var MockObject|ReportGraphEvent
@@ -129,8 +104,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $reportDataEventMock;
 
     private ReportSubscriber $reportSubscriber;
-
-    private MockObject&DncReportService $dncReportService;
 
     /** @var array<string, array<string, string>> */
     private array $leadColumns = [
@@ -161,9 +134,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
         $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
-        $this->stageModelMock                   = $this->createMock(StageModel::class);
-        $this->campaignModelMock                = $this->createMock(CampaignModel::class);
-        $this->eventCollectorMock               = $this->createMock(EventCollector::class);
+        $stageModelMock                         = $this->createMock(StageModel::class);
+        $campaignModelMock                      = $this->createMock(CampaignModel::class);
+        $eventCollectorMock                     = $this->createMock(EventCollector::class);
         $this->companyModelMock                 = $this->createMock(CompanyModel::class);
         $this->companyReportDataMock            = $this->createMock(CompanyReportData::class);
         $this->fieldsBuilderMock                = $this->createMock(FieldsBuilder::class);
@@ -172,30 +145,30 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
         $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
         $this->reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
-        $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
+        $campaignRepositoryMock                 = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
-        $this->expressionBuilderMock            = $this->createMock(ExpressionBuilder::class);
+        $expressionBuilderMock                  = $this->createMock(ExpressionBuilder::class);
         $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
         $this->companyRepositoryMock            = $this->createMock(CompanyRepository::class);
         $this->pointsChangeLogRepositoryMock    = $this->createMock(PointsChangeLogRepository::class);
-        $this->dncReportService                 = $this->createMock(DncReportService::class);
+        $dncReportService                       = $this->createMock(DncReportService::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
             $this->leadFieldModelMock,
-            $this->stageModelMock,
-            $this->campaignModelMock,
-            $this->eventCollectorMock,
+            $stageModelMock,
+            $campaignModelMock,
+            $eventCollectorMock,
             $this->companyModelMock,
             $this->companyReportDataMock,
             $this->fieldsBuilderMock,
             $this->translatorMock,
-            $this->dncReportService
+            $dncReportService
         );
 
         $this->queryBuilderMock->expects($this->any())
                 ->method('expr')
-                ->willReturn($this->expressionBuilderMock);
+                ->willReturn($expressionBuilderMock);
 
         $this->queryBuilderMock->expects($this->any())
             ->method('resetQueryParts')
@@ -267,9 +240,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('orderBy')
             ->willReturn($this->queryBuilderMock);
 
-        $this->campaignModelMock->method('getRepository')->willReturn($this->campaignRepositoryMock);
+        $campaignModelMock->method('getRepository')->willReturn($campaignRepositoryMock);
 
-        $this->eventCollectorMock->expects($this->any())
+        $eventCollectorMock->expects($this->any())
             ->method('getEventsArray')
             ->willReturn(
                 [
@@ -309,7 +282,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('hasId')
             ->willReturn(false);
 
-        $this->stageModelMock->expects($this->any())
+        $stageModelMock->expects($this->any())
             ->method('getUserStages')
             ->willReturn([
                 'stage' => [

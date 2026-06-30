@@ -37,8 +37,6 @@ class RealTimeExecutionerTest extends TestCase
 
     private MockObject&ContactTracker $contactTracker;
 
-    private MockObject&LeadRepository $leadRepository;
-
     private DecisionHelper $decisionHelper;
 
     private EventRedirectionHelper&MockObject $redirectionHelper;
@@ -59,14 +57,14 @@ class RealTimeExecutionerTest extends TestCase
 
         $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $this->leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->decisionHelper    = new DecisionHelper($this->leadRepository);
+        $this->decisionHelper    = new DecisionHelper($leadRepository);
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
         // Configure the redirection helper mock to return the event it receives
         $this->redirectionHelper->method('handleEventRedirection')
-            ->willReturnCallback(fn (Event $event) => $event);
+            ->willReturnCallback(fn (Event $event): Event => $event);
     }
 
     public function testContactNotFoundResultsInEmptyResponses(): void
@@ -348,10 +346,7 @@ class RealTimeExecutionerTest extends TestCase
         return $event;
     }
 
-    /**
-     * @return RealTimeExecutioner
-     */
-    private function getExecutioner()
+    private function getExecutioner(): RealTimeExecutioner
     {
         return new RealTimeExecutioner(
             new NullLogger(),

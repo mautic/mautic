@@ -126,7 +126,7 @@ final class TransportChainTest extends MauticMysqlTestCase
             {
                 $transports = $this->getTransports();
 
-                return array_map(fn ($v) => $v['service'], $transports);
+                return array_map(fn ($v): TransportInterface => $v['service'], $transports);
             }
         };
 

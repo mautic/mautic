@@ -565,7 +565,7 @@ TEXT;
      *
      * @return TrackableModel&MockObject
      */
-    protected function getModel(array $doNotTrack = [], array $urlFieldsForPlaintext = [])
+    protected function getModel(array $doNotTrack = [], array $urlFieldsForPlaintext = []): MockObject
     {
         // Add default DoNotTrack
         $doNotTrack = array_merge(

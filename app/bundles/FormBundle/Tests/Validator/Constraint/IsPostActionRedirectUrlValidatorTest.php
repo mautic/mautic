@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[CoversClass(IsPostActionRedirectUrlValidator::class)]
 class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTestCase
 {
-    private ValidatorInterface|MockObject $urlValidator;
+    private ?MockObject $urlValidator = null;
 
     public static function provideEmptyValue(): \Generator
     {

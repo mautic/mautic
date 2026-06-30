@@ -19,12 +19,12 @@ abstract class AbstractStepTestCase extends TestCase
     /**
      * @var MockObject|InputInterface
      */
-    protected $input;
+    protected MockObject $input;
 
     /**
      * @var MockObject|OutputInterface
      */
-    protected $output;
+    protected MockObject $output;
 
     protected function setUp(): void
     {

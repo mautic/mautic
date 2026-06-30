@@ -126,7 +126,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
 
     private function makeEventExecutionFail(): callable
     {
-        $listener = function (CampaignExecutionEvent $event) { // @phpstan-ignore parameter.deprecatedClass
+        $listener = function (CampaignExecutionEvent $event): void { // @phpstan-ignore parameter.deprecatedClass
             $event->setResult(false);
             $event->stopPropagation();
         };

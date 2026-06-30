@@ -25,7 +25,7 @@ class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
     /**
      * @var MockObject|LoggerInterface
      */
-    private $logger;
+    private MockObject $logger;
 
     protected function setUp(): void
     {

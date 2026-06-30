@@ -31,18 +31,6 @@ class FieldHelperTest extends TestCase
     private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var VariableExpresserHelperInterface&MockObject
-     */
-    private MockObject $variableExpresserHelper;
-
-    /**
-     * @var ChannelListHelper&MockObject
-     */
-    private MockObject $channelListHelper;
-
-    private MockObject $eventDispatcher;
-
-    /**
      * @var MauticSyncFieldsLoadEvent&MockObject
      */
     private MockObject $mauticSyncFieldsLoadEvent;
@@ -57,15 +45,15 @@ class FieldHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
-        $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
+        $variableExpresserHelper       = $this->createMock(VariableExpresserHelperInterface::class);
+        $channelListHelper             = $this->createMock(ChannelListHelper::class);
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
-        $this->channelListHelper->method('getFeatureChannels')
+        $channelListHelper->method('getFeatureChannels')
             ->willReturn(['Email' => 'email']);
 
         $this->mauticSyncFieldsLoadEvent = $this->createMock(MauticSyncFieldsLoadEvent::class);
-        $this->eventDispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->eventDispatcher->method('dispatch')
+        $eventDispatcher                 = $this->createMock(EventDispatcherInterface::class);
+        $eventDispatcher->method('dispatch')
             ->willReturn($this->mauticSyncFieldsLoadEvent);
 
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -73,10 +61,10 @@ class FieldHelperTest extends TestCase
         $this->fieldHelper = new FieldHelper(
             $this->fieldModel,
             $this->fieldsWithUniqueIdentifier,
-            $this->variableExpresserHelper,
-            $this->channelListHelper,
+            $variableExpresserHelper,
+            $channelListHelper,
             $this->createMock(TranslatorInterface::class),
-            $this->eventDispatcher,
+            $eventDispatcher,
             $this->objectProvider
         );
     }
