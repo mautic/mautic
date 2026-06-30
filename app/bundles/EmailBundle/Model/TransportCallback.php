@@ -11,9 +11,9 @@ use Mautic\LeadBundle\Model\DoNotContact;
 class TransportCallback
 {
     public function __construct(
-        private DoNotContact $dncModel,
-        private ContactFinder $finder,
-        private EmailStatModel $emailStatModel,
+        private readonly DoNotContact $dncModel,
+        private readonly ContactFinder $finder,
+        private readonly EmailStatModel $emailStatModel,
     ) {
     }
 

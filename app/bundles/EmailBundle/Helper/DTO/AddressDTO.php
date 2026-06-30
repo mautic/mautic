@@ -12,7 +12,7 @@ final class AddressDTO
 {
     private ?string $name = null;
 
-    public function __construct(private string $email, ?string $name = null)
+    public function __construct(private readonly string $email, ?string $name = null)
     {
         $this->setName($name);
     }

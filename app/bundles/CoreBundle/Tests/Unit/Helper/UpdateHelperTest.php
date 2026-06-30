@@ -24,37 +24,37 @@ use Psr\Http\Message\StreamInterface;
 class UpdateHelperTest extends TestCase
 {
     /**
-     * @var Logger|MockObject
+     * @var MockObject&Logger
      */
     private MockObject $logger;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Client|MockObject
+     * @var MockObject&Client
      */
     private MockObject $client;
 
     /**
-     * @var ResponseInterface|MockObject
+     * @var MockObject&ResponseInterface
      */
     private MockObject $response;
 
     /**
-     * @var StreamInterface|MockObject
+     * @var MockObject&StreamInterface
      */
     private MockObject $streamBody;
 
     /**
-     * @var ReleaseParser|MockObject
+     * @var MockObject&ReleaseParser
      */
     private MockObject $releaseParser;
 
     /**
-     * @var PreUpdateCheckHelper|MockObject
+     * @var MockObject&PreUpdateCheckHelper
      */
     private MockObject $preUpdateCheckHelper;
 
@@ -303,7 +303,7 @@ class UpdateHelperTest extends TestCase
                 'POST',
                 $statsUrl,
                 $this->callback(
-                    function (array $options) {
+                    function (array $options): true {
                         $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::FORM_PARAMS, $options);
                         $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::CONNECT_TIMEOUT, $options);
                         $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::HEADERS, $options);
@@ -551,7 +551,7 @@ class UpdateHelperTest extends TestCase
                 function (string $method, string $url, array $options): void {
                     $request = $this->createMock(RequestInterface::class);
 
-                    throw new RequestException('something bad happened', $request, null);
+                    throw new RequestException('something bad happened', $request);
                 }
             );
 
@@ -710,7 +710,7 @@ class UpdateHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('GET', $updateUrl)
-            ->willThrowException(new RequestException('bad', $this->createMock(RequestInterface::class), $this->response));
+            ->willThrowException(new RequestException('bad', $this->createStub(RequestInterface::class), $this->response));
 
         $this->releaseParser->expects($this->never())
             ->method('getLatestSupportedRelease');

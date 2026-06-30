@@ -31,8 +31,11 @@ class CampaignControllerTest extends MauticMysqlTestCase
     use UserEntityTrait;
 
     private Lead $contactOne;
+
     private Lead $contactTwo;
+
     private Lead $contactThree;
+
     private Campaign $campaign;
 
     /**

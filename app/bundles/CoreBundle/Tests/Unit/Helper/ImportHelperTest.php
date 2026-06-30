@@ -29,11 +29,11 @@ class ImportHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->exportHelper = new ExportHelper(
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(FilePathResolver::class),
-            $this->createMock(ProcessSignalService::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(FilePathResolver::class),
+            $this->createStub(ProcessSignalService::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
 
         $filesystem = new Filesystem();

@@ -20,27 +20,27 @@ class ReleaseParserTest extends TestCase
             [
                 'handler' => new MockHandler(
                     [
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-2.16.0.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-3.0.1-beta.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-3.0.1-alpha.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-3.0.0.json');
 
                             return new Response(200, [], $metadata);
                         },
-                        function (Request $request, array $options) {
+                        function (Request $request, array $options): Response {
                             $metadata = file_get_contents(__DIR__.'/json/metadata-2.15.0.json');
 
                             return new Response(200, [], $metadata);

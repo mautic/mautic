@@ -67,7 +67,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         IntegrationEntityModel $integrationEntityModel,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected DoNotContact $doNotContactModel,
-        private UserModel $userModel,
+        private readonly UserModel $userModel,
     ) {
         parent::__construct(
             $eventDispatcher,

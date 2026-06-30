@@ -25,10 +25,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MappingHelper
 {
     public function __construct(
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private ObjectMappingRepository $objectMappingRepository,
-        private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly ObjectMappingRepository $objectMappingRepository,
+        private readonly ObjectProvider $objectProvider,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

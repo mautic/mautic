@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Config $config,
-        private GrapesJsBuilderModel $grapesJsBuilderModel,
+        private readonly Config $config,
+        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
     ) {
     }
 

@@ -44,7 +44,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $leadList = $this->createMock(LeadList::class);
+        $leadList = $this->createStub(LeadList::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -76,7 +76,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $form     = $this->createMock(Form::class);
+        $form     = $this->createStub(Form::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -94,7 +94,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $leadList = $this->createMock(LeadList::class);
+        $leadList = $this->createStub(LeadList::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -112,7 +112,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $form     = $this->createMock(Form::class);
+        $form     = $this->createStub(Form::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')

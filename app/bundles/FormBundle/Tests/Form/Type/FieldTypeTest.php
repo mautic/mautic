@@ -22,17 +22,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldTypeTest extends TypeTestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&TranslatorInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $translator;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectCollectorInterface
+     */
     private \PHPUnit\Framework\MockObject\MockObject $objectCollector;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&FieldCollectorInterface
+     */
     private \PHPUnit\Framework\MockObject\MockObject $fieldCollector;
-    private \PHPUnit\Framework\MockObject\MockObject $mappedFieldCollector;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&AlreadyMappedFieldCollectorInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $mappedFieldCollector;
 
     protected function setUp(): void
     {
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createStub(TranslatorInterface::class);
         $this->objectCollector      = $this->createMock(ObjectCollectorInterface::class);
         $this->fieldCollector       = $this->createMock(FieldCollectorInterface::class);
-        $this->mappedFieldCollector = $this->createMock(AlreadyMappedFieldCollectorInterface::class);
+        $this->mappedFieldCollector = $this->createStub(AlreadyMappedFieldCollectorInterface::class);
 
         // Set up expected behavior for objectCollector
         $objectCollection = new ObjectCollection();

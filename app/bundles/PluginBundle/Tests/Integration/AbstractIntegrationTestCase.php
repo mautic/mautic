@@ -25,82 +25,82 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AbstractIntegrationTestCase extends TestCase
 {
     /**
-     * @var EventDispatcherInterface&MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     protected MockObject $dispatcher;
 
     /**
-     * @var CacheStorageHelper&MockObject
+     * @var MockObject&CacheStorageHelper
      */
     protected MockObject $cache;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
     protected MockObject $em;
 
     /**
-     * @var Session&MockObject
+     * @var MockObject&Session
      */
     protected MockObject $session;
 
     /**
-     * @var RequestStack&MockObject
+     * @var MockObject&RequestStack
      */
     protected MockObject $request;
 
     /**
-     * @var Router&MockObject
+     * @var MockObject&Router
      */
     protected MockObject $router;
 
     /**
-     * @var TranslatorInterface&MockObject
+     * @var MockObject&TranslatorInterface
      */
     protected MockObject $translator;
 
     /**
-     * @var Logger&MockObject
+     * @var MockObject&Logger
      */
     protected MockObject $logger;
 
     /**
-     * @var EncryptionHelper&MockObject
+     * @var MockObject&EncryptionHelper
      */
     protected MockObject $encryptionHelper;
 
     /**
-     * @var LeadModel&MockObject
+     * @var MockObject&LeadModel
      */
     protected MockObject $leadModel;
 
     /**
-     * @var CompanyModel&MockObject
+     * @var MockObject&CompanyModel
      */
     protected MockObject $companyModel;
 
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
     protected MockObject $pathsHelper;
 
     /**
-     * @var NotificationModel&MockObject
+     * @var MockObject&NotificationModel
      */
     protected MockObject $notificationModel;
 
     /**
-     * @var FieldModel&MockObject
+     * @var MockObject&FieldModel
      */
     protected MockObject $fieldModel;
 
     /**
-     * @var IntegrationEntityModel&MockObject
+     * @var MockObject&IntegrationEntityModel
      */
     protected MockObject $integrationEntityModel;
 
     /**
-     * @var DoNotContact&MockObject
+     * @var MockObject&DoNotContact
      */
     protected MockObject $doNotContact;
 

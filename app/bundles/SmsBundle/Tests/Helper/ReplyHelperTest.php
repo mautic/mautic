@@ -15,14 +15,14 @@ use Symfony\Component\HttpFoundation\Request;
 class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     private NullLogger $logger;
 
     /**
-     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ContactTracker
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
 
