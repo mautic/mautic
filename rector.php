@@ -34,7 +34,7 @@ return RectorConfig::configure()
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         AddParamTypeFromPropertyTypeRector::class,
-        ClosureReturnTypeRector::class,
+        // ClosureReturnTypeRector::class,
 
         TypedPropertyFromAssignsRector::class,
         ReturnTypeFromStrictParamRector::class,
@@ -43,7 +43,7 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(36)
+    ->withTypeCoverageLevel(42)
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(27)
     ->withSkip([

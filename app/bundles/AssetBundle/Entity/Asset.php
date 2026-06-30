@@ -923,7 +923,7 @@ class Asset extends FormEntity implements UuidInterface
      *
      * @return array<string, float|string|false|null>|string
      */
-    public function getFileInfo()
+    public function getFileInfo(): array|string
     {
         $fileInfo = [];
 

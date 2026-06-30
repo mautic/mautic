@@ -305,7 +305,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return string
      */
-    protected function prepareContentWithTrackableTokens($content, $type)
+    protected function prepareContentWithTrackableTokens($content, $type): string|array|null
     {
         if (empty($content)) {
             return '';
@@ -427,7 +427,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return bool|non-empty-array<mixed, mixed>
      */
-    protected function prepareUrlForTracking(string $url)
+    protected function prepareUrlForTracking(string $url): false|array
     {
         // Ensure it's clean
         $url = trim($url);
@@ -655,7 +655,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return mixed|string
      */
-    protected function httpBuildQuery(array $queryParts)
+    protected function httpBuildQuery(array $queryParts): string|array|null
     {
         $query = http_build_query($queryParts);
 

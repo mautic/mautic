@@ -86,10 +86,8 @@ final class AssetsHelper
      *
      * @param string     $path
      * @param bool|false $absolute
-     *
-     * @return string|bool
      */
-    public function getOverridableUrl($path, $absolute = false)
+    public function getOverridableUrl($path, $absolute = false): false|string
     {
         $mediaPath  = $this->pathsHelper->getSystemPath('media', false);
         $assetsPath = $this->pathsHelper->getSystemPath('assets', false);

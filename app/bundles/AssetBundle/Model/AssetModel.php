@@ -457,7 +457,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @return int|string
      */
-    public function getTotalFilesize($assets)
+    public function getTotalFilesize($assets): int|string|array|float|false|null
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {

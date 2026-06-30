@@ -67,10 +67,8 @@ class EventController extends CommonFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -206,10 +204,8 @@ class EventController extends CommonFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $valid         = $cancelled = false;
         $method        = $request->getMethod();

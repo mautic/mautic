@@ -123,10 +123,8 @@ class PluginController extends FormController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
