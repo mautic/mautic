@@ -145,7 +145,7 @@ trait CustomFieldEntityTrait
             $value = CustomFieldHelper::fixValueType($field['type'], $value);
         }
 
-        if ($oldValue !== $value && (!('' === $oldValue && null === $value) && !(null === $oldValue && '' === $value))) {
+        if ($oldValue !== $value && (('' !== $oldValue || null !== $value) && (null !== $oldValue || '' !== $value))) {
             $this->addChange('fields', [$alias => [$oldValue, $value]]);
             $this->updatedFields[$alias] = $value;
         }

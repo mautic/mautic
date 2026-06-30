@@ -19,13 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CustomFieldColumn
 {
     public function __construct(
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private SchemaDefinition $schemaDefinition,
-        private LoggerInterface $logger,
-        private LeadFieldSaver $leadFieldSaver,
-        private CustomFieldIndex $customFieldIndex,
-        private FieldColumnDispatcher $fieldColumnDispatcher,
-        private TranslatorInterface $translator,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly SchemaDefinition $schemaDefinition,
+        private readonly LoggerInterface $logger,
+        private readonly LeadFieldSaver $leadFieldSaver,
+        private readonly CustomFieldIndex $customFieldIndex,
+        private readonly FieldColumnDispatcher $fieldColumnDispatcher,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

@@ -25,15 +25,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private LanguageHelper $languageHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -272,7 +272,7 @@ class FormSubscriber implements EventSubscriberInterface
                     if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
                         unset($post[$key]);
                     }
-                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                    if (isset($fieldTypes[$key]) && 'password' == $fieldTypes[$key]) {
                         $post[$key] = '*********';
                     }
                 }

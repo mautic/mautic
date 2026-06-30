@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class PointInsightSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private InsightModel $insightModel,
+        private readonly InsightModel $insightModel,
     ) {
     }
 

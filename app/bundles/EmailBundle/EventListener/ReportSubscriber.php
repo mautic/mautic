@@ -164,13 +164,13 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
 
     public function __construct(
-        private Connection $db,
-        private CompanyReportData $companyReportData,
-        private StatRepository $statRepository,
-        private EmailRepository $emailRepository,
-        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private FieldsBuilder $fieldsBuilder,
-        private DncReportService $dncReportService,
+        private readonly Connection $db,
+        private readonly CompanyReportData $companyReportData,
+        private readonly StatRepository $statRepository,
+        private readonly EmailRepository $emailRepository,
+        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private readonly FieldsBuilder $fieldsBuilder,
+        private readonly DncReportService $dncReportService,
     ) {
     }
 

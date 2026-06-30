@@ -19,12 +19,12 @@ class PathsHelperTest extends TestCase
     private string $rootDir  = __DIR__.'/resource/paths';
 
     /**
-     * @var MockObject|UserHelper
+     * @var \PHPUnit\Framework\MockObject\Stub|UserHelper
      */
-    private MockObject $userHelper;
+    private \PHPUnit\Framework\MockObject\Stub $userHelper;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
@@ -32,7 +32,7 @@ class PathsHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->userHelper           = $this->createMock(UserHelper::class);
+        $this->userHelper           = $this->createStub(UserHelper::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
             ->willReturnCallback(
@@ -127,7 +127,7 @@ class PathsHelperTest extends TestCase
         $tempPath = __DIR__.'/resource/paths/no_exist/tmp';
 
         /** @var UserHelper&MockObject $userHelper */
-        $userHelper = $this->createMock(UserHelper::class);
+        $userHelper = $this->createStub(UserHelper::class);
 
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);

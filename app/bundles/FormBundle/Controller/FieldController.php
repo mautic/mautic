@@ -29,12 +29,12 @@ use Twig\Environment;
 class FieldController extends CommonFormController
 {
     public function __construct(
-        private FormModel $formModel,
-        private FieldModel $formFieldModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
         FormFactoryInterface $formFactory,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
-        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

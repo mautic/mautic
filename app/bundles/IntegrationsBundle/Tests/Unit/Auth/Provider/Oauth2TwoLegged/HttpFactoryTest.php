@@ -321,9 +321,9 @@ class HttpFactoryTest extends TestCase
     public function testClientConfiguration(): void
     {
         $credentials               = $this->getCredentials();
-        $signerInterface           = $this->createMock(SignerInterface::class);
-        $kamermansTokenPersistence = $this->createMock(KamermansTokenPersistenceInterface::class);
-        $accessTokenSigner         = $this->createMock(AccessTokenSigner::class);
+        $signerInterface           = $this->createStub(SignerInterface::class);
+        $kamermansTokenPersistence = $this->createStub(KamermansTokenPersistenceInterface::class);
+        $accessTokenSigner         = $this->createStub(AccessTokenSigner::class);
 
         $clientCredentialSigner = $this->createMock(ConfigCredentialsSignerInterface::class);
         $clientCredentialSigner->expects($this->once())

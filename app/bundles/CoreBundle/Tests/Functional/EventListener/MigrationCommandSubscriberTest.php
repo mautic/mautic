@@ -18,7 +18,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class MigrationCommandSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private string $tablePrefix;
+
     private EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void

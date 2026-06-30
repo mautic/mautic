@@ -12,7 +12,7 @@ use Mautic\SmsBundle\EventListener\TrackingSubscriber;
 class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|StatRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&StatRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $statRepository;
 

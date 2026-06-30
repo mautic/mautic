@@ -238,21 +238,11 @@
       <!-- left section -->
       <div class="col-md-9 height-auto">
           <div>
-              <!-- email detail header -->
-              <div class="pr-md pl-md pt-lg pb-lg">
-                  <div class="box-layout">
-                      <div class="col-xs-10">
-                          <div>{{ email.subject }}</div>
-                          <div class="text-secondary">{{ emailPreview }}</div>
-                      </div>
-                  </div>
-              </div>
-              <!--/ email detail header -->
 
-              <!-- email detail collapseable -->
-              <div class="collapse pr-md pl-md" id="email-details">
-                  <div class="pr-md pl-md pb-md">
-                      <div class="panel shd-none mb-0">
+          <!-- email detail collapseable -->
+          <div class="collapse pr-md pl-md" id="email-details">
+              <div class="pr-md pl-md pb-md">
+                  <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
                               {{- include('@MauticCore/Helper/details.html.twig', {'entity': email}) -}}
@@ -513,6 +503,18 @@
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
           {{ customContent('right.section.start', _context) }}
+
+          <!-- email preview -->
+          <div class="pa-16">
+              <iframe
+                  id="content_preview_frame"
+                  src="{{ previewUrl|e }}"
+                  sandbox="allow-popups allow-popups-to-escape-sandbox"
+                  title="{{ 'mautic.email.preview.iframe_title'|trans }}"
+                  style="width: 100%; min-height: 1000px; border: 0; zoom: 0.35; overflow: hidden;">
+              </iframe>
+          </div>
+          <!--/ email preview -->
           <!-- preview URL -->
           <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">

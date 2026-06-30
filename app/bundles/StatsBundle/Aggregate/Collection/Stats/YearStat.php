@@ -9,7 +9,7 @@ class YearStat implements StatInterface
      */
     private array $stats = [];
 
-    private int $year;
+    private readonly int $year;
 
     /**
      * @param int $year

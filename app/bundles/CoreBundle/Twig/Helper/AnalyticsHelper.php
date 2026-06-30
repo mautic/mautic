@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 final class AnalyticsHelper
 {
-    private string $code;
+    private readonly string $code;
 
     public function __construct(CoreParametersHelper $parametersHelper)
     {

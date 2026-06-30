@@ -85,17 +85,17 @@ class CommonApiControllerTest extends CampaignTestAbstract
     protected function getResultFromProtectedMethod(string $method, array $args): mixed
     {
         $controller = new CommonApiController(
-            $this->createMock(CorePermissions::class),
-            $this->createMock(Translator::class),
-            $this->createMock(EntityResultHelper::class),
-            $this->createMock(Router::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(AppVersion::class),
-            $this->createMock(RequestStack::class),
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(Translator::class),
+            $this->createStub(EntityResultHelper::class),
+            $this->createStub(Router::class),
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(AppVersion::class),
+            $this->createStub(RequestStack::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
@@ -223,17 +223,17 @@ class CommonApiControllerTest extends CampaignTestAbstract
     private function invokeProtectedSanitize(array &$where): void
     {
         $controller = new CommonApiController(
-            $this->createMock(CorePermissions::class),
-            $this->createMock(Translator::class),
-            $this->createMock(EntityResultHelper::class),
-            $this->createMock(Router::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(AppVersion::class),
-            $this->createMock(RequestStack::class),
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(Translator::class),
+            $this->createStub(EntityResultHelper::class),
+            $this->createStub(Router::class),
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(AppVersion::class),
+            $this->createStub(RequestStack::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $reflection = new \ReflectionClass(CommonApiController::class);
@@ -243,7 +243,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class), $this->createMock(ModelFactory::class), $this->createMock(EventDispatcherInterface::class), $this->createMock(CoreParametersHelper::class)) extends CommonApiController {
+        $controller = new class($this->createStub(CorePermissions::class), $this->createStub(Translator::class), new EntityResultHelper(), $this->createStub(Router::class), $this->createStub(FormFactoryInterface::class), $this->createStub(AppVersion::class), $this->createStub(RequestStack::class), $this->createStub(ManagerRegistry::class), $this->createStub(ModelFactory::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(CoreParametersHelper::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors

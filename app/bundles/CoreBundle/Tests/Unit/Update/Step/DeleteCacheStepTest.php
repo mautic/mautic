@@ -10,12 +10,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DeleteCacheStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|CacheHelper
+     * @var MockObject&CacheHelper
      */
     private MockObject $cacheHelper;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 

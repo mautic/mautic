@@ -15,12 +15,12 @@ use Symfony\Component\Routing\RouterInterface;
 class TokenHelperTest extends TestCase
 {
     /**
-     * @var FocusModel|MockObject
+     * @var MockObject&FocusModel
      */
     private MockObject $model;
 
     /**
-     * @var CorePermissions|MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 

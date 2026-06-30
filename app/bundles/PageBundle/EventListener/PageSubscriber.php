@@ -19,12 +19,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetsHelper $assetsHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
-        private LanguageHelper $languageHelper,
-        private PageModel $pageModel,
-        private PageDraftModel $pageDraftModel,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly LanguageHelper $languageHelper,
+        private readonly PageModel $pageModel,
+        private readonly PageDraftModel $pageDraftModel,
     ) {
     }
 

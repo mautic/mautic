@@ -12,8 +12,8 @@ final class HtmlExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('htmlAttributesStringToArray', [$this, 'convertHtmlAttributesToArray']),
-            new TwigFunction('htmlEntityDecode', [$this, 'htmlEntityDecode']),
+            new TwigFunction('htmlAttributesStringToArray', $this->convertHtmlAttributesToArray(...)),
+            new TwigFunction('htmlEntityDecode', $this->htmlEntityDecode(...)),
         ];
     }
 

@@ -16,7 +16,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     /**
      * @var Lead[]
      */
-    private $leads = [];
+    private array $leads = [];
 
     protected $useCleanupRollback = false;
 
