@@ -62,7 +62,7 @@ class PageModelTest extends PageTestAbstract
         $this->router->expects($this->once())
             ->method('generate')
             ->willReturnCallback(
-                function (string $route, array $routeParams, int $referenceType) {
+                function (string $route, array $routeParams, int $referenceType): string {
                     $this->assertSame('mautic_page_public', $route);
                     $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
                     $this->assertSame(0, $referenceType);
@@ -213,7 +213,7 @@ class PageModelTest extends PageTestAbstract
         ];
         $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
-        $params = [[
+        return [[
             'page_title'      => 'Testpage',
             'page_language'   => 'en-GB',
             'page_referrer'   => '',
@@ -253,7 +253,5 @@ class PageModelTest extends PageTestAbstract
             'adblock'         => false,
             'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
         ]];
-
-        return $params;
     }
 }

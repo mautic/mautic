@@ -29,10 +29,10 @@ class ContactScheduledExportCommand extends Command
     public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
     public function __construct(
-        private ContactExportSchedulerModel $contactExportSchedulerModel,
-        private EventDispatcherInterface $eventDispatcher,
-        private FormatterHelper $formatterHelper,
-        private ProcessSignalService $processSignalService,
+        private readonly ContactExportSchedulerModel $contactExportSchedulerModel,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly FormatterHelper $formatterHelper,
+        private readonly ProcessSignalService $processSignalService,
     ) {
         parent::__construct();
     }

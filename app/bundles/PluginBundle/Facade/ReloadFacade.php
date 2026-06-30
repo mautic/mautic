@@ -9,9 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReloadFacade
 {
     public function __construct(
-        private PluginModel $pluginModel,
-        private ReloadHelper $reloadHelper,
-        private TranslatorInterface $translator,
+        private readonly PluginModel $pluginModel,
+        private readonly ReloadHelper $reloadHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchSegmentController extends AbstractFormController
 {
     public function __construct(
-        private SegmentActionModel $segmentActionModel,
-        private ListModel $segmentModel,
+        private readonly SegmentActionModel $segmentActionModel,
+        private readonly ListModel $segmentModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

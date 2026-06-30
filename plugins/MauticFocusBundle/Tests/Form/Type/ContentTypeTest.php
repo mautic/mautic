@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 class ContentTypeTest extends TestCase
 {
     /**
-     * @var mixed|\PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&FormBuilderInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 

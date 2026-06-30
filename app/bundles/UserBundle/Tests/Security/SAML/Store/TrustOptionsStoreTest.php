@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class TrustOptionsStoreTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

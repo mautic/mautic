@@ -11,7 +11,6 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
-// use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
@@ -37,9 +36,6 @@ return RectorConfig::configure()
         AddParamTypeFromPropertyTypeRector::class,
         ClosureReturnTypeRector::class,
 
-        // flips nested negated conditions to same-meaning clear ones
-        Rector\CodeQuality\Rector\BooleanNot\SimplifyDeMorganBinaryRector::class,
-
         TypedPropertyFromAssignsRector::class,
         ReturnTypeFromStrictParamRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
@@ -49,10 +45,13 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withTypeCoverageLevel(36)
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(19)
+    ->withCodeQualityLevel(27)
     ->withSkip([
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
+        Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
+        // soon to be deprecated
+        Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
 
         Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
         '*/Test/*',
@@ -66,6 +65,11 @@ return RectorConfig::configure()
 
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
+
+        Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
+            // test fixture
+            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
+        ],
 
         // designed to be overriden by 3rd party, adding return type will break BC
         Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictScalarReturnsRector::class => [

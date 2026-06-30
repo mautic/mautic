@@ -16,24 +16,24 @@ class CacheProviderTest extends TestCase
     private CacheProvider $cacheProvider;
 
     /**
-     * @var MockObject|FilesystemTagAwareAdapter
+     * @var \PHPUnit\Framework\MockObject\Stub|FilesystemTagAwareAdapter
      */
-    private MockObject $adapter;
+    private \PHPUnit\Framework\MockObject\Stub $adapter;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var MockObject|ContainerInterface
+     * @var MockObject&ContainerInterface
      */
     private MockObject $container;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adapter              = $this->createMock(FilesystemTagAwareAdapter::class);
+        $this->adapter              = $this->createStub(FilesystemTagAwareAdapter::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->container            = $this->createMock(ContainerInterface::class);
         $this->cacheProvider        = new CacheProvider($this->coreParametersHelper, $this->container);

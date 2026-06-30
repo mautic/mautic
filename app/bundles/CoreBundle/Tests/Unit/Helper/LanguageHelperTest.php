@@ -16,29 +16,29 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LanguageHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
     /**
-     * @var Logger&MockObject
+     * @var Logger&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $logger;
+    private \PHPUnit\Framework\MockObject\Stub $logger;
 
     /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Client&MockObject
+     * @var MockObject&Client
      */
     private MockObject $client;
 
     /**
-     * @var TranslatorInterface&MockObject
+     * @var TranslatorInterface&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\Stub $translator;
 
     private string $translationsPath;
 
@@ -46,10 +46,10 @@ class LanguageHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->logger               = $this->createMock(Logger::class);
+        $this->logger               = $this->createStub(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->client               = $this->createMock(Client::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createStub(TranslatorInterface::class);
 
         $this->translationsPath = __DIR__.'/resource/language';
         $this->tmpPath          = $this->translationsPath.'/tmp';

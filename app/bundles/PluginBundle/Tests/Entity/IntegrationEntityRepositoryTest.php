@@ -16,7 +16,9 @@ use PHPUnit\Framework\Assert;
 class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     public const INTEGRATION        = 'someIntegration';
+
     public const INTEGRATION_ENTITY = 'someIntegrationEntity';
+
     public const INTERNAL_ENTITY    = 'lead';
 
     /**
@@ -62,8 +64,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
             null,
             false,
             0,
-            0,
-            null
+            0
         );
 
         Assert::assertCount(1, $results);

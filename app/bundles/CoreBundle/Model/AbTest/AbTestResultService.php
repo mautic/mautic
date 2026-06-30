@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 final class AbTestResultService
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

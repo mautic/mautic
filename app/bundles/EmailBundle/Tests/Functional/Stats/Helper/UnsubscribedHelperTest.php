@@ -24,11 +24,17 @@ use Mautic\UserBundle\Entity\User;
 final class UnsubscribedHelperTest extends MauticMysqlTestCase
 {
     private UnsubscribedHelper $unsubscribedHelper;
+
     private User $adminUser;
+
     private User $regularUser;
+
     private Email $email;
+
     private Campaign $campaign;
+
     private Lead $lead1;
+
     private Lead $lead2;
 
     protected function setUp(): void

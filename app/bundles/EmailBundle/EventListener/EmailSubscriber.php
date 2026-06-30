@@ -30,12 +30,12 @@ class EmailSubscriber implements EventSubscriberInterface
     private const RETRY_COUNT = 3;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
-        private EmailModel $emailModel,
-        private TranslatorInterface $translator,
-        private EntityManagerInterface $entityManager,
-        private EmailDraftModel $emailDraftModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly EmailModel $emailModel,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EmailDraftModel $emailDraftModel,
     ) {
     }
 

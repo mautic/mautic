@@ -27,12 +27,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class CampaignEventImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private CampaignModel $campaignModel,
-        private EntityManagerInterface $entityManager,
-        private AuditLogModel $auditLogModel,
-        private IpLookupHelper $ipLookupHelper,
-        private EventDispatcherInterface $dispatcher,
-        private EventModel $eventModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EventModel $eventModel,
     ) {
     }
 

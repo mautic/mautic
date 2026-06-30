@@ -25,8 +25,8 @@ class MaxMindDoNotSellDownloadHelper
 
     public function __construct(
         $auth,
-        private LoggerInterface $logger,
-        private HttpClientInterface $httpClient,
+        private readonly LoggerInterface $logger,
+        private readonly HttpClientInterface $httpClient,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->auth       = explode(':', (string) $auth, 2);

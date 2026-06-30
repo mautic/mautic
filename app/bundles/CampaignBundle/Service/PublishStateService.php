@@ -20,7 +20,7 @@ class PublishStateService
      */
     private array $cachedRangesByCampaign = [];
 
-    public function __construct(private AuditLogRepository $auditLogRepository)
+    public function __construct(private readonly AuditLogRepository $auditLogRepository)
     {
     }
 

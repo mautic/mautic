@@ -13,7 +13,7 @@ class CredentialsStoreTest extends TestCase
     private string $cacheDir;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

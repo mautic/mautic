@@ -8,9 +8,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 class LeadChangeEvent extends Event
 {
     public function __construct(
-        private Lead $oldLead,
+        private readonly Lead $oldLead,
         private $oldTrackingId,
-        private Lead $newLead,
+        private readonly Lead $newLead,
         private $newTrackingId,
     ) {
     }

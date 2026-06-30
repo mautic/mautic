@@ -28,10 +28,10 @@ class CorePermissions implements ResetInterface
 
     public function __construct(
         protected UserHelper $userHelper,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private array $bundles,
-        private array $pluginBundles,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly array $bundles,
+        private readonly array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
     }

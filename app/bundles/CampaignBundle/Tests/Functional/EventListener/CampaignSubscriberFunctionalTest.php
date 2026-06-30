@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private CampaignSubscriber $campaignSubscriber;
 
     protected function setUp(): void

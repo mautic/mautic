@@ -17,12 +17,12 @@ abstract class AbstractStepTestCase extends TestCase
     protected $progressBar;
 
     /**
-     * @var MockObject|InputInterface
+     * @var MockObject&InputInterface
      */
     protected MockObject $input;
 
     /**
-     * @var MockObject|OutputInterface
+     * @var MockObject&OutputInterface
      */
     protected MockObject $output;
 

@@ -58,7 +58,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
      */
     private array $renderedContentCache = [];
 
-    public function __construct(private TokenHelper $tokenHelper, private IntegrationHelper $integrationHelper, private PageModel $pageModel, private BuilderTokenHelperFactory $builderTokenHelperFactory, private TranslatorInterface $translator, private Connection $connection, private Environment $twig, private CoreParametersHelper $coreParametersHelper)
+    public function __construct(private readonly TokenHelper $tokenHelper, private readonly IntegrationHelper $integrationHelper, private readonly PageModel $pageModel, private readonly BuilderTokenHelperFactory $builderTokenHelperFactory, private readonly TranslatorInterface $translator, private readonly Connection $connection, private readonly Environment $twig, private readonly CoreParametersHelper $coreParametersHelper)
     {
     }
 

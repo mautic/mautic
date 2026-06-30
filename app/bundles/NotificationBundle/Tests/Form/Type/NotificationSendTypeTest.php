@@ -8,7 +8,6 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -18,23 +17,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class NotificationSendTypeTest extends TypeTestCase
 {
-    private MockObject $router;
-
-    private MockObject $translator;
-
-    private MockObject $connection;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&RouterInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $router;
 
     /**
-     * @var ModelFactory<object>&MockObject
+     * @var \PHPUnit\Framework\MockObject\Stub&TranslatorInterface
      */
-    private MockObject $modelFactory;
+    private \PHPUnit\Framework\MockObject\Stub $translator;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Connection
+     */
+    private \PHPUnit\Framework\MockObject\Stub $connection;
+
+    /**
+     * @var ModelFactory<object>&\PHPUnit\Framework\MockObject\Stub
+     */
+    private \PHPUnit\Framework\MockObject\Stub $modelFactory;
 
     protected function setUp(): void
     {
-        $this->router       = $this->createMock(RouterInterface::class);
-        $this->translator   = $this->createMock(TranslatorInterface::class);
-        $this->modelFactory = $this->createMock(ModelFactory::class);
-        $this->connection   = $this->createMock(Connection::class);
+        $this->router       = $this->createStub(RouterInterface::class);
+        $this->translator   = $this->createStub(TranslatorInterface::class);
+        $this->modelFactory = $this->createStub(ModelFactory::class);
+        $this->connection   = $this->createStub(Connection::class);
 
         parent::setup();
     }
