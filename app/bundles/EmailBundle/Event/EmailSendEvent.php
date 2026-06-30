@@ -59,7 +59,7 @@ class EmailSendEvent extends CommonEvent
      * @param bool  $isDynamicContentParsing
      */
     public function __construct(
-        private ?MailHelper $helper = null,
+        private readonly ?MailHelper $helper = null,
         $args = [],
         private $isDynamicContentParsing = false,
     ) {

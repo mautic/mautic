@@ -9,7 +9,7 @@ class LoginEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetUser(): void
     {
-        $user  = $this->createMock(User::class);
+        $user  = $this->createStub(User::class);
         $event = new LoginEvent($user);
 
         $this->assertEquals($user, $event->getUser());

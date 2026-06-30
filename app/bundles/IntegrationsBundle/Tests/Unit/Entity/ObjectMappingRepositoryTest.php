@@ -58,7 +58,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->query->expects($this->once())
             ->method('setParameters')
-            ->with($this->callback(function (ArrayCollection $collection) {
+            ->with($this->callback(function (ArrayCollection $collection): true {
                 /** @var Parameter $parameter */
                 $parameter = $collection[0];
                 $this->assertSame('internalObject', $parameter->getName());

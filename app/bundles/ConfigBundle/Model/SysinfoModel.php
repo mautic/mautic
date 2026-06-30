@@ -25,10 +25,10 @@ class SysinfoModel
     public function __construct(
         protected PathsHelper $pathsHelper,
         protected CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         protected Connection $connection,
-        private InstallService $installService,
-        private CheckStep $checkStep,
+        private readonly InstallService $installService,
+        private readonly CheckStep $checkStep,
     ) {
     }
 

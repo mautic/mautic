@@ -24,7 +24,9 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
     }
 
     private const ADD_POINTS = 10;
+
     private EventExecutioner $eventExecutioner;
+
     private EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void // @phpstan-ignore phpunit.callParent

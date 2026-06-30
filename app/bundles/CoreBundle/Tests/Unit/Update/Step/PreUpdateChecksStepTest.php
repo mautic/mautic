@@ -15,12 +15,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class PreUpdateChecksStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|UpdateHelper
+     * @var MockObject&UpdateHelper
      */
     private MockObject $updateHelper;
 

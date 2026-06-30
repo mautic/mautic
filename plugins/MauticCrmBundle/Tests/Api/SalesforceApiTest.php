@@ -421,7 +421,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->with('Lead')
             ->willReturn(['firstname', 'lastname', 'HasOptedOutOfEmail']);
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
 
         $integration->method('getTranslator')->willReturn($translator);
 
@@ -486,7 +486,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         $integration->expects($this->never())->method('upsertUnreadAdminsNotification');
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createStub(EntityManager::class);
 
         $entity = $this
             ->getMockBuilder(Integration::class)

@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback     = false;
+
     private const ADMINISTRATOR_VALUE = "administrator's";
 
     public function testCompareValueEqualsOperator(): void

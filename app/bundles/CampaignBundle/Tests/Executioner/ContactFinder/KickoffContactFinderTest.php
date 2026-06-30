@@ -14,12 +14,12 @@ use Psr\Log\NullLogger;
 class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
 

@@ -11,8 +11,8 @@ final class FormatterHelper
     public const FLOAT_PRECISION = 4;
 
     public function __construct(
-        private DateHelper $dateHelper,
-        private TranslatorInterface $translator,
+        private readonly DateHelper $dateHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

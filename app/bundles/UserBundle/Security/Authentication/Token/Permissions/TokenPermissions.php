@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class TokenPermissions
 {
-    public function __construct(private TokenStorageInterface $tokenStorage, private PermissionRepository $permissionRepository, private EntityManagerInterface $entityManager)
+    public function __construct(private readonly TokenStorageInterface $tokenStorage, private readonly PermissionRepository $permissionRepository, private readonly EntityManagerInterface $entityManager)
     {
     }
 

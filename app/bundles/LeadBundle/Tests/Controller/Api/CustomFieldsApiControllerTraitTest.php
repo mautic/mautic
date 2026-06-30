@@ -35,6 +35,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
 
         $controller = new class($modelFake) {
             use CustomFieldsApiControllerTrait;
+
             private string $entityNameOne = 'lead';
 
             public function __construct(private object $model)

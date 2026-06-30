@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ManualWinnerEvent extends Event
 {
-    public function __construct(private Email $email)
+    public function __construct(private readonly Email $email)
     {
     }
 

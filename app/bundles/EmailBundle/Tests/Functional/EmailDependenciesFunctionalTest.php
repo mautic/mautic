@@ -18,6 +18,7 @@ use Mautic\ReportBundle\Entity\Report;
 final class EmailDependenciesFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
+
     private EmailFixturesHelper $emailFixturesHelper;
 
     protected function setUp(): void

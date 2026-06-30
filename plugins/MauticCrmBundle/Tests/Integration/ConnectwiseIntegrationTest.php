@@ -54,7 +54,7 @@ class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
                 fn (): array => $this->generateData(2)
             );
 
-        $integrationEntityModel = $this->createMock(IntegrationEntityModel::class);
+        $integrationEntityModel = $this->createStub(IntegrationEntityModel::class);
 
         $integration = $this->getMockBuilder(ConnectwiseIntegration::class)
             ->setConstructorArgs([
