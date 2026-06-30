@@ -32,13 +32,7 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditRoleAction(): void
     {
-        $role = new Role();
-        $role->setName('Test Role');
-        $role->setDescription('The Description');
-
-        $this->em->persist($role);
-        $this->em->flush();
-
+        $role       = $this->createRole('Test Role');
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/roles/edit/'.$role->getId());
         $saveButton = $crawler->selectButton('role[buttons][save]');
 
@@ -51,6 +45,24 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertStringContainsString($updatedName, $this->client->getResponse()->getContent());
+    }
+
+    public function testBatchDeleteRoleAction(): void
+    {
+        $usedRole   = $this->createRole('Used Role');
+        $unusedRole = $this->createRole('Unused Role');
+        $user       = $this->createUser('testuser', $usedRole);
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/s/roles/batchDelete?ids=all');
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $this->assertSame($user->getRole(), $usedRole);
+        $this->assertStringContainsString($usedRole->getName().' cannot be deleted because it still has users assigned to it', $response->getContent());
+        $this->assertNull($unusedRole->getId());
     }
 
     public function testIndexActionCanSortByUserCount(): void
@@ -89,6 +101,18 @@ class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($uniquePrefix.' 3', trim($rows->eq(0)->filter('td')->eq(1)->text()));
         $this->assertSame($uniquePrefix.' 2', trim($rows->eq(1)->filter('td')->eq(1)->text()));
         $this->assertSame($uniquePrefix.' 1', trim($rows->eq(2)->filter('td')->eq(1)->text()));
+    }
+
+    private function createRole(string $title): Role
+    {
+        $role = new Role();
+        $role->setName($title);
+        $role->setDescription('The Description');
+
+        $this->em->persist($role);
+        $this->em->flush();
+
+        return $role;
     }
 
     private function createUser(string $username, Role $role): User

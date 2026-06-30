@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -31,7 +32,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
-    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security)
+    public function __construct(FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine, ModelFactory $modelFactory, UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, EventDispatcherInterface $dispatcher, Translator $translator, FlashBag $flashBag, RequestStack $requestStack, CorePermissions $security, BatchDeleteService $batchDeleteService)
     {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -45,7 +46,7 @@ class ResultController extends CommonFormController
         );
 
         // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFacotry, int $objectId, int $page = 1): Response
@@ -436,6 +437,22 @@ class ResultController extends CommonFormController
         }
 
         return $args;
+    }
+
+    protected function getBatchDeleteGetEntitiesArgs(Request $request): array
+    {
+        /** @var FormModel $formModel */
+        $formModel = $this->getModel('form.form');
+
+        return [
+            'form'            => $formModel->getEntity((int) $this->getFormIdFromRequest()),
+            'return_entities' => true,
+        ];
+    }
+
+    protected function getBatchDeleteFilterAlias(Request $request): ?string
+    {
+        return 's';
     }
 
     /**

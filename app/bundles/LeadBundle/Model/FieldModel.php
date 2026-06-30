@@ -13,12 +13,14 @@ use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
@@ -44,7 +46,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<LeadField>
  */
-class FieldModel extends FormModel
+class FieldModel extends FormModel implements CannotBeDeletedInterface
 {
     public static $coreFields = [
         // Listed according to $order for installation
@@ -723,14 +725,6 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Filter used field ids.
-     */
-    public function filterUsedFieldIds(array $ids): array
-    {
-        return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));
-    }
-
-    /**
      * Reorder fields based on passed entity position.
      */
     public function reorderFieldsByEntity($entity): void
@@ -1028,6 +1022,49 @@ class FieldModel extends FormModel
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
         return $this->getRepository()->findOneByAlias($alias);
+    }
+
+    /**
+     * @param int[] $ids
+     *
+     * @return array<string|int, array{type: string, msg: string, msgVars: array<string, mixed>}>
+     */
+    public function cannotBeDeleted(array $ids): array
+    {
+        $usedFields = [];
+        foreach ($ids as $id) {
+            $field    = $this->getEntity($id);
+            if ($field->isFixed()) {
+                $usedFields[$id] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.lead.field.error.cannot.delete.is_fixed',
+                    'msgVars' => [
+                        '%name%' => $field->getName(),
+                    ],
+                ];
+                continue;
+            }
+
+            $segments = $this->getFieldSegments($field);
+            if (0 === $segments->count()) {
+                continue;
+            }
+            $segmentNames = [];
+            /** @var LeadList $segment */
+            foreach ($segments as $segment) {
+                $segmentNames[] = $segment->getName();
+            }
+            $usedFields[$id] = [
+                'type'    => 'error',
+                'msg'     => 'mautic.lead.field.error.cannot.delete.batch',
+                'msgVars' => [
+                    '%name%'         => $field->getName(),
+                    '%dependencies%' => implode(',<br>', $segmentNames),
+                ],
+            ];
+        }
+
+        return $usedFields;
     }
 
     /**

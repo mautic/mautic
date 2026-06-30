@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Controller\LeadBatchActionTrait;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchContactController extends AbstractFormController
 {
+    use LeadBatchActionTrait;
+
     public function __construct(
         private ContactActionModel $actionModel,
         private CategoryModel $categoryModel,
@@ -41,19 +44,27 @@ class BatchContactController extends AbstractFormController
      */
     public function execAction(Request $request): JsonResponse
     {
-        $params = $request->get('lead_batch');
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $params     = $request->get('lead_batch');
+        $ids        = $params['ids'];
+        $contactIds = [];
 
-        if ($ids && is_array($ids)) {
+        if ('all' === $ids) {
+            $contactIds = $this->getBatchActionEntityIdsForAll($request);
+        }
+
+        if (json_decode($ids)) {
+            $contactIds = json_decode($ids);
+        }
+
+        if (!empty($contactIds)) {
             $categoriesToAdd    = $params['add'] ?? [];
             $categoriesToRemove = $params['remove'] ?? [];
-            $contactIds         = json_decode($params['ids']);
 
             $this->actionModel->addContactsToCategories($contactIds, $categoriesToAdd);
             $this->actionModel->removeContactsFromCategories($contactIds, $categoriesToRemove);
 
             $this->addFlashMessage('mautic.lead.batch_leads_affected', [
-                '%count%'     => count($ids),
+                '%count%'     => count($contactIds),
             ]);
         } else {
             $this->addFlashMessage('mautic.core.error.ids.missing');

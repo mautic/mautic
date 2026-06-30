@@ -786,45 +786,19 @@ class PageController extends FormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var PageModel $model */
             $model     = $this->getModel('page');
-            $ids       = json_decode($request->query->get('ids', '{}'));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.page.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'page:pages:deleteown', 'page:pages:deleteother', $entity->getCreatedBy()
-                )) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'page', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.page.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes   = $this->batchDeleteService->batchDelete(
+                $model,
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.page.filter', '')),
+                    $this->getModelName(),
+                    [$this, 'isLocked'],
+                ),
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

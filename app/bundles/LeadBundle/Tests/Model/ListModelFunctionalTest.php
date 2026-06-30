@@ -10,9 +10,12 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Response;
 
 class ListModelFunctionalTest extends MauticMysqlTestCase
 {
+    private const SEGMENT_A = 'Segment A';
+
     public function testPublicSegmentsInContactPreferences(): void
     {
         $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
@@ -44,7 +47,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         $segment = new LeadList();
-        $segment->setName('Segment A');
+        $segment->setName(self::SEGMENT_A);
 
         $segmentModel->saveEntity($segment);
 
@@ -99,7 +102,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         $contactRepository = $this->em->getRepository(Lead::class);
 
         $segment = new LeadList();
-        $segment->setName('Segment A');
+        $segment->setName(self::SEGMENT_A);
 
         $segmentModel->saveEntity($segment);
 
@@ -142,6 +145,55 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(1, (int) end($data['datasets'][0]['data'])); // Added for today.
         Assert::assertSame(1, (int) end($data['datasets'][1]['data'])); // Removed for today.
         Assert::assertSame(0, (int) end($data['datasets'][2]['data'])); // Total for today.
+    }
+
+    public function testBatchDeleteAction(): void
+    {
+        $user      = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
+        $segmentA  = $this->createLeadList($user, self::SEGMENT_A, true);
+        $segmentB  = $this->createLeadList($user, 'Segment B', false);
+        $segmentC  = $this->createLeadList($user, 'Segment C', true);
+        $this->em->flush();
+        $segmentA->setFilters(
+            [
+                [
+                    'object'     => 'lead',
+                    'glue'       => 'and',
+                    'type'       => 'leadlist',
+                    'field'      => 'leadlist',
+                    'operator'   => 'in',
+                    'filter'     => $segmentB->getId(),
+                    'display'    => '',
+                    'properties' => [
+                        'filter' => [$segmentB->getId()],
+                    ],
+                ],
+            ]
+        );
+        $this->em->persist($segmentA);
+        $this->em->flush();
+
+        $this->assertNotNull($segmentA->getId());
+        $this->assertNotNull($segmentB->getId());
+        $this->assertNotNull($segmentC->getId());
+
+        // Test Batch delete action by id.
+        $this->client->request('POST', '/s/segments/batchDelete?ids='.json_encode([$segmentB->getId(), $segmentC->getId()]));
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $content = $response->getContent();
+        $this->assertStringContainsString(sprintf("Segment '%s' cannot be deleted, it is required by segment(s):", $segmentB->getName()), $content);
+        $this->assertStringContainsString($segmentA->getName(), $content);
+        $this->assertStringContainsString('1 segments have been deleted!', $content);
+        $this->assertNull($segmentC->getId());
+
+        // Test Batch delete action for all.
+        $this->client->request('POST', '/s/segments/batchDelete?ids=all');
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertStringContainsString('2 segments have been deleted!', $response->getContent());
+        $this->assertNull($segmentA->getId());
+        $this->assertNull($segmentB->getId());
     }
 
     private function createLeadList(User $user, string $name, bool $isGlobal): LeadList

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Model\TagModel;
-use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
+use Mautic\LeadBundle\Model\TagModel as LeadTagModel;
+use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
+use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
@@ -48,7 +48,7 @@ class TagController extends FormController
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
         $model = $this->getModel('tagmanager.tag');
-        \assert($model instanceof TagManagerModel);
+        \assert($model instanceof TagModel);
         $session = $request->getSession();
 
         // set some permissions
@@ -163,7 +163,7 @@ class TagController extends FormController
         // retrieve the entity
         $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
         $model = $this->getModel('tagmanager.tag');
-        \assert($model instanceof TagManagerModel);
+        \assert($model instanceof TagModel);
         // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
         // set the return URL for post actions
@@ -192,7 +192,7 @@ class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, TagManagerModel $model, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, TagModel $model, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -517,7 +517,8 @@ class TagController extends FormController
         if (!$permissions[self::PERMISSION_VIEW]) {
             $this->throwAccessDenied();
         } else {
-            $secondaryTag = $this->leadTagModel->getEntity($objectId);
+            $leadTagModel = $this->getLeadTagModel();
+            $secondaryTag = $leadTagModel->getEntity($objectId);
 
             if (null === $secondaryTag) {
                 $response = $this->handleTagNotFound($objectId);
@@ -529,7 +530,7 @@ class TagController extends FormController
                 ]);
 
                 $form = $this->formFactory->create(
-                    \MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType::class,
+                    TagMergeType::class,
                     [],
                     [
                         'action'      => $action,
@@ -538,7 +539,7 @@ class TagController extends FormController
                 );
 
                 $response = 'POST' === $request->getMethod()
-                    ? $this->handleMergePostRequest($form, $secondaryTag, $permissions, $postActionVars)
+                    ? $this->handleMergePostRequest($form, $secondaryTag, $permissions, $postActionVars, $leadTagModel)
                     : $this->renderMergeForm($request, $action, $form, $secondaryTag);
             }
         }
@@ -589,7 +590,7 @@ class TagController extends FormController
      * @param array<string, bool>  $permissions
      * @param array<string, mixed> $postActionVars
      */
-    private function handleMergePostRequest(FormInterface $form, Tag $secondaryTag, array $permissions, array $postActionVars): Response
+    private function handleMergePostRequest(FormInterface $form, Tag $secondaryTag, array $permissions, array $postActionVars, LeadTagModel $leadTagModel): Response
     {
         if ($this->isFormCancelled($form) || !$this->isFormValid($form)) {
             $response = $this->handleFormCancellation($secondaryTag);
@@ -603,7 +604,7 @@ class TagController extends FormController
             } elseif (!$permissions[self::PERMISSION_EDIT] || !$permissions[self::PERMISSION_DELETE]) {
                 $this->throwAccessDenied();
             } else {
-                $response = $this->performTagMerge($primaryTag, $secondaryTag);
+                $response = $this->performTagMerge($leadTagModel, $primaryTag, $secondaryTag);
             }
         }
 
@@ -649,9 +650,9 @@ class TagController extends FormController
         );
     }
 
-    private function performTagMerge(Tag $primaryTag, Tag $secondaryTag): Response
+    private function performTagMerge(LeadTagModel $leadTagModel, Tag $primaryTag, Tag $secondaryTag): Response
     {
-        $this->leadTagModel->tagMerge($primaryTag, $secondaryTag);
+        $leadTagModel->tagMerge($primaryTag, $secondaryTag);
 
         $viewParameters = [
             'objectId'     => $primaryTag->getId(),
@@ -678,6 +679,14 @@ class TagController extends FormController
             ],
             'flashes' => $flashes,
         ]);
+    }
+
+    private function getLeadTagModel(): LeadTagModel
+    {
+        $leadTagModel = $this->getModel('lead.tag');
+        \assert($leadTagModel instanceof LeadTagModel);
+
+        return $leadTagModel;
     }
 
     private function renderMergeForm(Request $request, string $action, FormInterface $form, Tag $secondaryTag): Response
@@ -778,52 +787,19 @@ class TagController extends FormController
             ],
         ];
 
-        if ('POST' === $request->getMethod()) {
-            $ids             = json_decode($request->query->get('ids', '{}'));
-            $deleteIds       = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.tagmanager.tag.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted(self::PERMISSION_DELETE)) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                try {
-                    $entities = $model->deleteEntities($deleteIds);
-                } catch (ForeignKeyConstraintViolationException) {
-                    $flashes[] = [
-                        'type'    => 'notice',
-                        'msg'     => 'mautic.tagmanager.tag.error.cannotbedeleted',
-                    ];
-
-                    return $this->postActionRedirect(
-                        array_merge($postActionVars, [
-                            'flashes' => $flashes,
-                        ])
-                    );
-                }
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.tagmanager.tag.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $model = $this->getModel('tagmanager.tag');
+            \assert($model instanceof TagModel);
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.tags.filter', '')),
+                    'tagmanager.tag',
+                    [$this, 'isLocked'],
+                ),
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

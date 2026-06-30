@@ -779,39 +779,16 @@ class CompanyController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('lead.company');
             \assert($model instanceof CompanyModel);
-            $ids       = json_decode($request->query->get('ids', '{}'));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.company.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->isGranted('lead:leads:deleteother')) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.company', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-                $deleted  = count($entities);
-                $this->addFlashMessage(
-                    'mautic.company.notice.batch_deleted',
-                    [
-                        '%count%'     => $deleted,
-                    ]
-                );
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.company.filter', '')),
+                    'lead.company',
+                    [$this, 'isLocked'],
+                ),
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

@@ -395,6 +395,9 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         selectrow(this, "checked");
                     } else {
                         selectrow(this, "unchecked");
+                        // Set selectall data-attribute to false
+                        $('[data-toggle=selectall]').attr("data-selectall", "0");
+                        $('[data-toggle~=checkall]').prop("checked", false);
                     }
                     updateToolbarState();
                 });
@@ -448,8 +451,10 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 }
 
                 // Check if any checkbox is selected and update toolbar state
-                function updateToolbarState() {
-                    var checkedBoxes = $(toggler + ":checked").length;
+                function updateToolbarState(selectall = false) {
+                    const checkedBoxes = selectall
+                        ? $('.pagination-wrapper [data-item-count]').data("item-count")
+                        : $(toggler + ":checked").length;
                     $(".toolbar--batch-actions").toggleClass("toolbar--batch-actions--active", checkedBoxes > 0);
 
                     var $summaryCount = $(".toolbar--batch-summary__count");
@@ -467,6 +472,18 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
 
                     // Uncheck main toggle checkbox if it exists
                     $("[data-toggle=checkall]").prop("checked", false);
+                });
+
+                // Select all items (including items in other pages)
+                $(document).on("click", "[data-toggle=selectall]", function() {
+                    if (!mQuery("[data-toggle~=checkall]").is(":checked")) {
+                        // Check all visible checkboxes
+                        mQuery("[data-toggle~=checkall]").click();
+                    }
+                    // Update the selected item count
+                    updateToolbarState(true);
+                    // Set selectall data-attribute to true
+                    $(this).attr("data-selectall", "1");
                 });
 
                 // Event console
@@ -500,7 +517,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     }
                 });
 
-                // Add this new handler right here
+                // Unchecks all checkboxes
                 $(document).on("click", "[data-toggle=cancel-checkall]", function() {
                     // Uncheck the main toggle checkbox
                     $(toggler).prop("checked", false);

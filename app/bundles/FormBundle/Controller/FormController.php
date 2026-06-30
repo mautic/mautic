@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
@@ -47,9 +48,10 @@ class FormController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        BatchDeleteService $batchDeleteService,
     ) {
         // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
     /**
@@ -1060,46 +1062,16 @@ class FormController extends CommonFormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('form');
             \assert($model instanceof FormModel);
-            $ids       = json_decode($request->query->get('ids', ''));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $objectId = (int) $objectId;
-                $entity   = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'form:forms:deleteown',
-                    'form:forms:deleteother',
-                    $entity->getCreatedBy()
-                )
-                ) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.form.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.form.filter', '')),
+                    $this->getModelName(),
+                    [$this, 'isLocked'],
+                ),
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(
@@ -1142,43 +1114,58 @@ class FormController extends CommonFormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             /** @var FormModel $model */
             $model = $this->getModel('form');
-            $ids   = json_decode($request->query->get('ids', ''));
-            $count = 0;
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
 
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.form.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'form:forms:editown',
-                    'form:forms:editother',
-                    $entity->getCreatedBy()
-                )
-                ) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
-                } else {
-                    $model->generateHtml($entity);
-                    ++$count;
+            $filter = $this->batchDeleteService->getBatchActionFilter(
+                $request->query->get('ids', ''),
+                $request->get('search', $request->getSession()->get('mautic.form.filter', '')),
+                $model,
+            );
+
+            if (empty($filter)) {
+                $flashes[] = ['msg' => 'mautic.core.error.ids.missing'];
+            } else {
+                $entities = $model->getEntities([
+                    'filter'           => $filter,
+                    'ignore_paginator' => true,
+                ]);
+                $count = 0;
+                // Do this in chunks so that we don't run out of memory.
+                $chunks = array_chunk($entities, BatchDeleteService::LOAD_RESULTS_IN_CHUNKS_OF);
+                foreach ($chunks as $chunk) {
+                    // Loop over the entities to perform access checks pre-delete.
+                    foreach ($chunk as $entity) {
+                        if (is_array($entity)) {
+                            $entity = reset($entity);
+                        }
+
+                        if (!$this->security->hasEntityAccess(
+                            'form:forms:editown',
+                            'form:forms:editother',
+                            $entity->getCreatedBy()
+                        )) {
+                            $flashes[] = ['msg' => 'mautic.core.error.accessdenied'];
+                        } elseif ($model->isLocked($entity)) {
+                            // Use isLocked callback.
+                            $flashes[] = $this->isLocked($postActionVars, $entity, 'form.form', true);
+                        } else {
+                            $model->generateHtml($entity);
+                            ++$count;
+                        }
+                    }
+                    // Clear the chunk from memory after each iteration.
+                    unset($chunk);
                 }
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.form.notice.batch_html_generated',
+                    'msgVars' => [
+                        '%count%' => $count,
+                    ],
+                ];
             }
-
-            $flashes[] = [
-                'type'    => 'notice',
-                'msg'     => 'mautic.form.notice.batch_html_generated',
-                'msgVars' => [
-                    '%count%'     => $count,
-                ],
-            ];
         } // else don't do anything
 
         return $this->postActionRedirect(

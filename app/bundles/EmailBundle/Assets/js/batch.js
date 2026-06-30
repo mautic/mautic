@@ -2,14 +2,10 @@
 Mautic.emailBatchSubmit = function() {
     if (Mautic.batchActionPrecheck("")) {
         if (mQuery('#email_batch_newCategory').val()) {
-            const $emailBatchIds = mQuery('#email_batch_ids');
-            if ($emailBatchIds.length) {
-                $emailBatchIds.val(Mautic.getCheckedListIds(false, true));
-            }
-
+            const ids = Mautic.getSelectedIds(false, true);
+            mQuery('#email_batch_ids').val(ids);
             return true;
         }
-
     }
 
     return false;
@@ -21,7 +17,7 @@ function setCategory(id, newCategory) {
     const span = div.querySelector("span");
 
     div.textContent = newCategory.name;
-    span.style = "background: #" + newCategory.color + ";"
+    span.style = "background: #" + newCategory.color + ";";
 
     div.prepend(span);
 }

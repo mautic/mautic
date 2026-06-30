@@ -416,6 +416,26 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($pageMessage, $content);
     }
 
+    public function testBatchDeleteAction(): void
+    {
+        $companyRepository = $this->em->getRepository(Company::class);
+        $companies         = $companyRepository->findAll();
+        $this->assertCount(2, $companies);
+        // Perform batch delete action for company 1.
+        $this->client->request(Request::METHOD_POST, sprintf('/s/companies/batchDelete?ids=["%s"]', $this->company1Id));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $companies = $companyRepository->findAll();
+        $this->assertCount(1, $companies);
+        $this->assertNull($companyRepository->find($this->company1Id));
+        // Perform batch delete action for all.
+        $this->client->request(Request::METHOD_POST, '/s/companies/batchDelete?ids=all');
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertCount(0, $companyRepository->findAll());
+    }
+
     protected function createLead(string $firstName = 'Firstname', string $lastName = 'Lastname', string $email = 'test@test.com', string $phoneNumber = '555-666-777'): Lead
     {
         $lead = new Lead();

@@ -27,6 +27,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\StageBundle\Entity\Stage;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -37,10 +38,11 @@ class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
-    private const CONTACT_A_EMAIL               = 'contact@a.email';
-    private const CONTACT_B_EMAIL               = 'contact@b.email';
-    private const CONTACT_C_EMAIL               = 'contact@c.email';
-    private const CLOSE_MODAL_ASSERTION_MESSAGE = 'The response does not contain the `closeModal` param.';
+    private const CLOSE_MODAL_MISSING_MESSAGE = 'The response does not contain the `closeModal` param.';
+    private const CONTACT_A_EMAIL             = 'contact@a.email';
+    private const CONTACT_B_EMAIL             = 'contact@b.email';
+    private const CONTACT_C_EMAIL             = 'contact@c.email';
+    private const THREE_CONTACTS_AFFECTED     = '3 contacts affected';
 
     protected function setUp(): void
     {
@@ -202,9 +204,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString(self::THREE_CONTACTS_AFFECTED, $response['flashes']);
 
         $payload = [
             'lead_batch' => [
@@ -243,9 +245,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString(self::THREE_CONTACTS_AFFECTED, $response['flashes']);
     }
 
     public function testContactFieldsAreUpdatedWithBatchFindAndReplace(): void
@@ -292,7 +294,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('fr_FR', $contactC->getPreferredLocale());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 contacts affected', $response['flashes']);
     }
@@ -362,7 +364,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('en', $contactG->getPreferredLocale());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('5 contacts affected', $response['flashes']);
     }
@@ -1200,7 +1202,7 @@ EMAIL;
         $fetchedContact = $contactRepository->find($contact->getId());
         $this->assertInstanceOf(Lead::class, $fetchedContact);
 
-        // Ensure the DNC recored was created.
+        // Ensure the DNC record was created.
         Assert::assertSame(DoNotContact::MANUAL, $dnc->getReason());
         Assert::assertSame('Test Reason', $dnc->getComments());
         Assert::assertSame($contact->getId(), $dnc->getLead()->getId());
@@ -1243,6 +1245,109 @@ EMAIL;
             ],
             $auditLog->getDetails()['args']
         );
+    }
+
+    public function testBatchDeleteAction(): void
+    {
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
+        // Perform batch delete action for contact A.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDelete?ids=["'.$contactA->getId().'"]');
+        // Assert response is correct.
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        // Check that only contact A has been deleted for now.
+        $contacts = $this->em->getRepository(Lead::class)->findAll();
+        $this->assertCount(2, $contacts);
+        $contactEmails = array_map(fn ($contact) => $contact->getEmail(), $contacts);
+        $this->assertNotContains($contactA->getEmail(), $contactEmails);
+        $this->assertContains($contactB->getEmail(), $contactEmails);
+        $this->assertContains($contactC->getEmail(), $contactEmails);
+        // Perform batch delete action for all.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchDelete?ids=all');
+        // Assert that all contacts have been deleted.
+        $contacts = $this->em->getRepository(Lead::class)->findAll();
+        $this->assertCount(0, $contacts);
+    }
+
+    public function testBatchStageActionForAll(): void
+    {
+        // Create contacts and stage.
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        $contactC = $this->createContact(self::CONTACT_C_EMAIL);
+        $stage    = $this->createStage();
+        // Assert that contacts do not have stage set at this point.
+        $this->assertNull($contactA->getStage(), 'ContactA has a stage set and is not null.');
+        $this->assertNull($contactB->getStage(), 'ContactB has a stage set and is not null.');
+        $this->assertNull($contactC->getStage(), 'ContactC has a stage set and is not null.');
+        // Perform batch action - add stage.
+        $stageId  = $stage->getId();
+        $payload  = [
+            'lead_batch_stage' => [
+                'addstage' => $stageId,
+                'ids'      => 'all',
+            ],
+        ];
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchStages', $payload);
+        $clientResponse = $this->client->getResponse();
+        // Assert response is correct.
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString(self::THREE_CONTACTS_AFFECTED, $response['flashes']);
+        // Assert that stage has been assigned to all contacts.
+        $this->assertNotNull($contactA->getStage());
+        $this->assertNotNull($contactB->getStage());
+        $this->assertNotNull($contactC->getStage());
+        $this->assertEquals($stageId, $contactA->getStage()->getId());
+        $this->assertEquals($stageId, $contactB->getStage()->getId());
+        $this->assertEquals($stageId, $contactC->getStage()->getId());
+    }
+
+    private function createStage(): Stage
+    {
+        $stage = new Stage();
+
+        $stage->setName('Stage A');
+
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        return $stage;
+    }
+
+    public function testBatchOwnersActionForAll(): void
+    {
+        $ownerId = 1;
+        // Create contacts.
+        $contactA = $this->createContact(self::CONTACT_A_EMAIL);
+        $contactB = $this->createContact(self::CONTACT_B_EMAIL);
+        // Assert that contacts do not have stage set at this point.
+        $this->assertNull($contactA->getOwner(), 'ContactA owner is not null.');
+        $this->assertNull($contactB->getOwner(), 'ContactB owner is not null.');
+        // Perform batch action - add stage.
+        $payload  = [
+            'lead_batch_owner' => [
+                'addowner' => $ownerId,
+                'ids'      => 'all',
+            ],
+        ];
+        $this->client->request(Request::METHOD_POST, '/s/contacts/batchOwners', $payload);
+        $clientResponse = $this->client->getResponse();
+        // Assert response is correct.
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_MISSING_MESSAGE);
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('2 contacts affected', $response['flashes']);
+        // Assert that owner has been assigned to all contacts.
+        $this->assertNotNull($contactA->getOwner());
+        $this->assertNotNull($contactB->getOwner());
+        $this->assertEquals($ownerId, $contactA->getOwner()->getId());
+        $this->assertEquals($ownerId, $contactB->getOwner()->getId());
     }
 
     public function testCampaignMembershipOnContactListing(): void

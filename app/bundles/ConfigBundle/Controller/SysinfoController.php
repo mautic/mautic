@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -31,9 +32,10 @@ class SysinfoController extends FormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
+        BatchDeleteService $batchDeleteService,
     ) {
         // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
     public function indexAction(): \Symfony\Component\HttpFoundation\Response

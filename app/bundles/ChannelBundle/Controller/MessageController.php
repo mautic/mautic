@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -42,8 +43,9 @@ class MessageController extends AbstractStandardFormController
         FlashBag $flashBag,
         private RequestStack $requestStack,
         CorePermissions $security,
+        BatchDeleteService $batchDeleteService,
     ) {
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
     /**

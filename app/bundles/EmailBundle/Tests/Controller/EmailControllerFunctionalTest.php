@@ -29,6 +29,7 @@ use function Symfony\Component\Clock\now;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -37,6 +38,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     private const CLICK_URL_LOW  = 'https://example.com/low';
     private const CLICK_URL_MID  = 'https://example.com/mid';
     private const CLICK_URL_HIGH = 'https://example.com/high';
+    private const TEST_EMAIL_C   = 'Test Email C';
 
     protected function setUp(): void
     {
@@ -637,7 +639,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testEmailDetailsPageShouldNotHavePendingCount(): void
     {
         $segment = $this->createSegment('Test Segment A', 'test-segment-a');
-        $email   = $this->createEmail('Test Email C', 'Test Email C Subject', 'list', 'blank', 'Test html', $segment);
+        $email   = $this->createEmail(self::TEST_EMAIL_C, 'Test Email C Subject', 'list', 'blank', 'Test html', $segment);
         $this->em->flush();
 
         $this->client->enableProfiler();
@@ -1028,7 +1030,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testSendEmailForImportCustomEmailTemplate(): void
     {
         $email = new Email();
-        $email->setName('Test Email C');
+        $email->setName(self::TEST_EMAIL_C);
         $email->setSubject('Test Email C Subject');
         $email->setTemplate('blank');
         $email->setEmailType('template');
@@ -1203,6 +1205,34 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($dynamicContent);
 
         return $dynamicContent;
+    }
+
+    public function testBatchDeleteAction(): void
+    {
+        $emailA = $this->createEmail('Email A', 'Test Email A', 'list', 'blank', 'Test html');
+        $emailB = $this->createEmail('Email B', 'Test Email B', 'list', 'blank', 'Test html');
+        $emailC = $this->createEmail('Email C', self::TEST_EMAIL_C, 'list', 'blank', 'Test html');
+        $this->em->flush();
+        $this->assertNotNull($emailA->getId());
+        $this->assertNotNull($emailB->getId());
+        $this->assertNotNull($emailC->getId());
+
+        // Perform batch delete action for Email A.
+        $this->client->request('POST', sprintf('/s/emails/batchDelete?ids=["%s"]', $emailA->getId()));
+        // Assert response is correct.
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $emails = $this->em->getRepository(Email::class)->findAll();
+        $this->assertCount(2, $emails);
+        $emailNames = array_map(fn ($email) => $email->getName(), $emails);
+        $this->assertNotContains($emailA->getName(), $emailNames);
+        $this->assertContains($emailB->getName(), $emailNames);
+        $this->assertContains($emailC->getName(), $emailNames);
+        // Perform batch delete action for all.
+        $this->client->request('POST', '/s/emails/batchDelete?ids=all');
+        // Assert that all emails have been deleted.
+        $emails = $this->em->getRepository(Email::class)->findAll();
+        $this->assertCount(0, $emails);
     }
 
     /**

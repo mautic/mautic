@@ -671,46 +671,16 @@ class MobileNotificationController extends FormController
         if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('notification');
             \assert($model instanceof NotificationModel);
-            $ids = json_decode($request->query->get('ids', '{}'));
-
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.notification.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    'notification:mobile_notifications:viewown',
-                    'notification:mobile_notifications:viewother',
-                    $entity->getCreatedBy()
-                )
-                ) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'notification', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            // Delete everything we are able to
-            if (!empty($deleteIds)) {
-                $entities = $model->deleteEntities($deleteIds);
-
-                $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.notification.notice.batch_deleted',
-                    'msgVars' => [
-                        '%count%' => count($entities),
-                    ],
-                ];
-            }
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.mobile_notification.filter', '')),
+                    'notification',
+                    [$this, 'isLocked'],
+                ),
+            );
         } // else don't do anything
 
         return $this->postActionRedirect(

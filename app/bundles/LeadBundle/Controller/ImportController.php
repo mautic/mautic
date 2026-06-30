@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\BatchDeleteService;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -67,6 +68,7 @@ class ImportController extends FormController
         FlashBag $flashBag,
         private RequestStack $requestStack,
         CorePermissions $security,
+        BatchDeleteService $batchDeleteService,
     ) {
         /** @var ImportModel $model */
         $model = $modelFactory->getModel($this->getModelName());
@@ -74,7 +76,7 @@ class ImportController extends FormController
         $this->importModel = $model;
 
         // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security, $batchDeleteService);
     }
 
     /**

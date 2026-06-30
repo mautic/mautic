@@ -79,7 +79,7 @@ class ContactExportSchedulerModel extends AbstractCommonModel
 
         $filter = ['string' => $search, 'force' => []];
 
-        if (!empty($ids)) {
+        if (!empty($ids) && 'all' !== $ids) {
             $filter['force'] = [
                 [
                     'column' => 'l.id',

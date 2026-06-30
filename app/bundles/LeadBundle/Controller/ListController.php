@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -562,59 +561,18 @@ class ListController extends FormController
             ],
         ];
 
-        if ('POST' === $request->getMethod()) {
-            $ids       = json_decode($request->query->get('ids', '{}'));
-            $deleteIds = [];
-
-            // Loop over the IDs to perform access checks pre-delete
-            foreach ($ids as $objectId) {
-                $entity = $model->getEntity($objectId);
-
-                if (null === $entity) {
-                    $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.lead.list.error.notfound',
-                        'msgVars' => ['%id%' => $objectId],
-                    ];
-                } elseif (!$this->security->hasEntityAccess(
-                    LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
-                )) {
-                    $flashes[] = $this->getAccessDeniedFlash();
-                } elseif ($model->isLocked($entity)) {
-                    $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.list', true);
-                } else {
-                    $deleteIds[] = $objectId;
-                }
-            }
-
-            if ($deleteIds) {
-                try {
-                    $deletedEntities = $model->deleteEntities($deleteIds);
-                } catch (DeleteEntitiesDependencyException $e) {
-                    $deletedEntities = $e->getDeletedEntities();
-
-                    if ($e->getUnableToDeleteEntities()) {
-                        $flashes[] = [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.lead.list.error.cannot.delete.batch',
-                            'msgVars' => [
-                                '%segments%' => implode(', ', array_map(fn (LeadList $entity) => $entity->getName(), $e->getUnableToDeleteEntities())),
-                            ],
-                        ];
-                    }
-                }
-
-                if ($deletedEntities) {
-                    $flashes[] = [
-                        'type'    => 'notice',
-                        'msg'     => 'mautic.lead.list.notice.batch_deleted',
-                        'msgVars' => [
-                            '%count%' => count($deletedEntities),
-                        ],
-                    ];
-                }
-            }
-        }
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $flashes = $this->batchDeleteService->batchDelete(
+                $model,
+                new \Mautic\CoreBundle\Service\BatchDeleteRequest(
+                    $postActionVars,
+                    $request->query->get('ids', ''),
+                    $request->get('search', $request->getSession()->get('mautic.segment.filter', '')),
+                    'lead.list',
+                    [$this, 'isLocked'],
+                ),
+            );
+        } // else don't do anything
 
         return $this->postActionRedirect(
             array_merge($postActionVars, [

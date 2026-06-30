@@ -5,6 +5,7 @@ namespace Mautic\UserBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\CannotBeDeletedInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -34,7 +35,7 @@ use Twig\Environment;
 /**
  * @extends FormModel<User>
  */
-class UserModel extends FormModel implements GlobalSearchInterface
+class UserModel extends FormModel implements GlobalSearchInterface, CannotBeDeletedInterface
 {
     private const INVITE_TOKEN_SELECTOR_BYTES = 16;
 
@@ -531,5 +532,27 @@ class UserModel extends FormModel implements GlobalSearchInterface
         }
 
         $this->logger->warning('User invite link rejected: '.$reason, $context);
+    }
+
+    /**
+     * Current user cannot be deleted.
+     */
+    public function cannotBeDeleted(array $ids): array
+    {
+        $currentUser   = $this->userHelper->getUser();
+        $currentUserId = $currentUser->getId();
+        if (in_array($currentUserId, $ids)) {
+            return [
+                $currentUserId => [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.user.user.error.cannot.delete.batch',
+                    'msgVars' => [
+                        '%name%' => $currentUser->getName(),
+                    ],
+                ],
+            ];
+        }
+
+        return [];
     }
 }

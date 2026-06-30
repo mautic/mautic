@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class BatchSegmentController extends AbstractFormController
 {
+    use LeadBatchActionTrait;
+
     public function __construct(
         private SegmentActionModel $segmentActionModel,
         private ListModel $segmentModel,
@@ -42,7 +44,16 @@ class BatchSegmentController extends AbstractFormController
     public function setAction(Request $request): JsonResponse
     {
         $params     = $request->query->all()['lead_batch'] ?? $request->request->all()['lead_batch'] ?? [];
-        $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $ids        = $params['ids'];
+        $contactIds = [];
+
+        if ('all' === $ids) {
+            $contactIds = $this->getBatchActionEntityIdsForAll($request);
+        }
+
+        if (json_decode($ids)) {
+            $contactIds = json_decode($ids);
+        }
 
         if ($contactIds && is_array($contactIds)) {
             $segmentsToAdd    = $params['add'] ?? [];

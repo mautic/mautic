@@ -49,7 +49,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                                 'mautic_plugin_fullcontact_action',
                                 ['objectAction' => 'batchLookupPerson']
                             ).
-                            '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                            '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':Mautic.getSelectedIds(false, true)}});return true;',
                         'data-header' => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.fullcontact.button.caption'),
@@ -101,7 +101,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                                     'mautic_plugin_fullcontact_action',
                                     ['objectAction' => 'batchLookupCompany']
                                 ).
-                                '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                                '?\' + mQuery.param({\'fullcontact_batch_lookup\':{\'ids\':Mautic.getSelectedIds(false, true)}});return true;',
                             'data-header' => $this->translator->trans(
                                 'mautic.plugin.fullcontact.button.caption'
                             ),

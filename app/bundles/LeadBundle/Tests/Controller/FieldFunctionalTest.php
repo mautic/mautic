@@ -107,8 +107,10 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST,
             '/s/contacts/fields/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
 
-        Assert::assertStringContainsString('cannot be deleted because they are in use by other entities.',
-            strip_tags($this->client->getResponse()->getContent()));
+        $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $flashes  = strip_tags($response['flashes']);
+        Assert::assertStringContainsString("Field 'Field First' cannot be deleted, it is used in segment(s):Field Segment", $flashes);
+        Assert::assertStringContainsString("Field 'Field Second' cannot be deleted, it is used in segment(s):Field Segment", $flashes);
     }
 
     public function testNewSelectField(): void
@@ -181,6 +183,42 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
         $text = strip_tags($this->client->getResponse()->getContent());
         Assert::assertStringNotContainsString($expectedMessage, $text);
+    }
+
+    public function testBatchDeleteFields(): void
+    {
+        // Create fields.
+        $fieldA = $this->createField('a');
+        $fieldB = $this->createField('b');
+        $this->em->persist($fieldA);
+        $this->em->persist($fieldB);
+        $this->em->flush();
+        // Assert that the fields have been created.
+        $fieldRepository = $this->em->getRepository(LeadField::class);
+        $this->assertSame($fieldA, $fieldRepository->find($fieldA->getId()));
+        $this->assertSame($fieldB, $fieldRepository->find($fieldB->getId()));
+
+        $titleField = $fieldRepository->findOneBy(['alias' => 'title']);
+        $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
+        \assert($titleField instanceof LeadField);
+        \assert($emailField instanceof LeadField);
+
+        $query = http_build_query([
+            'ids' => json_encode([$fieldA->getId(), $fieldB->getId(), $titleField->getId(), $emailField->getId()], JSON_THROW_ON_ERROR),
+        ]);
+
+        // Batch delete selected fields.
+        $this->client->request(Request::METHOD_POST, '/s/contacts/fields/batchDelete?'.$query);
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+        $content = $response->getContent();
+        // Assert that certain fields cannot be deleted.
+        $this->assertStringContainsString("Field 'Title' is used internally and cannot be deleted.", $content);
+        $this->assertStringContainsString("Field 'Email' is used internally and cannot be deleted.", $content);
+        // Assert that the created fields were deleted.
+        $this->assertStringContainsString(' fields have been deleted!', $content);
+        $this->assertNull($fieldA->getId());
+        $this->assertNull($fieldB->getId());
     }
 
     /**

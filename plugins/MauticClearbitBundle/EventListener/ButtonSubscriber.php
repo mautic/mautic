@@ -48,7 +48,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                                 'mautic_plugin_clearbit_action',
                                 ['objectAction' => 'batchLookupPerson']
                             ).
-                            '?\' + mQuery.param({\'clearbit_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                            '?\' + mQuery.param({\'clearbit_batch_lookup\':{\'ids\':Mautic.getSelectedIds(false, true)}});return true;',
                         'data-header' => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
                     ],
                     'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
@@ -100,7 +100,7 @@ class ButtonSubscriber implements EventSubscriberInterface
                                     'mautic_plugin_clearbit_action',
                                     ['objectAction' => 'batchLookupCompany']
                                 ).
-                                '?\' + mQuery.param({\'clearbit_batch_lookup\':{\'ids\':JSON.parse(Mautic.getCheckedListIds(false, true))}});return true;',
+                                '?\' + mQuery.param({\'clearbit_batch_lookup\':{\'ids\':Mautic.getSelectedIds(false, true)}});return true;',
                             'data-header' => $this->translator->trans(
                                 'mautic.plugin.clearbit.button.caption'
                             ),

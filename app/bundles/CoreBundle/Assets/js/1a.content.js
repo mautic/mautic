@@ -471,6 +471,20 @@ Mautic.onPageLoad = function (container, response, inModal) {
     // Initialize tab delete buttons
     Mautic.activateTabDeleteButtons(container);
 
+    // Add total item count to select all buttons.
+    mQuery("[data-toggle=selectall]").each(function() {
+        const totalItemCount = mQuery('.pagination-wrapper [data-item-count]').data("item-count");
+        if (totalItemCount) {
+            const buttonText = mQuery(this).find("span").text();
+            // Check if there's already a counter in parentheses
+            const updatedText = /\(\d+\)$/.test(buttonText)
+                ? buttonText.replace(/\(\d+\)$/, `(${totalItemCount})`)
+                : buttonText + ` (${totalItemCount})`;
+            // Update the button's text
+            mQuery(this).find("span").text(updatedText);
+        }
+    });
+
     //spin icons on button click
     mQuery(container + ' .btn:not(.btn-nospin)').on('click.spinningicons', function (event) {
         Mautic.startIconSpinOnEvent(event);

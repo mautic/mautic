@@ -240,6 +240,13 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
     }
 
+    public function testBatchDeleteActionWhenSelectAll(): void
+    {
+        $this->client->request('POST', '/s/tags/batchDelete?ids=all');
+        $this->assertResponseIsSuccessful('Return code must be 200.');
+        $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
+    }
+
     public function testEmptyTagShouldThrowValidationError(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');

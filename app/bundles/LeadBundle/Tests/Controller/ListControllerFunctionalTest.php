@@ -546,14 +546,6 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             'leadlist_id'   => $list2->getId(),
         ]);
 
-        $expectedErrorMessage = $this->translator->trans(
-            'mautic.lead.list.error.cannot.delete.batch',
-            [
-                '%segments%'  => $list1->getName().', '.$list2->getName(),
-            ],
-            'flashes'
-        );
-
         $parameters = 'ids=["'.$list1->getId().'","'.$list2->getId().'"]';
         $this->client->request('POST', 's/segments/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
 
@@ -561,7 +553,14 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+        $this->assertStringContainsString(
+            sprintf('The segment %s is used in "%s" campaign. Please check it before deleting.', $list1->getName(), $campaignName),
+            $clientResponseBody['flashes']
+        );
+        $this->assertStringContainsString(
+            sprintf('The segment %s is used in "%s" campaign. Please check it before deleting.', $list2->getName(), $campaignName),
+            $clientResponseBody['flashes']
+        );
     }
 
     /** @param array<int, array<string, mixed>>|null $filters */
