@@ -14,14 +14,14 @@ use PHPUnit\Framework\MockObject\MockObject;
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&IpLookupHelper
+     * @var \PHPUnit\Framework\MockObject\Stub&IpLookupHelper
      */
-    private MockObject $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\Stub $ipLookupHelper;
 
     /**
-     * @var MockObject&AuditLogModel
+     * @var \PHPUnit\Framework\MockObject\Stub&AuditLogModel
      */
-    private MockObject $auditLogModel;
+    private \PHPUnit\Framework\MockObject\Stub $auditLogModel;
 
     /**
      * @var MockObject&WebhookKillNotificator
@@ -30,8 +30,8 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel          = $this->createMock(AuditLogModel::class);
+        $this->ipLookupHelper         = $this->createStub(IpLookupHelper::class);
+        $this->auditLogModel          = $this->createStub(AuditLogModel::class);
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
     }
 
@@ -49,7 +49,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnWebhookKill(): void
     {
-        $webhookMock = $this->createMock(Webhook::class);
+        $webhookMock = $this->createStub(Webhook::class);
         $reason      = 'reason';
 
         $eventMock = $this->createMock(WebhookEvent::class);

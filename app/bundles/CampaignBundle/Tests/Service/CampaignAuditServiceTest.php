@@ -14,9 +14,22 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
     private const CAMPAIGN_NAME = 'Test Campaign';
+
     private CampaignAuditService $campaignAuditService;
+
+    /**
+     * @var MockObject&FlashBag
+     */
     private MockObject $flashBagMock;
+
+    /**
+     * @var MockObject&UrlGeneratorInterface
+     */
     private MockObject $urlGeneratorMock;
+
+    /**
+     * @var MockObject&EventRepository
+     */
     private MockObject $eventRepositoryMock;
 
     protected function setUp(): void
@@ -74,7 +87,7 @@ class CampaignAuditServiceTest extends MauticMysqlTestCase
             ->method('add')
             ->with(
                 'mautic.core.notice.campaign.unpublished.email',
-                $this->callback(function (array $messageVars) use ($unpublishedEmail) {
+                $this->callback(function (array $messageVars) use ($unpublishedEmail): true {
                     $this->assertStringContainsString($unpublishedEmail->getName(), $messageVars['%name%']);
                     $this->assertStringContainsString('mautic_email_index', $messageVars['%menu_link%']);
 

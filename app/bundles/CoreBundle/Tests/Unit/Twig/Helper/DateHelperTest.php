@@ -17,13 +17,10 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     private DateHelper $helper;
 
-    /**
-     * @var string
-     */
-    private static $oldTimezone;
+    private static string $oldTimezone;
 
     /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

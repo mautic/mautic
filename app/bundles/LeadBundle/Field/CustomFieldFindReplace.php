@@ -14,8 +14,8 @@ use Mautic\LeadBundle\Helper\CustomFieldHelper;
 final class CustomFieldFindReplace
 {
     public function __construct(
-        private FieldList $fieldList,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly FieldList $fieldList,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
     }
 

@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldHelperTest extends TestCase
 {
     /**
-     * @var FieldModel&MockObject
+     * @var MockObject&FieldModel
      */
     private MockObject $fieldModel;
 
@@ -31,12 +31,12 @@ class FieldHelperTest extends TestCase
     private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var MauticSyncFieldsLoadEvent&MockObject
+     * @var MockObject&MauticSyncFieldsLoadEvent
      */
     private MockObject $mauticSyncFieldsLoadEvent;
 
     /**
-     * @var ObjectProvider&MockObject
+     * @var MockObject&ObjectProvider
      */
     private MockObject $objectProvider;
 
@@ -63,7 +63,7 @@ class FieldHelperTest extends TestCase
             $this->fieldsWithUniqueIdentifier,
             $variableExpresserHelper,
             $channelListHelper,
-            $this->createMock(TranslatorInterface::class),
+            $this->createStub(TranslatorInterface::class),
             $eventDispatcher,
             $this->objectProvider
         );

@@ -27,10 +27,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class GenerateProductionAssetsCommand extends Command
 {
     public function __construct(
-        private AssetGenerationHelper $assetGenerationHelper,
-        private PathsHelper $pathsHelper,
-        private TranslatorInterface $translator,
-        private Filesystem $filesystem,
+        private readonly AssetGenerationHelper $assetGenerationHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly Filesystem $filesystem,
     ) {
         parent::__construct();
     }

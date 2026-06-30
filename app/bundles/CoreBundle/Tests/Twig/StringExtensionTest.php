@@ -12,6 +12,7 @@ use Twig\Loader\ArrayLoader;
 final class StringExtensionTest extends TestCase
 {
     private Environment $twig;
+
     private StringExtension $extension;
 
     protected function setUp(): void

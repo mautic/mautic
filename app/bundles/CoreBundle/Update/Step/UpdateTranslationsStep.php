@@ -12,9 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class UpdateTranslationsStep implements StepInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private LanguageHelper $languageHelper,
-        private LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $languageHelper,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

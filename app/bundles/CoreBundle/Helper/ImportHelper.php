@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 class ImportHelper
 {
     public function __construct(
-        private PathsHelper $pathsHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 

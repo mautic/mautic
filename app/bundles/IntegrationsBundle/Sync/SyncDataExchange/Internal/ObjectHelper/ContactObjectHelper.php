@@ -38,12 +38,12 @@ class ContactObjectHelper implements ObjectHelperInterface
     private array $contactsCreated = [];
 
     public function __construct(
-        private LeadModel $model,
-        private LeadRepository $repository,
-        private Connection $connection,
-        private DoNotContactModel $dncModel,
-        private FieldList $fieldList,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly LeadModel $model,
+        private readonly LeadRepository $repository,
+        private readonly Connection $connection,
+        private readonly DoNotContactModel $dncModel,
+        private readonly FieldList $fieldList,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 

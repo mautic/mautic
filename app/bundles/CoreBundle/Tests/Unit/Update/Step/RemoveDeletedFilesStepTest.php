@@ -11,17 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|LoggerInterface
+     * @var MockObject&LoggerInterface
      */
     private MockObject $logger;
 
     /**
-     * @var MockObject|PathsHelper
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 

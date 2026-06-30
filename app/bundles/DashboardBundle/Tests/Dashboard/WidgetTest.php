@@ -20,17 +20,17 @@ class WidgetTest extends TestCase
     private const USER_ID = 1;
 
     /**
-     * @var DashboardModel&MockObject
+     * @var MockObject&DashboardModel
      */
     private MockObject $dashboardModel;
 
     /**
-     * @var UserHelper&MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelper;
 
     /**
-     * @var User&MockObject
+     * @var MockObject&User
      */
     private MockObject $user;
 

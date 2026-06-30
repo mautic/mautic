@@ -10,7 +10,7 @@ use Mautic\EmailBundle\Entity\Email;
 
 class EmailVariantConverterService
 {
-    public function __construct(private VariantConverterService $variantConverterService)
+    public function __construct(private readonly VariantConverterService $variantConverterService)
     {
     }
 

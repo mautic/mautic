@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 

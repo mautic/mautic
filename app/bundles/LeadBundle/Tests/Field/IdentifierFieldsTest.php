@@ -13,12 +13,12 @@ use PHPUnit\Framework\TestCase;
 class IdentifierFieldsTest extends TestCase
 {
     /**
-     * @var FieldsWithUniqueIdentifier&MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifiers;
 
     /**
-     * @var FieldList&MockObject
+     * @var MockObject&FieldList
      */
     private MockObject $fieldList;
 

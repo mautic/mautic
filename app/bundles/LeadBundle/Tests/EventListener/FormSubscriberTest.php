@@ -25,22 +25,25 @@ use Symfony\Component\HttpFoundation\Request;
 class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
 
     private FormSubscriber $subscriber;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
 
     /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
+    /**
+     * @var MockObject&SubmissionEvent
+     */
     private MockObject $submissionEvent;
 
     protected function setUp(): void
