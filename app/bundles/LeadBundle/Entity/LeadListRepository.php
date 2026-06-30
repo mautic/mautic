@@ -923,6 +923,6 @@ SQL;
             ->executeQuery()
             ->fetchAllNumeric();
 
-        return array_map(fn ($row): int => (int) $row[0], $result);
+        return array_map(fn (array $row): int => (int) $row[0], $result);
     }
 }

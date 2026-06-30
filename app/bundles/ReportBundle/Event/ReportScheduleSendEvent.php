@@ -16,10 +16,7 @@ class ReportScheduleSendEvent extends Event
     ) {
     }
 
-    /**
-     * @return Scheduler
-     */
-    public function getScheduler()
+    public function getScheduler(): Scheduler
     {
         return $this->scheduler;
     }

@@ -156,10 +156,8 @@ final class AssetsHelper
      * injecting/fetching assets for a different context.
      *
      * @param string $context
-     *
-     * @return $this
      */
-    public function setContext($context = self::CONTEXT_APP)
+    public function setContext($context = self::CONTEXT_APP): self
     {
         $this->context = $context;
         if (!isset($this->assets[$context])) {
@@ -176,10 +174,8 @@ final class AssetsHelper
      * @param string                       $location
      * @param bool                         $async
      * @param string                       $name
-     *
-     * @return $this
      */
-    public function addScript($script, $location = 'head', $async = false, $name = null)
+    public function addScript($script, $location = 'head', $async = false, $name = null): self
     {
         $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name): void {
@@ -215,10 +211,8 @@ final class AssetsHelper
      *
      * @param string $script
      * @param string $location
-     *
-     * @return $this
      */
-    public function addScriptDeclaration($script, $location = 'head')
+    public function addScriptDeclaration($script, $location = 'head'): self
     {
         if ('head' == $location) {
             // special place for these so that declarations and scripts can be mingled
@@ -240,10 +234,8 @@ final class AssetsHelper
      * Adds a stylesheet to be loaded in the template header.
      *
      * @param string|array<string, string> $stylesheet
-     *
-     * @return $this
      */
-    public function addStylesheet($stylesheet)
+    public function addStylesheet($stylesheet): self
     {
         $addSheet = function ($s): void {
             if (!isset($this->assets[$this->context]['stylesheets'])) {
@@ -270,10 +262,8 @@ final class AssetsHelper
      * Add style tag to the header.
      *
      * @param string $styles
-     *
-     * @return $this
      */
-    public function addStyleDeclaration($styles)
+    public function addStyleDeclaration($styles): self
     {
         if (!isset($this->assets[$this->context]['styleDeclarations'])) {
             $this->assets[$this->context]['styleDeclarations'] = [];
@@ -291,10 +281,8 @@ final class AssetsHelper
      *
      * @param string $declaration
      * @param string $location
-     *
-     * @return $this
      */
-    public function addCustomDeclaration($declaration, $location = 'head')
+    public function addCustomDeclaration($declaration, $location = 'head'): self
     {
         if ('head' == $location) {
             $this->assets[$this->context]['headDeclarations'][] = ['custom' => $declaration];

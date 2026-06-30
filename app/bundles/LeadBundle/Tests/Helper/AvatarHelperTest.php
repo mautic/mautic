@@ -17,17 +17,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private AssetsHelper $assetsHelperMock;
-
-    /**
-     * @var MockObject&PathsHelper
-     */
-    private MockObject $pathsHelperMock;
-
-    private GravatarHelper $gravatarHelperMock;
-
-    private DefaultAvatarHelper $defaultAvatarHelperMock;
-
     /**
      * @var MockObject&Lead
      */
@@ -45,20 +34,20 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         /** @var CoreParametersHelper&MockObject $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $this->assetsHelperMock = new AssetsHelper($packagesMock);
-        $this->pathsHelperMock  = $this->createMock(PathsHelper::class);
-        $this->pathsHelperMock->method('getSystemPath')
+        $assetsHelperMock = new AssetsHelper($packagesMock);
+        $pathsHelperMock  = $this->createMock(PathsHelper::class);
+        $pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
-        $this->pathsHelperMock->method('getAssetsPath')
+        $pathsHelperMock->method('getAssetsPath')
           ->willReturn($root.'/app/assets');
-        $this->pathsHelperMock->method('getMediaPath')
+        $pathsHelperMock->method('getMediaPath')
           ->willReturn($root.'/media');
 
-        $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
-        $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock);
-        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
+        $assetsHelperMock->setPathsHelper($pathsHelperMock);
+        $defaultAvatarHelperMock       = new DefaultAvatarHelper($assetsHelperMock);
+        $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $coreParametersHelper, $this->createMock(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
-        $this->avatarHelper            = new AvatarHelper($this->assetsHelperMock, $this->pathsHelperMock, $this->gravatarHelperMock, $this->defaultAvatarHelperMock);
+        $this->avatarHelper            = new AvatarHelper($assetsHelperMock, $pathsHelperMock, $gravatarHelperMock, $defaultAvatarHelperMock);
     }
 
     /**

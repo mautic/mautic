@@ -55,10 +55,8 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param string $queryPartName
      * @param mixed  $value
-     *
-     * @return $this
      */
-    public function setQueryPart($queryPartName, $value)
+    public function setQueryPart($queryPartName, $value): static
     {
         $this->resetQueryPart($queryPartName);
         $this->add($queryPartName, $value);
@@ -167,11 +165,9 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * Add AND condition to existing table alias.
      *
-     * @return $this
-     *
      * @throws QueryException
      */
-    public function addJoinCondition($alias, $expr)
+    public function addJoinCondition($alias, $expr): static
     {
         $result = $parts = $this->getQueryPart('join');
 
@@ -193,10 +189,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function replaceJoinCondition($alias, $expr)
+    public function replaceJoinCondition($alias, $expr): static
     {
         $parts = $this->getQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
@@ -366,10 +359,7 @@ class QueryBuilder extends BaseQueryBuilder
         return count($this->logicStack) > 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getLogicStack()
+    public function getLogicStack(): array
     {
         return $this->logicStack;
     }
@@ -382,10 +372,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $stack;
     }
 
-    /**
-     * @return $this
-     */
-    private function addLogicStack($expression)
+    private function addLogicStack($expression): static
     {
         $this->logicStack[] = $expression;
 
@@ -427,10 +414,8 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Apply content of stack.
-     *
-     * @return $this
      */
-    public function applyStackLogic()
+    public function applyStackLogic(): static
     {
         if ($this->hasLogicStack()) {
             $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());

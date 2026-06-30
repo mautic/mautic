@@ -83,10 +83,7 @@ class TrackableModel extends AbstractCommonModel
         return $this->em->getRepository(Trackable::class);
     }
 
-    /**
-     * @return RedirectModel
-     */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): RedirectModel
     {
         return $this->redirectModel;
     }
@@ -540,11 +537,7 @@ class TrackableModel extends AbstractCommonModel
             return $this->isValidUrl($url, false);
         }
 
-        if (!$this->isValidUrl($tokenValue)) {
-            return false;
-        }
-
-        return true;
+        return $this->isValidUrl($tokenValue);
     }
 
     /**
@@ -560,16 +553,10 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        if (($forceScheme && !isset($urlParts['scheme']))
-            || (isset($urlParts['scheme'])
-                && !in_array(
-                    $urlParts['scheme'],
-                    ['http', 'https', 'ftp', 'ftps', 'mailto']
-                ))) {
-            return false;
-        }
-
-        return true;
+        return !($forceScheme && !isset($urlParts['scheme'])) && !(isset($urlParts['scheme']) && !in_array(
+            $urlParts['scheme'],
+            ['http', 'https', 'ftp', 'ftps', 'mailto']
+        ));
     }
 
     /**
@@ -738,10 +725,7 @@ class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
-    /**
-     * @return array
-     */
-    protected function getContactFieldUrlTokens()
+    protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;

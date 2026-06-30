@@ -43,7 +43,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $emailModel = static::getContainer()->get('mautic.email.model.email');
-        \assert($emailModel instanceof EmailModel);
+        $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
     }
 
@@ -137,7 +137,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         }
 
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
 
         return $contacts;
@@ -417,8 +417,8 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
             $this->emulateEmailStat($lead, $email, $l['read']);
 
             if ($l['read'] && $l['click']) {
-                $hits       = rand(1, 5);
-                $uniqueHits = rand(1, $hits);
+                $hits       = random_int(1, 5);
+                $uniqueHits = random_int(1, $hits);
                 $this->emulateClick($lead, $email, $hits, $uniqueHits);
             }
         }
@@ -612,6 +612,80 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotEmpty($data, 'The stats should not be empty');
     }
 
+    public function testGetEmailsToSendWinnerVariantReturnsOnlyEligibleEmails(): void
+    {
+        [$eligibleParent]       = $this->createVariantPair('eligible', 90, 2);
+        [$defaultWeightParent]  = $this->createVariantPair('default-weight', 100, 2);
+        [$noDelayParent]        = $this->createVariantPair('no-delay', 90, 0);
+
+        $this->em->flush();
+
+        $ids = array_map(
+            static fn (Email $email): int => (int) $email->getId(),
+            $this->emailModel->getEmailsToSendWinnerVariant()
+        );
+
+        sort($ids);
+
+        Assert::assertSame([(int) $eligibleParent->getId()], $ids);
+        Assert::assertNotContains((int) $defaultWeightParent->getId(), $ids);
+        Assert::assertNotContains((int) $noDelayParent->getId(), $ids);
+    }
+
+    public function testTimeLeftToDetermineWinnerReturnsFullDelayWithoutStatsAndVariantStartDate(): void
+    {
+        [$parent] = $this->createVariantPair('no-start-date', 90, 3);
+        $parent->setVariantStartDate(null);
+        $this->em->persist($parent);
+        $this->em->flush();
+
+        Assert::assertSame(['hours' => 3, 'minutes' => 0], $this->emailModel->timeLeftToDetermineWinner((int) $parent->getId(), 3));
+    }
+
+    public function testIsReadyToSendWinnerDependsOnLastSentDate(): void
+    {
+        [$parent, $winner] = $this->createVariantPair('ready-check', 90, 1);
+        $contact           = $this->createContact();
+
+        $stat = new Stat();
+        $stat->setEmail($winner);
+        $stat->setLead($contact);
+        $stat->setEmailAddress($contact->getEmail());
+        $stat->setDateSent(new \DateTime('-3 hours', new \DateTimeZone('UTC')));
+        $this->em->persist($stat);
+        $this->em->flush();
+
+        Assert::assertTrue($this->emailModel->isReadyToSendWinner((int) $parent->getId(), 1));
+
+        [$freshParent] = $this->createVariantPair('not-ready', 90, 1);
+        $this->em->flush();
+
+        Assert::assertFalse($this->emailModel->isReadyToSendWinner((int) $freshParent->getId(), 1));
+    }
+
+    public function testConvertWinnerVariantCopiesPublishSettingsFromOldParent(): void
+    {
+        [$parent, $winner] = $this->createVariantPair('conversion', 90, 1);
+        $parent->setPublishUp(new \DateTime('2026-01-01 00:00:00', new \DateTimeZone('UTC')));
+        $parent->setPublishDown(new \DateTime('2026-01-31 23:59:59', new \DateTimeZone('UTC')));
+        $parent->setContinueSending(true);
+        $this->em->persist($parent);
+        $this->em->flush();
+
+        $this->emailModel->convertWinnerVariant($winner);
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var Email $winnerReloaded */
+        $winnerReloaded = $this->em->getRepository(Email::class)->find($winner->getId());
+
+        Assert::assertInstanceOf(Email::class, $winnerReloaded);
+        Assert::assertNull($winnerReloaded->getVariantParent());
+        Assert::assertSame('2026-01-01 00:00:00', $winnerReloaded->getPublishUp()?->format('Y-m-d H:i:s'));
+        Assert::assertSame('2026-01-31 23:59:59', $winnerReloaded->getPublishDown()?->format('Y-m-d H:i:s'));
+        Assert::assertTrue($winnerReloaded->getContinueSending());
+    }
+
     private function createContact(): Lead
     {
         $contact = new Lead();
@@ -621,6 +695,46 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($contact);
 
         return $contact;
+    }
+
+    /**
+     * @return array{0: Email, 1: Email}
+     */
+    private function createVariantPair(string $suffix, int $totalWeight, int $sendWinnerDelay): array
+    {
+        $parent = new Email();
+        $parent->setName('Parent '.$suffix);
+        $parent->setSubject('Parent '.$suffix);
+        $parent->setCustomHTML('parent-'.$suffix);
+        $parent->setEmailType('template');
+        $parent->setLanguage('en');
+        $parent->setIsPublished(true);
+        $parent->setContinueSending(true);
+        $parent->setVariantSettings([
+            'enableAbTest'    => true,
+            'totalWeight'     => $totalWeight,
+            'sendWinnerDelay' => $sendWinnerDelay,
+            'winnerCriteria'  => 'email.openrate',
+        ]);
+        $this->em->persist($parent);
+
+        $winner = new Email();
+        $winner->setName('Winner '.$suffix);
+        $winner->setSubject('Winner '.$suffix);
+        $winner->setCustomHTML('winner-'.$suffix);
+        $winner->setEmailType('template');
+        $winner->setLanguage('en');
+        $winner->setIsPublished(true);
+        $winner->setVariantParent($parent);
+        $winner->setVariantSettings([
+            'weight'         => 90,
+            'winnerCriteria' => 'email.openrate',
+        ]);
+        $parent->addVariantChild($winner);
+
+        $this->em->persist($winner);
+
+        return [$parent, $winner];
     }
 
     private function createTemplateEmail(): Email
@@ -683,7 +797,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsNotPostponed(): void
     {
         $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        \assert($messageQueueRepository instanceof MessageQueueRepository);
+        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         Assert::assertSame(0, $messageQueueRepository->count([]), 'Email should not be postponed.');
     }
@@ -691,7 +805,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     private function assertEmailIsPostponed(Email $email, Lead $contact): void
     {
         $messageQueueRepository = $this->em->getRepository(MessageQueue::class);
-        \assert($messageQueueRepository instanceof MessageQueueRepository);
+        $this->assertInstanceOf(MessageQueueRepository::class, $messageQueueRepository);
 
         $queuedMessages = $messageQueueRepository->findBy([]);
         Assert::assertCount(1, $queuedMessages, 'Email should be postponed.');

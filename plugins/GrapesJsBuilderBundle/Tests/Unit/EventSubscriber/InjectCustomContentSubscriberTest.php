@@ -29,7 +29,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
     /** @var MockObject&RouterInterface */
     private MockObject $router;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->config = $this->createMock(Config::class);
         $this->model  = $this->createMock(GrapesJsBuilderModel::class);
@@ -69,7 +69,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
 
         $this->config->method('isPublished')->willReturn(true);
 
-        $this->twig->expects(self::once())
+        $this->twig->expects($this->once())
             ->method('render')
             ->with('@GrapesJsBuilder/Setting/fields.html.twig', ['customMjml' => '<mjml>request</mjml>'])
             ->willReturn('<div>ok</div>');
@@ -96,7 +96,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
         $this->model->method('getRepository')->willReturn($repository);
         $this->config->method('isPublished')->willReturn(true);
 
-        $this->twig->expects(self::once())
+        $this->twig->expects($this->once())
             ->method('render')
             ->with('@GrapesJsBuilder/Setting/fields.html.twig', ['customMjml' => '<mjml>stored</mjml>'])
             ->willReturn('<div>stored</div>');
@@ -124,7 +124,7 @@ final class InjectCustomContentSubscriberTest extends TestCase
                 ['grapesjsbuilder_delete', [], 0, 'https://example.test/delete'],
             ]);
 
-        $this->twig->expects(self::once())
+        $this->twig->expects($this->once())
             ->method('render')
             ->with(
                 '@GrapesJsBuilder/Setting/vars.html.twig',

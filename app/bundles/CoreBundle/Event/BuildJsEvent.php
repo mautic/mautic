@@ -30,10 +30,8 @@ class BuildJsEvent extends Event
      *
      * @param string $js
      * @param string $section The section name. Shows when in debug mode
-     *
-     * @return $this
      */
-    public function appendJs($js, $section = '')
+    public function appendJs($js, $section = ''): static
     {
         if ($section && $this->debugMode) {
             $slashes = str_repeat('/', strlen($section) + 10);

@@ -180,7 +180,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('removeFromCategories')->willReturnCallback(function (...$parameters) use ($matcher, $categories) {
+            ->method('removeFromCategories')->willReturnCallback(function (...$parameters) use ($matcher, $categories): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($categories, $parameters[0]);
                 }

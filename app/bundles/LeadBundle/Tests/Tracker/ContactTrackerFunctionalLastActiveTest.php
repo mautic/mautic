@@ -43,7 +43,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
 
         if ($skip) {
             $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-            $eventDispatcher->addListener(LeadGetCurrentEvent::class, function (LeadGetCurrentEvent $event) {
+            $eventDispatcher->addListener(LeadGetCurrentEvent::class, function (LeadGetCurrentEvent $event): void {
                 $event->skipContactLastActiveLogged();
             });
         }

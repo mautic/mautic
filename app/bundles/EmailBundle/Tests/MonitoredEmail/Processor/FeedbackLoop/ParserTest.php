@@ -33,7 +33,7 @@ BODY;
         $parser = new Parser($message);
 
         $email = $parser->parse();
-        $this->assertEquals('user@example.com', $email);
+        $this->assertSame('user@example.com', $email);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that an exception is thrown if no feedback report is found')]

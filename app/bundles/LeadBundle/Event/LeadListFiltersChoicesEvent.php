@@ -40,10 +40,7 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
         return $this->operators;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
@@ -107,11 +104,8 @@ class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
 
         // ajax request to load the filter's value fields
         $request = $this->getRequest();
-        if ('loadSegmentFilterForm' === $request->attributes->get('action')) {
-            return true;
-        }
 
         // something else such as dynamic content
-        return false;
+        return 'loadSegmentFilterForm' === $request->attributes->get('action');
     }
 }

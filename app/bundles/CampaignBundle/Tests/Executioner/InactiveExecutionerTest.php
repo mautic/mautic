@@ -50,7 +50,7 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         // Configure the redirection helper mock to return the event it receives
         $this->redirectionHelper->method('handleEventRedirection')
-            ->willReturnCallback(fn (Event $event) => $event);
+            ->willReturnCallback(fn (Event $event): Event => $event);
     }
 
     public function testNoContactsFoundResultsInNothingExecuted(): void

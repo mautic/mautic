@@ -239,10 +239,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->dateTriggered;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDateTriggered(?\DateTimeInterface $dateTriggered = null)
+    public function setDateTriggered(?\DateTimeInterface $dateTriggered = null): static
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
@@ -260,10 +257,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->ipAddress;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -278,10 +272,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
-    public function setLead(LeadEntity $lead)
+    public function setLead(LeadEntity $lead): static
     {
         $this->lead = $lead;
 
@@ -301,7 +292,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
      *
      * @return $this
      */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event): static
     {
         $this->event = $event;
 
@@ -322,10 +313,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * @param bool $isScheduled
-     *
-     * @return $this
      */
-    public function setIsScheduled($isScheduled)
+    public function setIsScheduled($isScheduled): static
     {
         if (null === $this->previousScheduledState) {
             $this->previousScheduledState = $this->isScheduled;
@@ -354,10 +343,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->triggerDate;
     }
 
-    /**
-     * @return $this
-     */
-    public function setTriggerDate(?\DateTimeInterface $triggerDate = null, ?string $note = null)
+    public function setTriggerDate(?\DateTimeInterface $triggerDate = null, ?string $note = null): static
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
@@ -384,10 +370,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->campaign;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): static
     {
         $this->campaign = $campaign;
 
@@ -404,10 +387,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * @param bool $systemTriggered
-     *
-     * @return $this
      */
-    public function setSystemTriggered($systemTriggered)
+    public function setSystemTriggered($systemTriggered): static
     {
         $this->systemTriggered = $systemTriggered;
 
@@ -424,10 +405,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * @param bool $nonActionPathTaken
-     *
-     * @return $this
      */
-    public function setNonActionPathTaken($nonActionPathTaken)
+    public function setNonActionPathTaken($nonActionPathTaken): static
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
 
@@ -457,10 +436,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * @param mixed[] $metadata
-     *
-     * @return $this
      */
-    public function setMetadata($metadata)
+    public function setMetadata($metadata): static
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline
@@ -514,10 +491,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * @param int $rotation
-     *
-     * @return LeadEventLog
      */
-    public function setRotation($rotation)
+    public function setRotation($rotation): static
     {
         $this->rotation = (int) $rotation;
 
@@ -532,10 +507,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->failedLog;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFailedLog(?FailedLeadEventLog $log = null)
+    public function setFailedLog(?FailedLeadEventLog $log = null): static
     {
         $this->failedLog = $log;
 

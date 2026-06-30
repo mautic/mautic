@@ -24,10 +24,7 @@ class Fetcher
     ) {
     }
 
-    /**
-     * @return $this
-     */
-    public function setMailboxes(array $mailboxes)
+    public function setMailboxes(array $mailboxes): static
     {
         $this->mailboxes = $mailboxes;
 
@@ -86,10 +83,7 @@ class Fetcher
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getLog()
+    public function getLog(): array
     {
         return $this->log;
     }

@@ -23,9 +23,9 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
     {
         $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
-        Assert::assertEquals(0, $crawler->selectButton('Save as Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Discard Draft')->count());
+        Assert::assertCount(0, $crawler->selectButton('Save as Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Apply Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testEmailDraftConfigured(): void
@@ -33,9 +33,9 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $email   = $this->createNewEmail();
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/edit/{$email->getId()}");
 
-        Assert::assertEquals(1, $crawler->selectButton('Save as Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Apply Draft')->count());
-        Assert::assertEquals(0, $crawler->selectButton('Discard Draft')->count());
+        Assert::assertCount(1, $crawler->selectButton('Save as Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Apply Draft'));
+        Assert::assertCount(0, $crawler->selectButton('Discard Draft'));
     }
 
     public function testCheckDraftInList(): void
@@ -53,10 +53,10 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $email = $this->createNewEmail();
         $this->saveDraft($email);
         $crawler = $this->client->request(Request::METHOD_GET, "/email/preview/{$email->getId()}");
-        $this->assertEquals('Test html', $crawler->text());
+        $this->assertSame('Test html', $crawler->text());
 
         $crawler = $this->client->request(Request::METHOD_GET, "/email/preview/{$email->getId()}/draft");
-        $this->assertEquals('Test html Draft', $crawler->text());
+        $this->assertSame('Test html Draft', $crawler->text());
     }
 
     public function testSaveDraftAndApplyDraftForLegacy(): void

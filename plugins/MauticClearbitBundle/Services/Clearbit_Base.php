@@ -42,7 +42,7 @@ class Clearbit_Base
     /**
      * @param mixed[] $hdr
      */
-    private function _update_rate_limit($hdr): void
+    private function _update_rate_limit(array $hdr): void
     {
         $remaining            = (float) $hdr['X-RateLimit-Remaining'];
         $reset                = (float) $hdr['X-RateLimit-Reset'];
@@ -65,10 +65,8 @@ class Clearbit_Base
 
     /**
      * @param string $id
-     *
-     * @return object
      */
-    public function setWebhookId($id = null)
+    public function setWebhookId($id = null): static
     {
         $this->_webhookId = $id;
 

@@ -164,12 +164,14 @@ class MailHelper
      * @var string
      */
     protected $subject              = '';
+
     private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
     protected $plainText              = '';
+
     private ?string $plainTextInitial = null;
 
     /**
@@ -259,7 +261,7 @@ class MailHelper
             $coreParametersHelper->get('mailer_from_name')
         );
         $this->addressLengthLimit = (int) $coreParametersHelper->get('mailer_address_length_limit');
-        $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
+        $this->setDefaultFrom(new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->message = $this->getMessageInstance();
@@ -278,10 +280,8 @@ class MailHelper
 
     /**
      * @param bool $cleanSlate
-     *
-     * @return $this
      */
-    public function getMailer($cleanSlate = true)
+    public function getMailer($cleanSlate = true): static
     {
         $this->reset($cleanSlate);
 
@@ -857,10 +857,8 @@ class MailHelper
 
     /**
      * Return the content identifier.
-     *
-     * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         return $this->contentHash;
     }
@@ -1061,10 +1059,9 @@ class MailHelper
     /**
      * Set reply to address(es) for this mailer instance.
      *
-     * @param array<string>|string $addresses
-     * @param string               $name
+     * @param string $name
      */
-    public function setReplyTo($addresses, $name = null): void
+    public function setReplyTo(?string $addresses, $name = null): void
     {
         $this->replyTo = $addresses;
     }
@@ -1130,10 +1127,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIdHash()
+    public function getIdHash(): ?string
     {
         return $this->idHash;
     }
@@ -1641,10 +1635,8 @@ class MailHelper
 
     /**
      * Returns if the mailer supports and is in tokenization mode.
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
         return $this->tokenizationEnabled;
     }
@@ -1943,17 +1935,9 @@ class MailHelper
         }
     }
 
-    private function setDefaultFrom($overrideFrom, AddressDTO $systemFrom): void
+    private function setDefaultFrom(AddressDTO $systemFrom): void
     {
-        if (is_array($overrideFrom)) {
-            $fromEmail    = key($overrideFrom);
-            $fromName     = $this->cleanName($overrideFrom[$fromEmail]);
-            $overrideFrom = [$fromEmail => $fromName];
-        } elseif (!empty($overrideFrom)) {
-            $overrideFrom = [$overrideFrom => null];
-        }
-
-        $this->systemFrom = $overrideFrom ?: $systemFrom;
+        $this->systemFrom = $systemFrom;
         $this->from       = $this->systemFrom;
     }
 

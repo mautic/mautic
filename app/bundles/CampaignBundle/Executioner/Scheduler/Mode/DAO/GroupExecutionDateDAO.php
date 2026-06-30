@@ -20,18 +20,12 @@ class GroupExecutionDateDAO
         $this->contacts->set($contact->getId(), $contact);
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getExecutionDate()
+    public function getExecutionDate(): \DateTimeInterface
     {
         return $this->executionDate;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getContacts()
+    public function getContacts(): ArrayCollection
     {
         return $this->contacts;
     }

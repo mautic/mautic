@@ -43,11 +43,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
         $entityDescriptor = $this->get($entityId);
 
         // EntityIds do not match
-        if (!$entityDescriptor) {
-            return false;
-        }
-
-        return true;
+        return null !== $entityDescriptor;
     }
 
     /**

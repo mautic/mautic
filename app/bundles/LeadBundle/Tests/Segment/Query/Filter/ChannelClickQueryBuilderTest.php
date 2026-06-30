@@ -32,25 +32,20 @@ class ChannelClickQueryBuilderTest extends TestCase
     private MockObject $randomParameterMock;
 
     /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcherMock;
-
-    /**
      * @var Connection|MockObject
      */
     private MockObject $connectionMock;
 
     private ChannelClickQueryBuilder $queryBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
-        $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
+        $dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $this->dispatcherMock
+            $dispatcherMock
         );
 
         $this->connectionMock->method('quote')
@@ -59,7 +54,7 @@ class ChannelClickQueryBuilderTest extends TestCase
 
     public function testGetServiceId(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'mautic.lead.query.builder.channel_click.value',
             $this->queryBuilder::getServiceId()
         );

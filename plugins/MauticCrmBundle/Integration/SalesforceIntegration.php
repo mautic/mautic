@@ -167,11 +167,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function updateDncByDate(): bool
     {
         $featureSettings = $this->settings->getFeatureSettings();
-        if (isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0]) {
-            return true;
-        }
 
-        return false;
+        return isset($featureSettings['updateDncByDate'][0]) && 'updateDncByDate' === $featureSettings['updateDncByDate'][0];
     }
 
     /**
@@ -202,13 +199,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
      * @return mixed[]
      *
      * @throws InvalidArgumentException
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $silenceExceptions = $settings['silence_exceptions'] ?? true;
         $salesForceObjects = [];
@@ -978,11 +973,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array $params
      *
-     * @return int|null
-     *
      * @throws \Exception
      */
-    public function pushLeadActivity($params = [])
+    public function pushLeadActivity($params = []): ?int
     {
         $executed = null;
 
@@ -1309,7 +1302,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         if (isset($config['objects'])) {
             // try searching for lead as this has been changed before in updated done to the plugin
-            if (false !== array_search('Contact', $config['objects'])) {
+            if (in_array('Contact', $config['objects'])) {
                 $resultContact = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
 
                 if ($resultContact) {
@@ -1858,7 +1851,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $objectFields       = [];
 
         // Important to have contacts first!!
-        if (false !== array_search('Contact', $config['objects'])) {
+        if (in_array('Contact', $config['objects'])) {
             $supportedObjects['Contact'] = 'Contact';
             $fieldsToCreate              = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fieldKeys, 'Contact');
             $objectFields['Contact']     = [
@@ -1866,7 +1859,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'create' => $fieldsToCreate,
             ];
         }
-        if (false !== array_search('Lead', $config['objects'])) {
+        if (in_array('Lead', $config['objects'])) {
             $supportedObjects['Lead'] = 'Lead';
             $fieldsToCreate           = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fieldKeys, 'Lead');
             $objectFields['Lead']     = [
@@ -2082,7 +2075,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         // Salesforce craps out with double quotes and unescaped single quotes
         $findEmailsInSF = array_map(
-            fn ($lead): string => str_replace("'", "\'", $this->cleanPushData($lead['email'])),
+            fn (array $lead): string => str_replace("'", "\'", $this->cleanPushData($lead['email'])),
             $checkEmailsInSF
         );
 
@@ -2390,7 +2383,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         ];
 
         foreach (['Lead', 'Contact'] as $object) {
-            if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
+            if (isset($config['objects']) && in_array($object, $config['objects'])) {
                 $fieldMapping[$object]['create'] = $this->prepareFieldsForSync($config['leadFields'] ?? [], $fields, $object);
                 $fieldMapping[$object]['update'] = isset($fieldsToUpdateInSf[$object]) ? array_intersect_key(
                     $fieldMapping[$object]['create'],
@@ -2431,7 +2424,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $object => [],
         ];
 
-        if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
+        if (isset($config['objects']) && in_array($object, $config['objects'])) {
             $fieldKeys          = array_keys($config['companyFields']);
             $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, 'Account');
             $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, 'Account', 'mautic_company');
@@ -3099,10 +3092,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $matchedFields;
     }
 
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    public function getEntityManager()
+    public function getEntityManager(): \Doctrine\ORM\EntityManager
     {
         return $this->em;
     }

@@ -32,11 +32,6 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
     private MockObject $schemaDefinition;
 
     /**
-     * @var MockObject|Logger
-     */
-    private MockObject $logger;
-
-    /**
      * @var MockObject|LeadFieldSaver
      */
     private MockObject $leadFieldSaver;
@@ -51,11 +46,6 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $fieldColumnDispatcher;
 
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
-
     private CustomFieldColumn $customFieldColumn;
 
     protected function setUp(): void
@@ -64,19 +54,19 @@ class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 
         $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $this->schemaDefinition      = $this->createMock(SchemaDefinition::class);
-        $this->logger                = $this->createMock(Logger::class);
+        $logger                      = $this->createMock(Logger::class);
         $this->leadFieldSaver        = $this->createMock(LeadFieldSaver::class);
         $this->customFieldIndex      = $this->createMock(CustomFieldIndex::class);
         $this->fieldColumnDispatcher = $this->createMock(FieldColumnDispatcher::class);
-        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $translator                  = $this->createMock(TranslatorInterface::class);
         $this->customFieldColumn     = new CustomFieldColumn(
             $this->columnSchemaHelper,
             $this->schemaDefinition,
-            $this->logger,
+            $logger,
             $this->leadFieldSaver,
             $this->customFieldIndex,
             $this->fieldColumnDispatcher,
-            $this->translator
+            $translator
         );
     }
 

@@ -47,6 +47,7 @@ class ThemeHelper implements ThemeHelperInterface
     private Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
+
     private ?Environment $sandboxEnv         = null;
 
     /**

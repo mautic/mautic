@@ -23,8 +23,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class TagController extends FormController
 {
     private const PERMISSION_VIEW   = 'tagManager:tagManager:view';
+
     private const PERMISSION_EDIT   = 'tagManager:tagManager:edit';
+
     private const PERMISSION_DELETE = 'tagManager:tagManager:delete';
+
     private const PERMISSION_CREATE = 'tagManager:tagManager:create';
 
     private TagModel $leadTagModel;
@@ -398,14 +401,12 @@ class TagController extends FormController
     /**
      * Return tag if exists and user has access.
      *
-     * @param int $tagId
-     *
      * @return Tag
      *
      * @throws EntityNotFoundException
      * @throws AccessDeniedException
      */
-    private function getTag($tagId)
+    private function getTag(int $tagId)
     {
         /** @var Tag|null $tag */
         $tag = $this->getModel('lead.tag')->getEntity($tagId);

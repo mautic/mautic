@@ -18,19 +18,19 @@ class FormSubscriberTest extends TestCase
     /**
      * @var MockObject|EmailModel
      */
-    protected $emailModel;
+    protected MockObject $emailModel;
 
     /**
      * @var MockObject|ContactTracker
      */
-    protected $contactTracker;
+    protected MockObject $contactTracker;
 
     /**
      * @var FormSubscriber
      */
     protected $formSubscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->emailModel     = $this->createMock(EmailModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);

@@ -104,7 +104,7 @@ class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 /** @phpstan-ignore class.extendsFinalByPhpDoc */
                 new class($assertRequest) extends Client {
                     public function __construct(
-                        private object $assertRequest,
+                        private readonly object $assertRequest,
                     ) {
                     }
 

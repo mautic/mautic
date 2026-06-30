@@ -211,7 +211,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            fn ($row): int => (int) $row['id'],
+            fn (array $row): int => (int) $row['id'],
             $result
         );
     }

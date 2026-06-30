@@ -173,13 +173,13 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $fetcher = new Fetcher($repo, $organizer, '701f10000021UnkAAE');
 
         // The query to fetch unknown members should be the 2 Leads not returned by at(0)
-        $this->assertEquals(
+        $this->assertSame(
             "SELECT Test, Id from Lead where Id in ('00Qf100000YjYv4EAF','00Qf100000YjYv9EAF') and ConvertedContactId = NULL",
             $fetcher->getQueryForUnknownObjects(['Test'], Lead::OBJECT)
         );
 
         // The query to fetch unknown members should be the 2 Contacts not returned by at(1)
-        $this->assertEquals(
+        $this->assertSame(
             "SELECT Test, Id from Contact where Id in ('00Qf100000YjYvTEAV','00Qf100000X1NR5EAN')",
             $fetcher->getQueryForUnknownObjects(['Test'], Contact::OBJECT)
         );
@@ -187,16 +187,13 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         // Should include all but the two we are already tracking as campaign members
         $unknown = $fetcher->getUnknownCampaignMembers();
 
-        $this->assertEquals(
+        $this->assertSame(
             [2, 3, 5, 6, 7, 8, 9, 10],
             $unknown
         );
     }
 
-    /**
-     * @return Organizer
-     */
-    private function getOrgnanizer()
+    private function getOrgnanizer(): Organizer
     {
         $records = [
             [

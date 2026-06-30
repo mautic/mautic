@@ -6,7 +6,7 @@ use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 class StubIntegration extends CrmAbstractIntegration
 {
-    public function getName()
+    public function getName(): string
     {
         return 'Stub';
     }

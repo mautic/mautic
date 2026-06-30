@@ -46,10 +46,7 @@ class ContactTracker
     ) {
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getContact()
+    public function getContact(): ?Lead
     {
         if (null !== $this->getRequest() && $this->getRequest()->cookies->get('Blocked-Tracking')) {
             return null;
@@ -61,7 +58,7 @@ class ContactTracker
             return null;
         }
 
-        if (empty($this->trackedContact)) {
+        if (!$this->trackedContact instanceof Lead) {
             $this->trackedContact = $this->getCurrentContact();
             $this->generateTrackingCookies();
         }
@@ -172,10 +169,7 @@ class ContactTracker
         $this->ipLookupHelper->reset();
     }
 
-    /**
-     * @return Lead|null
-     */
-    private function getSystemContact()
+    private function getSystemContact(): ?Lead
     {
         if ($this->useSystemContact() && $this->systemContact) {
             $this->logger->debug('CONTACT: System lead is being used');
@@ -271,10 +265,7 @@ class ContactTracker
         return $this->createNewContact($ip);
     }
 
-    /**
-     * @param bool $persist
-     */
-    private function createNewContact(?IpAddress $ip = null, $persist = true): Lead
+    private function createNewContact(?IpAddress $ip = null, bool $persist = true): Lead
     {
         // let's create a lead
         $lead = new Lead();

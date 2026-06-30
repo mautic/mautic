@@ -247,7 +247,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field   = new Field();
         $form    = new Form();
         $contact = new class extends Lead {
-            public function getFieldValue($field, $group = null)
+            public function getFieldValue($field, $group = null): string
             {
                 Assert::assertSame('field_a', $field);
 
@@ -267,7 +267,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field   = new Field();
         $form    = new Form();
         $contact = new class extends Lead {
-            public function getFieldValue($field, $group = null)
+            public function getFieldValue($field, $group = null): null
             {
                 Assert::assertSame('field_a', $field);
 
@@ -287,7 +287,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field   = new Field();
         $form    = new Form();
         $contact = new class extends Lead {
-            public function getFieldValue($field, $group = null)
+            public function getFieldValue($field, $group = null): string
             {
                 Assert::assertSame('field_a', $field);
 
@@ -312,7 +312,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setProperties($properties);
         $field->setType($type);
 
-        $this->assertEquals($result, $field->hasChoices());
+        $this->assertSame($result, $field->hasChoices());
     }
 
     /**
@@ -331,12 +331,12 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     public function testFieldWidth(): void
     {
         $field = new Field();
-        $this->assertEquals('100%', $field->getFieldWidth(), 'Default field width should be 100%');
+        $this->assertSame('100%', $field->getFieldWidth(), 'Default field width should be 100%');
 
         $field->setFieldWidth('50%');
-        $this->assertEquals('50%', $field->getFieldWidth(), 'Field width should be updated to 50%');
+        $this->assertSame('50%', $field->getFieldWidth(), 'Field width should be updated to 50%');
 
         $field->setFieldWidth('');
-        $this->assertEquals('100%', $field->getFieldWidth(), 'Field width should default to 100% when set to empty string');
+        $this->assertSame('100%', $field->getFieldWidth(), 'Field width should default to 100% when set to empty string');
     }
 }

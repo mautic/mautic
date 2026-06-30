@@ -21,12 +21,12 @@ class LeadSubscriberTest extends TestCase
     /**
      * @var IntegrationEntityRepository|MockObject
      */
-    private $integrationEntityRepository;
+    private MockObject $integrationEntityRepository;
 
     /**
      * @var IntegrationRepository|MockObject
      */
-    private $integrationRepository;
+    private MockObject $integrationRepository;
 
     protected function setUp(): void
     {

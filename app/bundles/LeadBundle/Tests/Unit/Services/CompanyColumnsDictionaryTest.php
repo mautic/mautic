@@ -13,10 +13,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanyColumnsDictionaryTest extends TestCase
 {
-    private FieldList&MockObject $fieldList;
-
-    private TranslatorInterface&MockObject $translator;
-
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
     private CompanyColumnsDictionary $dictionary;
@@ -25,20 +21,20 @@ final class CompanyColumnsDictionaryTest extends TestCase
     {
         parent::setUp();
 
-        $this->fieldList            = $this->createMock(FieldList::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $fieldList                  = $this->createMock(FieldList::class);
+        $translator                 = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
-        $this->translator->method('trans')->willReturnArgument(0);
+        $translator->method('trans')->willReturnArgument(0);
 
-        $this->fieldList->expects($this->once())
+        $fieldList->expects($this->once())
             ->method('getFieldList')
             ->with(false, true, ['isPublished' => true, 'object' => 'company'])
             ->willReturn(['annual_revenue' => 'Annual Revenue']);
 
         $this->dictionary = new CompanyColumnsDictionary(
-            $this->fieldList,
-            $this->translator,
+            $fieldList,
+            $translator,
             $this->coreParametersHelper,
         );
     }
