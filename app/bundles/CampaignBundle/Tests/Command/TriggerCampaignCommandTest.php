@@ -22,6 +22,7 @@ use PHPUnit\Framework\Assert;
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;
+
     private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
 
     protected function setUp(): void

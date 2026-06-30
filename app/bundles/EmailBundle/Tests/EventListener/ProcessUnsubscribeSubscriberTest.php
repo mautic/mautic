@@ -21,7 +21,7 @@ final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $unsubscribe            = $this->createMock(Unsubscribe::class);
         $feedbackLoop           = $this->createMock(FeedbackLoop::class);
-        $this->subscriber       = new ProcessUnsubscribeSubscriber($unsubscribe, $feedbackLoop, $this->createMock(CoreParametersHelper::class));
+        $this->subscriber       = new ProcessUnsubscribeSubscriber($unsubscribe, $feedbackLoop, $this->createStub(CoreParametersHelper::class));
     }
 
     public function testOnEmailSend(): void

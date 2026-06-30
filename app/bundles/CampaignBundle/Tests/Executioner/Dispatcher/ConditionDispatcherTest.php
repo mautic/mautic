@@ -15,12 +15,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|ConditionAccessor
+     * @var MockObject&ConditionAccessor
      */
     private MockObject $config;
 
@@ -39,7 +39,7 @@ class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertInstanceOf(ConditionEvent::class, $event);
                     $this->assertSame('something', $eventName);

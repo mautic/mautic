@@ -13,8 +13,8 @@ class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $auditLogModel  = $this->createMock(AuditLogModel::class);
+        $ipLookupHelper = $this->createStub(IpLookupHelper::class);
+        $auditLogModel  = $this->createStub(AuditLogModel::class);
         $subscriber     = new SecuritySubscriber($ipLookupHelper, $auditLogModel);
 
         $this->assertSame(

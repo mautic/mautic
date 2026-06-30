@@ -27,9 +27,9 @@ class PointSubscriberTest extends TestCase
 
     public function testPointBuildAddsActions(): void
     {
-        $pointModel        = $this->createMock(PointModel::class);
+        $pointModel        = $this->createStub(PointModel::class);
         $pointBuilderEvent = $this->createMock(PointBuilderEvent::class);
-        $pointActionHelper = $this->createMock(PointActionHelper::class);
+        $pointActionHelper = $this->createStub(PointActionHelper::class);
         $matcher           = self::exactly(2);
 
         $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper): void {
@@ -63,11 +63,11 @@ class PointSubscriberTest extends TestCase
     public function testPageHitTriggersPageHitWhenPageIsSet(): void
     {
         $pageHitEvent      = $this->createMock(PageHitEvent::class);
-        $page              = $this->createMock(Page::class);
-        $hit               = $this->createMock(Hit::class);
-        $lead              = $this->createMock(Lead::class);
+        $page              = $this->createStub(Page::class);
+        $hit               = $this->createStub(Hit::class);
+        $lead              = $this->createStub(Lead::class);
         $pointModel        = $this->createMock(PointModel::class);
-        $pointActionHelper = $this->createMock(PointActionHelper::class);
+        $pointActionHelper = $this->createStub(PointActionHelper::class);
 
         $pageHitEvent->expects($this->once())->method('getPage')->willReturn($page);
         $pageHitEvent->expects($this->once())->method('getHit')->willReturn($hit);
@@ -81,10 +81,10 @@ class PointSubscriberTest extends TestCase
     public function testURLHitTriggersPageHitWhenPageIsSet(): void
     {
         $pageHitEvent      = $this->createMock(PageHitEvent::class);
-        $hit               = $this->createMock(Hit::class);
-        $lead              = $this->createMock(Lead::class);
+        $hit               = $this->createStub(Hit::class);
+        $lead              = $this->createStub(Lead::class);
         $pointModel        = $this->createMock(PointModel::class);
-        $pointActionHelper = $this->createMock(PointActionHelper::class);
+        $pointActionHelper = $this->createStub(PointActionHelper::class);
 
         $pageHitEvent->expects($this->once())->method('getPage')->willReturn(null);
         $pageHitEvent->expects($this->once())->method('getHit')->willReturn($hit);

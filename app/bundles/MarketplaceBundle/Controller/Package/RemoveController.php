@@ -23,9 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 class RemoveController extends CommonController
 {
     public function __construct(
-        private PackageModel $packageModel,
-        private RouteProvider $routeProvider,
-        private Config $config,
+        private readonly PackageModel $packageModel,
+        private readonly RouteProvider $routeProvider,
+        private readonly Config $config,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

@@ -1,5 +1,7 @@
-export { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser } from './utils';
+import { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser } from './utils';
 import { patchBlocks, createBlockPatcher } from './blocks';
+
+export { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser };
 
 export default (editor, opts = {}) => {
   const options = {

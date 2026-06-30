@@ -157,7 +157,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteAction(): void
     {
         $projects   = $this->projectRepository->findAll();
-        $projectsId = array_map(fn (Project $project) => $project->getId(), $projects);
+        $projectsId = array_map(fn (Project $project): ?int => $project->getId(), $projects);
         $this->client->request('POST', '/s/projects/batchDelete?ids='.json_encode($projectsId));
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->projectRepository->count([]), 'All projects must be deleted.');

@@ -49,15 +49,15 @@ final class ImportController extends AbstractFormController
         ManagerRegistry $doctrine,
         CoreParametersHelper $coreParametersHelper,
         ModelFactory $modelFactory,
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         CorePermissions $security,
-        private LoggerInterface $logger,
-        private PathsHelper $pathsHelper,
-        private FormFactoryInterface $formFactory,
+        private readonly LoggerInterface $logger,
+        private readonly PathsHelper $pathsHelper,
+        private readonly FormFactoryInterface $formFactory,
     ) {
         parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }

@@ -19,8 +19,8 @@ class Interval implements ScheduleModeInterface
     private ?\DateTimeZone $defaultTimezone = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly LoggerInterface $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

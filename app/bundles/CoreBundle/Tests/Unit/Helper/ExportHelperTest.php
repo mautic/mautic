@@ -63,7 +63,7 @@ class ExportHelperTest extends TestCase
             $this->coreParametersHelperMock,
             $this->filePathResolver,
             $processSignalService,
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
     }
 

@@ -52,14 +52,14 @@ final class ConfigTypeTest extends TypeTestCase
         $permsMock->method('isGranted')->willReturn(false);
 
         $dsnType              = new DsnType(
-            $this->createMock(DsnTransformerFactory::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(DsnTransformerFactory::class),
+            $this->createStub(CoreParametersHelper::class),
         );
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
-        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createMock(Mailbox::class));
-        $dsnValidator                   = new DsnValidator($this->createMock(TransportFactory::class));
+        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
+        $dsnValidator                   = new DsnValidator($this->createStub(TransportFactory::class));
         $emailValidator                 = $this->createMock(EmailValidator::class);
         $customFieldValidator           = $this->createMock(CustomFieldValidator::class);
         $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($emailValidator, $customFieldValidator);

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class EntityDescriptorStoreTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

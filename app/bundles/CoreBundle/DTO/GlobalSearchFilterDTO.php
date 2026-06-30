@@ -11,7 +11,7 @@ final class GlobalSearchFilterDTO
      */
     private array $filters = [];
 
-    public function __construct(private string $searchString)
+    public function __construct(private readonly string $searchString)
     {
     }
 

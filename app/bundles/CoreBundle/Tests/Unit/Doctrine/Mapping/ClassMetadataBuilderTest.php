@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|ClassMetadataInfo
+     * @var MockObject&ClassMetadataInfo
      */
     private MockObject $classMetadataInfo;
 

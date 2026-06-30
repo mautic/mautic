@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\OptimisticLockTrait;
 
 final class OptimisticLockService implements OptimisticLockServiceInterface
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
     }
 

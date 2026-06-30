@@ -18,7 +18,7 @@ class QueryBuilder extends BaseQueryBuilder
     private array $logicStack = [];
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
         parent::__construct($connection);
     }

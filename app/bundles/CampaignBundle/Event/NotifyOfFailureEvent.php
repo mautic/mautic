@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class NotifyOfFailureEvent extends Event
 {
-    public function __construct(private Lead $lead, private CampaignEvent $failedEvent)
+    public function __construct(private readonly Lead $lead, private readonly CampaignEvent $failedEvent)
     {
     }
 

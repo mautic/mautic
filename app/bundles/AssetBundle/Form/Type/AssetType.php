@@ -29,8 +29,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class AssetType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private AssetModel $assetModel,
+        private readonly TranslatorInterface $translator,
+        private readonly AssetModel $assetModel,
     ) {
     }
 

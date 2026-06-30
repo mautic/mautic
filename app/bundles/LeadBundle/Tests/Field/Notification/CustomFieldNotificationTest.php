@@ -15,9 +15,9 @@ class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoUserId(): void
     {
-        $notificationModel   = $this->createMock(NotificationModel::class);
+        $notificationModel   = $this->createStub(NotificationModel::class);
         $userModel           = $this->createMock(UserModel::class);
-        $translatorInterface = $this->createMock(TranslatorInterface::class);
+        $translatorInterface = $this->createStub(TranslatorInterface::class);
 
         $leadField = new LeadField();
 
@@ -31,7 +31,7 @@ class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
 
     public function testNoUser(): void
     {
-        $notificationModel   = $this->createMock(NotificationModel::class);
+        $notificationModel   = $this->createStub(NotificationModel::class);
         $userModel           = $this->createMock(UserModel::class);
         $translatorInterface = $this->createMock(TranslatorInterface::class);
 

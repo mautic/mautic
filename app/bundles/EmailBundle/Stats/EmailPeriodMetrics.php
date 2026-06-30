@@ -16,7 +16,7 @@ class EmailPeriodMetrics
     private const EMAIL_SOURCE          = 'email';
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
     }
 

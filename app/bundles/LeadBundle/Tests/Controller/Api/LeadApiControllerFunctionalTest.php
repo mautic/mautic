@@ -1203,7 +1203,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $expectedActivites = 0;
         for ($i = 0; $i < 10; ++$i) {
             $contact = new Lead();
-            $contact->setEmail('email'.(string) $i.'@acquia.cz');
+            $contact->setEmail('email'.$i.'@acquia.cz');
             $this->em->persist($contact);
             // +30 assets downloads
             $expectedActivites += 3;
@@ -1259,7 +1259,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
             for ($iEmailStat = 0; $iEmailStat < 3; ++$iEmailStat) {
                 $stat = new StatEmail();
                 $stat->setLead($contact);
-                $stat->setEmailAddress('email'.(string) $i.'@acquia.cz');
+                $stat->setEmailAddress('email'.$i.'@acquia.cz');
                 $stat->setDateSent(date_create('2013-03-15'));
                 $this->em->persist($stat);
             }
@@ -1297,7 +1297,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $expectedDatesOrder = ['2013-03-25', '2013-03-20', '2013-03-15', '2013-03-10', '2013-03-05'];
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId().'/activity');
+        $this->client->request('GET', '/api/contacts/'.$contact->getId().'/activity');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseJson = json_decode($clientResponse->getContent());

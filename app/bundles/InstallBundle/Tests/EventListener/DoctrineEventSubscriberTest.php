@@ -14,21 +14,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\InstallBundle\EventListener\DoctrineEventSubscriber;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DoctrineEventSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject&EntityManagerInterface
+     * @var \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface
      */
-    private MockObject $entityManager;
+    private \PHPUnit\Framework\MockObject\Stub $entityManager;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
     }
 
     public function testSubscriberWillAddCorrectIndexes(): void

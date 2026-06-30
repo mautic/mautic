@@ -232,25 +232,28 @@ class MailHelper
 
     private array $embedImagesReplaces = [];
 
+    /**
+     * @param MailerInterface $mailer @api cannot be readonly as changed in tests via reflection
+     */
     public function __construct(
         private MailerInterface $mailer,
-        private FromEmailHelper $fromEmailHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private Mailbox $mailbox,
-        private LoggerInterface $logger,
-        private MailHashHelper $mailHashHelper,
-        private RouterInterface $router,
-        private Environment $twig,
-        private ThemeHelper $themeHelper,
-        private PathsHelper $pathsHelper,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
-        private EntityManagerInterface $entityManager,
-        private AssetModel $assetModel,
-        private TrackableModel $trackableModel,
-        private RedirectModel $redirectModel,
-        private SMimeHelper $sMimeHelper,
-        private EmailStatModel $emailStatModel,
+        private readonly FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Mailbox $mailbox,
+        private readonly LoggerInterface $logger,
+        private readonly MailHashHelper $mailHashHelper,
+        private readonly RouterInterface $router,
+        private readonly Environment $twig,
+        private readonly ThemeHelper $themeHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AssetModel $assetModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly RedirectModel $redirectModel,
+        private readonly SMimeHelper $sMimeHelper,
+        private readonly EmailStatModel $emailStatModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');

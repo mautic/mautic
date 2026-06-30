@@ -32,66 +32,66 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriberTest extends CommonMocks
 {
     /**
-     * @var IpLookupHelper&MockObject
+     * @var IpLookupHelper&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $ipLookupHelper;
+    private \PHPUnit\Framework\MockObject\Stub $ipLookupHelper;
 
     /**
-     * @var AuditLogModel&MockObject
+     * @var MockObject&AuditLogModel
      */
     private MockObject $auditLogModel;
 
     /**
-     * @var LeadChangeEventDispatcher&MockObject
+     * @var LeadChangeEventDispatcher&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $leadEventDispatcher;
+    private \PHPUnit\Framework\MockObject\Stub $leadEventDispatcher;
 
     private DncReasonHelper $dncReasonHelper;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var TranslatorInterface&MockObject
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var RouterInterface&MockObject
+     * @var RouterInterface&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $router;
+    private \PHPUnit\Framework\MockObject\Stub $router;
 
     /**
-     * @var ModelFactory<object>&MockObject
+     * @var ModelFactory<object>&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $modelFactory;
+    private \PHPUnit\Framework\MockObject\Stub $modelFactory;
 
-    private LeadListRepository&MockObject $leadListRepository;
+    private LeadListRepository&\PHPUnit\Framework\MockObject\Stub $leadListRepository;
 
-    private SegmentCountCacheHelper&MockObject $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
 
-    private CoreParametersHelper&MockObject $coreParametersHelper;
+    private CoreParametersHelper&\PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
 
-    private CompanyLeadRepository&MockObject $companyLeadRepository;
+    private CompanyLeadRepository&\PHPUnit\Framework\MockObject\Stub $companyLeadRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->ipLookupHelper          = $this->createMock(IpLookupHelper::class);
+        $this->ipLookupHelper          = $this->createStub(IpLookupHelper::class);
         $this->auditLogModel           = $this->createMock(AuditLogModel::class);
-        $this->leadEventDispatcher     = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper         = new DncReasonHelper($this->createMock(TranslatorInterface::class));
+        $this->leadEventDispatcher     = $this->createStub(LeadChangeEventDispatcher::class);
+        $this->dncReasonHelper         = new DncReasonHelper($this->createStub(TranslatorInterface::class));
         $this->entityManager           = $this->createMock(EntityManager::class);
         $this->translator              = $this->createMock(TranslatorInterface::class);
-        $this->router                  = $this->createMock(RouterInterface::class);
-        $this->modelFactory            = $this->createMock(ModelFactory::class);
-        $this->leadListRepository      = $this->createMock(LeadListRepository::class);
-        $this->segmentCountCacheHelper = $this->createMock(SegmentCountCacheHelper::class);
-        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
-        $this->companyLeadRepository   = $this->createMock(CompanyLeadRepository::class);
+        $this->router                  = $this->createStub(RouterInterface::class);
+        $this->modelFactory            = $this->createStub(ModelFactory::class);
+        $this->leadListRepository      = $this->createStub(LeadListRepository::class);
+        $this->segmentCountCacheHelper = $this->createStub(SegmentCountCacheHelper::class);
+        $this->coreParametersHelper    = $this->createStub(CoreParametersHelper::class);
+        $this->companyLeadRepository   = $this->createStub(CompanyLeadRepository::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice(): void

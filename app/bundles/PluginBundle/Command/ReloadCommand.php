@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ReloadCommand extends Command
 {
     public function __construct(
-        private ReloadFacade $reloadFacade,
+        private readonly ReloadFacade $reloadFacade,
     ) {
         parent::__construct();
     }

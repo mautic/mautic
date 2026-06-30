@@ -20,8 +20,8 @@ class LeadChangeCompanyEvent extends Event
      */
     public function __construct(
         Lead|array $leads,
-        private Company $company,
-        private bool $added = true,
+        private readonly Company $company,
+        private readonly bool $added = true,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;

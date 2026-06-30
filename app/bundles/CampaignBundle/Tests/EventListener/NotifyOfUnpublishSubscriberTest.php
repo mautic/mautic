@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 class NotifyOfUnpublishSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;
+
     private NotifyOfUnpublishSubscriber $subscriber;
 
     protected function setUp(): void
@@ -22,7 +23,7 @@ class NotifyOfUnpublishSubscriberTest extends TestCase
 
     public function testNotifyOfUnpublish(): void
     {
-        $event = $this->createMock(Event::class);
+        $event = $this->createStub(Event::class);
 
         $notifyEvent = new NotifyOfUnpublishEvent($event);
 
