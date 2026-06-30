@@ -12,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 class IdStoreTest extends TestCase
 {
     /**
-     * @var ObjectManager|MockObject
+     * @var MockObject&ObjectManager
      */
     private MockObject $manager;
 
     /**
-     * @var TimeProviderInterface|MockObject
+     * @var MockObject&TimeProviderInterface
      */
     private MockObject $timeProvider;
 

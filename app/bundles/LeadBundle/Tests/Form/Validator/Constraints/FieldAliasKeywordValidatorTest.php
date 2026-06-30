@@ -15,8 +15,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
+     */
     private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&UnitOfWork
+     */
     private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
 
     private FieldAliasKeywordValidator $validator;

@@ -21,8 +21,8 @@ final class UpdateCompanyNameOnLeadsCommand
     public const COMMAND_NAME = 'mautic:company:update_lead_company';
 
     public function __construct(
-        private CompanyLeadRepository $companyLeadRepository,
-        private CompanyRepository $companyRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 

@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private VersionProviderInterface $versionProvider)
+    public function __construct(private readonly VersionProviderInterface $versionProvider)
     {
     }
 

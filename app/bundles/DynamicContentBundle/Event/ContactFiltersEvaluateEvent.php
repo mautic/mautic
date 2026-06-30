@@ -17,7 +17,7 @@ final class ContactFiltersEvaluateEvent extends Event
      * @param mixed[] $filters
      */
     public function __construct(
-        private array $filters,
+        private readonly array $filters,
         private Lead $contact,
     ) {
     }

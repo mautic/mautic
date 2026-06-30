@@ -16,11 +16,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CategorySubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
-        private CategoryModel $categoryModel,
-        private TranslatorInterface $translator,
+        private readonly BundleHelper $bundleHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
+        private readonly CategoryModel $categoryModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

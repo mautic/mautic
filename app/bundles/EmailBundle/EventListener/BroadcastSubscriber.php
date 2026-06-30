@@ -14,9 +14,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BroadcastSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailModel $model,
-        private EntityManager $em,
-        private TranslatorInterface $translator,
+        private readonly EmailModel $model,
+        private readonly EntityManager $em,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

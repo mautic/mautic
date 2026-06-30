@@ -17,8 +17,8 @@ class SegmentCountCacheCommand extends Command
     public const COMMAND_NAME = 'lead:list:count-cache-update';
 
     public function __construct(
-        private LeadListRepository $leadListRepository,
-        private SegmentCountCacheHelper $segmentCountCacheHelper,
+        private readonly LeadListRepository $leadListRepository,
+        private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
     ) {
         parent::__construct();
     }

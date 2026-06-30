@@ -37,7 +37,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PageType extends AbstractType
 {
-    private ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?\Mautic\UserBundle\Entity\User $user;
 
     /**
      * @var bool
@@ -45,12 +45,12 @@ class PageType extends AbstractType
     private $canViewOther = false;
 
     public function __construct(
-        private EntityManager $em,
-        private PageModel $model,
+        private readonly EntityManager $em,
+        private readonly PageModel $model,
         CorePermissions $corePermissions,
         UserHelper $userHelper,
-        private ThemeHelperInterface $themeHelper,
-        private PageConfigInterface $pageConfig,
+        private readonly ThemeHelperInterface $themeHelper,
+        private readonly PageConfigInterface $pageConfig,
     ) {
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();

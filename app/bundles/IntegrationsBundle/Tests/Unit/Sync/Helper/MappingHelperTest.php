@@ -32,17 +32,17 @@ class MappingHelperTest extends TestCase
     private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var ObjectProvider&MockObject
+     * @var MockObject&ObjectProvider
      */
     private MockObject $objectProvider;
 
     /**
-     * @var EventDispatcherInterface&MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var ObjectMappingRepository&MockObject
+     * @var MockObject&ObjectMappingRepository
      */
     private MockObject $objectMappingRepository;
 
@@ -91,7 +91,7 @@ class MappingHelperTest extends TestCase
             ->method('getFieldsWithUniqueIdentifier')
             ->willReturn([]);
 
-        $mappingManual        = $this->createMock(MappingManualDAO::class);
+        $mappingManual        = $this->createStub(MappingManualDAO::class);
         $internalObjectName   = 'Contact';
         $integrationObjectDAO = new ObjectDAO('Object', 1);
 
@@ -131,7 +131,7 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                    function (InternalObjectFindEvent $event) use ($internalObject): true {
                         Assert::assertSame($internalObject, $event->getObject());
                         Assert::assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
@@ -181,7 +181,7 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                    function (InternalObjectFindEvent $event) use ($internalObject): true {
                         Assert::assertSame($internalObject, $event->getObject());
                         Assert::assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
@@ -240,7 +240,7 @@ class MappingHelperTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (InternalObjectFindEvent $event) use ($internalObject) {
+                    function (InternalObjectFindEvent $event) use ($internalObject): true {
                         Assert::assertSame($internalObject, $event->getObject());
                         Assert::assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 

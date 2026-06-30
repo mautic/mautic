@@ -17,10 +17,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class Notifier
 {
     public function __construct(
-        private HandlerContainer $handlerContainer,
-        private SyncIntegrationsHelper $syncIntegrationsHelper,
-        private ConfigIntegrationsHelper $configIntegrationsHelper,
-        private TranslatorInterface $translator,
+        private readonly HandlerContainer $handlerContainer,
+        private readonly SyncIntegrationsHelper $syncIntegrationsHelper,
+        private readonly ConfigIntegrationsHelper $configIntegrationsHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

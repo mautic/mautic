@@ -14,9 +14,9 @@ class PluginInstallEvent extends Event
      * @param array<class-string, ClassMetadata>|null $metadata
      */
     public function __construct(
-        private Plugin $plugin,
-        private ?array $metadata,
-        private ?bool $installedSchema,
+        private readonly Plugin $plugin,
+        private readonly ?array $metadata,
+        private readonly ?bool $installedSchema,
     ) {
     }
 

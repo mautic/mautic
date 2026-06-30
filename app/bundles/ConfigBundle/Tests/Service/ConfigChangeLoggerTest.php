@@ -10,8 +10,8 @@ class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetOriginalNormData(): void
     {
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $auditLogModel  = $this->createMock(AuditLogModel::class);
+        $ipLookupHelper = $this->createStub(IpLookupHelper::class);
+        $auditLogModel  = $this->createStub(AuditLogModel::class);
         $logger         = new ConfigChangeLogger($ipLookupHelper, $auditLogModel);
 
         $this->assertEquals($logger, $logger->setOriginalNormData([]));

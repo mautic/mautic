@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LeadRepository $leadRepository,
-        private PrimaryCompanyHelper $primaryCompanyHelper)
+        private readonly LeadRepository $leadRepository,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper)
     {
     }
 

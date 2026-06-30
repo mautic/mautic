@@ -22,8 +22,8 @@ use Symfony\Component\HttpFoundation\Response;
 class CacheController extends CommonController
 {
     public function __construct(
-        private Config $config,
-        private Allowlist $allowlist,
+        private readonly Config $config,
+        private readonly Allowlist $allowlist,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

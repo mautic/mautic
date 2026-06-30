@@ -19,7 +19,7 @@ class BundleMetadataBuilder
     private array $coreMetadata = [];
 
     public function __construct(
-        private array $symfonyBundles,
+        private readonly array $symfonyBundles,
         private array $paths,
     ) {
         $this->buildMetadata();

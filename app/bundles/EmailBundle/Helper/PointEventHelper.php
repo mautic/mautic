@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class PointEventHelper
 {
-    public function __construct(private EmailModel $emailModel)
+    public function __construct(private readonly EmailModel $emailModel)
     {
     }
 

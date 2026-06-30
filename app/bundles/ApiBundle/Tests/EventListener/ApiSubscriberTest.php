@@ -15,17 +15,17 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class ApiSubscriberTest extends CommonMocks
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Request&MockObject
+     * @var MockObject&Request
      */
     private MockObject $request;
 
     /**
-     * @var RequestEvent&MockObject
+     * @var MockObject&RequestEvent
      */
     private MockObject $event;
 

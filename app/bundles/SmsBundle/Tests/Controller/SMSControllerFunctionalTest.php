@@ -13,7 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const EDIT_SMS_PATH       = '/s/sms/edit/';
+
     private const DEFAULT_SMS_MESSAGE = 'sms body';
+
     private const SAVE_AND_CLOSE      = 'Save & Close';
 
     protected function setUp(): void

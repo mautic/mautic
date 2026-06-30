@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
@@ -17,9 +18,9 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     protected $logs;
 
     /**
-     * @var ArrayCollection|Lead[]
+     * @var Collection<int, Lead>
      */
-    private ArrayCollection $contacts;
+    private readonly Collection $contacts;
 
     private array $logContactXref = [];
 
@@ -67,7 +68,6 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     {
         $contacts = new ArrayCollection();
 
-        /** @var Lead $contact */
         foreach ($this->contacts as $contact) {
             $contacts->set($contact->getId(), $contact);
         }

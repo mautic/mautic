@@ -9,10 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class PieChartTest extends TestCase
 {
-    /**
-     * @var PieChart
-     */
-    private $pieChart;
+    private PieChart $pieChart;
 
     protected function setUp(): void
     {

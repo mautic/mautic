@@ -18,7 +18,7 @@ final class EntityExportEvent extends Event
      */
     private array $dependencies = [];
 
-    public function __construct(private string $entityName, private int $entityId)
+    public function __construct(private readonly string $entityName, private readonly int $entityId)
     {
     }
 

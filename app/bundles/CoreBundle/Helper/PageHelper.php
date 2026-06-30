@@ -9,10 +9,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class PageHelper implements PageHelperInterface
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
-        private string $sessionPrefix,
-        private int $page,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $sessionPrefix,
+        private readonly int $page,
     ) {
     }
 
