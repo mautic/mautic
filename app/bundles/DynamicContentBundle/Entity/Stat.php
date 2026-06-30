@@ -132,10 +132,8 @@ class Stat
 
     /**
      * Up the sent count.
-     *
-     * @return Stat
      */
-    public function upSentCount()
+    public function upSentCount(): static
     {
         $count           = (int) $this->sentCount + 1;
         $this->sentCount = $count;

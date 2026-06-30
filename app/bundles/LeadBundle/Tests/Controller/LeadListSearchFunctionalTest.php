@@ -111,14 +111,10 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $previousQueries   = $allQueries;
         $doctrineExtension = new DoctrineExtension();
 
-        $queries = array_map(function (array $query) use ($doctrineExtension) {
-            return $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']);
-        }, $queries);
+        $queries = array_map(fn (array $query) => $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']), $queries);
 
         foreach ($expectedQueries as $expectedQuery) {
-            $matchedQueries = array_filter($queries, function (string $query) use ($expectedQuery) {
-                return $expectedQuery === $query;
-            });
+            $matchedQueries = array_filter($queries, fn (string $query) => $expectedQuery === $query);
             Assert::assertCount(1, $matchedQueries, sprintf('The query "%s" was expected to be executed once.', $expectedQuery));
         }
     }

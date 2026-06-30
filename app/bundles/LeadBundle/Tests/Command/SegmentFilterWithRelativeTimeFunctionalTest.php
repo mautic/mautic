@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -87,7 +88,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
 
         $tzProperty             = new \ReflectionProperty(DateTimeHelper::class, 'defaultLocalTimezone');
         $originalCachedTimezone = $tzProperty->getValue();
-        $tzProperty->setValue(null, 'Europe/Prague');
+        ReflectionHelper::setStaticValue(DateTimeHelper::class, 'defaultLocalTimezone', 'Europe/Prague');
 
         try {
             $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
@@ -98,7 +99,7 @@ final class SegmentFilterWithRelativeTimeFunctionalTest extends MauticMysqlTestC
                 'Contact last active 30 min ago must be included in the "-1 hour" segment even when the system timezone is non-UTC.'
             );
         } finally {
-            $tzProperty->setValue(null, $originalCachedTimezone);
+            ReflectionHelper::setStaticValue(DateTimeHelper::class, 'defaultLocalTimezone', $originalCachedTimezone);
         }
     }
 

@@ -25,6 +25,7 @@ use Twig\Environment;
 class SearchSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
+
     private \Mautic\LeadBundle\Entity\LeadRepository $leadRepo;
 
     public function __construct(
@@ -452,10 +453,7 @@ class SearchSubscriber implements EventSubscriberInterface
         $this->buildNotificationSentQuery($event, true);
     }
 
-    /**
-     * @param bool $isMobile
-     */
-    private function buildNotificationSentQuery(LeadBuildSearchEvent $event, $isMobile = false): void
+    private function buildNotificationSentQuery(LeadBuildSearchEvent $event, bool $isMobile = false): void
     {
         $tables = [
             [
@@ -544,7 +542,7 @@ class SearchSubscriber implements EventSubscriberInterface
         }
 
         $renderedResults = array_map(
-            fn ($item) => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
+            fn ($item): string => $twig->render($template, array_merge(['item' => $item], $templateParameters)),
             $results['results']
         );
 

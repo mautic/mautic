@@ -15,9 +15,9 @@ class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
     private const CAMPAIGN_NAME = 'Test Campaign';
     private CampaignAuditService $campaignAuditService;
-    private FlashBag|MockObject $flashBagMock;
-    private UrlGeneratorInterface|MockObject $urlGeneratorMock;
-    private EventRepository|MockObject $eventRepositoryMock;
+    private MockObject $flashBagMock;
+    private MockObject $urlGeneratorMock;
+    private MockObject $eventRepositoryMock;
 
     protected function setUp(): void
     {

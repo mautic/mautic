@@ -20,7 +20,7 @@ class MultipleEmailsValidValidator extends ConstraintValidator
      */
     public function validate($emailsInString, Constraint $constraint): void
     {
-        if (!$emailsInString) {
+        if (null === $emailsInString || '' === $emailsInString) {
             return;
         }
 

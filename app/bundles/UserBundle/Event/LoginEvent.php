@@ -12,10 +12,7 @@ class LoginEvent extends Event
     ) {
     }
 
-    /**
-     * @return User|null
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return $this->user;
     }

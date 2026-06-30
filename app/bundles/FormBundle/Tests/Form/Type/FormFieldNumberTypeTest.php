@@ -17,7 +17,7 @@ final class FormFieldNumberTypeTest extends TypeTestCase
     /**
      * @var MockObject|FormBuilderInterface
      */
-    private $formBuilder;
+    private MockObject $formBuilder;
 
     /**
      * @var AbstractType<FormFieldNumberType>

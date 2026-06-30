@@ -69,10 +69,8 @@ class PushID
 
     /**
      * @param int $id
-     *
-     * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -87,10 +85,7 @@ class PushID
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -107,10 +102,8 @@ class PushID
 
     /**
      * @param string $pushID
-     *
-     * @return $this
      */
-    public function setPushID($pushID)
+    public function setPushID($pushID): static
     {
         $this->pushID = $pushID;
 
@@ -125,10 +118,7 @@ class PushID
         return $this->enabled;
     }
 
-    /**
-     * @return $this
-     */
-    public function setEnabled($enabled)
+    public function setEnabled($enabled): static
     {
         $this->enabled = $enabled;
 
@@ -145,10 +135,8 @@ class PushID
 
     /**
      * @param bool $mobile
-     *
-     * @return $this
      */
-    public function setMobile($mobile)
+    public function setMobile($mobile): static
     {
         $this->mobile = $mobile;
 

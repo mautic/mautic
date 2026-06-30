@@ -143,10 +143,8 @@ class Client extends BaseClient
 
     /**
      * @param string $name
-     *
-     * @return Client
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
 
@@ -170,10 +168,7 @@ class Client extends BaseClient
         $this->redirectUris = $redirectUris;
     }
 
-    /**
-     * @return Client
-     */
-    public function addAuthCode(AuthCode $authCodes)
+    public function addAuthCode(AuthCode $authCodes): static
     {
         $this->authCodes[] = $authCodes;
 
@@ -205,10 +200,7 @@ class Client extends BaseClient
         return $users->contains($user);
     }
 
-    /**
-     * @return Client
-     */
-    public function addUser(User $users)
+    public function addUser(User $users): static
     {
         $this->users[] = $users;
 

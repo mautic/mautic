@@ -20,7 +20,7 @@ class SegmentLogReportSubscriberTest extends TestCase
 
     private SegmentLogReportSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,10 +58,12 @@ class SegmentLogReportSubscriberTest extends TestCase
         $setTables = [];
         $mockEvent->expects($this->exactly(1))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setTables[] = $args;
+
+                return $mockEvent;
             });
 
         $this->subscriber->onReportBuilder($mockEvent);

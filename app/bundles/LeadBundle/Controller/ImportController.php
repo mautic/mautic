@@ -201,7 +201,7 @@ class ImportController extends FormController
         try {
             $initEvent = $this->dispatchImportOnInit();
         } catch (AccessDeniedException $e) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (!$initEvent->objectSupported) {
@@ -724,7 +724,7 @@ class ImportController extends FormController
         return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }
 
-    protected function getPermissionBase()
+    protected function getPermissionBase(): ?string
     {
         return $this->getModel($this->getModelName())->getPermissionBase();
     }

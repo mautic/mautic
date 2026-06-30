@@ -46,7 +46,7 @@ class RemoveController extends CommonController
         }
 
         if (!$this->security->isGranted(MarketplacePermissions::CAN_REMOVE_PACKAGES)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView(

@@ -112,7 +112,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $batchSize = 20;
         $i         = 0;
         foreach ($entities as $entity) {
-            $isNew = ($entity->getId()) ? false : true;
+            $isNew = !(bool) $entity->getId();
 
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
@@ -441,7 +441,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new SmsEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

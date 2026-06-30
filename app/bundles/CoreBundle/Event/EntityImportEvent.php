@@ -19,7 +19,9 @@ final class EntityImportEvent extends Event
     private array $dependencies = [];
 
     public const UPDATE = 'update';
+
     public const NEW    = 'new';
+
     public const ERRORS = 'errors';
 
     /**

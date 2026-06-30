@@ -126,7 +126,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     private $eventsOrderbyDir;
 
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
+
     private ?\DateTimeImmutable $unHealthySince         = null;
+
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
@@ -242,10 +244,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param string $name
-     *
-     * @return Webhook
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -263,10 +263,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param string $description
-     *
-     * @return Webhook
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -284,10 +282,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param string $webhookUrl
-     *
-     * @return Webhook
      */
-    public function setWebhookUrl($webhookUrl)
+    public function setWebhookUrl($webhookUrl): static
     {
         $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
@@ -305,10 +301,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param ?string $secret
-     *
-     * @return Webhook
      */
-    public function setSecret($secret)
+    public function setSecret($secret): static
     {
         $this->isChanged('secret', $secret);
         $this->secret = $secret;
@@ -324,10 +318,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->secret;
     }
 
-    /**
-     * @return Webhook
-     */
-    public function setCategory(?Category $category = null)
+    public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -353,10 +344,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param Collection<int, Event> $events
-     *
-     * @return $this
      */
-    public function setEvents($events)
+    public function setEvents($events): static
     {
         $this->isChanged('events', $events);
 
@@ -424,10 +413,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return false;
     }
 
-    /**
-     * @return $this
-     */
-    public function addEvent(Event $event)
+    public function addEvent(Event $event): static
     {
         $this->isChanged('events', $event);
 
@@ -436,10 +422,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function removeEvent(Event $event)
+    public function removeEvent(Event $event): static
     {
         $this->isChanged('events', $event);
         $this->removedEvents[] = $event;
@@ -451,7 +434,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param string $eventsOrderbyDir
      */
-    public function setEventsOrderbyDir($eventsOrderbyDir)
+    public function setEventsOrderbyDir($eventsOrderbyDir): static
     {
         $this->isChanged('eventsOrderbyDir', $eventsOrderbyDir);
         $this->eventsOrderbyDir = $eventsOrderbyDir;
@@ -490,10 +473,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param ArrayCollection<int,Log> $logs
-     *
-     * @return $this
      */
-    public function addLogs($logs)
+    public function addLogs($logs): static
     {
         $this->logs = $logs;
 
@@ -505,20 +486,14 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addLog(Log $log)
+    public function addLog(Log $log): static
     {
         $this->logs[] = $log;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function removeLog(Log $log)
+    public function removeLog(Log $log): static
     {
         $this->logs->removeElement($log);
 
@@ -533,10 +508,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->payload;
     }
 
-    /**
-     * @return Webhook
-     */
-    public function setPayload($payload)
+    public function setPayload($payload): static
     {
         $this->payload = $payload;
 
@@ -553,11 +525,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
         $aWhileBack = (new \DateTime())->modify('-2 days');
 
-        if ($dateModified < $aWhileBack) {
-            return false;
-        }
-
-        return true;
+        return $dateModified >= $aWhileBack;
     }
 
     /**

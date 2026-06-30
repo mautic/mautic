@@ -74,7 +74,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s', $redirect->getRedirectId()));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         Assert::assertSame($url, $response->getTargetUrl());
     }
@@ -121,7 +121,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s?ct=%s', $redirect->getRedirectId(), $ct));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
+        $this->assertInstanceOf(RedirectResponse::class, $response);
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         Assert::assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 

@@ -24,9 +24,9 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->pathsHelper = $this->getContainer()->get('mautic.helper.paths');
-        \assert($this->pathsHelper instanceof PathsHelper);
+        $this->assertInstanceOf(PathsHelper::class, $this->pathsHelper);
         $this->filesystem  = $this->getContainer()->get('mautic.filesystem');
-        \assert($this->filesystem instanceof Filesystem);
+        $this->assertInstanceOf(Filesystem::class, $this->filesystem);
 
         $themePath = $this->pathsHelper->getThemesPath();
 
@@ -72,7 +72,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteActionWithNonCoreTheme(): void
     {
         $themeHelper = self::getContainer()->get(ThemeHelper::class);
-        \assert($themeHelper instanceof ThemeHelper);
+        $this->assertInstanceOf(ThemeHelper::class, $themeHelper);
         $themeHelper->copy('blank', 'blanktest');
         $themeHelper->copy('blank', 'auroratest');
 

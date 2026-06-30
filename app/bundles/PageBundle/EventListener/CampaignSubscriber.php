@@ -228,11 +228,13 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $config = $event->getConfig();
         if (empty($config['services'])) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $values = [];
@@ -241,6 +243,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
         $this->trackingHelper->updateCacheItem($values);
 
-        return $event->setResult(true);
+        $event->setResult(true);
     }
 }

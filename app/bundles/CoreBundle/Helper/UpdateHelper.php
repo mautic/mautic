@@ -109,7 +109,7 @@ class UpdateHelper
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         } catch (RequestException $exception) {
-            if (!empty($exception->getResponse())) {
+            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'UPDATE CHECK: Could not fetch a release list: %s (%s)',
@@ -234,7 +234,7 @@ class UpdateHelper
 
             $this->client->request('POST', $statUrl, $options);
         } catch (RequestException $exception) {
-            if (!empty($exception->getResponse())) {
+            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'STAT UPDATE: Error communicating with the stat server: %s (%s)',
@@ -316,10 +316,8 @@ class UpdateHelper
 
     /**
      * Tries to get server OS.
-     *
-     * @return string
      */
-    private function getServerOs()
+    private function getServerOs(): string
     {
         if (function_exists('php_uname')) {
             return php_uname('s').' '.php_uname('r');

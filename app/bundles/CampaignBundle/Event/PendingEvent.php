@@ -214,7 +214,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @return LeadEventLog[]|ArrayCollection
      */
-    public function getFailures()
+    public function getFailures(): ArrayCollection
     {
         return $this->failures;
     }
@@ -222,7 +222,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @return LeadEventLog[]|ArrayCollection
      */
-    public function getSuccessful()
+    public function getSuccessful(): ArrayCollection
     {
         return $this->successful;
     }

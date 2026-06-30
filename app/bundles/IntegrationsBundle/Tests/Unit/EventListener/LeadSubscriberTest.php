@@ -59,7 +59,7 @@ class LeadSubscriberTest extends TestCase
      */
     private MockObject $eventDispatcherInterfaceMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -80,7 +80,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        Assert::assertEquals(
+        Assert::assertSame(
             [
                 LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
@@ -460,8 +460,8 @@ class LeadSubscriberTest extends TestCase
              * @param mixed[] $fieldChanges
              */
             public function __construct(
-                private array $fieldChanges,
-                private int $objectId,
+                private readonly array $fieldChanges,
+                private readonly int $objectId,
             ) {
                 parent::__construct();
             }
@@ -493,8 +493,8 @@ class LeadSubscriberTest extends TestCase
              * @param mixed[] $fieldChanges
              */
             public function __construct(
-                private array $fieldChanges,
-                private int $objectId,
+                private readonly array $fieldChanges,
+                private readonly int $objectId,
             ) {
             }
 

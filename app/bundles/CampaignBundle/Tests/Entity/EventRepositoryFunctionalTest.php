@@ -34,7 +34,7 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testGetContactPendingEventsConsidersCampaignPublishUpAndDown(?\DateTime $publishUp, ?\DateTime $publishDown, int $expectedCount): void
     {
         $repository = static::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
         $event    = $this->createEvent($campaign);
@@ -52,7 +52,7 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
     {
         $repository = static::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
 
@@ -153,7 +153,7 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 
         // 4. Call the method under test
         $repository   = self::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        $this->assertInstanceOf(EventRepository::class, $repository);
         $resultEmails = $repository->getCampaignEmailEvents($campaign->getId());
 
         // 5. Assert the results

@@ -32,10 +32,8 @@ class BundleHelper
 
     /**
      * Get's an array of details for enabled Mautic plugins.
-     *
-     * @return array
      */
-    public function getPluginBundles()
+    public function getPluginBundles(): array
     {
         return $this->pluginBundles;
     }

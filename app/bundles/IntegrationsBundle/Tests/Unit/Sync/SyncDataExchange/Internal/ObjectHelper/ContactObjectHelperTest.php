@@ -233,7 +233,7 @@ class ContactObjectHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $contact1->expects($matcher)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('john@doe.com', $parameters[1]);
@@ -329,7 +329,7 @@ class ContactObjectHelperTest extends TestCase
     public function testFindObjectById(): void
     {
         $contact = new Lead();
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1)
             ->willReturn($contact);
@@ -339,7 +339,7 @@ class ContactObjectHelperTest extends TestCase
 
     public function testFindObjectByIdReturnsNull(): void
     {
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1);
 
@@ -352,7 +352,7 @@ class ContactObjectHelperTest extends TestCase
     public function testSetFieldValues(): void
     {
         $contact = new Lead();
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('setFieldValues')
             ->with($contact, []);
         $this->getObjectHelper()->setFieldValues($contact);

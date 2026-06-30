@@ -393,7 +393,7 @@ class FieldController extends CommonFormController
         if (!$request->isXmlHttpRequest()
             || !$this->security->isGranted(['form:forms:editown', 'form:forms:editother', 'form:forms:create'], 'MATCH_ONE')
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $formField = (array_key_exists($objectId, $fields)) ? $fields[$objectId] : null;

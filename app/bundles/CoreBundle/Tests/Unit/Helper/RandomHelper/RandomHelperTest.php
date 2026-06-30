@@ -36,10 +36,7 @@ class RandomHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return RandomHelper
-     */
-    private function getRandomHelper()
+    private function getRandomHelper(): RandomHelper
     {
         return new RandomHelper();
     }

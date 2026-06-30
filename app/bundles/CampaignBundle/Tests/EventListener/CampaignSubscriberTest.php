@@ -23,7 +23,7 @@ class CampaignSubscriberTest extends TestCase
 
     private CampaignSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,7 +40,7 @@ class CampaignSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        self::assertEquals(
+        self::assertSame(
             [
                 CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
                 CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
