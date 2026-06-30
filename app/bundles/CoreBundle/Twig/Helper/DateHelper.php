@@ -13,6 +13,9 @@ final class DateHelper
      */
     private array $formats;
 
+    /**
+     * @api cannot be readonly, as changed in tests via reflection
+     */
     private DateTimeHelper $helper;
 
     /**
@@ -26,8 +29,8 @@ final class DateHelper
         $dateShortFormat,
         $dateOnlyFormat,
         $timeOnlyFormat,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         $this->formats = [
             'datetime' => $dateFullFormat,

@@ -19,8 +19,8 @@ use Doctrine\ORM\EntityManagerInterface;
 final class PutProcessor implements ProcessorInterface
 {
     public function __construct(
-        private ProcessorInterface $persistProcessor,
-        private EntityManagerInterface $entityManager,
+        private readonly ProcessorInterface $persistProcessor,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

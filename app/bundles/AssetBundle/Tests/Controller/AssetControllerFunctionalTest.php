@@ -23,6 +23,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
     use ControllerTrait;
 
     private const SALES_USER = 'sales';
+
     private const ADMIN_USER = 'admin';
 
     protected function setUp(): void

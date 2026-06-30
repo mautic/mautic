@@ -19,7 +19,9 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
     public const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
+
     public const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
+
     public const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
 
     public const BITWISE_BY_PERM = [
@@ -27,6 +29,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         self::PERMISSION_DELETE_OWN   => 66,
         self::PERMISSION_DELETE_OTHER => 150,
     ];
+
     private const NO_NESTING_VALIDATION_MESSAGE = 'DWC tokens cannot be used within another DWC. Please remove any DWC tokens from the content to proceed.';
 
     public function testAccessControlNewAction(): void

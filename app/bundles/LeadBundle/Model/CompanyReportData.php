@@ -9,8 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CompanyReportData
 {
     public function __construct(
-        private FieldModel $fieldModel,
-        private TranslatorInterface $translator,
+        private readonly FieldModel $fieldModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

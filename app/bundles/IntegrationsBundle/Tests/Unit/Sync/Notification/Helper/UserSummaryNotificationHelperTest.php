@@ -17,27 +17,27 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UserSummaryNotificationHelperTest extends TestCase
 {
     /**
-     * @var Writer|MockObject
+     * @var MockObject&Writer
      */
     private MockObject $writer;
 
     /**
-     * @var UserHelper|MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelper;
 
     /**
-     * @var OwnerProvider|MockObject
+     * @var MockObject&OwnerProvider
      */
     private MockObject $ownerProvider;
 
     /**
-     * @var RouteHelper|MockObject
+     * @var MockObject&RouteHelper
      */
     private MockObject $routeHelper;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -86,7 +86,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
@@ -140,7 +140,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }

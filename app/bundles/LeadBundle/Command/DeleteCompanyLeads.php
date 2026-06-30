@@ -21,9 +21,9 @@ final class DeleteCompanyLeads
     public const COMMAND_NAME = 'mautic:company:delete_company_leads';
 
     public function __construct(
-        private CompanyLeadRepository $companyLeadRepository,
-        private CompanyRepository $companyRepository,
-        private CompanyModel $companyModel,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+        private readonly CompanyRepository $companyRepository,
+        private readonly CompanyModel $companyModel,
     ) {
     }
 

@@ -14,7 +14,7 @@ use Symfony\Component\Asset\Packages;
 class AssetsHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 

@@ -38,8 +38,11 @@ class LeadControllerTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     private const CONTACT_A_EMAIL               = 'contact@a.email';
+
     private const CONTACT_B_EMAIL               = 'contact@b.email';
+
     private const CONTACT_C_EMAIL               = 'contact@c.email';
+
     private const CLOSE_MODAL_ASSERTION_MESSAGE = 'The response does not contain the `closeModal` param.';
 
     protected function setUp(): void

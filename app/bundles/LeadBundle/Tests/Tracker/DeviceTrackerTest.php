@@ -22,24 +22,21 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
     private DeviceDetectorFactory $deviceDetectorFactory;
 
     /**
-     * @var DeviceTrackingServiceInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceTrackingServiceInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
 
     /**
-     * @var Logger
+     * @var Logger&\PHPUnit\Framework\MockObject\Stub
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private \PHPUnit\Framework\MockObject\Stub $logger;
 
-    /**
-     * @var string
-     */
-    private $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
+    private string $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
 
     protected function setUp(): void
     {
         $createCacheItem = \Closure::bind(
-            function ($key) {
+            function ($key): CacheItem {
                 $item        = new CacheItem();
                 $item->key   = $key;
                 $item->isHit = false;
@@ -77,7 +74,7 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $this->deviceCreatorService  = new DeviceCreatorService();
         $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
 
-        $this->logger = $this->createMock(Logger::class);
+        $this->logger = $this->createStub(Logger::class);
     }
 
     public function testDeviceCreatedByUserAgent(): void

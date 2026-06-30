@@ -109,7 +109,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
-            $this->callback(function (AddColumnBackgroundEvent $event) {
+            $this->callback(function (AddColumnBackgroundEvent $event): true {
                 $event->stopPropagation();
 
                 return $event instanceof AddColumnBackgroundEvent;
@@ -129,7 +129,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
-            $this->callback(function (UpdateColumnBackgroundEvent $event) {
+            $this->callback(function (UpdateColumnBackgroundEvent $event): true {
                 $event->stopPropagation();
 
                 return true;
@@ -149,7 +149,7 @@ class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())->method('hasListeners')->willReturn(true);
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
-            $this->callback(function (DeleteColumnBackgroundEvent $event) {
+            $this->callback(function (DeleteColumnBackgroundEvent $event): true {
                 $event->stopPropagation();
 
                 return $event instanceof DeleteColumnBackgroundEvent;

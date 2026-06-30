@@ -10,8 +10,8 @@ use Mautic\WebhookBundle\Notificator\WebhookFailureNotificator;
 
 class WebhookService
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper,
-        private WebhookFailureNotificator $webhookFailureNotificator)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly WebhookFailureNotificator $webhookFailureNotificator)
     {
     }
 

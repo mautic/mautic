@@ -35,7 +35,7 @@ class FlashBagTest extends TestCase
     private MockObject $requestStack;
 
     /**
-     * @var NotificationModel&MockObject
+     * @var MockObject&NotificationModel
      */
     private MockObject $notificationModel;
 

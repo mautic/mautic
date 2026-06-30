@@ -8,8 +8,8 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 class FailedEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     public function __construct(
-        private AbstractEventAccessor $config,
-        private LeadEventLog $log,
+        private readonly AbstractEventAccessor $config,
+        private readonly LeadEventLog $log,
     ) {
     }
 

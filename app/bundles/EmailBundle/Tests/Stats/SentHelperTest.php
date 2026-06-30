@@ -23,9 +23,13 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class SentHelperTest extends TestCase
 {
     private DateTimeHelper $dateTimeHelper;
+
     private SentHelper $sentHelper;
+
     private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;
+
     private MockObject&QueryBuilder $queryBuilder;
+
     private MockObject&Result $result;
 
     private GeneratedColumns $generatedColumns;
@@ -52,7 +56,7 @@ class SentHelperTest extends TestCase
             new Collector(new EventDispatcher()),
             $connection,
             $this->generatedColumnsProvider,
-            $this->createMock(UserHelper::class)
+            $this->createStub(UserHelper::class)
         );
     }
 

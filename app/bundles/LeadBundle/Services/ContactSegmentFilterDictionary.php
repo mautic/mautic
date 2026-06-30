@@ -22,7 +22,7 @@ class ContactSegmentFilterDictionary
     private array $filters = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

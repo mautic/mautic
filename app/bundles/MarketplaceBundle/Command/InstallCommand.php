@@ -20,8 +20,8 @@ class InstallCommand extends Command
     public const NAME = 'mautic:marketplace:install';
 
     public function __construct(
-        private ComposerHelper $composer,
-        private PackageModel $packageModel,
+        private readonly ComposerHelper $composer,
+        private readonly PackageModel $packageModel,
     ) {
         parent::__construct();
     }

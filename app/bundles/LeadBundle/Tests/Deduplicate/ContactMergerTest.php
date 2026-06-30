@@ -22,22 +22,22 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&MergeRecordRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
+     * @var \PHPUnit\Framework\MockObject\Stub|EventDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\Stub $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject&Logger
      */
     private \PHPUnit\Framework\MockObject\MockObject $logger;
 
@@ -48,7 +48,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->leadModel       = $this->createMock(LeadModel::class);
         $leadRepo              = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
-        $this->dispatcher      = $this->createMock(EventDispatcher::class);
+        $this->dispatcher      = $this->createStub(EventDispatcher::class);
         $this->logger          = $this->createMock(Logger::class);
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
@@ -558,7 +558,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeOwners($winner, $loser);
         $this->assertEquals($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
 
-        $winner->setOwner(null);
+        $winner->setOwner();
         $this->getMerger()->mergeOwners($winner, $loser);
 
         // Should be set to loser owner since winner owner was null

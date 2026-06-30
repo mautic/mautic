@@ -65,8 +65,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         protected ChannelListHelper $channelListHelper,
         protected FieldModel $fieldModel,
         protected ReportHelper $reportHelper,
-        private CsvExporter $csvExporter,
-        private ExcelExporter $excelExporter,
+        private readonly CsvExporter $csvExporter,
+        private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -74,7 +74,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
@@ -451,7 +451,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         $debugData     = [];
 
         // UI doesn't set time so reset it to midnight. API can set time so do not reset it. Using DateTimeImmutable to distinguish.
-        $resetTime = !(isset($options['dateFrom']) && $options['dateFrom'] instanceof \DateTimeImmutable);
+        $resetTime = !isset($options['dateFrom']) || !$options['dateFrom'] instanceof \DateTimeImmutable;
 
         if ($resetTime && isset($options['dateFrom'])) {
             $now = new \DateTime();

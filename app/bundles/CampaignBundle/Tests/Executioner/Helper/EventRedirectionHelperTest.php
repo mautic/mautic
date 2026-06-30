@@ -60,7 +60,7 @@ final class EventRedirectionHelperTest extends TestCase
         $event->setCampaign($campaign);
 
         $logs   = new ArrayCollection([0 => $event]);
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
         $helper = new EventRedirectionHelper($logger);
         $result = $helper->handleEventRedirection($event, $logs, 0);
 
@@ -94,7 +94,7 @@ final class EventRedirectionHelperTest extends TestCase
 
         $logs = new ArrayCollection([0 => $deletedEvent]);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         $helper = new EventRedirectionHelper($logger);
 
@@ -208,7 +208,7 @@ final class EventRedirectionHelperTest extends TestCase
 
         $testCollection = new ArrayCollection([$event]);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         $helper = new EventRedirectionHelper($logger);
 
@@ -239,7 +239,7 @@ final class EventRedirectionHelperTest extends TestCase
 
         $testCollection = new ArrayCollection([$event]);
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         $helper = new EventRedirectionHelper($logger);
 

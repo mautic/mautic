@@ -21,7 +21,7 @@ class NotificationHelper
         protected IntegrationHelper $integrationHelper,
         protected RouterInterface $router,
         protected RequestStack $requestStack,
-        private DoNotContactModel $doNotContact,
+        private readonly DoNotContactModel $doNotContact,
     ) {
     }
 

@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 class ConfigSubscriberTest extends TestCase
 {
     /**
-     * @var ConfigChangeLogger|MockObject
+     * @var MockObject&ConfigChangeLogger
      */
     private MockObject $logger;
 

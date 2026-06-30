@@ -31,7 +31,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     private const EMAILS_A_MONTH = 2;
+
     private bool $useDefaultFrequencyRules;
+
     private EmailModel $emailModel;
 
     protected function setUp(): void

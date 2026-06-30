@@ -20,19 +20,19 @@ use PHPUnit\Framework\TestCase;
 class RelationsHelperTest extends TestCase
 {
     /**
-     * @var MappingHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
 
     private RelationsHelper $relationsHelper;
 
     /**
-     * @var ReportDAO|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ReportDAO
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncReport;
 
     /**
-     * @var MappingManualDAO|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&MappingManualDAO
      */
     private \PHPUnit\Framework\MockObject\MockObject $mappingManual;
 

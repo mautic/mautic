@@ -35,12 +35,12 @@ class ReportBuilderEvent extends AbstractReportEvent
      * @param mixed[]|Paginator|array $leadFields list of published array of lead fields
      */
     public function __construct(
-        private TranslatorInterface $translator,
-        private ChannelListHelper $channelListHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly ChannelListHelper $channelListHelper,
         string $context,
-        private array|Paginator $leadFields,
-        private ReportHelper $reportHelper,
-        private ?string $reportSource = null,
+        private readonly array|Paginator $leadFields,
+        private readonly ReportHelper $reportHelper,
+        private readonly ?string $reportSource = null,
     ) {
         $this->context = $context;
     }

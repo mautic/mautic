@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class PageHitValidator extends ConstraintValidator
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper)
     {
     }
 

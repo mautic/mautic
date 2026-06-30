@@ -18,8 +18,8 @@ class EventCollector
     private ?EventAccessor $events = null;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

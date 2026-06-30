@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class GenerateABTestType extends AbstractType
 {
-    public function __construct(private EmailModel $emailModel, private TranslatorInterface $translator)
+    public function __construct(private readonly EmailModel $emailModel, private readonly TranslatorInterface $translator)
     {
     }
 

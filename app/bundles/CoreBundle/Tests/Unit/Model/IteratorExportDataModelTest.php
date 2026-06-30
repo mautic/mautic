@@ -10,14 +10,14 @@ use PHPUnit\Framework\MockObject\MockObject;
 class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|AbstractCommonModel<object>
+     * @var MockObject&AbstractCommonModel
      */
     private MockObject $commonModel;
 
     /**
-     * @var MockObject|CommonRepository<object>
+     * @var \PHPUnit\Framework\MockObject\Stub|CommonRepository<object>
      */
-    private MockObject $commonRepository;
+    private \PHPUnit\Framework\MockObject\Stub $commonRepository;
 
     private IteratorExportDataModel $iteratorExportDataModel;
 
@@ -26,7 +26,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->commonModel      = $this->createMock(AbstractCommonModel::class);
-        $this->commonRepository = $this->createMock(CommonRepository::class);
+        $this->commonRepository = $this->createStub(CommonRepository::class);
         $args                   = ['limit' => 1000];
         $callback               = fn ($var) => $var;
 

@@ -12,7 +12,7 @@ class DateDefaultTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetParameterValue(): void
     {
-        $dateDecorator             = $this->createMock(DateDecorator::class);
+        $dateDecorator             = $this->createStub(DateDecorator::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate([]);
 
         $filterDecorator = new DateDefault($dateDecorator, '2018-03-02 01:02:03');

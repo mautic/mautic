@@ -12,8 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldList
 {
     public function __construct(
-        private LeadFieldRepository $leadFieldRepository,
-        private TranslatorInterface $translator,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
