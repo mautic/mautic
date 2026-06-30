@@ -15,7 +15,7 @@ final class MediaMaxAllowedSizeValidator extends ConstraintValidator
 {
     private const MAX_MEDIA_SIZE_IN_BYTES = 5000000;
 
-    public function __construct(private AssetsHelper $assetsHelper, private PathsHelper $pathsHelper)
+    public function __construct(private readonly AssetsHelper $assetsHelper, private readonly PathsHelper $pathsHelper)
     {
     }
 

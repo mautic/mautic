@@ -13,7 +13,7 @@ final class ListTypeaheadEvent extends Event
      */
     private array $dataArray = [];
 
-    public function __construct(private string $fieldAlias, private string $filter)
+    public function __construct(private readonly string $fieldAlias, private readonly string $filter)
     {
     }
 

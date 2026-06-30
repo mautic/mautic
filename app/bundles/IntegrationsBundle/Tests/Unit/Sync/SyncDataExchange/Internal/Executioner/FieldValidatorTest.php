@@ -17,12 +17,12 @@ use PHPUnit\Framework\TestCase;
 class FieldValidatorTest extends TestCase
 {
     /**
-     * @var LeadFieldRepository&MockObject
+     * @var MockObject&LeadFieldRepository
      */
     private MockObject $leadFieldRepository;
 
     /**
-     * @var BulkNotification&MockObject
+     * @var MockObject&BulkNotification
      */
     private MockObject $bulkNotification;
 

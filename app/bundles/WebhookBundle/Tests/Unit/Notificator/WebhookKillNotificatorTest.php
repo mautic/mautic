@@ -372,7 +372,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $generatedRoute = 'generatedRoute';
         $details        = 'details';
         $createdById    = 1;
-        $owner          = $this->createMock(User::class);
+        $owner          = $this->createStub(User::class);
         $ownerEmail     = 'owner@email.com';
         $modifiedBy     = null;
         $htmlUrl        = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';

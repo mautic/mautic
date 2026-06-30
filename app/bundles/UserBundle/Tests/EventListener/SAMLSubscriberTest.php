@@ -14,12 +14,12 @@ use Symfony\Component\Routing\Router;
 class SAMLSubscriberTest extends TestCase
 {
     /**
-     * @var RequestEvent&MockObject
+     * @var MockObject&RequestEvent
      */
     private MockObject $event;
 
     /**
-     * @var Router&MockObject
+     * @var MockObject&Router
      */
     private MockObject $router;
 

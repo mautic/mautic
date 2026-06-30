@@ -58,7 +58,7 @@ final class ClientTest extends TestCase
         $matcher = $this->exactly(2);
         $this->parametersMock->expects($matcher)
             ->method('get')
-            ->willReturnCallback(function (string $parameter) use ($matcher, $siteUrl) {
+            ->willReturnCallback(function (string $parameter) use ($matcher, $siteUrl): string|array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('site_url', $parameter);
 
@@ -74,7 +74,7 @@ final class ClientTest extends TestCase
 
         $this->httpClientMock->expects($this->once())
             ->method('sendRequest')
-            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload) {
+            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload): true {
                 $this->assertSame($method, $request->getMethod());
                 $this->assertSame($url, (string) $request->getUri());
 

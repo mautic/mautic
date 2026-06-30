@@ -14,9 +14,9 @@ class CampaignContactCountHelper
     private const CACHE_TTL = 43200;
 
     public function __construct(
-        private CacheProviderInterface $cacheProvider,
-        private CoreParametersHelper $coreParametersHelper,
-        private LeadRepository $campaignLeadRepository,
+        private readonly CacheProviderInterface $cacheProvider,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly LeadRepository $campaignLeadRepository,
     ) {
     }
 

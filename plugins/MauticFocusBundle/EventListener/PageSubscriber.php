@@ -17,10 +17,10 @@ class PageSubscriber implements EventSubscriberInterface
     private string $regex = '{focus=(.*?)}';
 
     public function __construct(
-        private CorePermissions $security,
-        private FocusModel $model,
-        private RouterInterface $router,
-        private BuilderTokenHelperFactory $builderTokenHelperFactory,
+        private readonly CorePermissions $security,
+        private readonly FocusModel $model,
+        private readonly RouterInterface $router,
+        private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
 

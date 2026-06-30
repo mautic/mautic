@@ -11,9 +11,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CampaignAuditService
 {
     public function __construct(
-        private FlashBag $flashBag,
-        private UrlGeneratorInterface $urlGenerator,
-        private EventRepository $eventRepository,
+        private readonly FlashBag $flashBag,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly EventRepository $eventRepository,
     ) {
     }
 

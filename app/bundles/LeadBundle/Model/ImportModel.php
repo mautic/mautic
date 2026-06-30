@@ -54,7 +54,7 @@ class ImportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private ProcessSignalService $processSignalService,
+        private readonly ProcessSignalService $processSignalService,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 

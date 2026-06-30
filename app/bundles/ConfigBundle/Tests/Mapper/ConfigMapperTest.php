@@ -149,7 +149,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $parameterHelper = $this->createMock(CoreParametersHelper::class);
+        $parameterHelper = $this->createStub(CoreParametersHelper::class);
 
         $mapper = new ConfigMapper($parameterHelper, []);
 
@@ -159,7 +159,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Defaults should be bound when local config has no values')]
     public function testParametersAreBoundToDefaults(): void
     {
-        $parameterHelper = $this->createMock(CoreParametersHelper::class);
+        $parameterHelper = $this->createStub(CoreParametersHelper::class);
 
         $mapper = new ConfigMapper($parameterHelper, []);
 

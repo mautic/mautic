@@ -69,7 +69,7 @@ class StatHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(StatNotFoundException::class);
 
-        $statHelper = new StatHelper($this->createMock(EmailStatModel::class));
+        $statHelper = new StatHelper($this->createStub(EmailStatModel::class));
 
         $statHelper->getStat('nada@nada.com');
     }

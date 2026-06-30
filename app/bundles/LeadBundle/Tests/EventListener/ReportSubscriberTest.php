@@ -35,37 +35,37 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModelMock;
 
     /**
-     * @var MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
     private MockObject $leadFieldModelMock;
 
     /**
-     * @var MockObject|CompanyModel
+     * @var MockObject&CompanyModel
      */
     private MockObject $companyModelMock;
 
     /**
-     * @var MockObject|CompanyReportData
+     * @var MockObject&CompanyReportData
      */
     private MockObject $companyReportDataMock;
 
     /**
-     * @var MockObject|FieldsBuilder
+     * @var MockObject&FieldsBuilder
      */
     private MockObject $fieldsBuilderMock;
 
     /**
-     * @var MockObject|Translator
+     * @var MockObject&Translator
      */
     private MockObject $translatorMock;
 
     /**
-     * @var MockObject|ReportGeneratorEvent
+     * @var MockObject&ReportGeneratorEvent
      */
     private MockObject $reportGeneratorEventMock;
 
@@ -74,29 +74,29 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private ReportHelper $reportHelperMock;
 
     /**
-     * @var MockObject|ReportBuilderEvent
+     * @var MockObject&ReportBuilderEvent
      */
     private MockObject $reportBuilderEventMock;
 
     /**
-     * @var MockObject|QueryBuilder
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilderMock;
 
     /**
-     * @var MockObject|ReportGraphEvent
+     * @var MockObject&ReportGraphEvent
      */
     private MockObject $reportGraphEventMock;
 
     /**
-     * @var MockObject|CompanyRepository
+     * @var \PHPUnit\Framework\MockObject\Stub|CompanyRepository
      */
-    private MockObject $companyRepositoryMock;
+    private \PHPUnit\Framework\MockObject\Stub $companyRepositoryMock;
 
     /**
-     * @var MockObject|PointsChangeLogRepository
+     * @var \PHPUnit\Framework\MockObject\Stub|PointsChangeLogRepository
      */
-    private MockObject $pointsChangeLogRepositoryMock;
+    private \PHPUnit\Framework\MockObject\Stub $pointsChangeLogRepositoryMock;
 
     /**
      * @var MockObject&ReportDataEvent
@@ -143,15 +143,15 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translatorMock                   = $this->createMock(Translator::class);
         $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
-        $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $this->channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
+        $this->reportHelperMock                 = new ReportHelper($this->createStub(EventDispatcherInterface::class));
         $campaignRepositoryMock                 = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
         $expressionBuilderMock                  = $this->createMock(ExpressionBuilder::class);
         $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
-        $this->companyRepositoryMock            = $this->createMock(CompanyRepository::class);
-        $this->pointsChangeLogRepositoryMock    = $this->createMock(PointsChangeLogRepository::class);
+        $this->companyRepositoryMock            = $this->createStub(CompanyRepository::class);
+        $this->pointsChangeLogRepositoryMock    = $this->createStub(PointsChangeLogRepository::class);
         $dncReportService                       = $this->createMock(DncReportService::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
@@ -176,7 +176,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock->expects($this->any())
             ->method('getQueryPart')
-            ->willReturnCallback(function ($input) {
+            ->willReturnCallback(function ($input): array|string {
                 if ('join' === $input) {
                     return [
                         'lp' => [[
@@ -328,7 +328,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->any();
         $this->reportBuilderEventMock->expects($matcher)->method('checkContext')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher) {
+                function (...$parameters) use ($matcher): false {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame([
                             'leads',
@@ -353,7 +353,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testNotRelevantContextGenerate(): void
     {
         $matcher = $this->exactly(2);
-        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+        $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): false {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame([
                     'leads',
@@ -854,7 +854,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->any();
         $this->reportGeneratorEventMock->expects($matcher)->method('checkContext')
             ->willReturnCallback(
-                function (...$parameters) use ($matcher) {
+                function (...$parameters) use ($matcher): true {
                     if (1 === $matcher->numberOfInvocations()) {
                         $this->assertSame([
                             'leads',

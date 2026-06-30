@@ -6,7 +6,7 @@ namespace Mautic\CampaignBundle\DTO;
 
 final class PublishStateDateRange
 {
-    public function __construct(private bool $published, private \DateTimeInterface $fromDate, private ?\DateTimeInterface $toDate = null)
+    public function __construct(private readonly bool $published, private readonly \DateTimeInterface $fromDate, private ?\DateTimeInterface $toDate = null)
     {
         if ($this->toDate && $this->fromDate > $this->toDate) {
             $this->toDate = null; // Invalid range: make it open-ended when fromDate is after toDate

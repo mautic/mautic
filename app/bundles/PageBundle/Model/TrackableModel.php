@@ -62,7 +62,7 @@ class TrackableModel extends AbstractCommonModel
 
     public function __construct(
         protected RedirectModel $redirectModel,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -553,7 +553,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        return !($forceScheme && !isset($urlParts['scheme'])) && !(isset($urlParts['scheme']) && !in_array(
+        return (!$forceScheme || isset($urlParts['scheme'])) && (!isset($urlParts['scheme']) || in_array(
             $urlParts['scheme'],
             ['http', 'https', 'ftp', 'ftps', 'mailto']
         ));
