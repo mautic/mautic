@@ -34,11 +34,17 @@ use Symfony\Contracts\EventDispatcher\Event;
 class PointModelTest extends TestCase
 {
     private IpLookupHelper&MockObject $ipLookupHelper;
+
     private LeadModel&MockObject $leadModel;
+
     private EntityManager&MockObject $em;
+
     private CorePermissions&MockObject $security;
+
     private EventDispatcherInterface&MockObject $dispatcher;
-    private Translator&MockObject $translator;
+
+    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+
     private PointModel $pointModel;
 
     protected function setUp(): void
@@ -51,7 +57,7 @@ class PointModelTest extends TestCase
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
         $router                     = $this->createMock(RouterInterface::class);
-        $this->translator           = $this->createMock(Translator::class);
+        $this->translator           = $this->createStub(Translator::class);
         $userHelper                 = $this->createMock(UserHelper::class);
         $mauticLogger               = $this->createMock(LoggerInterface::class);
         $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
@@ -81,7 +87,7 @@ class PointModelTest extends TestCase
         $pointProperties = ['property' => 'value'];
         $pointDelta      = 7;
         $pointGroup      = null;
-        $ip              = $this->createMock(IpAddress::class);
+        $ip              = $this->createStub(IpAddress::class);
         $this->security->method('isAnonymous')->willReturn(true);
         $this->ipLookupHelper->method('getIpAddress')->willReturn($ip);
 
@@ -99,7 +105,7 @@ class PointModelTest extends TestCase
                 $ip,
                 $pointGroup
             );
-        $eventDetails = $this->createMock(Hit::class);
+        $eventDetails = $this->createStub(Hit::class);
 
         $repository = $this->createMock(PointRepository::class);
         $this->em->expects($this->once())

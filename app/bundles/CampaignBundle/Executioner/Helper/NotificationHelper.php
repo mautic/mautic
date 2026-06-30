@@ -15,11 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class NotificationHelper
 {
     public function __construct(
-        private UserModel $userModel,
-        private NotificationModel $notificationModel,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly UserModel $userModel,
+        private readonly NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

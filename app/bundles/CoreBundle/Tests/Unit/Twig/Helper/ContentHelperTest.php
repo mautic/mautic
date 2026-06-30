@@ -8,10 +8,7 @@ use Twig\Environment;
 
 class ContentHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContentHelper
-     */
-    private $contentHelper;
+    private ContentHelper $contentHelper;
 
     protected function setUp(): void
     {

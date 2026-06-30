@@ -12,6 +12,9 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private DoNotContactSubscriber $doNotContactSubscriber;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContact
+     */
     private \PHPUnit\Framework\MockObject\MockObject $doNotContact;
 
     protected function setUp(): void

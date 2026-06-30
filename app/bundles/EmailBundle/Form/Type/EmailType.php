@@ -48,17 +48,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailType extends AbstractType
 {
-    private bool $isDraftEnabled;
+    private readonly bool $isDraftEnabled;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private EntityManagerInterface $em,
-        private StageModel $stageModel,
-        private CoreParametersHelper $coreParametersHelper,
-        private ThemeHelperInterface $themeHelper,
-        private CorePermissions $corePermissions,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface $em,
+        private readonly StageModel $stageModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ThemeHelperInterface $themeHelper,
+        private readonly CorePermissions $corePermissions,
         EmailConfigInterface $emailConfig,
-        private EmailDefaultsHelper $defaultsHelper,
+        private readonly EmailDefaultsHelper $defaultsHelper,
     ) {
         $this->isDraftEnabled = $emailConfig->isDraftEnabled();
     }

@@ -26,6 +26,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CampaignModelTransactionalTest extends TestCase
 {
     private MockObject&CampaignRepository $campaignRepositoryMock;
+
     private MockObject&CampaignModel $campaignModel;
 
     protected function setUp(): void
@@ -36,7 +37,7 @@ class CampaignModelTransactionalTest extends TestCase
 
         $entityManagerMock = $this->createMock(EntityManager::class);
         $entityManagerMock->method('getConnection')
-            ->willReturn($this->createMock(Connection::class));
+            ->willReturn($this->createStub(Connection::class));
 
         $entityManagerMock->method('getRepository')
             ->with(Campaign::class)
@@ -46,20 +47,20 @@ class CampaignModelTransactionalTest extends TestCase
 
         $this->campaignModel = $this->getMockBuilder(CampaignModel::class)
             ->setConstructorArgs([
-                $this->createMock(ListModel::class),
-                $this->createMock(FormModel::class),
-                $this->createMock(EventCollector::class),
-                $this->createMock(MembershipBuilder::class),
-                $this->createMock(ContactTracker::class),
-                $this->createMock(GeneratedColumnsProviderInterface::class),
+                $this->createStub(ListModel::class),
+                $this->createStub(FormModel::class),
+                $this->createStub(EventCollector::class),
+                $this->createStub(MembershipBuilder::class),
+                $this->createStub(ContactTracker::class),
+                $this->createStub(GeneratedColumnsProviderInterface::class),
                 $entityManagerMock,
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
                 $userHelperMock,
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['saveEntity'])
             ->getMock();

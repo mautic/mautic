@@ -18,9 +18,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class MigrationCommandSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private VersionProviderInterface $versionProvider,
-        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
-        private Connection $connection,
+        private readonly VersionProviderInterface $versionProvider,
+        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private readonly Connection $connection,
     ) {
     }
 

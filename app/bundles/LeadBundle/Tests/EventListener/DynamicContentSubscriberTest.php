@@ -16,14 +16,11 @@ use PHPUnit\Framework\TestCase;
 class DynamicContentSubscriberTest extends TestCase
 {
     /**
-     * @var LeadListRepository|MockObject
+     * @var MockObject&LeadListRepository
      */
     private MockObject $segmentRepository;
 
-    /**
-     * @var DynamicContentSubscriber
-     */
-    private $subscriber;
+    private DynamicContentSubscriber $subscriber;
 
     protected function setUp(): void
     {

@@ -23,8 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class MailchimpType extends AbstractType
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private PluginModel $pluginModel,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly PluginModel $pluginModel,
         protected RequestStack $requestStack,
         protected CoreParametersHelper $coreParametersHelper,
     ) {

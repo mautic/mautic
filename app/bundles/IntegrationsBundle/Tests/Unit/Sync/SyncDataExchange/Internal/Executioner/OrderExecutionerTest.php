@@ -30,29 +30,29 @@ class OrderExecutionerTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var MappingHelper|MockObject
+     * @var MockObject&MappingHelper
      */
     private MockObject $mappingHelper;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var ObjectProvider|MockObject
+     * @var MockObject&ObjectProvider
      */
     private MockObject $objectProvider;
 
     private OrderExecutioner $orderExecutioner;
 
     /**
-     * @var ReferenceResolverInterface|MockObject
+     * @var MockObject&ReferenceResolverInterface
      */
     private MockObject $referenceResolver;
 
     /**
-     * @var FieldValidatorInterface|MockObject
+     * @var MockObject&FieldValidatorInterface
      */
     private MockObject $fieldValidator;
 
@@ -405,7 +405,7 @@ class OrderExecutionerTest extends TestCase
         $this->objectProvider->expects($this->exactly(4))
             ->method('getObjectByName')
             ->willReturnCallback(
-                function (string $objectName) {
+                function (string $objectName): MockObject {
                     if ('bar' === $objectName) {
                         throw new ObjectNotFoundException($objectName);
                     }

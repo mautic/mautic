@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "002b7a3226291c477589310eb04ea7a4",
+    "content-hash": "5ec7e051e2fda0d8f1228521733165f9",
     "packages": [
         {
             "name": "api-platform/core",
@@ -17728,16 +17728,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.5.2",
+            "version": "dev-main",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "49ff6339174bdbdf50b0b35ecbcff14a05ac9e24"
+                "reference": "f570c31f1a8da05bd0f352451ff118b584569756"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/49ff6339174bdbdf50b0b35ecbcff14a05ac9e24",
-                "reference": "49ff6339174bdbdf50b0b35ecbcff14a05ac9e24",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/f570c31f1a8da05bd0f352451ff118b584569756",
+                "reference": "f570c31f1a8da05bd0f352451ff118b584569756",
                 "shasum": ""
             },
             "require": {
@@ -17753,6 +17753,7 @@
             "suggest": {
                 "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
             },
+            "default-branch": true,
             "bin": [
                 "bin/rector"
             ],
@@ -17776,7 +17777,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.5.2"
+                "source": "https://github.com/rectorphp/rector/tree/main"
             },
             "funding": [
                 {
@@ -17784,7 +17785,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-22T11:39:33+00:00"
+            "time": "2026-06-29T20:23:57+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -19395,7 +19396,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "rector/rector": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {},

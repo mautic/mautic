@@ -12,8 +12,8 @@ use Symfony\Component\Translation\MessageCatalogue;
 class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private PathsHelper $pathsHelper,
+        private readonly BundleHelper $bundleHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 

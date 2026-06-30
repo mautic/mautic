@@ -21,43 +21,43 @@ use PHPUnit\Framework\TestCase;
 class EventLoggerTest extends TestCase
 {
     /**
-     * @var IpLookupHelper&MockObject
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
     /**
-     * @var ContactTracker|MockObject
+     * @var ContactTracker|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $contactTracker;
+    private \PHPUnit\Framework\MockObject\Stub $contactTracker;
 
     /**
-     * @var LeadEventLogRepository|MockObject
+     * @var MockObject&LeadEventLogRepository
      */
     private MockObject $leadEventLogRepository;
 
     /**
-     * @var LeadRepository|MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
 
     /**
-     * @var SummaryModel|MockObject
+     * @var SummaryModel|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $summaryModel;
+    private \PHPUnit\Framework\MockObject\Stub $summaryModel;
 
     /**
-     * @var CoreParametersHelper&MockObject
+     * @var CoreParametersHelper&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
 
     protected function setUp(): void
     {
         $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
+        $this->contactTracker         = $this->createStub(ContactTracker::class);
         $this->leadEventLogRepository = $this->createMock(LeadEventLogRepository::class);
         $this->leadRepository         = $this->createMock(LeadRepository::class);
-        $this->summaryModel           = $this->createMock(SummaryModel::class);
-        $this->coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
+        $this->summaryModel           = $this->createStub(SummaryModel::class);
+        $this->coreParametersHelper   = $this->createStub(CoreParametersHelper::class);
     }
 
     public function testAllLogsAreReturnedWithFinalPersist(): void

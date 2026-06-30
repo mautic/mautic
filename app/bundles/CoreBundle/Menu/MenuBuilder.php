@@ -12,10 +12,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class MenuBuilder
 {
     public function __construct(
-        private FactoryInterface $factory,
-        private MatcherInterface $matcher,
-        private EventDispatcherInterface $dispatcher,
-        private MenuHelper $menuHelper,
+        private readonly FactoryInterface $factory,
+        private readonly MatcherInterface $matcher,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly MenuHelper $menuHelper,
     ) {
     }
 

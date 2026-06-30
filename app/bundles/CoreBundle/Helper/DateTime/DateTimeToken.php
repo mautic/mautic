@@ -7,8 +7,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 class DateTimeToken
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private DateTimeLocalization $dateTimeLocalization,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly DateTimeLocalization $dateTimeLocalization,
     ) {
     }
 

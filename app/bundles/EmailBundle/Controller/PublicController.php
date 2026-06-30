@@ -465,14 +465,13 @@ class PublicController extends CommonFormController
         // bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
-        $BCcontent = $emailEntity->getContent();
-        $content   = $emailEntity->getCustomHtml();
+        $content = $emailEntity->getCustomHtml();
 
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
             $content = $emailEntity->getDraftContent();
         }
 
-        if (empty($content) && !empty($BCcontent)) {
+        if (empty($content) && $emailEntity->getTemplate()) {
             $template = $emailEntity->getTemplate();
 
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');

@@ -33,8 +33,8 @@ class FileUploader
     ];
 
     public function __construct(
-        private FilePathResolver $filePathResolver,
-        private Translator $translator,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly Translator $translator,
     ) {
     }
 

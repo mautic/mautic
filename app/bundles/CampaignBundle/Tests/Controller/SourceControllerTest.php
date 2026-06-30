@@ -11,8 +11,11 @@ use Mautic\LeadBundle\Entity\LeadList;
 class SourceControllerTest extends MauticMysqlTestCase
 {
     private const ACCESS_DENIED      = 'You do not have access to the requested area\/action';
+
     private const NEW_FORMS_URL      = '/s/campaigns/sources/new/1?sourceType=forms';
+
     private const DELETE_FORMS_URL   = '/s/campaigns/sources/delete/1?sourceType=forms';
+
     private const NEW_LISTS_URL      = '/s/campaigns/sources/new/1?sourceType=lists';
 
     public function testNewActionWithInvalidSourceType(): void

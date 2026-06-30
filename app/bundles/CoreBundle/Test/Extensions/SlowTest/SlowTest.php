@@ -22,6 +22,7 @@ use PHPUnit\TextUI\Configuration\Configuration;
 class SlowTest implements Extension
 {
     private bool $prepared          = false;
+
     private bool $preparationFailed = false;
 
     /**

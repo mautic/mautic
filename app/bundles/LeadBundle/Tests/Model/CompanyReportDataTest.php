@@ -7,13 +7,12 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CompanyReportData::class)]
 class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&Translator
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 

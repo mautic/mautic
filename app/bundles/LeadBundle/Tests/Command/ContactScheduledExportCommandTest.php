@@ -25,8 +25,8 @@ class ContactScheduledExportCommandTest extends TestCase
         $contactExportScheduledModel = $this->createMock(ContactExportSchedulerModel::class);
         $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
-        $translator           = $this->createMock(TranslatorInterface::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $translator           = $this->createStub(TranslatorInterface::class);
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
         $dateHelper           = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
@@ -37,7 +37,7 @@ class ContactScheduledExportCommandTest extends TestCase
         );
 
         $formatterHelper             = new FormatterHelper($dateHelper, $translator);
-        $processSignalService        = $this->createMock(ProcessSignalService::class);
+        $processSignalService        = $this->createStub(ProcessSignalService::class);
 
         $contactExportSchedulerRepository = $this->createMock(ContactExportSchedulerRepository::class);
         $contactExportSchedulerRepository->method('findBy')
@@ -58,7 +58,7 @@ class ContactScheduledExportCommandTest extends TestCase
         };
 
         $inputInterfaceMock  = $this->createMock(InputInterface::class);
-        $outputInterfaceMock = $this->createMock(OutputInterface::class);
+        $outputInterfaceMock = $this->createStub(OutputInterface::class);
 
         $inputInterfaceMock->method('getOption')
             ->with('ids')

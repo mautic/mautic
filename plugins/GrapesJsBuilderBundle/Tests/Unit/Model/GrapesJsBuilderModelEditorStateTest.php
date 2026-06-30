@@ -114,7 +114,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         ]));
 
         /** @var MockObject&EmailModel $emailModel */
-        $emailModel = $this->createMock(EmailModel::class);
+        $emailModel = $this->createStub(EmailModel::class);
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
@@ -159,13 +159,13 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $requestStack,
             $emailModel,
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Router::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Router::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 }

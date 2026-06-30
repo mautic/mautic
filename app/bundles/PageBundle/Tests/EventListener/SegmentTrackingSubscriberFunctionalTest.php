@@ -277,7 +277,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         // Ensure entity manager is in sync before dispatching event
         $this->em->flush();
 
-        $event = new UrlTokenReplaceEvent($url, $contact, null);
+        $event = new UrlTokenReplaceEvent($url, $contact);
         $this->dispatcher->dispatch($event);
 
         return $event->getContent();
