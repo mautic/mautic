@@ -656,7 +656,7 @@ class MatchFilterForLeadTraitTest extends TestCase
         $segmentId  = 1;
         $operator   = 'invalid';
 
-        $segmentRepository = $this->createMock(LeadListRepository::class);
+        $segmentRepository = $this->createStub(LeadListRepository::class);
 
         $filter = [
             0 => [

@@ -22,7 +22,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     private MockObject $contact;
 
     /**
-     * @var MockObject|Client
+     * @var MockObject&Client
      */
     private MockObject $client;
 

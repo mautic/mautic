@@ -14,27 +14,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|LoggerInterface
+     * @var MockObject&LoggerInterface
      */
     private MockObject $logger;
 
     /**
-     * @var MockObject|InputInterface
+     * @var \PHPUnit\Framework\MockObject\Stub|InputInterface
      */
-    private MockObject $input;
+    private \PHPUnit\Framework\MockObject\Stub $input;
 
     /**
-     * @var MockObject|OutputInterface
+     * @var \PHPUnit\Framework\MockObject\Stub|OutputInterface
      */
-    private MockObject $output;
+    private \PHPUnit\Framework\MockObject\Stub $output;
 
     private ConsoleErrorListener $listener;
 
     protected function setUp(): void
     {
         $this->logger   = $this->createMock(LoggerInterface::class);
-        $this->input    = $this->createMock(InputInterface::class);
-        $this->output   = $this->createMock(OutputInterface::class);
+        $this->input    = $this->createStub(InputInterface::class);
+        $this->output   = $this->createStub(OutputInterface::class);
 
         $this->listener = new ConsoleErrorListener($this->logger);
     }
@@ -47,8 +47,7 @@ class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
         $event = new ConsoleErrorEvent(
             $this->input,
             $this->output,
-            new \Exception('Example exception'),
-            null
+            new \Exception('Example exception')
         );
 
         $this->logger->expects($this->once())

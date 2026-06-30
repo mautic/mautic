@@ -36,9 +36,9 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
     private array $actionEntities = [];
 
     public function __construct(
-        private FormModel $formModel,
-        private FieldModel $formFieldModel,
-        private ActionModel $actionModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $formFieldModel,
+        private readonly ActionModel $actionModel,
         EventDispatcherInterface $eventDispatcher,
     ) {
         // this will load the data before fixtures are loaded

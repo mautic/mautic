@@ -32,7 +32,7 @@ class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject&\Symfony\Component\Form\FormBuilderInterface {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('useremail', $parameters[0]);
                     $this->assertSame(EmailSendType::class, $parameters[1]);

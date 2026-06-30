@@ -41,7 +41,6 @@ class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $events      = $campaign->getEvents();
         $failedEvent = $events->first();
 
-        /** @var NotifyOfUnpublishEvent $unpublishEvent */
         $unpublishEvent = new NotifyOfUnpublishEvent($failedEvent);
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::getContainer()->get('event_dispatcher');

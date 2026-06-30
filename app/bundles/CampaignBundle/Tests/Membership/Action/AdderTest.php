@@ -13,12 +13,12 @@ use Mautic\LeadBundle\Entity\Lead;
 class AdderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 

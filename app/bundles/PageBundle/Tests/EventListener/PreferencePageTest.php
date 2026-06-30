@@ -22,7 +22,9 @@ use Symfony\Component\Translation\Translator;
 final class PreferencePageTest extends MauticMysqlTestCase
 {
     private EventDispatcherInterface $dispatcher;
+
     private FormFactoryInterface $formFactory;
+
     private LeadModel $leadModel;
 
     protected function setUp(): void

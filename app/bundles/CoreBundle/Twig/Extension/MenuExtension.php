@@ -20,9 +20,9 @@ class MenuExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('menuRender', [$this, 'menuRender'], ['is_safe' => ['all']]),
-            new TwigFunction('parseMenuAttributes', [$this, 'parseMenuAttributes'], ['is_safe' => ['all']]),
-            new TwigFunction('buildMenuClasses', [$this, 'buildMenuClasses'], ['is_safe' => ['all']]),
+            new TwigFunction('menuRender', $this->menuRender(...), ['is_safe' => ['all']]),
+            new TwigFunction('parseMenuAttributes', $this->parseMenuAttributes(...), ['is_safe' => ['all']]),
+            new TwigFunction('buildMenuClasses', $this->buildMenuClasses(...), ['is_safe' => ['all']]),
         ];
     }
 

@@ -12,19 +12,19 @@ use PHPUnit\Framework\TestCase;
 class FileLogHandlerTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var FormatterInterface|MockObject
+     * @var FormatterInterface|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $formatter;
+    private \PHPUnit\Framework\MockObject\Stub $formatter;
 
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->formatter            = $this->createMock(FormatterInterface::class);
+        $this->formatter            = $this->createStub(FormatterInterface::class);
     }
 
     public function testPropertiesAreSetFromCoreParametersHelperWhenDebugModeEnabled(): void

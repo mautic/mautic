@@ -121,9 +121,7 @@ final class PhpUnitConfigCommand extends Command
             $output .= '</testsuite>'.PHP_EOL;
         }
 
-        $output .= '</testsuites>'.PHP_EOL;
-
-        return $output;
+        return $output.('</testsuites>'.PHP_EOL);
     }
 
     /**
@@ -176,13 +174,11 @@ final class PhpUnitConfigCommand extends Command
         $extracted = [];
 
         // extract existing slow tests
-        if ($slowTests) {
-            foreach ($slowTests as $slowTest) {
-                foreach ($tests as $index => $filename) {
-                    if ($this->getClassName($filename) === $slowTest) {
-                        $extracted[] = $filename;
-                        unset($tests[$index]);
-                    }
+        foreach ($slowTests as $slowTest) {
+            foreach ($tests as $index => $filename) {
+                if ($this->getClassName($filename) === $slowTest) {
+                    $extracted[] = $filename;
+                    unset($tests[$index]);
                 }
             }
         }

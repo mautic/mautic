@@ -28,8 +28,8 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     }
 
     public function __construct(
-        private Reply $replier,
-        private CacheStorageHelper $cache,
+        private readonly Reply $replier,
+        private readonly CacheStorageHelper $cache,
     ) {
     }
 

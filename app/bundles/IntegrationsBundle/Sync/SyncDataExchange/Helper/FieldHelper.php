@@ -31,13 +31,13 @@ class FieldHelper
     private array $syncFields = [];
 
     public function __construct(
-        private FieldModel $fieldModel,
-        private FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
-        private VariableExpresserHelperInterface $variableExpresserHelper,
-        private ChannelListHelper $channelListHelper,
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $eventDispatcher,
-        private ObjectProvider $objectProvider,
+        private readonly FieldModel $fieldModel,
+        private readonly FieldsWithUniqueIdentifier $fieldWithUniqueIdentifier,
+        private readonly VariableExpresserHelperInterface $variableExpresserHelper,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ObjectProvider $objectProvider,
     ) {
     }
 

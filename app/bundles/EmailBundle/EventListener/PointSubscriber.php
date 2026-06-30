@@ -21,9 +21,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private PointModel $pointModel,
-        private EntityManager $entityManager,
-        private PointEventHelper $pointEventHelper,
+        private readonly PointModel $pointModel,
+        private readonly EntityManager $entityManager,
+        private readonly PointEventHelper $pointEventHelper,
     ) {
     }
 

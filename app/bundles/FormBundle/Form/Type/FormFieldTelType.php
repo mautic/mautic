@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FormFieldTelType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

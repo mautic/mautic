@@ -14,8 +14,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DashboardLeadsLifetimeWidgetType extends AbstractType
 {
     public function __construct(
-        private ListModel $segmentModel,
-        private TranslatorInterface $translator,
+        private readonly ListModel $segmentModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

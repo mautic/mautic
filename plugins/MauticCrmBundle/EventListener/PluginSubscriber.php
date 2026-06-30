@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PluginSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private EntityManagerInterface $entityManager, private PluginDatabase $pluginDatabase)
+    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly PluginDatabase $pluginDatabase)
     {
     }
 
