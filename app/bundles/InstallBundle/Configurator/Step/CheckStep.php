@@ -14,7 +14,7 @@ class CheckStep implements StepInterface
     /**
      * Flag if the configuration file is writable.
      */
-    private bool $configIsWritable;
+    private readonly bool $configIsWritable;
 
     /**
      * Absolute path to cache directory.
@@ -53,9 +53,9 @@ class CheckStep implements StepInterface
      */
     public function __construct(
         Configurator $configurator,
-        private string $projectDir,
+        private readonly string $projectDir,
         RequestStack $requestStack,
-        private OpenSSLCipher $openSSLCipher,
+        private readonly OpenSSLCipher $openSSLCipher,
     ) {
         $request = $requestStack->getCurrentRequest();
 

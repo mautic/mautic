@@ -17,8 +17,11 @@ use PHPUnit\Framework\TestCase;
 class LeadFieldDeleterTest extends TestCase
 {
     private MockObject&LeadFieldRepository $leadFieldRepositoryMock;
+
     private MockObject&FieldDeleteDispatcher $fieldDeleteDispatcherMock;
+
     private MockObject&BackgroundSettings $backgroundSettingsMock;
+
     private LeadFieldDeleter $leadFieldDeleter;
 
     protected function setUp(): void
@@ -29,7 +32,7 @@ class LeadFieldDeleterTest extends TestCase
         $this->leadFieldDeleter          = new LeadFieldDeleter(
             $this->leadFieldRepositoryMock,
             $this->fieldDeleteDispatcherMock,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $this->backgroundSettingsMock,
         );
     }

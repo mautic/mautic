@@ -14,14 +14,16 @@ use Symfony\Component\Cache\CacheItem;
 class RequestStateStoreTest extends TestCase
 {
     /**
-     * @var CacheProviderInterface&MockObject
+     * @var MockObject&CacheProviderInterface
      */
     private MockObject $cacheProvider;
 
     private CacheItem $cacheItem;
 
     private RequestStateStore $requestStateStore;
+
     private string $cachePrefix = 'prefix_suffix';
+
     private string $stateId     = 'state_id';
 
     protected function setUp(): void
@@ -88,7 +90,7 @@ class RequestStateStoreTest extends TestCase
 
     public function testGetIsHitRequestState(): void
     {
-        $state = $this->createMock(RequestState::class);
+        $state = $this->createStub(RequestState::class);
 
         $setUp = \Closure::bind(
             static function (CacheItem $item, RequestState $state): void {

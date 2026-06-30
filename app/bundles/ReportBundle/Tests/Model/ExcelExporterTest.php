@@ -36,7 +36,7 @@ class ExcelExporterTest extends TestCase
             'F j, Y',
             'g:i a',
             $translator,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $formatterHelper  = new FormatterHelper($dateHelperMock, $translator);

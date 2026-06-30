@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class UserInviteRegistrationType extends AbstractType
 {
     public function __construct(
-        private LanguageHelper $languageHelper,
+        private readonly LanguageHelper $languageHelper,
     ) {
     }
 

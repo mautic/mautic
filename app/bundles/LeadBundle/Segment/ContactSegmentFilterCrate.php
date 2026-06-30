@@ -40,7 +40,7 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
-    private array $sourceArray;
+    private readonly array $sourceArray;
 
     private $nullValue;
 

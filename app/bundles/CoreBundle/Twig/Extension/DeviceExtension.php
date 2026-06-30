@@ -13,7 +13,7 @@ class DeviceExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('deviceGetFullName', [AbstractDeviceParser::class, 'getFullName']),
+            new TwigFunction('deviceGetFullName', AbstractDeviceParser::getFullName(...)),
         ];
     }
 }

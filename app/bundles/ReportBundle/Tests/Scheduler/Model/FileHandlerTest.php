@@ -15,17 +15,17 @@ use PHPUnit\Framework\MockObject\MockObject;
 class FileHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FilePathResolver
+     * @var MockObject&FilePathResolver
      */
     private MockObject $filePathResolver;
 
     /**
-     * @var MockObject|FileProperties
+     * @var MockObject&FileProperties
      */
     private MockObject $fileProperties;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

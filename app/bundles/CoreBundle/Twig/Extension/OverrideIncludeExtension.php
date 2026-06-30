@@ -16,8 +16,8 @@ use Twig\TwigFunction;
 final class OverrideIncludeExtension extends AbstractExtension
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
-        private RequestStack $requestStack,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -25,7 +25,7 @@ final class OverrideIncludeExtension extends AbstractExtension
     {
         return [
             // Override the built-in include function with higher priority
-            new TwigFunction('include', [$this, 'includeWithEvent'], [
+            new TwigFunction('include', $this->includeWithEvent(...), [
                 'needs_environment' => true,
                 'needs_context'     => true,
                 'is_safe'           => ['html'],

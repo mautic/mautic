@@ -39,7 +39,7 @@ class SmsTransportPassTest extends TestCase
         $container
             ->register('mautic.sms.transport_chain')
             ->setClass($transport::class)
-            ->setArguments(['foo', $this->createMock(IntegrationHelper::class)])
+            ->setArguments(['foo', $this->createStub(IntegrationHelper::class)])
             ->setShared(false)
             ->setSynthetic(true)
             ->setAbstract(true);

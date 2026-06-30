@@ -36,8 +36,8 @@ final class FieldOperatorsEvent extends Event
      * @param array<string,array<string,string>> $allOperators
      */
     public function __construct(
-        private string $type,
-        private string $field,
+        private readonly string $type,
+        private readonly string $field,
         private array $allOperators,
         private array $operators,
     ) {

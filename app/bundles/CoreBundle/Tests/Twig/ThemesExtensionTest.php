@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 class ThemesExtensionTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
+
     private ThemesExtension $themesExtension;
 
     protected function setUp(): void

@@ -15,7 +15,7 @@ final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
     private CampaignEventLeadStagesType $campaignEventLeadStagesType;
 
     /**
-     * @var FormBuilderInterface&MockObject
+     * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilderInterface;
 

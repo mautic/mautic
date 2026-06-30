@@ -89,7 +89,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($matcher)
             ->method('dispatch')
             ->willReturnCallback(
-                function (\Symfony\Contracts\EventDispatcher\Event $event, string $eventName) use ($logs, &$dispatcCounter, $matcher) {
+                function (\Symfony\Contracts\EventDispatcher\Event $event, string $eventName) use ($logs, &$dispatcCounter, $matcher): \Symfony\Contracts\EventDispatcher\Event {
                     if (1 === $matcher->numberOfInvocations()) {
                     }
                     if (2 === $matcher->numberOfInvocations()) {
@@ -194,7 +194,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs): PendingEvent {
                     $pendingEvent->pass($logs->get(1));
 
                     return $pendingEvent;
@@ -255,7 +255,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs): PendingEvent {
                     $pendingEvent->fail($logs->get(2), 'something');
 
                     return $pendingEvent;

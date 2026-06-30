@@ -19,7 +19,7 @@ class CompanyListType extends AbstractType
     public const DEFAULT_LIMIT = 100;
 
     public function __construct(
-        private CompanyRepository $companyRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 

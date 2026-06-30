@@ -15,7 +15,7 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
         $event    = new Event();
         $event->setCampaign($campaign);
 
-        $channelPreferences = $this->getChannelPreference('email', $event);
+        $channelPreferences = $this->getChannelPreference($event);
 
         $log1 = new LeadEventLog();
         $log1->setEvent($event);
@@ -36,7 +36,7 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($organized->first()->getMetadata()['log'], 2);
     }
 
-    private function getChannelPreference(string $channel, Event $event): ChannelPreferences
+    private function getChannelPreference(Event $event): ChannelPreferences
     {
         return new ChannelPreferences($event);
     }

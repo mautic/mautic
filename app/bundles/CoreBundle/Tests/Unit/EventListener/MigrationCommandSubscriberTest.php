@@ -21,10 +21,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MigrationCommandSubscriberTest extends TestCase
 {
     private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;
+
     private MockObject&Connection $connection;
+
     private ConsoleTerminateEvent $event;
+
     private MockObject&Command $command;
+
     private MockObject&MySQLSchemaManager $schemaManager;
+
     private MigrationCommandSubscriber $subscriber;
 
     /**
@@ -40,14 +45,14 @@ class MigrationCommandSubscriberTest extends TestCase
         $this->schemaManager            = $this->createMock(MySQLSchemaManager::class);
         $this->generatedColumns         = new GeneratedColumns();
         $this->subscriber               = new MigrationCommandSubscriber(
-            $this->createMock(VersionProviderInterface::class),
+            $this->createStub(VersionProviderInterface::class),
             $this->generatedColumnsProvider,
             $this->connection
         );
 
         $input = $this->createMock(InputInterface::class);
 
-        $this->event = new ConsoleTerminateEvent($this->command, $input, $this->createMock(OutputInterface::class), 0);
+        $this->event = new ConsoleTerminateEvent($this->command, $input, $this->createStub(OutputInterface::class), 0);
 
         $this->connection->method('createSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));

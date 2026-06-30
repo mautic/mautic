@@ -15,7 +15,7 @@ use Psr\Http\Client\ClientInterface;
 class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 

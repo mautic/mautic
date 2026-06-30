@@ -71,7 +71,7 @@ class IntegrationsListTypeTest extends TestCase
         $integrationHelper->method('getIntegrationObject')
             ->willReturn(
                 /** @phpstan-ignore classConstant.deprecatedClass */
-                $this->createMock(AbstractIntegration::class)
+                $this->createStub(AbstractIntegration::class)
             );
 
         $callsForm = 0;
@@ -204,7 +204,7 @@ class IntegrationsListTypeTest extends TestCase
         $integrationHelper->method('getIntegrationObject')
             ->willReturn(
                 /** @phpstan-ignore classConstant.deprecatedClass */
-                $this->createMock(AbstractIntegration::class)
+                $this->createStub(AbstractIntegration::class)
             );
 
         $callsForm = 0;

@@ -46,7 +46,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,

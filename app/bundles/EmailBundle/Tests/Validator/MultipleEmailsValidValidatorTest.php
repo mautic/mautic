@@ -16,7 +16,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
     public function testNoEmailsProvided(): void
     {
         $emailValidatorMock = $this->createMock(EmailValidator::class);
-        $constraintMock     = $this->createMock(Constraint::class);
+        $constraintMock     = $this->createStub(Constraint::class);
 
         $emailValidatorMock->expects($this->never())
             ->method('validate');
@@ -29,7 +29,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidEmails(): void
     {
         $emailValidatorMock = $this->createMock(EmailValidator::class);
-        $constraintMock     = $this->createMock(Constraint::class);
+        $constraintMock     = $this->createStub(Constraint::class);
         $matcher            = $this->exactly(2);
 
         $emailValidatorMock->expects($matcher)
@@ -51,7 +51,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
     public function testNotValidEmails(): void
     {
         $emailValidatorMock                      = $this->createMock(EmailValidator::class);
-        $constraintMock                          = $this->createMock(Constraint::class);
+        $constraintMock                          = $this->createStub(Constraint::class);
         $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
         $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
@@ -78,7 +78,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
     public function testZeroValueIsValidated(): void
     {
         $emailValidatorMock                      = $this->createMock(EmailValidator::class);
-        $constraintMock                          = $this->createMock(Constraint::class);
+        $constraintMock                          = $this->createStub(Constraint::class);
         $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
         $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 

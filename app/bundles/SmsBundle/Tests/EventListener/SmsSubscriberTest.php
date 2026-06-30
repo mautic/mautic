@@ -15,7 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class SmsSubscriberTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub|CoreParametersHelper
+     */
+    private \PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
 
     private string $messageText = 'custom http://mautic.com text';
 
@@ -23,13 +26,13 @@ class SmsSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->coreParametersHelper = $this->createStub(CoreParametersHelper::class);
         parent::setUp();
     }
 
     public function testOnTokenReplacementWithTrackableUrls(): void
     {
-        $mockAuditLogModel = $this->createMock(AuditLogModel::class);
+        $mockAuditLogModel = $this->createStub(AuditLogModel::class);
 
         $mockTrackableModel = $this->createMock(TrackableModel::class);
         $mockTrackableModel->expects($this->any())->method('parseContentForTrackables')->willReturn([
@@ -63,7 +66,7 @@ class SmsSubscriberTest extends TestCase
 
     public function testOnTokenReplacementWithDisableTrackableUrls(): void
     {
-        $mockAuditLogModel = $this->createMock(AuditLogModel::class);
+        $mockAuditLogModel = $this->createStub(AuditLogModel::class);
 
         $mockTrackableModel = $this->createMock(TrackableModel::class);
         $mockTrackableModel->expects($this->any())->method('parseContentForTrackables')->willReturn([

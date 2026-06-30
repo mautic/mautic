@@ -18,7 +18,7 @@ class HttpFactoryTest extends TestCase
 
     public function testGetClientWithEmptyCredentials(): void
     {
-        $credentials = $this->createMock(CredentialsInterface::class);
+        $credentials = $this->createStub(CredentialsInterface::class);
         $httpFactory = new HttpFactory();
         $this->expectException(PluginNotConfiguredException::class);
         $httpFactory->getClient($credentials);

@@ -15,7 +15,7 @@ class ExceptionExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getRootPath', [$this, 'getRoot'], ['is_safe' => ['all']]),
+            new TwigFunction('getRootPath', $this->getRoot(...), ['is_safe' => ['all']]),
         ];
     }
 

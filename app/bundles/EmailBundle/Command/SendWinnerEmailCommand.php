@@ -23,7 +23,7 @@ final class SendWinnerEmailCommand extends ModeratedCommand
 
     public const COMMAND_NAME                   = 'mautic:email:sendwinner';
 
-    public function __construct(private SendWinnerService $sendWinnerService, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private readonly SendWinnerService $sendWinnerService, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

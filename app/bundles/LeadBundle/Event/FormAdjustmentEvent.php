@@ -15,10 +15,10 @@ final class FormAdjustmentEvent extends Event
      * @param mixed[]              $fieldDetails
      */
     public function __construct(
-        private FormInterface $form,
-        private string $fieldAlias,
-        private string $fieldObject,
-        private string $operator,
+        private readonly FormInterface $form,
+        private readonly string $fieldAlias,
+        private readonly string $fieldObject,
+        private readonly string $operator,
         private array $fieldDetails,
     ) {
     }

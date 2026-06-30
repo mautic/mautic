@@ -47,7 +47,7 @@ final class AssetsHelper
     private InstallService $installService;
 
     public function __construct(
-        private Packages $packages,
+        private readonly Packages $packages,
     ) {
     }
 

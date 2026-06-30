@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 class SegmentLogReportSubscriberTest extends TestCase
 {
     /**
-     * @var FieldsBuilder
+     * @var \PHPUnit\Framework\MockObject\MockObject&FieldsBuilder
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
 
@@ -81,7 +81,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $expressionBuilder = $this->createMock(ExpressionBuilder::class);
         $expressionBuilder->expects($this->exactly(1))
             ->method('or')
-            ->willReturn($this->createMock(CompositeExpression::class));
+            ->willReturn($this->createStub(CompositeExpression::class));
         $expressionBuilder->expects($this->exactly(2))
             ->method('isNotNull')
             ->willReturn('');

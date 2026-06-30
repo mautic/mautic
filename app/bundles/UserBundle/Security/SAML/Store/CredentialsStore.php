@@ -14,8 +14,8 @@ class CredentialsStore implements CredentialStoreInterface
     private ?X509Credential $credentials = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private string $entityId,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $entityId,
     ) {
     }
 

@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
-use PHPUnit\Framework\MockObject\MockBuilder;
 
 class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
@@ -23,7 +22,6 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        /** @var MockBuilder $mockBuilder */
         $mockBuilder = $this->getMockBuilder(StubIntegration::class);
         $mockBuilder->disableOriginalConstructor();
 
@@ -58,9 +56,9 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             'some_custom_field'   => 'some value',
         ];
 
-        $emailValidator = $this->createMock(EmailValidator::class);
+        $emailValidator = $this->createStub(EmailValidator::class);
 
-        $companyDeduper = $this->createMock(CompanyDeduper::class);
+        $companyDeduper = $this->createStub(CompanyDeduper::class);
 
         $companyModel = $this->getMockBuilder(CompanyModelStub::class)
             ->onlyMethods(['fetchCompanyFields', 'organizeFieldsByGroup', 'saveEntity'])
@@ -127,7 +125,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
     public function testLimitString(): void
     {
-        $integration = $this->createMock(StubIntegration::class);
+        $integration = $this->createStub(StubIntegration::class);
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
 

@@ -17,8 +17,8 @@ class DncReportService
     ];
 
     public function __construct(
-        private DoNotContact $doNotContactModel,
-        private DncFormatterHelper $dncFormatterHelper,
+        private readonly DoNotContact $doNotContactModel,
+        private readonly DncFormatterHelper $dncFormatterHelper,
     ) {
     }
 

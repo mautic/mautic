@@ -14,7 +14,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
 
     public const FALSE_BOOLEAN_VALUE = 'false';
 
-    private ValueNormalizer $valueNormalizer;
+    private readonly ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {

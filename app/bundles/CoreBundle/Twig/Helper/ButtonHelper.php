@@ -99,9 +99,9 @@ final class ButtonHelper
     private int $listMarker = 3;
 
     public function __construct(
-        private Environment $twig,
-        private TranslatorInterface $translator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly Environment $twig,
+        private readonly TranslatorInterface $translator,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

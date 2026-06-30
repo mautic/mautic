@@ -84,10 +84,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private ?string $contentTemplate = null;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Connection $db,
-        private Report $entity,
-        private ChannelListHelper $channelListHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Connection $db,
+        private readonly Report $entity,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
     }
 

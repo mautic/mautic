@@ -29,17 +29,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcherInterface&MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var TriggerEventRepository&MockObject
+     * @var MockObject&TriggerEventRepository
      */
     private MockObject $triggerEventRepository;
 
@@ -62,13 +62,13 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
             $triggerEventModel,
             $contactTracker,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         // reset private property cachedEvents in TriggerModel instance

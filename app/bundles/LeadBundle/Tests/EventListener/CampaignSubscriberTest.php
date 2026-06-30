@@ -40,7 +40,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configTo = [
+    private array $configTo = [
         'id'          => '112',
         'companyname' => 'Mautic2',
         'companemail' => 'mautic@mauticsecond.com',
@@ -94,7 +94,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configPageHit = [
+    private array $configPageHit = [
         'startDate'         => '2022-06-08 12:45:22.0',
         'endDate'           => '2023-06-08 12:45:22.0',
         'page'              => '1',
@@ -105,7 +105,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHit = [
+    private array $configUrlPageHit = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -116,7 +116,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHitWithoutSpentTime = [
+    private array $configUrlPageHitWithoutSpentTime = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -125,22 +125,19 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $mockLeadModel;
 
     /**
-     * @var CompanyModel|MockObject
+     * @var MockObject&CompanyModel
      */
     private MockObject $mockCompanyModel;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private CampaignSubscriber $subscriber;
 
     /**
-     * @var DoNotContact|MockObject
+     * @var MockObject&DoNotContact
      */
     private MockObject $doNotContact;
 
@@ -155,8 +152,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact           = $this->createMock(DoNotContact::class);
         $mockGroupModel               = $this->createMock(PointGroupModel::class);
         $filterOperatorProvider       = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class)
         );
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('getDefaultTimezone')
@@ -418,7 +415,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionUpdateLead(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $properties    = [
             'points' => 10,
         ];

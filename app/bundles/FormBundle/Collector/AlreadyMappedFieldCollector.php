@@ -14,7 +14,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
     private const EXPIRATION_IN_SECONDS = 18000;
 
     public function __construct(
-        private CacheProviderTagAwareInterface $cacheProvider,
+        private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
     }
 

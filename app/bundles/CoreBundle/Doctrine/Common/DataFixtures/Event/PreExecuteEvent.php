@@ -11,8 +11,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 class PreExecuteEvent extends Event
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private int $purgeMode,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly int $purgeMode,
     ) {
     }
 
