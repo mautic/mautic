@@ -44,6 +44,10 @@ final class ValidEmailLinksValidator extends ConstraintValidator
         $crawler = new Crawler($html);
 
         foreach ($crawler->filter('a[href]') as $link) {
+            if (!$link instanceof \DOMElement) {
+                continue;
+            }
+
             $url = html_entity_decode($link->getAttribute('href'), ENT_QUOTES | ENT_HTML5);
 
             if ($this->isValidUrl($url)) {

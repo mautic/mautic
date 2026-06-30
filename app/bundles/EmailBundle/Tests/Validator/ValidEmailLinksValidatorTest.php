@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Validator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\EmailBundle\Validator\ValidEmailLinksValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -46,9 +47,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
         $this->validator->validate($email, new ValidEmailLinks());
     }
 
-    /**
-     * @dataProvider validLinkProvider
-     */
+    #[DataProvider('validLinkProvider')]
     public function testValidLinksDoNotAddViolation(string $url): void
     {
         $email = new Email();
