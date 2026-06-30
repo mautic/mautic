@@ -170,6 +170,10 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
+        // PDOException: SQLSTATE[42803]: Grouping error: 7 ERROR:
+        // columns must appear in the GROUP BY clause or be used in an aggregate function
+        $q->groupBy('p.id, a.source_id, p.title, p.hits');
+
         $results = $q->executeQuery()->fetchAllAssociative();
 
         $downloads = [];
@@ -216,6 +220,10 @@ class DownloadRepository extends CommonRepository
             $q->andWhere($q->expr()->lte('a.date_download', ':dateTo'))
                 ->setParameter('dateTo', $dh->toUtcString());
         }
+
+        // PDOException: SQLSTATE[42803]: Grouping error: 7 ERROR:
+        // columns must appear in the GROUP BY clause or be used in an aggregate function
+        $q->groupBy('e.id, e.subject, e.variant_sent_count');
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
