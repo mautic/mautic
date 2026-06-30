@@ -272,7 +272,7 @@ class FormSubscriber implements EventSubscriberInterface
                     if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
                         unset($post[$key]);
                     }
-                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                    if (isset($fieldTypes[$key]) && 'password' == $fieldTypes[$key]) {
                         $post[$key] = '*********';
                     }
                 }

@@ -24,54 +24,57 @@ use PHPUnit\Framework\MockObject\MockObject;
 class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TrackableModel
+     * @var MockObject&TrackableModel
      */
     private MockObject $trackableModel;
 
     /**
-     * @var MockObject|PageTokenHelper
+     * @var MockObject&PageTokenHelper
      */
     private MockObject $pageTokenHelper;
 
     /**
-     * @var MockObject|AssetTokenHelper
+     * @var MockObject&AssetTokenHelper
      */
     private MockObject $assetTokenHelper;
 
     /**
-     * @var MockObject|FormTokenHelper
+     * @var MockObject&FormTokenHelper
      */
     private MockObject $formTokenHelper;
 
     /**
-     * @var MockObject|FocusTokenHelper
+     * @var MockObject&FocusTokenHelper
      */
     private MockObject $focusTokenHelper;
 
     /**
-     * @var MockObject|DynamicContentHelper
+     * @var MockObject&DynamicContentHelper
      */
     private MockObject $dynamicContentHelper;
 
     /**
-     * @var MockObject|DynamicContentModel
+     * @var MockObject&DynamicContentModel
      */
     private MockObject $dynamicContentModel;
 
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
+    /**
+     * @var MockObject&CompanyLeadRepository
+     */
     private MockObject $companyLeadRepositoryMock;
 
     private DynamicContentSubscriber $subscriber;
     /**
-     * @var CompanyModel|(CompanyModel&MockObject)|MockObject
+     * @var MockObject&CompanyModel
      */
     private MockObject $companyModel;
 

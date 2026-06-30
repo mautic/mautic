@@ -59,7 +59,7 @@ class PointEventHelperTest extends \PHPUnit\Framework\TestCase
 
         $mock->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(function ($id) use ($published) {
+            ->willReturnCallback(function ($id) use ($published): Email {
                 $email = new Email();
                 $email->setIsPublished($published);
 

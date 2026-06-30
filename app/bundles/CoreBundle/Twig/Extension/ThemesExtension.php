@@ -17,10 +17,10 @@ final class ThemesExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('getTextOnBrandColor', [$this, 'getTextOnBrandColor']),
-            new TwigFunction('getTextOnBrandHelperColor', [$this, 'getTextOnBrandHelperColor']),
-            new TwigFunction('getBrandPrimaryColor', [$this, 'getBrandPrimaryColor']),
-            new TwigFunction('getRoundedCorners', [$this, 'getRoundedCorners']),
+            new TwigFunction('getTextOnBrandColor', $this->getTextOnBrandColor(...)),
+            new TwigFunction('getTextOnBrandHelperColor', $this->getTextOnBrandHelperColor(...)),
+            new TwigFunction('getBrandPrimaryColor', $this->getBrandPrimaryColor(...)),
+            new TwigFunction('getRoundedCorners', $this->getRoundedCorners(...)),
         ];
     }
 

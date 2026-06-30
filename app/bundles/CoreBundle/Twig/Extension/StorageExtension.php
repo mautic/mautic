@@ -23,8 +23,8 @@ class StorageExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('save', [$this, 'save'], ['needs_context' => true]),
-            new TwigFunction('restore', [$this, 'restore'], ['needs_context' => true]),
+            new TwigFunction('save', $this->save(...), ['needs_context' => true]),
+            new TwigFunction('restore', $this->restore(...), ['needs_context' => true]),
         ];
     }
 

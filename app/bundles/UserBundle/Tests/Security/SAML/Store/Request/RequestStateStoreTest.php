@@ -14,7 +14,7 @@ use Symfony\Component\Cache\CacheItem;
 class RequestStateStoreTest extends TestCase
 {
     /**
-     * @var CacheProviderInterface&MockObject
+     * @var MockObject&CacheProviderInterface
      */
     private MockObject $cacheProvider;
 
@@ -88,7 +88,7 @@ class RequestStateStoreTest extends TestCase
 
     public function testGetIsHitRequestState(): void
     {
-        $state = $this->createMock(RequestState::class);
+        $state = $this->createStub(RequestState::class);
 
         $setUp = \Closure::bind(
             static function (CacheItem $item, RequestState $state): void {

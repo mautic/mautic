@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 class DynamicContentSubscriberTest extends TestCase
 {
     /**
-     * @var LeadListRepository|MockObject
+     * @var MockObject&LeadListRepository
      */
     private MockObject $segmentRepository;
 

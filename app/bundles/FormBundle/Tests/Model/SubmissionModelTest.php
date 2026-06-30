@@ -50,39 +50,39 @@ use Twig\Environment;
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
     /**
-     * @var MockObject|FormModel
+     * @var MockObject&FormModel
      */
     private MockObject $formModel;
 
     /**
-     * @var MockObject|CampaignModel
+     * @var MockObject&CampaignModel
      */
     private MockObject $campaignModel;
 
     /**
-     * @var MockObject|LeadFieldModel
+     * @var MockObject&LeadFieldModel
      */
     private MockObject $leadFieldModel;
 
     /**
-     * @var MockObject|CompanyModel
+     * @var MockObject&CompanyModel
      */
     private MockObject $companyModel;
 
     /**
-     * @var MockObject|Translator
+     * @var MockObject&Translator
      */
     private MockObject $translator;
 
     private DateHelper $dateHelper;
 
     /**
-     * @var MockObject|UserHelper
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelper;
 
@@ -92,37 +92,37 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $fieldsWithUniqueIdentifier;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var MockObject|SubmissionRepository
+     * @var MockObject&SubmissionRepository
      */
     private MockObject $submissioRepository;
 
     /**
-     * @var MockObject|LeadRepository
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
 
     /**
-     * @var MockObject|UploadFieldValidator
+     * @var MockObject&UploadFieldValidator
      */
     private MockObject $uploadFieldValidatorMock;
 
     /**
-     * @var MockObject|UploadedFile
+     * @var MockObject&UploadedFile
      */
     private MockObject $file1Mock;
 
     /**
-     * @var MockObject|RouterInterface
+     * @var MockObject&RouterInterface
      */
     private MockObject $router;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
 
@@ -155,7 +155,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'Y-m-d',
             'H:i',
             $this->translator,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->userHelper                 = $this->createMock(UserHelper::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -223,13 +223,13 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $contactMerger,
             $this->fieldsWithUniqueIdentifier,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
             $this->userHelper,
             $mockLogger,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
@@ -267,7 +267,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->campaignModel->method('getCampaignsByForm')->willReturn([]);
 
-        $userMock = $this->createMock(UserRepository::class);
+        $userMock = $this->createStub(UserRepository::class);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
@@ -467,9 +467,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     public function getAccessibleReflectionMethod(string $name): \ReflectionMethod
     {
-        $method = $this->submissionModelReflection->getMethod($name);
-
-        return $method;
+        return $this->submissionModelReflection->getMethod($name);
     }
 
     public function testGetExportHeader(): void

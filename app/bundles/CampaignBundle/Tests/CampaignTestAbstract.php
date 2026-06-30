@@ -69,18 +69,18 @@ class CampaignTestAbstract extends TestCase
         return new CampaignModel(
             $leadListModel,
             $formModel,
-            $this->createMock(EventCollector::class),
-            $this->createMock(MembershipBuilder::class),
-            $this->createMock(ContactTracker::class),
-            $this->createMock(GeneratedColumnsProviderInterface::class),
+            $this->createStub(EventCollector::class),
+            $this->createStub(MembershipBuilder::class),
+            $this->createStub(ContactTracker::class),
+            $this->createStub(GeneratedColumnsProviderInterface::class),
             $entityManager,
             $security,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
             $userHelper,
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
         );
     }
 }

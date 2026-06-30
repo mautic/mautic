@@ -52,7 +52,7 @@ class SentHelperTest extends TestCase
             new Collector(new EventDispatcher()),
             $connection,
             $this->generatedColumnsProvider,
-            $this->createMock(UserHelper::class)
+            $this->createStub(UserHelper::class)
         );
     }
 

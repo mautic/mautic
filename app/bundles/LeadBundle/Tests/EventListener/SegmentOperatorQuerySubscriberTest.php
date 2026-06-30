@@ -19,17 +19,17 @@ use PHPUnit\Framework\TestCase;
 final class SegmentOperatorQuerySubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|QueryBuilder
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilder;
 
     /**
-     * @var MockObject|ExpressionBuilder
+     * @var MockObject&ExpressionBuilder
      */
     private MockObject $expressionBuilder;
 
     /**
-     * @var MockObject|ContactSegmentFilter
+     * @var MockObject&ContactSegmentFilter
      */
     private MockObject $contactSegmentFilter;
 
@@ -91,7 +91,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
+                $this->callback(function (CompositeExpression $expression) use ($expectedExpression): true {
                     $this->assertSame($expectedExpression, (string) $expression);
 
                     return true;
@@ -171,7 +171,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
             ->with(
-                $this->callback(function (CompositeExpression $expression) use ($expectedExpression) {
+                $this->callback(function (CompositeExpression $expression) use ($expectedExpression): true {
                     $this->assertSame($expectedExpression, (string) $expression);
 
                     return true;
@@ -350,7 +350,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAll(): void
     {
         $regexpQuery = 'regexp query';
-        $eventQuery  = $this->createMock(CompositeExpression::class);
+        $eventQuery  = $this->createStub(CompositeExpression::class);
 
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -402,8 +402,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $filterField         = 'l.email';
         $regexpQueriesString = 'all regexp queries';
         $regexpQueries       = $this->createMock(CompositeExpression::class);
-        $combinedQuery       = $this->createMock(CompositeExpression::class);
-        $eventQuery          = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createStub(CompositeExpression::class);
+        $eventQuery          = $this->createStub(CompositeExpression::class);
 
         $regexpQueries->method('__toString')
             ->willReturn($regexpQueriesString);
@@ -466,7 +466,7 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
     public function testOnMultiselectOperatorsIfMultiselectOperatorIncludingAny(): void
     {
         $regexpQuery = 'regexp query';
-        $eventQuery  = $this->createMock(CompositeExpression::class);
+        $eventQuery  = $this->createStub(CompositeExpression::class);
 
         $event = new SegmentOperatorQueryBuilderEvent(
             $this->queryBuilder,
@@ -518,8 +518,8 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
         $filterField         = 'l.email';
         $regexpQueriesString = 'all regexp queries';
         $regexpQueries       = $this->createMock(CompositeExpression::class);
-        $combinedQuery       = $this->createMock(CompositeExpression::class);
-        $eventQuery          = $this->createMock(CompositeExpression::class);
+        $combinedQuery       = $this->createStub(CompositeExpression::class);
+        $eventQuery          = $this->createStub(CompositeExpression::class);
 
         $regexpQueries->method('__toString')
             ->willReturn($regexpQueriesString);

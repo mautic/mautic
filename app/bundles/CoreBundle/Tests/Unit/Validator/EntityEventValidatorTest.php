@@ -19,12 +19,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class EntityEventValidatorTest extends TestCase
 {
     private EventDispatcherInterface $dispatcher;
-    private \PHPUnit\Framework\MockObject\MockObject $context;
+    private \PHPUnit\Framework\MockObject\Stub $context;
     private ConstraintValidatorInterface $validator;
 
     protected function setUp(): void
     {
-        $this->context    = $this->createMock(ExecutionContextInterface::class);
+        $this->context    = $this->createStub(ExecutionContextInterface::class);
         $this->dispatcher = new EventDispatcher();
         $this->validator  = new EntityEventValidator($this->dispatcher);
         $this->validator->initialize($this->context);

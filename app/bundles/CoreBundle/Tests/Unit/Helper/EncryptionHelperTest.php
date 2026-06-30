@@ -14,17 +14,17 @@ use PHPUnit\Framework\MockObject\MockObject;
 class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelperMock;
 
     /**
-     * @var MockObject|OpenSSLCipher
+     * @var MockObject&OpenSSLCipher
      */
     private MockObject $mainCipherMock;
 
     /**
-     * @var MockObject|SymmetricCipherInterface
+     * @var MockObject&SymmetricCipherInterface
      */
     private MockObject $secondaryCipherMock;
 

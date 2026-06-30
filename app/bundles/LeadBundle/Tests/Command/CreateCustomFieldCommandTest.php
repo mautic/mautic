@@ -16,23 +16,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CreateCustomFieldCommandTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $backgroundServiceMock;
+    private \PHPUnit\Framework\MockObject\Stub $backgroundServiceMock;
 
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
+    private \PHPUnit\Framework\MockObject\Stub $translatorMock;
 
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepositoryMock;
+    private \PHPUnit\Framework\MockObject\Stub $leadFieldRepositoryMock;
 
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
+    private \PHPUnit\Framework\MockObject\Stub $pathsHelperMock;
 
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
 
     protected function setUp(): void
     {
-        $this->backgroundServiceMock   = $this->createMock(BackgroundService::class);
-        $this->translatorMock          = $this->createMock(TranslatorInterface::class);
-        $this->leadFieldRepositoryMock = $this->createMock(LeadFieldRepository::class);
-        $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
-        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
+        $this->backgroundServiceMock   = $this->createStub(BackgroundService::class);
+        $this->translatorMock          = $this->createStub(TranslatorInterface::class);
+        $this->leadFieldRepositoryMock = $this->createStub(LeadFieldRepository::class);
+        $this->pathsHelperMock         = $this->createStub(PathsHelper::class);
+        $this->coreParametersHelper    = $this->createStub(CoreParametersHelper::class);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]

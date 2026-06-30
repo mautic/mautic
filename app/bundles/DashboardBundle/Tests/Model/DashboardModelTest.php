@@ -41,18 +41,18 @@ final class DashboardModelTest extends TestCase
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(WidgetDetailEventFactory::class),
-            $this->createMock(Filesystem::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(WidgetDetailEventFactory::class),
+            $this->createStub(Filesystem::class),
             $requestStack,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CacheProviderTagAwareInterface::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CacheProviderTagAwareInterface::class),
         );
     }
 
@@ -91,7 +91,7 @@ final class DashboardModelTest extends TestCase
     {
         $widget    = new Widget();
         $exception = new \RuntimeException('DB connection failed — secret host: db.internal');
-        $event     = $this->createMock(WidgetDetailEvent::class);
+        $event     = $this->createStub(WidgetDetailEvent::class);
 
         $widgetEventFactory = $this->createMock(WidgetDetailEventFactory::class);
         $widgetEventFactory->method('create')->willReturn($event);
@@ -116,18 +116,18 @@ final class DashboardModelTest extends TestCase
 
         $model = new DashboardModel(
             $this->coreParametersHelper,
-            $this->createMock(PathsHelper::class),
+            $this->createStub(PathsHelper::class),
             $widgetEventFactory,
-            $this->createMock(Filesystem::class),
+            $this->createStub(Filesystem::class),
             $requestStack,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
             $logger,
-            $this->createMock(CacheProviderTagAwareInterface::class),
+            $this->createStub(CacheProviderTagAwareInterface::class),
         );
 
         // Pass timezone to skip userHelper->getUser()->getTimezone()

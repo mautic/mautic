@@ -26,19 +26,19 @@ use PHPUnit\Framework\TestCase;
 class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var SyncJudgeInterface&MockObject
+     * @var MockObject&SyncJudgeInterface
      */
     private MockObject $syncJudge;
 
     /**
-     * @var ValueHelper&MockObject
+     * @var MockObject&ValueHelper
      */
     private MockObject $valueHelper;
 
     /**
-     * @var FieldHelper&MockObject
+     * @var FieldHelper&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $fieldHelper;
+    private \PHPUnit\Framework\MockObject\Stub $fieldHelper;
 
     /**
      * @var MockObject&BulkNotification
@@ -49,7 +49,7 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->syncJudge        = $this->createMock(SyncJudgeInterface::class);
         $this->valueHelper      = $this->createMock(ValueHelper::class);
-        $this->fieldHelper      = $this->createMock(FieldHelper::class);
+        $this->fieldHelper      = $this->createStub(FieldHelper::class);
         $this->bulkNotification = $this->createMock(BulkNotification::class);
     }
 

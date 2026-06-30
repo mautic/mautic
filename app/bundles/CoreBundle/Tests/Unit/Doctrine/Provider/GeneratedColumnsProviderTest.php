@@ -16,12 +16,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class GeneratedColumnsProviderTest extends TestCase
 {
     /**
-     * @var MockObject|VersionProviderInterface
+     * @var MockObject&VersionProviderInterface
      */
     private MockObject $versionProvider;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 

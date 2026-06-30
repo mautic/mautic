@@ -32,17 +32,17 @@ class MauticSyncProcessTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncDateHelper|MockObject
+     * @var MockObject&SyncDateHelper
      */
     private MockObject $syncDateHelper;
 
     /**
-     * @var ObjectChangeGenerator|MockObject
+     * @var MockObject&ObjectChangeGenerator
      */
     private MockObject $objectChangeGenerator;
 
     /**
-     * @var MauticSyncDataExchange|MockObject
+     * @var MockObject&MauticSyncDataExchange
      */
     private MockObject $syncDataExchange;
 
@@ -83,7 +83,7 @@ class MauticSyncProcessTest extends TestCase
         $this->syncDataExchange->expects($this->once())
             ->method('getSyncReport')
             ->willReturnCallback(
-                function (RequestDAO $requestDAO) {
+                function (RequestDAO $requestDAO): ReportDAO {
                     $requestObjects = $requestDAO->getObjects();
                     $this->assertCount(1, $requestObjects);
 

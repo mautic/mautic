@@ -25,7 +25,7 @@ final class OverrideIncludeExtension extends AbstractExtension
     {
         return [
             // Override the built-in include function with higher priority
-            new TwigFunction('include', [$this, 'includeWithEvent'], [
+            new TwigFunction('include', $this->includeWithEvent(...), [
                 'needs_environment' => true,
                 'needs_context'     => true,
                 'is_safe'           => ['html'],

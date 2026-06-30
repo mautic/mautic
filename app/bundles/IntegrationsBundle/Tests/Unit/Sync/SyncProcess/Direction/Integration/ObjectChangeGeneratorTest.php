@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 

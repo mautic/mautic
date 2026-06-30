@@ -20,7 +20,7 @@ class ThemeExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getThemeName', [$this, 'getThemeName']),
+            new TwigFunction('getThemeName', $this->getThemeName(...)),
         ];
     }
 

@@ -23,9 +23,9 @@ final class MauticReportBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var \PHPUnit\Framework\MockObject\Stub|EventDispatcherInterface
      */
-    private MockObject $dispatcher;
+    private \PHPUnit\Framework\MockObject\Stub $dispatcher;
 
     /**
      * @var MockObject|Connection
@@ -38,9 +38,9 @@ final class MauticReportBuilderTest extends TestCase
     {
         parent::setUp();
 
-        $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
+        $this->dispatcher          = $this->createStub(EventDispatcherInterface::class);
         $this->connection          = $this->getMockedConnection();
-        $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $this->channelListHelper   = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
             new QueryBuilder($this->connection),

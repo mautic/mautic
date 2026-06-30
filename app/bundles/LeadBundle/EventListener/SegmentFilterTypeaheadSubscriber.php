@@ -82,7 +82,7 @@ final class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
         $field      = $this->fieldModel->getEntityByAlias($event->getFieldAlias());
 
         // Select field types that make sense to provide typeahead for.
-        $isLookup     = in_array($field->getType(), ['lookup']);
+        $isLookup     = 'lookup' == $field->getType();
         $shouldLookup = in_array($field->getAlias(), ['city', 'company', 'title']);
 
         if ($isLookup && $shouldLookup) {

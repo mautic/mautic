@@ -86,15 +86,15 @@ class WebhookControllerTest extends TestCase
         ];
 
         $controller = new AjaxController(
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(ModelFactory::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(FlashBag::class),
-            $this->createMock(RequestStack::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
+            $this->createStub(RequestStack::class),
+            $this->createStub(CorePermissions::class),
         );
 
         $parameterBag = $this->createMock(ParameterBagInterface::class);
@@ -194,7 +194,7 @@ class WebhookControllerTest extends TestCase
             ->with($eventUnderTest)
             ->willReturn([$webhookEvent]);
 
-        $webhookQueueRepository = $this->createMock(WebhookQueueRepository::class);
+        $webhookQueueRepository = $this->createStub(WebhookQueueRepository::class);
 
         $webhookRepository = $this->createMock(WebhookRepository::class);
         $webhookRepository->expects($this->once())
@@ -254,15 +254,15 @@ class WebhookControllerTest extends TestCase
             $serializer,
             $client,
             $em,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(WebhookService::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(WebhookService::class)
         );
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
         $subscriber = new WebhookSubscriber($webhookModel, $leadModel);
         $subscriber->onLeadNewUpdate($event);

@@ -18,12 +18,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class CanPublishValidatorTest extends TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|PluginIsPublishedEvent
+     * @var MockObject&PluginIsPublishedEvent
      */
     private MockObject $event;
     private CanPublishValidator $canPublishValidator;
@@ -52,7 +52,7 @@ class CanPublishValidatorTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
+        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
         $this->canPublishValidator->validate(1, new CanPublish('testIntegration'));
     }
@@ -72,7 +72,7 @@ class CanPublishValidatorTest extends TestCase
             ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
+        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
         $this->canPublishValidator->validate(0, new CanPublish('testIntegration'));
     }
@@ -92,7 +92,7 @@ class CanPublishValidatorTest extends TestCase
             ->with(PluginEvents::PLUGIN_IS_PUBLISHED_STATE_CHANGING)
             ->willReturn($this->event);
 
-        $this->canPublishValidator->initialize($this->createMock(ExecutionContext::class));
+        $this->canPublishValidator->initialize($this->createStub(ExecutionContext::class));
 
         $this->expectException(UnexpectedTypeException::class);
 

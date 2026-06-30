@@ -20,7 +20,7 @@ class StatRepositoryFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->focusModel = static::$kernel->getContainer()->get('mautic.focus.model.focus');
-        $this->setTestsData($this->createLead(), $this->focusModel);
+        $this->setTestsData($this->createLead());
     }
 
     public function testGetStatsViewByLead(): void
@@ -44,7 +44,7 @@ class StatRepositoryFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    private function setTestsData(Lead $lead, FocusModel $focusModel): void
+    private function setTestsData(Lead $lead): void
     {
         $focusPopupA = $this->createFocus('popup focus A');
         $focusPopupB = $this->createFocus('popup focus B');

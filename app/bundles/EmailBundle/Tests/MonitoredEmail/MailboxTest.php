@@ -18,9 +18,9 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             'use_attachments' => false,
         ];
 
-        $parametersHelper = $this->createMock(CoreParametersHelper::class);
+        $parametersHelper = $this->createStub(CoreParametersHelper::class);
 
-        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper = $this->createStub(PathsHelper::class);
 
         $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
 
@@ -179,7 +179,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper = $this->createStub(PathsHelper::class);
 
         $mailbox = new \Mautic\EmailBundle\MonitoredEmail\Mailbox($parametersHelper, $pathsHelper);
 

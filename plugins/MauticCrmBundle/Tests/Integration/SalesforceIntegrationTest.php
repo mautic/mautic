@@ -172,7 +172,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf->expects($this->exactly(2))
             ->method('getMauticContactsToUpdate')
             ->willReturnCallback(
-                function () use (&$counter) {
+                function () use (&$counter): true {
                     ++$counter;
 
                     return true;
@@ -197,7 +197,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf->expects($this->exactly(2))
             ->method('getMauticContactsToUpdate')
             ->willReturnCallback(
-                function () use (&$counter) {
+                function () use (&$counter): true {
                     ++$counter;
 
                     return true;
@@ -207,7 +207,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $counter = 0;
         $sf->method('getSalesforceSyncLimit')
             ->willReturnCallback(
-                function () use (&$counter) {
+                function () use (&$counter): int {
                     ++$counter;
 
                     return (1 === $counter) ? 100 : 0;
@@ -278,7 +278,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          */
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
-                function () {
+                function (): array {
                     $args   = func_get_args();
                     $emails = array_column($args[1], 'email');
 
@@ -304,7 +304,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          */
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
-                function () {
+                function (): array {
                     $args   = func_get_args();
                     $emails = array_column($args[1], 'email');
 
@@ -485,7 +485,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf->expects($this->once())
             ->method('getLeadData')
             ->willReturnCallback(
-                function () {
+                function (): array {
                     $leadIds = func_get_arg(2);
                     $data    = [];
 
@@ -536,7 +536,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
          */
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
-                function () {
+                function (): array {
                     $args   = func_get_args();
                     $emails = array_column($args[1], 'email');
 
@@ -1000,7 +1000,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         /* @var \PHPUnit\Framework\MockObject\MockObject $this->>dispatcher */
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(
-                function () use ($sf, $integration) {
+                function () use ($sf, $integration): PluginIntegrationKeyEvent {
                     $args = func_get_args();
 
                     return match ($args[0]) {
@@ -1023,7 +1023,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToUpdate')
             ->willReturnCallback(
-                function () use ($max, $specificObject) {
+                function () use ($max, $specificObject): array {
                     $args   = func_get_args();
                     $object = $args[6];
 
@@ -1051,16 +1051,14 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     {
         $mockRepository->method('findLeadsToCreate')
             ->willReturnCallback(
-                function () use ($max) {
+                function () use ($max): int|array {
                     $args = func_get_args();
 
                     if (false === $args[2]) {
                         return $max;
                     }
 
-                    $createLeads = $this->getLeadsToCreate($args[2], $max);
-
-                    return $createLeads;
+                    return $this->getLeadsToCreate($args[2], $max);
                 }
             );
     }
@@ -1161,38 +1159,36 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $contactCount = 0;
         $leadCount    = 0;
 
-        if (!empty($emails)) {
-            foreach ($emails as $email) {
-                // Extact ID
-                preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
-                $object = $match[1];
+        foreach ($emails as $email) {
+            // Extact ID
+            preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
+            $object = $match[1];
 
-                if ('Lead' === $object) {
-                    if ($leadCount >= $maxLeads) {
-                        continue;
-                    }
-                    ++$leadCount;
-                } else {
-                    if ($contactCount >= $maxContacts) {
-                        continue;
-                    }
-                    ++$contactCount;
+            if ('Lead' === $object) {
+                if ($leadCount >= $maxLeads) {
+                    continue;
                 }
-
-                $id        = $match[2];
-                $records[] = [
-                    'attributes' => [
-                        'type' => $object,
-                        'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
-                    ],
-                    'Id'        => 'SF'.$id,
-                    'FirstName' => $object.$id,
-                    'LastName'  => $object.$id,
-                    'Email'     => $object.$id.'@sftest.com',
-                ];
-
-                $this->addSpecialCases($id, $records);
+                ++$leadCount;
+            } else {
+                if ($contactCount >= $maxContacts) {
+                    continue;
+                }
+                ++$contactCount;
             }
+
+            $id        = $match[2];
+            $records[] = [
+                'attributes' => [
+                    'type' => $object,
+                    'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
+                ],
+                'Id'        => 'SF'.$id,
+                'FirstName' => $object.$id,
+                'LastName'  => $object.$id,
+                'Email'     => $object.$id.'@sftest.com',
+            ];
+
+            $this->addSpecialCases($id, $records);
         }
 
         $this->returnedSfEntities = array_merge($this->returnedSfEntities, $records);

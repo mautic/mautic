@@ -21,7 +21,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $translatorMock = $this->createMock(Translator::class);
+        $translatorMock = $this->createStub(Translator::class);
 
         $fileMock = $this->createMock(UploadedFile::class);
 
@@ -51,7 +51,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $translatorMock = $this->createMock(Translator::class);
+        $translatorMock = $this->createStub(Translator::class);
 
         $fileMock = $this->createMock(UploadedFile::class);
 
@@ -120,7 +120,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $translatorMock = $this->createMock(Translator::class);
+        $translatorMock = $this->createStub(Translator::class);
 
         $filePathResolverMock->expects($this->once())
             ->method('delete')

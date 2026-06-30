@@ -72,10 +72,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
 
         $orderedObjects = $syncOrderDAO->getUnidentifiedObjects();
         foreach ($orderedObjects as $objectName => $unidentifiedObjects) {
-            /**
-             * @var mixed
-             * @var ObjectChangeDAO $unidentifiedObject
-             */
+            /** @var ObjectChangeDAO $unidentifiedObject */
             foreach ($unidentifiedObjects as $unidentifiedObject) {
                 // Use getFields here to ensure we have values for required fields in addition to one way mapped fields
                 // Can also use getUnchangedFields, getChangedFields, or getRequiredFields
@@ -106,7 +103,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         $orderedObjects = $syncOrderDAO->getIdentifiedObjects();
         foreach ($orderedObjects as $objectName => $identifiedObjects) {
             /**
-             * @var mixed
+             * @var mixed           $id
              * @var ObjectChangeDAO $identifiedObject
              */
             foreach ($identifiedObjects as $id => $identifiedObject) {
@@ -199,7 +196,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
             $toDatetime   = $requestedObject->getToDateTime();
             $mappedFields = $requestedObject->getFields();
 
-            $updatedPeople = $this->getReportPayload($objectName, $fromDateTime, $toDatetime, $mappedFields);
+            $updatedPeople = $this->getReportPayload();
             foreach ($updatedPeople as $person) {
                 // If the integration knows modified timestamps per field, use that. Otherwise, we're using the complete object's
                 // last modified timestamp.
@@ -237,11 +234,10 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
     /**
      * @return array<mixed[]>
      */
-    private function getReportPayload($object, \DateTimeInterface $fromDateTime, \DateTimeInterface $toDateTime, array $mappedFields): array
+    private function getReportPayload(): array
     {
         // Query integration's API for objects changed between $fromDateTime and $toDateTime with the requested fields in $mappedFields if that's
         // applicable to the integration. I.e. Salesforce supports querying for specific fields in it's SOQL
-
         return [
             [
                 'id'            => 1,

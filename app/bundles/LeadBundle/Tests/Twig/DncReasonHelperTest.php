@@ -53,7 +53,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName(): void
     {
-        $translator      = $this->createMock(TranslatorInterface::class);
+        $translator      = $this->createStub(TranslatorInterface::class);
         $dncReasonHelper = new DncReasonHelper($translator);
         $this->assertSame('lead_dnc_reason', $dncReasonHelper->getName());
     }

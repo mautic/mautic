@@ -15,12 +15,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormModel
+     * @var MockObject&FormModel
      */
     private MockObject $formModel;
 
     /**
-     * @var MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
     private MockObject $fieldModel;
 

@@ -13,7 +13,7 @@ class SerializerExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('serializerDecode', [Serializer::class, 'decode']),
+            new TwigFunction('serializerDecode', Serializer::decode(...)),
         ];
     }
 }

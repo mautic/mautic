@@ -35,22 +35,22 @@ class PeakInteractionTimerTest extends TestCase
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
     /**
-     * @var StatRepository|MockObject
+     * @var MockObject&StatRepository
      */
     private MockObject $statRepositoryMock;
 
     /**
-     * @var MockObject|HitRepository
+     * @var MockObject&HitRepository
      */
     private MockObject $hitRepositoryMock;
 
     /**
-     * @var MockObject|SubmissionRepository
+     * @var MockObject&SubmissionRepository
      */
     private MockObject $submissionRepositoryMock;
 
     /**
-     * @var MockObject|CacheProviderInterface
+     * @var MockObject&CacheProviderInterface
      */
     private MockObject $cacheProviderMock;
 
@@ -83,7 +83,7 @@ class PeakInteractionTimerTest extends TestCase
             ]);
 
         $createCacheItem = \Closure::bind(
-            function ($key) {
+            function ($key): CacheItem {
                 $item        = new CacheItem();
                 $item->key   = $key;
                 $item->isHit = false;
@@ -210,7 +210,7 @@ class PeakInteractionTimerTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeDataProvider')]
     public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
-        $contactMock = $this->createMock(Lead::class);
+        $contactMock = $this->createStub(Lead::class);
 
         $this->statRepositoryMock
             ->method('getLeadStats')
@@ -306,7 +306,7 @@ class PeakInteractionTimerTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('getOptimalTimeAndDayDataProvider')]
     public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
-        $contactMock = $this->createMock(Lead::class);
+        $contactMock = $this->createStub(Lead::class);
 
         $this->statRepositoryMock
             ->method('getLeadStats')

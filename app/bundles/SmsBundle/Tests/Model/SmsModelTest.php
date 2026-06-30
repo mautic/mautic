@@ -30,15 +30,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&CacheStorageHelper
+     * @var \PHPUnit\Framework\MockObject\Stub&CacheStorageHelper
      */
-    private MockObject $cacheStorageHelper;
+    private \PHPUnit\Framework\MockObject\Stub $cacheStorageHelper;
 
     private MockObject&EntityManagerInterface $entityManger;
 
-    private MockObject&LeadModel $leadModel;
+    private \PHPUnit\Framework\MockObject\Stub&LeadModel $leadModel;
 
-    private MockObject&TrackableModel $pageTrackableModel;
+    private \PHPUnit\Framework\MockObject\Stub&TrackableModel $pageTrackableModel;
 
     private MockObject&TransportChain $transport;
 
@@ -46,33 +46,33 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&EventDispatcherInterface $dispatcher;
 
-    private MockObject&UrlGeneratorInterface $urlGenerator;
+    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
 
     private MockObject&TranslatorInterface $translator;
 
-    private MockObject&UserHelper $userHelper;
+    private \PHPUnit\Framework\MockObject\Stub&UserHelper $userHelper;
 
-    private MockObject&LoggerInterface $logger;
+    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
 
-    private MockObject&CoreParametersHelper $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
 
     private SmsModel $smsModel;
 
     protected function setUp(): void
     {
-        $this->pageTrackableModel   = $this->createMock(TrackableModel::class);
-        $this->leadModel            = $this->createMock(LeadModel::class);
+        $this->pageTrackableModel   = $this->createStub(TrackableModel::class);
+        $this->leadModel            = $this->createStub(LeadModel::class);
         $this->transport            = $this->createMock(TransportChain::class);
         /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->cacheStorageHelper   = $this->createMock(CacheStorageHelper::class);
+        $this->cacheStorageHelper   = $this->createStub(CacheStorageHelper::class);
         $this->entityManger         = $this->createMock(EntityManagerInterface::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->urlGenerator         = $this->createMock(UrlGeneratorInterface::class);
+        $this->urlGenerator         = $this->createStub(UrlGeneratorInterface::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->userHelper           = $this->createMock(UserHelper::class);
-        $this->logger               = $this->createMock(LoggerInterface::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->userHelper           = $this->createStub(UserHelper::class);
+        $this->logger               = $this->createStub(LoggerInterface::class);
+        $this->coreParametersHelper = $this->createStub(CoreParametersHelper::class);
         $this->dispatcher->method('dispatch')
             ->willReturnArgument(0);
         $this->smsModel             = new SmsModel(
@@ -185,7 +185,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($smsRepo = $this->createMock(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
-            ->willReturn($this->createMock(StatRepository::class));
+            ->willReturn($this->createStub(StatRepository::class));
 
         $smsRepo->expects($this->once())
             ->method('upCount')

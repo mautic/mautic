@@ -14,9 +14,9 @@ class TagManagerPermissionsTest extends TestCase
     private \PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
 
     /**
-     * @var FormBuilderInterface
+     * @var FormBuilderInterface&\PHPUnit\Framework\MockObject\Stub
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+    private \PHPUnit\Framework\MockObject\Stub $formBuilder;
 
     protected function setUp(): void
     {
@@ -29,7 +29,7 @@ class TagManagerPermissionsTest extends TestCase
             ])
             ->getMock();
 
-        $this->formBuilder = $this->createMock(FormBuilderInterface::class);
+        $this->formBuilder = $this->createStub(FormBuilderInterface::class);
     }
 
     public function testBuildFormMethodAddsStandardFormFields(): void
