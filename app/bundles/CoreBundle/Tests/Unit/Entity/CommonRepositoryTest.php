@@ -23,7 +23,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     private QueryBuilder $qb;
 
     /**
-     * @var MockObject|Connection
+     * @var MockObject&Connection
      */
     private MockObject $connectionMock;
 

@@ -29,7 +29,7 @@ class LeadFieldDeleterTest extends TestCase
         $this->leadFieldDeleter          = new LeadFieldDeleter(
             $this->leadFieldRepositoryMock,
             $this->fieldDeleteDispatcherMock,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $this->backgroundSettingsMock,
         );
     }

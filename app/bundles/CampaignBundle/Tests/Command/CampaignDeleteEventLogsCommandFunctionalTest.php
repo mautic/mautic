@@ -66,9 +66,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
             $commandData['campaign_event_ids'] = [$event1->getId(), $event2->getId()];
         }
 
-        $exitCode = $applicationTester->run($commandData);
-
-        return $exitCode;
+        return $applicationTester->run($commandData);
     }
 
     private function createLead(): Lead

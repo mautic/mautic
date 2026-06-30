@@ -30,9 +30,9 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     private NullLogger $logger;
 
     /**
-     * @var EventLogger|MockObject
+     * @var EventLogger|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $eventLogger;
+    private \PHPUnit\Framework\MockObject\Stub $eventLogger;
 
     private Interval $intervalScheduler;
 
@@ -41,21 +41,21 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     private Optimized $optimizedScheduler;
 
     /**
-     * @var EventCollector|MockObject
+     * @var MockObject&EventCollector
      */
     private MockObject $eventCollector;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     private EventScheduler $scheduler;
 
     /**
-     * @var MockObject&PublishStateService
+     * @var \PHPUnit\Framework\MockObject\Stub&PublishStateService
      */
-    private MockObject $publishStateService;
+    private \PHPUnit\Framework\MockObject\Stub $publishStateService;
 
     protected function setUp(): void
     {
@@ -63,14 +63,14 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $coreParamtersHelper       = $this->createMock(CoreParametersHelper::class);
         $coreParamtersHelper->method('getDefaultTimezone')
             ->willReturn('America/New_York');
-        $this->eventLogger                = $this->createMock(EventLogger::class);
+        $this->eventLogger                = $this->createStub(EventLogger::class);
         $peakInteractionTimer             = $this->createMock(PeakInteractionTimer::class);
         $this->intervalScheduler          = new Interval($this->logger, $coreParamtersHelper);
         $this->dateTimeScheduler          = new DateTime($this->logger);
         $this->optimizedScheduler         = new Optimized($peakInteractionTimer);
         $this->eventCollector             = $this->createMock(EventCollector::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->publishStateService        = $this->createMock(PublishStateService::class);
+        $this->publishStateService        = $this->createStub(PublishStateService::class);
         $this->scheduler                  = new EventScheduler(
             $this->logger,
             $this->eventLogger,
@@ -80,7 +80,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->dispatcher,
             $coreParamtersHelper,
-            $this->createMock(OptimisticLockServiceInterface::class),
+            $this->createStub(OptimisticLockServiceInterface::class),
             $this->publishStateService
         );
     }
@@ -385,7 +385,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->dispatcher,
             $coreParamtersHelper,
-            $this->createMock(OptimisticLockServiceInterface::class),
+            $this->createStub(OptimisticLockServiceInterface::class),
             $this->publishStateService
         );
 

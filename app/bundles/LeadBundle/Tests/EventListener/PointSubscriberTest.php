@@ -14,13 +14,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
 
     private PointSubscriber $subscriber;
+    /**
+     * @var MockObject&TriggerExecutedEvent
+     */
     private MockObject $triggerExecutedEvent;
 
+    /**
+     * @var MockObject&TriggerEventEntity
+     */
     private MockObject $triggerEventEntity;
 
     protected function setUp(): void

@@ -14,24 +14,24 @@ use PHPUnit\Framework\MockObject\MockObject;
 class ScheduleModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|SchedulerRepository
+     * @var MockObject&SchedulerRepository
      */
     private MockObject $schedulerRepository;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var MockObject|SchedulerPlanner
+     * @var MockObject&SchedulerPlanner
      */
     private MockObject $schedulerPlanner;
 
     /**
-     * @var MockObject|ExportOption
+     * @var \PHPUnit\Framework\MockObject\Stub|ExportOption
      */
-    private MockObject $exportOption;
+    private \PHPUnit\Framework\MockObject\Stub $exportOption;
 
     private ScheduleModel $scheduleModel;
 
@@ -40,7 +40,7 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->schedulerRepository = $this->createMock(SchedulerRepository::class);
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->schedulerPlanner    = $this->createMock(SchedulerPlanner::class);
-        $this->exportOption        = $this->createMock(ExportOption::class);
+        $this->exportOption        = $this->createStub(ExportOption::class);
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')

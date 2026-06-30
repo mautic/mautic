@@ -23,19 +23,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallServiceTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&Configurator
+     */
     private MockObject $configurator;
 
+    /**
+     * @var MockObject&CacheHelper
+     */
     private MockObject $cacheHelper;
 
+    /**
+     * @var MockObject&PathsHelper
+     */
     private MockObject $pathsHelper;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
+    /**
+     * @var MockObject&TranslatorInterface
+     */
     private MockObject $translator;
 
+    /**
+     * @var MockObject&ValidatorInterface
+     */
     private MockObject $validator;
 
     private InstallService $installer;
@@ -95,7 +110,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             );
 
         $index = 0;
-        $step  = $this->createMock(StepInterface::class);
+        $step  = $this->createStub(StepInterface::class);
 
         $this->configurator->expects($this->once())
             ->method('getStep')
@@ -121,7 +136,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             );
 
         $index = 0;
-        $step  = $this->createMock(StepInterface::class);
+        $step  = $this->createStub(StepInterface::class);
 
         $this->configurator->expects($this->once())
             ->method('getStep')
@@ -285,7 +300,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'table_prefix' => 'mautic_',
         ];
 
-        $step = $this->createMock(StepInterface::class);
+        $step = $this->createStub(StepInterface::class);
         $this->assertEquals(['error' => null], $this->installer->createDatabaseStep($step, $dbParams));
     }
 

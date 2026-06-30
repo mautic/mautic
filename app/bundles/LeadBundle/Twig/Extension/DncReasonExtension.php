@@ -22,7 +22,7 @@ class DncReasonExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('dncReasonToText', [$this, 'toText']),
+            new TwigFunction('dncReasonToText', $this->toText(...)),
         ];
     }
 

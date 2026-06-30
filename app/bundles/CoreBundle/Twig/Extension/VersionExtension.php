@@ -18,7 +18,7 @@ class VersionExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('mauticAppVersion', [$this, 'getVersion']),
+            new TwigFunction('mauticAppVersion', $this->getVersion(...)),
         ];
     }
 

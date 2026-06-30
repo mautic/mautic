@@ -37,7 +37,7 @@ class PreUpAssertionMigrationTest extends TestCase
             }
         };
 
-        $migration->preUp($this->createMock(Schema::class));
+        $migration->preUp($this->createStub(Schema::class));
 
         Assert::assertEmpty($migration->messages);
     }
@@ -73,7 +73,7 @@ class PreUpAssertionMigrationTest extends TestCase
         };
 
         try {
-            $migration->preUp($this->createMock(Schema::class));
+            $migration->preUp($this->createStub(Schema::class));
             $this->fail(sprintf('Exception %s should have been thrown', SkipMigration::class));
         } catch (SkipMigration) {
         }
@@ -116,7 +116,7 @@ class PreUpAssertionMigrationTest extends TestCase
             }
         };
 
-        $migration->preUp($this->createMock(Schema::class));
+        $migration->preUp($this->createStub(Schema::class));
 
         Assert::assertCount(2, $migration->messages);
         Assert::assertSame([

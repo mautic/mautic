@@ -553,7 +553,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        return !($forceScheme && !isset($urlParts['scheme'])) && !(isset($urlParts['scheme']) && !in_array(
+        return (!$forceScheme || isset($urlParts['scheme'])) && (!isset($urlParts['scheme']) || in_array(
             $urlParts['scheme'],
             ['http', 'https', 'ftp', 'ftps', 'mailto']
         ));

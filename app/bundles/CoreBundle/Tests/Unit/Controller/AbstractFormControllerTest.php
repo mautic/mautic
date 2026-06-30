@@ -21,7 +21,7 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     private AbstractFormController $classFromAbstractFormController;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Form
+     * @var \PHPUnit\Framework\MockObject\MockObject&Form
      */
     private \PHPUnit\Framework\MockObject\MockObject $formMock;
 

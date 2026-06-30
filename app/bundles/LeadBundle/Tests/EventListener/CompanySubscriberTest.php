@@ -17,12 +17,12 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper        = $this->createMock(IpLookupHelper::class);
-        $auditLogModel         = $this->createMock(AuditLogModel::class);
-        $entityManager         = $this->createMock(EntityManager::class);
-        $coreParameters        = $this->createMock(CoreParametersHelper::class);
-        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
-        $companyModel          = $this->createMock(CompanyModel::class);
+        $ipLookupHelper        = $this->createStub(IpLookupHelper::class);
+        $auditLogModel         = $this->createStub(AuditLogModel::class);
+        $entityManager         = $this->createStub(EntityManager::class);
+        $coreParameters        = $this->createStub(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createStub(CompanyLeadRepository::class);
+        $companyModel          = $this->createStub(CompanyModel::class);
         $subscriber            = new CompanySubscriber(
             $ipLookupHelper,
             $auditLogModel,
@@ -74,10 +74,10 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $entityManager         = $this->createMock(EntityManager::class);
-        $coreParameters        = $this->createMock(CoreParametersHelper::class);
-        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
-        $companyModel          = $this->createMock(CompanyModel::class);
+        $entityManager         = $this->createStub(EntityManager::class);
+        $coreParameters        = $this->createStub(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createStub(CompanyLeadRepository::class);
+        $companyModel          = $this->createStub(CompanyModel::class);
         $subscriber            = new CompanySubscriber(
             $ipLookupHelper,
             $auditLogModel,

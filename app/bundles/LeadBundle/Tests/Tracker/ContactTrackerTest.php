@@ -26,49 +26,49 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|LeadRepository
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepositoryMock;
 
     /**
-     * @var MockObject|ContactTrackingServiceInterface
+     * @var MockObject&ContactTrackingServiceInterface
      */
     private MockObject $contactTrackingServiceMock;
 
     /**
-     * @var MockObject|DeviceTracker
+     * @var MockObject&DeviceTracker
      */
     private MockObject $deviceTrackerMock;
 
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject&CorePermissions
      */
     private MockObject $securityMock;
 
     /**
-     * @var MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\Stub|Logger
      */
-    private MockObject $loggerMock;
+    private \PHPUnit\Framework\MockObject\Stub $loggerMock;
 
     /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelperMock;
 
     private RequestStack $requestStack;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelperMock;
 
     /**
-     * @var MockObject|EventDispatcher
+     * @var MockObject&EventDispatcher
      */
     private MockObject $dispatcherMock;
 
     /**
-     * @var MockObject|FieldModel
+     * @var MockObject&FieldModel
      */
     private MockObject $leadFieldModelMock;
 
@@ -81,7 +81,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->dispatcherMock             = $this->createMock(EventDispatcher::class);
         $this->leadFieldModelMock         = $this->createMock(FieldModel::class);
-        $this->loggerMock                 = $this->createMock(Logger::class);
+        $this->loggerMock                 = $this->createStub(Logger::class);
         $this->ipLookupHelperMock         = $this->createMock(IpLookupHelper::class);
         $this->requestStack               = new RequestStack();
 

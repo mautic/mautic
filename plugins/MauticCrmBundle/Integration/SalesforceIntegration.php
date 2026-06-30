@@ -215,7 +215,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = fn (array $field, $object): bool => ('boolean' !== $field['type'] && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id', 'CreatedDate']))
-        || ('Lead' == $object && in_array($field['name'], ['Company']))
+        || ('Lead' == $object && 'Company' == $field['name'])
         || (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
 
         $salesFields = [];
@@ -249,10 +249,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && !in_array($fieldInfo['name'], ['Id', 'IsDeleted', 'CreatedDate'])))
                                         || !isset($fieldInfo['name'])
-                                        || (in_array(
-                                            $fieldInfo['type'],
-                                            ['reference']
-                                        ) && 'AccountId' != $fieldInfo['name'])
+                                        || ('reference' == $fieldInfo['type'] && 'AccountId' != $fieldInfo['name'])
                                     ) {
                                         continue;
                                     }
@@ -275,7 +272,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         ];
 
                                         // CreateDate can be updatable just in Mautic
-                                        if (in_array($fieldInfo['name'], ['CreatedDate'])) {
+                                        if ('CreatedDate' == $fieldInfo['name']) {
                                             $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject]['update_mautic'] = 1;
                                         }
                                     } else {
