@@ -41,10 +41,7 @@ class Stat
      */
     private $list;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     private ?\DateTimeInterface $dateSent = null;
 
@@ -293,18 +290,12 @@ class Stat
         return $this->id;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress|null $ip
-     */
-    public function setIpAddress(IpAddress $ip): void
+    public function setIpAddress(?IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -521,10 +512,8 @@ class Stat
 
     /**
      * @param int $openCount
-     *
-     * @return Stat
      */
-    public function setOpenCount($openCount)
+    public function setOpenCount($openCount): static
     {
         $this->addChange('openCount', $this->openCount, $openCount);
         $this->openCount = $openCount;
@@ -546,10 +535,8 @@ class Stat
 
     /**
      * Up the sent count.
-     *
-     * @return Stat
      */
-    public function upOpenCount()
+    public function upOpenCount(): static
     {
         $count = (int) $this->openCount + 1;
         $this->addChange('openCount', $this->openCount, $count);
@@ -580,10 +567,7 @@ class Stat
         return $this->openDetails;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setOpenDetails(array $openDetails)
+    public function setOpenDetails(array $openDetails): static
     {
         $this->openDetails = $openDetails;
 
@@ -598,10 +582,7 @@ class Stat
         return $this->storedCopy;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setStoredCopy(Copy $storedCopy)
+    public function setStoredCopy(Copy $storedCopy): static
     {
         $this->storedCopy = $storedCopy;
 
@@ -646,7 +627,7 @@ class Stat
     /**
      * @param \DateTime|\DateTimeImmutable|null $dateTime
      */
-    private function toDateTime($dateTime): ?\DateTime
+    private function toDateTime(?\DateTimeInterface $dateTime): ?\DateTime
     {
         return $dateTime instanceof \DateTimeImmutable ? \DateTime::createFromImmutable($dateTime) : $dateTime;
     }

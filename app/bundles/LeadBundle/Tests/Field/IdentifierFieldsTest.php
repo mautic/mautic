@@ -13,12 +13,12 @@ use PHPUnit\Framework\TestCase;
 class IdentifierFieldsTest extends TestCase
 {
     /**
-     * @var FieldsWithUniqueIdentifier&MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifiers;
 
     /**
-     * @var FieldList&MockObject
+     * @var MockObject&FieldList
      */
     private MockObject $fieldList;
 
@@ -45,7 +45,7 @@ class IdentifierFieldsTest extends TestCase
 
         $fields = $this->identifierFields->getFieldList('lead');
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'firstname',
                 'lastname',
@@ -70,7 +70,7 @@ class IdentifierFieldsTest extends TestCase
 
         $fields = $this->identifierFields->getFieldList('company');
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'companyname',
                 'companyemail',
@@ -101,7 +101,7 @@ class IdentifierFieldsTest extends TestCase
 
         $fields = $this->identifierFields->getFieldList('lead');
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'firstname',
                 'lastname',
@@ -148,7 +148,7 @@ class IdentifierFieldsTest extends TestCase
 
         $fields = $this->identifierFields->getFieldList('lead');
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'firstname',
                 'lastname',

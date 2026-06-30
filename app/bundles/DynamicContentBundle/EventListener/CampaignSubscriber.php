@@ -20,9 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private DynamicContentModel $dynamicContentModel,
+        private readonly DynamicContentModel $dynamicContentModel,
         protected CacheProvider $cache,
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -113,7 +113,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(true);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
@@ -125,7 +125,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if ($dwc instanceof DynamicContent) {
             // Use translation if available
-            list($ignore, $dwc) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+            [$ignore, $dwc] = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
             \assert($dwc instanceof DynamicContent);
 
             if ($slot) {
@@ -143,10 +143,8 @@ class CampaignSubscriber implements EventSubscriberInterface
 
             $event->stopPropagation();
 
-            $result = $event->setResult($content);
+            $event->setResult($content);
             $event->setChannel('dynamicContent', $dwc->getId());
-
-            return $result;
         }
     }
 }

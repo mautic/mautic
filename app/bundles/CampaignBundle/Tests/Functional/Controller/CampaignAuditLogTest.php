@@ -102,7 +102,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated'),
@@ -113,5 +113,45 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
             $translator->trans('mautic.campaign.changelog.event_updated_details', ['%event_id%' => $eventId]),
             $this->client->getResponse()->getContent()
         );
+    }
+
+    public function testCampaignMultipleProjectAdditionsShowInAuditLog(): void
+    {
+        $campaignModel = CampaignAuditLogTest::getContainer()->get('mautic.campaign.model.campaign');
+
+        // Create projects first
+        $project1 = $this->createProject('First Project');
+        $project2 = $this->createProject('Second Project');
+        $this->em->flush();
+
+        // Create a campaign without projects
+        $campaign = $this->createCampaign('Campaign for Multiple Additions');
+        $campaignModel->saveEntity($campaign);
+        $this->em->flush();
+        $campaignId = $campaign->getId();
+
+        // Add first project
+        $campaign->addProject($project1);
+        $campaignModel->saveEntity($campaign);
+        $this->em->flush();
+
+        // Add second project
+        $campaign->addProject($project2);
+        $campaignModel->saveEntity($campaign);
+        $this->em->flush();
+
+        // View the campaign to see audit log
+        $campaignViewUrl = '/s/campaigns/view/'.$campaignId;
+        $this->client->request(Request::METHOD_GET, $campaignViewUrl);
+        $this->assertResponseIsSuccessful();
+
+        $responseContent = $this->client->getResponse()->getContent();
+
+        // Verify both project names appear
+        $this->assertStringContainsString('First Project', $responseContent);
+        $this->assertStringContainsString('Second Project', $responseContent);
+
+        // Should show the progression in audit log
+        $this->assertStringContainsString('First Project, Second Project', $responseContent);
     }
 }

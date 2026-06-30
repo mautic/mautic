@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -36,8 +37,10 @@ class ListLeadRepository extends CommonRepository
 
         if (!empty($lists)) {
             $q->andWhere(
-                $q->expr()->notIn('leadlist_id', $lists)
-            )->executeStatement();
+                $q->expr()->notIn('leadlist_id', ':ids')
+            )
+                ->setParameter('ids', $lists, ArrayParameterType::INTEGER)
+                ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()
@@ -83,5 +86,17 @@ class ListLeadRepository extends CommonRepository
         }
 
         return $deletedRecordCount;
+    }
+
+    public function removeLeadsByListId(int $listId): void
+    {
+        $table_name = MAUTIC_TABLE_PREFIX.'lead_lists_leads';
+        $conn       = $this->getEntityManager()->getConnection();
+        do {
+            $deletedRows = $conn->executeStatement(
+                "DELETE FROM {$table_name} WHERE leadlist_id = :listId LIMIT ".self::DELETE_BATCH_SIZE,
+                ['listId' => $listId]
+            );
+        } while ($deletedRows > 0);
     }
 }

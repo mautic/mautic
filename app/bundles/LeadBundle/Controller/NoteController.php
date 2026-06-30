@@ -22,7 +22,7 @@ class NoteController extends FormController
     public function indexAction(Request $request, $leadId = 0, $page = 1)
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -198,18 +198,18 @@ class NoteController extends FormController
             $passthroughVars['flashes'] = $this->getFlashContent();
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form'        => $form->createView(),
-                        'lead'        => $lead,
-                        'permissions' => $permissions,
-                    ],
-                    'contentTemplate' => '@MauticLead/Note/form.html.twig',
-                ]
-            );
         }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form'        => $form->createView(),
+                    'lead'        => $lead,
+                    'permissions' => $permissions,
+                ],
+                'contentTemplate' => '@MauticLead/Note/form.html.twig',
+            ]
+        );
     }
 
     /**
@@ -231,7 +231,7 @@ class NoteController extends FormController
         $valid      = false;
 
         if (null === $note || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl(
@@ -282,18 +282,18 @@ class NoteController extends FormController
             $passthroughVars['mauticContent'] = 'leadNote';
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
-                        'form'        => $form->createView(),
-                        'lead'        => $lead,
-                        'permissions' => $permissions,
-                    ],
-                    'contentTemplate' => '@MauticLead/Note/form.html.twig',
-                ]
-            );
         }
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'form'        => $form->createView(),
+                    'lead'        => $lead,
+                    'permissions' => $permissions,
+                ],
+                'contentTemplate' => '@MauticLead/Note/form.html.twig',
+            ]
+        );
     }
 
     /**
@@ -319,7 +319,7 @@ class NoteController extends FormController
             !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
             || $model->isLocked($note)
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $model->deleteEntity($note);
@@ -345,8 +345,8 @@ class NoteController extends FormController
     {
         if (method_exists($this, "{$objectAction}Action")) {
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);
-        } else {
-            return $this->accessDenied();
         }
+
+        return $this->notFound();
     }
 }

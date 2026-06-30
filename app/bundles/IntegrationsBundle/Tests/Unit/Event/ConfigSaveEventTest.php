@@ -16,7 +16,7 @@ class ConfigSaveEventTest extends TestCase
         $integration = $this->createMock(Integration::class);
         $event       = new ConfigSaveEvent($integration);
 
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getName')
             ->willReturn($name);
 

@@ -17,25 +17,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 {
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var ListModel&MockObject
-     */
-    private MockObject $listModel;
-
     private DynamicContentFilterEntryFiltersType $form;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->listModel  = $this->createMock(ListModel::class);
-        $this->form       =  new DynamicContentFilterEntryFiltersType($this->translator, $this->listModel);
+        $translator       = $this->createMock(TranslatorInterface::class);
+        $listModel        = $this->createMock(ListModel::class);
+        $this->form       =  new DynamicContentFilterEntryFiltersType($translator, $listModel);
     }
 
     public function testBuildForm(): void
@@ -43,7 +33,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $matcher = self::exactly(4);
         $builder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('glue', $parameters[0]);
                     $this->assertSame(ChoiceType::class, $parameters[1]);
@@ -77,7 +67,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
         $matcher = $this->exactly(2);
 
         $builder->expects($matcher)
-            ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
+            ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SET_DATA, $parameters[0]);
                     $this->assertIsCallable($parameters[1]);
@@ -101,7 +91,7 @@ class DynamicContentFilterEntryFiltersTypeTest extends TestCase
     public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects(self::once())
+        $resolver->expects($this->once())
             ->method('setRequired')
             ->with([
                 'countries',

@@ -12,12 +12,9 @@ use PHPUnit\Framework\Assert;
 
 class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
-    /**
-     * @var UserNotificationBuilder
-     */
-    private $notificationBuilder;
+    private UserNotificationBuilder $notificationBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

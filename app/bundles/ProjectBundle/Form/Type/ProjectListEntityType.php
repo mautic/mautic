@@ -30,7 +30,7 @@ final class ProjectListEntityType extends AbstractType
             'lookup_arguments'                  => fn (Options $options): array => [
                 'type'    => $options['entityType'],
                 'filter'  => '$data',
-                'limit'   => 100,
+                'limit'   => 1000,
                 'start'   => 0,
                 'options' => [
                     'entityType' => $options['entityType'],

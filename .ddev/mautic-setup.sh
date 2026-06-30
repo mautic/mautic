@@ -10,10 +10,12 @@ setup_mautic() {
 
     cp ./.ddev/local.config.php.dist ./config/local.php
     cp ./.ddev/.env.test.local ./.env.test.local
-    cp ./.ddev/.env.local.dist ./.env.local
+    if [[ "${CODESPACES:-}" != "true" ]]; then
+        cp ./.ddev/.env.local.dist ./.env.local
+    fi
 
     printf "Installing Mautic...\n"
-    php bin/console mautic:install "${MAUTIC_URL}"
+    php bin/console mautic:install "${MAUTIC_URL}" --force --no-interaction
     php bin/console cache:warmup --no-interaction --env=dev
 
     printf "Enabling plugins...\n"
@@ -44,7 +46,7 @@ then
     printf "\nAnswer [yes/no]: "
     read MAUTIC_PREF
 
-    if [ $MAUTIC_PREF == "yes" ] || [ -n $GITPOD_HEADLESS ];
+    if [[ "$MAUTIC_PREF" =~ ^([Yy]|[Yy][Ee][Ss])$ ]];
     then
         printf "Okay, setting up your Mautic instance... 🚀\n"
         echo "ddev-managed" > ./.ddev/mautic-preference

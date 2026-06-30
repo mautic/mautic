@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -27,10 +27,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('point:triggers:viewown')"),
         new Post(security: "is_granted('point:triggers:create')"),
-        new Get(security: "is_granted('point:triggers:viewown')"),
-        new Put(security: "is_granted('point:triggers:editown')"),
-        new Patch(security: "is_granted('point:triggers:editother')"),
-        new Delete(security: "is_granted('point:triggers:deleteown')"),
+        new Get(security: "is_granted('point:triggers:viewown', object)"),
+        new Put(security: "is_granted('point:triggers:editown', object)"),
+        new Patch(security: "is_granted('point:triggers:editother', object)"),
+        new Delete(security: "is_granted('point:triggers:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['point:read'],
@@ -46,6 +46,7 @@ class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
+
     public const ENTITY_NAME = 'point';
 
     /**
@@ -219,7 +220,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -228,10 +229,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param array $properties
-     *
-     * @return self
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -250,10 +249,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param string $type
-     *
-     * @return self
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -262,7 +259,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -276,10 +273,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return self
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -288,7 +283,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -297,10 +292,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return self
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -309,17 +302,14 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * @return self
-     */
-    public function addLog(LeadPointLog $log)
+    public function addLog(LeadPointLog $log): static
     {
         $this->log[] = $log;
 
@@ -341,10 +331,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return Point
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -353,7 +341,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -362,10 +350,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return Point
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -374,7 +360,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -382,7 +368,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -398,7 +384,7 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getDelta()
     {
@@ -415,10 +401,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param bool $repeatable
-     *
-     * @return Point
      */
-    public function setRepeatable($repeatable)
+    public function setRepeatable($repeatable): static
     {
         $this->isChanged('repeatable', $repeatable);
         $this->repeatable = $repeatable;

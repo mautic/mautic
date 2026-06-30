@@ -14,7 +14,7 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
 
     public const FALSE_BOOLEAN_VALUE = 'false';
 
-    private ValueNormalizer $valueNormalizer;
+    private readonly ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {
@@ -47,10 +47,6 @@ final class VariableExpresserHelper implements VariableExpresserHelperInterface
 
         if (is_float($var)) {
             return new EncodedValueDAO(EncodedValueDAO::FLOAT_TYPE, (string) $var);
-        }
-
-        if (is_double($var)) {
-            return new EncodedValueDAO(EncodedValueDAO::DOUBLE_TYPE, (string) $var);
         }
 
         if ($var instanceof \DateTime) {

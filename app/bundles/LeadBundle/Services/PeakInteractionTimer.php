@@ -13,40 +13,64 @@ use Mautic\PageBundle\Entity\HitRepository;
 
 class PeakInteractionTimer
 {
-    public const DEFAULT_BEST_HOUR_START         = 9; // 9 AM
-    public const DEFAULT_BEST_HOUR_END           = 12; // 12 PM
-    public const DEFAULT_BEST_DAYS               = [2, 1, 4]; // Tuesday, Monday, Thursday
+    public const DEFAULT_BEST_HOUR_START         = 9;
+
+    // 9 AM
+    public const DEFAULT_BEST_HOUR_END           = 12;
+
+    // 12 PM
+    public const DEFAULT_BEST_DAYS               = [2, 1, 4];
+
+    // Tuesday, Monday, Thursday
     public const DEFAULT_FETCH_INTERACTIONS_FROM = '-60 days';
+
     public const DEFAULT_FETCH_LIMIT             = 50;
-    public const DEFAULT_CACHE_TIMEOUT           = 43800; // in minutes ~ 1 month
+
+    public const DEFAULT_CACHE_TIMEOUT           = 43800;
+
+    // in minutes ~ 1 month
     public const MIN_INTERACTIONS                = 5;
+
     public const DEFAULT_MAX_OPTIMAL_DAYS        = 3;
 
-    private const MINUTES_START_OF_HOUR   = 0; // Start of the hour
-    private const HOUR_FORMAT             = 'G'; // 0 through 23
+    private const MINUTES_START_OF_HOUR   = 0;
+
+    // Start of the hour
+    private const HOUR_FORMAT             = 'G';
+
+    // 0 through 23
     private const DAY_FORMAT              = 'N'; // ISO 8601 numeric representation of the day of the week
 
     private ?\DateTimeZone $defaultTimezone = null;
 
-    private int $cacheTimeout;
+    private readonly int $cacheTimeout;
+
     private int $bestHourStart;
-    private int $bestDefaultHourStart;
+
+    private readonly int $bestDefaultHourStart;
+
     private int $bestHourEnd;
-    private int $bestDefaultHourEnd;
+
+    private readonly int $bestDefaultHourEnd;
+
     /** @var int[] */
     private array $bestDays;
+
     /** @var int[] */
-    private array $bestDefaultDays;
-    private string $fetchInteractionsFrom;
-    private int $fetchLimit;
+    private readonly array $bestDefaultDays;
+
+    private readonly string $fetchInteractionsFrom;
+
+    private readonly int $fetchLimit;
+
     private int $maxOptimalDays;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private StatRepository $statRepository,
-        private HitRepository $hitRepository,
-        private SubmissionRepository $submissionRepository,
-        private CacheProviderInterface $cacheProvider,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly StatRepository $statRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly CacheProviderInterface $cacheProvider,
     ) {
         $this->cacheTimeout          = $this->coreParametersHelper->get('peak_interaction_timer_cache_timeout');
         $this->bestDefaultHourStart  = $this->coreParametersHelper->get('peak_interaction_timer_best_default_hour_start');

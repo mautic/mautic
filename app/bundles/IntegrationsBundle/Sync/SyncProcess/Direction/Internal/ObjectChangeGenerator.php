@@ -35,10 +35,10 @@ class ObjectChangeGenerator
     ];
 
     public function __construct(
-        private SyncJudgeInterface $syncJudge,
-        private ValueHelper $valueHelper,
-        private FieldHelper $fieldHelper,
-        private BulkNotification $bulkNotification,
+        private readonly SyncJudgeInterface $syncJudge,
+        private readonly ValueHelper $valueHelper,
+        private readonly FieldHelper $fieldHelper,
+        private readonly BulkNotification $bulkNotification,
     ) {
     }
 
@@ -119,7 +119,7 @@ class ObjectChangeGenerator
                     $internalObject->getObject(),
                     $fieldMappingDAO->getInternalField()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;

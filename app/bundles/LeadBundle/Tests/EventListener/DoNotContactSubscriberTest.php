@@ -12,6 +12,9 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private DoNotContactSubscriber $doNotContactSubscriber;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContact
+     */
     private \PHPUnit\Framework\MockObject\MockObject $doNotContact;
 
     protected function setUp(): void
@@ -22,7 +25,7 @@ class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 DoNotContactAddEvent::ADD_DONOT_CONTACT       => ['addDncForLead', 0],
                 DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT => ['removeDncForLead', 0],

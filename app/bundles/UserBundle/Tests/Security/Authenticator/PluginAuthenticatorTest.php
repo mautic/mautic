@@ -42,9 +42,9 @@ class PluginAuthenticatorTest extends TestCase
 
         $pluginToken = new PluginToken($firewallName, $integration);
 
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $integrationService = $this->createMock(AbstractSsoServiceIntegration::class);
+        $integrationService = $this->createStub(AbstractSsoServiceIntegration::class);
         $integrationHelper  = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
@@ -82,27 +82,27 @@ class PluginAuthenticatorTest extends TestCase
             ->willReturn($returnedAuthEvent);
 
         $authenticateResult = new PluginAuthenticator(
-            $this->createMock(TokenPermissions::class),
+            $this->createStub(TokenPermissions::class),
             $dispatcher,
             $integrationHelper,
             $userProvider,
-            $this->createMock(AuthenticationHandler::class),
-            $this->createMock(OAuth2::class),
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(AuthenticationHandler::class),
+            $this->createStub(OAuth2::class),
+            $this->createStub(LoggerInterface::class),
             $firewallName
         );
 
         $authenticateResult = $authenticateResult->authenticate($request);
-        \assert($authenticateResult instanceof SelfValidatingPassport);
+        $this->assertInstanceOf(SelfValidatingPassport::class, $authenticateResult);
         self::assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
         self::assertSame($userIdentifier, $userBadge->getUserIdentifier());
         self::assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
-        \assert($pluginBadge instanceof PluginBadge);
+        $this->assertInstanceOf(PluginBadge::class, $pluginBadge);
         self::assertSame($returnedPluginToken, $pluginBadge->getPreAuthenticatedToken());
         self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
@@ -117,9 +117,9 @@ class PluginAuthenticatorTest extends TestCase
 
         $pluginToken = new PluginToken($firewallName, $integration);
 
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $integrationService = $this->createMock(AbstractSsoServiceIntegration::class);
+        $integrationService = $this->createStub(AbstractSsoServiceIntegration::class);
         $integrationHelper  = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects($this->once())
             ->method('getIntegrationObjects')
@@ -157,27 +157,26 @@ class PluginAuthenticatorTest extends TestCase
             });
 
         $pluginAuthenticator = new PluginAuthenticator(
-            $this->createMock(TokenPermissions::class),
+            $this->createStub(TokenPermissions::class),
             $dispatcher,
             $integrationHelper,
             $userProvider,
-            $this->createMock(AuthenticationHandler::class),
-            $this->createMock(OAuth2::class),
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(AuthenticationHandler::class),
+            $this->createStub(OAuth2::class),
+            $this->createStub(LoggerInterface::class),
             $firewallName
         );
 
         $authenticateResult = $pluginAuthenticator->authenticate($request);
-        \assert($authenticateResult instanceof SelfValidatingPassport);
         self::assertCount(2, $authenticateResult->getBadges());
 
         $userBadge = $authenticateResult->getBadge(UserBadge::class);
-        \assert($userBadge instanceof UserBadge);
+        \PHPUnit\Framework\Assert::assertInstanceOf(UserBadge::class, $userBadge);
         self::assertSame($userIdentifier, $userBadge->getUserIdentifier());
         self::assertSame($authenticatedUser, $userBadge->getUser());
 
         $pluginBadge = $authenticateResult->getBadge(PluginBadge::class);
-        \assert($pluginBadge instanceof PluginBadge);
+        \PHPUnit\Framework\Assert::assertInstanceOf(PluginBadge::class, $pluginBadge);
         self::assertEquals(new PluginToken($firewallName, $integration, $authenticatedUser), $pluginBadge->getPreAuthenticatedToken());
         self::assertSame($authenticatedIntegration, $pluginBadge->getAuthenticatingService());
     }
@@ -197,15 +196,13 @@ class PluginAuthenticatorTest extends TestCase
         $integrationHelper = $this->createMock(IntegrationHelper::class);
         $integrationHelper->expects(self::never())->method('getIntegrationObjects');
 
-        $userProvider = $this->createMock(UserProviderInterface::class);
+        $userProvider = $this->createStub(UserProviderInterface::class);
 
         $passportUser = $this->createMock(User::class);
         $passportUser->method('getPassword')->willReturn($encodedPassword);
         $passportUser->method('getRoles')->willReturn($roles);
 
-        $userBadge = new UserBadge('', function () use ($passportUser): UserInterface {
-            return $passportUser;
-        });
+        $userBadge = new UserBadge('', fn (): UserInterface => $passportUser);
 
         $pluginBadge = new PluginBadge(null, $pluginResponse, $authenticatingService);
 
@@ -224,7 +221,7 @@ class PluginAuthenticatorTest extends TestCase
         );
 
         $tokenPermissions = $this->createMock(TokenPermissions::class);
-        $tokenPermissions->expects(self::once())
+        $tokenPermissions->expects($this->once())
             ->method('setActivePermissionsOnAuthToken')
             ->with()
             ->willReturn($passportUser);
@@ -234,9 +231,9 @@ class PluginAuthenticatorTest extends TestCase
             $dispatcher,
             $integrationHelper,
             $userProvider,
-            $this->createMock(AuthenticationHandler::class),
-            $this->createMock(OAuth2::class),
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(AuthenticationHandler::class),
+            $this->createStub(OAuth2::class),
+            $this->createStub(LoggerInterface::class),
             $firewallName
         );
 
@@ -251,19 +248,19 @@ class PluginAuthenticatorTest extends TestCase
         $token        = new PluginToken(null);
 
         $authenticationHandler = $this->createMock(AuthenticationHandler::class);
-        $authenticationHandler->expects(self::once())
+        $authenticationHandler->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($request, $token)
             ->willReturn($response);
 
         $session = $this->createMock(SessionInterface::class);
-        $session->expects(self::once())
+        $session->expects($this->once())
             ->method('remove')
             ->with(SecurityRequestAttributes::AUTHENTICATION_ERROR);
         $request->setSession($session);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
                 new InteractiveLoginEvent($request, $token),
@@ -272,13 +269,13 @@ class PluginAuthenticatorTest extends TestCase
             ->willReturnArgument(0);
 
         $pluginAuthenticator = new PluginAuthenticator(
-            $this->createMock(TokenPermissions::class),
+            $this->createStub(TokenPermissions::class),
             $dispatcher,
-            $this->createMock(IntegrationHelper::class),
-            $this->createMock(UserProviderInterface::class),
+            $this->createStub(IntegrationHelper::class),
+            $this->createStub(UserProviderInterface::class),
             $authenticationHandler,
-            $this->createMock(OAuth2::class),
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(OAuth2::class),
+            $this->createStub(LoggerInterface::class),
             $firewallName
         );
 
@@ -290,22 +287,22 @@ class PluginAuthenticatorTest extends TestCase
         $firewallName = 'test';
         $request      = new Request();
         $response     = new Response();
-        $exception    = $this->createMock(AuthenticationException::class);
+        $exception    = $this->createStub(AuthenticationException::class);
 
         $authenticationHandler = $this->createMock(AuthenticationHandler::class);
-        $authenticationHandler->expects(self::once())
+        $authenticationHandler->expects($this->once())
             ->method('onAuthenticationFailure')
             ->with($request, $exception)
             ->willReturn($response);
 
         $pluginAuthenticator = new PluginAuthenticator(
-            $this->createMock(TokenPermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(IntegrationHelper::class),
-            $this->createMock(UserProviderInterface::class),
+            $this->createStub(TokenPermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(IntegrationHelper::class),
+            $this->createStub(UserProviderInterface::class),
             $authenticationHandler,
-            $this->createMock(OAuth2::class),
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(OAuth2::class),
+            $this->createStub(LoggerInterface::class),
             $firewallName
         );
 

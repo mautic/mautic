@@ -16,16 +16,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class ReportGeneratorEventTest extends TestCase
 {
     /**
-     * @var Report|MockObject
+     * @var MockObject&Report
      */
-    private $report;
+    private MockObject $report;
 
     /**
-     * @var QueryBuilder|MockObject
+     * @var MockObject&QueryBuilder
      */
-    private $queryBuilder;
-
-    private ChannelListHelper $channelListHelper;
+    private MockObject $queryBuilder;
 
     private ReportGeneratorEvent $reportGeneratorEvent;
 
@@ -35,12 +33,12 @@ class ReportGeneratorEventTest extends TestCase
 
         $this->report                = $this->createMock(Report::class);
         $this->queryBuilder          = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper     = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $channelListHelper           = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
         $this->reportGeneratorEvent  = new ReportGeneratorEvent(
             $this->report,
             [], // Use the setter if you need different options
             $this->queryBuilder,
-            $this->channelListHelper
+            $channelListHelper
         );
     }
 
@@ -251,7 +249,7 @@ class ReportGeneratorEventTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->queryBuilder->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);

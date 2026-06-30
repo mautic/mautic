@@ -11,7 +11,7 @@ class WebhookBuilderEvent extends Event
     private array $events = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -37,10 +37,8 @@ class WebhookBuilderEvent extends Event
 
     /**
      * Get webhook events.
-     *
-     * @return array
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         static $sorted = false;
 

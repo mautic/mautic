@@ -27,32 +27,32 @@ use PHPUnit\Framework\TestCase;
 class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel&MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $model;
 
     /**
-     * @var LeadRepository&MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $repository;
 
     /**
-     * @var Connection&MockObject
+     * @var Connection&\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $connection;
+    private \PHPUnit\Framework\MockObject\Stub $connection;
 
     /**
-     * @var DoNotContact&MockObject
+     * @var MockObject&DoNotContact
      */
     private MockObject $doNotContactModel;
 
     /**
-     * @var FieldList&MockObject
+     * @var MockObject&FieldList
      */
     private MockObject $fieldList;
 
     /**
-     * @var FieldsWithUniqueIdentifier&MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifier;
 
@@ -60,7 +60,7 @@ class ContactObjectHelperTest extends TestCase
     {
         $this->model                      = $this->createMock(LeadModel::class);
         $this->repository                 = $this->createMock(LeadRepository::class);
-        $this->connection                 = $this->createMock(Connection::class);
+        $this->connection                 = $this->createStub(Connection::class);
         $this->doNotContactModel          = $this->createMock(DoNotContact::class);
         $this->fieldList                  = $this->createMock(FieldList::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -98,7 +98,6 @@ class ContactObjectHelperTest extends TestCase
                     // Set contact ID
                     $reflection = new \ReflectionClass($lead);
                     $property   = $reflection->getProperty('id');
-                    $property->setAccessible(true);
                     $property->setValue($lead, $idMap[$lead->getEmail()]);
 
                     return true;
@@ -152,8 +151,7 @@ class ContactObjectHelperTest extends TestCase
                     // Set contact ID
                     $reflection = new \ReflectionClass($lead);
                     $property   = $reflection->getProperty('id');
-                    $property->setAccessible(true);
-                    $property->setValue($lead, $idMap[$lead->getEmail()]);
+                    $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
 
                     return true;
                 })
@@ -235,7 +233,7 @@ class ContactObjectHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $contact1->expects($matcher)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('john@doe.com', $parameters[1]);
@@ -331,7 +329,7 @@ class ContactObjectHelperTest extends TestCase
     public function testFindObjectById(): void
     {
         $contact = new Lead();
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1)
             ->willReturn($contact);
@@ -341,7 +339,7 @@ class ContactObjectHelperTest extends TestCase
 
     public function testFindObjectByIdReturnsNull(): void
     {
-        $this->repository->expects(self::once())
+        $this->repository->expects($this->once())
             ->method('getEntity')
             ->with(1);
 
@@ -354,7 +352,7 @@ class ContactObjectHelperTest extends TestCase
     public function testSetFieldValues(): void
     {
         $contact = new Lead();
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('setFieldValues')
             ->with($contact, []);
         $this->getObjectHelper()->setFieldValues($contact);

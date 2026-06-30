@@ -26,41 +26,31 @@ use PHPUnit\Framework\TestCase;
 class MauticSyncDataExchangeTest extends TestCase
 {
     /**
-     * @var MockObject|FieldChangeRepository
+     * @var MockObject&FieldChangeRepository
      */
     private MockObject $fieldChangeRepository;
 
     /**
-     * @var MockObject|FieldHelper
+     * @var MockObject&FieldHelper
      */
     private MockObject $fieldHelper;
 
     /**
-     * @var MockObject|MappingHelper
+     * @var MockObject&MappingHelper
      */
     private MockObject $mappingHelper;
 
     /**
-     * @var MockObject|FullObjectReportBuilder
+     * @var MockObject&FullObjectReportBuilder
      */
     private MockObject $fullObjectReportBuilder;
 
     /**
-     * @var MockObject|PartialObjectReportBuilder
+     * @var MockObject&PartialObjectReportBuilder
      */
     private MockObject $partialObjectReportBuilder;
 
-    /**
-     * @var MockObject|OrderExecutioner
-     */
-    private MockObject $orderExecutioner;
-
     private MauticSyncDataExchange $mauticSyncDataExchange;
-
-    /**
-     * @var SyncDateHelper&MockObject
-     */
-    private MockObject $syncDateHelper;
 
     protected function setUp(): void
     {
@@ -69,8 +59,8 @@ class MauticSyncDataExchangeTest extends TestCase
         $this->mappingHelper              = $this->createMock(MappingHelper::class);
         $this->fullObjectReportBuilder    = $this->createMock(FullObjectReportBuilder::class);
         $this->partialObjectReportBuilder = $this->createMock(PartialObjectReportBuilder::class);
-        $this->orderExecutioner           = $this->createMock(OrderExecutioner::class);
-        $this->syncDateHelper             = $this->createMock(SyncDateHelper::class);
+        $orderExecutioner                 = $this->createMock(OrderExecutioner::class);
+        $syncDateHelper                   = $this->createMock(SyncDateHelper::class);
 
         $this->mauticSyncDataExchange = new MauticSyncDataExchange(
             $this->fieldChangeRepository,
@@ -78,8 +68,8 @@ class MauticSyncDataExchangeTest extends TestCase
             $this->mappingHelper,
             $this->fullObjectReportBuilder,
             $this->partialObjectReportBuilder,
-            $this->orderExecutioner,
-            $this->syncDateHelper
+            $orderExecutioner,
+            $syncDateHelper
         );
     }
 

@@ -32,7 +32,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         Report $report,
         private array $options,
         private QueryBuilder $queryBuilder,
-        private ChannelListHelper $channelListHelper,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
         $this->report            = $report;
         $this->context           = $report->getSource();
@@ -67,10 +67,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getSelectColumns()
+    public function getSelectColumns(): array
     {
         return $this->selectColumns;
     }
@@ -85,18 +82,12 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * @return $this
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         $this->options = array_merge($this->options, $options);
 
@@ -389,11 +380,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function hasGroupBy(): bool
     {
-        if (!empty($this->getReport()->getGroupBy())) {
-            return true;
-        }
-
-        return false;
+        return !empty($this->getReport()->getGroupBy());
     }
 
     public function createParameterName(): string

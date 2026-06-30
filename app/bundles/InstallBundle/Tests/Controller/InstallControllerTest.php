@@ -25,63 +25,62 @@ use Symfony\Component\Routing\Router;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $sessionMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $containerMock;
-
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     */
     private \PHPUnit\Framework\MockObject\MockObject $routerMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $flashBagMock;
 
     private InstallController $controller;
 
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelper;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&PathsHelper
+     */
+    private \PHPUnit\Framework\MockObject\Stub $pathsHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject $configurator;
-
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&InstallService
+     */
     private \PHPUnit\Framework\MockObject\MockObject $installer;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->sessionMock          = $this->createMock(Session::class);
-        $this->containerMock        = $this->createMock(Container::class);
+        $sessionMock                = $this->createMock(Session::class);
+        $containerMock              = $this->createMock(Container::class);
         $this->routerMock           = $this->createMock(Router::class);
-        $this->flashBagMock         = $this->createMock(FlashBagInterface::class);
-        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $flashBagMock               = $this->createMock(FlashBagInterface::class);
+        $this->pathsHelper          = $this->createStub(PathsHelper::class);
 
-        $this->configurator   = $this->createMock(Configurator::class);
+        $configurator         = $this->createMock(Configurator::class);
         $this->installer      = $this->createMock(InstallService::class);
         $doctrine             = $this->createMock(ManagerRegistry::class);
         $modelFactory         = $this->createMock(ModelFactory::class);
         $userHelper           = $this->createMock(UserHelper::class);
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock = $this->createMock(Translator::class);
+        $translatorMock       = $this->createMock(Translator::class);
         $flashBag             = $this->createMock(FlashBag::class);
         $requestStack         = new RequestStack();
         $security             = $this->createMock(CorePermissions::class);
 
         $this->controller = new InstallController(
-            $this->configurator,
+            $configurator,
             $this->installer,
             $doctrine,
             $modelFactory,
             $userHelper,
             $coreParametersHelper,
             $dispatcher,
-            $this->translatorMock,
+            $translatorMock,
             $flashBag,
             $requestStack,
             $security
         );
-        $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
+        $this->controller->setContainer($containerMock);
+        $sessionMock->method('getFlashBag')->willReturn($flashBagMock);
 
-        $this->containerMock->method('get')
+        $containerMock->method('get')
             ->with('router')
             ->willReturn($this->routerMock);
     }
@@ -101,10 +100,10 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
 
         $response = $this->controller->stepAction(
             new Request(),
-            $this->createMock(EntityManagerInterface::class),
+            $this->createStub(EntityManagerInterface::class),
             $this->pathsHelper,
             InstallService::CHECK_STEP
         );
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 }

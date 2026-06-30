@@ -226,10 +226,10 @@ class SearchStringHelper
         return $filters;
     }
 
-    private function setFilter(&$filters, &$baseName, &$keyCount, &$string, &$command, $overrideCommand,
-        $setFilter = true,
-        $type = null,
-        $setUpNext = true): void
+    private function setFilter(&$filters, &$baseName, &$keyCount, string &$string, &$command, $overrideCommand,
+        bool $setFilter = true,
+        ?string $type = null,
+        bool $setUpNext = true): void
     {
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = ('OR' === $type || 'AND' === $type) ? strtolower($type) : 'and';

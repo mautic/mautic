@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @IgnoreAnnotation("covers")
- */
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Controller\Api\FieldApiController::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class)]
 final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
@@ -76,7 +73,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         // Test that the command will create the field
         $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $id]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertSame(0, $commandTester->getStatusCode());
 
         // Test fetching
         $this->assertGetResponse($payload, $id);
@@ -87,6 +84,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test deleting
         $this->assertDeleteResponse($payload, $id, $alias, true);
+
+        // Test deleting field if used in segment is not allowed.
+        $this->assertDeleteEntityActionFieldUsedInSegment(true);
     }
 
     public function testFieldApiEndpointsWithBackgroundProcessingDisabled(): void
@@ -104,6 +104,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test deleting
         $this->assertDeleteResponse($payload, $id, $alias, false);
+
+        // Test deleting field if used in segment is not allowed.
+        $this->assertDeleteEntityActionFieldUsedInSegment(false);
     }
 
     /**
@@ -128,7 +131,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $errorResponse  = json_decode($clientResponse->getContent(), true);
 
         Assert::assertArrayHasKey('errors', $errorResponse);
-        Assert::assertSame($errorResponse['errors'][0]['code'], $clientResponse->getStatusCode());
+        self::assertResponseStatusCodeSame($errorResponse['errors'][0]['code']);
         Assert::assertSame($expectedMessage, $errorResponse['errors'][0]['message']);
     }
 
@@ -168,7 +171,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $fieldAlias = 'test_multi';
 
         $fieldModel = $this->getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         Assert::assertEmpty($fields, 'There are no Custom Fields.');
@@ -204,16 +207,16 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, ['bramborak', 'makovec']);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $this->em->flush();
         $this->em->clear();
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $this->client->request('GET', '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('contact', $responseJson);
@@ -280,7 +283,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         $fieldAlias = 'test_single';
 
         $fieldModel = $this->getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
 
         $fields = $fieldModel->getLeadFieldCustomFields();
         Assert::assertEmpty($fields, 'There are no Custom Fields.');
@@ -316,16 +319,16 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, ['makovec']);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $this->em->flush();
         $this->em->clear();
 
         // Call endpoint
-        $this->client->request('GET', '/api/contacts/'.(string) $contact->getId());
+        $this->client->request('GET', '/api/contacts/'.$contact->getId());
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $responseJson = \json_decode($clientResponse->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertArrayHasKey('contact', $responseJson);
@@ -384,6 +387,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         yield 'empty string value' => [''];
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
     {
         // Test creating a new field
@@ -412,6 +416,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         return $response['field']['id'];
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertGetResponse(array $payload, int $id): void
     {
         // Test get and that the field was published
@@ -427,6 +432,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
         $typeSafePayload = $this->generateTypeSafePayload($payload);
@@ -448,6 +454,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @param array<string, mixed> $payload */
     private function assertDeleteResponse(array $payload, int $id, string $alias, bool $isBackground): void
     {
         // Test the field is deleted
@@ -471,6 +478,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /** @return array<string, mixed> */
     private function getCreatePayload(string $alias): array
     {
         return [
@@ -492,6 +500,7 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    /** @return array<string, mixed> */
     private function getEditPayload(int $id): array
     {
         return [
@@ -511,5 +520,54 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'charLengthLimit'     => 50,
             'properties'          => [],
         ];
+    }
+
+    private function assertDeleteEntityActionFieldUsedInSegment(bool $isBackground): void
+    {
+        // Create a custom field.
+        $alias   = uniqid('field');
+        $payload = $this->getCreatePayload($alias);
+        if ($isBackground) {
+            $id = $this->assertCreateResponse($payload, Response::HTTP_ACCEPTED);
+        } else {
+            $id = $this->assertCreateResponse($payload, Response::HTTP_CREATED);
+        }
+        // Execute the command to create the field
+        $commandTester = $this->testSymfonyCommand('mautic:custom-field:create-column', ['--id' => $id]);
+
+        $this->assertSame(0, $commandTester->getStatusCode());
+
+        // Create a segment which uses the custom field we just created.
+        $segment = new LeadList();
+        $segment->setName('New Segment');
+        $segment->setPublicName('New Segment');
+        $segment->setAlias('new_segment');
+        $segment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => $alias,
+                'object'     => 'lead',
+                'type'       => 'text',
+                'properties' => ['filter' => 'John'],
+                'display'    => null,
+                'operator'   => '=',
+            ],
+        ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        // Try deleting field which is used in segment.
+        $this->client->request('DELETE', sprintf('/api/fields/contact/%s/delete', $id));
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_CONFLICT, $clientResponse->getStatusCode());
+
+        // Test with Bulk Delete.
+        $this->client->request('DELETE', sprintf('/api/fields/contact/batch/delete?ids=%s', $id));
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString(
+            'Resolve all dependencies before attempting to delete.',
+            strip_tags($clientResponse->getContent())
+        );
     }
 }

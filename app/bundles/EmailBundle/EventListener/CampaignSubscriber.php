@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
@@ -16,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -35,20 +37,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailModel $emailModel,
-        private RealTimeExecutioner $realTimeExecutioner,
-        private SendEmailToUser $sendEmailToUser,
-        private TranslatorInterface $translator,
-        private LeadModel $leadModel,
+        private readonly EmailModel $emailModel,
+        private readonly RealTimeExecutioner $realTimeExecutioner,
+        private readonly SendEmailToUser $sendEmailToUser,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadModel $leadModel,
+        private readonly StatRepository $statRepository,
     ) {
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
-            EmailEvents::ON_CAMPAIGN_BATCH_ACTION   => [
+            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
+            EventPreview::class                      => ['onEventPreviewRequest', 0],
+            EmailEvents::EMAIL_ON_OPEN               => ['onEmailOpen', 0],
+            EmailEvents::ON_CAMPAIGN_BATCH_ACTION    => [
                 ['onCampaignTriggerActionSendEmailToContact', 0],
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
@@ -137,6 +141,21 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
+    public function onEventPreviewRequest(EventPreview $eventPreview): void
+    {
+        if ($eventPreview->isType('email.send')) {
+            $eventId           = $eventPreview->event->getId();
+            $statsSummaryArray = $this->statRepository->getStatsSummaryForCampaignEvents([$eventId]);
+            $emailStats        = $statsSummaryArray[$eventId];
+            $eventPreview->addEventStat('sent_count', $emailStats['sent_count']);
+            $eventPreview->addEventStat('read_count', $emailStats['read_count']);
+            $eventPreview->addEventStat('clicked_count', $emailStats['clicked_count']);
+            $eventPreview->addEventStat('open_rate', round($emailStats['open_rate'] * 100, 2).'%');
+            $eventPreview->addEventStat('click_through_rate', round($emailStats['click_through_rate'] * 100, 2).'%');
+            $eventPreview->addEventStat('click_through_open_rate', round($emailStats['click_through_open_rate'] * 100, 2).'%');
+        }
+    }
+
     /**
      * Trigger campaign event for opening of an email.
      *
@@ -170,7 +189,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): CampaignExecutionEvent
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): void
     {
         /** @var Email $eventDetails */
         $eventDetails = $event->getEventDetails();
@@ -178,7 +197,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         $eventConfig  = $event->getConfig();
 
         if (null == $eventDetails) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         // check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
@@ -191,24 +212,31 @@ class CampaignSubscriber implements EventSubscriberInterface
                     if (!empty($eventConfig['urls']['list'])) {
                         $limitToUrls = (array) $eventConfig['urls']['list'];
                         if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
-                            return $event->setResult(true);
+                            $event->setResult(true);
+
+                            return;
                         }
                     } else {
-                        return $event->setResult(true);
+                        $event->setResult(true);
+
+                        return;
                     }
                 }
+                $event->setResult(false);
 
-                return $event->setResult(false);
+                return;
             } elseif ($event->checkContext('email.open')) {
-                // open decision
-                return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+                $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+
+                return;
             } elseif ($event->checkContext('email.reply')) {
-                // reply decision
-                return $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+                $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
+
+                return;
             }
         }
 
-        return $event->setResult(false);
+        $event->setResult(false);
     }
 
     /**
@@ -224,6 +252,13 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $config  = $event->getEvent()->getProperties();
+
+        if (!isset($config['email'])) {
+            $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
+
+            return;
+        }
+
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
 
@@ -245,10 +280,10 @@ class CampaignSubscriber implements EventSubscriberInterface
             'customHeaders'  => [
                 'X-EMAIL-ID' => $emailId,
             ],
-            'ignoreDNC'      => MailHelper::EMAIL_TYPE_TRANSACTIONAL === $type,
+            'ignoreDNC'      => $email->getSendToDnc(),
         ];
 
-        // Determine if this email is transactional/marketing
+        // Determine if this email is Repeatable/Non Repeatable
         $pending         = $event->getPending();
         $contacts        = $event->getContacts();
         $contactIds      = $event->getContactIds();
@@ -276,18 +311,20 @@ class CampaignSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
-            if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
-                // Pass with a note to the UI because no use retrying
-                $event->passWithError(
-                    $pending->get($logId),
-                    $this->translator->trans(
-                        'mautic.email.contact_has_unsubscribed_from_category',
-                        ['%contact%' => $contact->getPrimaryIdentifier(), '%category%' => $emailCategory]
-                    )
-                );
-                unset($contactIds[$contact->getId()]);
-                continue;
+            if (!$options['ignoreDNC']) {
+                $categories = $this->leadModel->getUnsubscribedLeadCategoriesIds($contact);
+                if ($emailCategory && !empty($categories) && in_array($emailCategory, $categories)) {
+                    // Pass with a note to the UI because no use retrying
+                    $event->passWithError(
+                        $pending->get($logId),
+                        $this->translator->trans(
+                            'mautic.email.contact_has_unsubscribed_from_category',
+                            ['%contact%' => $contact->getPrimaryIdentifier(), '%category%' => $emailCategory]
+                        )
+                    );
+                    unset($contactIds[$contact->getId()]);
+                    continue;
+                }
             }
 
             $credentialArray[$logId] = $leadCredentials;

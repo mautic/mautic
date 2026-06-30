@@ -19,12 +19,12 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
     {
         /** @var EmailAddressValidator $emailAddressValidator */
         $emailAddressValidator = static::getContainer()->get('mautic.validator.emailaddress');
-        \assert($emailAddressValidator instanceof EmailAddressValidator);
+        $this->assertInstanceOf(EmailAddressValidator::class, $emailAddressValidator);
 
         $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
-        $context = new ExecutionContext($this->createMock(ValidatorInterface::class), null, $translator);
+        $context = new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator);
 
         $emailAddressValidator->initialize($context);
         $emailAddressValidator->validate($value, new EmailAddress());

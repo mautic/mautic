@@ -21,7 +21,7 @@ final class FieldCollectorTest extends \PHPUnit\Framework\TestCase
             {
                 ++$this->dispatchMethodCallCounter;
 
-                \assert($event instanceof FieldCollectEvent);
+                Assert::assertInstanceOf(FieldCollectEvent::class, $event);
                 Assert::assertSame('contact', $event->getObject());
 
                 return new FieldCollection();
@@ -32,8 +32,8 @@ final class FieldCollectorTest extends \PHPUnit\Framework\TestCase
         $fieldCollector->getFields('contact');
 
         // Calling for the second time to ensure it's cached and the dispatcher is called only once.
-        $fieldCollection = $fieldCollector->getFields('contact');
+        $fieldCollector->getFields('contact');
 
-        Assert::assertEquals(1, $dispatcher->dispatchMethodCallCounter);
+        Assert::assertSame(1, $dispatcher->dispatchMethodCallCounter);
     }
 }

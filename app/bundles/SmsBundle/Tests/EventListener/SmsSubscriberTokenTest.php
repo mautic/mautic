@@ -18,14 +18,21 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
 {
     use SmsTestHelperTrait;
 
+    protected function setUp(): void
+    {
+        $this->configParams['sms_disable_trackable_urls'] = false;
+
+        parent::setUp();
+    }
+
     public function testSmsTokenReplacement(): void
     {
         $transport = $this->configureTwilioWithArrayTransport();
         $smsModel  = $this->getContainer()->get('mautic.sms.model.sms');
-        \assert($smsModel instanceof SmsModel);
+        $this->assertInstanceOf(SmsModel::class, $smsModel);
 
         $contactModel = $this->getContainer()->get('mautic.lead.model.lead');
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
 
         $page = new Page();
         $page->setTitle('Test Page');
@@ -58,12 +65,12 @@ final class SmsSubscriberTokenTest extends MauticMysqlTestCase
 
         $ctRegex        = 'ct=([a-zA-Z0-9%]+)';
         $domainRegex    = 'https?:\/\/([a-zA-Z0-9.-]+)';
-        $assetLinkRegex = $domainRegex.'\/asset\/'.$asset->getId().':test\?'.$ctRegex;
-        $pageLinkregex  = $domainRegex.'\/test-page\?'.$ctRegex;
+        $assetLinkRegex = $domainRegex.'\/asset\/'.$asset->getSlug().'\?'.$ctRegex;
+        $pageLinkRegex  = $domainRegex.'\/test-page\?'.$ctRegex;
         $trackingRegex  = $domainRegex.'\/r\/([a-zA-Z0-9]+)\?'.$ctRegex;
 
         Assert::assertMatchesRegularExpression(
-            "/Hello John, download {$assetLinkRegex} or visit {$pageLinkregex} or {$trackingRegex}/",
+            "/Hello John, download {$assetLinkRegex} or visit {$pageLinkRegex} or {$trackingRegex}/",
             $transport->smses[0]['content']
         );
     }

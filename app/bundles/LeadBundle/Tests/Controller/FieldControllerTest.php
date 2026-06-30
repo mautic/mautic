@@ -24,7 +24,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $labelErrorMessage             = trim($crawler->filter('#leadfield_label')->nextAll()->text());
         $maxLengthErrorMessageTemplate = 'Label value cannot be longer than 191 characters';
 
-        $this->assertEquals($maxLengthErrorMessageTemplate, $labelErrorMessage);
+        $this->assertSame($maxLengthErrorMessageTemplate, $labelErrorMessage);
     }
 
     public function testLengthValidationOnLabelFieldWhenAddingCustomFieldSuccess(): void
@@ -34,7 +34,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $form  = $crawler->selectButton('Save & Close')->form();
         $label = 'Test value for custom field 4';
         $form['leadfield[label]']->setValue($label);
-        $crawler = $this->client->submit($form);
+        $this->client->submit($form);
 
         $field = $this->em->getRepository(LeadField::class)->findOneBy(['label' => $label]);
         $this->assertNotNull($field);
@@ -90,7 +90,7 @@ class FieldControllerTest extends MauticMysqlTestCase
         $errorMessage             = trim($crawler->filter('#leadfield_charLengthLimit')->nextAll()->text());
         $maxCharLimitErrorMessage = 'This value should be between 1 and 191.';
 
-        $this->assertEquals($maxCharLimitErrorMessage, $errorMessage);
+        $this->assertSame($maxCharLimitErrorMessage, $errorMessage);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getStringTypeFieldsArray')]

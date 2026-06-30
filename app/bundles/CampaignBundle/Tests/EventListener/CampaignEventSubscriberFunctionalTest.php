@@ -41,7 +41,6 @@ class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $events      = $campaign->getEvents();
         $failedEvent = $events->first();
 
-        /** @var NotifyOfUnpublishEvent $unpublishEvent */
         $unpublishEvent = new NotifyOfUnpublishEvent($failedEvent);
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::getContainer()->get('event_dispatcher');
@@ -90,11 +89,7 @@ class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $contacts = $response['contacts'];
         self::assertCount(150, $contacts);
-        self::assertSame(
-            201,
-            $this->client->getResponse()->getStatusCode(),
-            $this->client->getResponse()->getContent()
-        );
+        self::assertResponseStatusCodeSame(201, $this->client->getResponse()->getContent());
 
         return $contacts;
     }

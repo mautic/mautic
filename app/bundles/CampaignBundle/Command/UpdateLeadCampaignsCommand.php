@@ -32,11 +32,11 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     private bool $quiet = false;
 
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private TranslatorInterface $translator,
-        private MembershipBuilder $membershipBuilder,
-        private LoggerInterface $logger,
-        private FormatterHelper $formatterHelper,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly LoggerInterface $logger,
+        private readonly FormatterHelper $formatterHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
@@ -58,15 +58,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 '--campaign-id',
                 '-i',
                 InputOption::VALUE_OPTIONAL,
-                'Build membership for a specific campaign.  Otherwise, all campaigns will be rebuilt.',
-                null
+                'Build membership for a specific campaign.  Otherwise, all campaigns will be rebuilt.'
             )
             ->addOption(
                 '--contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Build membership for a specific contact.',
-                null
+                'Build membership for a specific contact.'
             )
             ->addOption(
                 '--contact-ids',
@@ -78,15 +76,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 '--min-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Build membership starting at a specific contact ID.',
-                null
+                'Build membership starting at a specific contact ID.'
             )
             ->addOption(
                 '--max-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Build membership up to a specific contact ID.',
-                null
+                'Build membership up to a specific contact ID.'
             )
             ->addOption(
                 '--thread-id',

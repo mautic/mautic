@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
@@ -24,37 +25,25 @@ use Symfony\Component\HttpFoundation\Request;
 class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoNotContact|(DoNotContact&MockObject)|MockObject
-     */
-    private DoNotContact|MockObject $doNotContact;
-
-    /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
-
-    /**
-     * @var PointGroupModel|(PointGroupModel&object&MockObject)|(PointGroupModel&MockObject)|(object&MockObject)|MockObject
-     */
-    private MockObject|PointGroupModel $pointGroupModel;
 
     private FormSubscriber $subscriber;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
 
     /**
-     * @var MockObject|LeadFieldRepository
-     */
-    private MockObject $leadFieldRepostory;
-
-    /**
-     * @var MockObject|IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
     private MockObject $ipLookupHelper;
 
+    /**
+     * @var MockObject&SubmissionEvent
+     */
     private MockObject $submissionEvent;
 
     protected function setUp(): void
@@ -62,17 +51,19 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->leadModel          = $this->createMock(LeadModel::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $this->ipLookupHelper     = $this->createMock(IpLookupHelper::class);
-        $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
-        $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
-        $this->doNotContact       = $this->createMock(DoNotContact::class);
+        $leadFieldRepostory       = $this->createMock(LeadFieldRepository::class);
+        $pointGroupModel          = $this->createMock(PointGroupModel::class);
+        $doNotContact             = $this->createMock(DoNotContact::class);
         $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
+        $fieldModel               = $this->createMock(FieldModel::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,
             $this->contactTracker,
             $this->ipLookupHelper,
-            $this->leadFieldRepostory,
-            $this->pointGroupModel,
-            $this->doNotContact
+            $leadFieldRepostory,
+            $pointGroupModel,
+            $doNotContact,
+            $fieldModel
         );
     }
 

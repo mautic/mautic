@@ -14,7 +14,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
     private const EXPIRATION_IN_SECONDS = 18000;
 
     public function __construct(
-        private CacheProviderTagAwareInterface $cacheProvider,
+        private readonly CacheProviderTagAwareInterface $cacheProvider,
     ) {
     }
 
@@ -38,7 +38,7 @@ final class AlreadyMappedFieldCollector implements AlreadyMappedFieldCollectorIn
 
     public function removeField(string $formId, string $object, string $fieldKey): void
     {
-        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey) {
+        $this->fetchAndSave($formId, $object, function (array $fields) use ($fieldKey): array {
             $cacheKey = array_search($fieldKey, $fields, true);
 
             if (false !== $cacheKey) {

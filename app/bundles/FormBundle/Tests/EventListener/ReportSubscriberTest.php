@@ -28,42 +28,35 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriberTest extends AbstractMauticTestCase
 {
     /**
-     * @var CompanyReportData|MockObject
+     * @var MockObject&CompanyReportData
      */
     private MockObject $companyReportData;
 
     /**
-     * @var SubmissionRepository|MockObject
+     * @var MockObject&SubmissionRepository
      */
     private MockObject $submissionRepository;
 
     /**
-     * @var FormModel|MockObject
+     * @var MockObject&FormModel
      */
     private MockObject $formModel;
 
     /**
-     * @var FormRepository|MockObject
+     * @var MockObject&FormRepository
      */
     private MockObject $formRepository;
 
     private ReportHelper $reportHelper;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface|MockObject
-     */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\Stub $translator;
 
     private ReportSubscriber $subscriber;
 
-    private MockObject&DncReportService $dncReportService;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['form_results_data_sources'] = true;
 
@@ -73,18 +66,18 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
-        $this->reportHelper         = new ReportHelper($this->createMock(EventDispatcher::class));
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->dncReportService     = $this->createMock(DncReportService::class);
+        $this->reportHelper         = new ReportHelper($this->createStub(EventDispatcher::class));
+        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
+        $this->translator           = $this->createStub(TranslatorInterface::class);
+        $dncReportService           = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $this->coreParametersHelper,
+            $coreParametersHelper,
             $this->translator,
-            $this->dncReportService
+            $dncReportService
         );
     }
 
@@ -133,18 +126,22 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(2))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setTables[] = $args;
+
+                return $mockEvent;
             });
 
         $mockEvent->expects($this->exactly(3))
             ->method('addGraph')
-            ->willReturnCallback(function () use (&$setGraphs): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setGraphs): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setGraphs[] = $args;
+
+                return $mockEvent;
             });
 
         $this->companyReportData->expects($this->once())
@@ -162,7 +159,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     {
         $reportBuilderEvent = new ReportBuilderEvent(
             $this->translator,
-            $this->createMock(ChannelListHelper::class),
+            $this->createStub(ChannelListHelper::class),
             'test',
             [],
             $this->reportHelper,
@@ -178,7 +175,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     {
         $reportBuilderEvent = new ReportBuilderEvent(
             $this->translator,
-            $this->createMock(ChannelListHelper::class),
+            $this->createStub(ChannelListHelper::class),
             ReportSubscriber::CONTEXT_FORM_RESULT,
             [],
             $this->reportHelper,
@@ -335,7 +332,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     {
         $mockEvent        = $this->createMock(ReportGraphEvent::class);
         $mockTrans        = $this->createMock(Translator::class);
-        $mockQueryBuilder = $this->createMock(QueryBuilder::class);
+        $mockQueryBuilder = $this->createStub(QueryBuilder::class);
         $mockChartQuery   = $this->createMock(ChartQuery::class);
 
         $mockTrans->expects($this->any())

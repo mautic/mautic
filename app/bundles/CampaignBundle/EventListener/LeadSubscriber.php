@@ -21,11 +21,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EventCollector $eventCollector,
-        private TranslatorInterface $translator,
-        private EntityManagerInterface $entityManager,
-        private RouterInterface $router,
-        private EventRepository $eventRepository,
+        private readonly EventCollector $eventCollector,
+        private readonly TranslatorInterface $translator,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly RouterInterface $router,
+        private readonly EventRepository $eventRepository,
     ) {
     }
 
@@ -61,11 +61,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 
-    /**
-     * @param string $eventTypeKey
-     * @param string $eventTypeName
-     */
-    private function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName): void
+    private function addTimelineEvents(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup('campaignList');
@@ -79,7 +75,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $leadEventLogRepository = $this->entityManager->getRepository(LeadEventLog::class);
 
         $options                   = $event->getQueryOptions();
-        $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
+        $options['scheduledState'] = 'campaign.event' !== $eventTypeKey;
         $logs                      = $leadEventLogRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->eventCollector->getEventsArray();
 
@@ -92,6 +88,30 @@ class LeadSubscriber implements EventSubscriberInterface
                     ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig';
 
                 $label = $log['event_name'].' / '.$log['campaign_name'];
+
+                // Case 1: This event was executed as a redirect because original event was deleted
+                // Show "Rescheduled from" message when:
+                // - Check metadata for rescheduled event information
+                if (!empty($log['metadata'])
+                    && is_array($log['metadata'])
+                    && !empty($log['metadata']['redirect_applied'])
+                    && !empty($log['metadata']['originalEventName'])) {
+                    $label = $log['event_name'].' / '.$log['campaign_name'].
+                        ' <span class="small">'.$this->translator->trans('mautic.campaign.event.redirected',
+                            ['%original%' => $log['metadata']['originalEventName']]).'</span>';
+                }
+
+                // Case 2: Event executed before being deleted - show "Deleted" label
+                // Show only if:
+                // - Event is marked as deleted
+                // - Event has been triggered (not just scheduled)
+                if (!empty($log['event_deleted_timestamp'])) {
+                    $label .= ' <span class="label label-danger">'.$this->translator->trans('mautic.campaign.deleted').
+                        '</span>';
+                }
+
+                // Case 3: Event scheduled to execute deleted event - don't show any special message
+                // (default display with no additional labels)
 
                 if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
                     // Note as cancelled

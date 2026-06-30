@@ -22,9 +22,10 @@ final class ProjectEntityType extends AbstractType
             'name',
             TextType::class,
             [
-                'label'       => 'mautic.core.name',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
+                'label'                 => 'mautic.core.name',
+                'label_attr'            => ['class' => 'control-label'],
+                'attr'                  => ['class' => 'form-control'],
+                'normalize_whitespaces' => true,
             ]
         );
 

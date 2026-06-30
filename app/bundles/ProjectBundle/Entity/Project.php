@@ -18,18 +18,19 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/projects', security: "is_granted('project:project:viewother')"),
-        new Get(uriTemplate: '/projects/{id}', security: "is_granted('project:project:view')"),
-        new Post(uriTemplate: '/projects', security: "is_granted('project:project:create')"),
-        new Put(uriTemplate: '/projects/{id}', security: "is_granted('project:project:edit')"),
-        new Patch(uriTemplate: '/projects/{id}', security: "is_granted('project:project:edit')"),
-        new Delete(uriTemplate: '/projects/{id}', security: "is_granted('project:project:delete')"),
+        new GetCollection(security: "is_granted('project:projects:view')"),
+        new Post(security: "is_granted('project:projects:create')"),
+        new Get(security: "is_granted('project:projects:view')"),
+        new Put(security: "is_granted('project:projects:edit')"),
+        new Patch(security: "is_granted('project:projects:edit')"),
+        new Delete(security: "is_granted('project:projects:delete')"),
     ],
     normalizationContext: [
         'groups'                  => ['project:read'],
@@ -38,8 +39,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     denormalizationContext: [
         'groups'                  => ['project:write'],
         'swagger_definition_name' => 'Write',
-    ],
-    security: 'false'
+    ]
 )]
 class Project extends FormEntity implements UuidInterface
 {
@@ -81,7 +81,7 @@ class Project extends FormEntity implements UuidInterface
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(ProjectRepository::class)
-            ->addIndex(['name'], 'project_name');
+            ->addUniqueConstraint(['name'], 'unique_project_name');
 
         $builder->addIdColumns();
 
@@ -114,6 +114,7 @@ class Project extends FormEntity implements UuidInterface
             'name',
             new NotBlank(['message' => 'mautic.core.name.required'])
         );
+        $metadata->addConstraint(new UniqueName());
     }
 
     public function getId(): ?int

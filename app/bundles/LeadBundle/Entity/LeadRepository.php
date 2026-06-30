@@ -211,7 +211,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            fn ($row): int => (int) $row['id'],
+            fn (array $row): int => (int) $row['id'],
             $result
         );
     }
@@ -324,9 +324,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if (count($result)) {
             return $all ? $result : $result[0];
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**
@@ -694,7 +694,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     protected function addCatchAllWhereClause($q, $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
-        $availableForSearch = array_map(fn ($alias) => 'l.'.$alias, $customFields);
+        $availableForSearch = array_map(fn ($alias): string => 'l.'.$alias, $customFields);
 
         $columns = array_merge(
             [
@@ -801,7 +801,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
 
                 $filter->strict  = true;
-                $q->andWhere($q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL()));
+                $q->andWhere(($filter->not ? 'NOT EXISTS' : 'EXISTS').'('.$sq->getSQL().')');
                 $q->setParameter($unique, $this->getListIdsByAlias($string) ?: [0], ArrayParameterType::INTEGER);
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
@@ -955,7 +955,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
                     $returnParameter = true;
                 }
-                $expr           = $q->expr()->{$filter->not ? 'notExists' : 'exists'}($sq->getSQL());
+                $expr           = ($filter->not ? 'NOT EXISTS' : 'EXISTS').' ('.$sq->getSQL().')';
                 $filter->strict = true;
                 break;
             default:
@@ -998,6 +998,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.core.searchcommand.ismine',
             'mautic.lead.lead.searchcommand.isunowned',
             'mautic.lead.lead.searchcommand.list',
+            'mautic.lead.lead.searchcommand.campaign_membership',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
             'mautic.lead.lead.searchcommand.company_id',
@@ -1165,8 +1166,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->in('l.id', $contactIds)
-            );
+                $qb->expr()->in('l.id', ':ids')
+            )
+            ->setParameter('ids', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
@@ -1411,7 +1413,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private function buildDuplicateValuesQuery(array $uniqueFields): string
     {
-        $fieldsAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
+        $fieldsAliases = array_map(fn ($uniqueField): string => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
 
         if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return $this->getDuplicateValuesQuery($fieldsAliases)->getSQL();

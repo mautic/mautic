@@ -30,15 +30,16 @@ class StatTest extends TestCase
         // Assert that the number of entries stored in the openDetails array
         // is equal to the lower of the two values openCount and
         // Stat::MAX_OPEN_DETAILS
-        $this->assertEquals(
+        $this->assertCount(
             min(Stat::MAX_OPEN_DETAILS, $stat->getOpenCount()),
-            count($stat->getOpenDetails())
+            $stat->getOpenDetails()
         );
     }
 
     /**
      * Data provider for addOpenDetails.
      */
+    /** @return array<string, array{0: int}> */
     public static function addOpenDetailsTestProvider(): array
     {
         return [

@@ -8,12 +8,12 @@ use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
     /**
-     * @const TAR_CACHE_FOLDER
+     * @var string
      */
     public const TAR_CACHE_FOLDER = 'unpack';
 
     /**
-     * @const TAR_TEMP_FILE
+     * @var string
      */
     public const TAR_TEMP_FILE = 'temp.tar.gz';
 
@@ -193,9 +193,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
      * Get if the string ends with.
      *
      * @param string $haystack
-     * @param string $needle
      */
-    private function endsWith($haystack, $needle): bool
+    private function endsWith($haystack, string $needle): bool
     {
         return str_ends_with($haystack, $needle);
     }

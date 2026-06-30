@@ -16,10 +16,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class EntityImportCommand extends ModeratedCommand
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
-        private ImportHelper $importHelper,
+        private readonly ImportHelper $importHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }

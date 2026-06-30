@@ -34,11 +34,10 @@ class FormBuilderEvent extends Event
      *                       'label'              => (required) what to display in the list
      *                       'eventName'          => (required) Event dispatched to execute action; it will receive a SubmissionEvent object
      *                       'formType'           => (required) name of the form type SERVICE for the action
-     *                       'allowCampaignForm'  => (optional) true to allow this action for campaign forms; defaults to false
      *                       'description'        => (optional) short description of event
      *                       'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.twig
      *                       'formTypeOptions'    => (optional) array of options to pass to formType
-     *                       'formTheme'          => (optional  theme for custom form views
+     *                       'formTheme'          => (optional)  theme for custom form views
      *                       ]
      *
      * @throws BadConfigurationException
@@ -63,10 +62,8 @@ class FormBuilderEvent extends Event
 
     /**
      * Get submit actions.
-     *
-     * @return array
      */
-    public function getSubmitActions()
+    public function getSubmitActions(): array
     {
         uasort(
             $this->actions,
@@ -146,9 +143,9 @@ class FormBuilderEvent extends Event
     /**
      * Get form fields.
      *
-     * @return mixed
+     * @return array<string, mixed>
      */
-    public function getFormFields()
+    public function getFormFields(): array
     {
         return $this->fields;
     }

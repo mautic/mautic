@@ -56,7 +56,8 @@
 <div class="label__divider"></div>
 {% set tags = [
     {
-        color: 'warm-gray',
+        color: 'high-contrast',
+        icon: smsType == 'list' ? 'ri-pie-chart-line' : 'ri-message-2-line',
         label: smsType == 'list'
             ? 'mautic.sms.type.list.header'
             : (smsType == 'template' ? 'mautic.sms.type.template.header' : type)

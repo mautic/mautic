@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +43,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
 
@@ -53,17 +54,68 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
         $text = strip_tags($this->client->getResponse()->getContent());
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $text);
+        self::assertResponseIsSuccessful();
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
         Assert::assertStringContainsString('Edit Custom Field - Best Date Ever', $text);
+    }
+
+    public function testFieldDeleteValidationUsedInSegment(): void
+    {
+        $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
+        $field_first      = $this->createField('First');
+        $fieldModel->saveEntity($field_first);
+
+        $field_second      = $this->createField('Second');
+        $fieldModel->saveEntity($field_second);
+
+        // Create a segment which uses the custom field we just created.
+        $segment = new LeadList();
+        $segment->setName('Field Segment');
+        $segment->setPublicName('Field Segment');
+        $segment->setAlias('field_segment');
+        $segment->setFilters([
+            [
+                'glue'       => 'and',
+                'field'      => 'field_first',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'display'    => null,
+                'operator'   => '=',
+            ],
+            [
+                'glue'       => 'and',
+                'field'      => 'field_second',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'display'    => null,
+                'operator'   => '=',
+            ],
+        ]);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        // Try deleting single field.
+        $this->client->request(Request::METHOD_POST,
+            '/s/contacts/fields/delete/'.$field_first->getId(), [], [], $this->createAjaxHeaders());
+
+        Assert::assertStringContainsString('please go back and check mentioned resource(s) before deleting.',
+            strip_tags($this->client->getResponse()->getContent()));
+
+        // Try deleting multiple fields.
+        $parameters = 'ids=["'.$field_first->getId().'","'.$field_second->getId().'"]';
+        $this->client->request(Request::METHOD_POST,
+            '/s/contacts/fields/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+
+        Assert::assertStringContainsString('cannot be deleted because they are in use by other entities.',
+            strip_tags($this->client->getResponse()->getContent()));
     }
 
     public function testNewSelectField(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $domDocument = $crawler->getNode(0)->ownerDocument;
         $inputLabel  = $domDocument->createElement('input');
@@ -87,7 +139,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
         $text = strip_tags($this->client->getResponse()->getContent());
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $text);
+        self::assertResponseIsSuccessful();
         Assert::assertStringNotContainsString('New Custom Field', $text);
         Assert::assertStringNotContainsString('This form should not contain extra fields.', $text);
         Assert::assertStringContainsString('Edit Custom Field - Test select field', $text);
@@ -101,7 +153,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         $domDocument = $crawler->getNode(0)->ownerDocument;
         $yesLabel    = $domDocument->createElement('input');
@@ -125,7 +177,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
         $form['leadfield[properties][no]']->setValue($properties['no'] ?? '');
 
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         $text = strip_tags($this->client->getResponse()->getContent());
         Assert::assertStringNotContainsString($expectedMessage, $text);
@@ -160,7 +212,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request(Request::METHOD_GET, 's/contacts/fields/new');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         // Check if the radio button with value 0 is checked and value 1 is not
         Assert::assertNotNull(

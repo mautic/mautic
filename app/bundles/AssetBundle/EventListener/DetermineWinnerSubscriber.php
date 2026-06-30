@@ -13,8 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private TranslatorInterface $translator,
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -49,8 +49,8 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         }
 
         $startDate = $parent->getVariantStartDate();
-        if (null != $startDate && !empty($ids)) {
-            $counts = ('page' == $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate);
+        if (null != $startDate) {
+            $counts = ('page' == $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
 
             $translator = $this->translator;
             if ($counts) {

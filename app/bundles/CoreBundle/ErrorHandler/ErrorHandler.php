@@ -202,7 +202,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if (null !== $error) {
                 $name = $this->getErrorName($error['type']);
-                if ($error && $error['type'] &= E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR) {
+                if ($error['type'] & (E_PARSE | E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR)) {
                     if (!$handlingFatal) {
                         // Prevent fatal loop
                         $handlingFatal = true;
@@ -302,10 +302,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param string $environment
-         *
-         * @return ErrorHandler
          */
-        public static function register($environment = 'prod')
+        public static function register($environment = 'prod'): self
         {
             if ('dev' === $environment) {
                 Debug::enable();
@@ -336,10 +334,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param mixed $displayErrors
-         *
-         * @return ErrorHandler
          */
-        public function setDisplayErrors($displayErrors)
+        public function setDisplayErrors($displayErrors): static
         {
             $this->displayErrors = $displayErrors;
 
@@ -348,10 +344,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param string $environment
-         *
-         * @return ErrorHandler
          */
-        public function setEnvironment($environment)
+        public function setEnvironment($environment): static
         {
             self::$environment = $environment;
 
@@ -360,10 +354,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param LoggerInterface $logger
-         *
-         * @return ErrorHandler
          */
-        public function setLogger($logger)
+        public function setLogger($logger): static
         {
             $this->logger = $logger;
 
@@ -372,10 +364,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param mixed $mainLogger
-         *
-         * @return ErrorHandler
          */
-        public function setMainLogger($mainLogger)
+        public function setMainLogger($mainLogger): static
         {
             $this->mainLogger = $mainLogger;
 
@@ -514,7 +504,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
-                $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
+                $loader             = new \Twig\Loader\FilesystemLoader([
+                    self::$root.'/app/bundles/CoreBundle/Resources/views/Offline',
+                    self::$root.'/app/bundles/CoreBundle/Resources/views/Exception',
+                ]);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn () => realpath(__DIR__.'/../../../../')));

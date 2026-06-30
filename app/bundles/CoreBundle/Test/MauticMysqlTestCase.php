@@ -26,20 +26,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     protected $useCleanupRollback = true;
 
-    public function __construct(?string $name = null)
-    {
-        parent::__construct($name);
-
-        $this->configParams += [
-            'db_driver' => 'pdo_mysql',
-        ];
-    }
-
     /**
      * @throws \Exception
      */
     protected function setUp(): void
     {
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+
         $this->setUpInvoked = true;
 
         parent::setUp();
@@ -343,6 +338,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $path = $this->getLocalConfigFile();
 
+        if (!file_exists($path.'.backup')) {
+            return;
+        }
+
         if (!rename($path.'.backup', $path)) {
             throw new \RuntimeException(sprintf('Unable to move file %s => %s', $path.'.backup', $path));
         }
@@ -384,7 +383,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function clearCache(): void
     {
         $cacheProvider = static::getContainer()->get('mautic.cache.provider');
-        \assert($cacheProvider instanceof CacheItemPoolInterface);
+        $this->assertInstanceOf(CacheItemPoolInterface::class, $cacheProvider);
         $cacheProvider->clear();
     }
 

@@ -15,33 +15,28 @@ use PHPUnit\Framework\TestCase;
 class PointActionHelperTest extends TestCase
 {
     /**
-     * @var MockObject|EntityManagerInterface
+     * @var MockObject&EntityManagerInterface
      */
-    private $entityManager;
+    private MockObject $entityManager;
 
     /**
-     * @var MockObject|HitRepository
+     * @var MockObject&HitRepository
      */
-    private $hitRepository;
+    private MockObject $hitRepository;
 
     /**
-     * @var MockObject|Lead
+     * @var MockObject&Hit
      */
-    private $lead;
-
-    /**
-     * @var MockObject|Hit
-     */
-    private $eventDetails;
+    private MockObject $eventDetails;
 
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->hitRepository = $this->createMock(HitRepository::class);
-        $this->lead          = $this->createMock(Lead::class);
+        $lead                = $this->createMock(Lead::class);
         $this->eventDetails  = $this->createMock(Hit::class);
 
-        $this->eventDetails->method('getLead')->willReturn($this->lead);
+        $this->eventDetails->method('getLead')->willReturn($lead);
         $this->entityManager->method('getRepository')->willReturn($this->hitRepository);
     }
 

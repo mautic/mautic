@@ -123,7 +123,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $crawler                = $this->client->request('GET', '/s/projects/edit/'.$project->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('Edit project: '.$project->getName(), $clientResponseContent, 'The return must contain \'Edit project\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
@@ -157,9 +157,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteAction(): void
     {
         $projects   = $this->projectRepository->findAll();
-        $projectsId = array_map(function (Project $project) {
-            return $project->getId();
-        }, $projects);
+        $projectsId = array_map(fn (Project $project): ?int => $project->getId(), $projects);
         $this->client->request('POST', '/s/projects/batchDelete?ids='.json_encode($projectsId));
         $this->assertResponseIsSuccessful();
         $this->assertEmpty($this->projectRepository->count([]), 'All projects must be deleted.');
@@ -222,7 +220,7 @@ final class ProjectControllerTest extends MauticMysqlTestCase
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

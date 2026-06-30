@@ -2,13 +2,17 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
 class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private $lead = [
+    /**
+     * @var array<string, mixed>
+     */
+    private array $lead = [
         'firstname' => 'Bob',
         'lastname'  => 'Smith',
         'country'   => '',
@@ -24,9 +28,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $reflectionProperty = new \ReflectionProperty(TokenHelper::class, 'parameters');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue(null, [
+        ReflectionHelper::setStaticValue(TokenHelper::class, 'parameters', [
             'date_format_dateonly' => 'F j, Y',
             'date_format_timeonly' => 'g:i a',
         ]);
@@ -46,9 +48,7 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getFields')
             ->willReturn($fields);
 
-        $reflectionProperty = new \ReflectionProperty(LeadRepository::class, 'leadFieldRepository');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue(null, $leadFieldRepository);
+        ReflectionHelper::setStaticValue(LeadRepository::class, 'leadFieldRepository', $leadFieldRepository);
 
         parent::setUp();
     }
@@ -226,6 +226,40 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $token     = '{contactfield=date|time}';
         $tokenList = TokenHelper::findLeadTokens($token, $lead);
         $this->assertEmpty($tokenList[$token]);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataValidateToken')]
+    public function testValidToken(string $content, bool $expected): void
+    {
+        $this->assertSame($expected, TokenHelper::validToken($content));
+    }
+
+    /**
+     * @return iterable<mixed>
+     */
+    public static function dataValidateToken(): iterable
+    {
+        yield ['{contactfield=firstname}', true];
+        yield ['{contactfield=lastname}', true];
+        yield ['{contactfield}', false];
+        yield ['firstname', false];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetTokenFieldAlias')]
+    public function testGetTokenFieldAlias(string $content, string $expected): void
+    {
+        $this->assertSame($expected, TokenHelper::getTokenFieldAlias($content));
+    }
+
+    /**
+     * @return iterable<string[]>
+     */
+    public static function dataGetTokenFieldAlias(): iterable
+    {
+        yield ['{random}', ''];
+        yield ['{contactfield=firstname}', 'firstname'];
+        yield ['{contact_field=firstname}', ''];
+        yield ['{contactfield=randomField}', 'randomField'];
     }
 
     /**

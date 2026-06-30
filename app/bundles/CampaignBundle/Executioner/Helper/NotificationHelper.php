@@ -9,17 +9,17 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
     public function __construct(
-        private UserModel $userModel,
-        private NotificationModel $notificationModel,
-        private TranslatorInterface $translator,
-        private Router $router,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly UserModel $userModel,
+        private readonly NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

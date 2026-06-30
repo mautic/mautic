@@ -8,7 +8,7 @@ use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
     }
 
@@ -29,12 +29,8 @@ class PointActionHelper
             $limitToPages = $action['properties']['pages'];
         }
 
-        if (!empty($limitToPages) && !in_array($pageHitId, $limitToPages)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToPages) || in_array($pageHitId, $limitToPages);
     }
 
     public function validateUrlHit($eventDetails, $action): bool
@@ -64,7 +60,7 @@ class PointActionHelper
 
         if ($action['properties']['returns_within'] || $action['properties']['returns_after']) {
             // get the latest hit only when it's needed
-            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), $urlWithSqlWC, 'second_to_last' => $eventDetails->getId()]);
+            $latestHit = $hitRepository->getLatestHit(['leadId' => $lead->getId(), 'urls' => [$urlWithSqlWC], 'second_to_last' => $eventDetails->getId()]);
         } else {
             $latestHit = null;
         }
@@ -95,18 +91,10 @@ class PointActionHelper
             }
         }
         if ($action['properties']['returns_within']) {
-            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within']) {
-                $changePoints['returns_within'] = true;
-            } else {
-                $changePoints['returns_within'] = false;
-            }
+            $changePoints['returns_within'] = $latestHit && $now->getTimestamp() - $latestHit->getTimestamp() <= $action['properties']['returns_within'];
         }
         if ($action['properties']['returns_after']) {
-            if ($latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after']) {
-                $changePoints['returns_after'] = true;
-            } else {
-                $changePoints['returns_after'] = false;
-            }
+            $changePoints['returns_after'] = $latestHit && $now->getTimestamp() - $latestHit->getTimestamp() >= $action['properties']['returns_after'];
         }
 
         // return true only if all configured options are true

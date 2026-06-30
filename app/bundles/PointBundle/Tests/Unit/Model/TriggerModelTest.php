@@ -25,82 +25,55 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var IpLookupHelper&MockObject
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var LeadModel&MockObject
-     */
-    private MockObject $leadModel;
-
-    /**
-     * @var TriggerEventModel&MockObject
-     */
-    private MockObject $triggerEventModel;
-
-    /**
-     * @var EventDispatcherInterface&MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var TranslatorInterface&MockObject
-     */
-    private MockObject $translator;
-
-    /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var TriggerEventRepository&MockObject
+     * @var MockObject&TriggerEventRepository
      */
     private MockObject $triggerEventRepository;
 
     private TriggerModel $triggerModel;
 
-    /**
-     * @var ContactTracker&MockObject
-     */
-    private MockObject $contactTracker;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->leadModel              = $this->createMock(LeadModel::class);
-        $this->triggerEventModel      = $this->createMock(TriggerEventModel::class);
-        $this->contactTracker         = $this->createMock(ContactTracker::class);
+        $ipLookupHelper               = $this->createMock(IpLookupHelper::class);
+        $leadModel                    = $this->createMock(LeadModel::class);
+        $triggerEventModel            = $this->createMock(TriggerEventModel::class);
+        $contactTracker               = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->translator             = $this->createMock(Translator::class);
+        $translator                   = $this->createMock(Translator::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
-            $this->ipLookupHelper,
-            $this->leadModel,
-            $this->triggerEventModel,
-            $this->contactTracker,
+            $ipLookupHelper,
+            $leadModel,
+            $triggerEventModel,
+            $contactTracker,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $translator,
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
         // reset private property cachedEvents in TriggerModel instance
         $reflectionClass = new \ReflectionClass(TriggerModel::class);
         $property        = $reflectionClass->getProperty('cachedEvents');
-        $property->setAccessible(true);
         $property->setValue($this->triggerModel, []);
     }
 
@@ -145,9 +118,8 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     Assert::assertSame($triggerEvent, $event->getTriggerEvent());
 
                     return $event;
-                } else {
-                    $this->fail("Unexpected event name: $eventName");
                 }
+                $this->fail("Unexpected event name: $eventName");
             });
 
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);

@@ -28,38 +28,38 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class LeadSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|FieldChangeRepository
+     * @var MockObject&FieldChangeRepository
      */
     private MockObject $fieldChangeRepository;
 
     /**
-     * @var MockObject|ObjectMappingRepository
+     * @var MockObject&ObjectMappingRepository
      */
     private MockObject $objectMappingRepository;
 
     /**
-     * @var MockObject|VariableExpresserHelperInterface
+     * @var MockObject&VariableExpresserHelperInterface
      */
     private MockObject $variableExpresserHelper;
 
     /**
-     * @var MockObject|SyncIntegrationsHelper
+     * @var MockObject&SyncIntegrationsHelper
      */
     private MockObject $syncIntegrationsHelper;
 
     /**
-     * @var MockObject|CompanyEvent
+     * @var MockObject&CompanyEvent
      */
     private MockObject $companyEvent;
 
     private LeadSubscriber $subscriber;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcherInterfaceMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -80,7 +80,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        Assert::assertEquals(
+        Assert::assertSame(
             [
                 LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
                 LeadEvents::LEAD_POST_DELETE    => ['onLeadPostDelete', 255],
@@ -411,6 +411,7 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
+    /** @param array<string, array{0: mixed, 1: mixed}> $fieldChanges */
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $integrationName     = 'testIntegration';
@@ -423,7 +424,6 @@ class LeadSubscriberTest extends TestCase
         $fieldNames = [];
         $values     = [];
         $valueDAOs  = [];
-        $i          = 0;
 
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
             $values[]     = [$newValue];
@@ -433,7 +433,7 @@ class LeadSubscriberTest extends TestCase
         $matcher = $this->exactly(1);
 
         $this->variableExpresserHelper->expects($matcher)->method('encodeVariable')
-                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs) {
+                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs): EncodedValueDAO {
                     $this->assertSame($values[$matcher->numberOfInvocations() - 1], $parameters);
 
                     return $valueDAOs[0];
@@ -460,8 +460,8 @@ class LeadSubscriberTest extends TestCase
              * @param mixed[] $fieldChanges
              */
             public function __construct(
-                private array $fieldChanges,
-                private int $objectId,
+                private readonly array $fieldChanges,
+                private readonly int $objectId,
             ) {
                 parent::__construct();
             }
@@ -493,8 +493,8 @@ class LeadSubscriberTest extends TestCase
              * @param mixed[] $fieldChanges
              */
             public function __construct(
-                private array $fieldChanges,
-                private int $objectId,
+                private readonly array $fieldChanges,
+                private readonly int $objectId,
             ) {
             }
 

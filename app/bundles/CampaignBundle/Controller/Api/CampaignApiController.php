@@ -7,6 +7,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Helper\CampaignContactCountHelper;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
@@ -23,6 +24,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,6 +60,7 @@ class CampaignApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private ValidatorInterface $validator,
         private EventModel $eventModel,
+        private CampaignContactCountHelper $contactCountHelper,
     ) {
         $campaignModel = $modelFactory->getModel('campaign');
         \assert($campaignModel instanceof CampaignModel);
@@ -77,6 +80,36 @@ class CampaignApiController extends CommonApiController
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+    }
+
+    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    {
+        $response = parent::getEntitiesAction($request, $userHelper);
+
+        $withCounts = $request->query->has('withContactCounts')
+            && 'false' !== strtolower((string) $request->query->get('withContactCounts', 'true'));
+        if (!$withCounts) {
+            return $response;
+        }
+
+        $content = json_decode($response->getContent(), true);
+
+        if (!isset($content[$this->entityNameMulti]) || empty($content[$this->entityNameMulti])) {
+            return $response;
+        }
+
+        $campaignIds = array_keys($content[$this->entityNameMulti]);
+
+        $contactCounts = $this->contactCountHelper->getContactCounts($campaignIds);
+
+        foreach ($content[$this->entityNameMulti] as $id => &$campaign) {
+            $campaign['contactCount']          = $contactCounts[$id]['contactCount'] ?? 0;
+            $campaign['contactCountFetchedAt'] = $contactCounts[$id]['countFetchedAt'] ?? null;
+        }
+
+        $response->setContent(json_encode($content));
+
+        return $response;
     }
 
     /**
@@ -142,8 +175,10 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * @param Campaign &$entity
-     * @param string   $action
+     * @param Campaign             &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -183,7 +218,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($entity->getEvents() as $currentEvent) {
                 if (!in_array($currentEvent->getId(), $requestEventIds)) {
-                    $deletedEvents[] = $currentEvent->getId();
+                    $deletedEvents[] = ['id' => $currentEvent->getId()];
                 }
             }
 
@@ -229,10 +264,10 @@ class CampaignApiController extends CommonApiController
         /** @var array<ConstraintViolationListInterface<ConstraintViolationInterface>> $eventViolations */
         $eventViolations = array_filter(
             array_map(
-                fn (Event $event) => $this->validator->validate($event),
+                fn (Event $event): ConstraintViolationListInterface => $this->validator->validate($event),
                 $entity->getEvents()->toArray()
             ),
-            fn ($error) => $error->count() > 0
+            fn ($error): bool => $error->count() > 0
         );
 
         if (count($eventViolations) > 0) {

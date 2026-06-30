@@ -14,10 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LeadSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailReplyRepository $emailReplyRepository,
-        private StatRepository $statRepository,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
+        private readonly EmailReplyRepository $emailReplyRepository,
+        private readonly StatRepository $statRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -48,7 +48,7 @@ class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
-    private function addEmailEvents(LeadTimelineEvent $event, $state): void
+    private function addEmailEvents(LeadTimelineEvent $event, string $state): void
     {
         // Set available event types
         $eventTypeKey  = 'email.'.$state;

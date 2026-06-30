@@ -16,12 +16,12 @@ class InactiveHelper
     private ?\DateTimeInterface $earliestInactiveDate = null;
 
     public function __construct(
-        private EventScheduler $scheduler,
-        private InactiveContactFinder $inactiveContactFinder,
-        private LeadEventLogRepository $eventLogRepository,
-        private EventRepository $eventRepository,
-        private LoggerInterface $logger,
-        private DecisionHelper $decisionHelper,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LeadEventLogRepository $eventLogRepository,
+        private readonly EventRepository $eventRepository,
+        private readonly LoggerInterface $logger,
+        private readonly DecisionHelper $decisionHelper,
     ) {
     }
 
@@ -36,7 +36,7 @@ class InactiveHelper
          */
         foreach ($decisions as $key => $decision) {
             $negativeChildren = $decision->getNegativeChildren();
-            if (!$negativeChildren->count()) {
+            if (!$negativeChildren->count() && !$decision->shouldBeRedirected()) {
                 $decisions->remove($key);
             }
         }
@@ -99,10 +99,7 @@ class InactiveHelper
         }
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getEarliestInactiveDateTime()
+    public function getEarliestInactiveDateTime(): ?\DateTimeInterface
     {
         return $this->earliestInactiveDate;
     }
@@ -113,7 +110,7 @@ class InactiveHelper
 
         /** @var Event|null $decision */
         $decision = $this->eventRepository->find($decisionId);
-        if ($decision && !$decision->isDeleted()) {
+        if ($decision && (!$decision->isDeleted() || $decision->shouldBeRedirected())) {
             $collection->set($decision->getId(), $decision);
         }
 

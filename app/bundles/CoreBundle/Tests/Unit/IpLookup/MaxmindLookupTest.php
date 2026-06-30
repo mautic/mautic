@@ -16,10 +16,16 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
 {
-    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+    private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
+    /**
+     * @var MockObject&Client
+     */
     protected MockObject $mockHttp;
 
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     protected MockObject $mockCoreParamsHelper;
 
     protected function setUp(): void
@@ -196,7 +202,8 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    private function checkDetails($details): void
+    /** @param array<string, string> $details */
+    private function checkDetails(array $details): void
     {
         $this->assertEquals('Los Angeles', $details['city']);
         $this->assertEquals('California', $details['region']);

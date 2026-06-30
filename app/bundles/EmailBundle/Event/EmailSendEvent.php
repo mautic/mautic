@@ -59,7 +59,7 @@ class EmailSendEvent extends CommonEvent
      * @param bool  $isDynamicContentParsing
      */
     public function __construct(
-        private ?MailHelper $helper = null,
+        private readonly ?MailHelper $helper = null,
         $args = [],
         private $isDynamicContentParsing = false,
     ) {
@@ -134,7 +134,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Set email content.
      */
-    public function setContent($content): void
+    public function setContent(string $content): void
     {
         if (null !== $this->helper) {
             $this->helper->setBody($content, 'text/html', null, true);
@@ -153,12 +153,12 @@ class EmailSendEvent extends CommonEvent
     {
         if (null !== $this->helper) {
             return $this->helper->getPlainText();
-        } else {
-            return $this->plainText;
         }
+
+        return $this->plainText;
     }
 
-    public function setPlainText($content): void
+    public function setPlainText(string $content): void
     {
         if (null !== $this->helper) {
             $this->helper->setPlainText($content);
@@ -190,15 +190,12 @@ class EmailSendEvent extends CommonEvent
     {
         if (null !== $this->helper) {
             return $this->helper->getSubject();
-        } else {
-            return $this->subject;
         }
+
+        return $this->subject;
     }
 
-    /**
-     * @param string $subject
-     */
-    public function setSubject($subject): void
+    public function setSubject(string $subject): void
     {
         if (null !== $this->helper) {
             $this->helper->setSubject($subject);
@@ -209,10 +206,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get the MailHelper object.
-     *
-     * @return MailHelper
      */
-    public function getHelper()
+    public function getHelper(): ?MailHelper
     {
         return $this->helper;
     }
@@ -312,16 +307,14 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Get the content hash to note if the content has been changed.
-     *
-     * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         if (null !== $this->helper) {
             return $this->helper->getContentHash();
-        } else {
-            return md5($this->getContent().$this->getPlainText());
         }
+
+        return md5($this->getContent().$this->getPlainText());
     }
 
     /**

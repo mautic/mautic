@@ -12,7 +12,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
 {
     private mixed $originalDdevTldValue;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->originalDdevTldValue = getenv('DDEV_TLD');
         putenv('DDEV_TLD');
@@ -20,7 +20,7 @@ class IpRestrictMiddlewareTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         putenv('DDEV_TLD='.$this->originalDdevTldValue);
 

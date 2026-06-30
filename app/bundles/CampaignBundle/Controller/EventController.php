@@ -38,8 +38,8 @@ class EventController extends CommonFormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private EventCollector $eventCollector,
-        private DateHelper $dateHelper,
+        private readonly EventCollector $eventCollector,
+        private readonly DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -49,8 +49,9 @@ class EventController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        private CampaignModel $campaignModel,
+        private readonly CampaignModel $campaignModel,
     ) {
+        // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
@@ -174,10 +175,11 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => $success,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
         ];
 
-        if (1 === $success && !empty($modifiedEvents)) {
+        if (1 === $success) {
             $passthroughVars['modifiedEvents'] = $modifiedEvents;
         }
 
@@ -190,16 +192,16 @@ class EventController extends CommonFormController
             $passthroughVars['closeModal'] = 1;
 
             return new JsonResponse($passthroughVars);
-        } else {
-            return $this->ajaxAction(
-                $request,
-                [
-                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
-                    'viewParameters'  => $viewParams,
-                    'passthroughVars' => $passthroughVars,
-                ]
-            );
         }
+
+        return $this->ajaxAction(
+            $request,
+            [
+                'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
+                'viewParameters'  => $viewParams,
+                'passthroughVars' => $passthroughVars,
+            ]
+        );
     }
 
     /**
@@ -315,6 +317,7 @@ class EventController extends CommonFormController
         $passthroughVars = [
             'mauticContent' => 'campaignEvent',
             'success'       => !$cancelled && $valid,
+            'formSubmitted' => $form->isSubmitted(),
             'route'         => false,
             'modifiedEvents'=> $modifiedEvents,
             'eventId'       => $event['id'] ?? '',
@@ -373,20 +376,27 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ('POST' == $request->getMethod() && null !== $event) {
-            $events            = $this->eventCollector->getEventsArray();
-            $event['settings'] = $events[$event['eventType']][$event['type']];
+            $events = $this->eventCollector->getEventsArray();
+            if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
+                $event['settings'] = $events[$event['eventType']][$event['type']];
+            }
 
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
                 // If event is new don't add to deleted list
                 if (!str_contains($objectId, 'new')) {
-                    $deletedEvents[] = $objectId;
+                    $redirectEvent = $request->get('redirectTo');
+
+                    $deletedEvents[] = [
+                        'id'            => $objectId,
+                        'redirectEvent' => $redirectEvent ?: null,
+                    ];
                 }
 
                 // Always remove from modified list if deleted
@@ -433,19 +443,23 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ('POST' == $request->getMethod() && null !== $event) {
-            $events            = $this->eventCollector->getEventsArray();
-            $event['settings'] = $events[$event['eventType']][$event['type']];
+            $events = $this->eventCollector->getEventsArray();
+            if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
+                $event['settings'] = $events[$event['eventType']][$event['type']];
+            }
 
             // add the field to the delete list
-            if (in_array($objectId, $deletedEvents)) {
-                $key = array_search($objectId, $deletedEvents);
-                unset($deletedEvents[$key]);
+            foreach ($deletedEvents as $key => $deleteInfo) {
+                if (isset($deleteInfo['id']) && $deleteInfo['id'] === $objectId) {
+                    unset($deletedEvents[$key]);
+                    break;
+                }
             }
 
             $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
@@ -496,7 +510,7 @@ class EventController extends CommonFormController
                 'MATCH_ONE'
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
@@ -541,14 +555,16 @@ class EventController extends CommonFormController
         $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
         $event['id']    = $event['tempId'] = $keyId;
 
+        $modifiedEvents         = $this->getModifiedEvents();
         $modifiedEvents[$keyId] = $event;
         $this->modifiedEvents   = $modifiedEvents;
 
-        $passThroughVars               = [
+        $passThroughVars = [
             'mauticContent'     => 'campaignEvent',
             'clearCloneStorage' => true,
             'success'           => 1,
             'route'             => false,
+            'modifiedEvents'    => $modifiedEvents,
         ];
 
         $passThroughVars = array_merge($passThroughVars, $this->eventViewVars($event, $campaignId, 'insert'));

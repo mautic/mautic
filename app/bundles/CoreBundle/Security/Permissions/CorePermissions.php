@@ -28,10 +28,10 @@ class CorePermissions implements ResetInterface
 
     public function __construct(
         protected UserHelper $userHelper,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private array $bundles,
-        private array $pluginBundles,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly array $bundles,
+        private readonly array $pluginBundles,
     ) {
         $this->registerPermissionClasses();
     }
@@ -49,10 +49,8 @@ class CorePermissions implements ResetInterface
 
     /**
      * Retrieves all permission objects.
-     *
-     * @return array
      */
-    public function getPermissionObjects()
+    public function getPermissionObjects(): array
     {
         if ($this->permissionObjectsGenerated) {
             return $this->permissionObjectsByName;
@@ -255,15 +253,14 @@ class CorePermissions implements ResetInterface
 
         if ('MATCH_ALL' == $mode) {
             // deny if any of the permissions are denied
-            return in_array(0, $permissions) ? false : true;
+            return !in_array(0, $permissions);
         } elseif ('MATCH_ONE' == $mode) {
             // grant if any of the permissions were granted
-            return in_array(1, $permissions) ? true : false;
+            return in_array(1, $permissions);
         } elseif ('RETURN_ARRAY' == $mode) {
             return $permissions;
-        } else {
-            throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
         }
+        throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
     }
 
     /**
@@ -325,11 +322,7 @@ class CorePermissions implements ResetInterface
             return true;
         }
 
-        if ($hasOtherPermission && !$entity->isNew() && $ownerId !== (int) $user->getId()) {
-            return true;
-        }
-
-        return false;
+        return $hasOtherPermission && !$entity->isNew() && $ownerId !== (int) $user->getId();
     }
 
     /**
@@ -376,18 +369,14 @@ class CorePermissions implements ResetInterface
         $ownerId = (int) $ownerId;
 
         if (0 === $ownerId) {
-            if ($other) {
-                return true;
-            } else {
-                return false;
-            }
+            return (bool) $other;
         } elseif ($own && (int) $this->userHelper->getUser()->getId() === (int) $ownerId) {
             return true;
         } elseif ($other && (int) $this->userHelper->getUser()->getId() !== (int) $ownerId) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -422,26 +411,20 @@ class CorePermissions implements ResetInterface
         return ($userEntity instanceof User && !$userEntity->isGuest()) ? false : true;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    protected function getTranslator()
+    protected function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
 
     /**
-     * @return bool|mixed
+     * @return mixed[]
      */
-    protected function getBundles()
+    protected function getBundles(): array
     {
         return $this->bundles;
     }
 
-    /**
-     * @return array
-     */
-    protected function getPluginBundles()
+    protected function getPluginBundles(): array
     {
         return $this->pluginBundles;
     }

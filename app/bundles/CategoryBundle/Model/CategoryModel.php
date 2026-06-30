@@ -157,7 +157,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new CategoryEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -165,9 +165,9 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

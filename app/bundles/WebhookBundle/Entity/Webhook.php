@@ -2,6 +2,13 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -13,10 +20,31 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'Webhooks',
+    operations: [
+        new GetCollection(uriTemplate: '/webhooks', security: "is_granted('webhook:webhooks:viewown')"),
+        new Post(uriTemplate: '/webhooks', security: "is_granted('webhook:webhooks:create')"),
+        new Get(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:viewown', object)"),
+        new Put(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editown', object)"),
+        new Patch(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editother', object)"),
+        new Delete(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['webhook:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['webhook:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Webhook extends FormEntity implements SkipModifiedInterface
 {
     public const LOGS_DISPLAY_LIMIT = 100;
@@ -24,36 +52,43 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @var ?int
      */
+    #[Groups(['webhook:read'])]
     private $id;
 
     /**
      * @var ?string
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $description;
 
     /**
      * @var ?string
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $webhookUrl;
 
     /**
      * @var ?string
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $secret;
 
     /**
      * @var Category|null
      **/
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $category;
 
     /**
      * @var Collection<int, Event>
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $events;
 
     /**
@@ -67,8 +102,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     private $removedEvents = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $payload;
 
     /**
@@ -77,6 +113,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      *
      * @var array
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $triggers = [];
 
     /**
@@ -85,10 +122,13 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      *
      * @var string|null
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $eventsOrderbyDir;
 
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
+
     private ?\DateTimeImmutable $unHealthySince         = null;
+
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
@@ -109,7 +149,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
         $builder->createOneToMany('events', 'Event')
             ->orphanRemoval()
-            ->setIndexBy('event_type')
+            ->setIndexBy('eventType')
             ->mappedBy('webhook')
             ->cascadePersist()
             ->cascadeMerge()
@@ -195,7 +235,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -204,10 +244,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param string $name
-     *
-     * @return Webhook
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -216,7 +254,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -225,10 +263,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param string $description
-     *
-     * @return Webhook
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -237,7 +273,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -246,10 +282,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param string $webhookUrl
-     *
-     * @return Webhook
      */
-    public function setWebhookUrl($webhookUrl)
+    public function setWebhookUrl($webhookUrl): static
     {
         $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
@@ -258,7 +292,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getWebhookUrl()
     {
@@ -267,10 +301,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param ?string $secret
-     *
-     * @return Webhook
      */
-    public function setSecret($secret)
+    public function setSecret($secret): static
     {
         $this->isChanged('secret', $secret);
         $this->secret = $secret;
@@ -286,10 +318,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->secret;
     }
 
-    /**
-     * @return Webhook
-     */
-    public function setCategory(?Category $category = null)
+    public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -298,7 +327,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return Category
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -315,10 +344,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param Collection<int, Event> $events
-     *
-     * @return $this
      */
-    public function setEvents($events)
+    public function setEvents($events): static
     {
         $this->isChanged('events', $events);
 
@@ -386,10 +413,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return false;
     }
 
-    /**
-     * @return $this
-     */
-    public function addEvent(Event $event)
+    public function addEvent(Event $event): static
     {
         $this->isChanged('events', $event);
 
@@ -398,10 +422,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function removeEvent(Event $event)
+    public function removeEvent(Event $event): static
     {
         $this->isChanged('events', $event);
         $this->removedEvents[] = $event;
@@ -413,7 +434,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param string $eventsOrderbyDir
      */
-    public function setEventsOrderbyDir($eventsOrderbyDir)
+    public function setEventsOrderbyDir($eventsOrderbyDir): static
     {
         $this->isChanged('eventsOrderbyDir', $eventsOrderbyDir);
         $this->eventsOrderbyDir = $eventsOrderbyDir;
@@ -422,7 +443,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getEventsOrderbyDir()
     {
@@ -452,10 +473,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @param ArrayCollection<int,Log> $logs
-     *
-     * @return $this
      */
-    public function addLogs($logs)
+    public function addLogs($logs): static
     {
         $this->logs = $logs;
 
@@ -467,20 +486,14 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addLog(Log $log)
+    public function addLog(Log $log): static
     {
         $this->logs[] = $log;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function removeLog(Log $log)
+    public function removeLog(Log $log): static
     {
         $this->logs->removeElement($log);
 
@@ -495,10 +508,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->payload;
     }
 
-    /**
-     * @return Webhook
-     */
-    public function setPayload($payload)
+    public function setPayload($payload): static
     {
         $this->payload = $payload;
 
@@ -515,11 +525,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
         $aWhileBack = (new \DateTime())->modify('-2 days');
 
-        if ($dateModified < $aWhileBack) {
-            return false;
-        }
-
-        return true;
+        return $dateModified >= $aWhileBack;
     }
 
     /**

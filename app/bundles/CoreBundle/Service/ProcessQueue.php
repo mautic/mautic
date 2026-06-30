@@ -11,20 +11,20 @@ final class ProcessQueue
     /**
      * @var \SplQueue<Process>
      */
-    private \SplQueue $pending;
+    private readonly \SplQueue $pending;
 
     /**
      * @var \SplObjectStorage<Process,Process>
      */
-    private \SplObjectStorage $processing;
+    private readonly \SplObjectStorage $processing;
 
     /**
      * @var \SplObjectStorage<Process,Process>
      */
-    private \SplObjectStorage $processed;
+    private readonly \SplObjectStorage $processed;
 
     public function __construct(
-        private int $processLimit = 10,
+        private readonly int $processLimit = 10,
     ) {
         $this->pending      = new \SplQueue();
         $this->processing   = new \SplObjectStorage();
@@ -46,8 +46,8 @@ final class ProcessQueue
             if ($process->isRunning()) {
                 continue;
             }
-            $this->processing->detach($process);
-            $this->processed->attach($process);
+            $this->processing->offsetUnset($process);
+            $this->processed->offsetSet($process);
         }
 
         // Add new processes to the processing queue
@@ -57,7 +57,7 @@ final class ProcessQueue
             }
             $process = $this->pending->dequeue();
             $process->start();
-            $this->processing->attach($process);
+            $this->processing->offsetSet($process);
         }
     }
 

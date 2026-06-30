@@ -29,9 +29,9 @@ class LeadTimelineEvent extends Event
      *  includeEvents => (array) event types to include
      *  excludeEvents => (array) event types to exclude.
      *
-     * @var array
+     * @var mixed[]
      */
-    protected $filters = [];
+    protected array $filters;
 
     /**
      * @var array<string, int>
@@ -214,7 +214,7 @@ class LeadTimelineEvent extends Event
         if (!empty($this->orderBy)) {
             usort(
                 $events,
-                function ($a, $b) {
+                function (array $a, array $b) {
                     switch ($this->orderBy[0]) {
                         case 'eventLabel':
                             $aLabel = '';
@@ -303,10 +303,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetch the order for queries.
-     *
-     * @return array|null
      */
-    public function getEventOrder()
+    public function getEventOrder(): ?array
     {
         return $this->orderBy;
     }
@@ -342,10 +340,8 @@ class LeadTimelineEvent extends Event
 
     /**
      * Fetches the lead being acted on.
-     *
-     * @return Lead
      */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

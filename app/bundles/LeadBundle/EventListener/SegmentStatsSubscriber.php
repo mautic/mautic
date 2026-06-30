@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentStatsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $leadListRepository)
+    public function __construct(private readonly LeadListRepository $leadListRepository)
     {
     }
 
@@ -39,7 +39,7 @@ final class SegmentStatsSubscriber implements EventSubscriberInterface
 
         $allSegments = $this->leadListRepository->getAllSegments();
 
-        $stats = array_map(function ($data) use ($result) {
+        $stats = array_map(function (array $data) use ($result): array {
             if (in_array($data['item_id'], array_column($result, 'item_id'))) {
                 $data['is_used'] = 1;
             }

@@ -18,6 +18,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
 
@@ -60,40 +61,46 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     /**
      * Overloading the method from MailerAssertionsTrait to get better typehint.
-     *
-     * @return MauticMessage[]
      */
-    public static function getMailerMessages(?string $transport = null): array
-    {
-        $messages = parent::getMailerMessages($transport);
-
-        return array_map(function (RawMessage $message): MauticMessage {
-            \assert($message instanceof MauticMessage);
-
-            return $message;
-        }, $messages);
-    }
-
-    /**
-     * Overloading the method from MailerAssertionsTrait to get better typehint.
-     */
-    public static function getMailerMessage(int $index = 0, ?string $transport = null): ?MauticMessage
+    public static function getMailerMessage(int $index = 0, ?string $transport = null): RawMessage|MauticMessage|null
     {
         return self::getMailerMessages($transport)[$index] ?? null;
     }
 
     /**
-     * @return MauticMessage[]
+     * @return RawMessage[]
      */
     public static function getMailerMessagesByToAddress(string $toAddress, ?string $transport = null): array
     {
-        return array_values(array_filter(self::getMailerMessages($transport), fn (MauticMessage $mauticMessage) => $mauticMessage->getTo()[0]->getAddress() === $toAddress));
+        return array_values(
+            array_filter(
+                self::getMailerMessages($transport),
+                function (RawMessage $message) use ($toAddress): bool {
+                    // Messages are actually Message objects (which extend RawMessage) and have getHeaders()
+                    if ($message instanceof Message) {
+                        return $toAddress === $message->getHeaders()->get('To')->getBodyAsString();
+                    }
+
+                    return false;
+                }
+            )
+        );
     }
 
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
@@ -107,7 +114,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->followRedirects(true);
 
         $this->em = static::getContainer()->get('doctrine')->getManager();
-        \assert($this->em instanceof EntityManagerInterface);
+        $this->assertInstanceOf(EntityManagerInterface::class, $this->em);
         $this->connection = $this->em->getConnection();
         $this->router     = static::getContainer()->get('router');
         $scheme           = $this->router->getContext()->getScheme();
@@ -124,6 +131,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function logoutUser(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->client->getCookieJar()->clear();
     }
 
     /**
@@ -192,7 +200,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         if ($command) {
             // Register the command
-            $application->add($command);
+            $application->addCommand($command);
         } else {
             $command = $application->find($name);
         }

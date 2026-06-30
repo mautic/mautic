@@ -40,13 +40,13 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @var array<string, mixed[]>
      */
-    private $cachedEvents = [];
+    private array $cachedEvents = [];
 
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
         protected TriggerEventModel $pointTriggerEventModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -104,7 +104,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         parent::saveEntity($entity, $unlock);
 
@@ -224,7 +224,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
@@ -275,7 +275,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return mixed[]
      */
-    public function getEvents()
+    public function getEvents(): array
     {
         if (empty($this->cachedEvents)) {
             $event = new TriggerBuilderEvent($this->translator);
@@ -343,16 +343,15 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
             return $this->invokeCallback($event, $lead, $settings);
-        } else {
-            /** @var TriggerEvent $triggerEvent */
-            $triggerEvent = $this->getEventRepository()->find($event['id']);
-
-            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-
-            $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
-
-            return $triggerExecutedEvent->getResult();
         }
+        /** @var TriggerEvent $triggerEvent */
+        $triggerEvent = $this->getEventRepository()->find($event['id']);
+
+        $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+
+        $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
+
+        return $triggerExecutedEvent->getResult();
     }
 
     private function invokeCallback($event, Lead $lead, array $settings): mixed

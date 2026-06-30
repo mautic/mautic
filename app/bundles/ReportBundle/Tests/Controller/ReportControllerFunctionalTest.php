@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const TEST_EMAIL         = 'test@email.com';
+
     private const DEFAULT_TEST_EMAIL = 'default@email.com';
 
     public function testHitRepositoryMostVisited(): void
@@ -58,7 +59,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testReportTableOrderColumn(): void
@@ -101,25 +102,25 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
     public function testCreatingNewReportAndClone(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/reports/new/');
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $saveButton = $crawler->selectButton('Save');
         $form       = $saveButton->form();
         $form['report[name]']->setValue('Report ABC');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         $saveButton = $crawler->selectButton('Save');
         $form       = $saveButton->form();
         $form['report[name]']->setValue('Report ABC - cloned');
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
         $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
 
         Assert::assertSame($report->getId() + 1, $reportClone->getId());
@@ -154,7 +155,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSqlInjectionNotWork('/s/reports/view/'.$report->getId().'\'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'?tmpl=list&name=report.'.$report->getId().'&orderby=a_id');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testContactReportwithComanyDateAddedColumn(): void
@@ -173,7 +174,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
@@ -273,7 +274,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         // Get report view
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         // Load view content as HTML and convert the report table to result array
         $result  = $this->parseReportTable($response->getContent());
@@ -326,11 +327,11 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $response = $this->client->getResponse();
 
         $result = $this->parseReportTable($response->getContent());
-        $this->assertEquals(2, count($result));
+        $this->assertCount(2, $result);
     }
 
     public function testUtmTagReportContainsExpression(): void
@@ -355,7 +356,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check the details page
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     /**
@@ -401,8 +402,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->client->submit($form);
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $report   = $this->em->getRepository(Report::class)->find($report->getId());
         $schedule = $report->getSchedule();
@@ -506,15 +506,14 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $form           = $buttonCrawler->form();
         $form['report[scheduleUnit]']->setValue(SchedulerEnum::UNIT_NOW);
         $this->client->submit($form);
-        $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $schedulerRepository = self::getContainer()->get(SchedulerRepository::class);
-        \assert($schedulerRepository instanceof SchedulerRepository);
+        $this->assertInstanceOf(SchedulerRepository::class, $schedulerRepository);
         $scheduler = $schedulerRepository->getSchedulerByReport($report);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
-        self::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         // Find save & close button
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
@@ -527,7 +526,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         $this->client->submit($form);
-        self::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         while ($scheduler->getScheduleDate() > new \DateTime()) {
             // This ugly thing is needed, because \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::computeScheduler
@@ -538,7 +537,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:reports:scheduler');
 
         $reportFileWriter = self::getContainer()->get(ReportFileWriter::class);
-        \assert($reportFileWriter instanceof ReportFileWriter);
+        $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
         self::assertFileExists($csvPath);
@@ -582,7 +581,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
     }
 
     /**
@@ -662,7 +661,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->get('mautic.report.model.report')->saveEntity($report);
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
         Assert::assertStringContainsString(self::TEST_EMAIL, $content);
@@ -707,7 +706,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         static::getContainer()->set('mautic.report.model.report', $reportModel);
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
         Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, $content);

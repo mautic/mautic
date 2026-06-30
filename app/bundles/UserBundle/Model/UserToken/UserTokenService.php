@@ -9,17 +9,15 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 final class UserTokenService implements UserTokenServiceInterface
 {
     public function __construct(
-        private RandomHelperInterface $randomHelper,
-        private UserTokenRepositoryInterface $userTokenRepository,
+        private readonly RandomHelperInterface $randomHelper,
+        private readonly UserTokenRepositoryInterface $userTokenRepository,
     ) {
     }
 
     /**
      * @param int $secretLength
-     *
-     * @return UserToken
      */
-    public function generateSecret(UserToken $token, $secretLength = 32)
+    public function generateSecret(UserToken $token, $secretLength = 32): UserToken
     {
         do {
             $randomSecret   = $this->randomHelper->generate($secretLength);

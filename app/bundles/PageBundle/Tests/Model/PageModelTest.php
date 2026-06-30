@@ -62,7 +62,7 @@ class PageModelTest extends PageTestAbstract
         $this->router->expects($this->once())
             ->method('generate')
             ->willReturnCallback(
-                function (string $route, array $routeParams, int $referenceType) {
+                function (string $route, array $routeParams, int $referenceType): string {
                     $this->assertSame('mautic_page_public', $route);
                     $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
                     $this->assertSame(0, $referenceType);
@@ -100,8 +100,7 @@ class PageModelTest extends PageTestAbstract
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new \ReflectionClass($pageModel::class);
         $cleanQueryMethod    = $pageModelReflection->getMethod('cleanQuery');
-        $cleanQueryMethod->setAccessible(true);
-        $res = $cleanQueryMethod->invokeArgs($pageModel, [
+        $res                 = $cleanQueryMethod->invokeArgs($pageModel, [
             [
                 'page_title'    => 'Mautic & PHP',
                 'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
@@ -147,6 +146,34 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
+    /**
+     * This test is somewhat synthetic to test the missing $query['ct'].
+     */
+    public function testNoClickThroughInQuery(): void
+    {
+        $redirectUrl = '/somewhat';
+        $pageModel   = $this->getPageModel();
+
+        $ipAddress = $this->createMock(IpAddress::class);
+        $ipAddress->method('isTrackable')->willReturn(true);
+
+        $this->security->method('isAnonymous')->willReturn(true);
+        $this->ipLookupHelper->method('getIpAddress')->willReturn($ipAddress);
+        $this->companyModel->method('fetchCompanyFields')->willReturn([]);
+
+        $redirect = $this->createMock(Redirect::class);
+        $redirect->method('getUrl')->willReturn($redirectUrl);
+
+        $this->contactRequestHelper->expects($this->once())
+            ->method('getContactFromQuery')
+            ->with(['page_url' => $redirectUrl])
+            ->willReturn(null);
+
+        $result = $pageModel->hitPage($redirect, new Request());
+        self::assertFalse($result);
+    }
+
+    /** @param array<string, string> $query */
     private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
@@ -161,6 +188,7 @@ class PageModelTest extends PageTestAbstract
         }
     }
 
+    /** @return array<int, array<string, mixed>> */
     private function getQueryParams(): array
     {
         $utm = [
@@ -185,7 +213,7 @@ class PageModelTest extends PageTestAbstract
         ];
         $ct      = ClickthroughHelper::encodeArrayForUrl($ctParams);
 
-        $params = [[
+        return [[
             'page_title'      => 'Testpage',
             'page_language'   => 'en-GB',
             'page_referrer'   => '',
@@ -225,7 +253,5 @@ class PageModelTest extends PageTestAbstract
             'adblock'         => false,
             'fingerprint'     => 'fec25ab2d659c4153c7f1d5724841132',
         ]];
-
-        return $params;
     }
 }

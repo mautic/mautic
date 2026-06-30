@@ -8,13 +8,13 @@ use PHPUnit\Framework\TestCase;
 
 class YearStatTest extends TestCase
 {
-    private $year     = '2019';
+    private int $year = 2019;
 
-    private $month    = 11;
+    private int $month = 11;
 
     private YearStat $yearStat;
 
-    private $monthStat;
+    private MonthStat $monthStat;
 
     protected function setUp(): void
     {

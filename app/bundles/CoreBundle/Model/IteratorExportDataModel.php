@@ -12,7 +12,10 @@ class IteratorExportDataModel implements \Iterator
 
     private int $total;
 
-    private $data;
+    /**
+     * @var ?mixed[]
+     */
+    private ?array $data;
 
     private int $totalResult;
 
@@ -23,16 +26,16 @@ class IteratorExportDataModel implements \Iterator
      * @template T of object
      */
     public function __construct(
-        private AbstractCommonModel $model,
-        private array $args,
+        private readonly AbstractCommonModel $model,
+        private readonly array $args,
         callable $callback,
-        private bool $skipOrdering = false,
+        private readonly bool $skipOrdering = false,
     ) {
         $this->callback     = $callback;
         $this->position     = 0;
         $this->total        = 0;
         $this->totalResult  = 0;
-        $this->data         = 0;
+        $this->data         = [];
     }
 
     /**
@@ -90,11 +93,7 @@ class IteratorExportDataModel implements \Iterator
      */
     public function valid(): bool
     {
-        if ($this->position <= $this->totalResult && !is_null($this->data)) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->position <= $this->totalResult && !is_null($this->data);
     }
 
     /**

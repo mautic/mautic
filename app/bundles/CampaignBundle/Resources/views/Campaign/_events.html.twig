@@ -35,7 +35,9 @@
                         {% if event.eventType is defined and 'action' != event.eventType %}
                           <small class="text-secondary">{{ event.percent }}%</small>
                         {% endif %}
-
+                        {% if event.deleted is defined and event.deleted is not empty %}
+                        <span class="label label-danger">{{ 'mautic.campaign.deleted'|trans }}</span>
+                        {% endif %}
                     </h5>
                     <h6 class="text-white dark-sm">{{ event.description }}</h6>
                 </div>

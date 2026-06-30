@@ -8,15 +8,16 @@ use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @template T of object
@@ -28,7 +29,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         protected CorePermissions $security,
         protected EventDispatcherInterface $dispatcher,
         protected UrlGeneratorInterface $router,
-        protected Translator $translator,
+        protected TranslatorInterface $translator,
         protected UserHelper $userHelper,
         protected LoggerInterface $logger,
         protected CoreParametersHelper $coreParametersHelper,
@@ -139,7 +140,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**

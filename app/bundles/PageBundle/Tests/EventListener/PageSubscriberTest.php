@@ -24,7 +24,7 @@ class PageSubscriberTest extends TestCase
 {
     public function testGetTokensWhenCalledReturnsValidTokens(): void
     {
-        $translator       = $this->createMock(Translator::class);
+        $translator       = $this->createStub(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);
         $pageBuilderEvent->addToken('{token_test}', 'TOKEN VALUE');
         $tokens = $pageBuilderEvent->getTokens();
@@ -44,7 +44,7 @@ class PageSubscriberTest extends TestCase
 EOF;
         $event = new PageDisplayEvent(
             $dummyPageContent,
-            $this->createMock(Page::class)
+            $this->createStub(Page::class)
         );
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
@@ -53,7 +53,7 @@ EOF;
 
         $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
 
-        $this->assertEquals(
+        $this->assertSame(
             $event->getContent(),
             <<<EOF
 <html>

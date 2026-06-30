@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\DynamicContentBundle\Tests\EventListener;
+namespace Mautic\DynamicContentBundle\Tests\Unit\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -24,59 +24,59 @@ use PHPUnit\Framework\MockObject\MockObject;
 class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TrackableModel
+     * @var MockObject&TrackableModel
      */
     private MockObject $trackableModel;
 
     /**
-     * @var MockObject|PageTokenHelper
+     * @var MockObject&PageTokenHelper
      */
     private MockObject $pageTokenHelper;
 
     /**
-     * @var MockObject|AssetTokenHelper
+     * @var MockObject&AssetTokenHelper
      */
     private MockObject $assetTokenHelper;
 
     /**
-     * @var MockObject|FormTokenHelper
+     * @var MockObject&FormTokenHelper
      */
     private MockObject $formTokenHelper;
 
     /**
-     * @var MockObject|FocusTokenHelper
+     * @var MockObject&FocusTokenHelper
      */
     private MockObject $focusTokenHelper;
 
     /**
-     * @var MockObject|AuditLogModel
-     */
-    private MockObject $auditLogModel;
-
-    /**
-     * @var MockObject|DynamicContentHelper
+     * @var MockObject&DynamicContentHelper
      */
     private MockObject $dynamicContentHelper;
 
     /**
-     * @var MockObject|DynamicContentModel
+     * @var MockObject&DynamicContentModel
      */
     private MockObject $dynamicContentModel;
 
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
-    private \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository $companyLeadRepositoryMock;
+
+    /**
+     * @var MockObject&CompanyLeadRepository
+     */
+    private MockObject $companyLeadRepositoryMock;
 
     private DynamicContentSubscriber $subscriber;
+
     /**
-     * @var CompanyModel|(CompanyModel&MockObject)|MockObject
+     * @var MockObject&CompanyModel
      */
     private MockObject $companyModel;
 
@@ -89,7 +89,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetTokenHelper          = $this->createMock(AssetTokenHelper::class);
         $this->formTokenHelper           = $this->createMock(FormTokenHelper::class);
         $this->focusTokenHelper          = $this->createMock(FocusTokenHelper::class);
-        $this->auditLogModel             = $this->createMock(AuditLogModel::class);
+        $auditLogModel                   = $this->createMock(AuditLogModel::class);
         $this->contactTracker            = $this->createMock(ContactTracker::class);
         $this->dynamicContentHelper      = $this->createMock(DynamicContentHelper::class);
         $this->dynamicContentModel       = $this->createMock(DynamicContentModel::class);
@@ -103,7 +103,7 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->assetTokenHelper,
             $this->formTokenHelper,
             $this->focusTokenHelper,
-            $this->auditLogModel,
+            $auditLogModel,
             $this->dynamicContentHelper,
             $this->dynamicContentModel,
             $this->security,

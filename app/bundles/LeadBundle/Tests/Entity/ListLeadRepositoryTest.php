@@ -14,7 +14,7 @@ final class ListLeadRepositoryTest extends MauticMysqlTestCase
 {
     private ListLeadRepository $listLeadRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class LeadRepositoryTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->clientOptions = ['debug' => true];
 
@@ -38,8 +38,6 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     public function testSaveIpAddressToContacts($args): void
     {
         $contactRepo = $this->em->getRepository(Lead::class);
-
-        $ipRepo = $this->em->getRepository(IpAddress::class);
 
         $ip      = new IpAddress('127.0.0.1');
         $contact = new Lead();
@@ -70,7 +68,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         $finalQueries = array_filter(
             $queries['default'],
-            fn (array $query) => str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)')
+            fn (array $query): bool => str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)')
         );
 
         foreach ($finalQueries as $query) {

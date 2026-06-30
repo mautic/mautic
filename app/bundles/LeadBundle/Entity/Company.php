@@ -2,6 +2,14 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -10,57 +18,133 @@ use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+#[ApiResource(
+    shortName: 'Companies',
+    operations: [
+        new GetCollection(uriTemplate: '/companies', security: "is_granted('lead:leads:viewown')"),
+        new Post(uriTemplate: '/companies', security: "is_granted('lead:leads:create')"),
+        new Get(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:viewown', object)"),
+        new Put(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editown', object)"),
+        new Patch(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:editother', object)"),
+        new Delete(uriTemplate: '/companies/{id}', security: "is_granted('lead:leads:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['company:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['company:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
     use ProjectTrait;
 
     public const FIELD_ALIAS = 'company';
+
     public const TABLE_NAME  = 'companies';
 
     /**
      * @var int
      */
+    #[Groups(['company:read'])]
     private $id;
 
     /**
      * @var int|null
      */
+    #[Groups(['company:read', 'company:write'])]
     private $score = 0;
 
+    #[Groups(['company:read', 'company:write'])]
     private ?User $owner = null;
 
     /**
      * @var mixed[]
      */
+    #[Groups(['company:read', 'company:write'])]
     private $socialCache = [];
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $email;
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $address1;
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $address2;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $phone;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $city;
 
+    /**
+     * @var ?string
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $state;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $zipcode;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $country;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $name;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $website;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $industry;
 
+    /**
+     * @var string|null
+     */
+    #[Groups(['company:read', 'company:write'])]
     private $description;
+
+    #[Groups(['company:read', 'company:write'])]
+    private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
     {
@@ -114,6 +198,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         $builder->createField('score', 'integer')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -244,10 +330,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         }
     }
 
-    /**
-     * @return Company
-     */
-    public function setOwner(?User $owner = null)
+    public function setOwner(?User $owner = null): static
     {
         $this->isChanged('owner', $owner);
         $this->owner = $owner;
@@ -272,10 +355,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param int $score
-     *
-     * @return Company
      */
-    public function setScore($score)
+    public function setScore($score): static
     {
         $score = (int) $score;
 
@@ -286,7 +367,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getScore()
     {
@@ -303,10 +384,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $name
-     *
-     * @return Company
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('companyname', $name);
         $this->name = $name;
@@ -324,10 +403,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $email
-     *
-     * @return Company
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->isChanged('companyemail', $email);
         $this->email = $email;
@@ -345,10 +422,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $address1
-     *
-     * @return Company
      */
-    public function setAddress1($address1)
+    public function setAddress1($address1): static
     {
         $this->isChanged('companyaddress1', $address1);
         $this->address1 = $address1;
@@ -366,10 +441,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $address2
-     *
-     * @return Company
      */
-    public function setAddress2($address2)
+    public function setAddress2($address2): static
     {
         $this->isChanged('companyaddress2', $address2);
         $this->address2 = $address2;
@@ -387,10 +460,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $phone
-     *
-     * @return Company
      */
-    public function setPhone($phone)
+    public function setPhone($phone): static
     {
         $this->isChanged('companyphone', $phone);
         $this->phone = $phone;
@@ -408,10 +479,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $city
-     *
-     * @return Company
      */
-    public function setCity($city)
+    public function setCity($city): static
     {
         $this->isChanged('companycity', $city);
         $this->city = $city;
@@ -429,10 +498,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $state
-     *
-     * @return Company
      */
-    public function setState($state)
+    public function setState($state): static
     {
         $this->isChanged('companystate', $state);
         $this->state = $state;
@@ -450,10 +517,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $zipcode
-     *
-     * @return Company
      */
-    public function setZipcode($zipcode)
+    public function setZipcode($zipcode): static
     {
         $this->isChanged('companyzipcode', $zipcode);
         $this->zipcode = $zipcode;
@@ -471,10 +536,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $country
-     *
-     * @return Company
      */
-    public function setCountry($country)
+    public function setCountry($country): static
     {
         $this->isChanged('companycountry', $country);
         $this->country = $country;
@@ -492,10 +555,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $website
-     *
-     * @return Company
      */
-    public function setWebsite($website)
+    public function setWebsite($website): static
     {
         $this->isChanged('companywebsite', $website);
         $this->website = $website;
@@ -513,10 +574,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $industry
-     *
-     * @return Company
      */
-    public function setIndustry($industry)
+    public function setIndustry($industry): static
     {
         $this->isChanged('companyindustry', $industry);
         $this->industry = $industry;
@@ -534,13 +593,29 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     /**
      * @param string|null $description
-     *
-     * @return Company
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('companydescription', $description);
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return !is_null($this->deleted);
+    }
+
+    public function getDeleted(): ?\DateTimeInterface
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(?\DateTimeInterface $deleted): self
+    {
+        $this->isChanged('companydeleted', $deleted);
+        $this->deleted = $deleted;
 
         return $this;
     }

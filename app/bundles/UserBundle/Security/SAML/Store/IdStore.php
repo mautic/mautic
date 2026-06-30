@@ -10,8 +10,8 @@ use Mautic\UserBundle\Entity\IdEntry;
 class IdStore implements IdStoreInterface
 {
     public function __construct(
-        private ObjectManager $manager,
-        private TimeProviderInterface $timeProvider,
+        private readonly ObjectManager $manager,
+        private readonly TimeProviderInterface $timeProvider,
     ) {
     }
 
@@ -44,10 +44,6 @@ class IdStore implements IdStoreInterface
             return false;
         }
 
-        if ($idEntry->getExpiryTime()->getTimestamp() < $this->timeProvider->getTimestamp()) {
-            return false;
-        }
-
-        return true;
+        return $idEntry->getExpiryTime()->getTimestamp() >= $this->timeProvider->getTimestamp();
     }
 }

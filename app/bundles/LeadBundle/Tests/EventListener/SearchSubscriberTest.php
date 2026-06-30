@@ -31,16 +31,16 @@ class SearchSubscriberTest extends TestCase
     public function testOnBuildSearchCommands(): void
     {
         $contactRepository = $this->createMock(LeadRepository::class);
-        $emailRepository   = $this->createMock(EmailRepository::class);
+        $emailRepository   = $this->createStub(EmailRepository::class);
         $connection        = $this->getMockedConnection();
         $mockPlatform      = $this->createMock(AbstractPlatform::class);
         $leadModel         = $this->createMock(LeadModel::class);
-        $companyModel      = $this->createMock(CompanyModel::class);
-        $listModel         = $this->createMock(ListModel::class);
+        $companyModel      = $this->createStub(CompanyModel::class);
+        $listModel         = $this->createStub(ListModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
-        $security          = $this->createMock(CorePermissions::class);
-        $twig              = $this->createMock(Environment::class);
-        $globalSearch      = $this->createMock(GlobalSearch::class);
+        $security          = $this->createStub(CorePermissions::class);
+        $twig              = $this->createStub(Environment::class);
+        $globalSearch      = $this->createStub(GlobalSearch::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
@@ -88,7 +88,7 @@ class SearchSubscriberTest extends TestCase
 
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function ($key) {
+            ->willReturnCallback(function ($key): string|array|null {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
             });
 
@@ -115,7 +115,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'email_read', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_email_stats es ON l.id = es.lead_id WHERE (es.email_id = ?) AND (es.is_read = ?) GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_email_stats es ON l.id = es.lead_id WHERE (es.email_id = ?) AND (es.is_read = ?) GROUP BY l.id', $sql);
 
         // test email sent
         $qb = new QueryBuilder($connection);
@@ -124,7 +124,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'email_sent', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_email_stats es ON l.id = es.lead_id WHERE es.email_id = ? GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_email_stats es ON l.id = es.lead_id WHERE es.email_id = ? GROUP BY l.id', $sql);
 
         // test email pending
         $qb = new QueryBuilder($connection);
@@ -133,7 +133,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'email_pending', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_message_queue mq ON l.id = mq.lead_id WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_message_queue mq ON l.id = mq.lead_id WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
 
         // test email queued
         $qb = new QueryBuilder($connection);
@@ -142,7 +142,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'email_queued', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_message_queue mq ON l.id = mq.lead_id WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status IN (?, ?)) GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_message_queue mq ON l.id = mq.lead_id WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status IN (?, ?)) GROUP BY l.id', $sql);
 
         // test sms sent
         $qb = new QueryBuilder($connection);
@@ -151,7 +151,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'sms_sent', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_sms_message_stats ss ON l.id = ss.lead_id WHERE ss.sms_id = ? GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_sms_message_stats ss ON l.id = ss.lead_id WHERE ss.sms_id = ? GROUP BY l.id', $sql);
 
         // test web sent
         $qb = new QueryBuilder($connection);
@@ -160,7 +160,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_push_notification_stats ns ON l.id = ns.lead_id INNER JOIN test_push_notifications pn ON pn.id = ns.notification_id WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_push_notification_stats ns ON l.id = ns.lead_id INNER JOIN test_push_notifications pn ON pn.id = ns.notification_id WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
 
         // test mobile sent
         $qb = new QueryBuilder($connection);
@@ -169,7 +169,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'mobile_sent', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_push_notification_stats ns ON l.id = ns.lead_id INNER JOIN test_push_notifications pn ON pn.id = ns.notification_id WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_push_notification_stats ns ON l.id = ns.lead_id INNER JOIN test_push_notifications pn ON pn.id = ns.notification_id WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
 
         // test import id
         $qb = new QueryBuilder($connection);
@@ -178,7 +178,7 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'import_id', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_lead_event_log lel ON l.id = lel.lead_id WHERE (lel.object_id = ?) AND (lel.object = ?) GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_lead_event_log lel ON l.id = lel.lead_id WHERE (lel.object_id = ?) AND (lel.object = ?) GROUP BY l.id', $sql);
 
         // test import action
         $qb = new QueryBuilder($connection);
@@ -187,6 +187,6 @@ class SearchSubscriberTest extends TestCase
         $event = new LeadBuildSearchEvent('1', 'import_action', $alias, false, $qb);
         $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  FROM lead l INNER JOIN test_lead_event_log lel ON l.id = lel.lead_id WHERE lel.action = ? GROUP BY l.id', $sql);
+        $this->assertSame('SELECT  FROM lead l INNER JOIN test_lead_event_log lel ON l.id = lel.lead_id WHERE lel.action = ? GROUP BY l.id', $sql);
     }
 }

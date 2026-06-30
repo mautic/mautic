@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -25,38 +27,32 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|KickoffContactFinder
-     */
-    private MockObject $kickoffContactFinder;
+    private MockObject&KickoffContactFinder $kickoffContactFinder;
 
-    /**
-     * @var MockObject|Translator
-     */
-    private MockObject $translator;
+    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
 
-    /**
-     * @var MockObject|EventExecutioner
-     */
-    private MockObject $executioner;
+    private MockObject&EventExecutioner $executioner;
 
-    /**
-     * @var MockObject|EventScheduler
-     */
-    private MockObject $scheduler;
+    private MockObject&EventScheduler $scheduler;
 
-    /**
-     * @var CoreParametersHelper&MockObject
-     */
-    private MockObject $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
+
+    private \PHPUnit\Framework\MockObject\Stub&EventRedirectionHelper $redirectionHelper;
+
+    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
+
+    private \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
         $this->kickoffContactFinder = $this->createMock(KickoffContactFinder::class);
-        $this->translator           = $this->createMock(Translator::class);
+        $this->translator           = $this->createStub(Translator::class);
         $this->executioner          = $this->createMock(EventExecutioner::class);
         $this->scheduler            = $this->createMock(EventScheduler::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $this->redirectionHelper    = $this->createStub(EventRedirectionHelper::class);
+        $this->entityManager        = $this->createStub(EntityManagerInterface::class);
+        $this->eventDispatcher      = $this->createStub(EventDispatcherInterface::class);
     }
 
     public function testNoContactsResultInEmptyResults(): void
@@ -116,17 +112,15 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $callbackCounter = 0;
         $this->scheduler->expects($this->exactly(4))
             ->method('validateAndScheduleEventForContacts')
-            ->willReturnCallback(
-                function () use (&$callbackCounter): void {
-                    ++$callbackCounter;
-                    if (in_array($callbackCounter, [3, 4])) {
-                        throw new NotSchedulableException();
-                    }
+            ->willReturnCallback(function () use (&$callbackCounter): void {
+                ++$callbackCounter;
+                if (in_array($callbackCounter, [3, 4])) {
+                    throw new NotSchedulableException();
                 }
-            );
+            });
 
         $this->executioner->expects($this->exactly(1))
-            ->method('executeEventsForContacts')->willReturnCallback(function (...$parameters) {
+            ->method('executeEventsForContacts')->willReturnCallback(function (...$parameters): void {
                 $this->assertCount(2, $parameters[0]);
                 $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
                 $this->assertInstanceOf(Counter::class, $parameters[2]);
@@ -146,9 +140,11 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->executioner,
             $this->scheduler,
-            $this->createMock(ProcessSignalService::class),
+            $this->createStub(ProcessSignalService::class),
             $this->coreParametersHelper,
-            $this->createMock(EventDispatcherInterface::class),
+            $this->eventDispatcher,
+            $this->redirectionHelper,
+            $this->entityManager,
         );
     }
 }

@@ -18,7 +18,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
     /**
      * @var Client Redis client
      */
-    private Client $redis;
+    private readonly Client $redis;
 
     public function __construct(
         private array $redisConfiguration,
@@ -58,7 +58,8 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
     public function gc($maxlifetime): int|false
     {
-        return 1;
+        // No garbage collection needed as Redis handles expiration.
+        return false;
     }
 
     public function updateTimestamp($sessionId, $data): bool

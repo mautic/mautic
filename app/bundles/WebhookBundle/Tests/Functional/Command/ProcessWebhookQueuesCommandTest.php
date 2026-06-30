@@ -42,7 +42,7 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
             array_push($queueIds, $addedLog->getId());
 
             $handlerStack->append(
-                function (RequestInterface $request) {
+                function (RequestInterface $request): Response {
                     Assert::assertSame('POST', $request->getMethod());
                     Assert::assertSame('https://httpbin.org/post', $request->getUri()->__toString());
 
@@ -63,6 +63,13 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
 
         // And 4 out of 10 queue records will be left alone as they did not fit the ID range.
         Assert::assertCount(4, $this->em->getRepository(WebhookQueue::class)->findBy(['webhook' => $webhook]));
+    }
+
+    public function testCommandWhenNoWebhooksFound(): void
+    {
+        $output = $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
+
+        Assert::assertStringContainsString('There are no published webhooks to process.', $output->getDisplay());
     }
 
     private function createWebhook(string $name, string $url, string $secret): Webhook

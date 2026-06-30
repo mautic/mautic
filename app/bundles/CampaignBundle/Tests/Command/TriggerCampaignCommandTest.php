@@ -5,17 +5,24 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Enum\RepublishBehavior;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\CampaignBundle\Tests\CampaignAuditLogTrait;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Command\SegmentCountCacheCommand;
+use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
 class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
+    use CampaignAuditLogTrait;
+
     private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
 
     protected function setUp(): void
@@ -65,7 +72,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 42 should have been send down the non-action path (red) of the condition
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[11]);
-        $this->assertEquals(42, $nonActionCount);
+        $this->assertSame(42, $nonActionCount);
 
         // 8 contacts are from the US and should be labeled with US:Action
         $this->assertCount(8, $byEvent[12]);
@@ -117,7 +124,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
+            $this->assertResponseIsSuccessful();
         }
 
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
@@ -144,7 +151,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 25 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(25, $nonActionCount);
+        $this->assertSame(25, $nonActionCount);
 
         // A condition should be logged as evaluated for each of the 25 contacts
         $this->assertCount(25, $byEvent[4]);
@@ -231,7 +238,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 1 should have been send down the non-action path (red) of the condition
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[11]);
-        $this->assertEquals(1, $nonActionCount);
+        $this->assertSame(1, $nonActionCount);
 
         // 0 contacts are from the US and should be labeled with US:Action
         $this->assertCount(0, $byEvent[12]);
@@ -284,7 +291,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
+            $this->assertResponseIsSuccessful();
         }
 
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
@@ -311,7 +318,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 0 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(0, $nonActionCount);
+        $this->assertSame(0, $nonActionCount);
 
         // There should be no inactive events
         $this->assertCount(0, $byEvent[4]);
@@ -392,7 +399,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 4 should have been send down the non-action path (red) of the condition
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[11]);
-        $this->assertEquals(4, $nonActionCount);
+        $this->assertSame(4, $nonActionCount);
 
         // 1 contacts are from the US and should be labeled with US:Action
         $this->assertCount(1, $byEvent[12]);
@@ -444,7 +451,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         // Now let's simulate email opens
         foreach ($stats as $stat) {
             $this->client->request('GET', '/email/'.$stat['tracking_hash'].'.gif');
-            $this->assertEquals(200, $this->client->getResponse()->getStatusCode(), var_export($this->client->getResponse()->getContent(), true));
+            $this->assertResponseIsSuccessful();
         }
 
         $byEvent = $this->getCampaignEventLogs([3, 4, 5, 10, 14, 15]);
@@ -471,7 +478,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 3 should be marked as non_action_path_taken
         $nonActionCount = $this->getNonActionPathTakenCount($byEvent[3]);
-        $this->assertEquals(3, $nonActionCount);
+        $this->assertSame(3, $nonActionCount);
 
         // A condition should be logged as evaluated for each of the 3 contacts
         $this->assertCount(3, $byEvent[4]);
@@ -544,13 +551,13 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
 
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(0, $count);
+        self::assertSame(0, $count);
 
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
+        self::assertSame(50, $count);
     }
 
     public function testCampaignActionChangeMembership(): void
@@ -618,7 +625,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $property = ['removeFrom' => ['this']];
         $event1   = $this->createEvent('Event', $campaign, 'campaign.addremovelead', 'action', $property);
         $property = ['points' => 1];
-        $event2   = $this->createEvent('Event', $campaign, 'lead.changepoints', 'action', $property);
+        $this->createEvent('Event', $campaign, 'lead.changepoints', 'action', $property);
         $this->em->flush();
         $this->em->clear();
 
@@ -708,7 +715,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $segmentMemberRepo->deleteEntities($segmentMemberRepo->findAll());
 
         $campaign = $campaignRepo->find(1); // Created in parent::setUp()
-        \assert($campaign instanceof Campaign);
+        $this->assertInstanceOf(Campaign::class, $campaign);
 
         $campaign->setAllowRestart(true);
 
@@ -753,7 +760,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         }
 
         // check if the new campaign processed first
-        $this->assertEquals("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
+        $this->assertSame("Triggering events for campaign {$newCampaign->getId()}", $campaignStartLines[0]);
     }
 
     /**
@@ -765,13 +772,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => 1]);
         // Segment cache count should be 50.
         $count = $this->segmentCountCacheHelper->getSegmentContactCount(1);
-        self::assertEquals(50, $count);
+        self::assertSame(50, $count);
     }
 
-    /**
-     * @return array
-     */
-    private function getTagCounts()
+    /** @return array<string, int> */
+    private function getTagCounts(): array
     {
         $tags = $this->db->createQueryBuilder()
             ->select('t.tag, count(*) as the_count')
@@ -789,10 +794,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         return $tagCounts;
     }
 
-    /**
-     * @return int
-     */
-    private function getNonActionPathTakenCount(array $logs)
+    /** @param array<int, array<string, mixed>> $logs */
+    private function getNonActionPathTakenCount(array $logs): int
     {
         $nonActionCount = 0;
         foreach ($logs as $log) {
@@ -802,5 +805,219 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         }
 
         return $nonActionCount;
+    }
+
+    /**
+     * @param array<array{dateAdded: string, details: array<string, array<int, mixed>>}> $auditLogs
+     * @param array<int, array<string, string>>                                          $expectedTriggerDateLog
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('republishBehaviorProvider')]
+    public function testTriggerCampaignCommandWithRepublishBehavior(
+        string $republishBehavior,
+        string $triggerMode,
+        int $intervalDays,
+        array $auditLogs,
+        string $expectedTriggerDate,
+        bool $expectedIsScheduled,
+        array $expectedTriggerDateLog,
+    ): void {
+        // Create an unpublished campaign with specified republish behavior
+        $campaign = new Campaign();
+        $campaign->setName("Campaign with {$republishBehavior} behavior");
+        $campaign->setIsPublished(true);
+        $campaign->setRepublishBehavior($republishBehavior);
+
+        $this->em->persist($campaign);
+
+        // Create an interval event
+        $event = new Event();
+        $event->setName('Test Interval Event');
+        $event->setType('email.send');
+        $event->setCampaign($campaign);
+        $event->setEventType(Event::TYPE_ACTION);
+        $event->setTriggerMode($triggerMode);
+        $event->setTriggerInterval($intervalDays);
+        $event->setTriggerIntervalUnit('d');
+
+        $this->em->persist($event);
+
+        // Create a contact
+        $contact = new Contact();
+        $contact->setEmail("test-{$republishBehavior}@example.com");
+
+        $this->em->persist($contact);
+
+        // Create an event log with past trigger date
+        $eventLog = new LeadEventLog();
+        $eventLog->setEvent($event);
+        $eventLog->setCampaign($campaign);
+        $eventLog->setLead($contact);
+        $eventLog->setTriggerDate(new \DateTime('2024-10-12 00:00:00'), 'Test setup'); // dateTriggered + 10 days
+        $eventLog->setDateTriggered(new \DateTime('2024-10-02 00:00:00')); // = date created for a new log
+        $eventLog->setIsScheduled(true);
+
+        $this->em->persist($eventLog);
+        $this->em->flush();
+
+        $this->saveAuditLogs($this->em, $auditLogs, $campaign);
+
+        $this->em->clear();
+
+        // Execute using the command
+        $logId         = $eventLog->getId();
+        $commandTester = $this->testSymfonyCommand('mautic:campaigns:trigger', [
+            '--campaign-id'       => $campaign->getId(),
+            '--scheduled-only'    => true, // Only execute scheduled events to test the executeScheduled method
+            '--contact-id'        => $contact->getId(),
+        ]);
+
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+
+        $eventLog = $this->em->find(LeadEventLog::class, $logId);
+        $this->assertInstanceOf(LeadEventLog::class, $eventLog);
+
+        Assert::assertSame($expectedTriggerDate, $eventLog->getTriggerDate()?->format(DateTimeHelper::FORMAT_DB));
+        Assert::assertSame($expectedIsScheduled, $eventLog->getIsScheduled());
+
+        // Assert that trigger date logging is working
+        $metadata = $eventLog->getMetadata();
+        Assert::assertIsArray($metadata, 'Metadata should be an array');
+        Assert::assertArrayHasKey('triggerDateLog', $metadata, 'Metadata should contain triggerDateLog');
+
+        $triggerDateLog = $metadata['triggerDateLog'];
+        Assert::assertNotEmpty($triggerDateLog, 'Trigger date log should contain entries');
+
+        Assert::assertCount(count($expectedTriggerDateLog), $triggerDateLog);
+
+        // Assert that the expected metadata is present
+        foreach ($triggerDateLog as $key => $log) {
+            Assert::assertSame($log['changedTo'], $expectedTriggerDateLog[$key]['changedTo']);
+            Assert::assertSame($log['note'], $expectedTriggerDateLog[$key]['note']);
+        }
+    }
+
+    /**
+     * @return array<string, array{republishBehavior: string, triggerMode: string, intervalDays: int, auditLogs: array<array{dateAdded: string, details: array<string, array<int, mixed>>}>, expectedTriggerDate: string, expectedIsScheduled: bool}>
+     */
+    public static function republishBehaviorProvider(): array
+    {
+        $unpublishedAfter5days = 'published, unpublished and published';
+        $auditLogs             = [
+            $unpublishedAfter5days => [
+                [
+                    'dateAdded' => '2024-10-01 00:00:00',
+                    'details'   => [
+                        'isPublished' => [false, true],
+                    ],
+                ],
+                [
+                    'dateAdded' => '2024-10-05 00:00:00',
+                    'details'   => [
+                        'isPublished' => [null, false],
+                    ],
+                ],
+                [
+                    'dateAdded' => '2024-10-10 00:00:00',
+                    'details'   => [
+                        'isPublished' => [false, true],
+                    ],
+                ],
+            ],
+        ];
+
+        return [
+            'Same the original trigger date as it should not change' => [
+                'republishBehavior'      => RepublishBehavior::COUNT_ALL_TIME->value,
+                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+                'intervalDays'           => 10,
+                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+                'expectedTriggerDateLog' => [
+                    [
+                        'changedTo' => '2024-10-12 00:00:00',
+                        'note'      => 'Test setup',
+                    ],
+                ],
+            ],
+            '10 days after last publish which is 2024-10-10 00:00:00' => [
+                'republishBehavior'      => RepublishBehavior::RESTART_ON_PUBLISH->value,
+                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+                'intervalDays'           => 10,
+                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+                'expectedTriggerDate'    => '2024-10-20 00:00:00', // 10 days after last publish
+                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+                'expectedTriggerDateLog' => [
+                    [
+                        'changedTo' => '2024-10-12 00:00:00',
+                        'note'      => 'Test setup',
+                    ],
+                    [
+                        'changedTo' => '2024-10-20 00:00:00',
+                        'note'      => 'Campaign republish behavior: restart_on_publish',
+                    ],
+                ],
+            ],
+            'Scheduled at 2024-10-02 00:00:00 for 10 days (2024-10-12 00:00:00), unpublished at 2024-10-05 00:00:00 after 3 days, published 2024-10-10 00:00:00 (5 days)' => [
+                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+                'intervalDays'           => 10,
+                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+                'expectedTriggerDate'    => '2024-10-17 00:00:00', // 3 days were already published, 7 remaining to go after publish of 2024-10-10 00:00:00.
+                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+                'expectedTriggerDateLog' => [
+                    [
+                        'changedTo' => '2024-10-12 00:00:00',
+                        'note'      => 'Test setup',
+                    ],
+                    [
+                        'changedTo' => '2024-10-17 00:00:00',
+                        'note'      => 'Campaign republish behavior: count_only_while_published',
+                    ],
+                ],
+            ],
+            'Absolute date trigger mode should not do anything' => [
+                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+                'triggerMode'            => Event::TRIGGER_MODE_DATE,
+                'intervalDays'           => 10,
+                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+                'expectedTriggerDateLog' => [
+                    [
+                        'changedTo' => '2024-10-12 00:00:00',
+                        'note'      => 'Test setup',
+                    ],
+                ],
+            ],
+            'Immediate trigger mode should not extend anything' => [
+                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+                'triggerMode'            => Event::TRIGGER_MODE_IMMEDIATE,
+                'intervalDays'           => 10,
+                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+                'expectedTriggerDateLog' => [
+                    [
+                        'changedTo' => '2024-10-12 00:00:00',
+                        'note'      => 'Test setup',
+                    ],
+                ],
+            ],
+            'If the interval is empty then there will be no extension' => [
+                'republishBehavior'      => RepublishBehavior::COUNT_ONLY_WHILE_PUBLISHED->value,
+                'triggerMode'            => Event::TRIGGER_MODE_INTERVAL,
+                'intervalDays'           => 0,
+                'auditLogs'              => $auditLogs[$unpublishedAfter5days],
+                'expectedTriggerDate'    => '2024-10-12 00:00:00', // Original trigger date
+                'expectedIsScheduled'    => false, // Executed anyway as the trigger date is still in the past
+                'expectedTriggerDateLog' => [
+                    [
+                        'changedTo' => '2024-10-12 00:00:00',
+                        'note'      => 'Test setup',
+                    ],
+                ],
+            ],
+        ];
     }
 }

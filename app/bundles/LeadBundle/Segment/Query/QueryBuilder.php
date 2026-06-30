@@ -18,7 +18,7 @@ class QueryBuilder extends BaseQueryBuilder
     private array $logicStack = [];
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
         parent::__construct($connection);
     }
@@ -55,10 +55,8 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * @param string $queryPartName
      * @param mixed  $value
-     *
-     * @return $this
      */
-    public function setQueryPart($queryPartName, $value)
+    public function setQueryPart($queryPartName, $value): static
     {
         $this->resetQueryPart($queryPartName);
         $this->add($queryPartName, $value);
@@ -136,7 +134,7 @@ class QueryBuilder extends BaseQueryBuilder
             $knownAliases[$tableReference] = true;
 
             $fromClauses[$tableReference] = $tableSql.\Closure::bind(
-                fn ($tableReference, &$knownAliases) => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
+                fn ($tableReference, &$knownAliases): string => $this->{'getSQLForJoins'}($tableReference, $knownAliases),
                 $this,
                 parent::class
             )($tableReference, $knownAliases);
@@ -167,11 +165,9 @@ class QueryBuilder extends BaseQueryBuilder
     /**
      * Add AND condition to existing table alias.
      *
-     * @return $this
-     *
      * @throws QueryException
      */
-    public function addJoinCondition($alias, $expr)
+    public function addJoinCondition($alias, $expr): static
     {
         $result = $parts = $this->getQueryPart('join');
 
@@ -193,10 +189,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function replaceJoinCondition($alias, $expr)
+    public function replaceJoinCondition($alias, $expr): static
     {
         $parts = $this->getQueryPart('join');
         foreach ($parts['l'] as $key => $part) {
@@ -268,10 +261,8 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Functions returns either the 'lead.id' or the primary key from right joined table.
-     *
-     * @return string
      */
-    public function guessPrimaryLeadContactIdColumn()
+    public function guessPrimaryLeadContactIdColumn(): string
     {
         $parts     = $this->getQueryParts();
         $leadTable = $parts['from'][0]['alias'];
@@ -353,7 +344,7 @@ class QueryBuilder extends BaseQueryBuilder
                 $val = "'$val'";
             } elseif (is_array($val)) {
                 if (ArrayParameterType::STRING === $this->getParameterType($key)) {
-                    $val = array_map(static fn ($value) => "'$value'", $val);
+                    $val = array_map(static fn ($value): string => "'$value'", $val);
                 }
                 $val = implode(', ', $val);
             }
@@ -368,10 +359,7 @@ class QueryBuilder extends BaseQueryBuilder
         return count($this->logicStack) > 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getLogicStack()
+    public function getLogicStack(): array
     {
         return $this->logicStack;
     }
@@ -384,10 +372,7 @@ class QueryBuilder extends BaseQueryBuilder
         return $stack;
     }
 
-    /**
-     * @return $this
-     */
-    private function addLogicStack($expression)
+    private function addLogicStack($expression): static
     {
         $this->logicStack[] = $expression;
 
@@ -429,10 +414,8 @@ class QueryBuilder extends BaseQueryBuilder
 
     /**
      * Apply content of stack.
-     *
-     * @return $this
      */
-    public function applyStackLogic()
+    public function applyStackLogic(): static
     {
         if ($this->hasLogicStack()) {
             $stackGroupExpression = new CompositeExpression(CompositeExpression::TYPE_AND, $this->popLogicStack());
@@ -454,9 +437,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function &parentProperty(string $property)
     {
-        return \Closure::bind(function &() use ($property) {
-            return $this->$property;
-        }, $this, parent::class)();
+        return \Closure::bind(fn &() => $this->$property, $this, parent::class)();
     }
 
     /**
@@ -466,8 +447,6 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function parentMethod(string $method, ...$arguments)
     {
-        return \Closure::bind(function () use ($method, $arguments) {
-            return $this->$method(...$arguments);
-        }, $this, parent::class)();
+        return \Closure::bind(fn () => $this->$method(...$arguments), $this, parent::class)();
     }
 }

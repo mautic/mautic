@@ -19,7 +19,9 @@ final class EntityImportEvent extends Event
     private array $dependencies = [];
 
     public const UPDATE = 'update';
+
     public const NEW    = 'new';
+
     public const ERRORS = 'errors';
 
     /**
@@ -32,7 +34,7 @@ final class EntityImportEvent extends Event
     ];
 
     /** @phpstan-ignore-next-line */
-    public function __construct(private string $entityName, private array $data, private ?int $userId)
+    public function __construct(private readonly string $entityName, private readonly array $data, private readonly ?int $userId)
     {
     }
 
@@ -104,10 +106,10 @@ final class EntityImportEvent extends Event
     }
 
     /**
-     * @return mixed|null
+     * @return array<string, array<string, mixed>>
      */
-    public function getStatus(): mixed
+    public function getStatus(): array
     {
-        return $this->status ?? null;
+        return $this->status;
     }
 }

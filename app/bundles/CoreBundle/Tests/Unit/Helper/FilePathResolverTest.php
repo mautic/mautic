@@ -15,16 +15,14 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Filesystem
+     * @var MockObject&Filesystem
      */
     private MockObject $filesystemMock;
 
     /**
-     * @var MockObject|UploadedFile
+     * @var MockObject&UploadedFile
      */
     private MockObject $fileMock;
-
-    private InputHelper $inputHelper;
 
     private FilePathResolver $filePathResolver;
 
@@ -33,8 +31,8 @@ class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->filesystemMock   = $this->createMock(Filesystem::class);
         $this->fileMock         = $this->createMock(UploadedFile::class);
-        $this->inputHelper      = new InputHelper();
-        $this->filePathResolver = new FilePathResolver($this->filesystemMock, $this->inputHelper);
+        $inputHelper            = new InputHelper();
+        $this->filePathResolver = new FilePathResolver($this->filesystemMock, $inputHelper);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Get correct name if few previous names are taken')]

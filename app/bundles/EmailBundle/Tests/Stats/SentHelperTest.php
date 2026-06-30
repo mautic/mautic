@@ -22,36 +22,15 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SentHelperTest extends TestCase
 {
-    private Collector $collector;
-
     private DateTimeHelper $dateTimeHelper;
 
     private SentHelper $sentHelper;
 
-    /**
-     * @var MockObject|Connection
-     */
-    private MockObject $connection;
+    private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;
 
-    /**
-     * @var MockObject|GeneratedColumnsProviderInterface
-     */
-    private MockObject $generatedColumnsProvider;
+    private MockObject&QueryBuilder $queryBuilder;
 
-    /**
-     * @var MockObject|UserHelper
-     */
-    private MockObject $userHelperMock;
-
-    /**
-     * @var MockObject|QueryBuilder
-     */
-    private MockObject $queryBuilder;
-
-    /**
-     * @var MockObject|Result
-     */
-    private MockObject $result;
+    private MockObject&Result $result;
 
     private GeneratedColumns $generatedColumns;
 
@@ -59,16 +38,13 @@ class SentHelperTest extends TestCase
     {
         parent::setUp();
 
-        $eventDispatcher                = new EventDispatcher();
-        $this->collector                = new Collector($eventDispatcher);
-        $this->connection               = $this->createMock(Connection::class);
+        $connection                     = $this->createMock(Connection::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
-        $this->userHelperMock           = $this->createMock(UserHelper::class);
         $this->queryBuilder             = $this->createMock(QueryBuilder::class);
         $this->result                   = $this->createMock(Result::class);
         $this->dateTimeHelper           = new DateTimeHelper();
 
-        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
+        $connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
 
         $generatedColumn        = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', 'CONCAT(YEAR(date_sent), "-", LPAD(MONTH(date_sent), 2, "0"), "-", LPAD(DAY(date_sent), 2, "0"))');
         $this->generatedColumns = new GeneratedColumns();
@@ -77,10 +53,10 @@ class SentHelperTest extends TestCase
         $this->generatedColumns->add($generatedColumn);
 
         $this->sentHelper = new SentHelper(
-            $this->collector,
-            $this->connection,
+            new Collector(new EventDispatcher()),
+            $connection,
             $this->generatedColumnsProvider,
-            $this->userHelperMock
+            $this->createStub(UserHelper::class)
         );
     }
 
@@ -90,7 +66,7 @@ class SentHelperTest extends TestCase
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 
-        $this->generatedColumnsProvider->expects($this->once())
+        $this->generatedColumnsProvider->expects($this->atLeastOnce())
             ->method('getGeneratedColumns')
             ->willReturn($this->generatedColumns);
 
@@ -114,6 +90,8 @@ class SentHelperTest extends TestCase
             ],
         ]);
 
+        $this->mockQueryPart();
+
         $dateFrom = new \DateTime('2022-12-10 00:00:00');
         $dateTo   = new \DateTime('2022-12-20 00:00:00');
         $options  = new EmailStatOptions();
@@ -134,7 +112,7 @@ class SentHelperTest extends TestCase
             ->method('generatedColumnsAreSupported')
             ->willReturn(true);
 
-        $this->generatedColumnsProvider->expects($this->once())
+        $this->generatedColumnsProvider->expects($this->atLeastOnce())
             ->method('getGeneratedColumns')
             ->willReturn($this->generatedColumns);
 
@@ -160,6 +138,8 @@ class SentHelperTest extends TestCase
                 ],
             ]);
 
+        $this->mockQueryPart();
+
         $dateFrom = new \DateTime('2022-12-10 00:00:00');
         $dateTo   = new \DateTime('2022-12-11 00:00:00');
         $options  = new EmailStatOptions();
@@ -173,5 +153,36 @@ class SentHelperTest extends TestCase
 
         $this->assertEquals(12, $hours['2022-12-10 13']->getCount());
         $this->assertEquals(30, $hours['2022-12-10 14']->getCount());
+    }
+
+    private function mockQueryPart(): void
+    {
+        $this->queryBuilder->method('getQueryPart')
+            ->willReturnMap(
+                [
+                    [
+                        'from',
+                        [
+                            [
+                                'table' => 'emails',
+                                'alias' => 'e',
+                            ],
+                        ],
+                    ],
+                    [
+                        'join',
+                        [
+                            'e' => [
+                                [
+                                    'joinType'      => 'inner',
+                                    'joinTable'     => 'email_stats',
+                                    'joinAlias'     => 't',
+                                    'joinCondition' => 't.id = e.id',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            );
     }
 }

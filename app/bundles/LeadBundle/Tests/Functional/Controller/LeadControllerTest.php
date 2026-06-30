@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class LeadControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
+
     /**
      * @var array<string>
      */
@@ -47,7 +48,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             's/contacts/batchExport',
             ['filetype' => 'csv']
         );
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler     = $contactExportSchedulerRows[0];
@@ -66,7 +67,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             UrlGeneratorInterface::ABSOLUTE_URL
         );
         $this->client->request(Request::METHOD_GET, $link);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $notFoundLink = $this->router->generate(
             'mautic_contact_export_download',
@@ -178,7 +179,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $user->setUsername(self::USERNAME);
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
 

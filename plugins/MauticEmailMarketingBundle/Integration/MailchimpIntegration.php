@@ -65,17 +65,15 @@ class MailchimpIntegration extends EmailAbstractIntegration
             $data = $this->makeRequest('https://login.mailchimp.com/oauth2/metadata');
 
             return $this->extractAuthKeys($data, 'dc');
-        } else {
-            return $error;
         }
+
+        return $error;
     }
 
     /**
-     * @param array $settings
-     *
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update

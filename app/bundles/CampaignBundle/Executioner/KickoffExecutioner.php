@@ -2,12 +2,14 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
@@ -36,26 +38,26 @@ class KickoffExecutioner implements ExecutionerInterface
     private ?Counter $counter = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private KickoffContactFinder $kickoffContactFinder,
-        private TranslatorInterface $translator,
-        private EventExecutioner $executioner,
-        private EventScheduler $scheduler,
-        private ProcessSignalService $processSignalService,
-        private CoreParametersHelper $coreParametersHelper,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly KickoffContactFinder $kickoffContactFinder,
+        private readonly TranslatorInterface $translator,
+        private readonly EventExecutioner $executioner,
+        private readonly EventScheduler $scheduler,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly EventRedirectionHelper $redirectionHelper,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
     /**
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -95,7 +97,7 @@ class KickoffExecutioner implements ExecutionerInterface
         }
         $this->logger->debug('CAMPAIGN: Processing the following events: '.implode(', ', $this->rootEvents->getKeys()));
         $totalKickoffEvents = 0;
-        if (!($this->output instanceof NullOutput)) {
+        if (!$this->output instanceof NullOutput) {
             $totalContacts      = $this->kickoffContactFinder->getContactCount($this->campaign->getId(), $this->rootEvents->getKeys(), $this->limiter);
             $totalKickoffEvents = $totalRootEvents * $totalContacts;
 
@@ -139,8 +141,11 @@ class KickoffExecutioner implements ExecutionerInterface
 
             /** @var Event $event */
             foreach ($rootEvents as $key => $event) {
+                $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
                 $this->progressBar->advance($contacts->count());
                 $this->counter->advanceEvaluated($contacts->count());
+                $this->entityManager->refresh($event);
+                $event = $this->redirectionHelper->handleEventRedirection($event, $rootEvents, $key);
 
                 try {
                     // Get the date the event would be executed on as if it was based on days only

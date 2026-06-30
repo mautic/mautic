@@ -12,22 +12,22 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @const TEMP_TEST_FILE
+     * @var string
      */
     public const TEMP_TEST_FILE = './DoNotSellTest.json';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&LoggerInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|HttpClientInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&HttpClientInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 

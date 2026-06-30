@@ -17,7 +17,7 @@ class AuditlogController extends CommonController
     public function indexAction(Request $request, $leadId, $page = 1)
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -70,7 +70,7 @@ class AuditlogController extends CommonController
     public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -79,7 +79,7 @@ class AuditlogController extends CommonController
         }
 
         if (!$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -104,13 +104,13 @@ class AuditlogController extends CommonController
         $dataType = $request->get('filetype', 'csv');
 
         $resultsCallback = function ($event) use ($dateHelper): array {
-            $eventLabel = $event['eventLabel'] ?? $event['eventType'];
-            if (is_array($eventLabel)) {
-                $eventLabel = $eventLabel['label'];
+            $userName = $event['userName'] ?? $event['eventType'];
+            if (is_array($userName)) {
+                $userName = $userName['label'];
             }
 
             return [
-                'eventName'      => $eventLabel,
+                'userName'       => $userName,
                 'eventType'      => $event['eventType'] ?? '',
                 'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];

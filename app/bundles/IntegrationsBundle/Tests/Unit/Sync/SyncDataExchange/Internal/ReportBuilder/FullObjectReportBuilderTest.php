@@ -34,17 +34,17 @@ class FullObjectReportBuilderTest extends TestCase
     private const TEST_EMAIL = 'test@test.com';
 
     /**
-     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider
      */
     private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
     /**
-     * @var FieldBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&FieldBuilder
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
 
@@ -88,7 +88,7 @@ class FullObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime): true {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                     $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -142,7 +142,7 @@ class FullObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject, $fromDateTime, $toDateTime): true {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                     $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -199,7 +199,7 @@ class FullObjectReportBuilderTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('hasListeners')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('hasListeners')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $parameters[0]);
                 }
@@ -225,7 +225,7 @@ class FullObjectReportBuilderTest extends TestCase
                         $internalObject,
                         $fromDateTime,
                         $toDateTime
-                    ) {
+                    ): void {
                         $this->assertSame($internalObject, $event->getObject());
                         $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                         $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -247,7 +247,7 @@ class FullObjectReportBuilderTest extends TestCase
                     $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $callback = function (InternalObjectFindByIdEvent $event) use ($internalObject, $contactEntity) {
+                    $callback = function (InternalObjectFindByIdEvent $event) use ($internalObject, $contactEntity): void {
                         $this->assertSame($internalObject, $event->getObject());
                         $event->setId($contactEntity->getId());
                         $event->setEntity($contactEntity);
@@ -256,7 +256,7 @@ class FullObjectReportBuilderTest extends TestCase
                     $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $parameters[1]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    $callback = function (InternalContactEvent $event) use ($contactEntity) {
+                    $callback = function (InternalContactEvent $event) use ($contactEntity): void {
                         $this->assertSame($contactEntity, $event->getContact());
                     };
                     $callback($parameters[0]);
@@ -302,7 +302,7 @@ class FullObjectReportBuilderTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('hasListeners')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('hasListeners')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $parameters[0]);
                 }
@@ -331,7 +331,7 @@ class FullObjectReportBuilderTest extends TestCase
                         $internalObject,
                         $fromDateTime,
                         $toDateTime
-                    ) {
+                    ): void {
                         $this->assertSame($internalObject, $event->getObject());
                         $this->assertSame($fromDateTime, $event->getDateRange()->getFromDate());
                         $this->assertSame($toDateTime, $event->getDateRange()->getToDate());
@@ -353,7 +353,7 @@ class FullObjectReportBuilderTest extends TestCase
                     $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $callback = function (InternalObjectFindByIdEvent $event) use ($internalObject, $companyEntity) {
+                    $callback = function (InternalObjectFindByIdEvent $event) use ($internalObject, $companyEntity): void {
                         $this->assertSame($internalObject, $event->getObject());
                         $event->setId($companyEntity->getId());
                         $event->setEntity($companyEntity);
@@ -362,7 +362,7 @@ class FullObjectReportBuilderTest extends TestCase
                     $this->assertSame(IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORD, $parameters[1]);
                 }
                 if (3 === $matcher->numberOfInvocations()) {
-                    $callback = function (InternalCompanyEvent $event) use ($companyEntity) {
+                    $callback = function (InternalCompanyEvent $event) use ($companyEntity): void {
                         $this->assertSame($companyEntity, $event->getCompany());
                     };
                     $callback($parameters[0]);

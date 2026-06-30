@@ -8,7 +8,7 @@ use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
 
 class ExtemeIpLookupTest extends \PHPUnit\Framework\TestCase
 {
-    private $cacheDir = __DIR__.'/../../../../../../var/cache/test';
+    private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 
     public function testIpLookupSuccessful(): void
     {

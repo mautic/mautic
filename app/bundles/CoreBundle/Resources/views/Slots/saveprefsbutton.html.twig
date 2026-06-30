@@ -1,4 +1,4 @@
-{% set style = saveprefsbutton.style|default('display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff;') %}
+{% set style = saveprefsbutton.style|default('display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff;height: auto;') %}
 {% set background = saveprefsbutton.background|default('') %}
 
 {% if form is defined %}
@@ -19,11 +19,10 @@
     {% endif %}
 {% endif %}
 
-    <a href="javascript:void(null)"
-        class="button btn btn-ghost btn-save"
+    <button class="button btn btn-ghost btn-save"
         {% if form is defined %}onclick="saveUnsubscribePreferences('{{ form.vars.id }}')"{% endif %}
         style="{{ style }}"
         background="{{ background }}">
-        {{ 'mautic.page.form.saveprefs'|trans }}
-    </a>
+        {{ saveprefsbutton['btnText']|default('mautic.page.form.saveprefs'|trans) }}
+    </button>
     <div style="clear:both"></div>

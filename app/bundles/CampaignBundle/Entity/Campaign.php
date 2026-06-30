@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CampaignBundle\Validator\Constraints\NoOrphanEvents;
@@ -21,14 +22,14 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
-use Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -36,10 +37,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('campaign:campaigns:viewown')"),
         new Post(security: "is_granted('campaign:campaigns:create')"),
-        new Get(security: "is_granted('campaign:campaigns:viewown')"),
-        new Put(security: "is_granted('campaign:campaigns:editown')"),
-        new Patch(security: "is_granted('campaign:campaigns:editother')"),
-        new Delete(security: "is_granted('campaign:campaigns:deleteown')"),
+        new Get(security: "is_granted('campaign:campaigns:viewown', object)"),
+        new Put(security: "is_granted('campaign:campaigns:editown', object)"),
+        new Patch(security: "is_granted('campaign:campaigns:editother', object)"),
+        new Delete(security: "is_granted('campaign:campaigns:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['campaign:read'],
@@ -51,7 +52,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-class Campaign extends FormEntity implements PublishStatusIconAttributesInterface, OptimisticLockInterface, UuidInterface
+class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
 
@@ -60,6 +61,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     use ProjectTrait;
 
     public const TABLE_NAME  = 'campaigns';
+
     public const ENTITY_NAME = 'campaign';
 
     /**
@@ -69,7 +71,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     private $name;
@@ -94,6 +96,10 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     #[Groups(['campaign:read', 'campaign:write'])]
     public ?\DateTimeInterface $deleted = null;
+
+    // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
+    #[Groups(['campaign:read', 'campaign:write'])]
+    private ?string $republishBehavior = null;
 
     /**
      * @var Category|null
@@ -161,6 +167,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder->addIdColumns();
 
         $builder->addPublishDates();
+
+        $builder->createField('republishBehavior', Types::STRING)
+            ->columnName('republish_behavior')
+            ->nullable()
+            ->length(32)
+            ->build();
 
         $builder->addCategory();
 
@@ -237,6 +249,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
                     'allowRestart',
                     'publishUp',
                     'publishDown',
+                    'republishBehavior',
                     'events',
                     'forms',
                     'lists', // @deprecated, will be renamed to 'segments' in 3.0.0
@@ -280,6 +293,29 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
+        } elseif ('projects' === $prop) {
+            // Initialize project tracking on first change
+            if (!isset($this->changes['projects']['old'])) {
+                $currentProjects           = array_map(fn ($project) => $project->getName(), iterator_to_array($current));
+                $this->changes['projects'] = [
+                    'old' => $currentProjects,
+                    'new' => $currentProjects,
+                ];
+            }
+
+            // Update the new state based on the operation
+            if ($val instanceof Project) {
+                // Add project if not already in the list
+                $projectName = $val->getName();
+                if (!in_array($projectName, $this->changes['projects']['new'], true)) {
+                    $this->changes['projects']['new'][] = $projectName;
+                }
+            } else {
+                // Remove project from the list
+                $this->changes['projects']['new'] = array_values(
+                    array_diff($this->changes['projects']['new'], [$val])
+                );
+            }
         } else {
             parent::isChanged($prop, $val);
         }
@@ -291,13 +327,27 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set description.
-     *
-     * @param string $description
-     *
-     * @return Campaign
+     * Override to convert projects changes to final format.
      */
-    public function setDescription($description)
+    public function getChanges($includePast = false)
+    {
+        $changes = parent::getChanges($includePast);
+
+        // Convert projects format if it exists and is in the intermediate format
+        if (isset($changes['projects']['old']) && isset($changes['projects']['new'])) {
+            $changes['projects'] = [
+                implode(', ', $changes['projects']['old']),
+                implode(', ', $changes['projects']['new']),
+            ];
+        }
+
+        return $changes;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -306,21 +356,14 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * Set name.
-     *
-     * @return Campaign
-     */
-    public function setName(string $name)
+    public function setName(string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -329,9 +372,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -340,10 +381,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * Calls $this->addEvent on every item in the collection.
-     *
-     * @return Campaign
      */
-    public function addEvents(array $events)
+    public function addEvents(array $events): static
     {
         foreach ($events as $id => $event) {
             $this->addEvent($id, $event);
@@ -352,12 +391,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Add events.
-     *
-     * @return Campaign
-     */
-    public function addEvent($key, Event $event)
+    public function addEvent($key, Event $event): static
     {
         if ($changes = $event->getChanges()) {
             $this->changes['events']['added'][$key] = [$key, $changes];
@@ -367,9 +401,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove events.
-     */
     public function removeEvent(Event $event): void
     {
         $this->changes['events']['removed'][$event->getId()] = $event->getName();
@@ -378,8 +409,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get events.
-     *
      * @return ArrayCollection<int, Event>
      */
     public function getEvents()
@@ -449,13 +478,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set publishUp.
-     *
      * @param ?\DateTime $publishUp
-     *
-     * @return Campaign
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -464,8 +489,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -474,13 +497,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Set publishDown.
-     *
      * @param ?\DateTime $publishDown
-     *
-     * @return Campaign
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -488,10 +507,21 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
+    public function getRepublishBehavior(): ?string
+    {
+        return $this->republishBehavior;
+    }
+
+    public function setRepublishBehavior(?string $republishBehavior): self
+    {
+        $this->isChanged('republishBehavior', $republishBehavior);
+        $this->republishBehavior = $republishBehavior;
+
+        return $this;
+    }
+
     /**
-     * Get publishDown.
-     *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -499,7 +529,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -515,12 +545,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $this->category = $category;
     }
 
-    /**
-     * Add lead.
-     *
-     * @return Campaign
-     */
-    public function addLead($key, Lead $lead)
+    public function addLead($key, Lead $lead): static
     {
         $action     = ($this->leads->contains($lead)) ? 'updated' : 'added';
         $leadEntity = $lead->getLead();
@@ -531,9 +556,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         return $this;
     }
 
-    /**
-     * Remove lead.
-     */
     public function removeLead(Lead $lead): void
     {
         $leadEntity                                              = $lead->getLead();
@@ -542,11 +564,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * Get leads.
-     *
      * @return Lead[]|Collection
      */
-    public function getLeads()
+    public function getLeads(): Collection
     {
         return $this->leads;
     }
@@ -554,69 +574,53 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * @return ArrayCollection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
 
-    /**
-     * Add list.
-     *
-     * @return Campaign
-     */
-    public function addList(LeadList $list)
+    public function addList(LeadList $list): static
     {
-        $this->lists[$list->getId()] = $list;
+        $this->lists[$list->getId() ?? ''] = $list;
 
-        $this->changes['lists']['added'][$list->getId()] = $list->getName();
+        $this->changes['lists']['added'][$list->getId() ?? ''] = $list->getName();
 
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
-        $this->changes['lists']['removed'][$list->getId()] = $list->getName();
+        $this->changes['lists']['removed'][$list->getId() ?? ''] = $list->getName();
         $this->lists->removeElement($list);
     }
 
     /**
      * @return ArrayCollection<int, Form>
      */
-    public function getForms()
+    public function getForms(): Collection
     {
         return $this->forms;
     }
 
-    /**
-     * Add form.
-     *
-     * @return Campaign
-     */
-    public function addForm(Form $form)
+    public function addForm(Form $form): static
     {
-        $this->forms[$form->getId()] = $form;
+        $this->forms[$form->getId() ?? ''] = $form;
 
-        $this->changes['forms']['added'][$form->getId()] = $form->getName();
+        $this->changes['forms']['added'][$form->getId() ?? ''] = $form->getName();
 
         return $this;
     }
 
-    /**
-     * Remove form.
-     */
     public function removeForm(Form $form): void
     {
-        $this->changes['forms']['removed'][$form->getId()] = $form->getName();
+        $this->changes['forms']['removed'][$form->getId() ?? ''] = $form->getName();
         $this->forms->removeElement($form);
     }
 
     /**
-     * @return mixed
+     * @return array<string, mixed>
      */
-    public function getCanvasSettings()
+    public function getCanvasSettings(): array
     {
         return $this->canvasSettings;
     }
@@ -631,7 +635,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function hasOrphanEvents(): bool
     {
-        $canvasSettings = $this->getCanvasSettings() ?? [];
+        $canvasSettings = $this->getCanvasSettings();
 
         if (empty($canvasSettings['nodes'])) {
             return false;
@@ -640,7 +644,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         // Extract event IDs from canvas nodes (excludes 'lists', 'forms' and other non-event nodes)
         $eventIds = array_filter(
             array_column($canvasSettings['nodes'], 'id'),
-            fn ($id) => !in_array($id, ['lists', 'forms'])
+            fn ($id): bool => !in_array($id, ['lists', 'forms'])
         );
 
         if (empty($eventIds)) {
@@ -668,10 +672,8 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
     /**
      * @param bool $allowRestart
-     *
-     * @return Campaign
      */
-    public function setAllowRestart($allowRestart)
+    public function setAllowRestart($allowRestart): static
     {
         $allowRestart = (bool) $allowRestart;
         $this->isChanged('allowRestart', $allowRestart);
@@ -704,11 +706,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         );
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     */
     public function getOnclickMethod(): string
     {
         return 'Mautic.confirmationCampaignPublishStatus(mQuery(this));';
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     *
+     * @return array<string, string>
+     */
     public function getDataAttributes(): array
     {
         return [
@@ -718,6 +728,11 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         ];
     }
 
+    /**
+     * @deprecated use CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE to change template params instead
+     *
+     * @return array<string, string>
+     */
     public function getTranslationKeysDataAttributes(): array
     {
         return [

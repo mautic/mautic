@@ -19,12 +19,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ConfigType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->add(
+            'campaign_republish_behavior',
+            RepublishBehaviorType::class
+        );
+
         $builder->add(
             'campaign_time_wait_on_event_false',
             ChoiceType::class,

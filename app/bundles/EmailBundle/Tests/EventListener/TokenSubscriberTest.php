@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -14,6 +15,8 @@ use Mautic\EmailBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\SMimeHelper;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,22 +38,22 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testDynamicContentCustomTokens(): void
     {
         /** @var MockObject&FromEmailHelper $fromEmailHelper */
-        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
+        $fromEmailHelper = $this->createStub(FromEmailHelper::class);
 
         /** @var MockObject&CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         /** @var MockObject&Mailbox $mailbox */
-        $mailbox = $this->createMock(Mailbox::class);
+        $mailbox = $this->createStub(Mailbox::class);
 
         /** @var MockObject&LoggerInterface $logger */
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         /** @var MockObject&RouterInterface $router */
-        $router = $this->createMock(RouterInterface::class);
+        $router = $this->createStub(RouterInterface::class);
 
         /** @var MockObject&Environment $twig */
-        $twig = $this->createMock(Environment::class);
+        $twig = $this->createStub(Environment::class);
 
         $requestStack = new RequestStack();
         $themeHelper  = $this->createMock(ThemeHelper::class);
@@ -83,14 +86,15 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $router,
             $twig,
             $themeHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
-            $this->createMock(ModelFactory::class),
-            $this->createMock(AssetModel::class),
-            $this->createMock(TrackableModel::class),
-            $this->createMock(RedirectModel::class),
+            $this->createStub(AssetModel::class),
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
+            $this->createStub(SMimeHelper::class),
+            $this->createStub(EmailStatModel::class),
         );
         $mailHelper->setTokens($tokens);
 
@@ -153,7 +157,7 @@ CONTENT
         $primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
         $primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
             ->willReturn(['email' => 'hello@someone.com']);
-        $segmentRepository    = $this->createMock(LeadListRepository::class);
+        $segmentRepository    = $this->createStub(LeadListRepository::class);
 
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)

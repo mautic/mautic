@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,13 +29,11 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
     private Lead $lead;
 
-    private ContactTracker $contactTracker;
-
     private LeadRepository $campaignLeadRepository;
 
     private LeadEventLogRepository $leadEventLogRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,7 +44,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $this->contactTracker         = static::getContainer()->get('mautic.tracker.contact');
+        $contactTracker               = static::getContainer()->get('mautic.tracker.contact');
         $this->campaignLeadRepository = static::getContainer()->get('mautic.campaign.repository.lead');
         $this->leadEventLogRepository = static::getContainer()->get('mautic.campaign.repository.lead_event_log');
 
@@ -64,7 +61,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
         $flashBagMock->method('all')
             ->willReturn([]);
 
-        $this->contactTracker->setSystemContact($this->lead);
+        $contactTracker->setSystemContact($this->lead);
     }
 
     public function testTwoCampaignsWithPageHitEventsDoNotInterfereWithEachOthersRotation(): void
@@ -80,9 +77,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
         $this->client->request('GET', sprintf('/%s', $this->page->getAlias()));
 
-        $response = $this->client->getResponse();
-
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $withJumpLog    = $this->campaignLeadRepository->getContactRotations([$this->lead->getId()], $this->campaignWithJump->getId());
         $withoutJumpLog = $this->campaignLeadRepository->getContactRotations([$this->lead->getId()], $this->campaignWithoutJump->getId());
@@ -101,9 +96,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
         $this->client->request('GET', sprintf('/%s', $this->page->getAlias()));
 
-        $response = $this->client->getResponse();
-
-        Assert::assertSame(200, $response->getStatusCode());
+        self::assertResponseIsSuccessful();
 
         $withJumpLog    = $this->campaignLeadRepository->getContactRotations([$this->lead->getId()], $this->campaignWithJump->getId());
         $withoutJumpLog = $this->campaignLeadRepository->getContactRotations([$this->lead->getId()], $this->campaignWithoutJump->getId());

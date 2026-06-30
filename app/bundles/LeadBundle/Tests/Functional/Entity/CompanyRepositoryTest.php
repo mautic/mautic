@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -30,7 +30,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         // Clear owners cache (to leave a clean environment for future tests):
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
-        $this->setPrivateProperty($mailHelper, 'leadOwners', []);
+        ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
     public function testEmailSendWithCompanyTokens(): void
@@ -160,26 +160,16 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
-        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
-        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+        ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
+        ReflectionHelper::setValue($mailHelper, 'transport', $transport);
         $this->transport = $transport;
-    }
-
-    /**
-     * @param mixed $value
-     */
-    private function setPrivateProperty(MailHelper $object, string $property, $value): void
-    {
-        $reflector = new \ReflectionProperty($object::class, $property);
-        $reflector->setAccessible(true);
-        $reflector->setValue($object, $value);
     }
 
     private function sendEmailViaApi(int $emailId): void
     {
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseIsSuccessful();
         Assert::assertSame(
             json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR),
             [

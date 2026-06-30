@@ -30,6 +30,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
@@ -216,7 +217,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
-        $formContent        = (!empty($form)) ? $this->twig->render(
+        $formContent        = ($form instanceof \Mautic\FormBundle\Entity\Form) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,
@@ -231,6 +232,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
                 'displayManager' => $displayManager,
             ]
         ) : '';
+
+        if ($form) {
+            $formName = $form->generateFormName("{$form->getName()}_focus", ['_']);
+            $this->formModel->populateValuesWithLead($form, $formContent, $formName);
+        }
 
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
@@ -337,7 +343,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FocusEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -345,9 +351,9 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

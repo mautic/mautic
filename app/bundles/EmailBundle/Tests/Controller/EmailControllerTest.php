@@ -38,69 +38,63 @@ class EmailControllerTest extends TestCase
      * @var string
      */
     public const NEW_CATEGORY_TITLE = 'New category';
-    private MockObject $translatorMock;
 
     /**
-     * @var MockObject|Session
+     * @var MockObject&Session
      */
     private MockObject $sessionMock;
 
     /**
-     * @var MockObject|ModelFactory<EmailModel>
+     * @var MockObject&ModelFactory
      */
     private MockObject $modelFactoryMock;
 
     /**
-     * @var MockObject|Container
+     * @var MockObject&Container
      */
     private MockObject $containerMock;
 
     /**
-     * @var MockObject|Router
+     * @var MockObject&Router
      */
     private MockObject $routerMock;
 
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $modelMock;
 
     /**
-     * @var MockObject|Email
+     * @var MockObject&Email
      */
     private MockObject $emailMock;
-
-    /**
-     * @var MockObject|FlashBag
-     */
-    private MockObject $flashBagMock;
 
     private EmailController $controller;
 
     /**
-     * @var MockObject|CorePermissions
+     * @var MockObject&CorePermissions
      */
     private MockObject $corePermissionsMock;
 
     /**
-     * @var MockObject|FormFactory
+     * @var MockObject&FormFactory
      */
     private MockObject $formFactoryMock;
 
     /**
-     * @var MockObject|Form
+     * @var \PHPUnit\Framework\MockObject\Stub|Form
      */
-    private MockObject $formMock;
+    private \PHPUnit\Framework\MockObject\Stub $formMock;
 
     /**
-     * @var MockObject|Environment
+     * @var MockObject&Environment
      */
     private MockObject $twigMock;
 
     private RequestStack $requestStack;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
@@ -113,7 +107,7 @@ class EmailControllerTest extends TestCase
         $this->routerMock    = $this->createMock(Router::class);
         $this->modelMock     = $this->createMock(EmailModel::class);
         $this->emailMock     = $this->createMock(Email::class);
-        $this->formMock      = $this->createMock(Form::class);
+        $this->formMock      = $this->createStub(Form::class);
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
@@ -123,8 +117,8 @@ class EmailControllerTest extends TestCase
         $helperUserMock                   = $this->createMock(UserHelper::class);
         $coreParametersHelper             = $this->createMock(CoreParametersHelper::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->translatorMock             = $this->createMock(Translator::class);
-        $this->flashBagMock               = $this->createMock(FlashBag::class);
+        $translatorMock                   = $this->createMock(Translator::class);
+        $flashBagMock                     = $this->createMock(FlashBag::class);
         $this->requestStack               = new RequestStack();
         $this->corePermissionsMock        = $this->createMock(CorePermissions::class);
 
@@ -139,13 +133,13 @@ class EmailControllerTest extends TestCase
             $helperUserMock,
             $coreParametersHelper,
             $this->dispatcher,
-            $this->translatorMock,
-            $this->flashBagMock,
+            $translatorMock,
+            $flashBagMock,
             $this->requestStack,
             $this->corePermissionsMock
         );
         $this->controller->setContainer($this->containerMock);
-        $this->sessionMock->method('getFlashBag')->willReturn($this->createMock(FlashBagInterface::class));
+        $this->sessionMock->method('getFlashBag')->willReturn($this->createStub(FlashBagInterface::class));
     }
 
     public function testSendActionWhenNoEntityFound(): void
@@ -173,12 +167,12 @@ class EmailControllerTest extends TestCase
             ->method('isPublished');
 
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testSendActionWhenEntityFoundButNotPublished(): void
@@ -210,12 +204,12 @@ class EmailControllerTest extends TestCase
             ->method('getEmailType');
 
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
         $this->requestStack->push($request);
         $response = $this->controller->sendAction($request, 5);
-        $this->assertEquals(302, $response->getStatusCode());
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testThatExampleEmailsHaveTestStringInTheirSubject(): void
@@ -230,7 +224,7 @@ class EmailControllerTest extends TestCase
             ['twig', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->twigMock],
         ];
 
-        $serviceExists = fn ($key) => count(array_filter($services, fn ($service) => $service[0] === $key)) > 0;
+        $serviceExists = fn ($key): bool => count(array_filter($services, fn ($service): bool => $service[0] === $key)) > 0;
 
         $this->containerMock->method('has')->willReturnCallback($serviceExists);
         $this->containerMock->method('get')->willReturnMap($services);
@@ -275,13 +269,13 @@ class EmailControllerTest extends TestCase
 
         $request = new Request();
         $this->requestStack->push($request);
-        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createMock(LeadModel::class), $this->createMock(FakeContactHelper::class));
+        $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createStub(LeadModel::class), $this->createStub(FakeContactHelper::class));
     }
 
     public function testWinnerActionForDispatchManualWinnerEvent(): void
     {
         $request = $this->createMock(Request::class);
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getSession')
             ->willReturn($this->sessionMock);
 
@@ -298,7 +292,7 @@ class EmailControllerTest extends TestCase
             ->with('email:emails:editown', 'email:emails:editother', null)
             ->willReturn(true);
 
-        $request->expects(self::once())
+        $request->expects($this->once())
             ->method('getMethod')
             ->willReturn(Request::METHOD_POST);
 

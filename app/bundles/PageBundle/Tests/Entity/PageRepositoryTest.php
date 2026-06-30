@@ -18,7 +18,7 @@ class PageRepositoryTest extends TestCase
     private function getRepository(): PageRepository
     {
         $repository = $this->configureRepository(Page::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
@@ -39,7 +39,6 @@ class PageRepositoryTest extends TestCase
         $filter     = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(PageRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 

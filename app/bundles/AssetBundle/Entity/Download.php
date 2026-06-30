@@ -2,12 +2,32 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('asset:assets:viewown')"),
+        new Get(security: "is_granted('asset:assets:viewown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['download:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['asset', 'ipaddress', 'email'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['download:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Download
 {
     public const TABLE_NAME = 'asset_downloads';
@@ -15,57 +35,62 @@ class Download
     /**
      * @var string
      */
+    #[Groups(['download:read'])]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['download:read', 'download:write'])]
     private $dateDownload;
 
     /**
      * @var Asset|null
      */
+    #[Groups(['download:read', 'download:write'])]
     private $asset;
 
     /**
      * @var IpAddress|null
      */
+    #[Groups(['download:read', 'download:write'])]
     private $ipAddress;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead|null
-     */
-    private $lead;
+    #[Groups(['download:read', 'download:write'])]
+    private ?Lead $lead = null;
 
     /**
      * @var int
      */
+    #[Groups(['download:read', 'download:write'])]
     private $code;
 
     /**
      * @var string|null
      */
+    #[Groups(['download:read', 'download:write'])]
     private $referer;
 
     /**
      * @var string
      */
+    #[Groups(['download:read', 'download:write'])]
     private $trackingId;
 
     /**
      * @var string|null
      */
+    #[Groups(['download:read', 'download:write'])]
     private $source;
 
     /**
      * @var int|null
      */
+    #[Groups(['download:read', 'download:write'])]
     private $sourceId;
 
-    /**
-     * @var Email|null
-     */
-    private $email;
+    #[Groups(['download:read', 'download:write'])]
+    private ?Email $email = null;
 
     private ?string $utmCampaign = null;
 
@@ -95,6 +120,7 @@ class Download
 
         $builder->createManyToOne('asset', 'Asset')
             ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addIpAddress(true);
@@ -150,22 +176,15 @@ class Download
             ->build();
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
     /**
-     * Set dateDownload.
-     *
      * @param \DateTime $dateDownload
-     *
-     * @return Download
      */
-    public function setDateDownload($dateDownload)
+    public function setDateDownload($dateDownload): static
     {
         $this->dateDownload = $dateDownload;
 
@@ -173,8 +192,6 @@ class Download
     }
 
     /**
-     * Get dateDownload.
-     *
      * @return \DateTimeInterface
      */
     public function getDateDownload()
@@ -183,13 +200,9 @@ class Download
     }
 
     /**
-     * Set code.
-     *
      * @param int $code
-     *
-     * @return Download
      */
-    public function setCode($code)
+    public function setCode($code): static
     {
         $this->code = $code;
 
@@ -197,8 +210,6 @@ class Download
     }
 
     /**
-     * Get code.
-     *
      * @return int
      */
     public function getCode()
@@ -207,13 +218,9 @@ class Download
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
-     *
-     * @return Download
      */
-    public function setReferer($referer)
+    public function setReferer($referer): static
     {
         $this->referer = $referer;
 
@@ -221,21 +228,14 @@ class Download
     }
 
     /**
-     * Get referer.
-     *
-     * @return string
+     * @return string|null
      */
     public function getReferer()
     {
         return $this->referer;
     }
 
-    /**
-     * Set asset.
-     *
-     * @return Download
-     */
-    public function setAsset(?Asset $asset = null)
+    public function setAsset(?Asset $asset = null): static
     {
         $this->asset = $asset;
 
@@ -243,19 +243,14 @@ class Download
     }
 
     /**
-     * Get asset.
-     *
-     * @return Asset
+     * @return Asset|null
      */
     public function getAsset()
     {
         return $this->asset;
     }
 
-    /**
-     * @return Download
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -263,7 +258,7 @@ class Download
     }
 
     /**
-     * @return IpAddress
+     * @return IpAddress|null
      */
     public function getIpAddress()
     {
@@ -271,13 +266,9 @@ class Download
     }
 
     /**
-     * Set trackingId.
-     *
-     * @param int $trackingId
-     *
-     * @return Download
+     * @param string $trackingId
      */
-    public function setTrackingId($trackingId)
+    public function setTrackingId($trackingId): static
     {
         $this->trackingId = $trackingId;
 
@@ -285,33 +276,25 @@ class Download
     }
 
     /**
-     * Get trackingId.
-     *
-     * @return int
+     * @return string
      */
     public function getTrackingId()
     {
         return $this->trackingId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead): void
+    public function setLead(?Lead $lead): void
     {
         $this->lead = $lead;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getSource()
     {
@@ -327,7 +310,7 @@ class Download
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSourceId()
     {
@@ -342,18 +325,12 @@ class Download
         $this->sourceId = (int) $sourceId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail(Email $email): void
+    public function setEmail(?Email $email): void
     {
         $this->email = $email;
     }
@@ -416,5 +393,10 @@ class Download
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getAsset()->getCreatedBy();
     }
 }

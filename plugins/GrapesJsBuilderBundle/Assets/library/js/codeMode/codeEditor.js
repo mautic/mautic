@@ -94,15 +94,19 @@ class CodeEditor {
       this.editor.DomComponents.getWrapper().set('content', '');
       this.editor.setComponents(code.trim())
 
-      // Reinitialize the content after parsing MJML.
+      // Reinitialize the content only in MJML mode after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
       // See: https://github.com/GrapesJS/mjml/issues/149
-      const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
-      this.editor.setComponents(parsedContent);
+      if (ContentService.isMjmlMode(this.editor)) {
+        const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+        this.editor.setComponents(parsedContent);
+      }
+
+      this.editor.trigger('mautic:code-editor-update');
 
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${e.message}`);
     }
   }
 

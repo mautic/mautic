@@ -16,32 +16,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|UserHelper
-     */
-    private MockObject $userHelper;
-
     private CorePermissions $corePermissions;
 
     /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
-
-    /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->userHelper           = $this->createMock(UserHelper::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $userHelper                 = $this->createMock(UserHelper::class);
+        $translator                 = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->corePermissions      = new CorePermissions(
-            $this->userHelper,
-            $this->translator,
+            $userHelper,
+            $translator,
             $this->coreParametersHelper,
             [
                 $this->mockBundleArray(ApiPermissions::class),
@@ -73,6 +63,7 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($permissionObjects['campaign'], $this->corePermissions->getPermissionObject(CampaignPermissions::class));
     }
 
+    /** @return array{permissionClasses: array<class-string, class-string>} */
     private function mockBundleArray(string $permissionClass): array
     {
         return ['permissionClasses' => [$permissionClass => $permissionClass]];

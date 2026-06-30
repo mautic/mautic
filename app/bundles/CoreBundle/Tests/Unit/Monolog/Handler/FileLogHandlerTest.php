@@ -12,19 +12,19 @@ use PHPUnit\Framework\TestCase;
 class FileLogHandlerTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var FormatterInterface|MockObject
+     * @var FormatterInterface|\PHPUnit\Framework\MockObject\Stub
      */
-    private MockObject $formatter;
+    private \PHPUnit\Framework\MockObject\Stub $formatter;
 
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->formatter            = $this->createMock(FormatterInterface::class);
+        $this->formatter            = $this->createStub(FormatterInterface::class);
     }
 
     public function testPropertiesAreSetFromCoreParametersHelperWhenDebugModeEnabled(): void
@@ -46,8 +46,8 @@ class FileLogHandlerTest extends TestCase
             );
 
         $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
-        $this->assertEquals(Level::Debug, $handler->getLevel());
-        $this->assertEquals(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
+        $this->assertSame(Level::Debug, $handler->getLevel());
+        $this->assertSame(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
 
         $filename = $this->getProperty($handler, 'filename');
         $this->assertEquals('/var/logs/mautic_test.php', $filename);
@@ -74,8 +74,8 @@ class FileLogHandlerTest extends TestCase
             );
 
         $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
-        $this->assertEquals(Level::Notice, $handler->getLevel());
-        $this->assertNotEquals(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
+        $this->assertSame(Level::Notice, $handler->getLevel());
+        $this->assertNotSame(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
 
         $filename = $this->getProperty($handler, 'filename');
         $this->assertEquals('/var/logs/mautic_test.php', $filename);
@@ -83,11 +83,10 @@ class FileLogHandlerTest extends TestCase
         $this->assertEquals(7, $maxFiles);
     }
 
-    private function getProperty(FileLogHandler $handler, string $property)
+    private function getProperty(FileLogHandler $handler, string $property): mixed
     {
         $reflection = new \ReflectionClass($handler);
         $fileName   = $reflection->getProperty($property);
-        $fileName->setAccessible(true);
 
         return $fileName->getValue($handler);
     }

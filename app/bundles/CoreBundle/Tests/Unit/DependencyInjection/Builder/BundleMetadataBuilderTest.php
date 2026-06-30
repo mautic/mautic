@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BundleMetadataBuilderTest extends TestCase
 {
+    /** @var array<string, string> */
     private array $paths;
 
     protected function setUp(): void
@@ -30,7 +31,7 @@ class BundleMetadataBuilderTest extends TestCase
         $builder  = new BundleMetadataBuilder($bundles, $this->paths);
         $metadata = $builder->getCoreBundleMetadata();
 
-        $this->assertEquals([], $builder->getPluginMetadata());
+        $this->assertSame([], $builder->getPluginMetadata());
         $this->assertTrue(isset($metadata['MauticCoreBundle']));
 
         $bundleMetadata = $metadata['MauticCoreBundle'];
@@ -56,7 +57,7 @@ class BundleMetadataBuilderTest extends TestCase
         $builder  = new BundleMetadataBuilder($bundles, $this->paths);
         $metadata = $builder->getPluginMetadata();
 
-        $this->assertEquals([], $builder->getCoreBundleMetadata());
+        $this->assertSame([], $builder->getCoreBundleMetadata());
         $this->assertTrue(isset($metadata['MauticFocusBundle']));
         $bundleMetadata = $metadata['MauticFocusBundle'];
 
@@ -79,7 +80,7 @@ class BundleMetadataBuilderTest extends TestCase
         $bundles = ['FooBarBundle' => 'Foo\Bar\BarBundle'];
 
         $builder = new BundleMetadataBuilder($bundles, $this->paths);
-        $this->assertEquals([], $builder->getCoreBundleMetadata());
-        $this->assertEquals([], $builder->getPluginMetadata());
+        $this->assertSame([], $builder->getCoreBundleMetadata());
+        $this->assertSame([], $builder->getPluginMetadata());
     }
 }

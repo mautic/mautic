@@ -61,7 +61,7 @@ class ConfigController extends AbstractFormController
     ) {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         try {
@@ -214,6 +214,9 @@ class ConfigController extends AbstractFormController
 
         $useConfigFormNotes = $integrationObject instanceof ConfigFormNotesInterface;
 
+        $plugin  = $integrationObject->getIntegrationSettings()->getPlugin();
+        $version = $plugin?->getVersion();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -235,6 +238,7 @@ class ConfigController extends AbstractFormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',
                     'route'         => false,
+                    'pluginVersion' => $version,
                 ],
             ]
         );

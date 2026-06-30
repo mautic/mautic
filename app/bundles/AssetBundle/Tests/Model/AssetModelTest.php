@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -39,13 +40,9 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private ContainerInterface&MockObject $container;
+    private LeadModel&\PHPUnit\Framework\MockObject\Stub $leadModel;
 
-    private CacheProvider $cacheProvider;
-
-    private LeadModel&MockObject $leadModel;
-
-    private CategoryModel&MockObject $categoryModel;
+    private CategoryModel&\PHPUnit\Framework\MockObject\Stub $categoryModel;
 
     private RequestStack&MockObject $requestStack;
 
@@ -65,42 +62,40 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    private MockObject&UrlGeneratorInterface $urlGenerator;
+    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
 
-    private Translator&MockObject $translator;
+    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
 
-    private UserHelper&MockObject $userHelper;
+    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
 
-    private LoggerInterface&MockObject $logger;
+    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        $this->coreParametersHelper->expects($this->once())
-            ->method('get')
+        $this->coreParametersHelper->method('get')
             ->with($this->equalTo('max_size'))
             ->willReturn('2MB');
 
-        $this->container             = $this->createMock(ContainerInterface::class);
-        $this->cacheProvider         = new CacheProvider($this->coreParametersHelper, $this->container);
-        $this->leadModel             = $this->createMock(LeadModel::class);
-        $this->categoryModel         = $this->createMock(CategoryModel::class);
+        $container                   = $this->createMock(ContainerInterface::class);
+        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $container);
+        $this->leadModel             = $this->createStub(LeadModel::class);
+        $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
-        $this->deviceDetectorFactory = new DeviceDetectorFactory($this->cacheProvider);
+        $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
         $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->entityManager         = $this->createMock(EntityManager::class);
         $this->corePermissions       = $this->createMock(CorePermissions::class);
         $this->eventDispatcher       = $this->createMock(EventDispatcherInterface::class);
-        $this->urlGenerator          = $this->createMock(UrlGeneratorInterface::class);
-        $this->translator            = $this->createMock(Translator::class);
-        $this->userHelper            = $this->createMock(UserHelper::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
+        $this->urlGenerator          = $this->createStub(UrlGeneratorInterface::class);
+        $this->translator            = $this->createStub(Translator::class);
+        $this->userHelper            = $this->createStub(UserHelper::class);
+        $this->logger                = $this->createStub(LoggerInterface::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
@@ -160,6 +155,8 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->corePermissions->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(true);
+
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(true);
 
         $request = $this->createMock(Request::class);
 
@@ -240,7 +237,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $ipAddress = new IpAddress('127.0.0.1');
 
-        $this->ipLookupHelper->expects($this->once())
+        $this->ipLookupHelper->expects($this->exactly(2))
             ->method('getIpAddress')
             ->willReturn($ipAddress);
 
@@ -254,7 +251,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($downloadPersist) use (&$download) {
+            ->with($this->callback(function ($downloadPersist) use (&$download): bool {
                 $download = $downloadPersist;
 
                 return $download instanceof Download;
@@ -265,7 +262,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->once())
             ->method('detach')
-            ->with($this->callback(function ($downloadDetach) use (&$download) {
+            ->with($this->callback(function ($downloadDetach) use (&$download): true {
                 $this->assertSame($downloadDetach, $download);
 
                 return true;
@@ -283,5 +280,121 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($lead, $download->getLead());
         $this->assertEquals($asset, $download->getAsset());
         $this->assertEquals('http://localhost', $download->getReferer());
+    }
+
+    #[DataProvider('getEntityBySlugsProvider')]
+    public function testGetEntityBySlugs(
+        string $slug,
+        bool $expectsLookup,
+        bool $shouldResolve,
+        ?string $alias,
+    ): void {
+        $asset = null;
+
+        if ($expectsLookup) {
+            $asset = new Asset();
+            $asset->setAlias($alias);
+        }
+
+        $model = $this->getMockBuilder(AssetModel::class)
+            ->setConstructorArgs([
+                $this->leadModel,
+                $this->categoryModel,
+                $this->requestStack,
+                $this->ipLookupHelper,
+                $this->deviceCreatorService,
+                $this->deviceDetectorFactory,
+                $this->deviceTrackingService,
+                $this->contactTracker,
+                $this->entityManager,
+                $this->corePermissions,
+                $this->eventDispatcher,
+                $this->urlGenerator,
+                $this->translator,
+                $this->userHelper,
+                $this->logger,
+                $this->coreParametersHelper,
+            ])
+            ->onlyMethods(['getEntity'])
+            ->getMock();
+
+        if ($expectsLookup) {
+            $model->expects($this->once())
+                ->method('getEntity')
+                ->willReturn($asset);
+        } else {
+            $model->expects($this->never())
+                ->method('getEntity');
+        }
+
+        $result = $model->getEntityBySlugs($slug);
+
+        if ($shouldResolve) {
+            $this->assertSame($asset, $result);
+        } else {
+            $this->assertFalse($result);
+        }
+    }
+
+    /**
+     * @return iterable<string, array{string, bool, bool, ?string}>
+     */
+    public static function getEntityBySlugsProvider(): iterable
+    {
+        yield 'id with alias' => [
+            '123:alias',
+            true,
+            true,
+            'alias',
+        ];
+
+        yield 'id with wrong alias (BC)' => [
+            '123:wrong-alias',
+            true,
+            true,
+            'real-alias',
+        ];
+
+        yield 'id with trailing colon' => [
+            '123:',
+            true,
+            true,
+            'alias',
+        ];
+
+        yield 'id with trailing colon but alias is null' => [
+            '123:',
+            true,
+            false,
+            null,
+        ];
+
+        yield 'bare id' => [
+            '123',
+            false,
+            false,
+            null,
+        ];
+
+        yield 'non-numeric id' => [
+            'abc:alias',
+            false,
+            false,
+            null,
+        ];
+
+        yield 'empty id' => [
+            ':alias',
+            false,
+            false,
+            null,
+        ];
+
+        yield 'id with empty alias (BC)' => [
+            '123:',
+            true,
+            true,
+            '',
+        ];
     }
 }

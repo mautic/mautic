@@ -177,10 +177,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @param Lead|array $lead
      * @param string     $source
-     *
-     * @return Stat|null
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): ?Stat
     {
         if (empty($lead)) {
             return null;
@@ -236,7 +234,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new DynamicContentEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -244,9 +242,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -262,10 +260,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * Get line chart data of hits.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string  $dateFormat
+     * @param array   $filter
+     * @param bool    $canViewOthers
      */
     public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
     {

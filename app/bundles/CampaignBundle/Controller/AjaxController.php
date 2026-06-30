@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AjaxController extends CommonAjaxController
 {
     public function __construct(
-        private DateHelper $dateHelper,
+        private readonly DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -65,7 +65,7 @@ class AjaxController extends CommonAjaxController
                 $newDate = new \DateTime($newDate);
 
                 if ($newDate >= new \DateTime()) {
-                    $log->setTriggerDate($newDate);
+                    $log->setTriggerDate($newDate, 'Manual date change via AJAX');
 
                     /** @var EventLogModel $logModel */
                     $logModel = $this->getModel('campaign.event_log');

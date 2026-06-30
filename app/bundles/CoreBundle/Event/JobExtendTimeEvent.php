@@ -6,9 +6,9 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-class JobExtendTimeEvent extends Event
+final class JobExtendTimeEvent extends Event
 {
-    public function __construct(private int $throttleSeconds = 60)
+    public function __construct(private readonly int $throttleSeconds = 60)
     {
     }
 

@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 final class ThemeControllerTest extends MauticMysqlTestCase
 {
@@ -25,9 +24,9 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->pathsHelper = $this->getContainer()->get('mautic.helper.paths');
-        \assert($this->pathsHelper instanceof PathsHelper);
+        $this->assertInstanceOf(PathsHelper::class, $this->pathsHelper);
         $this->filesystem  = $this->getContainer()->get('mautic.filesystem');
-        \assert($this->filesystem instanceof Filesystem);
+        $this->assertInstanceOf(Filesystem::class, $this->filesystem);
 
         $themePath = $this->pathsHelper->getThemesPath();
 
@@ -65,7 +64,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteActionValidation(): void
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22,%22brienz%22]');
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
         $this->assertStringContainsString('brienz is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
     }
@@ -73,18 +72,17 @@ final class ThemeControllerTest extends MauticMysqlTestCase
     public function testBatchDeleteActionWithNonCoreTheme(): void
     {
         $themeHelper = self::getContainer()->get(ThemeHelper::class);
-        \assert($themeHelper instanceof ThemeHelper);
+        $this->assertInstanceOf(ThemeHelper::class, $themeHelper);
         $themeHelper->copy('blank', 'blanktest');
         $themeHelper->copy('blank', 'auroratest');
 
         // Clear the private property 'themes' to reload themes.
         $reflectionClass = new \ReflectionClass(ThemeHelper::class);
         $themesProperty  = $reflectionClass->getProperty('themes');
-        $themesProperty->setAccessible(true);
         $themesProperty->setValue($themeHelper, []);
 
         $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22,%22auroratest%22]');
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('2 themes have been deleted!', $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
     }
 

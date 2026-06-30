@@ -11,17 +11,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateTranslationsStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|LanguageHelper
+     * @var MockObject&LanguageHelper
      */
     private MockObject $languageHelper;
 
     /**
-     * @var MockObject|LoggerInterface
+     * @var MockObject&LoggerInterface
      */
     private MockObject $logger;
 
@@ -125,7 +125,7 @@ class UpdateTranslationsStepTest extends AbstractStepTestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                fn (string $key) => $key
+                fn (string $key): string => $key
             );
 
         $this->logger->expects($this->once())

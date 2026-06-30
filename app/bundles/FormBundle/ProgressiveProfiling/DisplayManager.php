@@ -7,11 +7,11 @@ use Mautic\FormBundle\Entity\Form;
 
 class DisplayManager
 {
-    private DisplayCounter $displayCounter;
+    private readonly DisplayCounter $displayCounter;
 
     public function __construct(
-        private Form $form,
-        private array $viewOnlyFields = [],
+        private readonly Form $form,
+        private readonly array $viewOnlyFields = [],
     ) {
         $this->displayCounter = new DisplayCounter($form);
     }
@@ -26,18 +26,13 @@ class DisplayManager
         if ($field->isAlwaysDisplay()) {
             if ($this->form->getProgressiveProfilingLimit() <= $this->displayCounter->getDisplayFields()) {
                 return false;
-            } else {
-                $this->displayCounter->increaseAlreadyAlwaysDisplayed();
-
-                return true;
             }
+            $this->displayCounter->increaseAlreadyAlwaysDisplayed();
+
+            return true;
         }
 
-        if ($this->shouldDisplayNotAlwaysDisplayField($field)) {
-            return true;
-        } else {
-            return false;
-        }
+        return $this->shouldDisplayNotAlwaysDisplayField($field);
     }
 
     private function shouldDisplayNotAlwaysDisplayField(Field $field): bool
@@ -64,10 +59,7 @@ class DisplayManager
         return '' != $this->form->getProgressiveProfilingLimit();
     }
 
-    /**
-     * @return DisplayCounter
-     */
-    public function getDisplayCounter()
+    public function getDisplayCounter(): DisplayCounter
     {
         return $this->displayCounter;
     }

@@ -80,7 +80,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      */
     public function onFormPostSetData(FormEvent $event): void
     {
-        $this->selected = (array) $event->getData();
+        $this->selected = $this->sanitizeIds($event->getData());
     }
 
     /**
@@ -95,19 +95,15 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $data = $this->selected;
         }
 
+        // Ensure we only work with scalar numeric IDs to prevent array-to-string conversions
+        $data = $this->sanitizeIds($data);
+
         $modelName  = $this->options['model'];
         $modalRoute = $this->options['modal_route'];
 
         // Check if we've already f the choices
         if (!isset($this->choices[$modelName]) || count(array_diff($data, array_keys($this->choices[$modelName]))) !== count($data)) {
             $this->choices[$modelName] = [];
-
-            if ($data) {
-                $data = array_map(
-                    fn ($v): int => (int) $v,
-                    (array) $data
-                );
-            }
 
             // Build choice list in case of different formats
             $choices = $this->fetchChoices($modelName, $data);
@@ -218,6 +214,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $args['limit'] = max($args['limit'], count($data));
         }
 
+        $parameters = [];
         // Check if the method exists in the model
         $methodName = $this->options['model_lookup_method'] ?? null;
         if ($methodName && method_exists($model, $methodName)) {
@@ -228,9 +225,20 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $data ? CompositeExpression::and($expr->in($alias.'.id', $data)) : null;
-            $limit     = max(100, count($data));
-            $choices   = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
+            $composite = null;
+
+            $limit = 100;
+            if ($data) {
+                $composite = CompositeExpression::and(
+                    $expr->in($alias.'.id', ':dataIds')
+                );
+                $parameters['dataIds'] = $data;
+                if (count($data) > $limit) {
+                    $limit = count($data);
+                }
+            }
+
+            $choices = $model->getRepository()->getSimpleList($composite, $parameters, $labelColumn, $idColumn, null, $limit);
         }
 
         return $choices;
@@ -268,5 +276,44 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             $choices = $validChoices;
         }
+    }
+
+    /**
+     * Normalize incoming selected values to an array of unique integer IDs.
+     * Accepts scalars, arrays, or an entity object exposing the configured identifier getter.
+     *
+     * @param int|numeric-string|iterable<int|numeric-string|object>|object|null $data
+     *
+     * @return int[]
+     */
+    private function sanitizeIds(int|string|array|object|null $data): array
+    {
+        if (is_null($data)) {
+            return [];
+        }
+
+        if (!is_iterable($data)) {
+            $data = [$data];
+        }
+
+        $idColumn = $this->options['entity_id_column'] ?? 'id';
+        $getter   = 'get'.ucfirst((string) $idColumn);
+
+        $ids = [];
+        foreach ($data as $value) {
+            $id = null;
+
+            if (is_object($value) && method_exists($value, $getter)) {
+                $id = $value->$getter();
+            } elseif (is_scalar($value)) {
+                $id = $value;
+            }
+
+            if (is_int($id) || (is_string($id) && ctype_digit($id))) {
+                $ids[] = (int) $id;
+            }
+        }
+
+        return array_values(array_unique($ids));
     }
 }

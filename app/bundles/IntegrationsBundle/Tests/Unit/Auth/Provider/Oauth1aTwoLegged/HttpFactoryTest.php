@@ -13,12 +13,12 @@ class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('oauth1a_two_legged', (new HttpFactory())->getAuthType());
+        $this->assertSame('oauth1a_two_legged', (new HttpFactory())->getAuthType());
     }
 
     public function testGetClientWithEmptyCredentials(): void
     {
-        $credentials = $this->createMock(CredentialsInterface::class);
+        $credentials = $this->createStub(CredentialsInterface::class);
         $httpFactory = new HttpFactory();
         $this->expectException(PluginNotConfiguredException::class);
         $httpFactory->getClient($credentials);

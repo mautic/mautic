@@ -96,7 +96,7 @@ class ArrayHelper
         }
 
         return array_map(
-            fn (array $subArray) => array_flip($subArray),
+            fn (array $subArray): array => array_flip($subArray),
             $masterArrays
         );
     }
@@ -122,17 +122,15 @@ class ArrayHelper
 
     /**
      *  SUM/SUBSTRACT between two arrays.
-     *
-     * @param bool $subtracted
      */
-    private static function sumOrSub(array $a1, array $b2, $subtracted = false): array
+    private static function sumOrSub(array $a1, array $b2, bool $subtracted = false): array
     {
-        return array_map(function ($x, $y) use ($subtracted) {
+        return array_map(function ($x, $y) use ($subtracted): int|float|array {
             if ($subtracted) {
                 return $x - $y;
-            } else {
-                return $x + $y;
             }
+
+            return $x + $y;
         }, $a1, $b2);
     }
 }

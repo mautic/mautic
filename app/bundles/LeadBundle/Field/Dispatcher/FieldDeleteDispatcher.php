@@ -16,13 +16,15 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FieldDeleteDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private EntityManager $entityManager,
-        private BackgroundSettings $backgroundSettings,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EntityManager $entityManager,
+        private readonly BackgroundSettings $backgroundSettings,
     ) {
     }
 
     /**
+     * @deprecated Use regular call of `$this->dispatchEvent(LeadEvents::FIELD_PRE_DELETE, $entity)` instead
+     *
      * @throws NoListenerException
      * @throws AbortColumnUpdateException
      */
@@ -48,7 +50,7 @@ class FieldDeleteDispatcher
      *
      * @throws NoListenerException
      */
-    private function dispatchEvent($action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
+    private function dispatchEvent(string $action, LeadField $entity, ?LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
             throw new NoListenerException('There is no Listener for this event');

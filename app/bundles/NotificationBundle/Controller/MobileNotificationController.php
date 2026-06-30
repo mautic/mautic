@@ -21,10 +21,8 @@ class MobileNotificationController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         /** @var NotificationModel $model */
         $model = $this->getModel('notification');
@@ -46,7 +44,7 @@ class MobileNotificationController extends FormController
         );
 
         if (!$permissions['notification:mobile_notifications:viewown'] && !$permissions['notification:mobile_notifications:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session = $request->getSession();
@@ -145,10 +143,8 @@ class MobileNotificationController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         /** @var NotificationModel $model */
         $model    = $this->getModel('notification');
@@ -187,7 +183,7 @@ class MobileNotificationController extends FormController
             $notification->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // Audit Log
@@ -274,7 +270,7 @@ class MobileNotificationController extends FormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('notification:mobile_notifications:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -441,7 +437,7 @@ class MobileNotificationController extends FormController
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'notification');
@@ -575,7 +571,7 @@ class MobileNotificationController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity      = clone $entity;
@@ -626,7 +622,7 @@ class MobileNotificationController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'notification');
             }
@@ -695,7 +691,7 @@ class MobileNotificationController extends FormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'notification', true);
                 } else {

@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
@@ -24,15 +25,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private AuditLogModel $auditLogModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly AuditLogModel $auditLogModel,
         MailHelper $mailer,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private LanguageHelper $languageHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly LanguageHelper $languageHelper,
     ) {
         $this->mailer = $mailer->getMailer();
     }
@@ -67,7 +68,7 @@ class FormSubscriber implements EventSubscriberInterface
             ];
             $this->auditLogModel->writeToLog($log);
         }
-        if (!array_key_exists($form->getLanguage(), $this->languageHelper->getSupportedLanguages())) {
+        if (!array_key_exists($form->getLanguage() ?? '', $this->languageHelper->getSupportedLanguages())) {
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }
@@ -103,9 +104,8 @@ class FormSubscriber implements EventSubscriberInterface
             'formTypeCleanMasks' => [
                 'message' => 'raw',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
-            'template'          => '@MauticForm/Action/form_email.html.twig',
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'template'  => '@MauticForm/Action/form_email.html.twig',
         ]);
 
         $event->addSubmitAction('form.repost', [
@@ -119,8 +119,7 @@ class FormSubscriber implements EventSubscriberInterface
                 'failure_email'        => 'string',
                 'authorization_header' => 'string',
             ],
-            'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-            'allowCampaignForm' => true,
+            'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
 
@@ -182,7 +181,7 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
+        if (!empty($config['email_to_owner']) && null !== $owner) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
@@ -273,7 +272,7 @@ class FormSubscriber implements EventSubscriberInterface
                     if (in_array($key, ['messenger', 'submit', 'formId', 'formid', 'formName', 'return'])) {
                         unset($post[$key]);
                     }
-                    if (isset($fieldTypes[$key]) && in_array($fieldTypes[$key], ['password'])) {
+                    if (isset($fieldTypes[$key]) && 'password' == $fieldTypes[$key]) {
                         $post[$key] = '*********';
                     }
                 }

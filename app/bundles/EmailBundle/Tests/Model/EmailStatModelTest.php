@@ -29,7 +29,7 @@ final class EmailStatModelTest extends TestCase
         $statRepository->expects($this->once())
             ->method('saveEntities')
             ->willReturnCallback(
-                function (array $entities) {
+                function (array $entities): void {
                     Assert::assertCount(1, $entities);
                     Assert::assertInstanceOf(StatTest::class, $entities[0]);
 
@@ -40,11 +40,6 @@ final class EmailStatModelTest extends TestCase
 
         $dispatcher = new class extends EventDispatcher {
             public int $dispatchMethodCounter = 0;
-
-            public function __construct()
-            {
-                parent::__construct();
-            }
 
             public function dispatch(object $event, ?string $eventName = null): object
             {

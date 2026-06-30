@@ -19,7 +19,7 @@ class ClassExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_class', fn ($value) => (new \ReflectionClass($value))->getShortName()),
+            new TwigFunction('get_class', fn ($value): string => (new \ReflectionClass($value))->getShortName()),
         ];
     }
 
@@ -29,7 +29,7 @@ class ClassExtension extends AbstractExtension
     public function getTests(): array
     {
         return [
-            new TwigTest('instanceof', fn ($value, $class) => $value instanceof $class),
+            new TwigTest('instanceof', fn ($value, $class): bool => $value instanceof $class),
         ];
     }
 }

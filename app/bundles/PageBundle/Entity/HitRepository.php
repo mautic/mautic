@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -125,7 +126,7 @@ class HitRepository extends CommonRepository
      *
      * @param int $code
      */
-    public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200): array
+    public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -135,13 +136,20 @@ class HitRepository extends CommonRepository
 
         $q->select('count(distinct(h.tracking_id)) as hit_count, h.email_id')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->where($q->expr()->in('h.email_id', $emailIds))
+            ->where($q->expr()->in('h.email_id', ':emailIds'))
+            ->setParameter('emailIds', $emailIds, ArrayParameterType::INTEGER)
             ->groupBy('h.email_id');
 
         if (null != $fromDate) {
             $dateHelper = new DateTimeHelper($fromDate);
             $q->andwhere($q->expr()->gte('h.date_hit', ':date'))
                 ->setParameter('date', $dateHelper->toUtcString());
+        }
+
+        if (null != $toDate) {
+            $dateHelper = new DateTimeHelper($toDate);
+            $q->andwhere($q->expr()->lte('h.date_hit', ':dateTo'))
+                ->setParameter('dateTo', $dateHelper->toUtcString());
         }
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
@@ -220,13 +228,19 @@ class HitRepository extends CommonRepository
     /**
      * Get the latest hit.
      *
-     * @param array $options
+     * @param array{
+     *     leadId?: int,
+     *     urls?: string[]|string|null,
+     *     second_to_last?: int|null
+     * } $options
      */
     public function getLatestHit($options): ?\DateTime
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('h.date_hit latest_hit')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
+        $sq->select('h.date_hit')
+            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+            ->orderBy('h.date_hit', 'DESC')
+            ->setMaxResults(1);
 
         if (isset($options['leadId'])) {
             $sq->andWhere(
@@ -242,12 +256,15 @@ class HitRepository extends CommonRepository
         }
         if (isset($options['second_to_last'])) {
             $sq->andWhere($sq->expr()->neq('h.id', $options['second_to_last']));
-        } else {
-            $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
-        $result = $sq->executeQuery()->fetchAssociative();
 
-        return $result ? new \DateTime($result['latest_hit'], new \DateTimeZone('UTC')) : null;
+        $latestHit = $sq->executeQuery()->fetchOne();
+
+        if (!$latestHit) {
+            return null;
+        }
+
+        return new \DateTime($latestHit, new \DateTimeZone('UTC'));
     }
 
     /**
@@ -357,9 +374,10 @@ class HitRepository extends CommonRepository
             ->orderBy('ph.date_hit', 'ASC')
             ->andWhere(
                 $q->expr()->and(
-                    $q->expr()->in('ph.page_id', $pageIds)
+                    $q->expr()->in('ph.page_id', ':pageIds')
                 )
-            );
+            )
+            ->setParameter('pageIds', $pageIds, ArrayParameterType::INTEGER);
 
         if (isset($options['fromDate'])) {
             // make sure the date is UTC

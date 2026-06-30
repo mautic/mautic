@@ -12,8 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SubmissionRepository $submissionRepository,
-        private TranslatorInterface $translator,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -47,7 +47,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         }
 
         $startDate = $parent->getVariantStartDate();
-        if (null != $startDate && !empty($ids)) {
+        if (null != $startDate) {
             $counts = ('page' == $type) ? $this->submissionRepository->getSubmissionCountsByPage($ids, $startDate) : $this->submissionRepository->getSubmissionCountsByEmail($ids, $startDate);
 
             if ($counts) {

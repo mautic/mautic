@@ -25,7 +25,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', -50]],
             $this->subscriber->getSubscribedEvents()
         );
@@ -33,9 +33,10 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDataCleanup(): void
     {
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
         $dateTime         = new \DateTimeImmutable();
         $format           = 'Y-m-d H:i:s';
-        $rowCount         = 2;
         $translatedString = 'nonsense';
 
         $dateTimeMock = $this->createMock(\DateTime::class);
@@ -62,11 +63,19 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $expressionBuilder
             ->expects($this->exactly(2))
             ->method('lte')
-            ->with('date_added', ':date');
+            ->with('log.date_added', ':date');
 
         $qb = $this->createMock(QueryBuilder::class);
         $qb
-            ->expects($this->exactly(2))
+            ->method('select')
+            ->willReturn($qb);
+
+        $qb
+            ->method('from')
+            ->willReturn($qb);
+
+        $qb
+            ->expects($this->exactly(4))
             ->method('setParameter')
             ->willReturn($qb);
         $qb
@@ -74,26 +83,44 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('delete')
             ->willReturn($qb);
         $qb
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(4))
             ->method('expr')
             ->willReturn($expressionBuilder);
         $qb
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(4))
             ->method('where')
             ->willReturn($qb);
         $qb
+            ->expects($this->exactly(4))
+            ->method('executeQuery')
+            ->willReturnCallback(function (): \PHPUnit\Framework\MockObject\MockObject {
+                static $callCount = 0;
+                ++$callCount;
+                $result = $this->createMock(\Doctrine\DBAL\Result::class);
+                $result->method('fetchAllAssociative')->willReturn(match ($callCount) {
+                    1       => [['id' => 765]],
+                    3       => [['id' => 764]],
+                    default => [],
+                });
+
+                return $result;
+            });
+        $qb
             ->expects($this->exactly(2))
-            ->method('execute')
-            ->willReturn($rowCount);
+            ->method('executeStatement')
+            ->willReturn(1);
+
+        $qb->method('setMaxResults')->with(10000)->willReturn($qb);
+        $qb->method('setFirstResult')->with(0)->willReturn($qb);
 
         $connection = $this->createMock(Connection::class);
         $connection
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(4))
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
         $translator          = $this->createMock(TranslatorInterface::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
+        $userTokenRepository = $this->createStub(UserTokenRepositoryInterface::class);
         $subscriber          = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
 
         $translator

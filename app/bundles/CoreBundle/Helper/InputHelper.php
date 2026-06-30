@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use GuzzleHttp\Psr7\Query;
 use Joomla\Filter\InputFilter;
 
 class InputHelper
@@ -36,18 +37,12 @@ class InputHelper
         };
     }
 
-    /**
-     * @param bool $html
-     * @param bool $strict
-     *
-     * @return InputFilter
-     */
-    private static function getFilter($html = false, $strict = false)
+    private static function getFilter(bool $html = false, bool $strict = false): ?InputFilter
     {
-        if (empty(self::$htmlFilter)) {
+        if (!self::$htmlFilter instanceof InputFilter) {
             // Most of Mautic's HTML uses include full HTML documents so use blacklist method
             self::$htmlFilter               = new InputFilter([], [], 1, 1);
-            self::$htmlFilter->tagBlacklist = [
+            self::$htmlFilter->blockedTags  = [
                 'applet',
                 'bgsound',
                 'base',
@@ -60,7 +55,7 @@ class InputHelper
                 'object',
             ];
 
-            self::$htmlFilter->attrBlacklist = [
+            self::$htmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -78,7 +73,7 @@ class InputHelper
                     'span',
                 ], [], 0, 1);
 
-            self::$strictHtmlFilter->attrBlacklist = [
+            self::$strictHtmlFilter->blockedAttributes = [
                 'codebase',
                 'dynsrc',
                 'lowsrc',
@@ -97,9 +92,11 @@ class InputHelper
     /**
      * Wrapper to InputHelper.
      *
+     * @param mixed[] $arguments
+     *
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $arguments)
     {
         return self::getFilter()->clean($arguments[0], $name);
     }
@@ -148,9 +145,9 @@ class InputHelper
             return $value;
         } elseif (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
-        } else {
-            return self::getFilter()->clean($value, $mask);
         }
+
+        return self::getFilter()->clean($value, $mask);
     }
 
     /**
@@ -204,12 +201,9 @@ class InputHelper
         }
 
         $delimiter = '~';
-        if (false && in_array($delimiter, $allowedCharacters)) {
-            $delimiter = '#';
-        }
 
         if (!empty($allowedCharacters)) {
-            $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters)).']+'.$delimiter.'i';
+            $regex = $delimiter.'[^0-9a-z'.preg_quote(implode('', $allowedCharacters), $delimiter).']+'.$delimiter.'i';
         } else {
             $regex = $delimiter.'[^0-9a-z]+'.$delimiter.'i';
         }
@@ -294,7 +288,7 @@ class InputHelper
         }
 
         if (!empty($parts['query'])) {
-            parse_str($parts['query'], $query);
+            $query = Query::parse($parts['query']);
 
             // remove specified keys from the query
             foreach ($removeQuery as $q) {
@@ -303,9 +297,9 @@ class InputHelper
                 }
             }
 
-            // http_build_query urlencodes to RFC 1738 by default
-            // We change the encoding_type to RFC 3986 so that spaces are encoded as %20 instead of +
-            $parts['query'] = http_build_query($query, '', null, PHP_QUERY_RFC3986);
+            // http_build_query urlencodes to RFC 1738 by default.
+            // We change the encoding_type to RFC3986 so that spaces aren't encoded as +.
+            $parts['query'] = Query::build($query, PHP_QUERY_RFC3986);
         }
 
         return
@@ -487,7 +481,7 @@ class InputHelper
         $transId = 'Any-Latin; Latin-ASCII';
         if (function_exists('transliterator_transliterate') && $trans = \Transliterator::create($transId)) {
             // Use intl by default
-            return $trans->transliterate($value);
+            return $trans->transliterate((string) $value);
         }
 
         return \URLify::transliterate((string) $value);
@@ -597,7 +591,7 @@ class InputHelper
      */
     public static function stripTags(string $input, array $allowedTags = []): string
     {
-        $allowed = implode('', array_map(fn ($tag) => "<$tag>", $allowedTags));
+        $allowed = implode('', array_map(fn ($tag): string => "<$tag>", $allowedTags));
 
         return strip_tags($input, $allowed);
     }

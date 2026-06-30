@@ -11,6 +11,30 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class TagRepository extends CommonRepository
 {
     /**
+     * Delete an entity through the repository.
+     *
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
+     */
+    public function deleteEntity($entity, $flush = true): void
+    {
+        if ($entity instanceof Tag && null !== $entity->getId()) {
+            $this->deleteLeadAssociations((int) $entity->getId());
+        }
+
+        parent::deleteEntity($entity, $flush);
+    }
+
+    private function deleteLeadAssociations(int $tagId): void
+    {
+        $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'lead_tags_xref')
+            ->where('tag_id = :tagId')
+            ->setParameter('tagId', $tagId)
+            ->executeStatement();
+    }
+
+    /**
      * Delete orphan tags that are not associated with any lead.
      */
     public function deleteOrphans(): void
@@ -25,14 +49,15 @@ class TagRepository extends CommonRepository
         $qb->select('t.id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags', 't')
             ->having(sprintf('(%s)', $havingQb->getSQL()).' = 0');
-        $delete = $qb->executeQuery()->fetchAssociative();
+        $delete = $qb->executeQuery()->fetchFirstColumn();
 
         if (count($delete)) {
             $qb->resetQueryParts();
             $qb->delete(MAUTIC_TABLE_PREFIX.'lead_tags')
                 ->where(
-                    $qb->expr()->in('id', $delete)
+                    $qb->expr()->in('id', ':deleteIds')
                 )
+                ->setParameter('deleteIds', $delete, ArrayParameterType::INTEGER)
                 ->executeStatement();
         }
     }
@@ -211,5 +236,18 @@ class TagRepository extends CommonRepository
         }
 
         return $this->getTagsByName($tagsIdName);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    protected function addCatchAllWhereClause($qb, $filter): array
+    {
+        $alias = $this->getTableAlias();
+
+        return $this->addStandardCatchAllWhereClause($qb, $filter, [
+            $alias.'.tag',
+            $alias.'.description',
+        ]);
     }
 }

@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Segment\RelativeDate;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -49,31 +50,31 @@ class DynamicContentType extends AbstractType
     /**
      * @var mixed[]
      */
-    private array $countryChoices;
+    private readonly array $countryChoices;
 
     /**
      * @var mixed[]
      */
-    private array $regionChoices;
+    private readonly array $regionChoices;
 
     private $timezoneChoices;
 
     /**
      * @var mixed[]
      */
-    private array $localeChoices;
+    private readonly array $localeChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceTypesChoices;
+    private readonly array $deviceTypesChoices;
 
     private $deviceBrandsChoices;
 
     /**
      * @var mixed[]
      */
-    private array $deviceOsChoices;
+    private readonly array $deviceOsChoices;
 
     /**
      * @var array<string, string>
@@ -84,11 +85,12 @@ class DynamicContentType extends AbstractType
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManager $em,
         ListModel $listModel,
-        private TranslatorInterface $translator,
-        private LeadModel $leadModel,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadModel $leadModel,
         private TypeList $typeList,
+        private readonly RelativeDate $relativeDate,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -258,7 +260,7 @@ class DynamicContentType extends AbstractType
             );
         }
 
-        $filterModalTransformer = new FieldFilterTransformer($this->translator);
+        $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate);
         $builder->add(
             $builder->create(
                 'filters',
@@ -298,13 +300,13 @@ class DynamicContentType extends AbstractType
             }
         );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var DynamicContent|null $dynamicContent */
             $dynamicContent = $event->getData();
             $this->addContentField($event->getForm(), $dynamicContent?->getType());
         });
 
-        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->get('type')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
             $form = $event->getForm();
             $this->addContentField($form->getParent(), $form->getData());
         });
@@ -376,6 +378,7 @@ class DynamicContentType extends AbstractType
                 'data-editor-class'    => $editorClass,
                 'data-token-callback'  => 'email:getBuilderTokens',
                 'data-token-activator' => '{',
+                'allow-full-html'      => true,
             ],
             'required' => false,
         ]);

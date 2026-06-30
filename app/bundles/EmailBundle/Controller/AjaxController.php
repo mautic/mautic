@@ -35,8 +35,8 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $emailModel,
-            fn ($formType, $formOptions) => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn ($form)                   => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
+            fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn ($form): string                                                  => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
             'emailform'
         ));
@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
                 $stats['failed'] += $batchFailedCount;
 
                 foreach ($batchFailedRecipients as $emails) {
-                    $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
+                    $stats['failedRecipients'] += $emails;
                 }
 
                 $session->set('mautic.email.send.progress', $progress);
@@ -285,7 +285,7 @@ class AjaxController extends CommonAjaxController
             $email->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $content           = $email->getCustomHtml();
@@ -331,5 +331,20 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse([
             'usagesHtml'  => $usagesHtml,
         ]);
+    }
+
+    public function getEmailSendToDncStatusAction(Request $request, EmailModel $model): JsonResponse
+    {
+        $dataArray = [];
+        $objectId  = $request->query->get('id');
+
+        if ($objectId && $entity = $model->getEntity($objectId)) {
+            $yesText                         = $this->translator->trans('mautic.core.form.yes');
+            $noText                          = $this->translator->trans('mautic.core.form.no');
+            $dataArray['sendToDncText']      = $entity->getSendToDnc() ? $yesText : $noText;
+            $dataArray['sendToDncStatus']    = $entity->getSendToDnc();
+        }
+
+        return $this->sendJsonResponse($dataArray);
     }
 }

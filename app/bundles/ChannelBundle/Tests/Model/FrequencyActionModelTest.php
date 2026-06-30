@@ -13,27 +13,27 @@ use PHPUnit\Framework\MockObject\MockObject;
 class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Lead
+     * @var MockObject&Lead
      */
     private MockObject $contactMock5;
 
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $contactModelMock;
 
     /**
-     * @var MockObject|FrequencyRuleRepository
+     * @var MockObject&FrequencyRuleRepository
      */
     private MockObject $frequencyRepoMock;
 
     /**
-     * @var MockObject|FrequencyRule
+     * @var MockObject&FrequencyRule
      */
     private MockObject $frequencyRuleEmailMock;
 
     /**
-     * @var MockObject|FrequencyRule
+     * @var MockObject&FrequencyRule
      */
     private MockObject $frequencyRuleSmsMock;
 
@@ -149,7 +149,7 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactMock5->expects($matcher)
-            ->method('addFrequencyRule')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('addFrequencyRule')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($this->frequencyRuleEmailMock, $parameters[0]);
                 }
@@ -160,7 +160,7 @@ class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->frequencyRepoMock->expects($matcher)
-            ->method('saveEntity')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('saveEntity')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->frequencyRuleEmailMock, $parameters[0]);
                 }

@@ -24,9 +24,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(
-        private EntityManager $em,
-        private LeadRepository $leadRepository,
-        private MaxMindDoNotSellList $doNotSellList,
+        private readonly EntityManager $em,
+        private readonly LeadRepository $leadRepository,
+        private readonly MaxMindDoNotSellList $doNotSellList,
     ) {
         parent::__construct();
     }
@@ -62,7 +62,7 @@ EOT
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();
-            $doNotSellListIPs = array_map(fn ($item): string =>
+            $doNotSellListIPs = array_map(fn (array $item): string =>
                 // strip subnet mask characters
                 $this->doNotSellList->stripCIDR($item['value']), $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
@@ -116,15 +116,19 @@ EOT
         return $result->fetchAllAssociative();
     }
 
-    private function purgeData(string $contactId, string $ip): bool
+    private function purgeData(string $contactId, string $ip): void
     {
         /** @var Lead $lead */
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
         $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn ($item): bool => $item->getIpAddress() == $ip);
 
+        if (!$matchedIps) {
+            return;
+        }
+
         // We only purge data from the contact if it matches the data in the IP details
         if ($ipDetails = $matchedIps[0]->getIpDetails()) {
-            return false;
+            return;
         }
 
         $changed = false;
@@ -147,10 +151,6 @@ EOT
 
         if ($changed) {
             $this->leadRepository->saveEntity($lead);
-
-            return true;
         }
-
-        return false;
     }
 }

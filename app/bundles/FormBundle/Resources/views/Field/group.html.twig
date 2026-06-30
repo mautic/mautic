@@ -31,7 +31,7 @@
   }) %}
 {% endif %}
 
-{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'rating', 'textarea'] %}
   {% set inputAttributes = inputAttributes|merge({
           'value': field.defaultValue|default(''),
   }) %}
@@ -74,14 +74,16 @@
   }) %}
 {% endif %}
 
+{% set widthClass = 'mauticform-' ~ (field.fieldWidth|default('100%')|u.replace('%', '').replaceMatches('/\\.\\d+/', '')) %}
+
 {% set containerAttributes = containerAttributes|merge({
         'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
         'class': containerAttributes.class|default([])|merge([
           'mauticform-row',
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
+          widthClass
         ]),
-        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
@@ -225,9 +227,9 @@
     {% set labelAttributes = labelAttributes|merge({
             'for': firstId,
     }) %}
-    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</label>
+    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify_allow_target_blank }}</label>
   {% endif %}
-  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify }}</span>{% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage|purify_allow_target_blank }}</span>{% endif %}
 
   {% for listValue, listLabel in list|default([]) %}
     {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
@@ -251,10 +253,10 @@
             'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
             'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
     }) %}
-    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel|purify }}</label>
+    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel|purify_allow_target_blank }}</label>
 
     {% if wrapDiv %}</div>{% endif %}
   {% endfor %}
 
-  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
+  <span class="mauticform-errormsg" aria-live="polite" aria-atomic="true" aria-hidden="true" style="display:none;">{{ validationMessage }}</span>
 </div>

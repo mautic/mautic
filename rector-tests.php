@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
+use MauticRector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector;
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
+use Rector\PHPUnit\PHPUnit100\Rector\Class_\ParentTestClassConstructorRector;
 use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonAssertingTestRector;
-use Rector\PHPUnit\PHPUnit60\Rector\MethodCall\GetMockBuilderGetMockToCreateMockRector;
 use Rector\PHPUnit\PHPUnit80\Rector\MethodCall\SpecificAssertContainsRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Symfony\Symfony43\Rector\MethodCall\WebTestCaseAssertIsSuccessfulRector;
+use Rector\Symfony\Symfony43\Rector\MethodCall\WebTestCaseAssertResponseCodeRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -23,8 +27,20 @@ return RectorConfig::configure()
     ])
     ->withRules([
         SpecificAssertContainsRector::class,
-        GetMockBuilderGetMockToCreateMockRector::class,
+        AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
+        RemoveUnusedVariableAssignRector::class,
+        WebTestCaseAssertResponseCodeRector::class,
+        WebTestCaseAssertIsSuccessfulRector::class,
     ])
     ->withSkip([
         AddDoesNotPerformAssertionToNonAssertingTestRector::class, // Adds annotation where it does not belong to.
+        ParentTestClassConstructorRector::class, // Adds unnecessary constructors to test classes without custom logic.
+        WebTestCaseAssertResponseCodeRector::class => [
+            __DIR__.'/app/bundles/FormBundle/Tests/Controller/SubmissionFunctionalTest.php',
+            __DIR__.'/app/bundles/MarketplaceBundle/Tests/Functional/Controller/AjaxControllerTest.php',
+        ],
+        WebTestCaseAssertIsSuccessfulRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Functional/SamlTest.php',
+            __DIR__.'/app/bundles/MarketplaceBundle/Tests/Functional/Controller/AjaxControllerTest.php',
+        ],
     ]);

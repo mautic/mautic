@@ -19,7 +19,8 @@ class MessageRepository extends CommonRepository
     public function getEntities(array $args = [])
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
-        $qb->join(Channel::class, 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
+        // Because of this inner join pagination is not working properly. Removing this doesn't seem to break any feature.
+        // $qb->join(Channel::class, 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
         $qb->leftJoin(Category::class, 'cat', 'WITH', 'cat.id = '.$this->getTableAlias().'.category');
         $qb->groupBy($this->getTableAlias().'.id');
 

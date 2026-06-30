@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
+namespace MauticPlugin\MauticFocusBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
@@ -15,17 +15,12 @@ use Symfony\Component\Routing\RouterInterface;
 class TokenHelperTest extends TestCase
 {
     /**
-     * @var FocusModel|MockObject
+     * @var MockObject&FocusModel
      */
     private MockObject $model;
 
     /**
-     * @var MockObject|RouterInterface
-     */
-    private MockObject $router;
-
-    /**
-     * @var CorePermissions|MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
@@ -36,10 +31,10 @@ class TokenHelperTest extends TestCase
         parent::setUp();
 
         $this->model    = $this->createMock(FocusModel::class);
-        $this->router   = $this->createMock(RouterInterface::class);
+        $router         = $this->createMock(RouterInterface::class);
         $this->security = $this->createMock(CorePermissions::class);
 
-        $this->helper = new TokenHelper($this->model, $this->router, $this->security);
+        $this->helper = new TokenHelper($this->model, $router, $this->security);
     }
 
     public function testFindFocusTokensNotFound(): void
@@ -64,7 +59,7 @@ class TokenHelperTest extends TestCase
         $focusItem = new Focus();
         $focusItem->setIsPublished(true);
 
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('getEntity')
             ->with($focusItemId)
             ->willReturn($focusItem);
@@ -85,12 +80,12 @@ class TokenHelperTest extends TestCase
         $focusItem->setIsPublished(false);
         $focusItem->setCreatedBy($createdById);
 
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('getEntity')
             ->with($focusItemId)
             ->willReturn($focusItem);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with(
                 'focus:items:viewown',

@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\SubmitButton;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,10 +24,10 @@ class MonitoringController extends FormController
     /*
      * @param int $page
      */
-    public function indexAction(Request $request, MonitoringModel $model, $page = 1)
+    public function indexAction(Request $request, MonitoringModel $model, $page = 1): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session = $request->getSession();
@@ -108,13 +110,11 @@ class MonitoringController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper)
+    public function newAction(Request $request, MonitoringModel $model, IpLookupHelper $ipLookupHelper): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl('mautic_social_action', ['objectAction' => 'new']);
@@ -228,13 +228,10 @@ class MonitoringController extends FormController
         );
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
-     */
-    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false)
+    public function editAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:edit')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl('mautic_social_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
@@ -384,13 +381,11 @@ class MonitoringController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session = $request->getSession();
@@ -499,7 +494,7 @@ class MonitoringController extends FormController
     public function deleteAction(Request $request, IpLookupHelper $ipLookupHelper, $objectId)
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session   = $request->getSession();
@@ -560,13 +555,11 @@ class MonitoringController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         if (!$this->security->isGranted('mauticSocial:monitoring:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $session   = $request->getSession();
@@ -635,7 +628,7 @@ class MonitoringController extends FormController
     /**
      * @param int $page
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function contactsAction(
         Request $request,

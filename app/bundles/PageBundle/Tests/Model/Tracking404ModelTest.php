@@ -11,30 +11,30 @@ use Mautic\PageBundle\Model\Tracking404Model;
 class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ContactTracker
      */
     private \PHPUnit\Framework\MockObject\MockObject $mockContactTracker;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $mockCoreParametersHelper;
 
     /**
-     * @var PageModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var PageModel|\PHPUnit\Framework\MockObject\Stub
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mockPageModel;
+    private \PHPUnit\Framework\MockObject\Stub $mockPageModel;
 
     private Lead $lead;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $this->mockContactTracker = $this->createMock(ContactTracker::class);
 
-        $this->mockPageModel = $this->createMock(PageModel::class);
+        $this->mockPageModel = $this->createStub(PageModel::class);
 
         $this->lead = new Lead();
     }

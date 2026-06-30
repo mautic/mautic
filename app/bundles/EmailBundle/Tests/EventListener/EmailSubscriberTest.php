@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -21,9 +19,11 @@ use Mautic\EmailBundle\EventListener\EmailSubscriber;
 use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\SMimeHelper;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -42,24 +42,9 @@ use Twig\Environment;
 final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject&IpLookupHelper
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var MockObject&AuditLogModel
-     */
-    private MockObject $auditLogModel;
-
-    /**
      * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
-
-    /**
-     * @var MockObject&TranslatorInterface
-     */
-    private MockObject $translator;
 
     /**
      * @var MockObject&MauticMessage
@@ -72,12 +57,12 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->ipLookupHelper   = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel    = $this->createMock(AuditLogModel::class);
+        $ipLookupHelper         = $this->createMock(IpLookupHelper::class);
+        $auditLogModel          = $this->createMock(AuditLogModel::class);
         $this->emailModel       = $this->createMock(EmailModel::class);
-        $this->translator       = $this->createMock(TranslatorInterface::class);
+        $translator             = $this->createMock(TranslatorInterface::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->emailModel, $this->translator, $this->createMock(EntityManager::class), $this->createMock(EmailDraftModel::class));
+        $this->subscriber       = new EmailSubscriber($ipLookupHelper, $auditLogModel, $this->emailModel, $translator, $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
@@ -327,14 +312,15 @@ CONTENT,
             $router,
             $twig,
             $themeHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $requestStack,
             $entityManager,
-            $this->createMock(ModelFactory::class),
-            $this->createMock(AssetModel::class),
-            $this->createMock(TrackableModel::class),
-            $this->createMock(RedirectModel::class),
+            $this->createStub(AssetModel::class),
+            $this->createStub(TrackableModel::class),
+            $this->createStub(RedirectModel::class),
+            $this->createStub(SMimeHelper::class),
+            $this->createStub(EmailStatModel::class),
         );
 
         $email = new Email();

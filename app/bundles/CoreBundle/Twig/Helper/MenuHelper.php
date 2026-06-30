@@ -12,7 +12,7 @@ use Knp\Menu\Twig\Helper as KnpHelper;
 final class MenuHelper
 {
     public function __construct(
-        private KnpHelper $helper,
+        private readonly KnpHelper $helper,
     ) {
     }
 
@@ -77,7 +77,7 @@ final class MenuHelper
         /** @var ItemInterface $item */
         foreach ($menu as $item) {
             if ($matcher->isCurrent($item)) {
-                return ($item->isDisplayed()) ? false : true;
+                return !$item->isDisplayed();
             }
         }
 

@@ -3,11 +3,16 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait MatchFilterForLeadTrait
 {
+    /**
+     * @param array<int, array<string, mixed>> $filter
+     * @param array<string, mixed>             $lead
+     */
     protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {
@@ -30,7 +35,7 @@ trait MatchFilterForLeadTrait
                     continue;
                 }
             } else {
-                if (!array_key_exists($data['field'], $lead)) {
+                if (!array_key_exists($data['field'] ?? '', $lead)) {
                     continue;
                 }
             }
@@ -85,11 +90,12 @@ trait MatchFilterForLeadTrait
                     }
                     break;
                 case 'tags':
+                case 'select':
                 case 'multiselect':
-                    if (!is_array($leadVal)) {
+                    if (!is_null($leadVal) && !is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-                    if (!is_array($filterVal)) {
+                    if (!is_null($filterVal) && !is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
                     break;
@@ -119,11 +125,6 @@ trait MatchFilterForLeadTrait
                                 $filterVal[$key] = $regions[$value];
                             }
                         }
-                    }
-                    break;
-                case 'select':
-                    if (!is_array($filterVal)) {
-                        $filterVal = explode('|', $filterVal);
                     }
                     break;
             }
@@ -199,6 +200,8 @@ trait MatchFilterForLeadTrait
                 case 'contains':
                     $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                     break;
+                default:
+                    throw new OperatorsNotFoundException('Operator is not defined or invalid operator found.');
             }
         }
 

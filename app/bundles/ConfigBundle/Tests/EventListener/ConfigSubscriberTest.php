@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 class ConfigSubscriberTest extends TestCase
 {
     /**
-     * @var ConfigChangeLogger|MockObject
+     * @var MockObject&ConfigChangeLogger
      */
     private MockObject $logger;
 
@@ -34,7 +34,7 @@ class ConfigSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
             ],

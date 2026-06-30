@@ -21,20 +21,20 @@ class SyncCommandTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&SyncServiceInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
     private CommandTester $commandTester;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->syncService = $this->createMock(SyncServiceInterface::class);
         $application       = new Application();
 
-        $application->add(new SyncCommand($this->syncService));
+        $application->addCommand(new SyncCommand($this->syncService));
 
         // env is global option. Must be defined.
         $application->getDefinition()->addOption(
@@ -63,7 +63,7 @@ class SyncCommandTest extends TestCase
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
                 $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
                 $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
@@ -88,7 +88,7 @@ class SyncCommandTest extends TestCase
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
 
                 return true;

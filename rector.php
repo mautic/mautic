@@ -2,42 +2,60 @@
 
 declare(strict_types=1);
 
+use MauticRector\UnserializeToSerializerDecodeRector;
+use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
-use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
-use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
-use Rector\DeadCode\Rector\Property\RemoveUselessVarTagRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\Set\ValueObject\SetList;
-use Rector\TypeDeclaration\Rector\Class_\ReturnTypeFromStrictTernaryRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\NumericReturnTypeFromStrictScalarReturnsRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnDirectArrayRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictConstantReturnRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNativeCallRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
+use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
+use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([
+$extendableControllers = [
+    __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
+    __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
+    __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
+];
+
+return RectorConfig::configure()
+    ->withPaths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
-    ]);
+    ])
+    ->withPreparedSets(deadCode: true)
+    ->withPhpSets(php80: true)
+    ->withCache(__DIR__.'/var/cache/rector')
+    ->withRules([
+        Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
+        AddParamTypeFromPropertyTypeRector::class,
+        ClosureReturnTypeRector::class,
 
-    $rectorConfig->skip([
+        TypedPropertyFromAssignsRector::class,
+        ReturnTypeFromStrictParamRector::class,
+        ClassPropertyAssignToConstructorPromotionRector::class,
+        SimplifyUselessVariableRector::class,
+        UnserializeToSerializerDecodeRector::class,
+    ])
+    ->reportUnusedSkips()
+    ->withTypeCoverageLevel(36)
+    ->withCodingStyleLevel(3)
+    ->withCodeQualityLevel(27)
+    ->withSkip([
+        // too many changes
+        Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
+        Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
+        // soon to be deprecated
+        Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
+
+        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
         '*/Test/*',
         '*/Tests/*',
-
-        ReturnTypeFromReturnDirectArrayRector::class => [
-            // require bit test update
-            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
-            // array vs doctrine collection
-            __DIR__.'/app/bundles/CoreBundle/Entity/TranslationEntityTrait.php',
-        ],
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -48,77 +66,37 @@ return static function (RectorConfig $rectorConfig): void {
         // lets handle later, once we have more type declaratoins
         RecastingRemovalRector::class,
 
-        RemoveUnusedPrivatePropertyRector::class => [
-            // entities
-            __DIR__.'/app/bundles/UserBundle/Entity',
-            // typo fallback
-            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
+        Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector::class => [
+            // test fixture
+            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
 
-        RemoveUnusedVariableAssignRector::class => [
-            // unset variable to clear garbage collector
-            __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',
+        // designed to be overriden by 3rd party, adding return type will break BC
+        Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictScalarReturnsRector::class => [
+            ...$extendableControllers,
+        ],
+        ReturnTypeFromStrictTypedCallRector::class => [
+            ...$extendableControllers,
+        ],
+        StringReturnTypeFromStrictStringReturnsRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
+        ],
+        ReturnTypeFromStrictTypedPropertyRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
+            // handle mocks later
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
+        ],
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnNullableTypeRector::class => [
+            __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
+            // can be overriden, BC
+            ...$extendableControllers,
         ],
 
-        TypedPropertyFromStrictConstructorRector::class => [
-            // entities magic
-            __DIR__.'/app/bundles/LeadBundle/Entity',
-
-            // fixed in rector dev-main
-            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
-        ],
-
-        ClassPropertyAssignToConstructorPromotionRector::class => [
-            __DIR__.'/app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php',
-            __DIR__.'/app/bundles/ReportBundle/Event/ReportBuilderEvent.php',
-            // false positive
-            __DIR__.'/app/bundles/CoreBundle/DependencyInjection/Builder/BundleMetadata.php',
-        ],
-
-        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+        TypedPropertyFromAssignsRector::class => [
             '*/Entity/*',
         ],
 
         // handle later with full PHP 8.0 upgrade
-        Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector::class,
-
-        // handle later, case by case as lot of chnaged code
-        Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector::class => [
-            __DIR__.'/app/bundles/PointBundle/Controller/TriggerController.php',
-            __DIR__.'/app/bundles/LeadBundle/Controller/ImportController.php',
-            __DIR__.'/app/bundles/FormBundle/Controller/FormController.php',
-            // watch out on this one - the variables are set magically via $$name
-            // @see app/bundles/FormBundle/Form/Type/FieldType.php:99
-            __DIR__.'/app/bundles/FormBundle/Form/Type/FieldType.php',
-        ],
+        OptionalParametersAfterRequiredRector::class,
     ]);
-
-    // Define what rule sets will be applied
-    $rectorConfig->sets([
-        SetList::DEAD_CODE,
-        SetList::PHP_80,
-        // SetList::TYPE_DECLARATION,
-    ]);
-
-    // Define what single rules will be applied
-    $rectorConfig->rules([
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector::class,
-
-        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class,
-        NumericReturnTypeFromStrictScalarReturnsRector::class,
-        ReturnTypeFromReturnNewRector::class,
-        ReturnTypeFromStrictNativeCallRector::class,
-        ReturnTypeFromStrictNewArrayRector::class,
-        ReturnTypeFromStrictParamRector::class,
-        ReturnTypeFromStrictTernaryRector::class,
-        ClassPropertyAssignToConstructorPromotionRector::class,
-        AddVoidReturnTypeWhereNoReturnRector::class,
-        TypedPropertyFromStrictConstructorRector::class,
-        TypedPropertyFromStrictSetUpRector::class,
-        RemoveUnusedVariableAssignRector::class,
-        RemoveUselessVarTagRector::class,
-        SimplifyUselessVariableRector::class,
-        ReturnTypeFromStrictConstantReturnRector::class,
-        ReturnTypeFromReturnDirectArrayRector::class,
-    ]);
-};

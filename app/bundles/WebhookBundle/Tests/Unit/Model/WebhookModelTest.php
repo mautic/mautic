@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Model;
+namespace Mautic\WebhookBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Psr7\Response;
@@ -35,9 +35,9 @@ class WebhookModelTest extends TestCase
     private MockObject $parametersHelperMock;
 
     /**
-     * @var MockObject&SerializerInterface
+     * @var \PHPUnit\Framework\MockObject\Stub&SerializerInterface
      */
-    private MockObject $serializerMock;
+    private \PHPUnit\Framework\MockObject\Stub $serializerMock;
 
     /**
      * @var MockObject&EntityManager
@@ -52,17 +52,17 @@ class WebhookModelTest extends TestCase
     /**
      * @var MockObject&WebhookQueueRepository
      */
-    private $webhookQueueRepository;
+    private MockObject $webhookQueueRepository;
 
     /**
-     * @var MockObject&UserHelper
+     * @var \PHPUnit\Framework\MockObject\Stub&UserHelper
      */
-    private MockObject $userHelper;
+    private \PHPUnit\Framework\MockObject\Stub $userHelper;
 
     /**
-     * @var MockObject&EventDispatcherInterface
+     * @var \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface
      */
-    private MockObject $eventDispatcherMock;
+    private \PHPUnit\Framework\MockObject\Stub $eventDispatcherMock;
 
     private WebhookModel $model;
 
@@ -74,13 +74,13 @@ class WebhookModelTest extends TestCase
     protected function setUp(): void
     {
         $this->parametersHelperMock   = $this->createMock(CoreParametersHelper::class);
-        $this->serializerMock         = $this->createMock(SerializerInterface::class);
+        $this->serializerMock         = $this->createStub(SerializerInterface::class);
         $this->entityManagerMock      = $this->createMock(EntityManager::class);
-        $this->userHelper             = $this->createMock(UserHelper::class);
+        $this->userHelper             = $this->createStub(UserHelper::class);
         $this->webhookRepository      = $this->createMock(WebhookRepository::class);
         $this->webhookQueueRepository = $this->createMock(WebhookQueueRepository::class);
         $this->httpClientMock         = $this->createMock(Client::class);
-        $this->eventDispatcherMock    = $this->createMock(EventDispatcher::class);
+        $this->eventDispatcherMock    = $this->createStub(EventDispatcher::class);
 
         $this->model                  = $this->initModel();
     }
@@ -99,7 +99,7 @@ class WebhookModelTest extends TestCase
 
         $this->webhookRepository->expects($this->once())
             ->method('saveEntity')
-            ->with($this->callback(function (Webhook $entity) {
+            ->with($this->callback(function (Webhook $entity): true {
                 // The secret hash is not empty on save.
                 $this->assertNotEmpty($entity->getSecret());
 
@@ -145,12 +145,12 @@ class WebhookModelTest extends TestCase
         $queueMock->method('getPayload')->willReturn('{"the": "payload"}');
         $queueMock->method('getEvent')->willReturn($event);
         $queueMock->method('getDateAdded')->willReturn(new \DateTime('2018-04-10T15:04:57+00:00'));
-        $queueMock->method('getId')->willReturn(12);
+        $queueMock->method('getId')->willReturn('12');
 
         $queueRepositoryMock = $this->createMock(WebhookQueueRepository::class);
 
         $this->parametersHelperMock->method('get')
-            ->willReturnCallback(function ($param) {
+            ->willReturnCallback(function ($param): string|int|null {
                 if ('queue_mode' === $param) {
                     return WebhookModel::COMMAND_PROCESS;
                 }
@@ -197,7 +197,7 @@ class WebhookModelTest extends TestCase
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
 
         $this->parametersHelperMock->method('get')
-            ->willReturnCallback(function ($param) {
+            ->willReturnCallback(function ($param): ?string {
                 if ('queue_mode' === $param) {
                     return WebhookModel::IMMEDIATE_PROCESS;
                 }
@@ -241,8 +241,8 @@ class WebhookModelTest extends TestCase
         $queue->setDateAdded(new \DateTime('2021-04-01T16:00:00+00:00'));
 
         $webhookQueueRepoMock = $this->createMock(WebhookQueueRepository::class);
-        $webhookLogRepoMock   = $this->createMock(LogRepository::class);
-        $webhookRepoMock      = $this->createMock(WebhookRepository::class);
+        $webhookLogRepoMock   = $this->createStub(LogRepository::class);
+        $webhookRepoMock      = $this->createStub(WebhookRepository::class);
 
         $this->entityManagerMock->method('getRepository')
             ->willReturnMap([
@@ -441,12 +441,12 @@ class WebhookModelTest extends TestCase
             $this->serializerMock,
             $this->httpClientMock,
             $this->entityManagerMock,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->eventDispatcherMock,
-            $this->createMock(UrlGenerator::class),
-            $this->createMock(Translator::class),
+            $this->createStub(UrlGenerator::class),
+            $this->createStub(Translator::class),
             $this->userHelper,
-            $this->createMock(Logger::class),
+            $this->createStub(Logger::class),
             $webhookServiceMock
         );
 

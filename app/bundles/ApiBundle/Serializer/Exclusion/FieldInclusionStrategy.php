@@ -12,13 +12,13 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
-    private int $level;
+    private readonly int $level;
 
     /**
      * @param int $level
      */
     public function __construct(
-        private array $fields,
+        private readonly array $fields,
         $level = 3,
         private $path = null,
     ) {
@@ -45,10 +45,6 @@ class FieldInclusionStrategy implements ExclusionStrategyInterface
         }
 
         // children of children or parents of chidlren will be more than 3 levels deep
-        if ($navigatorContext->getDepth() <= $this->level) {
-            return false;
-        }
-
-        return true;
+        return $navigatorContext->getDepth() > $this->level;
     }
 }

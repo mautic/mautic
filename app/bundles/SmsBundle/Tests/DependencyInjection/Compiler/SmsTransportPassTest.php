@@ -39,7 +39,7 @@ class SmsTransportPassTest extends TestCase
         $container
             ->register('mautic.sms.transport_chain')
             ->setClass($transport::class)
-            ->setArguments(['foo', $this->createMock(IntegrationHelper::class)])
+            ->setArguments(['foo', $this->createStub(IntegrationHelper::class)])
             ->setShared(false)
             ->setSynthetic(true)
             ->setAbstract(true);
@@ -47,7 +47,7 @@ class SmsTransportPassTest extends TestCase
         $pass = new SmsTransportPass();
         $pass->process($container);
 
-        $this->assertEquals(2, count($container->findTaggedServiceIds('mautic.sms_transport')));
+        $this->assertCount(2, $container->findTaggedServiceIds('mautic.sms_transport'));
 
         $methodCalls = $container->getDefinition('mautic.sms.transport_chain')->getMethodCalls();
         $this->assertCount(count($methodCalls), $container->findTaggedServiceIds('mautic.sms_transport'));

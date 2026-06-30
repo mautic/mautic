@@ -16,7 +16,7 @@ class Shortener
     private array $services = [];
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -29,7 +29,7 @@ class Shortener
     {
         $name = $this->coreParametersHelper->get(self::SHORTENER_SERVICE);
 
-        if (isset($this->services[$name])) {
+        if ($name && isset($this->services[$name])) {
             return $this->services[$name];
         }
 

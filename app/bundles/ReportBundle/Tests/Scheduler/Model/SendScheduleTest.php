@@ -21,21 +21,19 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
     private SendSchedule $sendSchedule;
 
     /**
-     * @var MockObject|MailHelper
+     * @var MockObject&MailHelper
      */
     private MockObject $mailHelperMock;
 
     /**
-     * @var MockObject|MessageSchedule
+     * @var MockObject&MessageSchedule
      */
     private MockObject $messageSchedule;
 
     /**
-     * @var MockObject|FileHandler
+     * @var MockObject&FileHandler
      */
     private MockObject $fileHandler;
-
-    private \PHPUnit\Framework\MockObject\MockObject|EventDispatcher $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -46,7 +44,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock  = $this->createMock(MailHelper::class);
         $this->messageSchedule = $this->createMock(MessageSchedule::class);
         $this->fileHandler     = $this->createMock(FileHandler::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $eventDispatcher       = $this->createMock(EventDispatcher::class);
 
         $this->mailHelperMock->expects($this->once())
             ->method('getMailer')
@@ -56,7 +54,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
             $this->mailHelperMock,
             $this->messageSchedule,
             $this->fileHandler,
-            $this->eventDispatcher
+            $eventDispatcher
         );
     }
 
@@ -122,7 +120,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
         $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->with($this->callback(function ($arg) use ($matcher) {
+            ->with($this->callback(function ($arg) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('/path/to/report.csv', $arg);
 
@@ -189,7 +187,7 @@ class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
         $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->with($this->callback(function ($arg) use ($matcher) {
+            ->with($this->callback(function ($arg) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('path-to-a-file', $arg);
                 }

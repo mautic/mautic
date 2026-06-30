@@ -15,12 +15,12 @@ use Psr\Log\NullLogger;
 class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CampaignLeadRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignLeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $campaignLeadRepository;
 
@@ -85,10 +85,7 @@ class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($contactMemberDates, $contactFinder->getDatesAdded());
     }
 
-    /**
-     * @return InactiveContactFinder
-     */
-    private function getContactFinder()
+    private function getContactFinder(): InactiveContactFinder
     {
         return new InactiveContactFinder(
             $this->leadRepository,

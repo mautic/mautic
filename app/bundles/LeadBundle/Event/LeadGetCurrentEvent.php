@@ -10,9 +10,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class LeadGetCurrentEvent extends Event
 {
-    private ?Lead $contact = null;
+    private ?Lead $contact                    = null;
 
-    public function __construct(private ?Request $request = null)
+    private bool $skipContactLastActiveLogged = false;
+
+    public function __construct(private readonly ?Request $request = null)
     {
     }
 
@@ -29,5 +31,15 @@ final class LeadGetCurrentEvent extends Event
     public function setContact(?Lead $contact): void
     {
         $this->contact = $contact;
+    }
+
+    public function skipContactLastActiveLogged(): void
+    {
+        $this->skipContactLastActiveLogged = true;
+    }
+
+    public function isSkipContactLastActiveLogged(): bool
+    {
+        return $this->skipContactLastActiveLogged;
     }
 }

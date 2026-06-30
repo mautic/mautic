@@ -18,6 +18,62 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
+    public function testSingleValueModeRejectsCommaSeparatedValues(): void
+    {
+        $context = new class extends ExecutionContext {
+            public int $violationCount = 0;
+
+            public function __construct()
+            {
+            }
+
+            /**
+             * @param mixed[] $parameters
+             */
+            public function addViolation($message, array $parameters = []): void
+            {
+                ++$this->violationCount;
+            }
+        };
+
+        $translator = new class extends Translator {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @param mixed[] $parameters
+             */
+            public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+            {
+                return $id;
+            }
+        };
+
+        $dispatcher = new EventDispatcher();
+
+        $fieldModel = new class extends FieldModel {
+            public function __construct()
+            {
+            }
+
+            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+            {
+                throw new \RuntimeException('Field should not be fetched in single value mode test');
+            }
+        };
+
+        $validator = new EmailOrEmailTokenListValidator(
+            new EmailValidator($translator, $dispatcher),
+            new CustomFieldValidator($fieldModel, $translator)
+        );
+
+        $validator->initialize($context);
+        $validator->validate('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(['allowMultiple' => false]));
+
+        Assert::assertSame(1, $context->violationCount);
+    }
+
     /**
      * @param mixed $value
      */
@@ -62,17 +118,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             }
         };
 
-        $dispatcher = new class extends EventDispatcher {
-            public function __construct()
-            {
-                parent::__construct();
-            }
-
-            public function dispatch(object $event, ?string $eventName = null): object
-            {
-                return $event;
-            }
-        };
+        $dispatcher = new EventDispatcher();
 
         $fieldModel = new class extends FieldModel {
             /**
@@ -204,7 +250,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield|jane@doe.com}',
             1,
-            function (string $alias) {
+            function (string $alias): null {
                 Assert::assertSame('somefield', $alias);
 
                 return null;
@@ -225,7 +271,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield}',
             1,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();
@@ -250,7 +296,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield|jane@doe.com}, jone@doe.email, {contactfield=somefield}',
             0,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();
@@ -268,7 +314,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'jone@doe.email {contactfield=somefield}',
             1,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();

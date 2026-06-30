@@ -21,7 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class FieldApiControllerTest extends TestCase
 {
-    private $defaultWhere = [
+    /** @var array<int, array<string, mixed>> */
+    private array $defaultWhere = [
         [
             'col'  => 'object',
             'expr' => 'eq',
@@ -53,7 +54,10 @@ class FieldApiControllerTest extends TestCase
         $this->assertEquals(array_merge($where, $this->defaultWhere), $result);
     }
 
-    protected function getResultFromProtectedMethod($method, array $args, Request $request)
+    /**
+     * @param array<int, mixed> $args
+     */
+    protected function getResultFromProtectedMethod(string $method, array $args, Request $request): mixed
     {
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getCurrentRequest')
@@ -65,23 +69,22 @@ class FieldApiControllerTest extends TestCase
             ->willReturn($fieldRepository);
         $modelFactory = $this->createMock(ModelFactory::class);
         $controller   = new FieldApiController(
-            $this->createMock(CorePermissions::class),
-            $this->createMock(Translator::class),
-            $this->createMock(EntityResultHelper::class),
-            $this->createMock(Router::class),
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(AppVersion::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(Translator::class),
+            $this->createStub(EntityResultHelper::class),
+            $this->createStub(Router::class),
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(AppVersion::class),
             $requestStack,
-            $this->createMock(ManagerRegistry::class),
+            $this->createStub(ManagerRegistry::class),
             $modelFactory,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(CoreParametersHelper::class),
             $fieldModel,
         );
 
         $controllerReflection = new \ReflectionClass(FieldApiController::class);
         $method               = $controllerReflection->getMethod($method);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($controller, $args);
     }

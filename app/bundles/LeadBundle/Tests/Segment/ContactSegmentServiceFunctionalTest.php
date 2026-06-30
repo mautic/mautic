@@ -34,10 +34,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
      */
     private $fixtures;
 
-    /**
-     * @var ContactSegmentService
-     */
-    private $contactSegmentService;
+    private ContactSegmentService $contactSegmentService;
 
     protected function setUp(): void
     {
@@ -249,11 +246,27 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentRebuildCommandFailsOnMissingTable(): void
     {
-        /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = $this->getContainer()->get('mautic.lead.model.lead_segment_service');
-        $reference             = $this->fixtures->getReference('table-name-missing-in-filter');
+        $segment = $this->fixtures->getReference('table-name-missing-in-filter');
+        $this->assertInstanceOf(LeadList::class, $segment);
 
         $this->expectException(TableNotFoundException::class);
-        $contactSegmentService->getTotalLeadListLeadsCount($reference);
+        $this->contactSegmentService->getTotalLeadListLeadsCount($segment);
+    }
+
+    public function testGetNewLeadListLeadsWithLeadIdsLimiter(): void
+    {
+        $segment = $this->fixtures->getReference('segment-having-company');
+        $this->assertInstanceOf(LeadList::class, $segment);
+
+        $this->connection->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads', ['leadlist_id' => $segment->getId()]);
+
+        $leads = $this->contactSegmentService->getNewLeadListLeads($segment, []);
+        Assert::assertArrayHasKey($segment->getId(), $leads);
+        Assert::assertCount(50, $leads[$segment->getId()]);
+
+        $leadsSubset = array_column(array_slice($leads[$segment->getId()], 0, 15), 'id');
+        $leads       = $this->contactSegmentService->getNewLeadListLeads($segment, ['ids' => $leadsSubset]);
+        Assert::assertArrayHasKey($segment->getId(), $leads);
+        Assert::assertEqualsCanonicalizing($leadsSubset, array_column($leads[$segment->getId()], 'id'));
     }
 }

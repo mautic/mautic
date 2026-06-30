@@ -37,7 +37,7 @@ class PreUpAssertionMigrationTest extends TestCase
             }
         };
 
-        $migration->preUp($this->createMock(Schema::class));
+        $migration->preUp($this->createStub(Schema::class));
 
         Assert::assertEmpty($migration->messages);
     }
@@ -59,17 +59,11 @@ class PreUpAssertionMigrationTest extends TestCase
 
             protected function preUpAssertions(): void
             {
-                $this->skipAssertion(function (Schema $schema) {
-                    return true;
-                }, 'First exists');
+                $this->skipAssertion(fn (Schema $schema): true => true, 'First exists');
 
-                $this->skipAssertion(function (Schema $schema) {
-                    return true;
-                }, 'Second exists');
+                $this->skipAssertion(fn (Schema $schema): true => true, 'Second exists');
 
-                $this->skipAssertion(function (Schema $schema) {
-                    return true;
-                }, 'Third exists');
+                $this->skipAssertion(fn (Schema $schema): true => true, 'Third exists');
             }
 
             protected function write(string $message): void
@@ -79,7 +73,7 @@ class PreUpAssertionMigrationTest extends TestCase
         };
 
         try {
-            $migration->preUp($this->createMock(Schema::class));
+            $migration->preUp($this->createStub(Schema::class));
             $this->fail(sprintf('Exception %s should have been thrown', SkipMigration::class));
         } catch (SkipMigration) {
         }
@@ -109,17 +103,11 @@ class PreUpAssertionMigrationTest extends TestCase
 
             protected function preUpAssertions(): void
             {
-                $this->skipAssertion(function (Schema $schema) {
-                    return true;
-                }, 'First exists');
+                $this->skipAssertion(fn (Schema $schema): true => true, 'First exists');
 
-                $this->skipAssertion(function (Schema $schema) {
-                    return true;
-                }, 'Second exists');
+                $this->skipAssertion(fn (Schema $schema): true => true, 'Second exists');
 
-                $this->skipAssertion(function (Schema $schema) {
-                    return false;
-                }, 'Third does not exist');
+                $this->skipAssertion(fn (Schema $schema): false => false, 'Third does not exist');
             }
 
             protected function write(string $message): void
@@ -128,7 +116,7 @@ class PreUpAssertionMigrationTest extends TestCase
             }
         };
 
-        $migration->preUp($this->createMock(Schema::class));
+        $migration->preUp($this->createStub(Schema::class));
 
         Assert::assertCount(2, $migration->messages);
         Assert::assertSame([

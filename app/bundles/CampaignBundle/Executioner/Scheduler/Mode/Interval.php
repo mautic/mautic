@@ -19,8 +19,8 @@ class Interval implements ScheduleModeInterface
     private ?\DateTimeZone $defaultTimezone = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly LoggerInterface $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -141,11 +141,7 @@ class Interval implements ScheduleModeInterface
             return true;
         }
 
-        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event)) {
-            return false;
-        }
-
-        return true;
+        return !(!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event) || $this->isNegativePath($event));
     }
 
     private function isTriggerModeInterval(Event $event): bool
@@ -315,10 +311,7 @@ class Interval implements ScheduleModeInterface
         return $groupExecutionDate;
     }
 
-    /**
-     * @return \DateTimeZone
-     */
-    private function getDefaultTimezone()
+    private function getDefaultTimezone(): \DateTimeZone
     {
         if ($this->defaultTimezone) {
             return $this->defaultTimezone;

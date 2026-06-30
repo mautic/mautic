@@ -33,10 +33,10 @@ class NotificationTypeTest extends TypeTestCase
             new ValidatorExtension($validatorBuilder->getValidator()),
             new PreloadedExtension([
                 new CategoryListType(
-                    $this->createMock(EntityManager::class),
-                    $this->createMock(TranslatorInterface::class),
-                    $this->createMock(CategoryModel::class),
-                    $this->createMock(RouterInterface::class),
+                    $this->createStub(EntityManager::class),
+                    $this->createStub(TranslatorInterface::class),
+                    $this->createStub(CategoryModel::class),
+                    $this->createStub(RouterInterface::class),
                 ),
             ], []),
         ];
@@ -63,7 +63,7 @@ class NotificationTypeTest extends TypeTestCase
         Assert::assertTrue($form->isSynchronized());
 
         $formData = $form->getData();
-        \assert($formData instanceof Notification);
+        $this->assertInstanceOf(Notification::class, $formData);
 
         $expected->setChanges($formData->getChanges());
         Assert::assertEquals($expected, $formData);
@@ -75,7 +75,7 @@ class NotificationTypeTest extends TypeTestCase
         $errorCount    = 0;
         foreach ($view->children as $fieldName => $child) {
             $errors = $view->children[$fieldName]->vars['errors'];
-            \assert($errors instanceof FormErrorIterator);
+            $this->assertInstanceOf(FormErrorIterator::class, $errors);
 
             if (in_array($fieldName, $invalidFields, true)) {
                 ++$errorCount;
@@ -117,7 +117,7 @@ class NotificationTypeTest extends TypeTestCase
         Assert::assertTrue($form->isSynchronized());
 
         $formData = $form->getData();
-        \assert($formData instanceof Notification);
+        $this->assertInstanceOf(Notification::class, $formData);
 
         $expected->setChanges($formData->getChanges());
         Assert::assertEquals($expected, $formData);
@@ -127,7 +127,7 @@ class NotificationTypeTest extends TypeTestCase
         $view = $form->createView();
         foreach ($view->children as $fieldName => $child) {
             $errors = $view->children[$fieldName]->vars['errors'];
-            \assert($errors instanceof FormErrorIterator);
+            $this->assertInstanceOf(FormErrorIterator::class, $errors);
             self::assertCount(0, $errors);
         }
 

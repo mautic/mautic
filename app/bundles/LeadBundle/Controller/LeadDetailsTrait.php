@@ -97,7 +97,7 @@ trait LeadDetailsTrait
      *
      * @return array
      *
-     * @throws InvalidArgumentException if not an array
+     * @throws \InvalidArgumentException if not an array
      */
     public function sanitizeEventFilter($filters)
     {
@@ -222,9 +222,9 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(fn ($l): array => [
+        $logEvents = array_map(fn (array $l): array => [
             'eventType'       => $l['action'],
-            'eventLabel'      => $l['userName'],
+            'userName'        => $l['userName'],
             'timestamp'       => $l['dateAdded'],
             'details'         => $l['details'],
             'contentTemplate' => '@MauticLead/Auditlog/details.html.twig',
@@ -338,8 +338,8 @@ trait LeadDetailsTrait
             $model->getRepository()->refetchEntity($lead);
             $engagementsData = $this->getStatsCount($lead);
 
-            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
-            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
+            $engagements = array_map(fn ($a, $b): float|int => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user): float|int => $points_first_user + $points_second_user, $engagementsData['points'], $points);
         }
 
         return [

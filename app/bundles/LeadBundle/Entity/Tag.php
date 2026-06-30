@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -42,19 +43,22 @@ class Tag implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['leadfield:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $tag;
 
     /**
      * @var string|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $description;
 
-    public ?int $deletedId;
+    public ?int $deletedId = null;
 
     public function __construct(?string $tag = null, bool $clean = true)
     {
@@ -88,7 +92,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -103,10 +107,7 @@ class Tag implements UuidInterface
         return $this->tag;
     }
 
-    /**
-     * @return Tag
-     */
-    public function setTag(string $tag)
+    public function setTag(string $tag): static
     {
         $this->tag = $this->validateTag($tag);
 
@@ -114,7 +115,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -123,10 +124,8 @@ class Tag implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Tag
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 

@@ -8,6 +8,7 @@ use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions
 use Mautic\UserBundle\Security\Authenticator\PluginAuthenticator;
 use Mautic\UserBundle\Security\Authenticator\SsoAuthenticator;
 use Mautic\UserBundle\Security\EntryPoint\MainEntryPoint;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 
@@ -31,6 +32,13 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
+    $services->set(Mautic\UserBundle\ApiPlatform\UserProcessor::class)
+        ->args([
+            service('api_platform.doctrine.orm.state.persist_processor'),
+            service('security.user_password_hasher'),
+        ])
+        ->tag('api_platform.state_processor');
+
     $services->set('security.authenticator.mautic_sso', SsoAuthenticator::class)
         ->abstract()
         ->args([
@@ -49,6 +57,9 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->set(Mautic\UserBundle\Security\SAML\Helper::class);
     $services->set('security.token.permissions', TokenPermissions::class);
+
+    $services->set(UserProvider::class);
+    $services->alias('mautic.user.provider', UserProvider::class);
 
     $services->load('Mautic\\UserBundle\\Security\\EntryPoint\\', '../Security/EntryPoint/*.php');
     $services->load('Mautic\\UserBundle\\Security\\Authentication\\Token\\Permissions\\', '../Security/Authentication/Token/Permissions/*.php');

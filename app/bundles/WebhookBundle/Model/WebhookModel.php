@@ -122,12 +122,13 @@ class WebhookModel extends FormModel
     private ?float $startTime = null;
 
     private bool $disableAutoUnpublish;
+
     private int $webhookRetryDelay;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         protected SerializerInterface $serializer,
-        private Client $httpClient,
+        private readonly Client $httpClient,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -135,7 +136,7 @@ class WebhookModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private WebhookService $webhookService,
+        private readonly WebhookService $webhookService,
     ) {
         $this->setConfigProps($coreParametersHelper);
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -658,16 +659,16 @@ class WebhookModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof SymfonyEvent) {
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**

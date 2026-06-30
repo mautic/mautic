@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CampaignEventLogCleanupSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FailedLeadEventLogRepository $failedLeadEventLogRepository)
+    public function __construct(private readonly FailedLeadEventLogRepository $failedLeadEventLogRepository)
     {
     }
 
@@ -29,7 +29,7 @@ final class CampaignEventLogCleanupSubscriber implements EventSubscriberInterfac
     public function onEventBatchExecuted(ExecutedBatchEvent $event): void
     {
         $ids = $event->getExecuted()
-            ->map(fn (LeadEventLog $eventLog) => $eventLog->getId())
+            ->map(fn (LeadEventLog $eventLog): int => $eventLog->getId())
             ->getValues();
 
         if (!$ids) {

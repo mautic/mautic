@@ -30,7 +30,7 @@ class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @return QueryBuilder|MockObject
      */
-    private function getQueryBuilderMock()
+    private function getQueryBuilderMock(): MockObject
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 
@@ -60,7 +60,7 @@ class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('setParameter')
-            ->with('scheduleDate', $this->callback(function ($date) {
+            ->with('scheduleDate', $this->callback(function ($date): bool {
                 $today = new \DateTime();
                 $today->modify('+1 seconds'); // make sure our date is bigger
 

@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Psr7\Uri;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -46,6 +47,11 @@ class TrackableModel extends AbstractCommonModel
     protected $contentReplacements = [];
 
     /**
+     * Indicates whether first-pass replacements were collected while parsing content.
+     */
+    protected bool $hasFirstPassReplacements = false;
+
+    /**
      * Used to rebuild correct URLs when the tokenized URL contains query parameters.
      *
      * @var bool
@@ -56,7 +62,7 @@ class TrackableModel extends AbstractCommonModel
 
     public function __construct(
         protected RedirectModel $redirectModel,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -77,10 +83,7 @@ class TrackableModel extends AbstractCommonModel
         return $this->em->getRepository(Trackable::class);
     }
 
-    /**
-     * @return RedirectModel
-     */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): RedirectModel
     {
         return $this->redirectModel;
     }
@@ -92,15 +95,31 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return string
      */
-    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false, $utmTags = [])
-    {
+    public function generateTrackableUrl(
+        Trackable $trackable,
+        $clickthrough = [],
+        $shortenUrl = false,
+        $utmTags = [],
+    ) {
         if (!isset($clickthrough['channel'])) {
             $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
         }
 
         $redirect = $trackable->getRedirect();
 
-        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl, $utmTags);
+        $redirectModel = $this->getRedirectModel();
+
+        $trackedUrl = $redirectModel->generateRedirectUrl($redirect, $clickthrough);
+
+        if ([] !== $utmTags) {
+            $trackedUrl = $redirectModel->applyUtmTags($trackedUrl, $utmTags);
+        }
+
+        if ($shortenUrl) {
+            $trackedUrl = $redirectModel->shortenUrl($trackedUrl);
+        }
+
+        return $trackedUrl;
     }
 
     /**
@@ -300,15 +319,16 @@ class TrackableModel extends AbstractCommonModel
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
         uksort($this->contentReplacements['second_pass'], fn ($a, $b): int => strlen($b) - strlen($a));
 
-        if ('html' == $type) {
-            // For HTML, replace only the links; leaving the link text (if a URL) intact
+        if ('html' === $type) {
+            // Hours spent trying to handle through \DomDocument: 9h. The issue is that tokens "{token}" is replaced
+            // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 // Make the search regular expression match both "&" and "&amp;".
                 $search  = preg_quote($search, '/');
                 $search  = str_replace('&amp;', '&', $search);
                 $search  = str_replace('&', '(?:&|&amp;)', $search);
                 $content = preg_replace(
-                    '/<(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>/i',
+                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
@@ -324,6 +344,8 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
+     * @phpstan-impure
+     *
      * @return array
      */
     protected function extractTrackablesFromContent($content)
@@ -438,6 +460,7 @@ class TrackableModel extends AbstractCommonModel
             if ($token === $tokenizedHost && $scheme = (!empty($urlParts['scheme'])) ? $urlParts['scheme'] : false) {
                 // Token has a schema so let's get rid of it before replacing tokens
                 $this->contentReplacements['first_pass'][$scheme.'://'.$tokenizedHost] = $tokenizedHost;
+                $this->hasFirstPassReplacements                                        = true;
                 unset($urlParts['scheme']);
             }
 
@@ -452,7 +475,8 @@ class TrackableModel extends AbstractCommonModel
                 $trackableKey = $trackableUrl;
 
                 // Replace the URL token with the actual URL
-                $this->contentReplacements['first_pass'][$url] = $trackableUrl;
+                $this->contentReplacements['first_pass'][$url]  = $trackableUrl;
+                $this->hasFirstPassReplacements                 = true;
             }
         } else {
             // Regular URL without a tokenized host
@@ -513,11 +537,7 @@ class TrackableModel extends AbstractCommonModel
             return $this->isValidUrl($url, false);
         }
 
-        if (!$this->isValidUrl($tokenValue)) {
-            return false;
-        }
-
-        return true;
+        return $this->isValidUrl($tokenValue);
     }
 
     /**
@@ -533,16 +553,10 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        if (($forceScheme && !isset($urlParts['scheme']))
-            || (isset($urlParts['scheme'])
-                && !in_array(
-                    $urlParts['scheme'],
-                    ['http', 'https', 'ftp', 'ftps', 'mailto']
-                ))) {
-            return false;
-        }
-
-        return true;
+        return (!$forceScheme || isset($urlParts['scheme'])) && (!isset($urlParts['scheme']) || in_array(
+            $urlParts['scheme'],
+            ['http', 'https', 'ftp', 'ftps', 'mailto']
+        ));
     }
 
     /**
@@ -623,145 +637,17 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @return string
+     * Build a URL string from parse_url-style parts using Guzzle PSR-7.
+     * Decodes curly braces that Guzzle encodes to preserve Mautic tokens.
+     *
+     * @param array<string, mixed> $parts
      */
-    protected function httpBuildUrl($parts)
+    protected function httpBuildUrl(array $parts): string
     {
-        if (function_exists('http_build_url')) {
-            return http_build_url($parts);
-        } else {
-            /*
-             * Used if extension is not installed
-             *
-             * http_build_url
-             * Stand alone version of http_build_url (http://php.net/manual/en/function.http-build-url.php)
-             * Based on buggy and inefficient version I found at http://www.mediafire.com/?zjry3tynkg5 by tycoonmaster[at]gmail[dot]com
-             *
-             * @author    Chris Nasr (chris[at]fuelforthefire[dot]ca)
-             * @copyright Fuel for the Fire
-             * @package   http
-             * @version   0.1
-             * @created   2012-07-26
-             */
+        $uri = (string) Uri::fromParts($parts);
 
-            if (!defined('HTTP_URL_REPLACE')) {
-                // Define constants
-                define('HTTP_URL_REPLACE', 0x0001);    // Replace every part of the first URL when there's one of the second URL
-                define('HTTP_URL_JOIN_PATH', 0x0002);    // Join relative paths
-                define('HTTP_URL_JOIN_QUERY', 0x0004);    // Join query strings
-                define('HTTP_URL_STRIP_USER', 0x0008);    // Strip any user authentication information
-                define('HTTP_URL_STRIP_PASS', 0x0010);    // Strip any password authentication information
-                define('HTTP_URL_STRIP_PORT', 0x0020);    // Strip explicit port numbers
-                define('HTTP_URL_STRIP_PATH', 0x0040);    // Strip complete path
-                define('HTTP_URL_STRIP_QUERY', 0x0080);    // Strip query string
-                define('HTTP_URL_STRIP_FRAGMENT', 0x0100);    // Strip any fragments (#identifier)
-
-                // Combination constants
-                define('HTTP_URL_STRIP_AUTH', HTTP_URL_STRIP_USER | HTTP_URL_STRIP_PASS);
-                define('HTTP_URL_STRIP_ALL', HTTP_URL_STRIP_AUTH | HTTP_URL_STRIP_PORT | HTTP_URL_STRIP_QUERY | HTTP_URL_STRIP_FRAGMENT);
-            }
-
-            $flags = HTTP_URL_REPLACE;
-            $url   = [];
-
-            // Scheme and Host are always replaced
-            if (isset($parts['scheme'])) {
-                $url['scheme'] = $parts['scheme'];
-            }
-            if (isset($parts['host'])) {
-                $url['host'] = $parts['host'];
-            }
-
-            // (If applicable) Replace the original URL with it's new parts
-            if (HTTP_URL_REPLACE & $flags) {
-                // Go through each possible key
-                foreach (['user', 'pass', 'port', 'path', 'query', 'fragment'] as $key) {
-                    // If it's set in $parts, replace it in $url
-                    if (isset($parts[$key])) {
-                        $url[$key] = $parts[$key];
-                    }
-                }
-            } else {
-                // Join the original URL path with the new path
-                if (isset($parts['path']) && (HTTP_URL_JOIN_PATH & $flags)) {
-                    if (isset($url['path']) && '' != $url['path']) {
-                        // If the URL doesn't start with a slash, we need to merge
-                        if ('/' != $url['path'][0]) {
-                            // If the path ends with a slash, store as is
-                            if ('/' == $parts['path'][strlen($parts['path']) - 1]) {
-                                $sBasePath = $parts['path'];
-                            } // Else trim off the file
-                            else {
-                                // Get just the base directory
-                                $sBasePath = dirname($parts['path']);
-                            }
-
-                            // If it's empty
-                            if ('' == $sBasePath) {
-                                $sBasePath = '/';
-                            }
-
-                            // Add the two together
-                            $url['path'] = $sBasePath.$url['path'];
-
-                            // Free memory
-                            unset($sBasePath);
-                        }
-
-                        if (str_contains($url['path'], './')) {
-                            // Remove any '../' and their directories
-                            while (preg_match('/\w+\/\.\.\//', $url['path'])) {
-                                $url['path'] = preg_replace('/\w+\/\.\.\//', '', $url['path']);
-                            }
-
-                            // Remove any './'
-                            $url['path'] = str_replace('./', '', $url['path']);
-                        }
-                    } else {
-                        $url['path'] = $parts['path'];
-                    }
-                }
-
-                // Join the original query string with the new query string
-                if (isset($parts['query']) && (HTTP_URL_JOIN_QUERY & $flags)) {
-                    if (isset($url['query'])) {
-                        $url['query'] .= '&'.$parts['query'];
-                    } else {
-                        $url['query'] = $parts['query'];
-                    }
-                }
-            }
-
-            // Strips all the applicable sections of the URL
-            if (HTTP_URL_STRIP_USER & $flags) {
-                unset($url['user']);
-            }
-            if (HTTP_URL_STRIP_PASS & $flags) {
-                unset($url['pass']);
-            }
-            if (HTTP_URL_STRIP_PORT & $flags) {
-                unset($url['port']);
-            }
-            if (HTTP_URL_STRIP_PATH & $flags) {
-                unset($url['path']);
-            }
-            if (HTTP_URL_STRIP_QUERY & $flags) {
-                unset($url['query']);
-            }
-            if (HTTP_URL_STRIP_FRAGMENT & $flags) {
-                unset($url['fragment']);
-            }
-
-            // Combine the new elements into a string and return it
-            return
-                ((isset($url['scheme'])) ? 'mailto' == $url['scheme'] ? $url['scheme'].':' : $url['scheme'].'://' : '')
-                .((isset($url['user'])) ? $url['user'].((isset($url['pass'])) ? ':'.$url['pass'] : '').'@' : '')
-                .($url['host'] ?? '')
-                .((isset($url['port'])) ? ':'.$url['port'] : '')
-                .($url['path'] ?? '')
-                .((!empty($url['query'])) ? '?'.$url['query'] : '')
-                .((!empty($url['fragment'])) ? '#'.$url['fragment'] : '');
-        }
+        // Decode curly braces that Guzzle encoded to preserve Mautic tokens like {contactfield=bar}
+        return str_replace(['%7B', '%7D'], ['{', '}'], $uri);
     }
 
     /**
@@ -795,6 +681,8 @@ class TrackableModel extends AbstractCommonModel
      */
     private function parseContent($content, $channel, $channelId, array &$trackableTokens)
     {
+        $this->hasFirstPassReplacements = false;
+
         // Reset content replacement arrays
         $this->contentReplacements = [
             // PHPSTAN reported duplicate keys in this array. I can't determine which is the right one.
@@ -829,18 +717,15 @@ class TrackableModel extends AbstractCommonModel
 
             // Replace URLs in content with tokens
             $content = $this->prepareContentWithTrackableTokens($content, $contentType);
-        } elseif (!empty($this->contentReplacements['first_pass'])) {
-            // Replace URLs in content with tokens
+        } elseif ($this->hasFirstPassReplacements) {
+            // Apply first-pass replacements even when no trackables are created.
             $content = $this->prepareContentWithTrackableTokens($content, $contentType);
         }
 
         return $content;
     }
 
-    /**
-     * @return array
-     */
-    protected function getContactFieldUrlTokens()
+    protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;
@@ -867,17 +752,19 @@ class TrackableModel extends AbstractCommonModel
     {
         $trackableUrls = [];
         /** @var \DOMElement $link */
-        foreach ($links as $link) {
+        foreach ($this->extractHrefs($links) as $link) {
             $url = $link->getAttribute('href');
 
-            if ('' === $url) {
+            // Check for a do not track
+            // @deprecated since 7.x — Will be removed in 8.0. Use data-mautic-disable-tracking.
+            if ($link->hasAttribute('mautic:disable-tracking')) {
+                $this->doNotTrack[$url] = $url;
                 continue;
             }
 
-            // Check for a do not track
-            if ($link->hasAttribute('mautic:disable-tracking')) {
+            // Check for a do not track in proper HTML format
+            if ($link->hasAttribute('data-mautic-disable-tracking') && 'true' === $link->getAttribute('data-mautic-disable-tracking')) {
                 $this->doNotTrack[$url] = $url;
-
                 continue;
             }
 
@@ -888,5 +775,22 @@ class TrackableModel extends AbstractCommonModel
         }
 
         return $trackableUrls;
+    }
+
+    /**
+     * @return \Generator<int, \DOMElement>
+     */
+    private function extractHrefs(\DOMNodeList $elements): \Generator
+    {
+        /** @var \DOMElement $element */
+        foreach ($elements as $element) {
+            $url = $element->getAttribute('href');
+
+            if ('' === $url) {
+                continue;
+            }
+
+            yield $element;
+        }
     }
 }

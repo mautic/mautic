@@ -6,21 +6,22 @@ use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
+use PHPUnit\Framework\Assert;
 
 class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParamsHelperMock;
 
-    private $badFilePath = 'bad_list.json';
+    private string $badFilePath = 'bad_list.json';
 
-    private $badData     = 'bad data';
+    private string $badData     = 'bad data';
 
-    private $goodFilePath = 'good_list.json';
+    private string $goodFilePath = 'good_list.json';
 
-    private $goodData     = '{
+    private string $goodData     = '{
                                 "exclusions": [
                                     {
                                       "exclusion_type": "ccpa_do_not_sell",
@@ -54,13 +55,18 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testStripCidr(): void
+    {
+        Assert::assertSame('1.2.3.4', MaxMindDoNotSellList::stripCidr('1.2.3.4'));
+        Assert::assertSame('1.2.3.4', MaxMindDoNotSellList::stripCidr('1.2.3.4/32'));
+    }
+
     /**
      * Test trying to load the list when the list file path hasn't been configured.
      */
     public function testListPathNotConfigured(): void
     {
-        $coreParamsHelperMock = $this->coreParamsHelperMock;
-        $coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn('');
 
@@ -75,8 +81,7 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testListFileNotDownloaded(): void
     {
-        $coreParamsHelperMock = $this->coreParamsHelperMock;
-        $coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn('path_to_missing_file.json');
 
@@ -91,16 +96,15 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testFileWithBadData(): void
     {
-        $coreParamsHelperMock = $this->coreParamsHelperMock;
-        $coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn($this->badFilePath);
 
         $doNotSellList = new MaxMindDoNotSellList($this->coreParamsHelperMock);
 
-        $this->assertEquals($this->badFilePath, $doNotSellList->getListPath());
+        $this->assertSame($this->badFilePath, $doNotSellList->getListPath());
         $this->assertFalse($doNotSellList->loadList());
-        $this->assertEquals([], $doNotSellList->getList());
+        $this->assertSame([], $doNotSellList->getList());
     }
 
     /**
@@ -108,17 +112,21 @@ class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
      */
     public function testSuccessfulFileLoad(): void
     {
-        $coreParamsHelperMock = $this->coreParamsHelperMock;
-        $coreParamsHelperMock->method('get')
+        $this->coreParamsHelperMock->method('get')
             ->with('maxmind_do_not_sell_list_path')
             ->willReturn($this->goodFilePath);
 
         $doNotSellList = new MaxMindDoNotSellList($this->coreParamsHelperMock);
         $doNotSellList->loadList();
 
-        $this->assertEquals($this->goodFilePath, $doNotSellList->getListPath());
+        $this->assertSame($this->goodFilePath, $doNotSellList->getListPath());
 
         $goodData = json_decode($this->goodData, true)['exclusions'];
         $this->assertEquals($goodData, $doNotSellList->getList());
+
+        Assert::assertTrue($doNotSellList->valid());
+        Assert::assertSame(0, $doNotSellList->key());
+        $doNotSellList->next();
+        Assert::assertFalse($doNotSellList->valid());
     }
 }

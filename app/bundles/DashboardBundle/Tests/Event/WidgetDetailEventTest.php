@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\DashboardBundle\Tests\Entity;
+namespace Mautic\DashboardBundle\Tests\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -11,8 +11,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
 {
     private WidgetDetailEvent $widgetDetailEvent;
+
+    /**
+     * @var MockObject&Translator
+     */
     private MockObject $translator;
-    private MockObject $security;
+
+    /**
+     * @var MockObject&Widget
+     */
     private MockObject $widget;
 
     protected function setUp(): void
@@ -20,12 +27,12 @@ class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->translator            = $this->createMock(Translator::class);
-        $this->security              = $this->createMock(CorePermissions::class);
+        $security                    = $this->createMock(CorePermissions::class);
         $this->widget                = $this->createMock(Widget::class);
 
         $this->widgetDetailEvent = new WidgetDetailEvent(
             $this->translator,
-            $this->security,
+            $security,
             $this->widget
         );
     }

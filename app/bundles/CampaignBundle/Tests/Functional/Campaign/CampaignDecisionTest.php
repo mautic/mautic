@@ -18,6 +18,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;
     use LeadFieldTestTrait;
+
     protected $useCleanupRollback = false;
 
     /**
@@ -149,7 +150,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
     {
         $leadIds = [];
         foreach ($campaignEventLogs as $log) {
-            \assert($log instanceof LeadEventLog);
+            $this->assertInstanceOf(LeadEventLog::class, $log);
             $leadIds[] = $log->getLead()->getId();
         }
 

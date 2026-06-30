@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class ReferenceResolverTest extends TestCase
 {
     /**
-     * @var Connection|MockObject
+     * @var MockObject&Connection
      */
     private MockObject $connection;
 
@@ -101,7 +101,7 @@ class ReferenceResolverTest extends TestCase
      *
      * @return QueryBuilder|MockObject
      */
-    private function createQueryBuilder(...$returnValues)
+    private function createQueryBuilder(...$returnValues): MockObject
     {
         $result = $this->createMock(Result::class);
         $result->method('fetchOne')

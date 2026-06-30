@@ -10,6 +10,7 @@ use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,14 +34,14 @@ class DynamicContentController extends FormController
         );
     }
 
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, $page = 1): Response
     {
         $model = $this->getModel('dynamicContent');
 
         $permissions = $this->getPermissions();
 
         if (!$permissions['dynamiccontent:dynamiccontents:viewown'] && !$permissions['dynamiccontent:dynamiccontents:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -111,7 +112,7 @@ class DynamicContentController extends FormController
     public function newAction(Request $request, $entity = null)
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (!$entity instanceof DynamicContent) {
@@ -198,7 +199,7 @@ class DynamicContentController extends FormController
                         'passthroughVars' => $passthrough,
                     ]
                 );
-            } elseif ($valid && !$cancelled) {
+            } elseif ($valid) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
@@ -257,7 +258,7 @@ class DynamicContentController extends FormController
                 )
             );
         } elseif (!$this->security->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'dynamicContent');
@@ -329,10 +330,8 @@ class DynamicContentController extends FormController
      * Loads a specific form into the detailed panel.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         $model = $this->getModel('dynamicContent');
         \assert($model instanceof DynamicContentModel);
@@ -370,7 +369,7 @@ class DynamicContentController extends FormController
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /* @var DynamicContent $parent */
@@ -424,9 +423,7 @@ class DynamicContentController extends FormController
     }
 
     /**
-     * Clone an entity.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function cloneAction(Request $request, $objectId)
     {
@@ -441,7 +438,7 @@ class DynamicContentController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;
@@ -490,7 +487,7 @@ class DynamicContentController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'notification');
             }
@@ -552,7 +549,7 @@ class DynamicContentController extends FormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'dynamicContent', true);
                 } else {

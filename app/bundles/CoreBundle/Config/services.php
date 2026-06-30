@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Twig\Extra\String\StringExtension;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
@@ -41,8 +42,16 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
+    // Explicitly register our Twig extension with high priority
+    $services->set(Mautic\CoreBundle\Twig\Extension\OverrideIncludeExtension::class)
+        ->autowire()
+        ->tag('twig.extension', ['priority' => 100]);
+
     $services->set('mautic.http.client', GuzzleHttp\Client::class)->autowire();
     $services->set(Mautic\CoreBundle\Doctrine\MigrationFactoryDecorator::class)->autowire();
+
+    $services->set(StringExtension::class)
+        ->tag('twig.extension');
 
     $services->alias(GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(Psr\Http\Client\ClientInterface::class, 'mautic.http.client');

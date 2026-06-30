@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class BotRatioHelper
@@ -15,27 +16,41 @@ class BotRatioHelper
      * @param string[] $blockedIPAddresses
      */
     public function __construct(
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
+
         #[Autowire(env: 'float:MAUTIC_BOT_HELPER_BOT_RATIO_THRESHOLD')]
-        private float $botRatioThreshold = 0.6,
+        private readonly float $botRatioThreshold = 0.6,
 
         #[Autowire(env: 'int:MAUTIC_BOT_HELPER_TIME_EMAIL_THRESHOLD')]
-        private int $timeFromEmailThreshold = 2,
+        private readonly int $timeFromEmailThreshold = 2,
 
         #[Autowire(env: 'json:MAUTIC_BOT_HELPER_BLOCKED_USER_AGENTS')]
-        private array $blockedUserAgents = [],
+        private readonly array $blockedUserAgents = [],
 
         #[Autowire(env: 'json:MAUTIC_BOT_HELPER_BLOCKED_IP_ADDRESSES')]
-        private array $blockedIPAddresses = [],
+        private readonly array $blockedIPAddresses = [],
     ) {
     }
 
-    public function isHitByBot(Stat $emailStat, \DateTimeInterface $emailHitDateTime, IpAddress $ipAddress, string $userAgent): bool
-    {
+    public function isHitByBot(
+        Stat $emailStat,
+        \DateTimeInterface $emailHitDateTime,
+        IpAddress $ipAddress,
+        string $userAgent,
+    ): bool {
         $totalPoints = (int) $this->isUnderTimeThreshold($emailStat, $emailHitDateTime) +
             (int) $this->isIpInIgnoreList($ipAddress) +
             (int) $this->isUserAgentInIgnoreList($userAgent);
 
         return $totalPoints / 3 >= $this->botRatioThreshold;
+    }
+
+    private function isBotByMatomoDetector(string $userAgent): bool
+    {
+        $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+        $deviceDetector->parse();
+
+        return $deviceDetector->isBot();
     }
 
     private function isUnderTimeThreshold(Stat $emailStat, \DateTimeInterface $emailHitDateTime): bool
@@ -56,6 +71,10 @@ class BotRatioHelper
 
     private function isUserAgentInIgnoreList(string $userAgent): bool
     {
+        if ($this->isBotByMatomoDetector($userAgent)) {
+            return true;
+        }
+
         foreach ($this->blockedUserAgents as $blockedUserAgent) {
             if (str_contains($userAgent, $blockedUserAgent)) {
                 return true;

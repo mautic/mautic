@@ -30,7 +30,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testBooleanWithPrepareDbalFieldsForSave(): void
     {
-        $trait  = $this->createMock(LeadRepository::class);
+        $trait  = $this->createStub(LeadRepository::class);
         $fields = [
             'true'   => true,
             'false'  => false,
@@ -39,12 +39,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionObject($trait);
         $method     = $reflection->getMethod('prepareDbalFieldsForSave');
-        $method->setAccessible(true);
         $method->invokeArgs($trait, [&$fields]);
 
-        $this->assertEquals(1, $fields['true']);
-        $this->assertEquals(0, $fields['false']);
-        $this->assertEquals('blah', $fields['string']);
+        $this->assertSame(1, $fields['true']);
+        $this->assertSame(0, $fields['false']);
+        $this->assertSame('blah', $fields['string']);
     }
 
     /**
@@ -65,7 +64,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
-        $refMethod->setAccessible(true);
 
         $refMethod->invoke($mock, 'email', ['test@example.com', 'test2@example.com']);
 
@@ -146,11 +144,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('setParameter')
             ->with('emails', $emails, ArrayParameterType::STRING)
             ->willReturn($query);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('getArrayResult')
             ->willReturn([
                 0 => [
@@ -161,11 +159,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->entityManager->expects(self::once())
+        $this->entityManager->expects($this->once())
             ->method('createQuery')
             ->willReturn($query);
 
-        self::assertEquals(
+        self::assertSame(
             [1, 2],
             $this->repository->getContactIdsByEmails($emails)
         );
@@ -177,7 +175,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('getUniqueIdentifiersWherePart');
-        $refMethod->setAccessible(true);
 
         $this->assertEquals('andWhere', $refMethod->invoke($this->repository));
 

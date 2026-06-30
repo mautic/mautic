@@ -513,7 +513,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         int $status = 200,
         ?string $body = null,
     ): callable {
-        return static function (RequestInterface $request) use ($expectedData, $expectedMethod, $expectedUri, $status, $body) {
+        return static function (RequestInterface $request) use ($expectedData, $expectedMethod, $expectedUri, $status, $body): Response {
             Assert::assertSame($expectedMethod, $request->getMethod());
             Assert::assertSame($expectedUri, $request->getUri()->__toString());
             Assert::assertSame(json_encode($expectedData), $request->getBody()->getContents());
@@ -549,7 +549,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function noMoreRequestAssertion(): callable
     {
-        return function () {
+        return function (): void {
             $this->fail('No other request was expected');
         };
     }

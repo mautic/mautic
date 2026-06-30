@@ -18,9 +18,8 @@ class StageListType extends AbstractType
      */
     private array $choices = [];
 
-    public function __construct(private StageModel $stageModel)
+    public function __construct(private readonly StageModel $stageModel)
     {
-        $this->stageModel = $stageModel;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

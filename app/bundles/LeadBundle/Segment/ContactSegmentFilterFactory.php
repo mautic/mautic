@@ -21,10 +21,10 @@ class ContactSegmentFilterFactory
     private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
-        private TableSchemaColumnsCache $schemaCache,
-        private Container $container,
-        private DecoratorFactory $decoratorFactory,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TableSchemaColumnsCache $schemaCache,
+        private readonly Container $container,
+        private readonly DecoratorFactory $decoratorFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -119,11 +119,16 @@ class ContactSegmentFilterFactory
             ]);
 
             if ('or' === strtolower($filter['glue']) && '=' === $filter['operator']) {
-                if (!isset($arrStacks[$key])) {
-                    $arrStacks[$key] = [];
+                // Don't group date/datetime type filters - they require special processing
+                // by DateOptionFactory and don't support IN operator with arrays
+                if (isset($filter['type']) && in_array($filter['type'], ['date', 'datetime'], true)) {
+                    array_push($shrinkedFilters, $filter);
+                } else {
+                    if (!isset($arrStacks[$key])) {
+                        $arrStacks[$key] = [];
+                    }
+                    array_push($arrStacks[$key], $filter);
                 }
-
-                array_push($arrStacks[$key], $filter);
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
                 if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) { /** @phpstan-ignore-line `Comparison operation ">" between 0 and 0 is always false.` I don't see anything wrong. Seems to be a PHPSTAN issue https://github.com/phpstan/phpstan/issues/3831 */
@@ -165,9 +170,7 @@ class ContactSegmentFilterFactory
 
         $filter                         = $stack[0];
         $filter['operator']             = 'in';
-        $filter['properties']['filter'] = $filter['filter'] = array_map(function ($ele) {
-            return $ele['filter'];
-        }, $stack);
+        $filter['properties']['filter'] = $filter['filter'] = array_map(fn (array $ele): mixed => $ele['filter'], $stack);
 
         return $filter;
     }

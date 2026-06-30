@@ -20,8 +20,8 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock      = $this->createStub(FieldsBuilder::class);
+        $companyReportDataMock  = $this->createStub(CompanyReportData::class);
         $reportBuilderEventMock = $this->createMock(ReportBuilderEvent::class);
 
         $reportBuilderEventMock->expects($this->once())
@@ -38,8 +38,8 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate(): void
     {
-        $fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock    = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock        = $this->createStub(FieldsBuilder::class);
+        $companyReportDataMock    = $this->createStub(CompanyReportData::class);
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
         $reportGeneratorEventMock->expects($this->once())
@@ -56,9 +56,9 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportBuilder(): void
     {
-        $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
-        $reportHelperMock      = new ReportHelper($this->createMock(EventDispatcher::class));
+        $translatorMock        = $this->createStub(TranslatorInterface::class);
+        $channelListHelperMock = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
+        $reportHelperMock      = new ReportHelper($this->createStub(EventDispatcher::class));
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock = $this->createMock(CompanyReportData::class);
 
@@ -195,7 +195,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $reportGeneratorEventMock->expects($matcher)
-            ->method('usesColumn')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('usesColumn')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(['u.first_name', 'u.last_name'], $parameters[0]);
                 }
@@ -213,15 +213,14 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-        $reportUtmTagSubscriber = new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
 
-        return $reportUtmTagSubscriber;
+        return new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
     }
 
     /**
      * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getReportGeneratorEventMock()
+    private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
     {
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
@@ -236,7 +235,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getQueryBuilderMock()
+    private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 
@@ -247,7 +246,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->any();
 
         $queryBuilderMock->expects($matcher)->method('leftJoin')
-            ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock) {
+            ->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilderMock): \PHPUnit\Framework\MockObject\MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('utm', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);
