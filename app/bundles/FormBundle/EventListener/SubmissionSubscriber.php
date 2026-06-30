@@ -16,7 +16,7 @@ use Mautic\FormBundle\Entity\Submission;
 final class SubmissionSubscriber
 {
     public function __construct(
-        private FormRepository $formRepository,
+        private readonly FormRepository $formRepository,
     ) {
     }
 

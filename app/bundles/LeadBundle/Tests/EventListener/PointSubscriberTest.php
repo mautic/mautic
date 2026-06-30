@@ -19,6 +19,7 @@ class PointSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $leadModel;
 
     private PointSubscriber $subscriber;
+
     /**
      * @var MockObject&TriggerExecutedEvent
      */

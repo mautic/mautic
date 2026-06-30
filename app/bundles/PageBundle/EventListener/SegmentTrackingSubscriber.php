@@ -17,8 +17,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class SegmentTrackingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private LeadListRepository $leadListRepository,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly LeadListRepository $leadListRepository,
     ) {
     }
 

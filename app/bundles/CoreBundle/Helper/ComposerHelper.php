@@ -17,8 +17,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class ComposerHelper
 {
     public function __construct(
-        private KernelInterface $kernel,
-        private LoggerInterface $logger,
+        private readonly KernelInterface $kernel,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

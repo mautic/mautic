@@ -44,7 +44,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
     /**
      * @param array<mixed> $options
      */
-    public function __construct(array $options, private HttpUtils $httpUtils, private UserProviderInterface $userProvider, private AuthenticationSuccessHandlerInterface $successHandler, private AuthenticationFailureHandlerInterface $failureHandler, private IntegrationHelper $integrationHelper, private EventDispatcherInterface $dispatcher)
+    public function __construct(array $options, private readonly HttpUtils $httpUtils, private readonly UserProviderInterface $userProvider, private readonly AuthenticationSuccessHandlerInterface $successHandler, private readonly AuthenticationFailureHandlerInterface $failureHandler, private readonly IntegrationHelper $integrationHelper, private readonly EventDispatcherInterface $dispatcher)
     {
         if ([] === $options) {
             throw new \RuntimeException('$options parameter is empty. Did you forgot to configure?');

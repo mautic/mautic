@@ -13,22 +13,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class LanguageHelper
 {
-    private string $cacheFile;
+    private readonly string $cacheFile;
 
-    private Installer $installer;
+    private readonly Installer $installer;
 
     private array $supportedLanguages = [];
 
-    private string $installedTranslationsDirectory;
+    private readonly string $installedTranslationsDirectory;
 
-    private string $defaultTranslationsDirectory;
+    private readonly string $defaultTranslationsDirectory;
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private LoggerInterface $logger,
-        private CoreParametersHelper $coreParametersHelper,
-        private Client $client,
-        private TranslatorInterface $translator,
+        private readonly PathsHelper $pathsHelper,
+        private readonly LoggerInterface $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Client $client,
+        private readonly TranslatorInterface $translator,
     ) {
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';

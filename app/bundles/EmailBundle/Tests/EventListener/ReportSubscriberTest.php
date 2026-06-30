@@ -31,6 +31,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     use MockedConnectionTrait;
+
     /**
      * @var MockObject|Connection
      */

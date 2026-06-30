@@ -40,7 +40,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configTo = [
+    private array $configTo = [
         'id'          => '112',
         'companyname' => 'Mautic2',
         'companemail' => 'mautic@mauticsecond.com',
@@ -94,7 +94,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configPageHit = [
+    private array $configPageHit = [
         'startDate'         => '2022-06-08 12:45:22.0',
         'endDate'           => '2023-06-08 12:45:22.0',
         'page'              => '1',
@@ -105,7 +105,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHit = [
+    private array $configUrlPageHit = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -116,7 +116,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHitWithoutSpentTime = [
+    private array $configUrlPageHitWithoutSpentTime = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -134,10 +134,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $mockCompanyModel;
 
-    /**
-     * @var CampaignSubscriber
-     */
-    private $subscriber;
+    private CampaignSubscriber $subscriber;
 
     /**
      * @var MockObject&DoNotContact

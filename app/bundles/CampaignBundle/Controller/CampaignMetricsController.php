@@ -20,8 +20,8 @@ use Symfony\Component\HttpFoundation\Response;
 class CampaignMetricsController extends AbstractController
 {
     public function __construct(
-        private Translator $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly Translator $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

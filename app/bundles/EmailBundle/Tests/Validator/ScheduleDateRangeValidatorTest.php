@@ -17,6 +17,7 @@ class ScheduleDateRangeValidatorTest extends TestCase
      * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $context;
+
     private ScheduleDateRangeValidator $validator;
 
     protected function setUp(): void

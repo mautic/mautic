@@ -12,6 +12,7 @@ use Symfony\Component\Cache\CacheItem;
 final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&CacheProviderTagAwareInterface $cacheProvider;
+
     private AlreadyMappedFieldCollector $collector;
 
     protected function setup(): void

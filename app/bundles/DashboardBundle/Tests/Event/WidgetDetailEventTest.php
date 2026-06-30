@@ -11,10 +11,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
 {
     private WidgetDetailEvent $widgetDetailEvent;
+
     /**
      * @var MockObject&Translator
      */
     private MockObject $translator;
+
     /**
      * @var MockObject&Widget
      */

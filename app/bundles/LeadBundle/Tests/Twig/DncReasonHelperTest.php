@@ -12,7 +12,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<int, string>
      */
-    private $reasonTo = [
+    private array $reasonTo = [
         DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',
         DoNotContact::UNSUBSCRIBED   => 'mautic.lead.event.donotcontact_unsubscribed',
         DoNotContact::BOUNCED        => 'mautic.lead.event.donotcontact_bounced',
@@ -22,7 +22,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $translations = [
+    private array $translations = [
         'mautic.lead.event.donotcontact_contactable'  => 'a',
         'mautic.lead.event.donotcontact_unsubscribed' => 'b',
         'mautic.lead.event.donotcontact_bounced'      => 'c',

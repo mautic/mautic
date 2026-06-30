@@ -17,6 +17,7 @@ use Symfony\Component\Lock\LockInterface;
 class ModeratedCommandTest extends TestCase
 {
     private string $lockFilePath;
+
     /**
      * @var MockObject&CoreParametersHelper
      */

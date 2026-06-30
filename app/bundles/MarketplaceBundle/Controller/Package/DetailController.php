@@ -26,11 +26,11 @@ use Symfony\Component\HttpFoundation\Response;
 class DetailController extends CommonController
 {
     public function __construct(
-        private PackageModel $packageModel,
-        private RouteProvider $routeProvider,
-        private Config $config,
-        private ComposerHelper $composer,
-        private ResourceInstallerInterface $resourceInstaller,
+        private readonly PackageModel $packageModel,
+        private readonly RouteProvider $routeProvider,
+        private readonly Config $config,
+        private readonly ComposerHelper $composer,
+        private readonly ResourceInstallerInterface $resourceInstaller,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

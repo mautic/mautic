@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
 {
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     /**

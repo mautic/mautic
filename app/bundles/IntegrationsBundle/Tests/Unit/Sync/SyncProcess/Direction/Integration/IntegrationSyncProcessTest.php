@@ -49,15 +49,9 @@ class IntegrationSyncProcessTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private InputOptionsDAO $inputOptionsDAO;
 
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integrationSyncProcess;
+    private IntegrationSyncProcess $integrationSyncProcess;
 
     protected function setUp(): void
     {

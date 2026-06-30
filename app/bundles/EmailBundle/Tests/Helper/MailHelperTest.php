@@ -1275,7 +1275,7 @@ class MailHelperTest extends TestCase
 
         $emailSecret = hash_hmac('sha256', 'someemail@email.test', 'secret');
         $this->router->method('generate')
-            ->willReturnCallback(fn ($route) => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
+            ->willReturnCallback(fn ($route): string => 'http://www.somedomain.cz/email/unsubscribe/hash/someemail@email.test/'.$emailSecret);
 
         $transport     = new SmtpTransport();
         $symfonyMailer = new Mailer($transport);

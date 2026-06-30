@@ -21,6 +21,7 @@ final class EmailSubscriberTest extends TestCase
 {
     /** @var MockObject&Config */
     private MockObject $config;
+
     /** @var MockObject&GrapesJsBuilderRepository */
     private MockObject $grapesJsBuilderRepo;
 

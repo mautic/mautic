@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class NotifyOfUnpublishSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private NotificationHelper $notificationHelper)
+    public function __construct(private readonly NotificationHelper $notificationHelper)
     {
     }
 

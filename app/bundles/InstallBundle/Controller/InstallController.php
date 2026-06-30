@@ -26,8 +26,8 @@ use Symfony\Component\HttpFoundation\Response;
 class InstallController extends CommonController
 {
     public function __construct(
-        private Configurator $configurator,
-        private InstallService $installer,
+        private readonly Configurator $configurator,
+        private readonly InstallService $installer,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

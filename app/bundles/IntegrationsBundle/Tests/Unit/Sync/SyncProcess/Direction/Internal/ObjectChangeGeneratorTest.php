@@ -207,7 +207,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
         $matcher = $this->exactly(2);
 
@@ -272,7 +272,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(2))
             ->method('adjudicate')
             ->willReturnCallback(
-                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
         $matcher = $this->exactly(2);
 
@@ -331,7 +331,7 @@ class ObjectChangeGeneratorTest extends TestCase
         $this->syncJudge->expects($this->exactly(1))
             ->method('adjudicate')
             ->willReturnCallback(
-                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest) => $internalInformationChangeRequest
+                fn ($mode, InformationChangeRequestDAO $internalInformationChangeRequest, InformationChangeRequestDAO $integrationInformationChangeRequest): InformationChangeRequestDAO => $internalInformationChangeRequest
             );
 
         $this->bulkNotification->expects($this->exactly(1))

@@ -25,10 +25,7 @@ final class GeneratedColumnsProviderTest extends TestCase
      */
     private MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {

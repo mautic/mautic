@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class MauticReportBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
+
     /**
      * @var \PHPUnit\Framework\MockObject\Stub|EventDispatcherInterface
      */

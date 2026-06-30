@@ -10,7 +10,7 @@ class ExampleClassWithPrivateProperty
     /**
      * @phpstan-ignore-next-line
      */
-    private $test = 'value';
+    private string $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty

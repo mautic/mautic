@@ -45,15 +45,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         ],
     ];
 
-    /**
-     * @var array
-     */
-    private $payload = ['create' => [], 'update' => []];
+    private array $payload = ['create' => [], 'update' => []];
 
-    /**
-     * @var ValueNormalizer
-     */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {

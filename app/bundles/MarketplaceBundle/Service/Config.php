@@ -17,7 +17,7 @@ class Config
     public const MARKETPLACE_API_KEY           = 'marketplace_api_key';
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -21,7 +21,9 @@ class RequestStateStoreTest extends TestCase
     private CacheItem $cacheItem;
 
     private RequestStateStore $requestStateStore;
+
     private string $cachePrefix = 'prefix_suffix';
+
     private string $stateId     = 'state_id';
 
     protected function setUp(): void

@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class InstallDataCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
     }

@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 class NotifyOfUnpublishSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;
+
     private NotifyOfUnpublishSubscriber $subscriber;
 
     protected function setUp(): void

@@ -16,7 +16,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class CampaignAuditServiceFunctionalTest extends MauticMysqlTestCase
 {
     private CampaignAuditService $campaignAuditService;
+
     private FlashBag&MockObject $flashBagMock;
+
     private UrlGeneratorInterface&MockObject $urlGeneratorMock;
 
     protected function setUp(): void

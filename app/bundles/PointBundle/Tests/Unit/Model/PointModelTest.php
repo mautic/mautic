@@ -34,11 +34,17 @@ use Symfony\Contracts\EventDispatcher\Event;
 class PointModelTest extends TestCase
 {
     private IpLookupHelper&MockObject $ipLookupHelper;
+
     private LeadModel&MockObject $leadModel;
+
     private EntityManager&MockObject $em;
+
     private CorePermissions&MockObject $security;
+
     private EventDispatcherInterface&MockObject $dispatcher;
+
     private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+
     private PointModel $pointModel;
 
     protected function setUp(): void
