@@ -1392,12 +1392,13 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[template]']->setValue('blank');
         $form['emailform[customHtml]']->setValue('<a href="://example.com">Broken link</a>');
 
-        $this->client->submit($form);
+        $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
 
         $this->assertNull($email);
+        $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());
     }
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Validator;
 
-use GuzzleHttp\Psr7\Uri;
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Validator\Constraint;
@@ -35,9 +35,9 @@ final class ValidEmailLinksValidator extends ConstraintValidator
         }
     }
 
-    private function validateHtml(mixed $html, string $path, ValidEmailLinks $constraint): void
+    private function validateHtml(?string $html, string $path, ValidEmailLinks $constraint): void
     {
-        if (!is_string($html) || '' === trim($html)) {
+        if (null === $html || '' === trim($html)) {
             return;
         }
 
@@ -50,7 +50,7 @@ final class ValidEmailLinksValidator extends ConstraintValidator
 
             $url = html_entity_decode($link->getAttribute('href'), ENT_QUOTES | ENT_HTML5);
 
-            if ($this->isValidUrl($url)) {
+            if ($this->isMauticToken($url) || UrlHelper::isValidUrl($url)) {
                 continue;
             }
 
@@ -81,20 +81,8 @@ final class ValidEmailLinksValidator extends ConstraintValidator
         }
     }
 
-    private function isValidUrl(string $url): bool
+    private function isMauticToken(string $url): bool
     {
-        $parts = parse_url($url);
-
-        if (false === $parts) {
-            return false;
-        }
-
-        try {
-            Uri::fromParts($parts);
-
-            return true;
-        } catch (\InvalidArgumentException) {
-            return false;
-        }
+        return 1 === preg_match('/^\{[^{}]+\}$/', $url);
     }
 }

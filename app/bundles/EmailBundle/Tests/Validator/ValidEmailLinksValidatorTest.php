@@ -65,8 +65,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
     public static function validLinkProvider(): iterable
     {
         yield 'absolute URL' => ['https://example.com/path?foo=bar'];
-        yield 'relative URL' => ['/relative/path'];
-        yield 'anchor' => ['#section'];
+        yield 'URL with a token' => ['https://example.com/path?{contactfield=customfield-a}={contactfield=customfield-b}&array[]=value1#footer'];
         yield 'mailto URL' => ['mailto:test@example.com'];
         yield 'Mautic token' => ['{unsubscribe_url}'];
     }
