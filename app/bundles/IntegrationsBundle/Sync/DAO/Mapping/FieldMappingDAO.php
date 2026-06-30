@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class FieldMappingDAO
 {
-    private bool $isRequired;
+    private readonly bool $isRequired;
 
     /**
      * @param string $internalObject

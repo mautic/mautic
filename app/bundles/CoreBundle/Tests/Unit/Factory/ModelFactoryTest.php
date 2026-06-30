@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ModelFactoryTest extends TestCase
 {
     /**
-     * @var MockObject|ContainerInterface
+     * @var MockObject&ContainerInterface
      */
     private MockObject $container;
 
@@ -28,7 +28,7 @@ class ModelFactoryTest extends TestCase
 
     public function testModelKeyIsLowerCaseToMatchServiceKeys(): void
     {
-        $pointTriggerModel = $this->createMock(TriggerModel::class);
+        $pointTriggerModel = $this->createStub(TriggerModel::class);
         $modelName         = 'point.triggerEvent';
         $containerKey      = 'mautic.point.model.triggerEvent';
 

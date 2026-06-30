@@ -25,7 +25,7 @@ class FormSubscriberTest extends TestCase
     private FormSubscriber $subscriber;
 
     /**
-     * @var MailHelper&MockObject
+     * @var MockObject&MailHelper
      */
     private MockObject $mailer;
 
@@ -426,7 +426,7 @@ New line',
         $matcher = self::exactly(3);
 
         $this->mailer->expects($matcher)
-            ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail) {
+            ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([$to => null], $parameters[0]);
                 }

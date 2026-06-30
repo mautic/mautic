@@ -13,7 +13,7 @@ final class SmsRecipientDTO implements \JsonSerializable
     /**
      * @param array<mixed> $substitutionData
      */
-    public function __construct(private Lead $lead, private array $substitutionData, private string $finalMessage)
+    public function __construct(private readonly Lead $lead, private readonly array $substitutionData, private readonly string $finalMessage)
     {
     }
 

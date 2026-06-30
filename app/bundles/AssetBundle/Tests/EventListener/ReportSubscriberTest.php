@@ -24,35 +24,35 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private ChannelListHelper $channelListHelper;
 
     /**
-     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     * @var CompanyReportData|\PHPUnit\Framework\MockObject\Stub
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
+    private \PHPUnit\Framework\MockObject\Stub $companyReportData;
 
     /**
-     * @var DownloadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var DownloadRepository|\PHPUnit\Framework\MockObject\Stub
      */
-    private \PHPUnit\Framework\MockObject\MockObject $downloadRepository;
+    private \PHPUnit\Framework\MockObject\Stub $downloadRepository;
 
     /**
-     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&QueryBuilder
      */
     private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
 
     /**
-     * @var DncReportService|\PHPUnit\Framework\MockObject\MockObject
+     * @var DncReportService|\PHPUnit\Framework\MockObject\Stub
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dncReportService;
+    private \PHPUnit\Framework\MockObject\Stub $dncReportService;
 
     private ReportHelper $reportHelper;
 
     protected function setUp(): void
     {
         $this->queryBuilder        = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper   = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelper        = new ReportHelper($this->createMock(EventDispatcherInterface::class));
-        $this->companyReportData   = $this->createMock(CompanyReportData::class);
-        $this->downloadRepository  = $this->createMock(DownloadRepository::class);
-        $this->dncReportService    = $this->createMock(DncReportService::class);
+        $this->channelListHelper   = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
+        $this->reportHelper        = new ReportHelper($this->createStub(EventDispatcherInterface::class));
+        $this->companyReportData   = $this->createStub(CompanyReportData::class);
+        $this->downloadRepository  = $this->createStub(DownloadRepository::class);
+        $this->dncReportService    = $this->createStub(DncReportService::class);
     }
 
     public function testOnReportBuilderWithUnknownContext(): void

@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class LeadControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
+
     /**
      * @var array<string>
      */

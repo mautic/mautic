@@ -22,8 +22,8 @@ class SmsHelper
         protected PhoneNumberHelper $phoneNumberHelper,
         protected SmsModel $smsModel,
         protected IntegrationHelper $integrationHelper,
-        private DoNotContact $doNotContact,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly DoNotContact $doNotContact,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

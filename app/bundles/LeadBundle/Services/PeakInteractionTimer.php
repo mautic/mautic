@@ -43,34 +43,34 @@ class PeakInteractionTimer
 
     private ?\DateTimeZone $defaultTimezone = null;
 
-    private int $cacheTimeout;
+    private readonly int $cacheTimeout;
 
     private int $bestHourStart;
 
-    private int $bestDefaultHourStart;
+    private readonly int $bestDefaultHourStart;
 
     private int $bestHourEnd;
 
-    private int $bestDefaultHourEnd;
+    private readonly int $bestDefaultHourEnd;
 
     /** @var int[] */
     private array $bestDays;
 
     /** @var int[] */
-    private array $bestDefaultDays;
+    private readonly array $bestDefaultDays;
 
-    private string $fetchInteractionsFrom;
+    private readonly string $fetchInteractionsFrom;
 
-    private int $fetchLimit;
+    private readonly int $fetchLimit;
 
     private int $maxOptimalDays;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private StatRepository $statRepository,
-        private HitRepository $hitRepository,
-        private SubmissionRepository $submissionRepository,
-        private CacheProviderInterface $cacheProvider,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly StatRepository $statRepository,
+        private readonly HitRepository $hitRepository,
+        private readonly SubmissionRepository $submissionRepository,
+        private readonly CacheProviderInterface $cacheProvider,
     ) {
         $this->cacheTimeout          = $this->coreParametersHelper->get('peak_interaction_timer_cache_timeout');
         $this->bestDefaultHourStart  = $this->coreParametersHelper->get('peak_interaction_timer_best_default_hour_start');

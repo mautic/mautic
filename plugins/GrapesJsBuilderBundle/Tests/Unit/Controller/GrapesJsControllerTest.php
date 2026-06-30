@@ -18,7 +18,7 @@ final class GrapesJsControllerTest extends TestCase
 {
     public function testEditorStateActionThrowsForUnsupportedObjectType(): void
     {
-        $controller = $this->getControllerForEditorState($this->createMock(CorePermissions::class), null);
+        $controller = $this->getControllerForEditorState($this->createStub(CorePermissions::class), null);
 
         $this->expectException(ConflictHttpException::class);
         $this->expectExceptionMessage('Object not authorized to load custom builder');
@@ -28,7 +28,7 @@ final class GrapesJsControllerTest extends TestCase
 
     public function testEditorStateActionReturnsNullForNewEntity(): void
     {
-        $controller = $this->getControllerForEditorState($this->createMock(CorePermissions::class), null);
+        $controller = $this->getControllerForEditorState($this->createStub(CorePermissions::class), null);
         $response   = $controller->editorStateAction('email', 'new123');
 
         self::assertInstanceOf(JsonResponse::class, $response);

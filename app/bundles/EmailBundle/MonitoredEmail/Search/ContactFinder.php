@@ -11,9 +11,9 @@ use Psr\Log\LoggerInterface;
 class ContactFinder
 {
     public function __construct(
-        private StatRepository $statRepository,
-        private LeadRepository $leadRepository,
-        private LoggerInterface $logger,
+        private readonly StatRepository $statRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

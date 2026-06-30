@@ -20,11 +20,11 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
     public const EVENT_NAME = 'campaign.jump_to_event';
 
     public function __construct(
-        private EventRepository $eventRepository,
-        private EventExecutioner $eventExecutioner,
-        private TranslatorInterface $translator,
-        private LeadRepository $leadRepository,
-        private EventScheduler $eventScheduler,
+        private readonly EventRepository $eventRepository,
+        private readonly EventExecutioner $eventExecutioner,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadRepository $leadRepository,
+        private readonly EventScheduler $eventScheduler,
     ) {
     }
 

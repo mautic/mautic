@@ -24,7 +24,7 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $formConfigBuilder->setFormFactory((new FormFactoryBuilder())->getFormFactory());
         $formConfigBuilder->setCompound(true);
         $formConfigBuilder->setDataMapper(
-            $this->createMock(DataMapperInterface::class)
+            $this->createStub(DataMapperInterface::class)
         );
         $fooConfig = $formConfigBuilder->getFormConfig();
 

@@ -24,9 +24,9 @@ class IntegrationsHelper
     private array $decryptedIntegrationConfigurations = [];
 
     public function __construct(
-        private IntegrationRepository $integrationRepository,
-        private EncryptionService $encryptionService,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly IntegrationRepository $integrationRepository,
+        private readonly EncryptionService $encryptionService,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

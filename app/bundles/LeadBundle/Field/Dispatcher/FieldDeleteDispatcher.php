@@ -16,9 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class FieldDeleteDispatcher
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private EntityManager $entityManager,
-        private BackgroundSettings $backgroundSettings,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly EntityManager $entityManager,
+        private readonly BackgroundSettings $backgroundSettings,
     ) {
     }
 

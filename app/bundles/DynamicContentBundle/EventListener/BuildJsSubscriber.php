@@ -14,10 +14,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetsHelper $assetsHelper,
-        private TranslatorInterface $translator,
-        private RequestStack $requestStack,
-        private RouterInterface $router,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly RequestStack $requestStack,
+        private readonly RouterInterface $router,
     ) {
     }
 

@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CoreParametersHelperTest extends TestCase
 {
     /**
-     * @var MockObject|ContainerInterface
+     * @var MockObject&ContainerInterface
      */
     private MockObject $container;
 

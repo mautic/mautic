@@ -26,7 +26,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(3))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($endpoint, $parameters) use (&$page) {
+                function ($endpoint, $parameters) use (&$page): array {
                     ++$page;
 
                     // Page should be incremented 3 times by fetchAllRecords method

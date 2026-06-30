@@ -11,17 +11,17 @@ use Twig\TwigFunction;
 class TranslatorExtension extends AbstractExtension
 {
     public function __construct(
-        private Translator $translator,
+        private readonly Translator $translator,
     ) {
     }
 
     public function getFunctions()
     {
         return [
-            new TwigFunction('translatorGetJsLang', [$this, 'getJsLang']),
-            new TwigFunction('translatorHasId', [$this, 'translatorHasId']),
-            new TwigFunction('translatorConditional', [$this, 'translatorConditional']),
-            new TwigFunction('translatorGetHelper', [$this, 'getHelper']),
+            new TwigFunction('translatorGetJsLang', $this->getJsLang(...)),
+            new TwigFunction('translatorHasId', $this->translatorHasId(...)),
+            new TwigFunction('translatorConditional', $this->translatorConditional(...)),
+            new TwigFunction('translatorGetHelper', $this->getHelper(...)),
         ];
     }
 

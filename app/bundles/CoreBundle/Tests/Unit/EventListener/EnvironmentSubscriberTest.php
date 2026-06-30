@@ -19,7 +19,7 @@ class EnvironmentSubscriberTest extends TestCase
     private EnvironmentSubscriber $environmentSubscriber;
 
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelperMock;
 

@@ -15,8 +15,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class RouteHelper
 {
     public function __construct(
-        private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher,
+        private readonly ObjectProvider $objectProvider,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

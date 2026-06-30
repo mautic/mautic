@@ -35,7 +35,7 @@ class WebhookApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,

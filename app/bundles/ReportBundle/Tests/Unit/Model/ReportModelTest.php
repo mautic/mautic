@@ -46,7 +46,7 @@ final class ReportModelTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $request = new Request();
         $request->setSession($session);
         /** @var RequestStack $requestStack */
