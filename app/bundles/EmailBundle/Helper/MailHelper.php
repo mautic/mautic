@@ -1350,10 +1350,7 @@ class MailHelper
         return true;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
             $lead    = $this->getLead();

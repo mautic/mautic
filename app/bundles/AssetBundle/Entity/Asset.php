@@ -109,6 +109,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Holds max size of uploaded file.
+     *
+     * @var string
      */
     private $maxSize;
 

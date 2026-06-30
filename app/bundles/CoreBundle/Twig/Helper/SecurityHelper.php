@@ -49,11 +49,9 @@ final class SecurityHelper
     }
 
     /**
-     * @param string[]|string $permission
-     *
-     * @return mixed
+     * @return bool|array<string, bool>
      */
-    public function isGranted($permission)
+    public function isGranted(string $permission): bool|array
     {
         return $this->security->isGranted($permission);
     }

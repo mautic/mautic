@@ -658,7 +658,7 @@ class Mailbox
      *
      * @return array
      */
-    public function getMailsInfo(array $mailsIds)
+    public function getMailsInfo(array $mailsIds): array|false
     {
         $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
         if (is_array($mails) && count($mails)) {

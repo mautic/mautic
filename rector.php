@@ -35,7 +35,6 @@ return RectorConfig::configure()
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         AddParamTypeFromPropertyTypeRector::class,
         // ClosureReturnTypeRector::class,
-
         TypedPropertyFromAssignsRector::class,
         ReturnTypeFromStrictParamRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
@@ -52,6 +51,10 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
         // soon to be deprecated
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
+
+        Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Helper/ArrayHelper.php',
+        ],
 
         Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
         '*/Test/*',

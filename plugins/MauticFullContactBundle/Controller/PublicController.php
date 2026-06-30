@@ -236,7 +236,7 @@ class PublicController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction(LoggerInterface $mauticLogger, array $result, $validatedRequest): Response
+    private function compcallbackAction(LoggerInterface $mauticLogger, array $result, array $validatedRequest): Response
     {
         $notify = $validatedRequest['notify'];
 

@@ -146,10 +146,8 @@ class ThemeHelper implements ThemeHelperInterface
 
     /**
      * @param string $newName
-     *
-     * @return string
      */
-    private function getDirectoryName($newName)
+    private function getDirectoryName($newName): string
     {
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }

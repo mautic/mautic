@@ -39,10 +39,7 @@ class PageType extends AbstractType
 {
     private readonly ?\Mautic\UserBundle\Entity\User $user;
 
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private array|bool $canViewOther = false;
 
     public function __construct(
         private readonly EntityManager $em,

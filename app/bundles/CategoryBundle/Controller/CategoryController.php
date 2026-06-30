@@ -202,10 +202,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $bundle)
+    public function newAction(Request $request, $bundle): JsonResponse|Response
     {
         $model = $this->getModel('category');
         \assert($model instanceof CategoryModel);
@@ -299,10 +297,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
         $model   = $this->getModel('category');

@@ -259,7 +259,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      *
      * @return string
      */
-    public function sanitizeValue($value)
+    public function sanitizeValue($value): int|string|array
     {
         $valueType = gettype($value);
         $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));

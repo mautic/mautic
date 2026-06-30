@@ -64,7 +64,10 @@ class AuditlogController extends CommonController
         );
     }
 
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId)
+    /**
+     * @return Response|\Symfony\Component\HttpFoundation\StreamedResponse|array{userName: mixed, eventType: string, eventTimestamp: string}
+     */
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

@@ -70,7 +70,7 @@ class EmailRepository extends CommonRepository
      *
      * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
-    public function checkDoNotEmail($email)
+    public function checkDoNotEmail($email): false|array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('dnc.*')
@@ -166,8 +166,6 @@ class EmailRepository extends CommonRepository
      * @param int|null       $maxContactId
      * @param bool           $countWithMaxMin
      * @param \DateTime|null $maxDate
-     *
-     * @return QueryBuilder|int|array
      */
     public function getEmailPendingQuery(
         $emailId,
@@ -182,7 +180,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
-    ) {
+    ): array|int|QueryBuilder {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')

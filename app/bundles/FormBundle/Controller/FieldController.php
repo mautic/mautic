@@ -54,10 +54,8 @@ class FieldController extends CommonFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request, Environment $twig)
+    public function newAction(Request $request, Environment $twig): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -229,10 +227,8 @@ class FieldController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, Environment $twig, $objectId)
+    public function editAction(Request $request, Environment $twig, $objectId): JsonResponse|Response
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();

@@ -341,7 +341,7 @@ class WidgetDetailEvent extends CommonEvent
      *
      * @return bool
      */
-    public function hasPermission($permission)
+    public function hasPermission($permission): bool|array
     {
         return $this->security->isGranted($permission);
     }

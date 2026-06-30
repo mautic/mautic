@@ -409,7 +409,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getCompanies($params = [], $query = null, $executed = null)
+    public function getCompanies($params = [], $query = null, $executed = null): int|float|null
     {
         $executed = null;
 
@@ -1026,10 +1026,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

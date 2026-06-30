@@ -612,7 +612,7 @@ class SalesforceApi extends CrmApi
     /**
      * @return array<mixed>
      */
-    private function parseMissingField(string $errorMessage)
+    private function parseMissingField(string $errorMessage): array
     {
         $matches = [];
         preg_match(self::REGEXP_MISSING_FIELD, $errorMessage, $matches);
@@ -623,7 +623,7 @@ class SalesforceApi extends CrmApi
     /**
      * @return bool|float|mixed|string
      */
-    private function escapeQueryValue($value)
+    private function escapeQueryValue($value): string|array
     {
         // SF uses backslashes as escape delimeter
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
