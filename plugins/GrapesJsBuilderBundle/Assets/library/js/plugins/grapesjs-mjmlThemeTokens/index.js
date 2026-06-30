@@ -1,5 +1,6 @@
 import { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser } from './utils';
 import { patchBlocks, createBlockPatcher } from './blocks';
+import { createMjColumnClassStyles } from './mjColumnClassStyles';
 
 export { pluginId, extractMjHeadContent, createHeadInjectingMjmlParser };
 
@@ -41,103 +42,6 @@ export default (editor, opts = {}) => {
   };
 
   const classNames = parseMjClassNames(headContent);
-
-  // Parse mj-class definitions into a map: className -> { attr: value, ... }
-  const parseMjClassDefinitions = (mjHeadContent) => {
-    const definitions = new Map();
-    if (!mjHeadContent) return definitions;
-
-    const re = /<mj-class\s+([^>]*)>/gi;
-    let m;
-    while ((m = re.exec(mjHeadContent)) !== null) {
-      const attrString = m[1];
-      const nameMatch = attrString.match(/\bname\s*=\s*["']([^"']+)["']/);
-      if (!nameMatch) continue;
-
-      const name = nameMatch[1];
-      const attrs = {};
-      const attrRe = /([\w-]+)\s*=\s*["']([^"']*)["']/g;
-      let attrM;
-      while ((attrM = attrRe.exec(attrString)) !== null) {
-        if (attrM[1] !== 'name') {
-          attrs[attrM[1]] = attrM[2];
-        }
-      }
-      definitions.set(name, attrs);
-    }
-    return definitions;
-  };
-
-  const mjClassDefinitions = parseMjClassDefinitions(headContent);
-
-  // Resolve mj-class tokens into a merged attribute object
-  const resolveMjClassAttrs = (mjClassValue) => {
-    if (!mjClassValue || !mjClassDefinitions.size) return {};
-    const tokens = mjClassValue.split(/\s+/).filter(Boolean);
-    let resolved = {};
-    tokens.forEach((token) => {
-      const def = mjClassDefinitions.get(token);
-      if (def) {
-        resolved = { ...resolved, ...def };
-      }
-    });
-    return resolved;
-  };
-
-  // Check if an attribute is "covered" by an existing explicit attribute
-  const shorthandGroups = {
-    padding: ['padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
-    'border-radius': ['border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius'],
-  };
-
-  const isAttrCoveredByExisting = (key, existingAttrs) => {
-    for (const group of Object.values(shorthandGroups)) {
-      if (group.includes(key)) {
-        for (const member of group) {
-          if (member in existingAttrs) return true;
-        }
-      }
-    }
-    return false;
-  };
-
-  // Apply resolved mj-class attributes to component so views render correctly
-  const applyMjClassAttrsToComponent = (component) => {
-    if (!component) return;
-    const attrs = component.get('attributes') || {};
-    const mjClass = attrs['mj-class'];
-    if (!mjClass) return;
-
-    const resolved = resolveMjClassAttrs(mjClass);
-    if (!Object.keys(resolved).length) return;
-
-    const currentAttrs = { ...attrs };
-    let changed = false;
-    Object.entries(resolved).forEach(([key, value]) => {
-      if (key in currentAttrs) return;
-      if (isAttrCoveredByExisting(key, currentAttrs)) return;
-
-      currentAttrs[key] = value;
-      changed = true;
-    });
-
-    if (changed) {
-      component.set('attributes', currentAttrs);
-    }
-  };
-
-  const applyMjClassAttrsToAllComponents = () => {
-    const wrapper = editor.getWrapper?.();
-    if (!wrapper) return;
-
-    const walk = (cmp) => {
-      applyMjClassAttrsToComponent(cmp);
-      const children = cmp.components?.();
-      if (children && children.length) children.forEach((c) => walk(c));
-    };
-
-    wrapper.components?.().forEach((c) => walk(c));
-  };
 
   const registerHiddenMjAttributesTypes = () => {
     const isTag = (el, tag) => (el?.tagName || '').toLowerCase() === tag;
@@ -253,7 +157,6 @@ export default (editor, opts = {}) => {
       const attrs = { ...(cmp.get('attributes') || {}) };
       if (attrs['mj-class']) stripDefaultAttrsForComponent(cmp);
 
-
       const children = cmp.components?.();
       if (children && children.length) children.forEach((c) => walk(c));
     };
@@ -293,13 +196,30 @@ export default (editor, opts = {}) => {
 
     // Always strip defaults on new drops (lets theme <mj-attributes> and/or mj-class win)
     stripDefaultAttrsForComponent(component);
-
-    // Apply resolved mj-class attrs so the view renders them
-    applyMjClassAttrsToComponent(component);
   };
 
   // Must be executed during init (before setComponents) so mj-attributes content is hidden on parse
   registerHiddenMjAttributesTypes();
+  const mjColumnClassStyles = createMjColumnClassStyles(editor, headContent);
+  let currentHeadContent = headContent;
+  let previousHeadContent = headContent;
+
+  const updateHeadContent = (updatedHeadContent) => {
+    if (typeof options.mjmlParser?.updateHeadContent === 'function') {
+      options.mjmlParser.updateHeadContent(updatedHeadContent);
+    }
+    mjColumnClassStyles.updateHeadContent(updatedHeadContent);
+
+    classNames.clear();
+    parseMjClassNames(updatedHeadContent).forEach((className) => classNames.add(className));
+  };
+
+  editor.on('mautic:code-editor-update:before', (mjml) => {
+    readyForNewDrops = false;
+    previousHeadContent = currentHeadContent;
+    currentHeadContent = extractMjHeadContent(mjml);
+    updateHeadContent(currentHeadContent);
+  });
 
   editor.on('component:add', onComponentAdd);
 
@@ -316,10 +236,23 @@ export default (editor, opts = {}) => {
     blockColl.on('add reset', patchBlocksWithContext);
   }
 
+  editor.on('mautic:code-editor-update', () => {
+    stripDefaultAttrsForTokenizedComponents();
+    patchBlocksWithContext();
+  });
+
+  editor.on('mautic:code-editor-update:complete', (successful) => {
+    if (!successful) {
+      currentHeadContent = previousHeadContent;
+      updateHeadContent(currentHeadContent);
+      patchBlocksWithContext();
+    }
+    readyForNewDrops = true;
+  });
+
   // Service will call this after its setComponents + reparse workaround
   editor.on('mjml-theme-tokens:content:ready', () => {
     stripDefaultAttrsForTokenizedComponents();
-    applyMjClassAttrsToAllComponents();
     patchBlocksWithContext();
     readyForNewDrops = true;
   });

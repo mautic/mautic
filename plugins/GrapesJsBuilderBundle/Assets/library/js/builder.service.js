@@ -1187,28 +1187,9 @@ export default class BuilderService {
 
     const mjHeadContent = extractMjHeadContent(components);
 
-    const fontUrls = [];
-    const fontRegex = /<mj-font[^>]+href\s*=\s*["']([^"']+)["']/gi;
-    let fontMatch;
-    while ((fontMatch = fontRegex.exec(mjHeadContent)) !== null) {
-      fontUrls.push(fontMatch[1]);
-    }
-
     const styles = [
       `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`,
-      ...fontUrls,
     ];
-
-    // Extract non-inline <mj-style> CSS for canvas rendering (css-class styles)
-    const canvasCssBlocks = [];
-    const styleRegex = /<mj-style(?![^>]*\binline\b)[^>]*>([\s\S]*?)<\/mj-style>/gi;
-    let styleMatch;
-    while ((styleMatch = styleRegex.exec(mjHeadContent)) !== null) {
-      const cssContent = styleMatch[1].trim();
-      if (cssContent) {
-        canvasCssBlocks.push(cssContent);
-      }
-    }
 
     // IMPORTANT: mjmlParser must be provided directly to grapesjs-mjml via pluginsOpts
     const headInjectingParser = createHeadInjectingMjmlParser(mjHeadContent);
@@ -1276,6 +1257,7 @@ export default class BuilderService {
 
         [grapesjsMjmlThemeTokens]: {
           headContent: mjHeadContent,
+          mjmlParser: headInjectingParser,
         },
 
         grapesjsmautic: BuilderService.getMauticConf('email-mjml'),
@@ -1307,20 +1289,6 @@ export default class BuilderService {
 
     // Tell plugin initial content is ready: strip defaults for existing tokenized nodes + enable defaults for new drops
     this.editor.trigger('mjml-theme-tokens:content:ready');
-
-    // Inject non-inline <mj-style> CSS into the canvas iframe for css-class rendering
-    if (canvasCssBlocks.length) {
-      this.editor.on('load', () => {
-        const canvasFrame = this.editor.Canvas?.getFrame?.();
-        const frameDoc = canvasFrame?.el?.contentDocument || canvasFrame?.el?.contentWindow?.document;
-        if (frameDoc && frameDoc.head) {
-          const styleEl = frameDoc.createElement('style');
-          styleEl.setAttribute('data-gjs-theme-styles', 'true');
-          styleEl.textContent = canvasCssBlocks.join('\n');
-          frameDoc.head.appendChild(styleEl);
-        }
-      });
-    }
 
     this.removeSelectedElementsEmailMjml();
 
