@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class PageHelperFactory implements PageHelperFactoryInterface
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

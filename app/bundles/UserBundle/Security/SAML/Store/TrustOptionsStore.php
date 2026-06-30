@@ -11,8 +11,8 @@ class TrustOptionsStore implements TrustOptionsStoreInterface
     private ?TrustOptions $trustOptions = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private string $entityId,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly string $entityId,
     ) {
     }
 

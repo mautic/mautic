@@ -14,12 +14,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|SubmissionRepository
+     * @var MockObject&SubmissionRepository
      */
     private MockObject $submissionRepository;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 

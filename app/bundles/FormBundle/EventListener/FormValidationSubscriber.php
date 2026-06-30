@@ -16,8 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FormValidationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

@@ -42,20 +42,20 @@ class FieldModelTest extends TestCase
         $connection->method('getDatabasePlatform')
             ->willReturn($platform);
 
-        $leadFieldModel = $this->createMock(\Mautic\LeadBundle\Model\FieldModel::class);
+        $leadFieldModel = $this->createStub(\Mautic\LeadBundle\Model\FieldModel::class);
         $entityManager  = $this->createMock(EntityManager::class);
-        $schemaHelper   = $this->createMock(ColumnSchemaHelper::class);
+        $schemaHelper   = $this->createStub(ColumnSchemaHelper::class);
         $fieldModel     = new FieldModel(
             $leadFieldModel,
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(RequestStack::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(RequestStack::class),
             $schemaHelper
         );
 

@@ -19,8 +19,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class NoNestingValidatorTest extends TestCase
 {
     private const TRANSLATED_MESSAGE = 'DWC tokens cannot be used within another DWC.';
+
     private NoNesting $constraint;
+
     private NoNestingValidator $validator;
+
     private ExecutionContextInterface $context;
 
     protected function setUp(): void

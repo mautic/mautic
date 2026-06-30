@@ -6,21 +6,21 @@ namespace Mautic\CoreBundle\Release;
 
 final class Metadata implements \JsonSerializable
 {
-    private string $version;
+    private readonly string $version;
 
-    private int $majorVersion;
+    private readonly int $majorVersion;
 
-    private int $minorVersion;
+    private readonly int $minorVersion;
 
-    private int $patchVersion;
+    private readonly int $patchVersion;
 
-    private string $extraVersion;
+    private readonly string $extraVersion;
 
-    private string $stability;
+    private readonly string $stability;
 
-    private string $minSupportedPHPVersion;
+    private readonly string $minSupportedPHPVersion;
 
-    private string $maxSupportedPHPVersion;
+    private readonly string $maxSupportedPHPVersion;
 
     /**
      * We use this property to show a warning message on the dashboard
@@ -28,15 +28,15 @@ final class Metadata implements \JsonSerializable
      * Users are warned that their PHP version won't be supported by future
      * Mautic versions anymore.
      */
-    private string $showPHPVersionWarningIfUnder;
+    private readonly string $showPHPVersionWarningIfUnder;
 
-    private string $minSupportedMauticVersion;
+    private readonly string $minSupportedMauticVersion;
 
-    private string $announcementUrl;
+    private readonly string $announcementUrl;
 
-    private string $minSupportedMySqlVersion;
+    private readonly string $minSupportedMySqlVersion;
 
-    private string $minSupportedMariaDbVersion;
+    private readonly string $minSupportedMariaDbVersion;
 
     public function __construct(array $metadata)
     {

@@ -7,11 +7,11 @@ use Mautic\FormBundle\Entity\Form;
 
 class DisplayManager
 {
-    private DisplayCounter $displayCounter;
+    private readonly DisplayCounter $displayCounter;
 
     public function __construct(
-        private Form $form,
-        private array $viewOnlyFields = [],
+        private readonly Form $form,
+        private readonly array $viewOnlyFields = [],
     ) {
         $this->displayCounter = new DisplayCounter($form);
     }

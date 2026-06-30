@@ -14,7 +14,7 @@ class EscapeTransformer implements DataTransformerInterface
     /**
      * @var string[]
      */
-    private array $allowedParameters;
+    private readonly array $allowedParameters;
 
     public function __construct(array $allowedParameters)
     {

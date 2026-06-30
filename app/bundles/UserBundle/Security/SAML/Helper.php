@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class Helper
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private RequestStack $request)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper, private readonly RequestStack $request)
     {
     }
 

@@ -15,7 +15,7 @@ class UserMapperTest extends TestCase
     private UserMapper $mapper;
 
     /**
-     * @var Response|MockObject
+     * @var MockObject&Response
      */
     private MockObject $response;
 

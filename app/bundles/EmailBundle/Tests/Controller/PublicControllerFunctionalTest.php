@@ -21,10 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var int
-     */
-    private $leadId;
+    private ?int $leadId = null;
 
     /**
      * Tests that use the classic unsubscribe page. Not preference center.

@@ -16,10 +16,7 @@ class PageControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
     /**
      * @var int

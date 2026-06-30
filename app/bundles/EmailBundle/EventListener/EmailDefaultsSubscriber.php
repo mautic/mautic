@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class EmailDefaultsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailDefaultsHelper $defaultsHelper,
+        private readonly EmailDefaultsHelper $defaultsHelper,
     ) {
     }
 

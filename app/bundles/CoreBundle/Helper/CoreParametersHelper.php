@@ -7,12 +7,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CoreParametersHelper
 {
-    private \Symfony\Component\HttpFoundation\ParameterBag $parameters;
+    private readonly \Symfony\Component\HttpFoundation\ParameterBag $parameters;
 
     private ?array $resolvedParameters = null;
 
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
         $loader = new ParameterLoader();
 

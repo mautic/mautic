@@ -12,13 +12,13 @@ use JMS\Serializer\Metadata\PropertyMetadata;
  */
 class FieldInclusionStrategy implements ExclusionStrategyInterface
 {
-    private int $level;
+    private readonly int $level;
 
     /**
      * @param int $level
      */
     public function __construct(
-        private array $fields,
+        private readonly array $fields,
         $level = 3,
         private $path = null,
     ) {

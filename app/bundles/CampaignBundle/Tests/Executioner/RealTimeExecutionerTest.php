@@ -152,8 +152,8 @@ class RealTimeExecutionerTest extends TestCase
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event->expects($this->once())
             ->method('getPositiveChildren')
@@ -263,8 +263,8 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event = $this->getEventMock(2, 3);
         $event->method('getEventType')

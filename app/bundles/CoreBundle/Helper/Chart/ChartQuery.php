@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class ChartQuery extends AbstractChart
 {
-    private DateTimeHelper $dateTimeHelper;
+    private readonly DateTimeHelper $dateTimeHelper;
 
     private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
 

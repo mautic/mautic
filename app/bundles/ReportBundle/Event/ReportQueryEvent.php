@@ -7,13 +7,13 @@ use Mautic\ReportBundle\Entity\Report;
 
 class ReportQueryEvent extends AbstractReportEvent
 {
-    private int $totalResults;
+    private readonly int $totalResults;
 
     public function __construct(
         Report $report,
         private QueryBuilder $query,
         $totalResults,
-        private array $options,
+        private readonly array $options,
     ) {
         $this->context      = $report->getSource();
         $this->report       = $report;

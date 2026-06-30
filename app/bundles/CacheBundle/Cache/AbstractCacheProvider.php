@@ -21,8 +21,8 @@ abstract class AbstractCacheProvider implements CacheProviderInterface
     private ?Psr16Cache $psr16         = null;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private ContainerInterface $container,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly ContainerInterface $container,
     ) {
     }
 

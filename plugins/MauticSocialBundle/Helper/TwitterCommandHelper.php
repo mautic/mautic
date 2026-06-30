@@ -30,12 +30,12 @@ class TwitterCommandHelper
     private $twitterHandleField;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private FieldModel $fieldModel,
-        private MonitoringModel $monitoringModel,
-        private PostCountModel $postCountModel,
-        private Translator $translator,
-        private EntityManagerInterface $em,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly MonitoringModel $monitoringModel,
+        private readonly PostCountModel $postCountModel,
+        private readonly Translator $translator,
+        private readonly EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));

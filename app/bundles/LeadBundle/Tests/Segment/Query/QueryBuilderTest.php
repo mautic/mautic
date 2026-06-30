@@ -502,7 +502,7 @@ class QueryBuilderTest extends TestCase
 
     private function createConnectionFake(): Connection
     {
-        return new class([], $this->createMock(Driver::class)) extends Connection {
+        return new class([], $this->createStub(Driver::class)) extends Connection {
             public function getDatabasePlatform()
             {
                 return new MySQLPlatform();

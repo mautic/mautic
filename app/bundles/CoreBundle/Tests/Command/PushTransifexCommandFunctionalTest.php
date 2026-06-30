@@ -29,7 +29,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 Assert::assertSame('GET', $request->getMethod());
                 Assert::assertSame('https://rest.api.transifex.com/resources?filter%5Bproject%5D=o%3Amautic%3Ap%3Amautic', $request->getUri()->__toString());
 
@@ -39,7 +39,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // The first resource does not exist and must be created
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 $body = json_decode($request->getBody()->__toString(), true);
                 Assert::assertSame('POST', $request->getMethod());
                 Assert::assertSame('https://rest.api.transifex.com/resources', $request->getUri()->__toString());
@@ -54,7 +54,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // Starting the upload of content for the first resource
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 $body = json_decode($request->getBody()->__toString(), true);
                 Assert::assertSame('POST', $request->getMethod());
                 Assert::assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
@@ -66,7 +66,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // Starting the upload of content for the second resource
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 $body = json_decode($request->getBody()->__toString(), true);
                 Assert::assertSame('POST', $request->getMethod());
                 Assert::assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
@@ -78,7 +78,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // The first resource uploaded successfully
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 Assert::assertSame('GET', $request->getMethod());
                 Assert::assertSame('https://rest.api.transifex.com//resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748', $request->getUri()->__toString());
 
@@ -88,7 +88,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // The second resource uploaded successfully
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 Assert::assertSame('GET', $request->getMethod());
                 Assert::assertSame('https://rest.api.transifex.com//resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748', $request->getUri()->__toString());
 

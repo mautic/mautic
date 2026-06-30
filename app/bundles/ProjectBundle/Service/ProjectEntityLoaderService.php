@@ -23,11 +23,11 @@ final class ProjectEntityLoaderService
     private array $entityTypesCache = [];
 
     public function __construct(
-        private EntityManagerInterface $em,
-        private TranslatorInterface $translator,
-        private ModelFactory $modelFactory,
-        private CorePermissions $security,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
+        private readonly ModelFactory $modelFactory,
+        private readonly CorePermissions $security,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

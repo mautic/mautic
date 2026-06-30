@@ -21,8 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FilterType extends AbstractType
 {
     public function __construct(
-        private FormAdjustmentsProviderInterface $formAdjustmentsProvider,
-        private ListModel $listModel,
+        private readonly FormAdjustmentsProviderInterface $formAdjustmentsProvider,
+        private readonly ListModel $listModel,
     ) {
     }
 
