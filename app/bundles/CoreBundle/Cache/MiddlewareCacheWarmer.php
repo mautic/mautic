@@ -13,10 +13,10 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]
      */
-    private \SplPriorityQueue $specs;
+    private readonly \SplPriorityQueue $specs;
 
     public function __construct(
-        private string $env,
+        private readonly string $env,
     ) {
         $this->specs     = new \SplPriorityQueue();
     }

@@ -5,12 +5,11 @@ namespace Mautic\LeadBundle\Tests\Helper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
-use PHPUnit\Framework\Exception;
 
 class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CompanyLeadRepository|Exception
+     * @var \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 

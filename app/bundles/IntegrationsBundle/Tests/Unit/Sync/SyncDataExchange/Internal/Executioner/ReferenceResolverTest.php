@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class ReferenceResolverTest extends TestCase
 {
     /**
-     * @var Connection|MockObject
+     * @var MockObject&Connection
      */
     private MockObject $connection;
 

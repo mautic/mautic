@@ -16,7 +16,7 @@ class EmailRepositoryUpCountSentTest extends \PHPUnit\Framework\TestCase
     use RepositoryConfiguratorTrait;
 
     /**
-     * @var MockObject|QueryBuilder
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilderMock;
 

@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class MaxAllowedRecordsReachedInSingleProcessEvent extends Event
 {
-    public function __construct(private int $campaignId)
+    public function __construct(private readonly int $campaignId)
     {
     }
 

@@ -12,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class VersionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var Connection|MockObject
+     * @var MockObject&Connection
      */
     private MockObject $connection;
 

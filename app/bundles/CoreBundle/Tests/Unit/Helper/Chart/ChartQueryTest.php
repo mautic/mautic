@@ -17,12 +17,19 @@ use PHPUnit\Framework\TestCase;
 class ChartQueryTest extends TestCase
 {
     private \DateTime $dateFrom;
+
     private DateTimeHelper $dateTimeHelper;
+
     private \DateTime $dateTo;
+
     private MockObject&Connection $connection;
+
     private MockObject&QueryBuilder $queryBuilder;
+
     private string $dateColumn;
+
     private string $unit;
+
     private ChartQuery $chartQuery;
 
     protected function setUp(): void

@@ -53,7 +53,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 
         $parameterBagMock = $this->createMock(FileBag::class);
 
-        $fileMock = $this->createMock(UploadedFile::class);
+        $fileMock = $this->createStub(UploadedFile::class);
 
         $files = [
             'file' => $fileMock,
@@ -92,7 +92,7 @@ class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 
         $parameterBagMock = $this->createMock(FileBag::class);
 
-        $fileMock = $this->createMock(UploadedFile::class);
+        $fileMock = $this->createStub(UploadedFile::class);
 
         $files = [
             'file' => $fileMock,

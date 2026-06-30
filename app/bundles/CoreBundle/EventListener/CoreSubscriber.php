@@ -26,14 +26,14 @@ use Symfony\Component\Security\Http\SecurityEvents;
 class CoreSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private MenuHelper $menuHelper,
-        private UserHelper $userHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private AuthorizationCheckerInterface $securityContext,
-        private UserModel $userModel,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
+        private readonly BundleHelper $bundleHelper,
+        private readonly MenuHelper $menuHelper,
+        private readonly UserHelper $userHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuthorizationCheckerInterface $securityContext,
+        private readonly UserModel $userModel,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

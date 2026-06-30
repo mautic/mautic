@@ -13,8 +13,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class AssetsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AssetsHelper $assetsHelper,
-        private EventDispatcherInterface $dispatcher,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

@@ -21,17 +21,17 @@ use Psr\Log\LoggerInterface;
 class InactiveHelperTest extends TestCase
 {
     /**
-     * @var EventScheduler|MockObject
+     * @var MockObject&EventScheduler
      */
     private MockObject $scheduler;
 
     /**
-     * @var LeadEventLogRepository|MockObject
+     * @var MockObject&LeadEventLogRepository
      */
     private MockObject $eventLogRepository;
 
     /**
-     * @var LeadRepository|MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
 

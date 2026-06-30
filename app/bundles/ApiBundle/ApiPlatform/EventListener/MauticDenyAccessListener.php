@@ -15,8 +15,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 final class MauticDenyAccessListener
 {
     public function __construct(
-        private CorePermissions $security,
-        private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
+        private readonly CorePermissions $security,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
     }
 

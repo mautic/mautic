@@ -28,8 +28,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock         = $this->createMock(FileUploader::class);
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $formUploader             = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
-        $file1Mock                = $this->createMock(UploadedFile::class);
-        $file2Mock                = $this->createMock(UploadedFile::class);
+        $file1Mock                = $this->createStub(UploadedFile::class);
+        $file2Mock                = $this->createStub(UploadedFile::class);
         $form1Mock                = $this->createMock(Form::class);
         $field1Mock               = $this->createMock(Field::class);
         $form2Mock                = $this->createMock(Form::class);
@@ -124,8 +124,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock         = $this->createMock(FileUploader::class);
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $formUploader             = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
-        $file1Mock                = $this->createMock(UploadedFile::class);
-        $file2Mock                = $this->createMock(UploadedFile::class);
+        $file1Mock                = $this->createStub(UploadedFile::class);
+        $file2Mock                = $this->createStub(UploadedFile::class);
         $form1Mock                = $this->createMock(Form::class);
         $field1Mock               = $this->createMock(Field::class);
         $form2Mock                = $this->createMock(Form::class);
@@ -223,7 +223,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock->expects($this->never())
             ->method('delete');
 
-        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
@@ -236,7 +236,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Uploader returs correct path for file')]
     public function testGetCompleteFilePath(): void
     {
-        $fileUploaderMock = $this->createMock(FileUploader::class);
+        $fileUploaderMock = $this->createStub(FileUploader::class);
 
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelperMock->expects($this->once())

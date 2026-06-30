@@ -147,7 +147,7 @@ class ApiUserSubscriberTest extends TestCase
             ->method('getUserLoader')
             ->willReturn(null);
 
-        $accessToken      = $this->createMock(AccessToken::class);
+        $accessToken      = $this->createStub(AccessToken::class);
         $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
         $accessTokenBadge->method('getAccessToken')->willReturn($accessToken);
 
@@ -221,7 +221,7 @@ class ApiUserSubscriberTest extends TestCase
             ->method('getUserLoader')
             ->willReturn(null);
 
-        $accessToken      = $this->createMock(AccessToken::class);
+        $accessToken      = $this->createStub(AccessToken::class);
         $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
         $accessTokenBadge->method('getAccessToken')->willReturn($accessToken);
 
@@ -295,7 +295,7 @@ class ApiUserSubscriberTest extends TestCase
             ->method('getUserLoader')
             ->willReturn(null);
 
-        $accessToken      = $this->createMock(AccessToken::class);
+        $accessToken      = $this->createStub(AccessToken::class);
         $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
         $accessTokenBadge->method('getAccessToken')->willReturn($accessToken);
 
@@ -399,10 +399,10 @@ class ApiUserSubscriberTest extends TestCase
         $tokenPermissions->expects(self::never())
             ->method('setActivePermissionsOnAuthToken');
 
-        $accessTokenBadge = $this->createMock(AccessTokenBadge::class);
+        $accessTokenBadge = $this->createStub(AccessTokenBadge::class);
 
         $authenticatedToken = $this->createMock(OAuthToken::class);
-        $authenticatedToken->method('getUser')->willReturn($this->createMock(UserInterface::class));
+        $authenticatedToken->method('getUser')->willReturn($this->createStub(UserInterface::class));
         // No user was replaced.
         $authenticatedToken->expects(self::never())
             ->method('setUser');
@@ -436,7 +436,7 @@ class ApiUserSubscriberTest extends TestCase
         $tokenPermissions->expects(self::never())
             ->method('setActivePermissionsOnAuthToken');
 
-        $user = $this->createMock(UserInterface::class);
+        $user = $this->createStub(UserInterface::class);
 
         $accessToken = $this->createMock(AccessToken::class);
         $accessToken->method('getUser')->willReturn($user);

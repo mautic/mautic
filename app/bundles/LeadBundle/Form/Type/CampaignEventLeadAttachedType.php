@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class CampaignEventLeadAttachedType extends AbstractType
 {
-    public function __construct(private ListModel $listModel)
+    public function __construct(private readonly ListModel $listModel)
     {
     }
 

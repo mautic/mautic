@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class SendEmailToContactTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private SMimeHelper $sMimeHelper;
 
     protected function setUp(): void

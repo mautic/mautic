@@ -18,7 +18,7 @@ class FetcherTest extends \PHPUnit\Framework\TestCase
         $matcher   = $this->exactly(2);
 
         $repo->expects($matcher)
-            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer) {
+            ->method('getIntegrationsEntityId')->willReturnCallback(function (...$parameters) use ($matcher, $organizer): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('Salesforce', $parameters[0]);
                     $this->assertSame(Lead::OBJECT, $parameters[1]);

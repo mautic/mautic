@@ -20,8 +20,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UpdateIpDataStoreCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private AbstractLookup $ipService,
+        private readonly TranslatorInterface $translator,
+        private readonly AbstractLookup $ipService,
     ) {
         parent::__construct();
     }

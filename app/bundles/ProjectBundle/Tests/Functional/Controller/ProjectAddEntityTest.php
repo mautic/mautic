@@ -13,6 +13,7 @@ use Mautic\ProjectBundle\Model\ProjectModel;
 final class ProjectAddEntityTest extends MauticMysqlTestCase
 {
     private Project $testProject;
+
     private Email $testEmail;
 
     protected function setUp(): void

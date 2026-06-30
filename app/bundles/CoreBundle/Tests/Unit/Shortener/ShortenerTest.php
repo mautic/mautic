@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 class ShortenerTest extends TestCase
 {
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
@@ -29,7 +29,7 @@ class ShortenerTest extends TestCase
     public function testAddService(): void
     {
         /** @var ShortenerServiceInterface|MockObject $service */
-        $service = $this->createMock(ShortenerServiceInterface::class);
+        $service = $this->createStub(ShortenerServiceInterface::class);
 
         $this->shortener->addService($service);
 
@@ -39,7 +39,7 @@ class ShortenerTest extends TestCase
     public function testGetService(): void
     {
         /** @var ShortenerServiceInterface|MockObject $service */
-        $service = $this->createMock(ShortenerServiceInterface::class);
+        $service = $this->createStub(ShortenerServiceInterface::class);
 
         $this->coreParametersHelper
             ->expects($this->once())

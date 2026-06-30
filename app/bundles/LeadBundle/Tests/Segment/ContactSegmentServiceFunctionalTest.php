@@ -42,10 +42,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
      */
     private $fixtures;
 
-    /**
-     * @var ContactSegmentService
-     */
-    private $contactSegmentService;
+    private ContactSegmentService $contactSegmentService;
 
     protected function setUp(): void
     {

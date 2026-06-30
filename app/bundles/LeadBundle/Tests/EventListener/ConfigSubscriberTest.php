@@ -16,7 +16,7 @@ class ConfigSubscriberTest extends TestCase
     private ConfigSubscriber $configSubscriber;
 
     /**
-     * @var ConfigBuilderEvent&MockObject
+     * @var MockObject&ConfigBuilderEvent
      */
     private MockObject $configBuilderEvent;
 

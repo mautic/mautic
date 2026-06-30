@@ -44,7 +44,7 @@ class ReportSubscriber implements EventSubscriberInterface
     ];
 
     public function __construct(
-        private FieldsBuilder $fieldsBuilder,
+        private readonly FieldsBuilder $fieldsBuilder,
     ) {
     }
 

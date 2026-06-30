@@ -12,8 +12,8 @@ use Symfony\Component\Routing\RouterInterface;
 class BuildJsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private TrackingHelper $trackingHelper,
-        private RouterInterface $router,
+        private readonly TrackingHelper $trackingHelper,
+        private readonly RouterInterface $router,
     ) {
     }
 

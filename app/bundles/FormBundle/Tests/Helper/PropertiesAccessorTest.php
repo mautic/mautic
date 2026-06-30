@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormModel
+     * @var MockObject&FormModel
      */
     private MockObject $formModel;
 

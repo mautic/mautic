@@ -41,15 +41,15 @@ class InactiveExecutioner implements ExecutionerInterface
     protected ?\DateTime $now = null;
 
     public function __construct(
-        private InactiveContactFinder $inactiveContactFinder,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private EventScheduler $scheduler,
-        private InactiveHelper $helper,
-        private EventExecutioner $executioner,
-        private ProcessSignalService $processSignalService,
-        private EventRedirectionHelper $redirectionHelper,
-        private LeadRepository $leadRepository,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveHelper $helper,
+        private readonly EventExecutioner $executioner,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventRedirectionHelper $redirectionHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 

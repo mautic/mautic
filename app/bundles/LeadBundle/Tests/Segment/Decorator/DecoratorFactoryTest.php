@@ -103,7 +103,7 @@ final class DecoratorFactoryTest extends TestCase
 
     public function testDateDecoratorWhenNoSubscriberProvidesDecorator(): void
     {
-        $filterDecoratorInterface  = $this->createMock(FilterDecoratorInterface::class);
+        $filterDecoratorInterface  = $this->createStub(FilterDecoratorInterface::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date']);
 
         $this->dateOptionFactory->expects($this->once())
@@ -115,7 +115,7 @@ final class DecoratorFactoryTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate) {
+                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate): true {
                         $this->assertNull($event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 
@@ -133,7 +133,7 @@ final class DecoratorFactoryTest extends TestCase
 
     public function testDateDecoratorWhenSubscriberProvidesDecorator(): void
     {
-        $filterDecoratorInterface  = $this->createMock(FilterDecoratorInterface::class);
+        $filterDecoratorInterface  = $this->createStub(FilterDecoratorInterface::class);
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'date']);
 
         $this->dateOptionFactory->expects($this->never())
@@ -143,7 +143,7 @@ final class DecoratorFactoryTest extends TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface) {
+                    function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface): true {
                         $this->assertNull($event->getDecorator());
                         $this->assertSame($contactSegmentFilterCrate, $event->getCrate());
 

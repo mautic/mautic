@@ -44,13 +44,12 @@ class FileControllerTest extends MauticMysqlTestCase
         $filePath = $this->getFixurePath();
         copy($filePath.$fileName, $filePath.$tmpFile);
         $this->uploadedFilePath = $filePath.$tmpFile;
-        $image                  = new UploadedFile(
+
+        return new UploadedFile(
             $filePath.$tmpFile,
             $tmpFile,
             'image/png'
         );
-
-        return $image;
     }
 
     private function getFixurePath(): string

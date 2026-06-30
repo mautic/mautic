@@ -29,30 +29,30 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&KickoffContactFinder $kickoffContactFinder;
 
-    private MockObject&Translator $translator;
+    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
 
     private MockObject&EventExecutioner $executioner;
 
     private MockObject&EventScheduler $scheduler;
 
-    private MockObject&CoreParametersHelper $coreParametersHelper;
+    private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
 
-    private MockObject&EventRedirectionHelper $redirectionHelper;
+    private \PHPUnit\Framework\MockObject\Stub&EventRedirectionHelper $redirectionHelper;
 
-    private MockObject&EntityManagerInterface $entityManager;
+    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
 
-    private MockObject&EventDispatcherInterface $eventDispatcher;
+    private \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
         $this->kickoffContactFinder = $this->createMock(KickoffContactFinder::class);
-        $this->translator           = $this->createMock(Translator::class);
+        $this->translator           = $this->createStub(Translator::class);
         $this->executioner          = $this->createMock(EventExecutioner::class);
         $this->scheduler            = $this->createMock(EventScheduler::class);
-        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->redirectionHelper    = $this->createMock(EventRedirectionHelper::class);
-        $this->entityManager        = $this->createMock(EntityManagerInterface::class);
-        $this->eventDispatcher      = $this->createMock(EventDispatcherInterface::class);
+        $this->coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $this->redirectionHelper    = $this->createStub(EventRedirectionHelper::class);
+        $this->entityManager        = $this->createStub(EntityManagerInterface::class);
+        $this->eventDispatcher      = $this->createStub(EventDispatcherInterface::class);
     }
 
     public function testNoContactsResultInEmptyResults(): void
@@ -140,7 +140,7 @@ class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->executioner,
             $this->scheduler,
-            $this->createMock(ProcessSignalService::class),
+            $this->createStub(ProcessSignalService::class),
             $this->coreParametersHelper,
             $this->eventDispatcher,
             $this->redirectionHelper,
