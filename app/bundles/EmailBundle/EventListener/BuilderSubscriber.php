@@ -28,13 +28,13 @@ class BuilderSubscriber implements EventSubscriberInterface
     private array $convertedContent = [];
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EmailModel $emailModel,
-        private TrackableModel $pageTrackableModel,
-        private RedirectModel $pageRedirectModel,
-        private TranslatorInterface $translator,
-        private MailHashHelper $mailHash,
-        private FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EmailModel $emailModel,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly RedirectModel $pageRedirectModel,
+        private readonly TranslatorInterface $translator,
+        private readonly MailHashHelper $mailHash,
+        private readonly FromEmailHelper $fromEmailHelper,
     ) {
     }
 

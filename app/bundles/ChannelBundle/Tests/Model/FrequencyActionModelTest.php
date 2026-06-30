@@ -13,27 +13,27 @@ use PHPUnit\Framework\MockObject\MockObject;
 class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Lead
+     * @var MockObject&Lead
      */
     private MockObject $contactMock5;
 
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $contactModelMock;
 
     /**
-     * @var MockObject|FrequencyRuleRepository
+     * @var MockObject&FrequencyRuleRepository
      */
     private MockObject $frequencyRepoMock;
 
     /**
-     * @var MockObject|FrequencyRule
+     * @var MockObject&FrequencyRule
      */
     private MockObject $frequencyRuleEmailMock;
 
     /**
-     * @var MockObject|FrequencyRule
+     * @var MockObject&FrequencyRule
      */
     private MockObject $frequencyRuleSmsMock;
 

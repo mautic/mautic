@@ -24,15 +24,15 @@ class ButtonExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('buttonReset', [$this, 'reset'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonAdd', [$this, 'addButton'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetMenuLink', [$this, 'setMenuLink'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetWrappingTags', [$this, 'setWrappingTags'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonSetGroupType', [$this, 'setGroupType'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonGetCount', [$this, 'getButtonCount']),
-            new TwigFunction('buttonsRender', [$this, 'render'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonsAdd', [$this, 'addButtons'], ['is_safe' => ['all']]),
-            new TwigFunction('buttonsAddFromTemplate', [$this, 'addButtonsFromTemplate'], ['is_safe' => ['all']]),
+            new TwigFunction('buttonReset', $this->reset(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonAdd', $this->addButton(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonSetMenuLink', $this->setMenuLink(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonSetWrappingTags', $this->setWrappingTags(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonSetGroupType', $this->setGroupType(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonGetCount', $this->getButtonCount(...)),
+            new TwigFunction('buttonsRender', $this->render(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonsAdd', $this->addButtons(...), ['is_safe' => ['all']]),
+            new TwigFunction('buttonsAddFromTemplate', $this->addButtonsFromTemplate(...), ['is_safe' => ['all']]),
         ];
     }
 

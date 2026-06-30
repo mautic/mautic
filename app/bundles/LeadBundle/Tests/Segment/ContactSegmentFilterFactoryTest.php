@@ -17,7 +17,7 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testLeadFilter(): void
     {
-        $tableSchemaColumnsCache = $this->createMock(TableSchemaColumnsCache::class);
+        $tableSchemaColumnsCache = $this->createStub(TableSchemaColumnsCache::class);
         $container               = $this->createMock(Container::class);
         $decoratorFactory        = $this->createMock(DecoratorFactory::class);
 
@@ -30,13 +30,13 @@ class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryType')
             ->willReturn('MyQueryTypeId');
 
-        $filterQueryBuilder = $this->createMock(FilterQueryBuilderInterface::class);
+        $filterQueryBuilder = $this->createStub(FilterQueryBuilderInterface::class);
         $container->expects($this->exactly(6))
             ->method('get')
             ->with('MyQueryTypeId')
             ->willReturn($filterQueryBuilder);
 
-        $contactSegmentFilterFactory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createMock(EventDispatcherInterface::class));
+        $contactSegmentFilterFactory = new ContactSegmentFilterFactory($tableSchemaColumnsCache, $container, $decoratorFactory, $this->createStub(EventDispatcherInterface::class));
 
         $leadList = new LeadList();
         $leadList->setFilters([

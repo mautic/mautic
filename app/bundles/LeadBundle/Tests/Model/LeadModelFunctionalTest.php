@@ -112,9 +112,8 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
         /** @var CompanyLeadRepository $companyLeadRepo */
         $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
-        $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
 
-        return $contactCompanies;
+        return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }
 
     public function testGetCustomLeadFieldLength(): void

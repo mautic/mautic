@@ -26,9 +26,9 @@ class FieldFilterTransformer implements DataTransformerInterface
     private array $defaultStrings;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private RelativeDate $relativeDate,
-        private array $default = [],
+        private readonly TranslatorInterface $translator,
+        private readonly RelativeDate $relativeDate,
+        private readonly array $default = [],
     ) {
         $this->relativeDateStrings = LeadListRepository::getRelativeDateTranslationKeys();
         foreach ($this->relativeDateStrings as &$string) {

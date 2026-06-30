@@ -25,10 +25,10 @@ class DeleteOrphanSubmissionRecordsFromFormResultsTableCommand extends Command
     public const COMMAND_NAME = 'mautic:forms:delete-orphan-form-submission-records-from-form-results-table';
 
     public function __construct(
-        private FormRepository $formRepository,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private SubmissionRepository $submissionRepository,
+        private readonly FormRepository $formRepository,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly SubmissionRepository $submissionRepository,
     ) {
         parent::__construct();
     }

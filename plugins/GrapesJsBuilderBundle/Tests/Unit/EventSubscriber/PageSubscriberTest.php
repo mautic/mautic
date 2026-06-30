@@ -16,8 +16,10 @@ final class PageSubscriberTest extends TestCase
 {
     /** @var MockObject&Config */
     private MockObject $config;
+
     /** @var MockObject&GrapesJsBuilderModel */
     private MockObject $model;
+
     private PageSubscriber $subscriber;
 
     protected function setUp(): void

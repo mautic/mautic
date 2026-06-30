@@ -9,7 +9,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 final class UserTokenSetter implements UserTokenSetterInterface
 {
-    public function __construct(private UserModel $userModel, private TokenStorageInterface $tokenStorage)
+    public function __construct(private readonly UserModel $userModel, private readonly TokenStorageInterface $tokenStorage)
     {
     }
 

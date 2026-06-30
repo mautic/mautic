@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CategoryController extends AbstractFormController
 {
     public function __construct(
-        private FormFactoryInterface $formFactory,
+        private readonly FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

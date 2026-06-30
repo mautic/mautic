@@ -20,17 +20,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriberTest extends TestCase
 {
     /**
-     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&CompanyReportData
      */
     private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
 
     /**
-     * @var HitRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&HitRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
 
     /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
@@ -235,7 +235,7 @@ class ReportSubscriberTest extends TestCase
             ->method('trans')
             ->willReturnArgument(0);
 
-        $mockExprBuilder = $this->createMock(ExpressionBuilder::class);
+        $mockExprBuilder = $this->createStub(ExpressionBuilder::class);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

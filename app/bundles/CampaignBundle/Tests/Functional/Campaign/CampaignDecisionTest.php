@@ -18,6 +18,7 @@ class CampaignDecisionTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;
     use LeadFieldTestTrait;
+
     protected $useCleanupRollback = false;
 
     /**

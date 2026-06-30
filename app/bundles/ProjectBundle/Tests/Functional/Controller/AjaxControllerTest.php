@@ -23,7 +23,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $projectModel = self::getContainer()->get(ProjectModel::class);
 
         $projects = array_map(
-            static function (string $projectName) use ($projectModel) {
+            static function (string $projectName) use ($projectModel): Project {
                 $project = new Project();
                 $project->setName($projectName);
                 $projectModel->saveEntity($project);

@@ -32,16 +32,16 @@ class RealTimeExecutioner
     private ?Responses $responses = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private LeadModel $leadModel,
-        private EventRepository $eventRepository,
-        private EventExecutioner $executioner,
-        private Executioner $decisionExecutioner,
-        private EventCollector $collector,
-        private EventScheduler $scheduler,
-        private ContactTracker $contactTracker,
-        private DecisionHelper $decisionHelper,
-        private EventRedirectionHelper $redirectionHelper,
+        private readonly LoggerInterface $logger,
+        private readonly LeadModel $leadModel,
+        private readonly EventRepository $eventRepository,
+        private readonly EventExecutioner $executioner,
+        private readonly Executioner $decisionExecutioner,
+        private readonly EventCollector $collector,
+        private readonly EventScheduler $scheduler,
+        private readonly ContactTracker $contactTracker,
+        private readonly DecisionHelper $decisionHelper,
+        private readonly EventRedirectionHelper $redirectionHelper,
     ) {
     }
 

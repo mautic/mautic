@@ -18,8 +18,8 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
     private ?Client $client = null;
 
     public function __construct(
-        private Configuration $configuration,
-        private LoggerInterface $logger,
+        private readonly Configuration $configuration,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

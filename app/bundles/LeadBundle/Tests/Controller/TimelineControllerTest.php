@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class TimelineControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const SALES_USER = 'sales';
 
     public function testIndexActionsIsSuccessful(): void

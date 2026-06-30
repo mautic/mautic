@@ -14,10 +14,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private UserModel $userModel,
-        private RoleModel $userRoleModel,
-        private CorePermissions $security,
-        private GlobalSearch $globalSearch,
+        private readonly UserModel $userModel,
+        private readonly RoleModel $userRoleModel,
+        private readonly CorePermissions $security,
+        private readonly GlobalSearch $globalSearch,
     ) {
     }
 

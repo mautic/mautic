@@ -27,10 +27,10 @@ use Symfony\Component\HttpFoundation\Response;
 class AjaxController extends CommonAjaxController
 {
     public function __construct(
-        private ComposerHelper $composer,
-        private CacheHelper $cacheHelper,
-        private LoggerInterface $logger,
-        private Config $config,
+        private readonly ComposerHelper $composer,
+        private readonly CacheHelper $cacheHelper,
+        private readonly LoggerInterface $logger,
+        private readonly Config $config,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

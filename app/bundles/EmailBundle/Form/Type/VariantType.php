@@ -27,8 +27,8 @@ class VariantType extends AbstractType
     public const DEFAULT_WEIGHT       = 10;
 
     public function __construct(
-        private EmailModel $emailModel,
-        private TranslatorInterface $translator,
+        private readonly EmailModel $emailModel,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

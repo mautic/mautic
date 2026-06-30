@@ -51,10 +51,10 @@ final class PasswordSubscriberTest extends TestCase
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(
-                $this->createMock(AuthenticatorInterface::class),
+                $this->createStub(AuthenticatorInterface::class),
                 new Passport(
-                    $this->createMock(UserBadge::class),
-                    $this->createMock(CredentialsInterface::class),
+                    $this->createStub(UserBadge::class),
+                    $this->createStub(CredentialsInterface::class),
                     [$passwordStrengthBadge]
                 )
             )
@@ -67,10 +67,10 @@ final class PasswordSubscriberTest extends TestCase
 
         $this->passwordSubscriber->checkPassport(
             new CheckPassportEvent(
-                $this->createMock(AuthenticatorInterface::class),
+                $this->createStub(AuthenticatorInterface::class),
                 new Passport(
-                    $this->createMock(UserBadge::class),
-                    $this->createMock(CredentialsInterface::class),
+                    $this->createStub(UserBadge::class),
+                    $this->createStub(CredentialsInterface::class),
                     [$passwordStrengthBadge]
                 )
             )

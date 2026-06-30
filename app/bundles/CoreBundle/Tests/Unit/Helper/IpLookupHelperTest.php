@@ -15,10 +15,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DeviceDetector|(DeviceDetector&object&\PHPUnit\Framework\MockObject\MockObject)|(DeviceDetector&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector
      */
     private \PHPUnit\Framework\MockObject\MockObject $deviceDetector;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetectorFactoryInterface
+     */
     private \PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
 
     protected function setUp(): void
@@ -171,7 +174,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Check that requests without request context fall back to IP trackability')]
     public function testIsRequestTrackableWithoutRequest(): void
     {
-        $result = $this->getIpHelper(null)->isRequestTrackable();
+        $result = $this->getIpHelper()->isRequestTrackable();
 
         // Returns true since there's no request to check and the IP (127.0.0.1) is trackable
         $this->assertTrue($result);
@@ -206,10 +209,10 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory->expects($this->any())
             ->method('create')
             ->willReturnCallback(
-                fn () => $this->deviceDetector
+                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
             );
 
-        $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory, null);
+        $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory);
         $helper->reset();
 
         return $helper;
