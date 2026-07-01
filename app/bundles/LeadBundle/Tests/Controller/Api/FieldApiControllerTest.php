@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,7 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class FieldApiControllerTest extends TestCase
+final class FieldApiControllerTest extends TestCase
 {
     /** @var array<int, array<string, mixed>> */
     private array $defaultWhere = [

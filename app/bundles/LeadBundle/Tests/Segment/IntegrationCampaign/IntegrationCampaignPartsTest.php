@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\IntegrationCampaign;
 
 use Mautic\LeadBundle\Segment\IntegrationCampaign\IntegrationCampaignParts;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(IntegrationCampaignParts::class)]
-class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
+final class IntegrationCampaignPartsTest extends \PHPUnit\Framework\TestCase
 {
     public function testConnectwise(): void
     {

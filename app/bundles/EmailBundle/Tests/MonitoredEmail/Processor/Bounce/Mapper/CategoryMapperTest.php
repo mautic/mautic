@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce\Mapper;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\CategoryNotFound;
@@ -8,7 +10,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CategoryMapper::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(Definition::class)]
-class CategoryMapperTest extends \PHPUnit\Framework\TestCase
+final class CategoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the Category object is returned')]
     public function testCategoryIsMapped(): void

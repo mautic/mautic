@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
+final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -65,7 +67,7 @@ class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', 'api/assets/new', $payload);
         $response = $this->client->getResponse();
         $content  = $response->getContent();
-        $this->assertResponseStatusCodeSame(400, $response);
+        $this->assertResponseStatusCodeSame(400, $response->getContent());
         $this->assertStringContainsString($expectedError, $content);
     }
 

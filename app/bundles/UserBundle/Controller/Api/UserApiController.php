@@ -132,7 +132,7 @@ class UserApiController extends CommonApiController
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
-            if ('PATCH' == $method) {
+            if ('PATCH' === $method) {
                 // PATCH will accept a diff so just remove the entities
 
                 // Changing username via API is forbidden

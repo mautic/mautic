@@ -3,22 +3,15 @@
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @extends AbstractType<Page>
- */
 class PreferenceCenterListType extends AbstractType
 {
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private bool $canViewOther;
 
     public function __construct(
         private readonly PageModel $model,

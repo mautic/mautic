@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Twig\Extension;
 use Mautic\CoreBundle\Twig\Extension\PurifyExtension;
 use PHPUnit\Framework\TestCase;
 
-class PurifyExtensionTest extends TestCase
+final class PurifyExtensionTest extends TestCase
 {
     private PurifyExtension $extension;
 

@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class AbstractFormControllerTest extends MauticMysqlTestCase
+final class AbstractFormControllerTest extends MauticMysqlTestCase
 {
     public function testUnlockActionWithValidReturnUrl(): void
     {

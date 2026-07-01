@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
-class FieldBuilderTest extends TestCase
+final class FieldBuilderTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Router

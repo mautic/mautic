@@ -19,7 +19,7 @@ use Mautic\NotificationBundle\Tests\NotificationTrait;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 
-class CampaignSubscriberTest extends MauticMysqlTestCase
+final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     use NotificationTrait;
 

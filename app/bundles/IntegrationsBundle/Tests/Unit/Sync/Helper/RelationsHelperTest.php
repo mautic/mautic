@@ -17,7 +17,7 @@ use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use PHPUnit\Framework\TestCase;
 
-class RelationsHelperTest extends TestCase
+final class RelationsHelperTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper

@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Helper\Chart;
 use Mautic\CoreBundle\Helper\Chart\SeriesPieChart;
 use PHPUnit\Framework\TestCase;
 
-class SeriesPieChartTest extends TestCase
+final class SeriesPieChartTest extends TestCase
 {
     private SeriesPieChart $chart;
 

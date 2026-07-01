@@ -22,7 +22,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignMapStatsControllerTest extends MauticMysqlTestCase
+final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 {
     private CampaignMapStatsController $mapController;
 

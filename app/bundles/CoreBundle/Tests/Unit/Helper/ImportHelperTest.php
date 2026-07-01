@@ -15,7 +15,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportHelperTest extends TestCase
+final class ImportHelperTest extends TestCase
 {
     private ExportHelper $exportHelper;
 

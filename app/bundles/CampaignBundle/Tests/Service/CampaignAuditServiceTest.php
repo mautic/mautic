@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Service;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -11,7 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignAuditServiceTest extends MauticMysqlTestCase
+final class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
     private const CAMPAIGN_NAME = 'Test Campaign';
 

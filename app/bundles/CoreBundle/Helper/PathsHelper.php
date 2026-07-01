@@ -177,7 +177,7 @@ class PathsHelper
                 // these are absolute regardless as they are configurable
                 $globalPath = $this->dashboardImportDir;
 
-                if ('dashboard.global' == $name) {
+                if ('dashboard.global' === $name) {
                     return $globalPath;
                 }
 

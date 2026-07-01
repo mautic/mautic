@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class CompletedSyncIterationEventTest extends TestCase
+final class CompletedSyncIterationEventTest extends TestCase
 {
     public function testGetters(): void
     {

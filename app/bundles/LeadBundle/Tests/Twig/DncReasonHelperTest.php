@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Twig;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
+final class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<int, string>

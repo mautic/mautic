@@ -86,10 +86,8 @@ final class AssetsHelper
      *
      * @param string     $path
      * @param bool|false $absolute
-     *
-     * @return string|bool
      */
-    public function getOverridableUrl($path, $absolute = false)
+    public function getOverridableUrl($path, $absolute = false): false|string
     {
         $mediaPath  = $this->pathsHelper->getSystemPath('media', false);
         $assetsPath = $this->pathsHelper->getSystemPath('assets', false);
@@ -530,13 +528,10 @@ final class AssetsHelper
     /**
      * Turn all URLs in clickable links.
      *
-     * @param string                $text
      * @param array<string>         $protocols  http/https, ftp, mail, twitter
      * @param array<string, string> $attributes
-     *
-     * @return string|string[]|null
      */
-    public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = []): string|array|null
+    public function makeLinks(string $text, $protocols = ['http', 'mail'], array $attributes = []): ?string
     {
         // clear tags in text
         $text = InputHelper::url($text, false, $protocols);
