@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ChartQueryTest extends TestCase
+final class ChartQueryTest extends TestCase
 {
     private \DateTime $dateFrom;
 
@@ -101,7 +101,7 @@ class ChartQueryTest extends TestCase
             ->method('orderBy')
             ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '+00:00'), '%Y-%m-%d')");
 
-        $this->queryBuilder->method('getQueryPart')
+        $this->queryBuilder->expects($this->atLeast(3))->method('getQueryPart')
             ->willReturnMap(
                 [
                     ['from', [[

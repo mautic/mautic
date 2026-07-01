@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -42,7 +44,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
-class PublicControllerTest extends TestCase
+final class PublicControllerTest extends TestCase
 {
     private MockObject&Container $internalContainer;
 

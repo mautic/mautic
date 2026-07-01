@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldHelperTest extends TestCase
+final class FieldHelperTest extends TestCase
 {
     /**
      * @var MockObject&FieldModel

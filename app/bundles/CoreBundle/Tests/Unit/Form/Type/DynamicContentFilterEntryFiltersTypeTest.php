@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DynamicContentFilterEntryFiltersTypeTest extends TestCase
+final class DynamicContentFilterEntryFiltersTypeTest extends TestCase
 {
     private DynamicContentFilterEntryFiltersType $form;
 

@@ -33,7 +33,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {
@@ -62,7 +62,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $mailHashHelper = new MailHashHelper($coreParametersHelper);
 
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->atLeast(2))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],

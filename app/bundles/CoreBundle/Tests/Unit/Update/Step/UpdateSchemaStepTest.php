@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
@@ -17,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateSchemaStepTest extends AbstractStepTestCase
+final class UpdateSchemaStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
@@ -13,7 +15,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(UploadFieldValidator::class)]
-class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
+final class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('No Files given')]
     public function testNoFilesGiven(): void

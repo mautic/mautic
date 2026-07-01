@@ -579,7 +579,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $authType = $this->getAuthenticationType();
 
-        if ('oauth2' == $authType) {
+        if ('oauth2' === $authType) {
             $callback    = $this->getAuthCallbackUrl();
             $clientIdKey = $this->getClientIdKey();
             $state       = $this->getAuthLoginState();
@@ -1008,10 +1008,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param Lead|array $lead
      * @param array      $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config  = $this->mergeConfigToFeatureSettings($config);
         $zObject = 'Leads';

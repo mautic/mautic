@@ -1463,7 +1463,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setTemplate($template);
         $email->setCustomHtml($customHtml);
         $email->setVariantSettings($varientSetting);
-        if (!empty($segment)) {
+        if ($segment instanceof LeadList) {
             $email->addList($segment);
         }
         $this->em->persist($email);

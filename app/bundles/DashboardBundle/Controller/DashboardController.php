@@ -123,10 +123,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * Generate new dashboard widget and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function newAction(Request $request, FormFactoryInterface $formFactory)
+    public function newAction(Request $request, FormFactoryInterface $formFactory): JsonResponse|Response
     {
         // retrieve the entity
         $widget = new Widget();
@@ -189,10 +187,8 @@ class DashboardController extends AbstractFormController
 
     /**
      * edit widget and processes post data.
-     *
-     * @return JsonResponse|RedirectResponse|Response
      */
-    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId)
+    public function editAction(Request $request, FormFactoryInterface $formFactory, $objectId): JsonResponse|Response
     {
         $model  = $this->getModel('dashboard');
         \assert($model instanceof DashboardModel);

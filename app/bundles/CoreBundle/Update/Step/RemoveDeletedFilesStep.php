@@ -9,14 +9,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class RemoveDeletedFilesStep implements StepInterface
+final readonly class RemoveDeletedFilesStep implements StepInterface
 {
-    private readonly string $appRoot;
+    private string $appRoot;
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private TranslatorInterface $translator,
         PathsHelper $pathsHelper,
-        private readonly LoggerInterface $logger,
+        private LoggerInterface $logger,
     ) {
         $this->appRoot    = $pathsHelper->getRootPath();
     }

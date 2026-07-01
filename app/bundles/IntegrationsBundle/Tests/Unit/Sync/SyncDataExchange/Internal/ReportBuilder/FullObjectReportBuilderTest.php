@@ -27,7 +27,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FullObjectReportBuilderTest extends TestCase
+final class FullObjectReportBuilderTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 

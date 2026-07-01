@@ -12,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class TokenHelperTest extends TestCase
+final class TokenHelperTest extends TestCase
 {
     /**
      * @var MockObject&FocusModel

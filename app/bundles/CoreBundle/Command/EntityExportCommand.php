@@ -45,7 +45,7 @@ final class EntityExportCommand extends ModeratedCommand
         $entityName = $input->getOption('entity');
         $idOption   = $input->getOption('id');
 
-        $entityIds = array_filter(array_map('intval', explode(',', (string) $idOption)));
+        $entityIds = array_filter(array_map(intval(...), explode(',', (string) $idOption)));
 
         if (empty($entityName) || empty($entityIds)) {
             $output->writeln('<error>You must specify the entity and at least one valid entity ID.</error>');

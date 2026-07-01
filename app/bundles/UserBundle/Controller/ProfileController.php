@@ -48,7 +48,7 @@ class ProfileController extends FormController
 
         // make sure this user has access to edit privileged fields
         foreach ($permissions as $permName => $hasAccess) {
-            if ('apiAccess' == $permName) {
+            if ('apiAccess' === $permName) {
                 continue;
             }
 

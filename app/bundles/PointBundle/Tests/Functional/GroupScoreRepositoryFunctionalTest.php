@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -8,7 +10,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 
-class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
+final class GroupScoreRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

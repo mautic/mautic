@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
@@ -8,7 +10,7 @@ use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseIntegration::class)]
-class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
+final class ConnectwiseIntegrationTest extends AbstractIntegrationTestCase
 {
     use DataGeneratorTrait;
 
