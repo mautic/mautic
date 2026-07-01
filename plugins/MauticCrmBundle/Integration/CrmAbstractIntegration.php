@@ -469,11 +469,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
      *
      * @return array
      */
-    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, string $priorityObject = 'mautic')
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -482,11 +482,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
      *
      * @return array
      */
-    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, string $priorityObject = 'mautic')
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),
@@ -495,11 +495,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
      *
      * @return array
      */
-    protected function getFieldsByPriority(array $config, $priorityObject, $direction)
+    protected function getFieldsByPriority(array $config, string $priorityObject, $direction)
     {
         return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }

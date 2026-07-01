@@ -1891,11 +1891,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, string $priorityObject = 'mautic')
     {
         $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
 
@@ -1903,11 +1903,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param string $priorityObject
+     * @param mixed[] $config
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForIntegration(array $config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $object = null, string $priorityObject = 'mautic')
     {
         $fields = parent::getPriorityFieldsForIntegration($config, $object, $priorityObject);
         unset($fields['Contact']['Id'], $fields['Lead']['Id']);
