@@ -6,13 +6,13 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FormatterHelper
+final readonly class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 
     public function __construct(
-        private readonly DateHelper $dateHelper,
-        private readonly TranslatorInterface $translator,
+        private DateHelper $dateHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 

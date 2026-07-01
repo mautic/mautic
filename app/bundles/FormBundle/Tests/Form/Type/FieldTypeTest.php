@@ -20,13 +20,8 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldTypeTest extends TypeTestCase
+final class FieldTypeTest extends TypeTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&TranslatorInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $translator;
-
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ObjectCollectorInterface
      */
@@ -37,17 +32,10 @@ class FieldTypeTest extends TypeTestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldCollector;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&AlreadyMappedFieldCollectorInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $mappedFieldCollector;
-
     protected function setUp(): void
     {
-        $this->translator           = $this->createStub(TranslatorInterface::class);
         $this->objectCollector      = $this->createMock(ObjectCollectorInterface::class);
         $this->fieldCollector       = $this->createMock(FieldCollectorInterface::class);
-        $this->mappedFieldCollector = $this->createStub(AlreadyMappedFieldCollectorInterface::class);
 
         // Set up expected behavior for objectCollector
         $objectCollection = new ObjectCollection();
@@ -72,12 +60,12 @@ class FieldTypeTest extends TypeTestCase
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension([
                 FieldType::class => new FieldType(
-                    $this->translator,
+                    $this->createStub(TranslatorInterface::class),
                     $this->objectCollector,
                     $this->fieldCollector,
-                    $this->mappedFieldCollector
+                    $this->createStub(AlreadyMappedFieldCollectorInterface::class)
                 ),
-                FormFieldRatingType::class => new FormFieldRatingType($this->translator),
+                FormFieldRatingType::class => new FormFieldRatingType($this->createStub(TranslatorInterface::class)),
             ], []),
         ];
     }

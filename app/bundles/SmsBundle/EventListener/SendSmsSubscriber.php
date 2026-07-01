@@ -14,9 +14,9 @@ use Mautic\SmsBundle\Event\QueueEvent;
 use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class SendSmsSubscriber implements EventSubscriberInterface
+final readonly class SendSmsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly DoNotContactRepository $dncRepo, private readonly MessageQueueModel $messageQueueModel)
+    public function __construct(private DoNotContactRepository $dncRepo, private MessageQueueModel $messageQueueModel)
     {
     }
 

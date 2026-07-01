@@ -212,7 +212,7 @@ class UpdateHelper
             $instanceId = hash('sha1', $key.$installSource.$dbDriver);
 
             $data = array_map(
-                'trim',
+                trim(...),
                 [
                     'application'   => 'Mautic',
                     'version'       => $this->mauticVersion,

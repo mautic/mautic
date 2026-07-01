@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;
 
-class LeadDetailFunctionalTest extends MauticMysqlTestCase
+final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testCustomFieldOrderIsRespected(): void
     {

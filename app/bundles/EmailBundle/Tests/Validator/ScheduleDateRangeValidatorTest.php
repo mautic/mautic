@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class ScheduleDateRangeValidatorTest extends TestCase
+final class ScheduleDateRangeValidatorTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface

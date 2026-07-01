@@ -389,7 +389,7 @@ class QueryBuilder extends BaseQueryBuilder
         $glue = strtolower($glue);
 
         //  Different handling
-        if ('or' == $glue) {
+        if ('or' === $glue) {
             //  Is this the first condition in query builder?
             if (!is_null($this->getQueryPart('where'))) {
                 // Are the any queued conditions?

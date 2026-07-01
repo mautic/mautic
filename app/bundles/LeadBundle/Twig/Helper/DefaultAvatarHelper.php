@@ -4,10 +4,10 @@ namespace Mautic\LeadBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 
-final class DefaultAvatarHelper
+final readonly class DefaultAvatarHelper
 {
     public function __construct(
-        private readonly AssetsHelper $assetsHelper,
+        private AssetsHelper $assetsHelper,
     ) {
     }
 

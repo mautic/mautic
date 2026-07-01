@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use PHPUnit\Framework\TestCase;
 
-class InputOptionsDAOTest extends TestCase
+final class InputOptionsDAOTest extends TestCase
 {
     public function testWorkflowFromCliWithAllValuesSet(): void
     {

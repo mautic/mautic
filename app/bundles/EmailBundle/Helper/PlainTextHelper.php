@@ -437,7 +437,7 @@ class PlainTextHelper
                         unset($body);
                     }
                 } else {
-                    if (0 == $level) {
+                    if (0 === $level) {
                         $start  = $m[1];
                         $taglen = strlen($m[0]);
                     }

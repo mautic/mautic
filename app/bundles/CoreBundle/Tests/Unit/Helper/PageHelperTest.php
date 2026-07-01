@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-class PageHelperTest extends \PHPUnit\Framework\TestCase
+final class PageHelperTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&SessionInterface $session;
 

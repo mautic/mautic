@@ -1477,7 +1477,7 @@ class EmailController extends FormController
         $form     = $this->formFactory->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $request->request->get('complete', false);
 
-        if ('POST' == $request->getMethod() && ($complete || $this->isFormValid($form))) {
+        if ('POST' === $request->getMethod() && ($complete || $this->isFormValid($form))) {
             if (!$complete) {
                 $progress = [0, (int) $pending];
                 $session->set('mautic.email.send.progress', $progress);
@@ -1774,7 +1774,7 @@ class EmailController extends FormController
                     }
                 }
 
-                if (0 != count($errors)) {
+                if (0 !== count($errors)) {
                     $this->addFlashMessage(implode('; ', $errors));
                 } else {
                     $this->addFlashMessage('mautic.email.notice.test_sent_multiple.success');

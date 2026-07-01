@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormatterHelperTest extends \PHPUnit\Framework\TestCase
+final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
@@ -92,12 +92,8 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('string', gettype($result));
     }
 
-    /**
-     * @param mixed $input
-     * @param mixed $expected
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('stringProvider')]
-    public function testNormalizeStringValue($input, $expected): void
+    public function testNormalizeStringValue(string|int|bool|\DateTime $input, string|int|bool|\DateTime $expected): void
     {
         date_default_timezone_set('Europe/Paris');
         $this->assertEquals($this->formatterHelper->normalizeStringValue($input), $expected);

@@ -28,7 +28,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PartialObjectReportBuilderTest extends TestCase
+final class PartialObjectReportBuilderTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 

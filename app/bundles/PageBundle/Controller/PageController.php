@@ -390,7 +390,7 @@ class PageController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -540,7 +540,7 @@ class PageController extends FormController
         $existingPage = clone $entity;
         $this->restoreNullifiedFieldsDuringClone($existingPage, $entity);
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = ($this->isFormValid($form) && $this->checkOptimisticLockVersion($entity, $form, false))) {
@@ -790,7 +790,7 @@ class PageController extends FormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var PageModel $model */
             $model     = $this->getModel('page');
             $ids       = json_decode($request->query->get('ids', '{}'));
@@ -1031,7 +1031,7 @@ class PageController extends FormController
             $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $this->setListFilters($request->query->get('name'));
         }
 
@@ -1130,11 +1130,9 @@ class PageController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv')
+    public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv'): Response
     {
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();

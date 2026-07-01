@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\LeadBundle\Entity\UtmTag;
 use PHPUnit\Framework\Assert;
 
-class UtmTagTest extends \PHPUnit\Framework\TestCase
+final class UtmTagTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('setUtmTag')]
     public function testSetUtmContent(string $utmContent, int $expected): void

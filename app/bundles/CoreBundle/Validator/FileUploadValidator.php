@@ -54,7 +54,7 @@ class FileUploadValidator
     public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg = 'mautic.asset.asset.error.file.extension'): void
     {
         $extension         = strtolower($extension);
-        $allowedExtensions = array_map('strtolower', $allowedExtensions);
+        $allowedExtensions = array_map(strtolower(...), $allowedExtensions);
 
         if (!in_array($extension, $allowedExtensions, true)) {
             $this->throwException($extensionErrorMsg, [
@@ -94,7 +94,7 @@ class FileUploadValidator
      */
     public function checkMimeType(string $mimeType, array $allowedExtensions, string $messageId = 'mautic.asset.asset.error.invalid.mimetype'): void
     {
-        $allowedExtensions = array_map('strtolower', $allowedExtensions);
+        $allowedExtensions = array_map(strtolower(...), $allowedExtensions);
         $extensions        = $this->getExtensionsByMimeType($mimeType);
 
         foreach ($extensions as $extension) {

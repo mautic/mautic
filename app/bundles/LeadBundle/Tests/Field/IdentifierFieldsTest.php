@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Field\IdentifierFields;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class IdentifierFieldsTest extends TestCase
+final class IdentifierFieldsTest extends TestCase
 {
     /**
      * @var MockObject&FieldsWithUniqueIdentifier

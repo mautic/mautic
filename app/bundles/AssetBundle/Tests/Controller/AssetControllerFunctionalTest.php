@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AssetControllerFunctionalTest extends AbstractAssetTestCase
+final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
 

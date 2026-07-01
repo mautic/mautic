@@ -149,7 +149,7 @@ class ClientController extends AbstractStandardFormController
         $success = 0;
         $flashes = [];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $client = $this->clientModel->getEntity($clientId);
 
             if (null === $client) {
@@ -219,7 +219,7 @@ class ClientController extends AbstractStandardFormController
         $form->remove('consumerSecret');
 
         // /Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -336,7 +336,7 @@ class ClientController extends AbstractStandardFormController
         $form->remove('api_mode');
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
