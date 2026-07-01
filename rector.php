@@ -43,10 +43,19 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(36)
+    ->withTypeCoverageLevel(40)
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(27)
     ->withSkip([
+        UnserializeToSerializerDecodeRector::class => [
+            // tests
+            __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+
+        Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
+            __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
+        ],
+
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
