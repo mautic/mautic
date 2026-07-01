@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Helper;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Model\PluginModel;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Twig\Environment;
 
 final class IntegrationHelperTest extends TestCase
 {
@@ -13,7 +20,15 @@ final class IntegrationHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->integrationHelper = (new \ReflectionClass(IntegrationHelper::class))->newInstanceWithoutConstructor();
+        $this->integrationHelper = new IntegrationHelper(
+            $this->createStub(ContainerInterface::class),
+            $this->createStub(EntityManager::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(BundleHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(Environment::class),
+            $this->createStub(PluginModel::class),
+        );
     }
 
     public function testCurrentSocialProfileUrlsAreAvailable(): void
