@@ -530,7 +530,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param object $entity
+     * @param Lead $entity
      */
     public function deleteEntity($entity): void
     {
