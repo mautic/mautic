@@ -68,6 +68,13 @@ if (!isset($args['repackage'])) {
         exit;
     }
 
+    // Compile the GrapesJs builder assets. They are generated (not tracked in git), so
+    // they are absent from the git archive and must be built here into the packaging space.
+    system('cd '.__DIR__.'/packaging/plugins/GrapesJsBuilderBundle && npm ci && npm run build', $result);
+    if (0 !== $result) {
+        exit;
+    }
+
     // Common steps
     include_once __DIR__.'/processfiles.php';
 
@@ -95,6 +102,15 @@ if (!isset($args['repackage'])) {
         }
         $files = array_diff(scandir($path), ['..', '.']);
         array_walk($files, function (&$item) use ($dir) { $item = 'media/'.$dir.'/'.$item; });
+        $releaseFiles = array_merge($releaseFiles, $files);
+    }
+
+    // The GrapesJs builder assets are generated during packaging (see build step above) and are
+    // not tracked in git, so add them to the release files explicitly like the media files above.
+    $grapesJsDistDir = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    if (is_dir(__DIR__.'/packaging/'.$grapesJsDistDir)) {
+        $files = array_diff(scandir(__DIR__.'/packaging/'.$grapesJsDistDir), ['..', '.']);
+        array_walk($files, function (&$item) use ($grapesJsDistDir) { $item = $grapesJsDistDir.'/'.$item; });
         $releaseFiles = array_merge($releaseFiles, $files);
     }
 
