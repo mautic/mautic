@@ -787,7 +787,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return mixed
      */
-    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
     {
         if ('company' == $object) {
             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
@@ -885,7 +885,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId): void
+    public function saveCampaignMembers($allCampaignMembers, IntegrationObject $campaignMemberObject, $campaignId): void
     {
         if (empty($allCampaignMembers)) {
             return;

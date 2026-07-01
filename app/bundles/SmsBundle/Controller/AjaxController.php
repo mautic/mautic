@@ -86,7 +86,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return array<string, string>
      */
-    protected function getBuilderTokens($query): array
+    protected function getBuilderTokens(string $query): array
     {
         /** @var EmailModel $model */
         $model        = $this->getModel('email');

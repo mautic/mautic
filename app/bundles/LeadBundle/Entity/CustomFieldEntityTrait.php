@@ -69,7 +69,7 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
-    public function setFields($fields): void
+    public function setFields(array $fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
     }
