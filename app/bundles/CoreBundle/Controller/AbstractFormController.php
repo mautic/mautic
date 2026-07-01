@@ -13,9 +13,10 @@ abstract class AbstractFormController extends CommonController
     protected ?string $permissionBase = null;
 
     /**
+     * @param string $objectModel
      * @return mixed
      */
-    public function unlockAction(Request $request, $objectId, string $objectModel)
+    public function unlockAction(Request $request, $objectId, $objectModel)
     {
         $model                = $this->getModel($objectModel);
         $entity               = $model->getEntity($objectId);
