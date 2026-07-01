@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class CampaignModelTest extends CampaignTestAbstract
+final class CampaignModelTest extends CampaignTestAbstract
 {
     public function testGetSourceListsWithNull(): void
     {

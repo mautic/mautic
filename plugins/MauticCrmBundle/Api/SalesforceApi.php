@@ -365,7 +365,7 @@ class SalesforceApi extends CrmApi
         }
         $fields = array_unique($fields);
 
-        $ignoreConvertedLeads = ('Lead' == $object) ? ' and ConvertedContactId = NULL' : '';
+        $ignoreConvertedLeads = ('Lead' === $object) ? ' and ConvertedContactId = NULL' : '';
         if (!$this->isOptOutFieldAccessible()) { // If not opt-out is supported; unset it
             unset($fields[array_search('HasOptedOutOfEmail', $fields)]);
         }

@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Release;
 use Mautic\CoreBundle\Release\ThisRelease;
 use PHPUnit\Framework\TestCase;
 
-class ThisReleaseTest extends TestCase
+final class ThisReleaseTest extends TestCase
 {
     public function testMetadataParsed(): void
     {

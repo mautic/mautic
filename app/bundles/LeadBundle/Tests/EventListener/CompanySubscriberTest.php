@@ -13,7 +13,7 @@ use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
@@ -103,10 +103,8 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test create or update company logging.
-     *
-     * @param bool $isNew
      */
-    private function onCompanyPostSaveMethodCall($isNew): void
+    private function onCompanyPostSaveMethodCall(bool $isNew): void
     {
         $companyId = 1;
         $changes   = ['changes'];

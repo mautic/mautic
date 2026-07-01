@@ -8,7 +8,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldsWithUniqueIdentifierTest extends TestCase
+final class FieldsWithUniqueIdentifierTest extends TestCase
 {
     /**
      * @var MockObject&FieldList

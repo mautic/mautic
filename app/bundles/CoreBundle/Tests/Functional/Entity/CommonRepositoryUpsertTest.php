@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CommonRepositoryUpsertTest extends MauticMysqlTestCase
+final class CommonRepositoryUpsertTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {

@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends TestCase
+final class IpAddressModelTest extends TestCase
 {
     /**
      * @var MockObject&EntityManager

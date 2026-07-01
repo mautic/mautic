@@ -317,7 +317,7 @@ class ListController extends FormController
         $form = $segmentModel->createForm($segment, $this->formFactory, $action);
 
         // Check for a submitted form and process it
-        if (!$ignorePost && Request::METHOD_POST == $request->getMethod()) {
+        if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {

@@ -47,7 +47,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class SubmissionModelTest extends \PHPUnit\Framework\TestCase
+final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&IpLookupHelper

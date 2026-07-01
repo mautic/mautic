@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailGraphStatsControllerFunctionalTest extends MauticMysqlTestCase
+final class EmailGraphStatsControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

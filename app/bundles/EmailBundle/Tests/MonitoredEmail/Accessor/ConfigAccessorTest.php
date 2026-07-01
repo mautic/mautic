@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Accessor;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 
-class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
+final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, string> */
     protected array $config = [

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactScheduledExportCommandTest extends TestCase
+final class ContactScheduledExportCommandTest extends TestCase
 {
     public function testForSignalCaughtException(): void
     {

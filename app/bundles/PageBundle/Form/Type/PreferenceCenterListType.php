@@ -15,10 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PreferenceCenterListType extends AbstractType
 {
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private bool $canViewOther;
 
     public function __construct(
         private readonly PageModel $model,

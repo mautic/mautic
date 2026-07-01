@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class ConfigControllerFunctionalTest extends MauticMysqlTestCase
+final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testValuesAreEscapedProperly(): void
     {

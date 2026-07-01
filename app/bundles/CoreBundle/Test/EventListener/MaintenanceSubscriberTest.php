@@ -11,7 +11,7 @@ use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
+final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MaintenanceSubscriber $subscriber;
 

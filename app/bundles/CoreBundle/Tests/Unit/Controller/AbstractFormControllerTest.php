@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 {
     private AbstractFormController $classFromAbstractFormController;
 

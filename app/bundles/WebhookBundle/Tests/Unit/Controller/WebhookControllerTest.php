@@ -46,7 +46,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class WebhookControllerTest extends TestCase
+final class WebhookControllerTest extends TestCase
 {
     #[DataProvider('provideNewOrUpdate')]
     public function testPayloadsAreSame(bool $isNew): void
@@ -207,7 +207,7 @@ class WebhookControllerTest extends TestCase
             ->method('getSuccessVsErrorStatusCodeRatio');
 
         $em = $this->createMock(EntityManager::class);
-        $em->method('getRepository')
+        $em->expects($this->atLeast(3))->method('getRepository')
             ->willReturnMap([
                 [Event::class, $webhookEventRepository],
                 [WebhookQueue::class, $webhookQueueRepository],
@@ -235,7 +235,7 @@ class WebhookControllerTest extends TestCase
             ->willReturn(false);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->exactly(10))->method('get')
             ->willReturnMap([
                 ['webhook_limit', 10, 5],
                 ['webhook_time_limit', 600, 500],

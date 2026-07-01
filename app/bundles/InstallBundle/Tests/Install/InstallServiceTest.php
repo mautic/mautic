@@ -21,7 +21,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InstallServiceTest extends \PHPUnit\Framework\TestCase
+final class InstallServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Configurator

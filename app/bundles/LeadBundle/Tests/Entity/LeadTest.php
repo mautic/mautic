@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LeadTest extends TestCase
+final class LeadTest extends TestCase
 {
     use RequestTrait;
 

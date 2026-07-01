@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Update\StepProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class StepProviderTest extends TestCase
+final class StepProviderTest extends TestCase
 {
     private StepProvider $provider;
 

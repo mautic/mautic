@@ -9,7 +9,7 @@ use Mautic\UserBundle\Security\SAML\Store\IdStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class IdStoreTest extends TestCase
+final class IdStoreTest extends TestCase
 {
     /**
      * @var MockObject&ObjectManager

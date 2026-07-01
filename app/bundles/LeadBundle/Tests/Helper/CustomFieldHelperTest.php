@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use PHPUnit\Framework\TestCase;
 
-class CustomFieldHelperTest extends TestCase
+final class CustomFieldHelperTest extends TestCase
 {
     protected function setUp(): void
     {

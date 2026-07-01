@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 
-class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
+final class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Tests that getters returns same values as the contstruct')]
     public function testGetterReturnConstruct(): void

@@ -12,7 +12,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReplyHelperTest extends \PHPUnit\Framework\TestCase
+final class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface

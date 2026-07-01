@@ -181,7 +181,7 @@ final class ButtonHelper
                 $content .= $this->buildButton($button, $buttonCount);
 
                 $nextButton = $buttonCount + 1;
-                if (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
+                if (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
                     $content .= $dropdownHtml;
                     $dropdownHtmlAppended = true;
                 }
@@ -249,7 +249,7 @@ final class ButtonHelper
         $buttons = '';
 
         // Wrap links in a <li> tag for dropdowns
-        if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
+        if (self::TYPE_DROPDOWN === $this->groupType || (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
@@ -259,7 +259,7 @@ final class ButtonHelper
         }
 
         // Add or remove button classes based on group type
-        if (self::TYPE_GROUP == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount < $this->listMarker)) {
+        if (self::TYPE_GROUP === $this->groupType || (self::TYPE_BUTTON_DROPDOWN === $this->groupType && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
@@ -342,7 +342,7 @@ final class ButtonHelper
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : 0);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
-                if ($ap == $bp) {
+                if ($ap === $bp) {
                     $aText = $bText = '';
 
                     // Sort alphabetically
@@ -365,7 +365,7 @@ final class ButtonHelper
             }
         );
 
-        if (self::TYPE_BUTTON_DROPDOWN == $this->groupType) {
+        if (self::TYPE_BUTTON_DROPDOWN === $this->groupType) {
             // Find the start of the non-primary buttons
             $counter = 0;
             foreach ($this->buttons as $button) {

@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Routing\Router;
 
-class SAMLSubscriberTest extends TestCase
+final class SAMLSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&RequestEvent

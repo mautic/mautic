@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&SendEmailToUser

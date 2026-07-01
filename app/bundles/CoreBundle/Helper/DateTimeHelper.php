@@ -46,7 +46,7 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', ?string $fromFormat = self::FORMAT_DB, string $timezone = 'local'): void
     {
-        if ('local' == $timezone) {
+        if ('local' === $timezone) {
             $timezone = self::$defaultLocalTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';

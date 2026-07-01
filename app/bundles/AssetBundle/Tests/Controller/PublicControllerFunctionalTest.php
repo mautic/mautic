@@ -6,7 +6,7 @@ use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerFunctionalTest extends AbstractAssetTestCase
+final class PublicControllerFunctionalTest extends AbstractAssetTestCase
 {
     /**
      * Download action should return the file content.

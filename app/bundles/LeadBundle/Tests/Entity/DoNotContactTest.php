@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-class DoNotContactTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactTest extends \PHPUnit\Framework\TestCase
 {
     public function testDoNotContactComments(): void
     {

@@ -12,7 +12,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class OrderResultsDAOTest extends TestCase
+final class OrderResultsDAOTest extends TestCase
 {
     public function testObjectsOrganizedByObjectName(): void
     {

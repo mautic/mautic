@@ -46,7 +46,7 @@ class AjaxController extends CommonAjaxController
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
         $session     = $request->getSession();
-        $orderName   = ('fields' == $name) ? 'mauticform' : 'mauticform_action';
+        $orderName   = ('fields' === $name) ? 'mauticform' : 'mauticform_action';
         $order       = InputHelper::clean($request->request->all()[$orderName]);
         $components  = $session->get($sessionName);
 

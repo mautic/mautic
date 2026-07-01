@@ -30,7 +30,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-class PluginAuthenticatorTest extends TestCase
+final class PluginAuthenticatorTest extends TestCase
 {
     public function testAuthenticateByPreAuthenticationReplacesToken(): void
     {

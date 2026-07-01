@@ -6,7 +6,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Api\DynamicsApi;
 use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 
-class DynamicsApiTest extends AbstractIntegrationTestCase
+final class DynamicsApiTest extends AbstractIntegrationTestCase
 {
     private DynamicsIntegration $integration;
 

@@ -12,7 +12,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use PHPUnit\Framework\TestCase;
 
-class PointSubscriberTest extends TestCase
+final class PointSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {

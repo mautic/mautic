@@ -33,7 +33,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeadControllerTest extends MauticMysqlTestCase
+final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -464,7 +464,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $this->assertResponseIsSuccessful();
         $content = $this->client->getInternalResponse()->getContent();
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
         $this->assertTrue(strlen($content) > 10000, $content);
     }
 
@@ -1220,7 +1220,7 @@ EMAIL;
         $content = $this->client->getInternalResponse()->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
         $this->assertTrue(strlen($content) > 10000, $content);
 
         /** @var AuditLog $auditLog */

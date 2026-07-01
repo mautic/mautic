@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&EventDispatcherInterface $eventDispatcher;
 

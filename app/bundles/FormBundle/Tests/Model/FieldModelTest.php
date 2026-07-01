@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends TestCase
+final class FieldModelTest extends TestCase
 {
     public function testGenerateAlias(): void
     {

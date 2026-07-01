@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignAuditServiceTest extends MauticMysqlTestCase
+final class CampaignAuditServiceTest extends MauticMysqlTestCase
 {
     private const CAMPAIGN_NAME = 'Test Campaign';
 

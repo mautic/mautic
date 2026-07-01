@@ -6,7 +6,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\EntityMetadata;
 use PHPUnit\Framework\TestCase;
 
-class EntityMetadataTest extends TestCase
+final class EntityMetadataTest extends TestCase
 {
     private BundleMetadata $metadata;
 

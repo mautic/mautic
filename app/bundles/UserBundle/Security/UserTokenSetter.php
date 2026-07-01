@@ -7,9 +7,9 @@ namespace Mautic\UserBundle\Security;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-final class UserTokenSetter implements UserTokenSetterInterface
+final readonly class UserTokenSetter implements UserTokenSetterInterface
 {
-    public function __construct(private readonly UserModel $userModel, private readonly TokenStorageInterface $tokenStorage)
+    public function __construct(private UserModel $userModel, private TokenStorageInterface $tokenStorage)
     {
     }
 

@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class AdderTest extends \PHPUnit\Framework\TestCase
+final class AdderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository

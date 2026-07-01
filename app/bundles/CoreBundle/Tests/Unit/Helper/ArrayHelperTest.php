@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use PHPUnit\Framework\Assert;
 
-class ArrayHelperTest extends \PHPUnit\Framework\TestCase
+final class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetValue(): void
     {

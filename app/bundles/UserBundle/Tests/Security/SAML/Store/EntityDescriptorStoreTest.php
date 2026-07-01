@@ -7,7 +7,7 @@ use Mautic\UserBundle\Security\SAML\Store\EntityDescriptorStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EntityDescriptorStoreTest extends TestCase
+final class EntityDescriptorStoreTest extends TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper

@@ -12,11 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-final class MauticDenyAccessListener
+final readonly class MauticDenyAccessListener
 {
     public function __construct(
-        private readonly CorePermissions $security,
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
+        private CorePermissions $security,
+        private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
     {
     }
 

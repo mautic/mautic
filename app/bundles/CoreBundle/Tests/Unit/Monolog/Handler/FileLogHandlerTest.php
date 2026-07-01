@@ -9,22 +9,16 @@ use Monolog\Level;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FileLogHandlerTest extends TestCase
+final class FileLogHandlerTest extends TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
-    /**
-     * @var FormatterInterface|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $formatter;
-
     protected function setUp(): void
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->formatter            = $this->createStub(FormatterInterface::class);
     }
 
     public function testPropertiesAreSetFromCoreParametersHelperWhenDebugModeEnabled(): void
@@ -45,9 +39,11 @@ class FileLogHandlerTest extends TestCase
                 }
             );
 
-        $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
+        $formatterStub = $this->createStub(FormatterInterface::class);
+
+        $handler = new FileLogHandler($this->coreParametersHelper, $formatterStub);
         $this->assertSame(Level::Debug, $handler->getLevel());
-        $this->assertSame(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
+        $this->assertSame(spl_object_id($formatterStub), spl_object_id($handler->getFormatter()));
 
         $filename = $this->getProperty($handler, 'filename');
         $this->assertEquals('/var/logs/mautic_test.php', $filename);
@@ -73,9 +69,11 @@ class FileLogHandlerTest extends TestCase
                 }
             );
 
-        $handler = new FileLogHandler($this->coreParametersHelper, $this->formatter);
+        $formatterStub = $this->createStub(FormatterInterface::class);
+
+        $handler = new FileLogHandler($this->coreParametersHelper, $formatterStub);
         $this->assertSame(Level::Notice, $handler->getLevel());
-        $this->assertNotSame(spl_object_id($this->formatter), spl_object_id($handler->getFormatter()));
+        $this->assertNotSame(spl_object_id($formatterStub), spl_object_id($handler->getFormatter()));
 
         $filename = $this->getProperty($handler, 'filename');
         $this->assertEquals('/var/logs/mautic_test.php', $filename);

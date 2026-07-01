@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\TelizeLookup;
 
-class TelizeLookupTest extends \PHPUnit\Framework\TestCase
+final class TelizeLookupTest extends \PHPUnit\Framework\TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 

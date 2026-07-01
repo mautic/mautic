@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
+final class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<int, string>

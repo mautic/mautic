@@ -13,7 +13,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
+final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

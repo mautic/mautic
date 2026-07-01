@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckPhpVersion;
 use Mautic\CoreBundle\Release\Metadata;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CheckPhpVersionTest extends MauticMysqlTestCase
+final class CheckPhpVersionTest extends MauticMysqlTestCase
 {
     public function testPhpVersionOk(): void
     {

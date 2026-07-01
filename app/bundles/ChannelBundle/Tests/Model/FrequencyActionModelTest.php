@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
+final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Lead

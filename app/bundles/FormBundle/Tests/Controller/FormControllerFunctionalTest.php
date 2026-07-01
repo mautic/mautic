@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormControllerFunctionalTest extends MauticMysqlTestCase
+final class FormControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -406,7 +406,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form = $this->createForm('test', 'test');
 
         // Persist entities if provided
-        if (!empty($inputValues['entities'])) {
+        if (isset($inputValues['entities'])) {
             foreach ($inputValues['entities'] as $entity) {
                 $this->em->persist($entity);
             }

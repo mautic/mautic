@@ -9,7 +9,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use PHPUnit\Framework\TestCase;
 
-class StatsDAOTest extends TestCase
+final class StatsDAOTest extends TestCase
 {
     public function testGetYearsReturnsYears(): void
     {

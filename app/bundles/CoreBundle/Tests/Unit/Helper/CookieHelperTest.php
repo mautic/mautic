@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CookieHelper::class)]
-class CookieHelperTest extends TestCase
+final class CookieHelperTest extends TestCase
 {
     /**
      * @var MockObject&RequestStack

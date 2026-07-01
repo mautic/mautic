@@ -8,7 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class ModelFactoryTest extends TestCase
+final class ModelFactoryTest extends TestCase
 {
     /**
      * @var MockObject&ContainerInterface

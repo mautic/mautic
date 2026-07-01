@@ -8,7 +8,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetada
 use Mautic\CoreBundle\Security\Permissions\SystemPermissions;
 use PHPUnit\Framework\TestCase;
 
-class PermissionClassMetadataTest extends TestCase
+final class PermissionClassMetadataTest extends TestCase
 {
     public function testPermissionsFound(): void
     {

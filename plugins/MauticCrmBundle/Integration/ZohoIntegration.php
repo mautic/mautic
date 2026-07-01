@@ -579,7 +579,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $authType = $this->getAuthenticationType();
 
-        if ('oauth2' == $authType) {
+        if ('oauth2' === $authType) {
             $callback    = $this->getAuthCallbackUrl();
             $clientIdKey = $this->getClientIdKey();
             $state       = $this->getAuthLoginState();

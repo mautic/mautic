@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Loader\EnvVars\ConfigEnvVars;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ConfigEnvVarsTest extends TestCase
+final class ConfigEnvVarsTest extends TestCase
 {
     /**
      * @var ParameterBag

@@ -161,7 +161,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     /**
      * @throws \Exception
      */
-    private function applySqlFromFile($file): void
+    private function applySqlFromFile(string $file): void
     {
         $connectionParams = $this->connection->getParams();
         $password         = $connectionParams['password'] ? '-p'.escapeshellarg($connectionParams['password']) : '';

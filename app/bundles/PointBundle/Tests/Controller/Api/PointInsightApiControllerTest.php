@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\PointInsight;
 use Symfony\Component\HttpFoundation\Response;
 
-class PointInsightApiControllerTest extends MauticMysqlTestCase
+final class PointInsightApiControllerTest extends MauticMysqlTestCase
 {
     private const UPDATED_NAME = 'Updated Point Insight';
 

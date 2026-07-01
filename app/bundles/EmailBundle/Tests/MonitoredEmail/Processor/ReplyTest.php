@@ -24,7 +24,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReplyTest extends \PHPUnit\Framework\TestCase
+final class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&StatRepository

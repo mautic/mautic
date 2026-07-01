@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CustomMappedDecorator::class)]
-class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
+final class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetField(): void
     {

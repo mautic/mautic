@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(IpLookupHelper::class)]
-class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
+final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector

@@ -6,7 +6,7 @@ use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class TagManagerIntegrationTest extends TestCase
+final class TagManagerIntegrationTest extends TestCase
 {
     private TagManagerIntegration $tagManagerIntegration;
 

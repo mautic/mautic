@@ -13,7 +13,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CsvExporterTest extends \PHPUnit\Framework\TestCase
+final class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public const DATEONLYFORMAT = 'F j, Y';
 

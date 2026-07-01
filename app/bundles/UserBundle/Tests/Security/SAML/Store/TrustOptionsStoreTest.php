@@ -7,7 +7,7 @@ use Mautic\UserBundle\Security\SAML\Store\TrustOptionsStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TrustOptionsStoreTest extends TestCase
+final class TrustOptionsStoreTest extends TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper

@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Lock\LockInterface;
 
-class ModeratedCommandTest extends TestCase
+final class ModeratedCommandTest extends TestCase
 {
     private string $lockFilePath;
 

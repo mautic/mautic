@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use PHPUnit\Framework\TestCase;
 
-class CalculatorTest extends TestCase
+final class CalculatorTest extends TestCase
 {
     public function testSumByYearReturnsExpectedCount(): void
     {

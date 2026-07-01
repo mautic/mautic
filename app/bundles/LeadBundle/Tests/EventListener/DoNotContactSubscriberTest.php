@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\EventListener\DoNotContactSubscriber;
 use Mautic\LeadBundle\Model\DoNotContact;
 
-class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private DoNotContactSubscriber $doNotContactSubscriber;
 

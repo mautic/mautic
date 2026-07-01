@@ -6,7 +6,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 
-class DisplayManagerTest extends \PHPUnit\Framework\TestCase
+final class DisplayManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShowForField(): void
     {

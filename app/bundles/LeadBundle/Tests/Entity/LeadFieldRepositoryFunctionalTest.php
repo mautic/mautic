@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback     = false;
 

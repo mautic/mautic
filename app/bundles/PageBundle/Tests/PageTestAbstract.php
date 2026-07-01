@@ -36,7 +36,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PageTestAbstract extends TestCase
+abstract class PageTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
 

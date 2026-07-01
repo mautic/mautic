@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
+final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private CampaignRepository $repository;
 

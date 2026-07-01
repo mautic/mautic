@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
-class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
+final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, mixed> */
     private array $config = [

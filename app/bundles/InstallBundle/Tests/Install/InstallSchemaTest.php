@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @template T of AbstractPlatform
  */
-class InstallSchemaTest extends TestCase
+final class InstallSchemaTest extends TestCase
 {
     private Connection $connection;
 

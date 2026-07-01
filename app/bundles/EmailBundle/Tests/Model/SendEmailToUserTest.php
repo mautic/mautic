@@ -19,7 +19,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&EmailModel

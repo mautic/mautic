@@ -7,7 +7,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ConfigMetadataTest extends TestCase
+final class ConfigMetadataTest extends TestCase
 {
     /**
      * @var BundleMetadata|MockObject

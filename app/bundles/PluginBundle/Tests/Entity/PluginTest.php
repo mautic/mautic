@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\PluginBundle\Entity\Plugin;
 
-class PluginTest extends \PHPUnit\Framework\TestCase
+final class PluginTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyDescription(): void
     {

@@ -8,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Parser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail::class)]
-class ParserTest extends \PHPUnit\Framework\TestCase
+final class ParserTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that an email is found inside a feedback report')]
     public function testThatReplyIsDetectedThroughTrackingPixel(): void

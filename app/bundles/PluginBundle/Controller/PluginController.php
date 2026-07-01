@@ -88,7 +88,7 @@ class PluginController extends FormController
         // sort by name
         uksort(
             $integrations,
-            fn ($a, $b): int => strnatcasecmp($a, $b)
+            strnatcasecmp(...)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -123,10 +123,8 @@ class PluginController extends FormController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
@@ -176,7 +174,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(BadFormConfigException::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(ConfigMapper::class)]
-class ConfigMapperTest extends \PHPUnit\Framework\TestCase
+final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, array<string, mixed>> */
     private array $forms = [

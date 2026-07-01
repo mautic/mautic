@@ -24,20 +24,14 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
-class WebhookModelTest extends TestCase
+final class WebhookModelTest extends TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper
      */
     private MockObject $parametersHelperMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&SerializerInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $serializerMock;
 
     /**
      * @var MockObject&EntityManager
@@ -54,16 +48,6 @@ class WebhookModelTest extends TestCase
      */
     private MockObject $webhookQueueRepository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&UserHelper
-     */
-    private \PHPUnit\Framework\MockObject\Stub $userHelper;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $eventDispatcherMock;
-
     private WebhookModel $model;
 
     /**
@@ -74,13 +58,10 @@ class WebhookModelTest extends TestCase
     protected function setUp(): void
     {
         $this->parametersHelperMock   = $this->createMock(CoreParametersHelper::class);
-        $this->serializerMock         = $this->createStub(SerializerInterface::class);
         $this->entityManagerMock      = $this->createMock(EntityManager::class);
-        $this->userHelper             = $this->createStub(UserHelper::class);
         $this->webhookRepository      = $this->createMock(WebhookRepository::class);
         $this->webhookQueueRepository = $this->createMock(WebhookQueueRepository::class);
         $this->httpClientMock         = $this->createMock(Client::class);
-        $this->eventDispatcherMock    = $this->createStub(EventDispatcher::class);
 
         $this->model                  = $this->initModel();
     }
@@ -244,7 +225,7 @@ class WebhookModelTest extends TestCase
         $webhookLogRepoMock   = $this->createStub(LogRepository::class);
         $webhookRepoMock      = $this->createStub(WebhookRepository::class);
 
-        $this->entityManagerMock->method('getRepository')
+        $this->entityManagerMock->expects($this->exactly(3))->method('getRepository')
             ->willReturnMap([
                 [WebhookQueue::class, $webhookQueueRepoMock],
                 [Log::class, $webhookLogRepoMock],
@@ -438,14 +419,14 @@ class WebhookModelTest extends TestCase
         // create anew webhook model instance using mocks
         $model              = new WebhookModel(
             $this->parametersHelperMock,
-            $this->serializerMock,
+            $this->createStub(SerializerInterface::class),
             $this->httpClientMock,
             $this->entityManagerMock,
             $this->createStub(CorePermissions::class),
-            $this->eventDispatcherMock,
+            $this->createStub(EventDispatcher::class),
             $this->createStub(UrlGenerator::class),
             $this->createStub(Translator::class),
-            $this->userHelper,
+            $this->createStub(UserHelper::class),
             $this->createStub(Logger::class),
             $webhookServiceMock
         );

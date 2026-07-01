@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use PHPUnit\Framework\TestCase;
 
-class DayStatTest extends TestCase
+final class DayStatTest extends TestCase
 {
     private string $day = '2019-11-07';
 

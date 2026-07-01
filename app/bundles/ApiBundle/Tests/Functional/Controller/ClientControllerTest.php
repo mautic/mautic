@@ -8,7 +8,7 @@ use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class ClientControllerTest extends MauticMysqlTestCase
+final class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT = 6;
 

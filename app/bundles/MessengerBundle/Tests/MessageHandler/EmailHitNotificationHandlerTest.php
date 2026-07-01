@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 
-class EmailHitNotificationHandlerTest extends TestCase
+final class EmailHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void
     {
