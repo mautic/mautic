@@ -28,7 +28,12 @@ final class ValidEmailLinksValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, Email::class);
         }
 
-        $this->validateHtml($value->getCustomHtml(), 'customHtml', $constraint);
+        $customHtml = $value->getCustomHtml();
+        if (null !== $customHtml && '' !== trim($customHtml)) {
+            $this->validateHtml($customHtml, 'customHtml', $constraint);
+
+            return;
+        }
 
         foreach ($this->findHtmlStrings($value->getContent()) as $html) {
             $this->validateHtml($html, 'content', $constraint);

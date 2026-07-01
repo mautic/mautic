@@ -47,6 +47,18 @@ final class ValidEmailLinksValidatorTest extends TestCase
         $this->validator->validate($email, new ValidEmailLinks());
     }
 
+    public function testCustomHtmlTakesPrecedenceOverStaleBuilderContent(): void
+    {
+        $email = new Email();
+        $email->setCustomHtml('<a href="https://example.com">Valid link</a>');
+        $email->setContent(['slot' => ['content' => '<a href="://example.com">Stale broken link</a>']]);
+
+        $this->context->expects($this->never())
+            ->method('buildViolation');
+
+        $this->validator->validate($email, new ValidEmailLinks());
+    }
+
     #[DataProvider('validLinkProvider')]
     public function testValidLinksDoNotAddViolation(string $url): void
     {
