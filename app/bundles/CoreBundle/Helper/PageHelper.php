@@ -6,13 +6,13 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class PageHelper implements PageHelperInterface
+final readonly class PageHelper implements PageHelperInterface
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly string $sessionPrefix,
-        private readonly int $page,
+        private RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
+        private string $sessionPrefix,
+        private int $page,
     ) {
     }
 

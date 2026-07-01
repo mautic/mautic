@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Security\Permissions\SystemPermissions;
 use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\TestCase;
 
-class BundleMetadataBuilderTest extends TestCase
+final class BundleMetadataBuilderTest extends TestCase
 {
     /** @var array<string, string> */
     private array $paths;

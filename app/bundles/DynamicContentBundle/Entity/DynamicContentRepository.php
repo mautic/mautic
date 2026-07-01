@@ -156,7 +156,7 @@ class DynamicContentRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {
@@ -196,10 +196,7 @@ class DynamicContentRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return bool|object|null
-     */
-    public function getDynamicContentForSlotFromCampaign($slot)
+    public function getDynamicContentForSlotFromCampaign($slot): DynamicContent|false
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use PHPUnit\Framework\Assert;
 
-class ContactExportSchedulerTest extends MauticMysqlTestCase
+final class ContactExportSchedulerTest extends MauticMysqlTestCase
 {
     private string $previousTimeZone;
 

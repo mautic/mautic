@@ -23,46 +23,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class FocusModelTest extends TestCase
+final class FocusModelTest extends TestCase
 {
-    /**
-     * @var ContactTracker|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $contactTracker;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|EventDispatcherInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $dispatcher;
-
     /**
      * @var MockObject&FormModel
      */
     private MockObject $formModel;
 
-    /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $leadFieldModel;
-
-    /**
-     * @var Environment|mixed|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $twig;
-
-    /**
-     * @var TrackableModel|mixed|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $trackableModel;
-
     protected function setUp(): void
     {
         $this->formModel      = $this->createMock(FormModel::class);
-        $this->trackableModel = $this->createStub(TrackableModel::class);
-        $this->twig           = $this->createStub(Environment::class);
-        $this->dispatcher     = $this->createStub(EventDispatcherInterface::class);
-        $this->leadFieldModel = $this->createStub(FieldModel::class);
-        $this->contactTracker = $this->createStub(ContactTracker::class);
         parent::setUp();
     }
 
@@ -75,13 +45,13 @@ class FocusModelTest extends TestCase
 
         $focusModel = new FocusModel(
             $this->formModel,
-            $this->trackableModel,
-            $this->twig,
-            $this->leadFieldModel,
-            $this->contactTracker,
+            $this->createStub(TrackableModel::class),
+            $this->createStub(Environment::class),
+            $this->createStub(FieldModel::class),
+            $this->createStub(ContactTracker::class),
             $this->createStub(EntityManagerInterface::class),
             $this->createStub(CorePermissions::class),
-            $this->dispatcher,
+            $this->createStub(EventDispatcherInterface::class),
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),

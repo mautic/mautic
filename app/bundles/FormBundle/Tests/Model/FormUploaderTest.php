@@ -14,7 +14,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormUploaderTest extends \PHPUnit\Framework\TestCase
+final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
     private int $formId1   = 1;
 

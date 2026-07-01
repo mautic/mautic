@@ -16,9 +16,9 @@ class EncryptionService
     /**
      * @param mixed $keys
      *
-     * @return array|string
+     * @return string|string[]
      */
-    public function encrypt($keys)
+    public function encrypt($keys): string|array
     {
         if (!is_array($keys)) {
             return $this->encryptionHelper->encrypt($keys);

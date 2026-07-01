@@ -11,7 +11,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoUserId(): void
     {

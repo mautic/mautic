@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EmailActionModelTest extends TestCase
+final class EmailActionModelTest extends TestCase
 {
     public const NEW_CATEGORY_TITLE = 'New category';
 

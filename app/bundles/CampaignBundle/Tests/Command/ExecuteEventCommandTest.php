@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -9,7 +11,7 @@ use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
 
-class ExecuteEventCommandTest extends AbstractCampaignCommand
+final class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact(): void
     {

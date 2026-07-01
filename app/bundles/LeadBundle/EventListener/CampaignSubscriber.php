@@ -729,7 +729,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (in_array($triggerIntervalUnit, ['H', 'I'])) {
             $timeNotation = 'T';
             // DateInterval Minutes notation is 'M'
-            $triggerIntervalUnit = ('I' == $triggerIntervalUnit) ? 'M' : $triggerIntervalUnit;
+            $triggerIntervalUnit = ('I' === $triggerIntervalUnit) ? 'M' : $triggerIntervalUnit;
         }
 
         $duration = 'P'.$timeNotation.$triggerInterval.$triggerIntervalUnit;

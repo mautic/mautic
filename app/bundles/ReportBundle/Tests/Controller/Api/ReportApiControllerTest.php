@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -11,7 +13,7 @@ use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class ReportApiControllerTest extends MauticMysqlTestCase
+final class ReportApiControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

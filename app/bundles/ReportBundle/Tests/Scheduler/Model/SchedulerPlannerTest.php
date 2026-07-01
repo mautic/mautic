@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -10,7 +12,7 @@ use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
-class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
+final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 {
     public function testComputeSchedule(): void
     {

@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInte
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
+final class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper

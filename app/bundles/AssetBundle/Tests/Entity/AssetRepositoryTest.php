@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AssetRepositoryTest extends TestCase
+final class AssetRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

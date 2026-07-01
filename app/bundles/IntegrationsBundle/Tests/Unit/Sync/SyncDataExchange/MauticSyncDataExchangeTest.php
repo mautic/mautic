@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class MauticSyncDataExchangeTest extends TestCase
+final class MauticSyncDataExchangeTest extends TestCase
 {
     /**
      * @var MockObject&FieldChangeRepository
