@@ -26,9 +26,9 @@ class DoctrineEventSubscriberTest extends TestCase
     private \PHPUnit\Framework\MockObject\Stub $entityManager;
 
     /**
-     * @var Connection&MockObject
+     * @var \PHPUnit\Framework\MockObject\Stub&Connection
      */
-    private MockObject $connection;
+    private \PHPUnit\Framework\MockObject\Stub $connection;
 
     protected function setUp(): void
     {
