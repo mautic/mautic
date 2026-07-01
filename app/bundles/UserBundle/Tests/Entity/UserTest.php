@@ -15,7 +15,7 @@ final class UserTest extends \PHPUnit\Framework\TestCase
         $user->setPlainPassword('plainPass');
         $user->setCurrentPassword('currentPass');
 
-        $user = \Mautic\CoreBundle\Helper\Serializer::decode(serialize($user));
+        $user = unserialize(serialize($user));
         $this->assertInstanceOf(User::class, $user);
 
         $this->assertSame('testUser', $user->getUsername());
