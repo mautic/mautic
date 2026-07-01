@@ -194,8 +194,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param T    $entity
-     * @param bool $flush  true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
      */
     public function deleteEntity($entity, $flush = true): void
     {
@@ -819,8 +819,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param T    $entity
-     * @param bool $flush  true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
      */
     public function saveEntity($entity, $flush = true): void
     {
