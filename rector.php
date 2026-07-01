@@ -32,6 +32,8 @@ return RectorConfig::configure()
     ->withPhpSets(php80: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
+        Rector\TypeDeclaration\Rector\Closure\AddClosureNeverReturnTypeRector::class,
+
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         AddParamTypeFromPropertyTypeRector::class,
         ClosureReturnTypeRector::class,
@@ -54,6 +56,10 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
         ],
 
+        UnserializeToSerializerDecodeRector::class => [
+            __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
@@ -61,8 +67,6 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
 
         Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
-        '*/Test/*',
-        '*/Tests/*',
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
