@@ -458,6 +458,8 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
+     * @param array<string, mixed> $queryArgs
+     *
      * @throws \Exception
      */
     public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
