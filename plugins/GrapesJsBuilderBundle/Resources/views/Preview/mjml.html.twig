@@ -6,7 +6,7 @@
     <title>Email preview</title>
 </head>
 <body>
-<script id="mjml-preview-data" type="application/json">{{ mjml|json_encode|raw }}</script>
+<script id="mjml-preview-data" type="application/json">{{ mjml|json_encode|e('html') }}</script>
 <script src="{{ scriptUrl }}"></script>
 <script>
 (function () {
