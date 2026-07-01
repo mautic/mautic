@@ -529,7 +529,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ('category' == $prop || 'parent' == $prop) {
+        if ('category' === $prop || 'parent' === $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

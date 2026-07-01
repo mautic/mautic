@@ -12,14 +12,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Used to ensure that contacts tracked under the old method are continued to be tracked under the new.
  */
-final class ContactTrackingService implements ContactTrackingServiceInterface
+final readonly class ContactTrackingService implements ContactTrackingServiceInterface
 {
     public function __construct(
-        private readonly CookieHelper $cookieHelper,
-        private readonly LeadDeviceRepository $leadDeviceRepository,
-        private readonly LeadRepository $leadRepository,
-        private readonly MergeRecordRepository $mergeRecordRepository,
-        private readonly RequestStack $requestStack,
+        private CookieHelper $cookieHelper,
+        private LeadDeviceRepository $leadDeviceRepository,
+        private LeadRepository $leadRepository,
+        private MergeRecordRepository $mergeRecordRepository,
+        private RequestStack $requestStack,
     ) {
     }
 

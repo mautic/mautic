@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -9,7 +11,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
+final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

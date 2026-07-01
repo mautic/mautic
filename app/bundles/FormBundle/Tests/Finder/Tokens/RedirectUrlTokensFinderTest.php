@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(RedirectUrlTokensFinder::class)]
-class RedirectUrlTokensFinderTest extends TestCase
+final class RedirectUrlTokensFinderTest extends TestCase
 {
     private const NOT_VALID_URLS = [
         'ttps://example.com',

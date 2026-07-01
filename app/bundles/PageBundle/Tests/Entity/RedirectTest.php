@@ -8,7 +8,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class RedirectTest extends TestCase
+final class RedirectTest extends TestCase
 {
     public function testGetUrlRemovesWhitespace(): void
     {

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LeadControllerTest extends MauticMysqlTestCase
+final class LeadControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
 

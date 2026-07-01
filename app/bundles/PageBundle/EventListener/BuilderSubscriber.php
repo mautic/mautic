@@ -405,7 +405,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $language   = $page->getLanguage();
         $translated = $this->translator->trans('mautic.page.lang.'.$language);
 
-        if ($translated == 'mautic.page.lang.'.$language) {
+        if ($translated === 'mautic.page.lang.'.$language) {
             $translated = $language;
         }
 

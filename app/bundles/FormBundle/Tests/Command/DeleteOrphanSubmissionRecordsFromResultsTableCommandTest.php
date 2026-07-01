@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends MauticMysqlTestCase
+final class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends MauticMysqlTestCase
 {
     use FormTestHelperTrait;
 

@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriberTest extends TestCase
+final class BuilderSubscriberTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
@@ -77,7 +77,7 @@ class BuilderSubscriberTest extends TestCase
                 'signature'  => 'Owner Signature',
             ]);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
             ['unsubscribe_text', null, null],
             ['webview_text', null, null],
             ['default_signature_text', null, 'Default Signature'],

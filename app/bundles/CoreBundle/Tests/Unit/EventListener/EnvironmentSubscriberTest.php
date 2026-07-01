@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class EnvironmentSubscriberTest extends TestCase
+final class EnvironmentSubscriberTest extends TestCase
 {
     private EnvironmentSubscriber $environmentSubscriber;
 

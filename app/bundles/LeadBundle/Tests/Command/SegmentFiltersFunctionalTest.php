@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
+final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
 {
     private const FIELD_NAME = 'car';
 

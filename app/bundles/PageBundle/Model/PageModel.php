@@ -176,7 +176,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
                 ++$aliasTag;
             }
-            if ($testAlias != $alias) {
+            if ($testAlias !== $alias) {
                 $alias = $testAlias;
             }
             $entity->setAlias($alias);

@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
+final class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&FormBuilderInterface $formBuilder;
 

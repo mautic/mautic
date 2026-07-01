@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 use PHPUnit\Framework\Assert;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testCampaignLeadLogReportWithDncListColumn(): void
     {

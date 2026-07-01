@@ -9,10 +9,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Convert DNC reason ID to text.
  */
-final class DncReasonHelper
+final readonly class DncReasonHelper
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private TranslatorInterface $translator,
     ) {
     }
 

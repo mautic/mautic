@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -21,7 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends TestCase
+abstract class CampaignTestAbstract extends TestCase
 {
     protected static int $mockId       = 232;
 

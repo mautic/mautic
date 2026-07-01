@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class FulltextKeywordTest extends TestCase
+final class FulltextKeywordTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('dataDefault')]
     public function testDefault(string $value, string $expected): void
