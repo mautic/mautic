@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-final class CommandResponse
+final readonly class CommandResponse
 {
     public function __construct(
-        private readonly int $statusCode,
-        private readonly string $message,
+        private int $statusCode,
+        private string $message,
     ) {
     }
 

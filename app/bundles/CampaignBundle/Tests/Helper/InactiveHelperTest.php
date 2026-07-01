@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class InactiveHelperTest extends TestCase
+final class InactiveHelperTest extends TestCase
 {
     /**
      * @var MockObject&EventScheduler

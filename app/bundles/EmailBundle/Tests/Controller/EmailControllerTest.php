@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
 
-class EmailControllerTest extends TestCase
+final class EmailControllerTest extends TestCase
 {
     /**
      * @var string
@@ -82,11 +82,6 @@ class EmailControllerTest extends TestCase
     private MockObject $formFactoryMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub|Form
-     */
-    private \PHPUnit\Framework\MockObject\Stub $formMock;
-
-    /**
      * @var MockObject&Environment
      */
     private MockObject $twigMock;
@@ -107,7 +102,6 @@ class EmailControllerTest extends TestCase
         $this->routerMock    = $this->createMock(Router::class);
         $this->modelMock     = $this->createMock(EmailModel::class);
         $this->emailMock     = $this->createMock(Email::class);
-        $this->formMock      = $this->createStub(Form::class);
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
@@ -261,7 +255,7 @@ class EmailControllerTest extends TestCase
                     'action' => 'someUrl',
                 ]
             )
-            ->willReturn($this->formMock);
+            ->willReturn($this->createStub(Form::class));
 
         $this->twigMock->expects($this->once())
             ->method('render')

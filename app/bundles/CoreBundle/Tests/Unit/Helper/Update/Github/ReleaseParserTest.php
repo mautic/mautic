@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
 use PHPUnit\Framework\TestCase;
 
-class ReleaseParserTest extends TestCase
+final class ReleaseParserTest extends TestCase
 {
     private ReleaseParser $releaseParser;
 

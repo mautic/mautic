@@ -7,17 +7,12 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
+final class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&AbstractCommonModel
      */
     private MockObject $commonModel;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|CommonRepository<object>
-     */
-    private \PHPUnit\Framework\MockObject\Stub $commonRepository;
 
     private IteratorExportDataModel $iteratorExportDataModel;
 
@@ -26,7 +21,6 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->commonModel      = $this->createMock(AbstractCommonModel::class);
-        $this->commonRepository = $this->createStub(CommonRepository::class);
         $args                   = ['limit' => 1000];
         $callback               = fn ($var) => $var;
 
@@ -40,7 +34,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
             ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => [['a'], ['b']]]);
 
-        $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
+        $this->commonModel->method('getRepository')->willReturn($this->createStub(CommonRepository::class));
 
         $this->assertSame(0, $this->iteratorExportDataModel->key());
         $this->iteratorExportDataModel->rewind();
@@ -55,7 +49,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
             ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => []]);
 
-        $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
+        $this->commonModel->method('getRepository')->willReturn($this->createStub(CommonRepository::class));
 
         $this->assertSame(0, $this->iteratorExportDataModel->key());
         $this->iteratorExportDataModel->rewind();

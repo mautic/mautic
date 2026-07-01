@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignModelTransactionalTest extends TestCase
+final class CampaignModelTransactionalTest extends TestCase
 {
     private MockObject&CampaignRepository $campaignRepositoryMock;
 

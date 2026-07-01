@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\UserBundle\Entity\User;
 
-class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
+final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransformToUserIds(): void
     {

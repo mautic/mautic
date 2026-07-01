@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class HubspotIntegrationTest extends AbstractIntegrationTestCase
+final class HubspotIntegrationTest extends AbstractIntegrationTestCase
 {
     private HubspotIntegration $integration;
 

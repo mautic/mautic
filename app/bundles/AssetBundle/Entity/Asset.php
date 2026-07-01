@@ -1282,13 +1282,13 @@ class Asset extends FormEntity implements UuidInterface
     {
         $unit = strtoupper($unit);
 
-        if ((!$unit && $size >= 1 << 30) || 'GB' == $unit || 'G' == $unit) {
+        if ((!$unit && $size >= 1 << 30) || 'GB' === $unit || 'G' === $unit) {
             return [$size / (1 << 30), 'GB'];
         }
-        if ((!$unit && $size >= 1 << 20) || 'MB' == $unit || 'M' == $unit) {
+        if ((!$unit && $size >= 1 << 20) || 'MB' === $unit || 'M' === $unit) {
             return [$size / (1 << 20), 'MB'];
         }
-        if ((!$unit && $size >= 1 << 10) || 'KB' == $unit || 'K' == $unit) {
+        if ((!$unit && $size >= 1 << 10) || 'KB' === $unit || 'K' === $unit) {
             return [$size / (1 << 10), 'KB'];
         }
 

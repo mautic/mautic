@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use PHPUnit\Framework\Assert;
 
-class TagRepositoryTest extends MauticMysqlTestCase
+final class TagRepositoryTest extends MauticMysqlTestCase
 {
     private TagRepository $tagRepository;
 

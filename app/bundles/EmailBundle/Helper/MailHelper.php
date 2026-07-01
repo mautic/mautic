@@ -1229,7 +1229,7 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                $addresses = array_fill_keys(array_map(trim(...), explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
@@ -1272,7 +1272,7 @@ class MailHelper
         // Set custom headers
         if ($headers = $email->getHeaders()) {
             // HTML decode headers
-            $headers = array_map('html_entity_decode', $headers);
+            $headers = array_map(html_entity_decode(...), $headers);
 
             foreach ($headers as $name => $value) {
                 $this->addCustomHeader($name, $value);
@@ -1854,7 +1854,7 @@ class MailHelper
         }
 
         // HTML decode headers
-        $systemHeaders = array_map('html_entity_decode', $systemHeaders);
+        $systemHeaders = array_map(html_entity_decode(...), $systemHeaders);
 
         return $systemHeaders;
     }

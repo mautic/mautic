@@ -9,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
+final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

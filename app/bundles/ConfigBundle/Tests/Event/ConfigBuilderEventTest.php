@@ -5,7 +5,7 @@ namespace Mautic\ConfigBundle\Tests\Event;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Tests\CommonMocks;
 
-class ConfigBuilderEventTest extends CommonMocks
+final class ConfigBuilderEventTest extends CommonMocks
 {
     public function testAddForm(): void
     {

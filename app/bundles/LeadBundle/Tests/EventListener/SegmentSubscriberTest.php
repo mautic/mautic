@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends TestCase
+final class SegmentSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&IpLookupHelper
@@ -33,19 +33,9 @@ class SegmentSubscriberTest extends TestCase
      */
     private MockObject $listModel;
 
-    /**
-     * @var TranslatorInterface&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $translator;
-
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
     private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
-
-    /**
-     * @var SegmentUsedInCampaignsValidator&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $segmentUsedInCampaignsValidator;
 
     protected function setUp(): void
     {
@@ -54,8 +44,6 @@ class SegmentSubscriberTest extends TestCase
         $this->ipLookupHelper                  = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel                   = $this->createMock(AuditLogModel::class);
         $this->listModel                       = $this->createMock(ListModel::class);
-        $this->segmentUsedInCampaignsValidator = $this->createStub(SegmentUsedInCampaignsValidator::class);
-        $this->translator                      = $this->createStub(TranslatorInterface::class);
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
         $this->segmentCountCacheHelper         = $this->createStub(SegmentCountCacheHelper::class);
         $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
@@ -67,10 +55,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $this->assertSame(
@@ -124,10 +112,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -159,10 +147,10 @@ class SegmentSubscriberTest extends TestCase
             $this->ipLookupHelper,
             $this->auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -182,10 +170,8 @@ class SegmentSubscriberTest extends TestCase
 
     /**
      * Test create or update segment logging.
-     *
-     * @param bool $isNew
      */
-    private function onSegmentPostSaveMethodCall($isNew): void
+    private function onSegmentPostSaveMethodCall(bool $isNew): void
     {
         $segmentId = 1;
         $changes   = ['changes'];
@@ -214,10 +200,10 @@ class SegmentSubscriberTest extends TestCase
             $ipLookupHelper,
             $auditLogModel,
             $this->listModel,
-            $this->segmentUsedInCampaignsValidator,
+            $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->createStub(TranslatorInterface::class)
         );
 
         $segment = $this->createMock(LeadList::class);

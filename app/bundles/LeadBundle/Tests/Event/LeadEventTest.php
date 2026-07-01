@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Tests\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 
-class LeadEventTest extends \PHPUnit\Framework\TestCase
+final class LeadEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters(): void
     {

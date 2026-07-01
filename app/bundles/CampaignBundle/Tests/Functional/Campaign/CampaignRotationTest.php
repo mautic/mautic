@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class CampaignRotationTest extends MauticMysqlTestCase
+final class CampaignRotationTest extends MauticMysqlTestCase
 {
     private Campaign $campaignWithoutJump;
 

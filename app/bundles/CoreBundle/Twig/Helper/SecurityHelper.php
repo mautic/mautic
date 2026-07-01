@@ -13,13 +13,13 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 /**
  * final class SecurityHelper.
  */
-final class SecurityHelper
+final readonly class SecurityHelper
 {
     public function __construct(
-        private readonly CorePermissions $security,
-        private readonly RequestStack $requestStack,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly CsrfTokenManagerInterface $tokenManager,
+        private CorePermissions $security,
+        private RequestStack $requestStack,
+        private EventDispatcherInterface $dispatcher,
+        private CsrfTokenManagerInterface $tokenManager,
     ) {
     }
 
@@ -48,12 +48,7 @@ final class SecurityHelper
         return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
 
-    /**
-     * @param string[]|string $permission
-     *
-     * @return mixed
-     */
-    public function isGranted($permission)
+    public function isGranted(string $permission): bool
     {
         return $this->security->isGranted($permission);
     }

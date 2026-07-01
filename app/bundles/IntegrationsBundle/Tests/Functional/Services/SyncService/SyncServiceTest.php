@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\PluginBundle\Entity\Integration;
 
-class SyncServiceTest extends MauticMysqlTestCase
+final class SyncServiceTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

@@ -8,7 +8,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ConfigSubscriberTest extends TestCase
+final class ConfigSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&ConfigEvent

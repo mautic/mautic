@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Loader\EnvVars\ElFinderEnvVars;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class ElFinderEnvVarsTest extends TestCase
+final class ElFinderEnvVarsTest extends TestCase
 {
     /**
      * @var ParameterBag

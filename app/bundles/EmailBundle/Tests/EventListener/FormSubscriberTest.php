@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FormSubscriberTest extends TestCase
+final class FormSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&EmailModel

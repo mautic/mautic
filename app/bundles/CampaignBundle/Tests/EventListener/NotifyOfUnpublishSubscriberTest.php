@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class NotifyOfUnpublishSubscriberTest extends TestCase
+final class NotifyOfUnpublishSubscriberTest extends TestCase
 {
     private MockObject&NotificationHelper $notificationHelper;
 

@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 
-class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private Lead $lead;
 
@@ -154,7 +154,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
      * @param string[]|string $emails
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestAjaxGetLeadsByFieldValue')]
-    public function testAjaxGetLeadsByFieldValue($emails, bool $createFlag, int $expectedCount): void
+    public function testAjaxGetLeadsByFieldValue(string|array $emails, bool $createFlag, int $expectedCount): void
     {
         $this->createLeads($emails, $createFlag);
 
@@ -204,7 +204,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @param string[]|string $emails
      */
-    private function createLeads($emails, bool $flag): void
+    private function createLeads(string|array $emails, bool $flag): void
     {
         if (!$flag) {
             return;

@@ -13,8 +13,6 @@ use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 
 class DBALMocker
 {
-    protected $testCase;
-
     protected $mockEm;
 
     protected $mockConnection;
@@ -34,9 +32,8 @@ class DBALMocker
         'parameters' => [],
     ];
 
-    public function __construct(\PHPUnit\Framework\TestCase $testCase)
+    public function __construct(protected \PHPUnit\Framework\TestCase $testCase)
     {
-        $this->testCase = $testCase;
     }
 
     public function setQueryResponse($queryResponse): void

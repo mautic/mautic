@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 
-class SchedulerTemplateFactoryTest extends \PHPUnit\Framework\TestCase
+final class SchedulerTemplateFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testNowBuilder(): void
     {

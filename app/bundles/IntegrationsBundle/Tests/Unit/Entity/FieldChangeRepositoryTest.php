@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\LeadBundle\Entity\Company;
 use PHPUnit\Framework\TestCase;
 
-class FieldChangeRepositoryTest extends TestCase
+final class FieldChangeRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

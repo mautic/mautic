@@ -7,7 +7,7 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ReportCleanupTest extends TestCase
+final class ReportCleanupTest extends TestCase
 {
     /**
      * @var MockObject&FileHandler

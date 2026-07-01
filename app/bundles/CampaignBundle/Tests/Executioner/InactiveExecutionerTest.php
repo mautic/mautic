@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
+final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&InactiveContactFinder $inactiveContactFinder;
 

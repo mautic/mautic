@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class RedirectListTypeTest extends TestCase
+final class RedirectListTypeTest extends TestCase
 {
     private RedirectListType $form;
 

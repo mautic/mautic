@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 
-class MailboxTest extends \PHPUnit\Framework\TestCase
+final class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructWithDefaultConfig(): void
     {

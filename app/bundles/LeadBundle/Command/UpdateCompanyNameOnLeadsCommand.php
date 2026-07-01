@@ -16,13 +16,13 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: UpdateCompanyNameOnLeadsCommand::COMMAND_NAME,
     description: 'Update company name in leads table.'
 )]
-final class UpdateCompanyNameOnLeadsCommand
+final readonly class UpdateCompanyNameOnLeadsCommand
 {
     public const COMMAND_NAME = 'mautic:company:update_lead_company';
 
     public function __construct(
-        private readonly CompanyLeadRepository $companyLeadRepository,
-        private readonly CompanyRepository $companyRepository,
+        private CompanyLeadRepository $companyLeadRepository,
+        private CompanyRepository $companyRepository,
     ) {
     }
 

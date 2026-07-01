@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
-class CompanyLeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class CompanyLeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository */
     private \PHPUnit\Framework\MockObject\MockObject $repoMock;

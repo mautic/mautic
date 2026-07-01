@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 
-class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
 {
     private FieldAliasHelper $helper;
 

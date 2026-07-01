@@ -17,7 +17,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailMapStatsControllerTest extends MauticMysqlTestCase
+final class EmailMapStatsControllerTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception

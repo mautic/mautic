@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
+final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testWithEventIds(): void
     {

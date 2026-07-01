@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class BuildJsEventTest extends TestCase
+final class BuildJsEventTest extends TestCase
 {
     public const TEST_JS = <<<JS
 /** some comment */

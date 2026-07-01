@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\TestCase;
 
-class SegmentLogReportSubscriberTest extends TestCase
+final class SegmentLogReportSubscriberTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&FieldsBuilder

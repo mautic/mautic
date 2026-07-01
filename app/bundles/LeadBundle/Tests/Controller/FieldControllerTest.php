@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldControllerTest extends MauticMysqlTestCase
+final class FieldControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

@@ -6,7 +6,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent;
 
-class LeadListEventTest extends \PHPUnit\Framework\TestCase
+final class LeadListEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructGettersSetters(): void
     {

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateHelperTest extends \PHPUnit\Framework\TestCase
+final class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&TranslatorInterface
@@ -131,7 +131,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
-        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+        $this->assertEquals('February 21, 2021 7:00 pm', $result);
     }
 
     public function testToHumanized(): void

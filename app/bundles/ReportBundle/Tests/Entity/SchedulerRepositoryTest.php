@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
+final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 

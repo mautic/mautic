@@ -13,17 +13,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LanguageHelperTest extends TestCase
+final class LanguageHelperTest extends TestCase
 {
     /**
      * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
-
-    /**
-     * @var Logger&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $logger;
 
     /**
      * @var MockObject&CoreParametersHelper
@@ -35,21 +30,14 @@ class LanguageHelperTest extends TestCase
      */
     private MockObject $client;
 
-    /**
-     * @var TranslatorInterface&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $translator;
-
     private string $translationsPath;
 
     private string $tmpPath;
 
     protected function setUp(): void
     {
-        $this->logger               = $this->createStub(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->client               = $this->createMock(Client::class);
-        $this->translator           = $this->createStub(TranslatorInterface::class);
 
         $this->translationsPath = __DIR__.'/resource/language';
         $this->tmpPath          = $this->translationsPath.'/tmp';
@@ -156,6 +144,6 @@ class LanguageHelperTest extends TestCase
 
     private function getHelper(): LanguageHelper
     {
-        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->translator);
+        return new LanguageHelper($this->pathsHelper, $this->createStub(Logger::class), $this->coreParametersHelper, $this->client, $this->createStub(TranslatorInterface::class));
     }
 }

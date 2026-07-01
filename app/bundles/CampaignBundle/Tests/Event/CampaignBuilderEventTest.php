@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 
-class CampaignBuilderEventTest extends CampaignTestAbstract
+final class CampaignBuilderEventTest extends CampaignTestAbstract
 {
     public function testAddGetDecision(): void
     {

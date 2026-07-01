@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportHelperTest extends TestCase
+final class ExportHelperTest extends TestCase
 {
     private MockObject&TranslatorInterface $translatorInterfaceMock;
 

@@ -6,17 +6,12 @@ use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissio
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class TagManagerPermissionsTest extends TestCase
+final class TagManagerPermissionsTest extends TestCase
 {
     /**
      * @var TagManagerPermissions
      */
     private \PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
-
-    /**
-     * @var FormBuilderInterface&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $formBuilder;
 
     protected function setUp(): void
     {
@@ -28,8 +23,6 @@ class TagManagerPermissionsTest extends TestCase
                 'addStandardFormFields',
             ])
             ->getMock();
-
-        $this->formBuilder = $this->createStub(FormBuilderInterface::class);
     }
 
     public function testBuildFormMethodAddsStandardFormFields(): void
@@ -38,8 +31,8 @@ class TagManagerPermissionsTest extends TestCase
         $data    = ['someData'];
         $this->tagManagerPermissions->expects($this->once())
             ->method('addStandardFormFields')
-            ->with('tagManager', 'tagManager', $this->formBuilder, $data);
+            ->with('tagManager', 'tagManager', $this->createStub(FormBuilderInterface::class), $data);
 
-        $this->tagManagerPermissions->buildForm($this->formBuilder, $options, $data);
+        $this->tagManagerPermissions->buildForm($this->createStub(FormBuilderInterface::class), $options, $data);
     }
 }

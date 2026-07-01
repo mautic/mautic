@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Symfony\Component\HttpFoundation\Response;
 
-class TagApiControllerFunctionalTest extends MauticMysqlTestCase
+final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTagWorkflow(): void
     {

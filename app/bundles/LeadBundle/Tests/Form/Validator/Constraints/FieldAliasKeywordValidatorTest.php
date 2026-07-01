@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface

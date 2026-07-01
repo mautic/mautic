@@ -6,7 +6,7 @@ use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Mapper::class)]
-class MapperTest extends \PHPUnit\Framework\TestCase
+final class MapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>

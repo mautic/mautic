@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 
-class Issue9488Test extends MauticMysqlTestCase
+final class Issue9488Test extends MauticMysqlTestCase
 {
     private LeadRepository $contactRepository;
 

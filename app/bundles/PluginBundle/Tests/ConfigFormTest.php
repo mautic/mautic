@@ -18,7 +18,7 @@ use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
-class ConfigFormTest extends KernelTestCase
+final class ConfigFormTest extends KernelTestCase
 {
     protected function setUp(): void
     {
@@ -145,7 +145,7 @@ class ConfigFormTest extends KernelTestCase
 
         $integrationRepository = $this->createMock(IntegrationRepository::class);
 
-        $entityManager
+        $entityManager->expects($this->exactly(3))
                 ->method('getRepository')
                 ->willReturnMap(
                     [

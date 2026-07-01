@@ -10,7 +10,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldModelFunctionalTest extends MauticMysqlTestCase
+final class FieldModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

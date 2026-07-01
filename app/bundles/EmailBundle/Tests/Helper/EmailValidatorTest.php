@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailValidatorTest extends \PHPUnit\Framework\TestCase
+final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

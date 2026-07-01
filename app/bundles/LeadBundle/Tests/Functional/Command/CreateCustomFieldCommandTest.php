@@ -12,7 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class CreateCustomFieldCommandTest extends MauticMysqlTestCase
+final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

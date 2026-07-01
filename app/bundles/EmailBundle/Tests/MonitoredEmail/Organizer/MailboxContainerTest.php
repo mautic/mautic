@@ -8,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ConfigAccessor::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(MailboxContainer::class)]
-class MailboxContainerTest extends \PHPUnit\Framework\TestCase
+final class MailboxContainerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, string> */
     protected array $config = [

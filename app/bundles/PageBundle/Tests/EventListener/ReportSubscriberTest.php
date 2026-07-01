@@ -17,7 +17,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends TestCase
+final class ReportSubscriberTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&CompanyReportData

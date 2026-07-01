@@ -40,7 +40,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class MailHelperTest extends TestCase
+final class MailHelperTest extends TestCase
 {
     private const MINIFY_HTML = '<!doctype html>
     <html lang=3D"en" xmlns=3D"http://www.w3.org/1999/xhtml" xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-microsoft-com:office:office">
@@ -171,7 +171,7 @@ class MailHelperTest extends TestCase
     {
         $this->expectException(BatchQueueMaxException::class);
 
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(2))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
@@ -209,7 +209,7 @@ class MailHelperTest extends TestCase
 
     public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(1))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
@@ -443,7 +443,7 @@ class MailHelperTest extends TestCase
 
     public function testMailAsOwnerWithEncodedCharactersInName(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(2))->method('get')
             ->willReturnMap([
                 ['mailer_from_email', null, 'nobody@nowhere.com'],
                 ['mailer_from_name', null, 'No Body&#39;s Business'],
@@ -505,7 +505,7 @@ class MailHelperTest extends TestCase
 
     public function testQueuedAdvancedFromUsesResolvedMetadataFromAddressOnFlush(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap(
+        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')->willReturnMap(
             [
                 ['mailer_return_path', false, null],
                 ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -1351,7 +1351,7 @@ class MailHelperTest extends TestCase
     {
         $mockLeadRepository = $this->createMock(LeadRepository::class);
 
-        $mockLeadRepository->method('getLeadOwner')
+        $mockLeadRepository->expects($this->exactly(3))->method('getLeadOwner')
             ->willReturnMap(
                 [
                     [1, ['id' => 1, 'email' => 'owner1@owner.com', 'first_name' => '', 'last_name' => '', 'signature' => 'owner 1']],
@@ -1386,7 +1386,7 @@ class MailHelperTest extends TestCase
     public function testArrayOfAddressesAreRemappedIntoEmailToNameKeyValuePair(): void
     {
         $coreParametersHelper = $this->coreParametersHelper;
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->atLeast(2))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_return_path', false, null],
@@ -1485,7 +1485,7 @@ class MailHelperTest extends TestCase
 
     public function testHeadersAreTokenized(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(5))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_custom_headers', [], ['X-Mautic-Test-1' => '{tracking_pixel}']],
@@ -1552,7 +1552,7 @@ class MailHelperTest extends TestCase
 
     public function testThatHtmlIsCorrectlyProcessedWhenTheAreEmbeddedImages(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(7))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -1617,7 +1617,7 @@ class MailHelperTest extends TestCase
 
     public function testThatWeDontEmbedAlreadyEmbeddedImages(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(6))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -1957,7 +1957,7 @@ class MailHelperTest extends TestCase
     // - if an image exists on the local domain, it will be embedded.
     public function testImagesEmbeddedOnSend(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(7))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],
@@ -2041,7 +2041,7 @@ class MailHelperTest extends TestCase
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->atLeast(8))->method('get')->willReturnMap([
             ['mailer_convert_embed_images', false, true],
             ['mailer_append_tracking_pixel', false, true],
             ['mailer_from_email', null, 'nobody@nowhere.com'],

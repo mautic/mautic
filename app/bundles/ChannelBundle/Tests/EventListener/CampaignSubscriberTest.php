@@ -29,7 +29,7 @@ use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private EventDispatcher $dispatcher;
 

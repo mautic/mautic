@@ -9,7 +9,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerTest extends MauticMysqlTestCase
+final class CampaignControllerTest extends MauticMysqlTestCase
 {
     /**
      * Index should return status code 200.

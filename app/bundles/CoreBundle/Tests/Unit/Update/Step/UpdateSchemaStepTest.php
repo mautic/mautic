@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateSchemaStepTest extends AbstractStepTestCase
+final class UpdateSchemaStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface

@@ -15,7 +15,7 @@ use Monolog\Logger;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FeedbackLoop::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(Result::class)]
-class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
+final class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessage(): void

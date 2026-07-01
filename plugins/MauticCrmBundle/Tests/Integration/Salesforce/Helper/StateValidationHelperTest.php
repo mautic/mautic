@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\Helper;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 
-class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
+final class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testStateIsRemovedWhenCountryIsUnknown(): void
     {

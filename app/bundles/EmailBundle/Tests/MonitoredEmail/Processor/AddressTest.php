@@ -5,7 +5,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Address::class)]
-class AddressTest extends \PHPUnit\Framework\TestCase
+final class AddressTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that an email header with email addresses are parsed into array')]
     public function testArrayOfAddressesAreReturnedFromEmailHeader(): void

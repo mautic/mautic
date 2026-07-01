@@ -4,7 +4,7 @@ namespace Mautic\DashboardBundle\Tests\Entity;
 
 use Mautic\DashboardBundle\Entity\Widget;
 
-class WidgetTest extends \PHPUnit\Framework\TestCase
+final class WidgetTest extends \PHPUnit\Framework\TestCase
 {
     public function testWidgetNameXssAttempt(): void
     {

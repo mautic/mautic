@@ -938,7 +938,7 @@ class Mailbox
                         break;
                     case TYPEMULTIPART:
                         if (
-                            'report' != $subtype
+                            'report' !== $subtype
                             || empty($params['report-type'])
                         ) {
                             break;
@@ -958,9 +958,9 @@ class Mailbox
                         }
                         break;
                     case TYPEMESSAGE:
-                        if ($isDsn || ('delivery-status' == $subtype)) {
+                        if ($isDsn || ('delivery-status' === $subtype)) {
                             $mail->dsnReport = $data;
-                        } elseif ($isFbl || ('feedback-report' == $subtype)) {
+                        } elseif ($isFbl || ('feedback-report' === $subtype)) {
                             $mail->fblReport = $data;
                         } else {
                             $mail->textPlain .= trim($data);

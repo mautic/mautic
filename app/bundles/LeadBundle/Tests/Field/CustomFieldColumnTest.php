@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&ColumnSchemaHelper

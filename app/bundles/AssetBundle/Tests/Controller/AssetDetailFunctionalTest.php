@@ -6,7 +6,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class AssetDetailFunctionalTest extends MauticMysqlTestCase
+final class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadViewPreventsXSS(): void
     {

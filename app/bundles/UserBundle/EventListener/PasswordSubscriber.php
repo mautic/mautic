@@ -11,9 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-final class PasswordSubscriber implements EventSubscriberInterface
+final readonly class PasswordSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
+    public function __construct(private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel)
     {
     }
 

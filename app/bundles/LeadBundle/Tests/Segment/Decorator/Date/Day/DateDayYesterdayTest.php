@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateDayYesterday::class)]
-class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
+final class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
     {

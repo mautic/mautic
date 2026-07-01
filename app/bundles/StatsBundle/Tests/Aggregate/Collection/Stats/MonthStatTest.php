@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
 use PHPUnit\Framework\TestCase;
 
-class MonthStatTest extends TestCase
+final class MonthStatTest extends TestCase
 {
     private string $month = '2019-12';
 

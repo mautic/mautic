@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportCommandTest extends TestCase
+final class ImportCommandTest extends TestCase
 {
     public function testExecuteFailsIfModifiedByIsNotSet(): void
     {
@@ -163,7 +163,7 @@ class ImportCommandTest extends TestCase
         };
 
         $inputInterfaceMock = $this->createMock(InputInterface::class);
-        $inputInterfaceMock->method('getOption')->willReturnMap([
+        $inputInterfaceMock->expects($this->exactly(2))->method('getOption')->willReturnMap([
             ['id', 42],
             ['limit', 10],
         ]);

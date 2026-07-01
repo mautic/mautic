@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
 
-class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
+final class MaxmindDownloadLookupTest extends \PHPUnit\Framework\TestCase
 {
     public function testDownloadDataStore(): void
     {

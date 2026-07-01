@@ -18,7 +18,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigTypeTest extends TypeTestCase
+final class ConfigTypeTest extends TypeTestCase
 {
     public function testSubmitEmptyTrustedHosts(): void
     {

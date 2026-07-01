@@ -7,7 +7,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(InputHelper::class)]
-class InputHelperTest extends TestCase
+final class InputHelperTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The html returns correct values')]
     public function testHtmlFilter(): void

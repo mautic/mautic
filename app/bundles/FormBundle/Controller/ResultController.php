@@ -264,11 +264,9 @@ class ResultController extends CommonFormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function exportAction(Request $request, $objectId, $format = 'csv')
+    public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         $formModel = $this->getModel('form.form');
         $form      = $formModel->getEntity($objectId);

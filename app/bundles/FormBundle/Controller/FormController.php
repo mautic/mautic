@@ -316,7 +316,7 @@ class FormController extends CommonFormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -566,7 +566,7 @@ class FormController extends CommonFormController
         $form   = $model->createForm($entity, $this->formFactory, $action);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // set added/updated fields
@@ -1142,7 +1142,7 @@ class FormController extends CommonFormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var FormModel $model */
             $model = $this->getModel('form');
             $ids   = json_decode($request->query->get('ids', ''));

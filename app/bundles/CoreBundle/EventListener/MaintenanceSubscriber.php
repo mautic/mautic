@@ -72,7 +72,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                           'id', ':ids'
                       )
                   )
-                  ->setParameter('ids', array_map('intval', $ids), ArrayParameterType::INTEGER)
+                  ->setParameter('ids', array_map(intval(...), $ids), ArrayParameterType::INTEGER)
                   ->executeStatement();
             }
         }

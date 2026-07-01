@@ -4,7 +4,7 @@ namespace Mautic\UserBundle\Tests\Entity;
 
 use Mautic\UserBundle\Entity\User;
 
-class UserTest extends \PHPUnit\Framework\TestCase
+final class UserTest extends \PHPUnit\Framework\TestCase
 {
     public function testEraseCredentials(): void
     {

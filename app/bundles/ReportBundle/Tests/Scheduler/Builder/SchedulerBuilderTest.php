@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Recurr\Recurrence;
 
-class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
+final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetNextEvent(): void
     {

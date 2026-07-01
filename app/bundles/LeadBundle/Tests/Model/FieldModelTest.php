@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends MauticMysqlTestCase
+final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -259,7 +259,7 @@ class FieldModelTest extends MauticMysqlTestCase
             /** @var array<mixed> */
             private array $indexQueries = [];
 
-            public function startQuery($sql, ?array $params = null, ?array $types = null)
+            public function startQuery($sql, ?array $params = null, ?array $types = null): void
             {
                 if (false !== stripos($sql, 'create index')) {
                     $this->indexQueries[] = $sql;
@@ -270,7 +270,7 @@ class FieldModelTest extends MauticMysqlTestCase
                 }
             }
 
-            public function stopQuery()
+            public function stopQuery(): void
             {
                 // not used
             }

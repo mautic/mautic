@@ -1944,12 +1944,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (strstr($object, 'CampaignMember')) {
                     $object = 'CampaignMember';
                 }
-                if ('Account' == $object) {
+                if ('Account' === $object) {
                     $internalObject = 'company';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
                     $exception = new ApiErrorException($item['body'][0]['message']);
-                    if ('Contact' == $object || 'Lead' == $object) {
+                    if ('Contact' === $object || 'Lead' === $object) {
                         $exception->setContactId($contactId);
                     }
                     $this->logIntegrationError($exception);
@@ -2030,7 +2030,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $exception = new ApiErrorException($error);
-                    if (!empty($item['referenceId']) && ('Contact' == $object || 'Lead' == $object)) {
+                    if (!empty($item['referenceId']) && ('Contact' === $object || 'Lead' === $object)) {
                         $exception->setContactId($item['referenceId']);
                     }
                     $this->logIntegrationError($exception);

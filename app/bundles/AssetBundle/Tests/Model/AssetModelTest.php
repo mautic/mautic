@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class AssetModelTest extends \PHPUnit\Framework\TestCase
+final class AssetModelTest extends \PHPUnit\Framework\TestCase
 {
     private AssetModel $assetModel;
 

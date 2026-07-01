@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class RequestHelperTest extends TestCase
+final class RequestHelperTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Request
