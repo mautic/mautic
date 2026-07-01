@@ -118,11 +118,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param string $file
          * @param int    $line
-         * @param array  $context
          *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool
+        public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {
@@ -372,10 +371,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
-        /**
-         * @param array $context
-         */
-        protected function log($logLevel, $message, $context = [], $debugTrace = null)
+        protected function log($logLevel, $message, array $context = [], $debugTrace = null)
         {
             $message = strip_tags($message);
             if ($this->logger) {

@@ -1395,7 +1395,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
          * @param $mauticFields
          * @param $fieldType
          */
-        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
+        $cleanup = function (&$mappedFields, array $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
             $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
             $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
 
@@ -2150,7 +2150,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    protected function dispatchIntegrationKeyEvent($eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(

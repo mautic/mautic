@@ -144,7 +144,7 @@ class LegacyEventDispatcher
         }
     }
 
-    private function dispatchEventName($eventName, array $settings, LeadEventLog $log): CampaignExecutionEvent
+    private function dispatchEventName(string $eventName, array $settings, LeadEventLog $log): CampaignExecutionEvent
     {
         @trigger_error('eventName is deprecated. Convert to using batchEventName.', E_USER_DEPRECATED);
 
