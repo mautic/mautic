@@ -34,9 +34,6 @@ class UserCreator implements UserCreatorInterface
         $this->defaultRole   = (int) $defaultRole;
     }
 
-    /**
-     * @return UserInterface|null
-     */
     public function createUser(Response $response): User
     {
         if (empty($this->defaultRole)) {
