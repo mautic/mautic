@@ -8,12 +8,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 
-final class GroupScoreChangeEvent
+final readonly class GroupScoreChangeEvent
 {
     public function __construct(
-        private readonly GroupContactScore $groupContactScore,
-        private readonly int $oldScore,
-        private readonly int $newScore,
+        private GroupContactScore $groupContactScore,
+        private int $oldScore,
+        private int $newScore,
     ) {
     }
 

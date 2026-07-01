@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
-class RoleControllerFunctionalTest extends MauticMysqlTestCase
+final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const ROLE_NAME_FIELD        = 'role[name]';
     private const ROLE_DESCRIPTION_FIELD = 'role[description]';

@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class RequestStateStoreTest extends TestCase
+final class RequestStateStoreTest extends TestCase
 {
     /**
      * @var MockObject&CacheProviderInterface

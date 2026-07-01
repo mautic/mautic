@@ -18,17 +18,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
-class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends CommonMocks
 {
     /**
      * @var MockObject&Translator
      */
     private MockObject $translator;
-
-    /**
-     * @var RouterInterface|\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $router;
 
     /**
      * @var MockObject&FocusModel
@@ -58,7 +53,6 @@ class LeadSubscriberTest extends CommonMocks
     protected function setUp(): void
     {
         $this->translator     = $this->createMock(Translator::class);
-        $this->router         = $this->createStub(RouterInterface::class);
         $this->focusModel     = $this->createMock(FocusModel::class);
         $this->statRepository = $this->createMock(StatRepository::class);
         $matcher              = $this->any();
@@ -96,7 +90,7 @@ class LeadSubscriberTest extends CommonMocks
         $leadEvent  = new LeadTimelineEvent($lead);
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -120,7 +114,7 @@ class LeadSubscriberTest extends CommonMocks
         $leadEvent  = new LeadTimelineEvent();
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -149,7 +143,7 @@ class LeadSubscriberTest extends CommonMocks
         $leadEvent  = new LeadTimelineEvent($lead);
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 
@@ -173,7 +167,7 @@ class LeadSubscriberTest extends CommonMocks
         $leadEvent  = new LeadTimelineEvent();
         $subscriber = new LeadSubscriber(
             $this->translator,
-            $this->router,
+            $this->createStub(RouterInterface::class),
             $this->focusModel
         );
 

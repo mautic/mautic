@@ -233,10 +233,11 @@ class PublicController extends FormController
      * This is only called internally.
      *
      * @param mixed[] $result
+     * @param mixed[] $validatedRequest
      *
      * @throws \InvalidArgumentException
      */
-    private function compcallbackAction(LoggerInterface $mauticLogger, array $result, $validatedRequest): Response
+    private function compcallbackAction(LoggerInterface $mauticLogger, array $result, array $validatedRequest): Response
     {
         $notify = $validatedRequest['notify'];
 

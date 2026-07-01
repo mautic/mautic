@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LeadTest extends TestCase
+final class LeadTest extends TestCase
 {
     use RequestTrait;
 

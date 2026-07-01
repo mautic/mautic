@@ -13,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
-class SegmentCountCacheHelperTest extends TestCase
+final class SegmentCountCacheHelperTest extends TestCase
 {
     private MockObject&CacheProviderInterface $cacheProviderMock;
 
@@ -185,13 +185,7 @@ class SegmentCountCacheHelperTest extends TestCase
 
         $this->cacheProviderMock
             ->method('hasItem')
-            ->willReturnCallback(function ($key) use ($segmentId): bool {
-                if ($key === 'segment.'.$segmentId.'.lead') {
-                    return true;
-                }
-
-                return false;
-            });
+            ->willReturnCallback(fn ($key): bool => $key === 'segment.'.$segmentId.'.lead');
 
         $this->cacheProviderMock
             ->method('getItem')
@@ -222,13 +216,7 @@ class SegmentCountCacheHelperTest extends TestCase
         $this->cacheProviderMock
             ->expects(self::exactly(2))
             ->method('hasItem')
-            ->willReturnCallback(function ($key) use ($segmentId): bool {
-                if ($key === 'segment.'.$segmentId.'.lead') {
-                    return true;
-                }
-
-                return false;
-            });
+            ->willReturnCallback(fn ($key): bool => $key === 'segment.'.$segmentId.'.lead');
         $this->cacheProviderMock
             ->method('getItem')
             ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {

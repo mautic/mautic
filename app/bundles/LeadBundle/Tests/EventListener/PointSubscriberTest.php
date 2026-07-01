@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -11,7 +13,7 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class PointSubscriberTest extends \PHPUnit\Framework\TestCase
+final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&LeadModel

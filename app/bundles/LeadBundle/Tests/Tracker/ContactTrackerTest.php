@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactTrackerTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&LeadRepository
@@ -44,11 +44,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
      * @var MockObject&CorePermissions
      */
     private MockObject $securityMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|Logger
-     */
-    private \PHPUnit\Framework\MockObject\Stub $loggerMock;
 
     /**
      * @var MockObject&IpLookupHelper
@@ -81,7 +76,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->dispatcherMock             = $this->createMock(EventDispatcher::class);
         $this->leadFieldModelMock         = $this->createMock(FieldModel::class);
-        $this->loggerMock                 = $this->createStub(Logger::class);
         $this->ipLookupHelperMock         = $this->createMock(IpLookupHelper::class);
         $this->requestStack               = new RequestStack();
 
@@ -266,7 +260,7 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             $this->contactTrackingServiceMock,
             $this->deviceTrackerMock,
             $this->securityMock,
-            $this->loggerMock,
+            $this->createStub(Logger::class),
             $this->ipLookupHelperMock,
             $this->requestStack,
             $this->coreParametersHelperMock,

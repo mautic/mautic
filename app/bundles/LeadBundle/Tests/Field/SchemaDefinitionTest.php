@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class SchemaDefinitionTest extends TestCase
+final class SchemaDefinitionTest extends TestCase
 {
     /**
      * @param mixed[] $expected

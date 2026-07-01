@@ -88,7 +88,7 @@ class LeadSubscriber implements EventSubscriberInterface
                 } else {
                     $eventName = $label;
                 }
-                if ('failed' == $state or 'sent' == $state) { // this is to get the correct column for date dateSent
+                if ('failed' === $state or 'sent' === $state) { // this is to get the correct column for date dateSent
                     $dateSent = 'sent';
                 } else {
                     $dateSent = 'read';
@@ -108,7 +108,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'type' => $state,
                         ],
                         'contentTemplate' => '@MauticEmail/SubscribedEvents/Timeline/index.html.twig',
-                        'icon'            => ('read' == $state) ? 'ri-mail-open-line' : 'ri-mail-unread-line',
+                        'icon'            => ('read' === $state) ? 'ri-mail-open-line' : 'ri-mail-unread-line',
                         'contactId'       => $contactId,
                     ]
                 );
