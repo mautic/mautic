@@ -25,7 +25,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
-class CompanyObjectSubscriberTest extends TestCase
+final class CompanyObjectSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&CompanyObjectHelper

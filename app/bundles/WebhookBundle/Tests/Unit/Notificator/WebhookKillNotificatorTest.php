@@ -280,7 +280,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $modifiedByEmail = 'modified-by@email.com';
         $htmlUrl         = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
 
-        $this->translatorMock
+        $this->translatorMock->expects($this->exactly(2))
             ->method('trans')
             ->willReturnMap([
                 ['mautic.webhook.stopped', [], null, null, $subject],
@@ -310,7 +310,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             ->method('getModifiedBy')
             ->willReturn($modifiedById);
 
-        $this->entityManagerMock
+        $this->entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
             ->willReturnMap([
                 [User::class, $createdById, $owner],
@@ -377,7 +377,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $modifiedBy     = null;
         $htmlUrl        = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
 
-        $this->translatorMock
+        $this->translatorMock->expects($this->exactly(2))
             ->method('trans')
             ->willReturnMap([
                 ['mautic.webhook.stopped', [], null, null, $subject],

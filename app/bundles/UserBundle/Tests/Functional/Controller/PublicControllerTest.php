@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
 use Symfony\Component\HttpFoundation\Request;
 
-class PublicControllerTest extends MauticMysqlTestCase
+final class PublicControllerTest extends MauticMysqlTestCase
 {
     private const PASSWORD_RESET_URI = '/passwordreset';
 

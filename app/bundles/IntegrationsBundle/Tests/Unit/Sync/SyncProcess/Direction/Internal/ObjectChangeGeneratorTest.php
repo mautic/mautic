@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
      * @var MockObject&SyncJudgeInterface
@@ -36,11 +36,6 @@ class ObjectChangeGeneratorTest extends TestCase
     private MockObject $valueHelper;
 
     /**
-     * @var FieldHelper&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $fieldHelper;
-
-    /**
      * @var MockObject&BulkNotification
      */
     private MockObject $bulkNotification;
@@ -49,7 +44,6 @@ class ObjectChangeGeneratorTest extends TestCase
     {
         $this->syncJudge        = $this->createMock(SyncJudgeInterface::class);
         $this->valueHelper      = $this->createMock(ValueHelper::class);
-        $this->fieldHelper      = $this->createStub(FieldHelper::class);
         $this->bulkNotification = $this->createMock(BulkNotification::class);
     }
 
@@ -365,7 +359,7 @@ class ObjectChangeGeneratorTest extends TestCase
                     $mode,
                     InformationChangeRequestDAO $leftChangeRequest,
                     InformationChangeRequestDAO $rightChangeRequest,
-                ) {
+                ): InformationChangeRequestDAO {
                     return $leftChangeRequest;
                 }
             },
@@ -466,7 +460,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return new ObjectChangeGenerator(
             $this->syncJudge,
             $this->valueHelper,
-            $this->fieldHelper,
+            $this->createStub(FieldHelper::class),
             $this->bulkNotification
         );
     }

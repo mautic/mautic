@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\EnvProcessor;
 
 use Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor;
 use PHPUnit\Framework\TestCase;
 
-class NullableProcessorTest extends TestCase
+final class NullableProcessorTest extends TestCase
 {
     public function testNullReturnedIfEmptyString(): void
     {

@@ -100,7 +100,7 @@ final class ModifyCustomFieldCommand extends Command
                 continue;
             }
 
-            $row = array_map('trim', $row);
+            $row = array_map(trim(...), $row);
 
             // skip the first(header) row
             if (!$headerSkipped) {

@@ -7,19 +7,19 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class GravatarHelper
+final readonly class GravatarHelper
 {
-    private readonly bool $devMode;
+    private bool $devMode;
 
     /**
      * @var array<string>
      */
-    private readonly array $devHosts;
+    private array $devHosts;
 
     public function __construct(
-        private readonly DefaultAvatarHelper $defaultAvatarHelper,
+        private DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
-        private readonly RequestStack $requestStack,
+        private RequestStack $requestStack,
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');

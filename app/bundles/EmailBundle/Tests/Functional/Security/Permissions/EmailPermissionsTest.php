@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\Role;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailPermissionsTest extends MauticMysqlTestCase
+final class EmailPermissionsTest extends MauticMysqlTestCase
 {
     public function testEmailSendToDncPermissionIsAvailable(): void
     {

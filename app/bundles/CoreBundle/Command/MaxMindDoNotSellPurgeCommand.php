@@ -67,7 +67,7 @@ EOT
                 $this->doNotSellList->stripCIDR($item['value']), $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 
-            if (0 == count($doNotSellContacts)) {
+            if (0 === count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
 
                 return Command::SUCCESS;

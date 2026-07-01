@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Assert;
 
-class CompanyObjectHelperTest extends MauticMysqlTestCase
+final class CompanyObjectHelperTest extends MauticMysqlTestCase
 {
     public function testUpdateEmpty(): void
     {

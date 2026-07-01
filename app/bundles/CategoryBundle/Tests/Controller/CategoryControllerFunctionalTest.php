@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Tests\Controller;
 
 use Mautic\CategoryBundle\Entity\Category;
@@ -13,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategoryControllerFunctionalTest extends MauticMysqlTestCase
+final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
     private TranslatorInterface $translator;
 

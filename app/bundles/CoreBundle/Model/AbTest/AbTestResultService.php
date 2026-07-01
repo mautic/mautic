@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-final class AbTestResultService
+final readonly class AbTestResultService
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

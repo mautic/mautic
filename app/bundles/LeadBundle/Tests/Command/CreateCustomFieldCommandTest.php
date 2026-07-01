@@ -14,25 +14,10 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommandTest extends TestCase
+final class CreateCustomFieldCommandTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\Stub $backgroundServiceMock;
-
-    private \PHPUnit\Framework\MockObject\Stub $translatorMock;
-
-    private \PHPUnit\Framework\MockObject\Stub $leadFieldRepositoryMock;
-
-    private \PHPUnit\Framework\MockObject\Stub $pathsHelperMock;
-
-    private \PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
-
     protected function setUp(): void
     {
-        $this->backgroundServiceMock   = $this->createStub(BackgroundService::class);
-        $this->translatorMock          = $this->createStub(TranslatorInterface::class);
-        $this->leadFieldRepositoryMock = $this->createStub(LeadFieldRepository::class);
-        $this->pathsHelperMock         = $this->createStub(PathsHelper::class);
-        $this->coreParametersHelper    = $this->createStub(CoreParametersHelper::class);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]
@@ -40,11 +25,11 @@ class CreateCustomFieldCommandTest extends TestCase
     {
         $command = $this->getMockBuilder(CreateCustomFieldCommand::class)
             ->setConstructorArgs([
-                $this->backgroundServiceMock,
-                $this->translatorMock,
-                $this->leadFieldRepositoryMock,
-                $this->pathsHelperMock,
-                $this->coreParametersHelper,
+                $this->createStub(BackgroundService::class),
+                $this->createStub(TranslatorInterface::class),
+                $this->createStub(LeadFieldRepository::class),
+                $this->createStub(PathsHelper::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['completeRun', 'checkRunStatus'])
             ->getMock();

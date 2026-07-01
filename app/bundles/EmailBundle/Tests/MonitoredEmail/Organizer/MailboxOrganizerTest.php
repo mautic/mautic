@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\Event\ParseEmailEvent;
@@ -9,7 +11,7 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(MailboxOrganizer::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(ParseEmailEvent::class)]
-class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
+final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, array<string, int|string>> */
     protected array $mailboxes = [

@@ -15,7 +15,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class RouteHelperTest extends TestCase
+final class RouteHelperTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider

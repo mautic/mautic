@@ -79,7 +79,7 @@ trait EntityContactsTrait
         }
 
         // Apply filters
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $this->setListFilters($sessionVar.'.contact');
         }
 

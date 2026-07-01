@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Model\ImportModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class ImportCommandTest extends MauticMysqlTestCase
+final class ImportCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 
-class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
+final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * Test retrieving categories via API Platform v2 endpoint.

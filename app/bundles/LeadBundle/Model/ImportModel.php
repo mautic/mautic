@@ -444,7 +444,7 @@ class ImportModel extends FormModel
      */
     public function trimArrayValues(array $data): array
     {
-        return array_map('trim', $data);
+        return array_map(trim(...), $data);
     }
 
     /**
