@@ -15,7 +15,7 @@ abstract class AbstractFormController extends CommonController
     /**
      * @return mixed
      */
-    public function unlockAction(Request $request, $objectId, $objectModel)
+    public function unlockAction(Request $request, $objectId, string $objectModel)
     {
         $model                = $this->getModel($objectModel);
         $entity               = $model->getEntity($objectId);
@@ -58,12 +58,11 @@ abstract class AbstractFormController extends CommonController
      *
      * @param array  $postActionVars
      * @param object $entity
-     * @param string $model
      * @param bool   $batch          Flag if a batch action is being performed
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse|array
      */
-    protected function isLocked($postActionVars, $entity, $model, $batch = false)
+    protected function isLocked($postActionVars, $entity, string $model, $batch = false)
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);

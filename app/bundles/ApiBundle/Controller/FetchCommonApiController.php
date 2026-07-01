@@ -374,11 +374,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Returns a 403 Access Denied.
      *
-     * @param string $msg
-     *
      * @return Response
      */
-    protected function accessDenied($msg = 'mautic.core.error.accessdenied')
+    protected function accessDenied(string $msg = 'mautic.core.error.accessdenied')
     {
         return $this->returnError($msg, Response::HTTP_FORBIDDEN);
     }
@@ -391,11 +389,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Returns a 400 Bad Request.
      *
-     * @param string $msg
-     *
      * @return Response
      */
-    protected function badRequest($msg = 'mautic.core.error.badrequest')
+    protected function badRequest(string $msg = 'mautic.core.error.badrequest')
     {
         return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
     }
@@ -440,7 +436,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return mixed[]
      */
-    protected function getBatchEntities($parameters, &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
+    protected function getBatchEntities($parameters, array &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
     {
         $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
@@ -581,7 +577,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         return $this->prepareEntityResultsToArray(
             $results,
-            function ($entity): void {
+            function (object $entity): void {
                 $this->preSerializeEntity($entity);
             }
         );
