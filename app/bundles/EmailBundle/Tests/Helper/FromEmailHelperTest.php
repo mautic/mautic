@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FromEmailHelperTest extends TestCase
+final class FromEmailHelperTest extends TestCase
 {
     /** @var MockObject&CoreParametersHelper */
     private MockObject $coreParametersHelper;
@@ -118,7 +118,7 @@ class FromEmailHelperTest extends TestCase
 
     public function testDefaultIsReturnedWhenOwnerNotFound(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->exactly(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'someone@somewhere.com'],
@@ -476,7 +476,7 @@ class FromEmailHelperTest extends TestCase
 
     public function testTokenizedEmailFallsBackToTokenizedSystemDefault(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, '{contactfield=default_email|fallback@somewhere.com}'],
@@ -687,7 +687,7 @@ class FromEmailHelperTest extends TestCase
 
     public function testEmptySignatureIsReturnedWhenOwnerIsNotFound(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->exactly(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'someone@somewhere.com'],

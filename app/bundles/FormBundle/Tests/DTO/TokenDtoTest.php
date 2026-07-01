@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TokenDto::class)]
-class TokenDtoTest extends TestCase
+final class TokenDtoTest extends TestCase
 {
     public static function provideData(): \Generator
     {

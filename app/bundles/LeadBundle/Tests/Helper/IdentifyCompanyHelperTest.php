@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
+final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testDomainExistsRealDomain(): void
     {

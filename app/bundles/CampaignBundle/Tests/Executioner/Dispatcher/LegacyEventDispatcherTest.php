@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends TestCase
+final class LegacyEventDispatcherTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

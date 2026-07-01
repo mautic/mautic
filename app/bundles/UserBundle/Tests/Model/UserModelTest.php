@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -25,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class UserModelTest extends TestCase
+final class UserModelTest extends TestCase
 {
     private UserModel $userModel;
 
@@ -55,11 +57,6 @@ class UserModelTest extends TestCase
     private MockObject $user;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&UserToken
-     */
-    private \PHPUnit\Framework\MockObject\Stub $userToken;
-
-    /**
      * @var MockObject&UserTokenServiceInterface
      */
     private MockObject $userTokenService;
@@ -82,7 +79,6 @@ class UserModelTest extends TestCase
         $this->user             = $this->createMock(User::class);
         $this->router           = $this->createMock(Router::class);
         $this->translator       = $this->createMock(Translator::class);
-        $this->userToken        = $this->createStub(UserToken::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
@@ -105,7 +101,7 @@ class UserModelTest extends TestCase
     {
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->userToken);
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->mailHelper
             ->method('getMailer')
@@ -116,7 +112,7 @@ class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->userToken);
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->router->expects($this->once())
             ->method('generate')

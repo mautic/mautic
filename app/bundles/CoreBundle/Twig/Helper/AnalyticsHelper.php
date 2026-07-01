@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class AnalyticsHelper
+final readonly class AnalyticsHelper
 {
-    private readonly string $code;
+    private string $code;
 
     public function __construct(CoreParametersHelper $parametersHelper)
     {

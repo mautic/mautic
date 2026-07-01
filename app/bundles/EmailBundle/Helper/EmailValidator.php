@@ -62,7 +62,7 @@ class EmailValidator
      *
      * @returns bool
      */
-    public function hasValidCharacters($address)
+    public function hasValidCharacters($address): string|false
     {
         $invalidChar = strpbrk($address, '^&*%');
 

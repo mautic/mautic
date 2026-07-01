@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 
-class SearchStringHelperTest extends \PHPUnit\Framework\TestCase
+final class SearchStringHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testNegativeGroup(): void
     {

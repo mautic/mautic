@@ -85,7 +85,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                       $qb->expr()->in(
                           'lead_id', ':leadsIds')
                   )
-                  ->setParameter('leadsIds', array_map('intval', $leadsIds), ArrayParameterType::INTEGER)
+                  ->setParameter('leadsIds', array_map(intval(...), $leadsIds), ArrayParameterType::INTEGER)
                     ->executeStatement();
                 ++$loop;
             }

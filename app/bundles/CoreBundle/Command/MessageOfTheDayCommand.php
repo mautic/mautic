@@ -226,7 +226,7 @@ final class MessageOfTheDayCommand extends Command
 
         $labelWidth       = Helper::width($label);
         $longestLineWidth = max(array_map(
-            static fn (string $line): int => Helper::width($line),
+            Helper::width(...),
             $lines
         ));
 

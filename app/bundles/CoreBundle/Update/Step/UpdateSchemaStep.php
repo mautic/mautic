@@ -12,12 +12,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class UpdateSchemaStep implements StepInterface
+final readonly class UpdateSchemaStep implements StepInterface
 {
-    private readonly object $kernel;
+    private object $kernel;
 
     public function __construct(
-        private readonly TranslatorInterface $translator,
+        private TranslatorInterface $translator,
         ContainerInterface $container,
     ) {
         $this->kernel = $container->get('kernel');

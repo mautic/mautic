@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExampleSendTypeTest extends TestCase
+final class ExampleSendTypeTest extends TestCase
 {
     private ExampleSendType $form;
 

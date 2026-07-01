@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 #[Group('time-sensitive')]
-class IntegrationTokenFactoryTest extends TestCase
+final class IntegrationTokenFactoryTest extends TestCase
 {
     public function testTokenGeneratedWithExpiresIn(): void
     {

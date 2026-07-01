@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 
-class SegmentFilterFunctionalTest extends MauticMysqlTestCase
+final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @var Lead[]
@@ -195,7 +195,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $field->setObject('lead');
         $field->setAlias('multiselect');
         $field->setName('Multiselect');
-        $properties = unserialize('a:1:{s:4:"list";a:3:{i:0;a:2:{s:5:"label";s:1:"f";s:5:"value";s:1:"f";}i:1;a:2:{s:5:"label";s:1:"s";s:5:"value";s:1:"s";}i:2;a:2:{s:5:"label";s:1:"t";s:5:"value";s:1:"t";}}}');
+        $properties = \Mautic\CoreBundle\Helper\Serializer::decode('a:1:{s:4:"list";a:3:{i:0;a:2:{s:5:"label";s:1:"f";s:5:"value";s:1:"f";}i:1;a:2:{s:5:"label";s:1:"s";s:5:"value";s:1:"s";}i:2;a:2:{s:5:"label";s:1:"t";s:5:"value";s:1:"t";}}}');
         $field->setProperties($properties);
         $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);
