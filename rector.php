@@ -8,13 +8,10 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
-use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
 $extendableControllers = [
@@ -33,17 +30,14 @@ return RectorConfig::configure()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
-        AddParamTypeFromPropertyTypeRector::class,
-        ClosureReturnTypeRector::class,
 
         TypedPropertyFromAssignsRector::class,
-        ReturnTypeFromStrictParamRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(40)
+    ->withTypeCoverageLevel(36)
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(27)
     ->withSkip([
