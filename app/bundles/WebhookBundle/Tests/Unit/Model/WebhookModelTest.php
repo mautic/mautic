@@ -244,7 +244,7 @@ class WebhookModelTest extends TestCase
         $webhookLogRepoMock   = $this->createStub(LogRepository::class);
         $webhookRepoMock      = $this->createStub(WebhookRepository::class);
 
-        $this->entityManagerMock->method('getRepository')
+        $this->entityManagerMock->expects($this->exactly(3))->method('getRepository')
             ->willReturnMap([
                 [WebhookQueue::class, $webhookQueueRepoMock],
                 [Log::class, $webhookLogRepoMock],

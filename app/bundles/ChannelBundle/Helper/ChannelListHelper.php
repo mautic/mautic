@@ -20,8 +20,8 @@ class ChannelListHelper
     private array $featureChannels = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Translator $translator,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Translator $translator,
     ) {
     }
 

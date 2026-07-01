@@ -124,7 +124,7 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
                 }
 
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
-                Assert::assertSame($event->getFile(), 'my-path');
+                Assert::assertSame('my-path', $event->getFile());
                 if (1 === $matcher->numberOfInvocations()) {
                     Assert::assertSame($event->getScheduler(), $scheduler1);
                 }

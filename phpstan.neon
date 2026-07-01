@@ -11,9 +11,9 @@ parameters:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 80
-		param: 70
-		property: 64
+		return: 85
+		param: 72
+		property: 67
 	paths:
 		- app/bundles
 		- app/migrations

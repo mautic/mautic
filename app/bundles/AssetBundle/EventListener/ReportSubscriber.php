@@ -20,9 +20,9 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     public function __construct(
-        private CompanyReportData $companyReportData,
-        private DownloadRepository $downloadRepository,
-        private DncReportService $dncReportService,
+        private readonly CompanyReportData $companyReportData,
+        private readonly DownloadRepository $downloadRepository,
+        private readonly DncReportService $dncReportService,
     ) {
     }
 

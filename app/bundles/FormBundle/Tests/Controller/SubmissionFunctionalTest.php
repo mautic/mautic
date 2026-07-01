@@ -29,6 +29,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     use FormTestHelperTrait;
 
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void

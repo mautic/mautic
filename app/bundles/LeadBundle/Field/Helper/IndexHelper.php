@@ -28,8 +28,8 @@ class IndexHelper
     private int $indexCount = 0;
 
     public function __construct(
-        private EntityManager $entityManager,
-        private IndexSchemaHelper $indexSchemaHelper,
+        private readonly EntityManager $entityManager,
+        private readonly IndexSchemaHelper $indexSchemaHelper,
     ) {
     }
 

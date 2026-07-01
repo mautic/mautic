@@ -77,7 +77,7 @@ class BuilderSubscriberTest extends TestCase
                 'signature'  => 'Owner Signature',
             ]);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
             ['unsubscribe_text', null, null],
             ['webview_text', null, null],
             ['default_signature_text', null, 'Default Signature'],

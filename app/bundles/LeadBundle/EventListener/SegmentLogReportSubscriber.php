@@ -14,7 +14,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
     public const SEGMENT_LOG = 'segment.log';
 
     public function __construct(
-        private FieldsBuilder $fieldsBuilder,
+        private readonly FieldsBuilder $fieldsBuilder,
         private Connection $connection,
     ) {
     }

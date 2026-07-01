@@ -260,11 +260,7 @@ class ThemeHelperTest extends TestCase
                  */
                 public function exists($files): bool
                 {
-                    if ('/path/to/themes/new-theme-name' === $files) {
-                        return false;
-                    }
-
-                    return true;
+                    return '/path/to/themes/new-theme-name' !== $files;
                 }
 
                 /**
@@ -350,11 +346,7 @@ class ThemeHelperTest extends TestCase
                  */
                 public function exists($files): bool
                 {
-                    if ('/path/to/themes/requested-theme-dir' === $files) {
-                        return false;
-                    }
-
-                    return true;
+                    return '/path/to/themes/requested-theme-dir' !== $files;
                 }
 
                 /**

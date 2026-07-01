@@ -163,7 +163,7 @@ class ImportCommandTest extends TestCase
         };
 
         $inputInterfaceMock = $this->createMock(InputInterface::class);
-        $inputInterfaceMock->method('getOption')->willReturnMap([
+        $inputInterfaceMock->expects($this->exactly(2))->method('getOption')->willReturnMap([
             ['id', 42],
             ['limit', 10],
         ]);

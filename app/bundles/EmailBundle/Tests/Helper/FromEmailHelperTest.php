@@ -118,7 +118,7 @@ class FromEmailHelperTest extends TestCase
 
     public function testDefaultIsReturnedWhenOwnerNotFound(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->exactly(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'someone@somewhere.com'],
@@ -476,7 +476,7 @@ class FromEmailHelperTest extends TestCase
 
     public function testTokenizedEmailFallsBackToTokenizedSystemDefault(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->atLeast(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, '{contactfield=default_email|fallback@somewhere.com}'],
@@ -687,7 +687,7 @@ class FromEmailHelperTest extends TestCase
 
     public function testEmptySignatureIsReturnedWhenOwnerIsNotFound(): void
     {
-        $this->coreParametersHelper->method('get')
+        $this->coreParametersHelper->expects($this->exactly(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'someone@somewhere.com'],

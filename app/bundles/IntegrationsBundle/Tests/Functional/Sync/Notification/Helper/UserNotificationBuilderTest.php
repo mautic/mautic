@@ -15,10 +15,7 @@ class UserNotificationBuilderTest extends MauticMysqlTestCase
     private const ADMIN_USER = 'admin';
     private const SALES_USER = 'sales';
 
-    /**
-     * @var UserNotificationBuilder
-     */
-    private $notificationBuilder;
+    private UserNotificationBuilder $notificationBuilder;
 
     protected function setUp(): void
     {

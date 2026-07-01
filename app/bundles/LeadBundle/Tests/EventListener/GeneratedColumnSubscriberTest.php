@@ -20,7 +20,7 @@ class GeneratedColumnSubscriberTest extends TestCase
     /**
      * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator|MockObject $translator;
 
     private GeneratedColumnSubscriber $generatedColumnSubscriber;
 

@@ -44,7 +44,7 @@ class SubmissionRepository extends CommonRepository
 
     public function getEntities(array $args = [])
     {
-        $form       = $args['form'];
+        $form = $args['form'];
 
         // DBAL
         $viewOnlyFields = $args['viewOnlyFields'] ?? [];
@@ -95,7 +95,7 @@ class SubmissionRepository extends CommonRepository
 
         $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
         // Quote reserved keywords in field aliases
-        $fieldAliases = array_map(fn ($alias) => $databasePlatform->quoteIdentifier($alias), $fieldAliases);
+        $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
 
         $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select(
@@ -410,12 +410,12 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($emailId)) {
             $q->where($q->expr()->in('e.id', ':ids'))
-                ->setParameter('ids', array_map('intval', $emailId), ArrayParameterType::INTEGER)
-                ->groupBy('e.id, e.subject, e.variant_sent_count');
+                ->setParameter('ids', array_map(intval(...), $emailId), ArrayParameterType::INTEGER);
         } else {
             $q->where($q->expr()->eq('e.id', ':id'))
                 ->setParameter('id', (int) $emailId);
         }
+        $q->groupBy('e.id, e.subject, e.variant_sent_count');
 
         if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);

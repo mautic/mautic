@@ -19,7 +19,7 @@ use Monolog\Logger;
  */
 class UpdateHelper
 {
-    private string $phpVersion;
+    private readonly string $phpVersion;
 
     /**
      * @var string
@@ -27,12 +27,12 @@ class UpdateHelper
     private $mauticVersion;
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private Logger $logger,
-        private CoreParametersHelper $coreParametersHelper,
-        private Client $client,
-        private ReleaseParser $releaseParser,
-        private PreUpdateCheckHelper $preUpdateCheckHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly Logger $logger,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Client $client,
+        private readonly ReleaseParser $releaseParser,
+        private readonly PreUpdateCheckHelper $preUpdateCheckHelper,
     ) {
         $this->mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : 'unknown';
         $this->phpVersion    = defined('PHP_VERSION') ? PHP_VERSION : 'unknown';
@@ -212,7 +212,7 @@ class UpdateHelper
             $instanceId = hash('sha1', $key.$installSource.$dbDriver);
 
             $data = array_map(
-                'trim',
+                trim(...),
                 [
                     'application'   => 'Mautic',
                     'version'       => $this->mauticVersion,

@@ -145,7 +145,7 @@ class ConfigFormTest extends KernelTestCase
 
         $integrationRepository = $this->createMock(IntegrationRepository::class);
 
-        $entityManager
+        $entityManager->expects($this->exactly(3))
                 ->method('getRepository')
                 ->willReturnMap(
                     [

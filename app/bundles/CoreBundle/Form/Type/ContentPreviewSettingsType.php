@@ -28,7 +28,7 @@ class ContentPreviewSettingsType extends AbstractType
 
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
-    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, private UserHelper $userHelper)
+    public function __construct(private readonly TranslatorInterface $translator, private readonly CorePermissions $security, private readonly UserHelper $userHelper)
     {
     }
 

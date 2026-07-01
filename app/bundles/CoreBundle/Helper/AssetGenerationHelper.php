@@ -63,11 +63,11 @@ class AssetGenerationHelper
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices, and needs to be added after the jquery-ui components
     ];
 
-    private string $version;
+    private readonly string $version;
 
     public function __construct(
-        private BundleHelper $bundleHelper,
-        private PathsHelper $pathsHelper,
+        private readonly BundleHelper $bundleHelper,
+        private readonly PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
         AppVersion $appVersion,
     ) {

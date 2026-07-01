@@ -54,7 +54,7 @@ class ImportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private ProcessSignalService $processSignalService,
+        private readonly ProcessSignalService $processSignalService,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -444,7 +444,7 @@ class ImportModel extends FormModel
      */
     public function trimArrayValues(array $data): array
     {
-        return array_map('trim', $data);
+        return array_map(trim(...), $data);
     }
 
     /**

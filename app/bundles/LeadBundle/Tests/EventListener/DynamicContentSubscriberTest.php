@@ -20,10 +20,7 @@ class DynamicContentSubscriberTest extends TestCase
      */
     private MockObject $segmentRepository;
 
-    /**
-     * @var DynamicContentSubscriber
-     */
-    private $subscriber;
+    private DynamicContentSubscriber $subscriber;
 
     protected function setUp(): void
     {

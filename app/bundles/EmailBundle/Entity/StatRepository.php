@@ -299,7 +299,7 @@ class StatRepository extends CommonRepository
                     );
 
                 $q->andWhere(sprintf('EXISTS (%s)', $subQ->getSQL()))
-                    ->setParameter('subQListIds', array_map('intval', $listId), ArrayParameterType::INTEGER);
+                    ->setParameter('subQListIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
             }
         }
 

@@ -601,7 +601,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $testEmail = function (string $customToken): void {
             $message = $this->transport->sentMessage;
-            $this->assertSame($message->getSubject(), 'Email created via API test');
+            $this->assertSame('Email created via API test', $message->getSubject());
             $bodyRegExp = '#<h1>Email content created by an API test</h1>'.$customToken.'<br>Best regards, Mautic Admin<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
             $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);
@@ -644,7 +644,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $testEmailOwnerAsMailer = function (): void {
             $message = $this->transport->sentMessage;
-            $this->assertSame($message->getSubject(), 'Email created via API test');
+            $this->assertSame('Email created via API test', $message->getSubject());
             $bodyRegExp = '#<h1>Email content created by an API test</h1>{custom-token}<br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
             $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);
@@ -690,7 +690,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $testCustomReplyTo = function (): void {
             $message = $this->transport->sentMessage;
-            $this->assertSame($message->getSubject(), 'Email created via API test');
+            $this->assertSame('Email created via API test', $message->getSubject());
             $bodyRegExp = '#<h1>Email content created by an API test</h1>{custom-token}<br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getHtmlBody());
             $this->assertSame([$message->getTo()[0]->getAddress() => $message->getTo()[0]->getName()], ['jane@api.test' => 'Jane Doe']);

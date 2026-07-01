@@ -16,7 +16,7 @@ class FieldValueTransformer
     private bool $isTransformed = false;
 
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 

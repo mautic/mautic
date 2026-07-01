@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class NotifyOfUnpublishEvent extends Event
 {
-    public function __construct(private CampaignEvent $failedEvent)
+    public function __construct(private readonly CampaignEvent $failedEvent)
     {
     }
 

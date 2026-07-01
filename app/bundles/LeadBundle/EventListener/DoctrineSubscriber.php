@@ -15,7 +15,7 @@ class DoctrineSubscriber
 {
     public function __construct(
         #[Autowire(service: 'monolog.logger.mautic')]
-        private Logger $logger,
+        private readonly Logger $logger,
     ) {
     }
 

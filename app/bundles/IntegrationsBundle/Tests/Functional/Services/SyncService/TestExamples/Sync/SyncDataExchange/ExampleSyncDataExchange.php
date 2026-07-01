@@ -45,15 +45,9 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         ],
     ];
 
-    /**
-     * @var array
-     */
-    private $payload = ['create' => [], 'update' => []];
+    private array $payload = ['create' => [], 'update' => []];
 
-    /**
-     * @var ValueNormalizer
-     */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {
@@ -192,9 +186,6 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         $requestedObjects = $requestDAO->getObjects();
         foreach ($requestedObjects as $requestedObject) {
             $objectName   = $requestedObject->getObject();
-            $fromDateTime = $requestedObject->getFromDateTime();
-            $toDatetime   = $requestedObject->getToDateTime();
-            $mappedFields = $requestedObject->getFields();
 
             $updatedPeople = $this->getReportPayload();
             foreach ($updatedPeople as $person) {
@@ -223,10 +214,7 @@ class ExampleSyncDataExchange implements SyncDataExchangeInterface
         return $syncReport;
     }
 
-    /**
-     * @return array
-     */
-    public function getOrderPayload()
+    public function getOrderPayload(): array
     {
         return $this->payload;
     }

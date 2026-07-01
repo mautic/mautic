@@ -22,9 +22,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchContactController extends AbstractFormController
 {
     public function __construct(
-        private ChannelActionModel $channelActionModel,
-        private FrequencyActionModel $frequencyActionModel,
-        private LeadModel $contactModel,
+        private readonly ChannelActionModel $channelActionModel,
+        private readonly FrequencyActionModel $frequencyActionModel,
+        private readonly LeadModel $contactModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

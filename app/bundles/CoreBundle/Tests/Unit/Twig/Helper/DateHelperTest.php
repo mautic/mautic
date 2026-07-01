@@ -17,10 +17,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     private DateHelper $helper;
 
-    /**
-     * @var string
-     */
-    private static $oldTimezone;
+    private static string $oldTimezone;
 
     /**
      * @var MockObject&CoreParametersHelper
@@ -134,7 +131,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
-        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+        $this->assertEquals('February 21, 2021 7:00 pm', $result);
     }
 
     public function testToHumanized(): void

@@ -73,7 +73,7 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('cs.leadlist_id', ':segmentIds')
                     );
 
-                    $q->setParameter('segmentIds', array_map('intval', $listId), ArrayParameterType::INTEGER);
+                    $q->setParameter('segmentIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
@@ -89,7 +89,7 @@ class DoNotContactRepository extends CommonRepository
                         $q->expr()->in('list.leadlist_id', ':segmentIds')
                     );
 
-                $q->setParameter('segmentIds', array_map('intval', $listId), ArrayParameterType::INTEGER);
+                $q->setParameter('segmentIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                 $q->innerJoin('dnc', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = dnc.lead_id');
             }

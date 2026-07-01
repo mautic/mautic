@@ -71,11 +71,8 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValues, $params);
     }
 
-    /**
-     * @param string|int|bool|null $value
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('boolProvider')]
-    public function testCleanFieldsBoolean(?bool $expected, $value): void
+    public function testCleanFieldsBoolean(?bool $expected, string|int|bool|null $value): void
     {
         $fieldData = ['boolVal' => $value];
         $leadField = [

@@ -28,7 +28,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class DashboardModelTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
+
     private MockObject&Session $session;
+
     private DashboardModel $model;
 
     protected function setUp(): void

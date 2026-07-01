@@ -6,7 +6,7 @@ namespace MauticPlugin\MauticSocialBundle\Integration;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 
-final class Config
+final readonly class Config
 {
     public function __construct(private IntegrationHelper $integrationsHelper)
     {

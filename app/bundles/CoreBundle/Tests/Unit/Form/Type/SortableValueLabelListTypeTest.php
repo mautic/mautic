@@ -30,7 +30,7 @@ final class SortableValueLabelListTypeTest extends TestCase
 
                 return in_array($name, $expected[0], true);
             }),
-                $this->callback(fn ($type) => TextType::class === $type),
+                $this->callback(fn ($type): bool => TextType::class === $type),
                 $this->callback(function ($options) use (&$call): bool {
                     $expectedOptions = [
                         [
@@ -134,7 +134,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(fn ($newData) => $newData['label'] === $data['label'] && $newData['value'] === $expectedValue));
+                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expectedValue));
         } else {
             $event->expects($this->never())
                 ->method('setData');
@@ -187,7 +187,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(fn ($newData) => $newData['label'] === $data['label'] && $newData['value'] === $expected));
+                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expected));
         } else {
             $event->expects($this->never())
                 ->method('setData');

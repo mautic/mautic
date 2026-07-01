@@ -14,10 +14,7 @@ use PHPUnit\Framework\Assert;
 
 final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
+    private WebhookModel $webhookModel;
 
     protected function setUp(): void
     {

@@ -12,7 +12,7 @@ class VersionProvider implements VersionProviderInterface
     private ?string $version = null;
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
     }
 

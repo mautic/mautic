@@ -262,11 +262,8 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['{contactfield=randomField}', 'randomField'];
     }
 
-    /**
-     * @param string|int $result
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataLabelProvider')]
-    public function testLabelFormatForSelect(string $token, $result): void
+    public function testLabelFormatForSelect(string $token, string|int $result): void
     {
         $lead         = $this->lead;
         $tokenList    = TokenHelper::findLeadTokens($token, $lead);

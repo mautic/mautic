@@ -171,10 +171,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $mappingManual;
     }
 
-    /**
-     * @param bool $includeFirstNameField
-     */
-    private function getInternalSyncReport($includeFirstNameField = true): ReportDAO
+    private function getInternalSyncReport(bool $includeFirstNameField = true): ReportDAO
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);

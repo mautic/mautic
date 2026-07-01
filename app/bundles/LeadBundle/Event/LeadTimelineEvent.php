@@ -201,7 +201,7 @@ class LeadTimelineEvent extends Event
             return [];
         }
 
-        $events = call_user_func_array('array_merge', array_values($this->events));
+        $events = call_user_func_array(array_merge(...), array_values($this->events));
 
         foreach ($events as &$e) {
             if (!$e['timestamp'] instanceof \DateTime) {

@@ -103,10 +103,8 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test create or update company logging.
-     *
-     * @param bool $isNew
      */
-    private function onCompanyPostSaveMethodCall($isNew): void
+    private function onCompanyPostSaveMethodCall(bool $isNew): void
     {
         $companyId = 1;
         $changes   = ['changes'];

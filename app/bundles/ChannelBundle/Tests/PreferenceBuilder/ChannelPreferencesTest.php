@@ -30,10 +30,10 @@ class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
         $channelPreferences->addLog($log2, 2);
 
         $organized = $channelPreferences->getLogsByPriority(1);
-        $this->assertEquals($organized->first()->getMetadata()['log'], 1);
+        $this->assertEquals(1, $organized->first()->getMetadata()['log']);
 
         $organized = $channelPreferences->getLogsByPriority(2);
-        $this->assertEquals($organized->first()->getMetadata()['log'], 2);
+        $this->assertEquals(2, $organized->first()->getMetadata()['log']);
     }
 
     private function getChannelPreference(Event $event): ChannelPreferences

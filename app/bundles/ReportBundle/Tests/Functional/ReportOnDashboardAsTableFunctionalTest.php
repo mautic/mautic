@@ -43,13 +43,13 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
         $title   = $crawler->filter('.card-header h4')->text();
         $this->assertSame('Emails Report: table', trim($title));
 
-        $dropdownItems = $crawler->filter('.dropdown-menu li')->each(fn ($node) => trim($node->text()));
+        $dropdownItems = $crawler->filter('.dropdown-menu li')->each(fn ($node): string => trim($node->text()));
 
         $this->assertContains('Just retrieved latest data', $dropdownItems);
         $this->assertContains('Edit', $dropdownItems);
         $this->assertContains('Remove', $dropdownItems);
 
-        $headers = $crawler->filter('table thead th')->each(fn ($node) => trim($node->text()));
+        $headers = $crawler->filter('table thead th')->each(fn ($node): string => trim($node->text()));
 
         $expectedHeaders = ['Subject', 'Sent count', 'Read count', 'Read ratio', 'Unsubscribed ratio', 'Clicks ratio', 'Category name'];
         $this->assertSame($expectedHeaders, $headers);
@@ -58,7 +58,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 
         $this->assertCount(1, $rows);
 
-        $columns = $rows->first()->filter('td')->each(fn ($td) => trim($td->text()));
+        $columns = $rows->first()->filter('td')->each(fn ($td): string => trim($td->text()));
 
         $expected = [
             $email->getSubject(),

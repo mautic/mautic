@@ -761,7 +761,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
         $loserCompanyLead->setPrimary(true);
 
-        $this->companyLeadRepo->method('findBy')
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
             ->willReturnMap([
                 [['lead' => $loser], null, null, null, [$loserCompanyLead]],
                 [['lead' => $winner], null, null, null, []],
@@ -801,7 +801,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
         $loserCompanyLead->setPrimary(true);
 
-        $this->companyLeadRepo->method('findBy')
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
             ->willReturnMap([
                 [['lead' => $loser], null, null, null, [$loserCompanyLead]],
                 [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
@@ -840,7 +840,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $loserCompanyLead->setLead($loser);
         $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
 
-        $this->companyLeadRepo->method('findBy')
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
             ->willReturnMap([
                 [['lead' => $loser], null, null, null, [$loserCompanyLead]],
                 [['lead' => $winner], null, null, null, [$winnerCompanyLead]],

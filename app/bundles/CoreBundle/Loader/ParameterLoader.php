@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ParameterLoader
 {
-    private string $configBaseDir;
+    private readonly string $configBaseDir;
 
     private ParameterBag $parameterBag;
 
@@ -26,7 +26,7 @@ class ParameterLoader
     private static array $defaultParameters = [];
 
     public function __construct(
-        private string $rootPath = __DIR__.'/../../../',
+        private readonly string $rootPath = __DIR__.'/../../../',
     ) {
         $this->configBaseDir = static::getLocalConfigBaseDir($this->rootPath);
 

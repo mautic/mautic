@@ -16,13 +16,12 @@ use PHPUnit\Framework\Assert;
 class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     public const INTEGRATION        = 'someIntegration';
+
     public const INTEGRATION_ENTITY = 'someIntegrationEntity';
+
     public const INTERNAL_ENTITY    = 'lead';
 
-    /**
-     * @var IntegrationEntityRepository
-     */
-    private $integrationEntityRepository;
+    private IntegrationEntityRepository $integrationEntityRepository;
 
     protected function setUp(): void
     {

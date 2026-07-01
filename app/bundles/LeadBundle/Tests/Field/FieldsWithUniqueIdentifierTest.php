@@ -15,10 +15,7 @@ class FieldsWithUniqueIdentifierTest extends TestCase
      */
     private MockObject $fieldList;
 
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {

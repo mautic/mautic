@@ -38,7 +38,7 @@ class WidgetDetailEvent extends CommonEvent
 
     private bool $isPreview = false;
 
-    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProviderTagAwareInterface $cacheProvider = null)
+    public function __construct(private readonly TranslatorInterface $translator, private readonly CorePermissions $security, protected Widget $widget, private readonly ?CacheProviderTagAwareInterface $cacheProvider = null)
     {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
@@ -336,12 +336,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Check if the user has defined permission to see the widgets.
-     *
-     * @param string $permission
-     *
-     * @return bool
      */
-    public function hasPermission($permission)
+    public function hasPermission(string $permission): bool
     {
         return $this->security->isGranted($permission);
     }

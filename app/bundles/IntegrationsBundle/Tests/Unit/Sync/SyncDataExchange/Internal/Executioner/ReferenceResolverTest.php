@@ -97,9 +97,9 @@ class ReferenceResolverTest extends TestCase
     }
 
     /**
-     * @param mixed ...$returnValues
+     * @param mixed $returnValues
      *
-     * @return QueryBuilder|MockObject
+     * @return QueryBuilder&MockObject
      */
     private function createQueryBuilder(...$returnValues): MockObject
     {

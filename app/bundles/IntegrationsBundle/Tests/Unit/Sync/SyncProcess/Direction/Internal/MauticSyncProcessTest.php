@@ -46,10 +46,7 @@ class MauticSyncProcessTest extends TestCase
      */
     private MockObject $syncDataExchange;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private InputOptionsDAO $inputOptionsDAO;
 
     protected function setUp(): void
     {

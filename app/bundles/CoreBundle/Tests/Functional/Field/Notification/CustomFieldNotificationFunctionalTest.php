@@ -18,8 +18,11 @@ class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     private const ADMIN_USER = 'admin';
 
     protected $useCleanupRollback = false;
+
     private TranslatorInterface $translator;
+
     private CustomFieldNotification $notifier;
+
     private LeadField $leadField;
 
     protected function setUp(): void

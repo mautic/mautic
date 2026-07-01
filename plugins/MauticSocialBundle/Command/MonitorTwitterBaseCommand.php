@@ -52,7 +52,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         protected EventDispatcherInterface $dispatcher,
         protected Translator $translator,
         protected IntegrationHelper $integrationHelper,
-        private TwitterCommandHelper $twitterCommandHelper,
+        private readonly TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));

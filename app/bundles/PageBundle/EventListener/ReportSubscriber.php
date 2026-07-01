@@ -27,11 +27,11 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_VIDEO_HITS = 'video.hits';
 
     public function __construct(
-        private CompanyReportData $companyReportData,
-        private HitRepository $hitRepository,
-        private TranslatorInterface $translator,
-        private DncReportService $dncReportService,
-        private VersionProvider $versionProvider,
+        private readonly CompanyReportData $companyReportData,
+        private readonly HitRepository $hitRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly DncReportService $dncReportService,
+        private readonly VersionProvider $versionProvider,
     ) {
     }
 

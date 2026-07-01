@@ -10,9 +10,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
-use PHPUnit\Framework\TestCase;
 
-class IndexHelperTest extends TestCase
+class IndexHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetIndexCountAndColumns(): void
     {
@@ -29,6 +28,10 @@ class IndexHelperTest extends TestCase
                 ->willReturn([$columnName]);
             $indexes[] = $indexMock;
         }
+        $expectedColumnNames = array_map(
+            fn ($column) => $column[self::COLUMN_NAME_KEY],
+            $sqlResult
+        );
 
         $expectedColumnNames = $columnNames;
         $expectedCount       = count($expectedColumnNames);

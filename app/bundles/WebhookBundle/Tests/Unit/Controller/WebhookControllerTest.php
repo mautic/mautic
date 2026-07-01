@@ -207,7 +207,7 @@ class WebhookControllerTest extends TestCase
         $logRepository->expects($this->never())->method('removeLimitExceedLogs'); // because clean_webhook_logs_in_background = true
 
         $em = $this->createMock(EntityManager::class);
-        $em->method('getRepository')
+        $em->expects($this->atLeast(3))->method('getRepository')
             ->willReturnMap([
                 [Event::class, $webhookEventRepository],
                 [WebhookQueue::class, $webhookQueueRepository],
@@ -235,7 +235,7 @@ class WebhookControllerTest extends TestCase
             ->willReturn(false);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->exactly(10))->method('get')
             ->willReturnMap([
                 ['webhook_limit', 10, 5],
                 ['webhook_time_limit', 600, 500],

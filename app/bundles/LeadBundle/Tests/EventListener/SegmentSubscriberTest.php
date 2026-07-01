@@ -182,10 +182,8 @@ class SegmentSubscriberTest extends TestCase
 
     /**
      * Test create or update segment logging.
-     *
-     * @param bool $isNew
      */
-    private function onSegmentPostSaveMethodCall($isNew): void
+    private function onSegmentPostSaveMethodCall(bool $isNew): void
     {
         $segmentId = 1;
         $changes   = ['changes'];

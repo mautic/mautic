@@ -19,7 +19,7 @@ class CleanupCommand extends Command
 {
     public const NAME = 'mautic:integrations:cleanup';
 
-    public function __construct(private FieldChangeRepository $fieldChangeRepository)
+    public function __construct(private readonly FieldChangeRepository $fieldChangeRepository)
     {
         parent::__construct();
     }

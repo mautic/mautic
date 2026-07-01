@@ -184,7 +184,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $contactMerger                    = $this->createMock(ContactMerger::class);
         $userRepository                   = $this->createMock(UserRepository::class);
 
-        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
+        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
             Submission::class => $this->submissioRepository,
             Lead::class       => $this->leadRepository,
             User::class       => $userRepository,

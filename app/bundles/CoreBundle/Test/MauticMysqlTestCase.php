@@ -221,7 +221,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * @throws \InvalidArgumentException
      * @throws ProcessFailedException
      */
-    private function applySqlFromFile($file): void
+    private function applySqlFromFile(string $file): void
     {
         $connectionParams = $this->connection->getParams();
 

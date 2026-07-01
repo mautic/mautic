@@ -26,6 +26,7 @@ class CanPublishValidatorTest extends TestCase
      * @var MockObject&PluginIsPublishedEvent
      */
     private MockObject $event;
+
     private CanPublishValidator $canPublishValidator;
 
     protected function setUp(): void

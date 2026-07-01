@@ -137,7 +137,7 @@ class FieldValidatorTest extends TestCase
         Assert::assertSame($parameters[2], $changedObject->getIntegration());
         Assert::assertSame($parameters[3], sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject()));
         Assert::assertSame($parameters[4], $changedObject->getObject());
-        Assert::assertSame($parameters[5], 0);
+        Assert::assertSame(0, $parameters[5]);
         Assert::assertSame($parameters[6], sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId()));
     }
 }

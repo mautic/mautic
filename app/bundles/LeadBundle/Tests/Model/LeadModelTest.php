@@ -253,7 +253,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->method('get')
+        $this->coreParametersHelperMock->expects($this->exactly(2))->method('get')
             ->willReturnMap([
                 ['anonymize_ip', false, false],
                 ['ip_lookup_create_organization', false, false],
@@ -281,7 +281,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $entity->addIpAddress($ipAddress);
 
-        $this->coreParametersHelperMock->method('get')
+        $this->coreParametersHelperMock->expects($this->exactly(2))->method('get')
             ->willReturnMap([
                 ['anonymize_ip', false, false],
                 ['ip_lookup_create_organization', false, true],

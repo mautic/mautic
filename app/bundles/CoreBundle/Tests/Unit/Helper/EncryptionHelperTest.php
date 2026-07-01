@@ -28,10 +28,7 @@ class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $secondaryCipherMock;
 
-    /**
-     * @var string
-     */
-    private $key = 'totallySecretKeyHere';
+    private string $key = 'totallySecretKeyHere';
 
     protected function setUp(): void
     {

@@ -336,7 +336,9 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Test a tokenized transport that fills tokens correctly')]
     public function testBatchQueueContactsHaveTokensHydrated(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
+        $this->coreParametersHelper->expects($this->atLeast(2))
+            ->method('get')
+            ->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
 
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
@@ -441,7 +443,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Test that stat entries are saved in batches of 20')]
     public function testThatStatEntriesAreCreatedAndPersistedEveryBatch(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
+        $this->coreParametersHelper->expects($this->atLeast(2))->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
 
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
@@ -560,7 +562,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a failed email from the transport is handled')]
     public function testThatAFailureFromTransportIsHandled(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
+        $this->coreParametersHelper->expects($this->atLeast(2))->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
 
         $emailMock = $this->createMock(Email::class);
         $emailMock->method('getId')->willReturn(1);
@@ -691,7 +693,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $themeHelper->expects(self::never())
             ->method('checkForTwigTemplate');
 
-        $coreParametersHelper->method('get')
+        $coreParametersHelper->expects($this->atLeast(3))->method('get')
             ->willReturnMap(
                 [
                     ['mailer_from_email', null, 'nobody@nowhere.com'],

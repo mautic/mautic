@@ -757,7 +757,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 ]
             );
 
-        $this->em->method('getRepository')
+        $this->em->expects($this->atLeastOnce())->method('getRepository')
             ->willReturnMap(
                 [
                     [IntegrationEntity::class, $integrationEntityRepository],
@@ -854,7 +854,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $this->cache
+        $this->cache->expects($this->any())
             ->method('get')
             ->willReturnMap(
                 [
