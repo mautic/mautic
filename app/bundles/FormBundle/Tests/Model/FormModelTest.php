@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class FormModelTest extends \PHPUnit\Framework\TestCase
+final class FormModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&FormRepository

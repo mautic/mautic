@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 
-class MessageControllerFunctionalTest extends MauticMysqlTestCase
+final class MessageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testFormWithProject(): void
     {

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class SourceControllerTest extends MauticMysqlTestCase
+final class SourceControllerTest extends MauticMysqlTestCase
 {
     private const ACCESS_DENIED      = 'You do not have access to the requested area\/action';
 

@@ -37,6 +37,6 @@ class ArrayStringTransformer implements DataTransformerInterface
             return [];
         }
 
-        return array_map('trim', explode(',', $string));
+        return array_map(trim(...), explode(',', $string));
     }
 }

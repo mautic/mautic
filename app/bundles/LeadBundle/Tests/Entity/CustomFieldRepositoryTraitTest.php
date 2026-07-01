@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
-class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
+final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 {
     /** @var array<string, array<string, mixed>> */
     private array $fields = [

@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class MauticWriteSubscriber implements EventSubscriberInterface
+final readonly class MauticWriteSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly UserHelper $userHelper)
+    public function __construct(private UserHelper $userHelper)
     {
     }
 

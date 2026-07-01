@@ -9,9 +9,9 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class FormFieldSubscriber implements EventSubscriberInterface
+final readonly class FormFieldSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly FieldModel $fieldModel)
+    public function __construct(private FieldModel $fieldModel)
     {
     }
 

@@ -6,10 +6,10 @@ use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class ReportHelper
+final readonly class ReportHelper
 {
     public function __construct(
-        private readonly EventDispatcherInterface $dispatcher,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 

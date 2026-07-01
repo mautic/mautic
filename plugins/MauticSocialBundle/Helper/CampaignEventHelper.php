@@ -27,10 +27,7 @@ class CampaignEventHelper
     ) {
     }
 
-    /**
-     * @return array|false
-     */
-    public function sendTweetAction(Lead $lead, array $event)
+    public function sendTweetAction(Lead $lead, array $event): array|false
     {
         $tweetSent   = false;
         $tweetEntity = $this->tweetModel->getEntity($event['channelId']);

@@ -9,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class EmailTest extends TestCase
+final class EmailTest extends TestCase
 {
     public function testCloneResetPublishDates(): void
     {

@@ -12,7 +12,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailTriggerTest extends MauticMysqlTestCase
+final class EmailTriggerTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
     #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]

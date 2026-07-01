@@ -658,10 +658,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -760,10 +758,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Company $company
      * @param array   $config
-     *
-     * @return array|bool
      */
-    public function pushCompany($company, $config = [])
+    public function pushCompany($company, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -1944,12 +1940,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (strstr($object, 'CampaignMember')) {
                     $object = 'CampaignMember';
                 }
-                if ('Account' == $object) {
+                if ('Account' === $object) {
                     $internalObject = 'company';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
                     $exception = new ApiErrorException($item['body'][0]['message']);
-                    if ('Contact' == $object || 'Lead' == $object) {
+                    if ('Contact' === $object || 'Lead' === $object) {
                         $exception->setContactId($contactId);
                     }
                     $this->logIntegrationError($exception);
@@ -2030,7 +2026,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     $exception = new ApiErrorException($error);
-                    if (!empty($item['referenceId']) && ('Contact' == $object || 'Lead' == $object)) {
+                    if (!empty($item['referenceId']) && ('Contact' === $object || 'Lead' === $object)) {
                         $exception->setContactId($item['referenceId']);
                     }
                     $this->logIntegrationError($exception);
@@ -2300,10 +2296,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return bool|mixed|string
-     */
-    protected function setContactToSync(&$checkEmailsInSF, $lead)
+    protected function setContactToSync(&$checkEmailsInSF, $lead): false|string
     {
         $key = $this->getSyncKey($lead['email']);
         if (isset($checkEmailsInSF[$key])) {
@@ -2321,7 +2314,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return int
      */
-    protected function getSalesforceSyncLimit($currentContactList, $limit)
+    protected function getSalesforceSyncLimit($currentContactList, $limit): float|int
     {
         return $limit - count($currentContactList);
     }

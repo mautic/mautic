@@ -74,11 +74,9 @@ class CorePermissions implements ResetInterface
      * @param string $bundle         can be either short bundle name or full path to the permissions class
      * @param bool   $throwException
      *
-     * @return AbstractPermissions
-     *
      * @throws \InvalidArgumentException
      */
-    public function getPermissionObject($bundle, $throwException = true)
+    public function getPermissionObject($bundle, $throwException = true): false|AbstractPermissions
     {
         if (empty($bundle)) {
             throw new \InvalidArgumentException("Bundle and permission type must be specified. {$bundle} given.");
@@ -190,11 +188,11 @@ class CorePermissions implements ResetInterface
      * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
      *                                             exception will be thrown
      *
-     * @return mixed
+     * @return ($mode is 'RETURN_ARRAY' ? array<mixed> : bool)
      *
      * @throws \InvalidArgumentException
      */
-    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
+    public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false): bool|array
     {
         // Initialize all permission classes if
         $this->getPermissionObjects();
@@ -285,7 +283,7 @@ class CorePermissions implements ResetInterface
             }
 
             $parts = explode(':', $p);
-            if (3 != count($parts)) {
+            if (3 !== count($parts)) {
                 $result[$p] = false;
             } else {
                 // check against bundle permissions class

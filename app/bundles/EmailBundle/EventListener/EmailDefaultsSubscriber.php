@@ -9,10 +9,10 @@ use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class EmailDefaultsSubscriber implements EventSubscriberInterface
+final readonly class EmailDefaultsSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailDefaultsHelper $defaultsHelper,
+        private EmailDefaultsHelper $defaultsHelper,
     ) {
     }
 

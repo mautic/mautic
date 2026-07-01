@@ -10,9 +10,9 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
+final readonly class SegmentFilterTypeaheadSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly LeadModel $leadModel, private readonly FieldModel $fieldModel, private readonly CompanyModel $companyModel)
+    public function __construct(private LeadModel $leadModel, private FieldModel $fieldModel, private CompanyModel $companyModel)
     {
     }
 

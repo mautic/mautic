@@ -14,7 +14,7 @@ use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CorePermissionsTest extends \PHPUnit\Framework\TestCase
+final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 {
     private CorePermissions $corePermissions;
 

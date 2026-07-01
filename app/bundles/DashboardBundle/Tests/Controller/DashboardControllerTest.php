@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class DashboardControllerTest extends \PHPUnit\Framework\TestCase
+final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Request
