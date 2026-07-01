@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -12,7 +14,7 @@ use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SendScheduleTest extends \PHPUnit\Framework\TestCase
+final class SendScheduleTest extends \PHPUnit\Framework\TestCase
 {
     private Report $report;
 

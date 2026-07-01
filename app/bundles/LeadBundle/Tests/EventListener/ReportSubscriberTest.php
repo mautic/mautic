@@ -32,7 +32,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&LeadModel
@@ -89,16 +89,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $reportGraphEventMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub|CompanyRepository
-     */
-    private \PHPUnit\Framework\MockObject\Stub $companyRepositoryMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub|PointsChangeLogRepository
-     */
-    private \PHPUnit\Framework\MockObject\Stub $pointsChangeLogRepositoryMock;
-
-    /**
      * @var MockObject&ReportDataEvent
      */
     private MockObject $reportDataEventMock;
@@ -150,8 +140,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
         $expressionBuilderMock                  = $this->createMock(ExpressionBuilder::class);
         $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
-        $this->companyRepositoryMock            = $this->createStub(CompanyRepository::class);
-        $this->pointsChangeLogRepositoryMock    = $this->createStub(PointsChangeLogRepository::class);
         $dncReportService                       = $this->createMock(DncReportService::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
@@ -902,11 +890,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModelMock->expects($this->once())
             ->method('getPointLogRepository')
-            ->willReturn($this->pointsChangeLogRepositoryMock);
+            ->willReturn($this->createStub(PointsChangeLogRepository::class));
 
         $this->companyModelMock->expects($this->once())
             ->method('getRepository')
-            ->willReturn($this->companyRepositoryMock);
+            ->willReturn($this->createStub(CompanyRepository::class));
 
         $this->reportGraphEventMock->expects($this->once())
             ->method('getQueryBuilder')

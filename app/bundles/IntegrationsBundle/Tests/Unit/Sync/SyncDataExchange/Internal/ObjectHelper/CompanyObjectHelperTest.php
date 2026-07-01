@@ -19,7 +19,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CompanyObjectHelperTest extends TestCase
+final class CompanyObjectHelperTest extends TestCase
 {
     /**
      * @var MockObject&CompanyModel
@@ -32,11 +32,6 @@ class CompanyObjectHelperTest extends TestCase
     private MockObject $repository;
 
     /**
-     * @var Connection&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $connection;
-
-    /**
      * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifier;
@@ -45,7 +40,6 @@ class CompanyObjectHelperTest extends TestCase
     {
         $this->model                      = $this->createMock(CompanyModel::class);
         $this->repository                 = $this->createMock(CompanyRepository::class);
-        $this->connection                 = $this->createStub(Connection::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
 
         $this->fieldsWithUniqueIdentifier->method('getFieldsWithUniqueIdentifier')
@@ -241,7 +235,7 @@ class CompanyObjectHelperTest extends TestCase
 
     private function getObjectHelper(): CompanyObjectHelper
     {
-        return new CompanyObjectHelper($this->model, $this->repository, $this->connection, $this->fieldsWithUniqueIdentifier);
+        return new CompanyObjectHelper($this->model, $this->repository, $this->createStub(Connection::class), $this->fieldsWithUniqueIdentifier);
     }
 
     /**

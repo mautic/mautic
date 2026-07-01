@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OwnerProviderTest extends TestCase
+final class OwnerProviderTest extends TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\TokenSorter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TokenSorterTest extends TestCase
+final class TokenSorterTest extends TestCase
 {
     private TokenSorter $tokenSorter;
 

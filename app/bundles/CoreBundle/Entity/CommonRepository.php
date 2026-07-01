@@ -1474,7 +1474,7 @@ class CommonRepository extends ServiceEntityRepository
         $queryExpression              = $q->expr()->andX();
 
         if (isset($args['ids'])) {
-            $ids   = array_map('intval', $args['ids']);
+            $ids   = array_map(intval(...), $args['ids']);
             $param = $this->generateRandomParameterName();
             // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
             $queryExpression->add(
@@ -1487,7 +1487,7 @@ class CommonRepository extends ServiceEntityRepository
             $queryExpression->add(
                 $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], ':'.$param)
             );
-            $q->setParameter($param, array_map('strval', $args['ownedBy'][1]), ArrayParameterType::STRING);
+            $q->setParameter($param, array_map(strval(...), $args['ownedBy'][1]), ArrayParameterType::STRING);
         }
 
         if (!empty($filter)) {
@@ -1699,7 +1699,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected function getIdsExpr(&$q, $filter)
     {
-        if ($ids = array_map('intval', explode(',', $filter->string))) {
+        if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();
             $q->setParameter($parameterName, $ids, ArrayParameterType::INTEGER);
 

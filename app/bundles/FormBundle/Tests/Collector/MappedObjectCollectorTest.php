@@ -37,7 +37,7 @@ final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
 
             public function getFields(string $object): FieldCollection
             {
-                Assert::assertSame($object, 'contact');
+                Assert::assertSame('contact', $object);
                 ++$this->getFieldsMethodCallCounter;
 
                 return new FieldCollection();

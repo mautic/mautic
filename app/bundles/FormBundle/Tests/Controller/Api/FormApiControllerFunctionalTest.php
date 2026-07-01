@@ -345,7 +345,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_PATCH, "/api/forms/{$formId}/edit", $patchPayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        $fieldCount     = $fieldCount + 1;
+        ++$fieldCount;
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
         $this->assertSame($formId, $response['form']['id']);

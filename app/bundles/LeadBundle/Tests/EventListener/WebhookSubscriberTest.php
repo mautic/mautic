@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\Company;
@@ -17,14 +19,9 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&LeadModel
-     */
-    private \PHPUnit\Framework\MockObject\Stub $leadModel;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&WebhookModel
@@ -35,7 +32,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher = new EventDispatcher();
         $this->mockModel  = $this->createMock(WebhookModel::class);
-        $this->leadModel  = $this->createStub(LeadModel::class);
     }
 
     public function testNewContactEventIsFiredWhenIdentified(): void
@@ -48,7 +44,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -71,7 +67,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 )
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -90,7 +86,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->expects($this->exactly(0))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -147,7 +143,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -176,7 +172,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
 
         $this->dispatcher->addSubscriber($webhookSubscriber);
 
@@ -192,7 +188,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->expects($this->exactly(2))
             ->method('queueWebhooksByType');
 
-        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->leadModel);
+        $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
 
         $dispatcher->addSubscriber($webhookSubscriber);
 

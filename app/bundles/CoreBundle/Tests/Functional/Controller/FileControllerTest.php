@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileControllerTest extends MauticMysqlTestCase
+final class FileControllerTest extends MauticMysqlTestCase
 {
     private ?string $uploadedFilePath = null;
 

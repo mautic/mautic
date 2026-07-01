@@ -57,7 +57,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             {
             }
 
-            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null): ?object
             {
                 throw new \RuntimeException('Field should not be fetched in single value mode test');
             }
@@ -74,11 +74,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         Assert::assertSame(1, $context->violationCount);
     }
 
-    /**
-     * @param mixed $value
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
-    public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
+    public function testNoEmailsProvided(?string $value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class extends ExecutionContext {
             /**

@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class FileHandlerTest extends \PHPUnit\Framework\TestCase
+final class FileHandlerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&FilePathResolver

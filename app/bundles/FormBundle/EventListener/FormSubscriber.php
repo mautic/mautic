@@ -383,7 +383,7 @@ class FormSubscriber implements EventSubscriberInterface
      */
     private function getEmailsFromString($emailString): array
     {
-        return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
+        return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }
 
     /**

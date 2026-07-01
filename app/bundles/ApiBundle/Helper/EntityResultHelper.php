@@ -12,7 +12,7 @@ class EntityResultHelper
      *
      * @return array<mixed>|\ArrayObject<int,mixed>
      */
-    public function getArray($results, $callback = null)
+    public function getArray($results, $callback = null): \ArrayObject|array
     {
         $entities = [];
 

@@ -94,7 +94,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);

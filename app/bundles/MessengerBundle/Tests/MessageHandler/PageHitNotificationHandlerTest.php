@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -18,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageHitNotificationHandlerTest extends TestCase
+final class PageHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void
     {

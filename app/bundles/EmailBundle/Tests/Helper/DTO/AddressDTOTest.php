@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Helper\DTO\AddressDTO;
 use Mautic\EmailBundle\Helper\Exception\TokenNotFoundOrEmptyException;
 use PHPUnit\Framework\TestCase;
 
-class AddressDTOTest extends TestCase
+final class AddressDTOTest extends TestCase
 {
     public function testNameTokenReturnsTrue(): void
     {

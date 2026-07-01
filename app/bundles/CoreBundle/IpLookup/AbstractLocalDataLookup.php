@@ -108,7 +108,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
                     break;
 
-                case 'gz' == $tempExt:
+                case 'gz' === $tempExt:
                     $memLimit = $this->sizeInByte(ini_get('memory_limit'));
                     $freeMem  = $memLimit - memory_get_peak_usage();
                     // check whether there is enough memory to handle large iplookp DB
@@ -132,7 +132,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
                     break;
 
-                case 'zip' == $tempExt:
+                case 'zip' === $tempExt:
                     file_put_contents($tempTarget, $data->getBody());
 
                     $zipper = new \ZipArchive();

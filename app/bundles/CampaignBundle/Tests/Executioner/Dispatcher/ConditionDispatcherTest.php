@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
+final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface
