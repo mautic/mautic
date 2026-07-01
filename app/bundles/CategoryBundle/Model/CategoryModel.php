@@ -74,7 +74,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         return $bundle.':categories';
     }
 
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {

@@ -317,7 +317,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 

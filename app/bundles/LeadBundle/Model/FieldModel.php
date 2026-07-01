@@ -601,7 +601,6 @@ class FieldModel extends FormModel
 
     /**
      * @param LeadField $entity
-     * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
@@ -610,7 +609,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);

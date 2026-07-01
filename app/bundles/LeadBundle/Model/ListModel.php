@@ -119,11 +119,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $unlock
-     *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 

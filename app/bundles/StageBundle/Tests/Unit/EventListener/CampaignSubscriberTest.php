@@ -160,7 +160,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function saveEntity($entity, $unlock = true): void
+            public function saveEntity(object $entity, bool $unlock = true): void
             {
             }
         };
@@ -398,7 +398,7 @@ final class CampaignSubscriberTest extends TestCase
             {
             }
 
-            public function saveEntity($entity, $unlock = true): void
+            public function saveEntity(object $entity, bool $unlock = true): void
             {
             }
         };

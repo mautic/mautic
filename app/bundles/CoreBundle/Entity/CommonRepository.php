@@ -798,7 +798,7 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Persist an array of entities.
      *
-     * @param array|ArrayCollection $entities
+     * @param array<T>|ArrayCollection<int, T> $entities
      */
     public function saveEntities($entities): void
     {
@@ -819,10 +819,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param object $entity
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param T    $entity
+     * @param bool $flush  true by default; use false if persisting in batches
      */
-    public function saveEntity($entity, $flush = true): void
+    public function saveEntity(object $entity, bool $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
