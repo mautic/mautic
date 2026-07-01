@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ModifyCustomFieldCommand extends Command
 {
-    public function __construct(private FieldModel $fieldModel, private TranslatorInterface $translator)
+    public function __construct(private readonly FieldModel $fieldModel, private readonly TranslatorInterface $translator)
     {
         parent::__construct();
     }
@@ -100,7 +100,7 @@ final class ModifyCustomFieldCommand extends Command
                 continue;
             }
 
-            $row = array_map('trim', $row);
+            $row = array_map(trim(...), $row);
 
             // skip the first(header) row
             if (!$headerSkipped) {
@@ -160,6 +160,6 @@ final class ModifyCustomFieldCommand extends Command
             'isIndexed'         => $this->translator->trans('mautic.lead.field.analyse.header.indexed'),
         ];
 
-        return array_map(fn ($val) => array_search($val, $headers), $row);
+        return array_map(fn ($val): false|string => array_search($val, $headers), $row);
     }
 }

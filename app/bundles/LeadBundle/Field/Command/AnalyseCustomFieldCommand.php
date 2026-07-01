@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class AnalyseCustomFieldCommand extends Command
 {
-    public function __construct(private FieldModel $fieldModel, private LeadModel $leadModel, private TranslatorInterface $translator)
+    public function __construct(private readonly FieldModel $fieldModel, private readonly LeadModel $leadModel, private readonly TranslatorInterface $translator)
     {
         parent::__construct();
     }
@@ -74,8 +74,8 @@ class AnalyseCustomFieldCommand extends Command
 
         $rows = [];
         foreach ($analysisDetails as $analysisDetail) {
-            $maxLength        = (int) $analysisDetail['max_length'] ?: 0;
-            $columnLength     = (int) $analysisDetail['char_length_limit'] ?: 0;
+            $maxLength        = (int) $analysisDetail['max_length'];
+            $columnLength     = (int) $analysisDetail['char_length_limit'];
             $suggestedMaxSize = $this->getSuggestedMaxSize($columnLength, $maxLength);
 
             $label  = $analysisDetail['label'];

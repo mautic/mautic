@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
-class ListControllerTest extends MauticMysqlTestCase
+final class ListControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 

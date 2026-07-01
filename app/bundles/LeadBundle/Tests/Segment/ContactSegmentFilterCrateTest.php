@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterCrate::class)]
-class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyFilter(): void
     {
@@ -194,7 +196,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
-    public function testSpecialFieldsToConvertToNotEmpty($field): void
+    public function testSpecialFieldsToConvertToNotEmpty(string $field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -220,7 +222,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
-    public function testSpecialFieldsToConvertToEmpty($field): void
+    public function testSpecialFieldsToConvertToEmpty(string $field): void
     {
         $filter = [
             'glue'     => 'and',
@@ -245,7 +247,8 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    public static function specialFieldsToConvertToEmptyProvider()
+    /** @return array<int, array{0: string}> */
+    public static function specialFieldsToConvertToEmptyProvider(): array
     {
         return [
             ['page_id'],

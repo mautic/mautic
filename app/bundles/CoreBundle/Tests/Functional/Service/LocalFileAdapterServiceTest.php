@@ -12,12 +12,9 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class LocalFileAdapterServiceTest extends MauticMysqlTestCase
+final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 {
-    /**
-     * @var string
-     */
-    private $folderName;
+    private ?string $folderName = null;
 
     protected function beforeTearDown(): void
     {
@@ -34,6 +31,7 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
         $elFinderLoader = new class(static::getContainer()) extends ElFinderLoader {
             public function __construct(ContainerInterface $container)
             {
+                /** @phpstan-ignore symfonyContainer.privateService */
                 parent::__construct($container->get('fm_elfinder.configurator'));
             }
 

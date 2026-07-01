@@ -8,7 +8,7 @@ class ReportCleanup
 {
     public const KEEP_FILE_DAYS = 7;
 
-    public function __construct(private FileHandler $fileHandler)
+    public function __construct(private readonly FileHandler $fileHandler)
     {
     }
 
@@ -54,10 +54,6 @@ class ReportCleanup
         $now     = new \DateTime();
         $days    = $created->diff($now)->days;
 
-        if ($days > self::KEEP_FILE_DAYS) {
-            return true;
-        }
-
-        return false;
+        return $days > self::KEEP_FILE_DAYS;
     }
 }

@@ -12,7 +12,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\TriggerModel;
 
-class PointTriggerFunctionalTest extends MauticMysqlTestCase
+final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 {
     use TriggerTrait;
 

@@ -14,6 +14,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -42,8 +43,10 @@ class RoleApiController extends CommonApiController
     }
 
     /**
-     * @param Role   &$entity
-     * @param string $action
+     * @param Role                 &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

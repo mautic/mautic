@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\FileHelper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FileHelper::class)]
-class FileHelperTest extends \PHPUnit\Framework\TestCase
+final class FileHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('bytesToMegabytesProvider')]
     #[\PHPUnit\Framework\Attributes\TestDox('Conversion of Bytes to Megebytes')]
@@ -16,7 +18,8 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($megabyte, $fileHelper::convertBytesToMegabytes($byte));
     }
 
-    public static function bytesToMegabytesProvider()
+    /** @return array<int, array{0: int, 1: float}> */
+    public static function bytesToMegabytesProvider(): array
     {
         return [
             [0, 0.0],
@@ -35,7 +38,8 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($byte, $fileHelper::convertMegabytesToBytes($megabyte));
     }
 
-    public static function megabytesToBytesProvider()
+    /** @return array<int, array{0: int, 1: int}> */
+    public static function megabytesToBytesProvider(): array
     {
         return [
             [0, 0],
@@ -53,7 +57,8 @@ class FileHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($bytes, $fileHelper::convertPHPSizeToBytes($phpSize));
     }
 
-    public static function phpSizeToBytesProvider()
+    /** @return array<int, array{0: string, 1: int}> */
+    public static function phpSizeToBytesProvider(): array
     {
         return [
             ['3048M', 3_196_059_648],

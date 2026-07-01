@@ -50,8 +50,6 @@ class SeriesPieChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and count number. Method will add the rest.
      *
      * @param int[] $value
-     *
-     * @return $this
      */
     public function setDataset(array $value): static
     {

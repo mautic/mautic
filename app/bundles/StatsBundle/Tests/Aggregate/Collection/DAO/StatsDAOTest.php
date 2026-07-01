@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\DAO;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
@@ -9,7 +11,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use PHPUnit\Framework\TestCase;
 
-class StatsDAOTest extends TestCase
+final class StatsDAOTest extends TestCase
 {
     public function testGetYearsReturnsYears(): void
     {
@@ -19,7 +21,7 @@ class StatsDAOTest extends TestCase
         ];
 
         $stats = $this->getStats()->getYears();
-        $this->assertEquals($expected, array_keys($stats));
+        $this->assertSame($expected, array_keys($stats));
 
         array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(YearStat::class, $stat);
@@ -35,7 +37,7 @@ class StatsDAOTest extends TestCase
         ];
 
         $stats = $this->getStats()->getMonths();
-        $this->assertEquals($expected, array_keys($stats));
+        $this->assertSame($expected, array_keys($stats));
 
         array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(MonthStat::class, $stat);
@@ -51,7 +53,7 @@ class StatsDAOTest extends TestCase
         ];
 
         $stats = $this->getStats()->getWeeks();
-        $this->assertEquals($expected, array_keys($stats));
+        $this->assertSame($expected, array_keys($stats));
 
         array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(WeekStat::class, $stat);
@@ -68,7 +70,7 @@ class StatsDAOTest extends TestCase
         ];
 
         $stats = $this->getStats()->getDays();
-        $this->assertEquals($expected, array_keys($stats));
+        $this->assertSame($expected, array_keys($stats));
 
         array_walk($stats, function ($stat): void {
             $this->assertInstanceOf(DayStat::class, $stat);
@@ -87,7 +89,7 @@ class StatsDAOTest extends TestCase
         ];
 
         $stats = $this->getStats()->getHours();
-        $this->assertEquals($expected, array_keys($stats));
+        $this->assertSame($expected, array_keys($stats));
     }
 
     private function getStats(): StatsDAO

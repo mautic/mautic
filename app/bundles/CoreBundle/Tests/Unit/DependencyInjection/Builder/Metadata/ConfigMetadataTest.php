@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ConfigMetadataTest extends TestCase
+final class ConfigMetadataTest extends TestCase
 {
     /**
      * @var BundleMetadata|MockObject
@@ -55,7 +57,7 @@ class ConfigMetadataTest extends TestCase
         $configMetadata = new ConfigMetadata($this->metadata);
         $configMetadata->build();
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'extreme-ip' => [
                     'display_name' => 'Extreme-IP',

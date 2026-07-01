@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class LeadRepositoryTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->clientOptions = ['debug' => true];
 
@@ -35,7 +35,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
      * @param array<string, bool> $args
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('joinIpAddressesProvider')]
-    public function testSaveIpAddressToContacts($args): void
+    public function testSaveIpAddressToContacts(array $args): void
     {
         $contactRepo = $this->em->getRepository(Lead::class);
 
@@ -54,7 +54,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
         foreach ($results as $r) {
             $ipAddresses = $r->getIpAddresses();
             $ipAddress   = $ipAddresses->first();
-            $this->assertEquals($ipAddress->getIpAddress(), '127.0.0.1');
+            $this->assertEquals('127.0.0.1', $ipAddress->getIpAddress());
         }
 
         $this->client->enableProfiler();
@@ -68,7 +68,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
         $finalQueries = array_filter(
             $queries['default'],
-            fn (array $query) => str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)')
+            fn (array $query): bool => str_contains($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)')
         );
 
         foreach ($finalQueries as $query) {

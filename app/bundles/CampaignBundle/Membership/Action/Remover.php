@@ -13,11 +13,11 @@ class Remover
 {
     public const NAME = 'removed';
 
-    private string $unscheduledMessage;
+    private readonly string $unscheduledMessage;
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
         TranslatorInterface $translator,
         DateHelper $dateHelper,
     ) {
@@ -36,7 +36,7 @@ class Remover
             // Contact was removed by the change campaign action or a segment
             $campaignMember->setDateLastExited(new \DateTime());
         } else {
-            $campaignMember->setDateLastExited(null);
+            $campaignMember->setDateLastExited();
         }
 
         if ($campaignMember->wasManuallyRemoved()) {
@@ -56,7 +56,7 @@ class Remover
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember): void
+    private function saveCampaignMember(CampaignMember $campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

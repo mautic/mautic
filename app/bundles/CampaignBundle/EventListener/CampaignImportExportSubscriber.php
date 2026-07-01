@@ -764,11 +764,10 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
     /**
      * @param array<int, array<string, mixed>> $dependencies
-     * @param string                           $entity
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSubDependencies(array $dependencies, $entity): array
+    private function getSubDependencies(array $dependencies, string $entity): array
     {
         foreach ($dependencies as $dependencyGroup) {
             if (isset($dependencyGroup[$entity])) {

@@ -254,10 +254,8 @@ class FormEntity extends CommonEntity
      * Set dateAdded.
      *
      * @param \DateTime $dateAdded
-     *
-     * @return $this
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -278,10 +276,8 @@ class FormEntity extends CommonEntity
      * Set dateModified.
      *
      * @param \DateTime $dateModified
-     *
-     * @return $this
      */
-    public function setDateModified($dateModified)
+    public function setDateModified($dateModified): static
     {
         $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
@@ -303,10 +299,8 @@ class FormEntity extends CommonEntity
      * Set checkedOut.
      *
      * @param \DateTime $checkedOut
-     *
-     * @return $this
      */
-    public function setCheckedOut($checkedOut)
+    public function setCheckedOut($checkedOut): static
     {
         $this->checkedOut = $checkedOut;
 
@@ -316,7 +310,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOut.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getCheckedOut()
     {
@@ -325,10 +319,8 @@ class FormEntity extends CommonEntity
 
     /**
      * @param User|int|null $createdBy
-     *
-     * @return $this
      */
-    public function setCreatedBy($createdBy = null)
+    public function setCreatedBy($createdBy = null): static
     {
         if (null != $createdBy && !$createdBy instanceof User) {
             $this->createdBy = $createdBy;
@@ -345,7 +337,7 @@ class FormEntity extends CommonEntity
     /**
      * Get createdBy.
      *
-     * @return int
+     * @return int|null
      */
     public function getCreatedBy()
     {
@@ -356,10 +348,8 @@ class FormEntity extends CommonEntity
      * Set modifiedBy.
      *
      * @param User|int|null $modifiedBy
-     *
-     * @return mixed
      */
-    public function setModifiedBy($modifiedBy = null)
+    public function setModifiedBy($modifiedBy = null): static
     {
         if (null != $modifiedBy && !$modifiedBy instanceof User) {
             $this->modifiedBy = $modifiedBy;
@@ -388,10 +378,8 @@ class FormEntity extends CommonEntity
      * Set checkedOutBy.
      *
      * @param User $checkedOutBy
-     *
-     * @return mixed
      */
-    public function setCheckedOutBy($checkedOutBy = null)
+    public function setCheckedOutBy($checkedOutBy = null): static
     {
         if (null != $checkedOutBy && !$checkedOutBy instanceof User) {
             $this->checkedOutBy = $checkedOutBy;
@@ -409,7 +397,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOutBy.
      *
-     * @return User
+     * @return int|null
      */
     public function getCheckedOutBy()
     {
@@ -420,10 +408,8 @@ class FormEntity extends CommonEntity
      * Set isPublished.
      *
      * @param bool $isPublished
-     *
-     * @return $this
      */
-    public function setIsPublished($isPublished)
+    public function setIsPublished($isPublished): static
     {
         $this->isChanged('isPublished', (bool) $isPublished);
 
@@ -499,7 +485,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCheckedOutByUser()
     {
@@ -507,7 +493,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCreatedByUser()
     {
@@ -515,7 +501,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getModifiedByUser()
     {
@@ -524,10 +510,8 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $createdByUser
-     *
-     * @return $this
      */
-    public function setCreatedByUser($createdByUser)
+    public function setCreatedByUser($createdByUser): static
     {
         $this->createdByUser = $createdByUser;
 
@@ -536,10 +520,8 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $modifiedByUser
-     *
-     * @return $this
      */
-    public function setModifiedByUser($modifiedByUser)
+    public function setModifiedByUser($modifiedByUser): static
     {
         $this->modifiedByUser = $modifiedByUser;
 
@@ -548,10 +530,8 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $checkedOutByUser
-     *
-     * @return $this
      */
-    public function setCheckedOutByUser($checkedOutByUser)
+    public function setCheckedOutByUser($checkedOutByUser): static
     {
         $this->checkedOutByUser = $checkedOutByUser;
 

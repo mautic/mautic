@@ -9,7 +9,7 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalState;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class SignalCaughtExceptionTest extends TestCase
+final class SignalCaughtExceptionTest extends TestCase
 {
     public function testGetMessage(): void
     {

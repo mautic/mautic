@@ -1,11 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
@@ -15,42 +21,34 @@ use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ContactMergerTest extends \PHPUnit\Framework\TestCase
+final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LeadModel
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepo;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MergeRecordRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&MergeRecordRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Logger
+     * @var \PHPUnit\Framework\MockObject\MockObject&Logger
      */
     private \PHPUnit\Framework\MockObject\MockObject $logger;
+
+    private \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository $companyLeadRepo;
 
     protected function setUp(): void
     {
         $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->leadRepo        = $this->createMock(LeadRepository::class);
+        $leadRepo              = $this->createMock(LeadRepository::class);
         $this->mergeRecordRepo = $this->createMock(MergeRecordRepository::class);
-        $this->dispatcher      = $this->createMock(EventDispatcher::class);
         $this->logger          = $this->createMock(Logger::class);
+        $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepo);
+        $this->leadModel->method('getRepository')->willReturn($leadRepo);
     }
 
     public function testMergeTimestamps(): void
@@ -521,7 +519,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $matcher3 = $this->exactly(3);
 
         $winner->expects($matcher3)
-            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3) {
+            ->method('addUpdatedField')->willReturnCallback(function (...$parameters) use ($matcher3): void {
                 if (1 === $matcher3->numberOfInvocations()) {
                     $this->assertSame('email', $parameters[0]);
                     $this->assertSame('winner@test.com', $parameters[1]);
@@ -556,7 +554,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeOwners($winner, $loser);
         $this->assertEquals($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
 
-        $winner->setOwner(null);
+        $winner->setOwner();
         $this->getMerger()->mergeOwners($winner, $loser);
 
         // Should be set to loser owner since winner owner was null
@@ -744,16 +742,128 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeFieldData($winner, $loser);
     }
 
-    /**
-     * @return ContactMerger
-     */
-    private function getMerger()
+    public function testMergeCompaniesMovesLoserCompaniesToWinner(): void
+    {
+        $winner = new Lead();
+        $winner->setId(1);
+        $loser = new Lead();
+        $loser->setId(2);
+
+        $company = $this->getCompany(11);
+
+        $loserCompanyLead = new CompanyLead();
+        $loserCompanyLead->setCompany($company);
+        $loserCompanyLead->setLead($loser);
+        $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $loserCompanyLead->setPrimary(true);
+
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
+            ->willReturnMap([
+                [['lead' => $loser], null, null, null, [$loserCompanyLead]],
+                [['lead' => $winner], null, null, null, []],
+            ]);
+
+        $this->companyLeadRepo->expects($this->once())
+            ->method('saveEntities')
+            ->with($this->callback(function (array $companyLeads) use ($winner, $company): bool {
+                $this->assertCount(1, $companyLeads);
+                $this->assertSame($winner, $companyLeads[0]->getLead());
+                $this->assertSame($company, $companyLeads[0]->getCompany());
+                // The winner had no primary company so it inherits the loser's
+                $this->assertTrue($companyLeads[0]->getPrimary());
+
+                return true;
+            }), false);
+
+        $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    public function testMergeCompaniesKeepsWinnerPrimaryCompany(): void
+    {
+        $winner = new Lead();
+        $winner->setId(1);
+        $loser = new Lead();
+        $loser->setId(2);
+
+        $winnerCompanyLead = new CompanyLead();
+        $winnerCompanyLead->setCompany($this->getCompany(11));
+        $winnerCompanyLead->setLead($winner);
+        $winnerCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $winnerCompanyLead->setPrimary(true);
+
+        $loserCompanyLead = new CompanyLead();
+        $loserCompanyLead->setCompany($this->getCompany(22));
+        $loserCompanyLead->setLead($loser);
+        $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $loserCompanyLead->setPrimary(true);
+
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
+            ->willReturnMap([
+                [['lead' => $loser], null, null, null, [$loserCompanyLead]],
+                [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
+            ]);
+
+        $this->companyLeadRepo->expects($this->once())
+            ->method('saveEntities')
+            ->with($this->callback(function (array $companyLeads): bool {
+                $this->assertCount(1, $companyLeads);
+                // The winner already has a primary company so the loser's company is added as non-primary
+                $this->assertFalse((bool) $companyLeads[0]->getPrimary());
+
+                return true;
+            }), false);
+
+        $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    public function testMergeCompaniesSkipsCompaniesTheWinnerAlreadyHas(): void
+    {
+        $winner = new Lead();
+        $winner->setId(1);
+        $loser = new Lead();
+        $loser->setId(2);
+
+        $company = $this->getCompany(11);
+
+        $winnerCompanyLead = new CompanyLead();
+        $winnerCompanyLead->setCompany($company);
+        $winnerCompanyLead->setLead($winner);
+        $winnerCompanyLead->setDateAdded(new \DateTime('-1 day'));
+        $winnerCompanyLead->setPrimary(true);
+
+        $loserCompanyLead = new CompanyLead();
+        $loserCompanyLead->setCompany($company);
+        $loserCompanyLead->setLead($loser);
+        $loserCompanyLead->setDateAdded(new \DateTime('-1 day'));
+
+        $this->companyLeadRepo->expects($this->exactly(2))->method('findBy')
+            ->willReturnMap([
+                [['lead' => $loser], null, null, null, [$loserCompanyLead]],
+                [['lead' => $winner], null, null, null, [$winnerCompanyLead]],
+            ]);
+
+        $this->companyLeadRepo->expects($this->never())
+            ->method('saveEntities');
+
+        $this->getMerger()->mergeCompanies($winner, $loser);
+    }
+
+    private function getCompany(int $id): Company
+    {
+        $company = new Company();
+        ReflectionHelper::setValue($company, 'id', $id);
+
+        return $company;
+    }
+
+    private function getMerger(): ContactMerger
     {
         return new ContactMerger(
             $this->leadModel,
             $this->mergeRecordRepo,
-            $this->dispatcher,
-            $this->logger
+            $this->createStub(EventDispatcher::class),
+            $this->logger,
+            $this->companyLeadRepo
         );
     }
 }

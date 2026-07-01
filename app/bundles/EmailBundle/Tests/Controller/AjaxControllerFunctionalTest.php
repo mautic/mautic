@@ -8,19 +8,22 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use PHPUnit\Framework\Assert;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\Email as EmailMime;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provideSendToDncStatus')]
     public function testGetEmailSendToDncStatusAction(bool $sendToDnc, string $expectedTranslationKey): void
@@ -84,7 +87,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEmailCount(1);
 
         $email = KernelTestCase::getMailerMessage();
-        \assert($email instanceof EmailMime);
+        $this->assertInstanceOf(EmailMime::class, $email);
 
         /** @var UserHelper $userHelper */
         $userHelper = static::getContainer()->get(UserHelper::class);
@@ -294,6 +297,35 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('{contactfield=email}', $response['tokens']);
         Assert::assertArrayHasKey('{ownerfield=email}', $response['tokens']);
         Assert::assertArrayHasKey('{unsubscribe_url}', $response['tokens']);
+    }
+
+    public function testTogglePublishEventIsDispatched(): void
+    {
+        $dispatchedEvent = null;
+
+        self::getContainer()
+            ->get(EventDispatcherInterface::class)
+            ->addListener(EmailEvents::EMAIL_ON_TOGGLE_PUBLISH, function (EmailEvent $event) use (&$dispatchedEvent): void {
+                $dispatchedEvent = $event;
+            });
+
+        $email = $this->createEmailWithParams('Email', 'Email', 'list', 'empty', '<html></html>');
+        $email->setIsPublished(true);
+        $this->em->persist($email);
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax', [
+            'action' => 'togglePublishStatus',
+            'model'  => 'email',
+            'id'     => $email->getId(),
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $email = $this->em->getRepository(Email::class)->find($email->getId());
+        Assert::assertFalse($email->isPublished(), 'The email should not be published.');
+        Assert::assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
+        Assert::assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
     }
 
     private function createContact(string $email): Lead

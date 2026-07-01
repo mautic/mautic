@@ -102,9 +102,11 @@ class CodeEditor {
         this.editor.setComponents(parsedContent);
       }
 
+      this.editor.trigger('mautic:code-editor-update');
+
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${e.message}`);
     }
   }
 

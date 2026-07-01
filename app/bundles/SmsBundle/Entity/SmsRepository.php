@@ -227,11 +227,11 @@ class SmsRepository extends CommonRepository
         array $ignoreIds = [],
     ) {
         $q = $this->createQueryBuilder('e');
-        $q->select('partial e.{id, name, language}');
+        $q->select('partial e.{id, name, language, media}');
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {

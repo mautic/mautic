@@ -17,7 +17,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
     /**
      * @var TranslatorInterface&WarmableInterface&TranslatorBagInterface&LocaleAwareInterface
      */
-    private TranslatorInterface $translator;
+    private readonly TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
@@ -16,9 +18,9 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class LeadModelFunctionalTest extends MauticMysqlTestCase
+final class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
-    private $pointsAdded = false;
+    private bool $pointsAdded = false;
 
     protected $useCleanupRollback = false;
 
@@ -70,14 +72,14 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testMultipleAssignedCompany(): void
     {
-        self::assertEquals(2, count($this->getContactWithAssignTwoCompanies()));
+        self::assertCount(2, $this->getContactWithAssignTwoCompanies());
     }
 
     public function testSignleAssignedCompany(): void
     {
         $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
 
-        self::assertEquals(1, count($this->getContactWithAssignTwoCompanies()));
+        self::assertCount(1, $this->getContactWithAssignTwoCompanies());
     }
 
     /**
@@ -112,9 +114,8 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
         /** @var CompanyLeadRepository $companyLeadRepo */
         $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
-        $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
 
-        return $contactCompanies;
+        return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }
 
     public function testGetCustomLeadFieldLength(): void

@@ -13,7 +13,7 @@ class EnumExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('enumConditionalFieldTypes', [ConditionalFieldEnum::class, 'getConditionalFieldTypes']),
+            new TwigFunction('enumConditionalFieldTypes', ConditionalFieldEnum::getConditionalFieldTypes(...)),
         ];
     }
 }

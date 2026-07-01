@@ -44,11 +44,12 @@ class ThemeHelper implements ThemeHelperInterface
      */
     private array $themeHelpers = [];
 
-    private Filesystem $filesystem;
+    private readonly Filesystem $filesystem;
 
-    private Finder $finder;
+    private readonly Finder $finder;
 
     private bool $themesLoadedFromFilesystem = false;
+
     private ?Environment $sandboxEnv         = null;
 
     /**
@@ -106,13 +107,13 @@ class ThemeHelper implements ThemeHelperInterface
     private array $hiddenThemes = [];
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private Environment $twig,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly Environment $twig,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
         Finder $finder,
-        private BuilderIntegrationsHelper $builderIntegrationsHelper,
+        private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
     ) {
         $this->filesystem                = clone $filesystem;
         $this->finder                    = clone $finder;
@@ -145,12 +146,7 @@ class ThemeHelper implements ThemeHelperInterface
         return new twigThemeHelper($this->pathsHelper, $themeName);
     }
 
-    /**
-     * @param string $newName
-     *
-     * @return string
-     */
-    private function getDirectoryName($newName)
+    private function getDirectoryName(string $newName): string
     {
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
@@ -652,7 +648,7 @@ class ThemeHelper implements ThemeHelperInterface
             return [];
         }
 
-        return $this->hiddenThemes = array_map(fn ($item) => trim($item), explode('|', $this->filesystem->readFile($hidden)));
+        return $this->hiddenThemes = array_map(trim(...), explode('|', $this->filesystem->readFile($hidden)));
     }
 
     /**

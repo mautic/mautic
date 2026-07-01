@@ -125,6 +125,12 @@ class FormApiController extends CommonApiController
         return $this->handleView($view);
     }
 
+    /**
+     * @param Form                 &$entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $fieldModel = $this->getModel('form.field');
@@ -167,10 +173,8 @@ class FormApiController extends CommonApiController
                 if (empty($fieldParams['id'])) {
                     // Create an unique ID if not set - the following code requires one
                     $fieldParams['id'] = 'new'.hash('sha1', uniqid(mt_rand()));
-                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity();
                 } else {
-                    /** @var ?Field $fieldEntity */
                     $fieldEntity       = $fieldModel->getEntity($fieldParams['id']);
                     $requestFieldIds[] = $fieldParams['id'];
                 }

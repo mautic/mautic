@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ListApiControllerFunctionalTest extends MauticMysqlTestCase
+final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected ListModel $listModel;
 
@@ -811,6 +811,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString($expectedDetailMessage2, $allDetails);
     }
 
+    /** @param array<int, array<string, mixed>> $filters */
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();

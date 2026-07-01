@@ -27,35 +27,35 @@ use Twig\Loader\FilesystemLoader;
 use Twig\RuntimeLoader\FactoryRuntimeLoader;
 use Twig\TwigFilter;
 
-class ThemeHelperTest extends TestCase
+final class ThemeHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper|MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
     /**
-     * @var Environment|MockObject
+     * @var MockObject&Environment
      */
     private MockObject $twig;
 
     /**
-     * @var FilesystemLoader|MockObject
+     * @var MockObject&FilesystemLoader
      */
     private MockObject $loader;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParameterHelper;
 
     /**
-     * @var BuilderIntegrationsHelper|MockObject
+     * @var MockObject&BuilderIntegrationsHelper
      */
     private MockObject $builderIntegrationsHelper;
 
@@ -192,7 +192,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/page.html.twig');
-        $this->assertEquals('@themes/_1-2-1-2-column/html/page.html.twig', $template);
+        $this->assertSame('@themes/_1-2-1-2-column/html/page.html.twig', $template);
     }
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
@@ -227,8 +227,8 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/page.html.twig');
-        $this->assertNotEquals('@themes/nature/page.html.twig', $template);
-        $this->assertNotEquals('@themes/goldstar/page.html.twig', $template);
+        $this->assertNotSame('@themes/nature/page.html.twig', $template);
+        $this->assertNotSame('@themes/goldstar/page.html.twig', $template);
         $this->assertStringContainsString('/page.html.twig', $template);
     }
 
@@ -240,7 +240,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath($name, $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
@@ -259,20 +259,12 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class extends Filesystem {
-                public function __construct()
-                {
-                }
-
                 /**
                  * @param string $files
                  */
                 public function exists($files): bool
                 {
-                    if ('/path/to/themes/new-theme-name' === $files) {
-                        return false;
-                    }
-
-                    return true;
+                    return '/path/to/themes/new-theme-name' !== $files;
                 }
 
                 /**
@@ -334,7 +326,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath($name, $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
@@ -353,20 +345,12 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class extends Filesystem {
-                public function __construct()
-                {
-                }
-
                 /**
                  * @param string $files
                  */
                 public function exists($files): bool
                 {
-                    if ('/path/to/themes/requested-theme-dir' === $files) {
-                        return false;
-                    }
-
-                    return true;
+                    return '/path/to/themes/requested-theme-dir' !== $files;
                 }
 
                 /**
@@ -511,7 +495,7 @@ class ThemeHelperTest extends TestCase
 
         $this->pathsHelper
             ->expects($matcher)
-            ->method('getSystemPath')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getSystemPath')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('themes', $parameters[0]);
                     $this->assertTrue($parameters[1]);

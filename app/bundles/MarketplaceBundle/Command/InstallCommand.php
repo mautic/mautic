@@ -20,8 +20,8 @@ class InstallCommand extends Command
     public const NAME = 'mautic:marketplace:install';
 
     public function __construct(
-        private ComposerHelper $composer,
-        private PackageModel $packageModel,
+        private readonly ComposerHelper $composer,
+        private readonly PackageModel $packageModel,
     ) {
         parent::__construct();
     }
@@ -37,7 +37,7 @@ class InstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $packageName = $input->getArgument('package');
-        $dryRun      = true === $input->getOption('dry-run') ? true : false;
+        $dryRun      = true === $input->getOption('dry-run');
 
         try {
             $package = $this->packageModel->getPackageDetail($packageName);

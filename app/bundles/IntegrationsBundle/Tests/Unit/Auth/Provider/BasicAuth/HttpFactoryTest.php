@@ -10,11 +10,11 @@ use Mautic\IntegrationsBundle\Auth\Provider\BasicAuth\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends TestCase
+final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {
-        $this->assertEquals('basic_auth', (new HttpFactory())->getAuthType());
+        $this->assertSame('basic_auth', (new HttpFactory())->getAuthType());
     }
 
     public function testMissingUsernameThrowsException(): void

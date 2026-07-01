@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ClientController extends AbstractStandardFormController
 {
     public function __construct(
-        private ClientModel $clientModel,
+        private readonly ClientModel $clientModel,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
@@ -47,13 +47,11 @@ class ClientController extends AbstractStandardFormController
      * Generate's default client list.
      *
      * @param int $page
-     *
-     * @return Response
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1)
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -151,7 +149,7 @@ class ClientController extends AbstractStandardFormController
         $success = 0;
         $flashes = [];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $client = $this->clientModel->getEntity($clientId);
 
             if (null === $client) {
@@ -195,7 +193,7 @@ class ClientController extends AbstractStandardFormController
     public function newAction(Request $request, $objectId = 0)
     {
         if (!$this->security->isGranted('api:clients:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $apiMode = (0 === $objectId) ? $request->getSession()->get('mautic.client.filter.api_mode', 'oauth2') : $objectId;
@@ -221,7 +219,7 @@ class ClientController extends AbstractStandardFormController
         $form->remove('consumerSecret');
 
         // /Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -295,7 +293,7 @@ class ClientController extends AbstractStandardFormController
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('api:clients:editother')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $client    = $this->clientModel->getEntity($objectId);
@@ -338,7 +336,7 @@ class ClientController extends AbstractStandardFormController
         $form->remove('api_mode');
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
@@ -399,7 +397,7 @@ class ClientController extends AbstractStandardFormController
     public function deleteAction(Request $request, $objectId)
     {
         if (!$this->security->isGranted('api:clients:delete')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $returnUrl = $this->generateUrl('mautic_client_index');

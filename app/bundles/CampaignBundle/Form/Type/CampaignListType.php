@@ -15,13 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CampaignListType extends AbstractType
 {
-    /**
-     * @var bool
-     */
-    private $canViewOther = false;
+    private bool $canViewOther;
 
     public function __construct(
-        private CampaignModel $model,
+        private readonly CampaignModel $model,
         protected TranslatorInterface $translator,
         CorePermissions $security,
     ) {

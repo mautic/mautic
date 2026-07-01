@@ -55,13 +55,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         protected ActionModel $formActionModel,
         protected FieldModel $formFieldModel,
         protected FormFieldHelper $fieldHelper,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
         protected LeadFieldModel $leadFieldModel,
-        private FormUploader $formUploader,
-        private ContactTracker $contactTracker,
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private TableSchemaHelper $tableSchemaHelper,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly FormUploader $formUploader,
+        private readonly ContactTracker $contactTracker,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly TableSchemaHelper $tableSchemaHelper,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -152,7 +152,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -200,16 +200,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            if (!$field->getParent()) {
-                $field->setOrder($order);
-                ++$order;
-            } else {
-                if (isset($sessionFields[$field->getParent()]['order'])) {
-                    $field->setOrder($sessionFields[$field->getParent()]['order']);
-                } else {
-                    $field->setOrder($order);
-                }
-            }
+            $field->setOrder($order);
+            ++$order;
             $entity->addField($properties['id'], $field);
         }
 
@@ -327,7 +319,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
@@ -452,7 +444,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
+        uasort($fields, fn (Field $a, Field $b): int => $this->compareFieldOrder($a, $b));
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
@@ -889,7 +881,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html): void
+    private function loadHTML(\DOMDocument &$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -903,7 +895,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    private function saveHTML($dom, $html)
+    private function saveHTML(\DOMDocument $dom, $html): string|false|null
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
@@ -962,7 +954,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Generate dom manipulation javascript to include all script.
      */
-    private function generateJsScript($html): string
+    private function generateJsScript(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -1102,5 +1094,16 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+    }
+
+    private function compareFieldOrder(Field $a, Field $b): int
+    {
+        $order = $a->getOrder() <=> $b->getOrder();
+
+        if (0 !== $order) {
+            return $order;
+        }
+
+        return ($a->getId() ?? 0) <=> ($b->getId() ?? 0);
     }
 }

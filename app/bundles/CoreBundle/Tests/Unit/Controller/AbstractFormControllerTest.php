@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,12 +18,12 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 {
     private AbstractFormController $classFromAbstractFormController;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Form
+     * @var \PHPUnit\Framework\MockObject\MockObject&Form
      */
     private \PHPUnit\Framework\MockObject\MockObject $formMock;
 
@@ -43,10 +45,6 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
         $security             = $this->createMock(CorePermissions::class);
 
         $this->classFromAbstractFormController = new class($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $this->requestStack, $security) extends AbstractFormController {
-            public function returnIsFormCancelled(Form $form): bool
-            {
-                return $this->isFormCancelled($form);
-            }
         };
         $this->formMock = $this->createMock(Form::class);
     }
@@ -60,7 +58,7 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->formMock->method('getName')
             ->willReturn('company');
-        $isFormCancelled = $this->classFromAbstractFormController->returnIsFormCancelled($this->formMock);
+        $isFormCancelled = $this->invokeIsFormCancelled($this->formMock);
         $this->assertFalse($isFormCancelled);
     }
 
@@ -73,7 +71,7 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->formMock->method('getName')
             ->willReturn('company_merge');
-        $isFormCancelled = $this->classFromAbstractFormController->returnIsFormCancelled($this->formMock);
+        $isFormCancelled = $this->invokeIsFormCancelled($this->formMock);
         $this->assertTrue($isFormCancelled);
     }
 
@@ -86,8 +84,16 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->formMock->method('getName')
             ->willReturn('company_merge');
-        $isFormCancelled = $this->classFromAbstractFormController->returnIsFormCancelled($this->formMock);
+        $isFormCancelled = $this->invokeIsFormCancelled($this->formMock);
         $this->assertFalse($isFormCancelled);
+    }
+
+    private function invokeIsFormCancelled(Form $form): bool
+    {
+        $reflection = new \ReflectionClass(AbstractFormController::class);
+        $method     = $reflection->getMethod('isFormCancelled');
+
+        return (bool) $method->invoke($this->classFromAbstractFormController, $form);
     }
 
     private function prepareRequestStack(mixed $inputBagParameters): void

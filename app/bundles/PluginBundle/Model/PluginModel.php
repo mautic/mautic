@@ -26,9 +26,9 @@ class PluginModel extends FormModel
 {
     public function __construct(
         protected FieldModel $leadFieldModel,
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
         CoreParametersHelper $coreParametersHelper,
-        private BundleHelper $bundleHelper,
+        private readonly BundleHelper $bundleHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -86,10 +86,8 @@ class PluginModel extends FormModel
 
     /**
      * Loads config.php arrays for all plugins.
-     *
-     * @return array
      */
-    public function getAllPluginsConfig()
+    public function getAllPluginsConfig(): array
     {
         return $this->bundleHelper->getPluginBundles();
     }

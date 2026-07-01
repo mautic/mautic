@@ -11,7 +11,7 @@ class PointBuilderEvent extends Event
     private array $actions = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -60,10 +60,7 @@ class PointBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * @return array
-     */
-    public function getActions()
+    public function getActions(): array
     {
         uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
             $a['label'], $b['label']));

@@ -449,7 +449,7 @@ class PublicController extends CommonFormController
                     $emailEntity->getCreatedBy()
                 ))
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // bogus ID
@@ -465,14 +465,13 @@ class PublicController extends CommonFormController
         // bogus ID
         $idHash = 'xxxxxxxxxxxxxx';
 
-        $BCcontent = $emailEntity->getContent();
-        $content   = $emailEntity->getCustomHtml();
+        $content = $emailEntity->getCustomHtml();
 
         if ('draft' === $objectType && $draftEnabled && $emailEntity->hasDraft()) {
             $content = $emailEntity->getDraftContent();
         }
 
-        if (empty($content) && !empty($BCcontent)) {
+        if (empty($content) && $emailEntity->getTemplate()) {
             $template = $emailEntity->getTemplate();
 
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
@@ -641,7 +640,10 @@ class PublicController extends CommonFormController
         return TrackingPixelHelper::getResponse($request); // send gif
     }
 
-    private function addStat(MailHelper $mailer, $lead, $email, $query, $idHash): ?Stat
+    /**
+     * @param array<string, mixed> $query
+     */
+    private function addStat(MailHelper $mailer, $lead, string $email, array $query, string $idHash): ?Stat
     {
         if (null !== $lead) {
             // To lead
@@ -652,7 +654,7 @@ class PublicController extends CommonFormController
             $mailer->setFrom($from, '');
 
             // Set Content
-            $body = htmlspecialchars(filter_var($query['body'], FILTER_FLAG_STRIP_HIGH));
+            $body = htmlspecialchars(filter_var($query['body'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
             $mailer->setBody($body);
             $mailer->parsePlainText($body);
 
@@ -660,7 +662,7 @@ class PublicController extends CommonFormController
             $mailer->setLead($lead);
             $mailer->setIdHash($idHash);
 
-            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_FLAG_STRIP_HIGH));
+            $subject = htmlspecialchars(filter_var($query['subject'], FILTER_UNSAFE_RAW, FILTER_FLAG_STRIP_HIGH));
             $mailer->setSubject($subject);
 
             return $mailer->createEmailStat();
@@ -669,7 +671,7 @@ class PublicController extends CommonFormController
         return null;
     }
 
-    private function createLead($email, $repo): ?Lead
+    private function createLead(string $email, $repo): ?Lead
     {
         $model = $this->getModel('lead.lead');
         \assert($model instanceof LeadModel);
@@ -751,9 +753,9 @@ class PublicController extends CommonFormController
             'showContactSegments'          => str_contains($content, BuilderSubscriber::segmentListRegex),
             'showContactCategories'        => str_contains($content, BuilderSubscriber::categoryListRegex),
             'showContactPreferredChannels' => str_contains($content, BuilderSubscriber::preferredchannel),
-        ], fn (bool $value) =>!$value);
+        ], fn (bool $value): bool =>!$value);
 
-        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key) => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
+        $showParamsBasedOnConfiguration = array_filter($viewParameters, fn ($key): bool => str_starts_with($key, 'show'), ARRAY_FILTER_USE_KEY);
 
         return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }

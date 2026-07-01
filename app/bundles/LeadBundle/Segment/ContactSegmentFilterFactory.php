@@ -21,10 +21,10 @@ class ContactSegmentFilterFactory
     private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
-        private TableSchemaColumnsCache $schemaCache,
-        private Container $container,
-        private DecoratorFactory $decoratorFactory,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TableSchemaColumnsCache $schemaCache,
+        private readonly Container $container,
+        private readonly DecoratorFactory $decoratorFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -170,7 +170,7 @@ class ContactSegmentFilterFactory
 
         $filter                         = $stack[0];
         $filter['operator']             = 'in';
-        $filter['properties']['filter'] = $filter['filter'] = array_map(fn ($ele) => $ele['filter'], $stack);
+        $filter['properties']['filter'] = $filter['filter'] = array_map(fn (array $ele): mixed => $ele['filter'], $stack);
 
         return $filter;
     }

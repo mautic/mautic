@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -13,25 +15,13 @@ use Mautic\PageBundle\Form\Type\PageListType;
 use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigTypeTest extends TypeTestCase
+final class ConfigTypeTest extends TypeTestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
-
-    private $formType;
-
-    protected function setUp(): void
-    {
-        $this->formBuilder = $this->createMock(FormBuilderInterface::class);
-        $this->formType    = $this->getConfigFormType();
-        parent::setUp();
-    }
-
     public function testSubmitEmptyTrustedHosts(): void
     {
         $formData = [
@@ -126,7 +116,7 @@ class ConfigTypeTest extends TypeTestCase
         $this->assertTrue($form->isValid());
     }
 
-    private function getConfigFormType()
+    private function getConfigFormType(): ConfigType
     {
         $translator                 = $this->createMock(TranslatorInterface::class);
         $languageHelper             = $this->createMock(LanguageHelper::class);
@@ -141,7 +131,8 @@ class ConfigTypeTest extends TypeTestCase
         return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
     }
 
-    protected function getExtensions()
+    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    protected function getExtensions(): array
     {
         $validator = Validation::createValidator();
 

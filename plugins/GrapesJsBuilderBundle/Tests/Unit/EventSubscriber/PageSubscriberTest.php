@@ -16,8 +16,10 @@ final class PageSubscriberTest extends TestCase
 {
     /** @var MockObject&Config */
     private MockObject $config;
+
     /** @var MockObject&GrapesJsBuilderModel */
     private MockObject $model;
+
     private PageSubscriber $subscriber;
 
     protected function setUp(): void
@@ -40,7 +42,7 @@ final class PageSubscriberTest extends TestCase
         $page = new Page();
 
         $this->config->method('isPublished')->willReturn(true);
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('addOrEditPageEntity')
             ->with($page);
 

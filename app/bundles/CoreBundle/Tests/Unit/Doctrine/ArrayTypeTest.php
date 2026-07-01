@@ -10,7 +10,7 @@ class ExampleClassWithPrivateProperty
     /**
      * @phpstan-ignore-next-line
      */
-    private $test = 'value';
+    private string $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty
@@ -29,7 +29,7 @@ class ExampleClassWithPublicProperty
     public $test = 'value';
 }
 
-class ArrayTypeTest extends \PHPUnit\Framework\TestCase
+final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 

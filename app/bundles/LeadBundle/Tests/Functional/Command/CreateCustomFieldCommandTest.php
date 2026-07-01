@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Functional\Command;
 
 use Doctrine\DBAL\Schema\Column;
@@ -12,9 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class CreateCustomFieldCommandTest extends MauticMysqlTestCase
+final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,12 +36,12 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $kernel = static::getContainer()->get('kernel');
-        \assert($kernel instanceof KernelInterface);
+        $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = 1;
         $customFieldNotification = self::createMock(CustomFieldNotification::class);
         $customFieldNotification
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('customFieldWasCreated')
             ->with(self::isInstanceOf(LeadField::class), self::equalTo($expectedUserId));
         $kernel->getContainer()->set('mautic.lead.field.notification.custom_field', $customFieldNotification);
@@ -53,7 +55,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
             '--id'   => $leadField->getId(),
         ]);
 
-        self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        self::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
@@ -88,7 +90,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $kernel = static::getContainer()->get('kernel');
-        \assert($kernel instanceof KernelInterface);
+        $this->assertInstanceOf(KernelInterface::class, $kernel);
 
         $expectedUserId          = 1;
         $customFieldNotification = self::createMock(CustomFieldNotification::class);
@@ -104,7 +106,7 @@ class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
-        self::assertEquals(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        self::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
         $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);

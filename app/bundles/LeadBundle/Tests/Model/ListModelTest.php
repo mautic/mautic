@@ -27,24 +27,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ListModelTest extends TestCase
+final class ListModelTest extends TestCase
 {
-    protected ListModel|MockObject $fixture;
+    protected ?MockObject $fixture = null;
 
     private ListModel $model;
 
     /**
-     * @var LeadListRepository|MockObject
+     * @var MockObject&LeadListRepository
      */
     private MockObject $leadListRepositoryMock;
 
     /**
-     * @var SegmentCountCacheHelper|MockObject
+     * @var MockObject&SegmentCountCacheHelper
      */
     private MockObject $segmentCountCacheHelper;
 
     /**
-     * @var ContactSegmentService|MockObject
+     * @var MockObject&ContactSegmentService
      */
     private MockObject $contactSegmentServiceMock;
 
@@ -77,15 +77,19 @@ class ListModelTest extends TestCase
             $this->segmentCountCacheHelper,
             $doNotContactRepositoryMock,
             $entityManagerMock,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $eventDispatcherInterfaceMock,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translatorMock,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $loggerMock
         );
     }
 
+    /**
+     * @param array<int, mixed> $getLookupResultsReturn
+     * @param array<int, mixed> $expected
+     */
     #[DataProvider('sourceTypeTestDataProvider')]
     public function testGetSourceLists(array $getLookupResultsReturn, ?string $sourceType, array $expected): void
     {
@@ -94,6 +98,7 @@ class ListModelTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /** @param array<int, mixed> $getLookupResultsReturn */
     private function prepareMockForTestGetSourcesLists(array $getLookupResultsReturn): void
     {
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
@@ -114,19 +119,20 @@ class ListModelTest extends TestCase
                 $requestStack,
                 $segmentCountCacheHelperMock,
                 $doNotContactRepositoryMock,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class)])
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class)])
             ->onlyMethods([])
             ->getMock();
 
         $this->fixture = $mockListModel;
     }
 
+    /** @return array<int, array{0: array<int, mixed>, 1: string|null, 2: array<string|int, mixed>}> */
     public static function sourceTypeTestDataProvider(): array
     {
         return [
@@ -196,13 +202,13 @@ class ListModelTest extends TestCase
         $leadCount = 433;
 
         $this->leadListRepositoryMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getLeadCount')
             ->with($segmentId)
             ->willReturn($leadCount);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('setSegmentContactCount')
             ->with($segmentId, $leadCount);
 
@@ -212,7 +218,7 @@ class ListModelTest extends TestCase
         ];
 
         $this->contactSegmentServiceMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getNewLeadListLeadsCount')
             ->with($leadList)
             ->willReturn($newLeadsCount);
@@ -223,7 +229,7 @@ class ListModelTest extends TestCase
         ];
 
         $this->contactSegmentServiceMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getOrphanedLeadListLeadsCount')
             ->with($leadList)
             ->willReturn($orphanLeadsCount);
@@ -231,7 +237,7 @@ class ListModelTest extends TestCase
         self::assertSame(0, $this->model->rebuildListLeads($leadList));
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -251,7 +257,7 @@ class ListModelTest extends TestCase
         $this->model->removeLead($lead, $leadList);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($currentLeadCount - 1);
@@ -268,7 +274,7 @@ class ListModelTest extends TestCase
         $leadCount = 100;
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -288,7 +294,7 @@ class ListModelTest extends TestCase
         $this->model->addLead($lead, $leadList);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($currentLeadCount + 1);
@@ -305,13 +311,13 @@ class ListModelTest extends TestCase
         $leadCount = 100;
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('hasSegmentContactCount')
             ->with($segmentId)
             ->willReturn(true);
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getSegmentContactCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -328,13 +334,13 @@ class ListModelTest extends TestCase
         $leadCount = 100;
 
         $this->segmentCountCacheHelper
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('hasSegmentContactCount')
             ->with($segmentId)
             ->willReturn(false);
 
         $this->leadListRepositoryMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getLeadCount')
             ->with($segmentId)
             ->willReturn($leadCount);
@@ -351,14 +357,14 @@ class ListModelTest extends TestCase
         $dnc       = 3;
 
         $this->leadListRepositoryMock
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getLeadCount')
             ->with($segmentId)
             ->willReturn($total);
 
         $doNotContactRepository = $this->createMock(DoNotContactRepository::class);
         $doNotContactRepository
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getCount')
             ->with(null, null, null, $segmentId)
             ->willReturn($dnc);
@@ -375,7 +381,7 @@ class ListModelTest extends TestCase
     {
         $leadList  = $this->mockLeadList(765);
         $segmentId = $leadList->getId();
-        $this->leadListRepositoryMock->expects(self::once())
+        $this->leadListRepositoryMock->expects($this->once())
             ->method('leadListExists')
             ->with($segmentId)
             ->willReturn(true);
@@ -387,7 +393,7 @@ class ListModelTest extends TestCase
     {
         return new class($id) extends LeadList {
             public function __construct(
-                private int $id,
+                private readonly int $id,
             ) {
                 parent::__construct();
             }
@@ -403,7 +409,7 @@ class ListModelTest extends TestCase
     {
         return new class($id) extends Lead {
             public function __construct(
-                private int $id,
+                private readonly int $id,
             ) {
                 parent::__construct();
             }

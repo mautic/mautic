@@ -33,7 +33,7 @@ class SMimeHelper
      */
     private array $tempFiles = [];
 
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private Filesystem $filesystem, private EncryptionHelper $encryptionHelper, private LoggerInterface $logger)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper, private readonly Filesystem $filesystem, private readonly EncryptionHelper $encryptionHelper, private readonly LoggerInterface $logger)
     {
     }
 

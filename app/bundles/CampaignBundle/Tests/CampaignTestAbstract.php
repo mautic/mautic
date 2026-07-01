@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -21,13 +23,16 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class CampaignTestAbstract extends TestCase
+abstract class CampaignTestAbstract extends TestCase
 {
     protected static int $mockId       = 232;
+
     protected static string $mockName  = 'Mock name';
+
     protected static string $mockAlias = 'Mock alias';
+
     /** @var EntityManager&MockObject */
-    protected EntityManager $entityManager;
+    protected ?MockObject $entityManager = null;
 
     protected function initCampaignModel(): CampaignModel
     {
@@ -69,18 +74,18 @@ class CampaignTestAbstract extends TestCase
         return new CampaignModel(
             $leadListModel,
             $formModel,
-            $this->createMock(EventCollector::class),
-            $this->createMock(MembershipBuilder::class),
-            $this->createMock(ContactTracker::class),
-            $this->createMock(GeneratedColumnsProviderInterface::class),
+            $this->createStub(EventCollector::class),
+            $this->createStub(MembershipBuilder::class),
+            $this->createStub(ContactTracker::class),
+            $this->createStub(GeneratedColumnsProviderInterface::class),
             $entityManager,
             $security,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
             $userHelper,
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
         );
     }
 }

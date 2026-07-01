@@ -7,11 +7,11 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use PHPUnit\Framework\TestCase;
 
-class ObjectMappingTest extends TestCase
+final class ObjectMappingTest extends TestCase
 {
     private \DateTime $dateCreated;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->dateCreated = new \DateTime();
 

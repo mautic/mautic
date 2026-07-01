@@ -38,8 +38,8 @@ class FieldModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
-        private ColumnSchemaHelper $columnSchemaHelper,
+        private readonly RequestStack $requestStack,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -155,7 +155,7 @@ class FieldModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormFieldEvent($entity, $isNew);
             }
 

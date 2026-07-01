@@ -82,14 +82,14 @@ class SubmissionModel extends CommonFormModel
         protected LeadFieldModel $leadFieldModel,
         protected CompanyModel $companyModel,
         protected FormFieldHelper $fieldHelper,
-        private UploadFieldValidator $uploadFieldValidator,
-        private FormUploader $formUploader,
-        private DeviceTrackingServiceInterface $deviceTrackingService,
-        private FieldValueTransformer $fieldValueTransformer,
-        private DateHelper $dateHelper,
-        private ContactTracker $contactTracker,
-        private ContactMerger $contactMerger,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly UploadFieldValidator $uploadFieldValidator,
+        private readonly FormUploader $formUploader,
+        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly FieldValueTransformer $fieldValueTransformer,
+        private readonly DateHelper $dateHelper,
+        private readonly ContactTracker $contactTracker,
+        private readonly ContactMerger $contactMerger,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -110,11 +110,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param bool $returnEvent
      *
-     * @return bool|array
-     *
      * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
+    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false): array|false
     {
         $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
 
@@ -383,7 +381,7 @@ class SubmissionModel extends CommonFormModel
 
         if ($this->dispatcher->hasListeners(FormEvents::FORM_ON_SUBMIT)) {
             // Reset action config from executeFormActions()
-            $submissionEvent->setAction(null);
+            $submissionEvent->setAction();
 
             // Dispatch to on submit listeners
             $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
@@ -460,11 +458,9 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs)
+    public function exportResults($format, $form, $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -571,11 +567,9 @@ class SubmissionModel extends CommonFormModel
      * @param object               $page
      * @param array<string, mixed> $queryArgs
      *
-     * @return StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs)
+    public function exportResultsForPage($format, $page, $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];

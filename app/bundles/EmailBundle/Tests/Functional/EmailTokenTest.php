@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailTokenTest extends MauticMysqlTestCase
+final class EmailTokenTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -111,7 +111,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         $body = $crawler->filter('body');
 
         // Remove the tracking tags that are causing troubles with different Mautic configurations.
-        $body->filter('a,img,div')->each(function (Crawler $crawler) {
+        $body->filter('a,img,div')->each(function (Crawler $crawler): void {
             foreach ($crawler as $node) {
                 $node->parentNode->removeChild($node);
             }

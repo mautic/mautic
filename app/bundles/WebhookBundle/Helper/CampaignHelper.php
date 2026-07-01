@@ -22,7 +22,7 @@ class CampaignHelper
     public function __construct(
         protected Client $client,
         protected CompanyModel $companyModel,
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -70,14 +70,13 @@ class CampaignHelper
     }
 
     /**
-     * @param string $url
      * @param string $method
      * @param int    $timeout
      *
      * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      */
-    private function makeRequest($url, $method, $timeout, array $headers, array $payload): void
+    private function makeRequest(string $url, $method, $timeout, array $headers, array $payload): void
     {
         switch ($method) {
             case 'get':
@@ -95,7 +94,7 @@ class CampaignHelper
                     \GuzzleHttp\RequestOptions::HEADERS     => $headers,
                     \GuzzleHttp\RequestOptions::TIMEOUT     => $timeout,
                 ];
-                if (array_key_exists('content-type', $headers) && 'application/json' == strtolower($headers['content-type'])) {
+                if (array_key_exists('content-type', $headers) && 'application/json' === strtolower($headers['content-type'])) {
                     $options[\GuzzleHttp\RequestOptions::BODY] = json_encode($payload);
                 } else {
                     $options[\GuzzleHttp\RequestOptions::FORM_PARAMS] = $payload;
