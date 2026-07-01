@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class DetailsTypeTest extends TestCase
+final class DetailsTypeTest extends TestCase
 {
     public function testBuildFormRemovesHiddenKeys(): void
     {

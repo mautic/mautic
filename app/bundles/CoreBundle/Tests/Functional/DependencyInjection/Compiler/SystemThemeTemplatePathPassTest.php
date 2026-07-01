@@ -11,7 +11,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 
-class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
+final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

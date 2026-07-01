@@ -34,7 +34,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
  */
-class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
+final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

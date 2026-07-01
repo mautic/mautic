@@ -7,7 +7,7 @@ namespace Mautic\PageBundle\Tests\Entity;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 
-class PageTest extends \PHPUnit\Framework\TestCase
+final class PageTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array<string, array<int, mixed>> $changes

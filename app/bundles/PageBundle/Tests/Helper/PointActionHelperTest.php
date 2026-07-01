@@ -12,7 +12,7 @@ use Mautic\PageBundle\Helper\PointActionHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class PointActionHelperTest extends TestCase
+final class PointActionHelperTest extends TestCase
 {
     /**
      * @var MockObject&EntityManagerInterface

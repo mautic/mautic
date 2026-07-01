@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
-class RoleControllerFunctionalTest extends MauticMysqlTestCase
+final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testNewRoleAction(): void
     {

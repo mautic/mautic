@@ -6,11 +6,11 @@ use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 
-final class UserTokenService implements UserTokenServiceInterface
+final readonly class UserTokenService implements UserTokenServiceInterface
 {
     public function __construct(
-        private readonly RandomHelperInterface $randomHelper,
-        private readonly UserTokenRepositoryInterface $userTokenRepository,
+        private RandomHelperInterface $randomHelper,
+        private UserTokenRepositoryInterface $userTokenRepository,
     ) {
     }
 

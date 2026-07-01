@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 /**
  * IntegrationRepository.
  */
-class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
+final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     public const INTEGRATION        = 'someIntegration';
 
@@ -21,15 +21,9 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public const INTERNAL_ENTITY    = 'lead';
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
-    /**
-     * @var IntegrationEntityRepository
-     */
-    private $integrationEntityRepository;
+    private IntegrationEntityRepository $integrationEntityRepository;
 
     protected function setUp(): void
     {

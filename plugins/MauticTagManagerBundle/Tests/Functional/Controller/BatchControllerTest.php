@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -8,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
-class BatchControllerTest extends MauticMysqlTestCase
+final class BatchControllerTest extends MauticMysqlTestCase
 {
     private const BATCH_TAG_FORM_SELECTOR = 'form[name=batch_tag]';
 

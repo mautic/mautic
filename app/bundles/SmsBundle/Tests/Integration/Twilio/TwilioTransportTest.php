@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TwilioTransportTest extends TestCase
+final class TwilioTransportTest extends TestCase
 {
     private TwilioTransport $twilioTransport;
 

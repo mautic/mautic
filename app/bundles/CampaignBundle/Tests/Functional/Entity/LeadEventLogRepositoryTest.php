@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class LeadEventLogRepositoryTest extends MauticMysqlTestCase
+final class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 {
     private LeadEventLogRepository $repository;
 

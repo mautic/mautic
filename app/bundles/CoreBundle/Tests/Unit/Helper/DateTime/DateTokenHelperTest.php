@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const DATE_FORMAT      = 'F j, Y';
 

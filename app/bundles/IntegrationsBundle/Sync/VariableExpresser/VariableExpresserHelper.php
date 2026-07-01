@@ -8,13 +8,13 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\EncodedValueDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 
-final class VariableExpresserHelper implements VariableExpresserHelperInterface
+final readonly class VariableExpresserHelper implements VariableExpresserHelperInterface
 {
     public const TRUE_BOOLEAN_VALUE  = 'true';
 
     public const FALSE_BOOLEAN_VALUE = 'false';
 
-    private readonly ValueNormalizer $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct()
     {

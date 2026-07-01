@@ -110,11 +110,16 @@ class LookupHelper
         }
     }
 
-    public function validateRequest($oid, $type)
+    /**
+     * @return array{notify: mixed, entity: mixed}|false
+     */
+    public function validateRequest($oid, $type): array|false
     {
         // prefix#entityId#hour#userId#nonce
         [$w, $id, $hour, $uid, $nonce]     = explode('#', $oid, 5);
         $notify                            = (str_contains($w, '_notify') && $uid) ? $uid : false;
+
+        $entity = null;
 
         switch ($type) {
             case 'person':
@@ -144,10 +149,8 @@ class LookupHelper
 
     /**
      * @param bool $person
-     *
-     * @return bool|Clearbit_Company|Clearbit_Person
      */
-    protected function getClearbit($person = true)
+    protected function getClearbit($person = true): false|Clearbit_Person|Clearbit_Company
     {
         if (!$this->integration || !$this->integration->getIntegrationSettings()->getIsPublished()) {
             return false;

@@ -25,7 +25,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class OrderExecutionerTest extends TestCase
+final class OrderExecutionerTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
