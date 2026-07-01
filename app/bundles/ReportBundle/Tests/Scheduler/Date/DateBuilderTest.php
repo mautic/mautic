@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Date;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;

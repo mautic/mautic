@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Model;
 
 use Mautic\CoreBundle\Entity\CommonRepository;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests\Entity;
 
 use Mautic\PluginBundle\Entity\Plugin;

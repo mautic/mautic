@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;

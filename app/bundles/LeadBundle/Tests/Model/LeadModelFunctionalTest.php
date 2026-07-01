@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Exception as DBALException;

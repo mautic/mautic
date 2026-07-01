@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\Tests\Message;
 
 use Mautic\MessengerBundle\Message\PageHitNotification;

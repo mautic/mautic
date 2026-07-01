@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
 use Mautic\ReportBundle\Entity\Report;

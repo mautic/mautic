@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\Event\ParseEmailEvent;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;

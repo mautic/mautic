@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\DAO;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;

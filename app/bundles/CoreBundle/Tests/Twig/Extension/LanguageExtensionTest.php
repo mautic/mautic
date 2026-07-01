@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Extension\LanguageExtension;

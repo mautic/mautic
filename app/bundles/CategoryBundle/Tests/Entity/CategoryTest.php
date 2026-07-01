@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Tests\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;

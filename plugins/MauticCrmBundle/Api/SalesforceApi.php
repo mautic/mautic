@@ -612,7 +612,7 @@ class SalesforceApi extends CrmApi
     /**
      * @return array<mixed>
      */
-    private function parseMissingField(string $errorMessage)
+    private function parseMissingField(string $errorMessage): array
     {
         $matches = [];
         preg_match(self::REGEXP_MISSING_FIELD, $errorMessage, $matches);
@@ -620,10 +620,7 @@ class SalesforceApi extends CrmApi
         return isset($matches[1]) ? [$matches[1], $matches[2]] : [null, null];
     }
 
-    /**
-     * @return bool|float|mixed|string
-     */
-    private function escapeQueryValue($value)
+    private function escapeQueryValue(string $value): string
     {
         // SF uses backslashes as escape delimeter
         // Remember that PHP uses \ as an escape. Therefore, to replace a single backslash with 2, must use 2 and 4
@@ -633,9 +630,7 @@ class SalesforceApi extends CrmApi
         $value = $this->integration->cleanPushData($value);
 
         // Escape single quotes
-        $value = str_replace("'", "\'", $value);
-
-        return $value;
+        return str_replace("'", "\'", $value);
     }
 
     public function isOptOutFieldAccessible(): bool

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DashboardBundle\Tests\Entity;
 
 use Mautic\DashboardBundle\Entity\Widget;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
 use Doctrine\DBAL\Exception\RetryableException;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Translation\Translator;

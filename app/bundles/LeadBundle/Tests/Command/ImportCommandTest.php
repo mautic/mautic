@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Model\NotificationModel;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Integration;
 
 use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;

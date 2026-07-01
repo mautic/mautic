@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;

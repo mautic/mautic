@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityRepository;

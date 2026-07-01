@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Calculator;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\RequestTrait;

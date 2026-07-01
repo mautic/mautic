@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Tests\Validator\Constraints;
 
 use Mautic\DynamicContentBundle\Entity\DynamicContent;

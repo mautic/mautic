@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;

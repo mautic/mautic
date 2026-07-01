@@ -110,11 +110,9 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param bool $returnEvent
      *
-     * @return bool|array
-     *
      * @throws ORMException
      */
-    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false)
+    public function saveSubmission($post, $server, Form $form, Request $request, $returnEvent = false): array|false
     {
         $leadFields = array_merge($this->leadFieldModel->getFieldListWithProperties(false), $this->leadFieldModel->getSpecialLeadFields());
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Event;
 
 use Mautic\EmailBundle\Event\EmailSendEvent;

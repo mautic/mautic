@@ -79,11 +79,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return false|CampaignExecutionEvent
-     *
      * @throws InvalidArgumentException
      */
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): false|CampaignExecutionEvent
     {
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();

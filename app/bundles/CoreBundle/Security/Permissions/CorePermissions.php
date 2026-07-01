@@ -74,11 +74,9 @@ class CorePermissions implements ResetInterface
      * @param string $bundle         can be either short bundle name or full path to the permissions class
      * @param bool   $throwException
      *
-     * @return AbstractPermissions
-     *
      * @throws \InvalidArgumentException
      */
-    public function getPermissionObject($bundle, $throwException = true)
+    public function getPermissionObject($bundle, $throwException = true): false|AbstractPermissions
     {
         if (empty($bundle)) {
             throw new \InvalidArgumentException("Bundle and permission type must be specified. {$bundle} given.");
