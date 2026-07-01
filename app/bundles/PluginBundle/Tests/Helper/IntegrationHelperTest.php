@@ -31,9 +31,9 @@ final class IntegrationHelperTest extends TestCase
 
         $this->assertIsArray($patterns['twitter']);
         $this->assertCount(2, $patterns['twitter']);
-        $this->assertSame(1, preg_match($patterns['twitter'][0], 'https://x.com/mautic'));
-        $this->assertSame(1, preg_match($patterns['twitter'][1], 'https://twitter.com/mautic'));
-        $this->assertSame(1, preg_match($patterns['tiktok'], 'https://tiktok.com/@mautic'));
-        $this->assertSame(1, preg_match($patterns['youtube'][0], 'https://youtube.com/@mautic'));
+        $this->assertMatchesRegularExpression($patterns['twitter'][0], 'https://x.com/mautic');
+        $this->assertMatchesRegularExpression($patterns['twitter'][1], 'https://twitter.com/mautic');
+        $this->assertMatchesRegularExpression($patterns['tiktok'], 'https://tiktok.com/@mautic');
+        $this->assertMatchesRegularExpression($patterns['youtube'][0], 'https://youtube.com/@mautic');
     }
 }
