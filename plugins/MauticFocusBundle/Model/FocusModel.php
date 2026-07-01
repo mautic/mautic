@@ -121,8 +121,9 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param Focus $entity
+     * @param bool  $unlock
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
         $this->generateTrackableUrl($entity);

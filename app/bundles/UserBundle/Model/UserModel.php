@@ -69,7 +69,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));

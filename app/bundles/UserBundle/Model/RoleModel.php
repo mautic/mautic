@@ -32,7 +32,7 @@ class RoleModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, $unlock = true): void
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');

@@ -97,7 +97,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Create/edit entity.
      *
-     * @param T $entity
+     * @param T    $entity
      * @param bool $unlock
      */
     public function saveEntity($entity, $unlock = true): void

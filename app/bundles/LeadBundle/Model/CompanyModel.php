@@ -79,8 +79,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * @param Company $entity
+     * @param bool    $unlock
      */
-    public function saveEntity(object $entity, bool $unlock = true): void
+    public function saveEntity($entity, $unlock = true): void
     {
         // Update leads primary company name
         $this->setEntityDefaultValues($entity, 'company');

@@ -99,8 +99,9 @@ class MonitoringModel extends FormModel
 
     /**
      * @param Monitoring $monitoringEntity
+     * @param bool       $unlock
      */
-    public function saveEntity(object $monitoringEntity, bool $unlock = true): void
+    public function saveEntity($monitoringEntity, $unlock = true): void
     {
         // we're editing an existing record
         if (!$monitoringEntity->isNew()) {
