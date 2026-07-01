@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailTokenTest extends MauticMysqlTestCase
+final class EmailTokenTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\Console\Command\Command;
 
-class CleanupCommandTest extends MauticMysqlTestCase
+final class CleanupCommandTest extends MauticMysqlTestCase
 {
     public function testOrphanFieldChangeRecordDeleted(): void
     {

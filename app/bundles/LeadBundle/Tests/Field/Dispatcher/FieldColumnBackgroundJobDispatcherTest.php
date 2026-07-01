@@ -16,7 +16,7 @@ use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
+final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

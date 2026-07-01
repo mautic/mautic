@@ -54,17 +54,15 @@ class FieldController extends CommonFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request, Environment $twig)
+    public function newAction(Request $request, Environment $twig): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $formField = $request->request->all()['formfield'] ?? [];
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
@@ -97,7 +95,7 @@ class FieldController extends CommonFormController
         }
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -229,10 +227,8 @@ class FieldController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, Environment $twig, $objectId)
+    public function editAction(Request $request, Environment $twig, $objectId): JsonResponse|Response
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();
@@ -258,7 +254,7 @@ class FieldController extends CommonFormController
             $form = $this->getFieldForm($formId, $formField);
 
             // Check for a submitted form and process it
-            if ('POST' == $method) {
+            if ('POST' === $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;

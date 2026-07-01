@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ListModelTest extends TestCase
+final class ListModelTest extends TestCase
 {
     protected ?MockObject $fixture = null;
 

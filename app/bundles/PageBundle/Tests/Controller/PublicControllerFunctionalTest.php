@@ -11,7 +11,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PublicControllerFunctionalTest extends MauticMysqlTestCase
+final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTrackingImageAction(): void
     {

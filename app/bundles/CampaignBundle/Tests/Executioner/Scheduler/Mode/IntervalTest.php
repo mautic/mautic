@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Psr\Log\NullLogger;
 
-class IntervalTest extends \PHPUnit\Framework\TestCase
+final class IntervalTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array<int> $restrictedDays

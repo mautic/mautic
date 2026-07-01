@@ -16,7 +16,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {

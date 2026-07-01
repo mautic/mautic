@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class DeleteFormTest extends \PHPUnit\Framework\TestCase
+final class DeleteFormTest extends \PHPUnit\Framework\TestCase
 {
     public function testDelete(): void
     {

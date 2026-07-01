@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 
-class CompanyTest extends MauticMysqlTestCase
+final class CompanyTest extends MauticMysqlTestCase
 {
     public function testChangingPropertiesHydratesFieldChanges(): void
     {

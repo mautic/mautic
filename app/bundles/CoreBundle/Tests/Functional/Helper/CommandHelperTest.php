@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CommandHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class CommandHelperTest extends MauticMysqlTestCase
+final class CommandHelperTest extends MauticMysqlTestCase
 {
     private CommandHelper $commandHelper;
 

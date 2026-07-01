@@ -144,12 +144,7 @@ class ThemeHelper implements ThemeHelperInterface
         return new twigThemeHelper($this->pathsHelper, $themeName);
     }
 
-    /**
-     * @param string $newName
-     *
-     * @return string
-     */
-    private function getDirectoryName($newName)
+    private function getDirectoryName(string $newName): string
     {
         return InputHelper::filename(str_replace(' ', '-', $newName));
     }
@@ -626,7 +621,7 @@ class ThemeHelper implements ThemeHelperInterface
             return [];
         }
 
-        return $this->hiddenThemes = array_map(fn ($item): string => trim($item), explode('|', $this->filesystem->readFile($hidden)));
+        return $this->hiddenThemes = array_map(trim(...), explode('|', $this->filesystem->readFile($hidden)));
     }
 
     /**

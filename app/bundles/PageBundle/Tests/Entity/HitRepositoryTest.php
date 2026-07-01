@@ -13,7 +13,7 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 
-class HitRepositoryTest extends MauticMysqlTestCase
+final class HitRepositoryTest extends MauticMysqlTestCase
 {
     private HitRepository $hitRepository;
 

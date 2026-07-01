@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use PHPUnit\Framework\Assert;
 
-class CampaignDecisionTest extends MauticMysqlTestCase
+final class CampaignDecisionTest extends MauticMysqlTestCase
 {
     use CampaignEntitiesTrait;
     use LeadFieldTestTrait;

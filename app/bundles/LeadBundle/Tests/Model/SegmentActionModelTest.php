@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
 
-class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
+final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\Stub $contactMock5;
 

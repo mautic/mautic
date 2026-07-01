@@ -11,7 +11,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class UserTokenSetterTest extends AbstractMauticTestCase
+final class UserTokenSetterTest extends AbstractMauticTestCase
 {
     public function testSetUserMakesTheUserAvailableToUserHelper(): void
     {

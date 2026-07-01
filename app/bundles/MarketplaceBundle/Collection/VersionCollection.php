@@ -28,7 +28,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
     {
         return new self(
             array_map(
-                fn (array $record): Version => Version::fromArray($record),
+                Version::fromArray(...),
                 $array
             )
         );

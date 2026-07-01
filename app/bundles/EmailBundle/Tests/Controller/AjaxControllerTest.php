@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class AjaxControllerTest extends \PHPUnit\Framework\TestCase
+final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Session

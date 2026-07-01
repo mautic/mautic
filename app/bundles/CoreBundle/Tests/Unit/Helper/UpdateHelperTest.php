@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
@@ -21,7 +23,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class UpdateHelperTest extends TestCase
+final class UpdateHelperTest extends TestCase
 {
     /**
      * @var MockObject&Logger

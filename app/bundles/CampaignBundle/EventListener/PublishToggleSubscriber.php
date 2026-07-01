@@ -11,9 +11,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PublishToggleSubscriber implements EventSubscriberInterface
+final readonly class PublishToggleSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly CoreParametersHelper $coreParametersHelper, private readonly TranslatorInterface $translator)
+    public function __construct(private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
     {
     }
 

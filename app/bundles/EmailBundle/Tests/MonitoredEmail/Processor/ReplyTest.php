@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,7 +26,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReplyTest extends \PHPUnit\Framework\TestCase
+final class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&StatRepository

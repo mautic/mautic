@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailSubscriberTest extends TestCase
+final class EmailSubscriberTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('onEmailAddressReplacementProvider')]
     public function testOnEmailAddressReplacement(string $value, string $expected): void

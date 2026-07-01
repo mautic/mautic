@@ -6,25 +6,25 @@ namespace Mautic\CoreBundle\Service;
 
 use Symfony\Component\Process\Process;
 
-final class ProcessQueue
+final readonly class ProcessQueue
 {
     /**
      * @var \SplQueue<Process>
      */
-    private readonly \SplQueue $pending;
+    private \SplQueue $pending;
 
     /**
      * @var \SplObjectStorage<Process,Process>
      */
-    private readonly \SplObjectStorage $processing;
+    private \SplObjectStorage $processing;
 
     /**
      * @var \SplObjectStorage<Process,Process>
      */
-    private readonly \SplObjectStorage $processed;
+    private \SplObjectStorage $processed;
 
     public function __construct(
-        private readonly int $processLimit = 10,
+        private int $processLimit = 10,
     ) {
         $this->pending      = new \SplQueue();
         $this->processing   = new \SplObjectStorage();
