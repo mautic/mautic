@@ -14,11 +14,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Appends contact segment IDs to tracking URLs for third-party integrations like VWO.
  */
-final class SegmentTrackingSubscriber implements EventSubscriberInterface
+final readonly class SegmentTrackingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly LeadListRepository $leadListRepository,
+        private CoreParametersHelper $coreParametersHelper,
+        private LeadListRepository $leadListRepository,
     ) {
     }
 

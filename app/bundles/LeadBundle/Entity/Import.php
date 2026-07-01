@@ -575,7 +575,7 @@ class Import extends FormEntity
      *
      * @return int
      */
-    public function getRunTimeSeconds()
+    public function getRunTimeSeconds(): int|float
     {
         $startTime = $this->getDateStarted();
         $endTime   = $this->getDateEnded();

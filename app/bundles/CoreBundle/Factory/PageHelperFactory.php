@@ -7,11 +7,11 @@ use Mautic\CoreBundle\Helper\PageHelper;
 use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class PageHelperFactory implements PageHelperFactoryInterface
+final readonly class PageHelperFactory implements PageHelperFactoryInterface
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private RequestStack $requestStack,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

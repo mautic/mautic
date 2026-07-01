@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\HttpFoundation\Request;
 
-class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
+final class PreviewSettingsFunctionalTest extends MauticMysqlTestCase
 {
     public function testPreviewSettingsAllEnabled(): void
     {

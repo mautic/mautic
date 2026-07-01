@@ -12,7 +12,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 
-class AssertCustomMjmlTest extends MauticMysqlTestCase
+final class AssertCustomMjmlTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

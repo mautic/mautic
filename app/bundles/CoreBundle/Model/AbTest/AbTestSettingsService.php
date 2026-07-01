@@ -164,7 +164,7 @@ class AbTestSettingsService
      */
     private function setWinnerCriteriaFromVariant(string $variantCriteria): void
     {
-        if (!empty($this->winnerCriteria) && $variantCriteria != $this->winnerCriteria) {
+        if (!empty($this->winnerCriteria) && $variantCriteria !== $this->winnerCriteria) {
             // there are variants with different winner criteria
             $this->configurationError = true;
         } else {

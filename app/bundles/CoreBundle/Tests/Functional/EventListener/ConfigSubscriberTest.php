@@ -9,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ConfigSubscriberTest extends MauticMysqlTestCase
+final class ConfigSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

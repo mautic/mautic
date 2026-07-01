@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AvatarHelperTest extends \PHPUnit\Framework\TestCase
+final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&Lead

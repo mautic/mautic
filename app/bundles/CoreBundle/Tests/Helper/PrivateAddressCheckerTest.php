@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
 use PHPUnit\Framework\TestCase;
 
-class PrivateAddressCheckerTest extends TestCase
+final class PrivateAddressCheckerTest extends TestCase
 {
     private PrivateAddressChecker $checker;
 

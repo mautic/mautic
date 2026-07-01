@@ -16,7 +16,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContext(): void
     {

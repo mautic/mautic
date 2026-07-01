@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
-class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
+final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper

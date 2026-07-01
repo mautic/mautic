@@ -42,7 +42,7 @@ final class SafeRemoteUrlValidator extends ConstraintValidator
             return false;
         }
 
-        $allowedDomains = array_map('strtolower', $this->coreParametersHelper->get('allowed_remote_domains'));
+        $allowedDomains = array_map(strtolower(...), $this->coreParametersHelper->get('allowed_remote_domains'));
 
         if ($siteDomain = $this->parseDomain((string) $this->coreParametersHelper->get('site_url'))) {
             $allowedDomains[] = $siteDomain;

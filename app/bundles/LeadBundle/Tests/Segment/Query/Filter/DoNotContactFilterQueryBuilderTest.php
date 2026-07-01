@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DoNotContactFilterQueryBuilderTest extends TestCase
+final class DoNotContactFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
 

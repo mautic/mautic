@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CoreParametersHelperTest extends TestCase
+final class CoreParametersHelperTest extends TestCase
 {
     /**
      * @var MockObject&ContainerInterface

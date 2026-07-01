@@ -6,9 +6,9 @@ namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class CampaignConfig
+final readonly class CampaignConfig
 {
-    public function __construct(private readonly CoreParametersHelper $coreParametersHelper)
+    public function __construct(private CoreParametersHelper $coreParametersHelper)
     {
     }
 

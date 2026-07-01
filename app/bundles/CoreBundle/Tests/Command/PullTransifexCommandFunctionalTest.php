@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
+final class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 

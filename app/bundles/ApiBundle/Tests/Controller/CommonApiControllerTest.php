@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,7 +23,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CommonApiControllerTest extends CampaignTestAbstract
+final class CommonApiControllerTest extends CampaignTestAbstract
 {
     public function testAddAliasIfNotPresentWithOneColumnWithoutAlias(): void
     {

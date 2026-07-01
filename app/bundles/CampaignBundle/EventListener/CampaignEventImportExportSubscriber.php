@@ -24,15 +24,15 @@ use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly CampaignModel $campaignModel,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly EventModel $eventModel,
+        private CampaignModel $campaignModel,
+        private EntityManagerInterface $entityManager,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private EventDispatcherInterface $dispatcher,
+        private EventModel $eventModel,
     ) {
     }
 

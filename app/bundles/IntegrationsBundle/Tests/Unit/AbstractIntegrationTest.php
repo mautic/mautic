@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\IntegrationsBundle\Tests\Unit;
 
 use Doctrine\ORM\EntityManager;
@@ -21,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTest extends TestCase
+final class AbstractIntegrationTest extends TestCase
 {
     public function testParseCallbackResponseWithUTF8StringThatContainsControlChars(): void
     {

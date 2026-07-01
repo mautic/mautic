@@ -138,7 +138,7 @@ class Progress
      *
      * @return int
      */
-    public function toPercent()
+    public function toPercent(): float|int
     {
         return ($this->total) ? ceil(($this->done / $this->total) * 100) : 100;
     }

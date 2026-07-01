@@ -10,16 +10,9 @@ use Symfony\Component\Form\FormInterface;
 
 final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&FormInterface<FormInterface<mixed>>
-     */
-    private \PHPUnit\Framework\MockObject\Stub $form;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->form = $this->createStub(FormInterface::class);
     }
 
     public function testConstructGettersSetters(): void
@@ -33,9 +26,11 @@ final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
                 'list' => ['one', 'two'],
             ],
         ];
-        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $fieldDetails);
 
-        $this->assertSame($this->form, $event->getForm());
+        $formStub = $this->createStub(FormInterface::class);
+        $event    = new FormAdjustmentEvent($formStub, $alias, $object, $operator, $fieldDetails);
+
+        $this->assertSame($formStub, $event->getForm());
         $this->assertSame($alias, $event->getFieldAlias());
         $this->assertSame($object, $event->getFieldObject());
         $this->assertSame($operator, $event->getOperator());

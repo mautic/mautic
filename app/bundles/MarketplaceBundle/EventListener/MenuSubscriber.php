@@ -11,10 +11,10 @@ use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class MenuSubscriber implements EventSubscriberInterface
+final readonly class MenuSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Config $config,
+        private Config $config,
     ) {
     }
 

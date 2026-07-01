@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -9,7 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults(): void
     {

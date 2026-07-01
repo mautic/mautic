@@ -18,13 +18,13 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ImportCompanySubscriber implements EventSubscriberInterface
+final readonly class ImportCompanySubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FieldList $fieldList,
-        private readonly CorePermissions $corePermissions,
-        private readonly CompanyModel $companyModel,
-        private readonly TranslatorInterface $translator,
+        private FieldList $fieldList,
+        private CorePermissions $corePermissions,
+        private CompanyModel $companyModel,
+        private TranslatorInterface $translator,
     ) {
     }
 
