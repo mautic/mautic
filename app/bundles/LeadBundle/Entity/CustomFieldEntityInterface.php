@@ -6,8 +6,6 @@ interface CustomFieldEntityInterface
 {
     /**
      * @param mixed[] $fields
-     *
-     * @return mixed
      */
     public function setFields(array $fields): void;
 

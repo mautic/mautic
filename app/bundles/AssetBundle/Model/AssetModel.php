@@ -89,7 +89,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload(?Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {

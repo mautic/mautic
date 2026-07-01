@@ -81,8 +81,8 @@ class CommonRepository extends ServiceEntityRepository
     public function checkUniqueAlias($alias, $entity = null)
     {
         $q = $this->createQueryBuilder('e')
-                  ->select('count(e.id) as aliascount')
-                  ->where('e.alias = :alias');
+            ->select('count(e.id) as aliascount')
+            ->where('e.alias = :alias');
         $q->setParameter('alias', $alias);
 
         if (!empty($entity) && $entity->getId()) {
@@ -194,9 +194,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param bool $flush true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
      */
-    public function deleteEntity(object $entity, $flush = true): void
+    public function deleteEntity($entity, $flush = true): void
     {
         // delete entity
         $this->_em->remove($entity);
@@ -213,7 +214,10 @@ class CommonRepository extends ServiceEntityRepository
         }
     }
 
-    public function detachEntity(object $entity): void
+    /**
+     * @param mixed $entity
+     */
+    public function detachEntity($entity): void
     {
         $this->getEntityManager()->detach($entity);
     }
@@ -240,7 +244,7 @@ class CommonRepository extends ServiceEntityRepository
     {
         try {
             $q = $this->createQueryBuilder($this->getTableAlias())
-                      ->setParameter('alias', $alias);
+                ->setParameter('alias', $alias);
 
             $expr = $q->expr()->andX(
                 $q->expr()->eq($this->getTableAlias().'.alias', ':alias')
@@ -251,7 +255,7 @@ class CommonRepository extends ServiceEntityRepository
             if (null !== $catAlias) {
                 if (isset($metadata->associationMappings['category'])) {
                     $q->leftJoin($this->getTableAlias().'.category', 'category')
-                      ->setParameter('catAlias', $catAlias);
+                        ->setParameter('catAlias', $catAlias);
 
                     $expr->add(
                         $q->expr()->eq('category.alias', ':catAlias')
@@ -417,7 +421,7 @@ class CommonRepository extends ServiceEntityRepository
                 $q = $this->createQueryBuilder($this->getTableAlias());
                 $this->buildSelectClause($q, $id['select']);
                 $q->where($this->getTableAlias().'.id = :id')
-                ->setParameter('id', (int) $id['id']);
+                    ->setParameter('id', (int) $id['id']);
                 $entity = $q->getQuery()->getSingleResult();
             } else {
                 $entity = $this->find((int) $id);
@@ -629,9 +633,9 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $q->resetQueryPart('select')
-          ->select($selectString)
-          ->setFirstResult($start)
-          ->setMaxResults($limit);
+            ->select($selectString)
+            ->setFirstResult($start)
+            ->setMaxResults($limit);
 
         $this->buildOrderByClauseFromArray($q, $order);
 
@@ -705,8 +709,8 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
-          ->from($tableName, $alias)
-          ->orderBy($prefix.$labelColumn);
+            ->from($tableName, $alias)
+            ->orderBy($prefix.$labelColumn);
 
         if (null !== $expr && $expr->count()) {
             $q->where($expr);
@@ -721,7 +725,7 @@ class CommonRepository extends ServiceEntityRepository
             $q->andWhere(
                 $q->expr()->eq($prefix.'is_published', ':true')
             )
-              ->setParameter('true', true, 'boolean');
+                ->setParameter('true', true, 'boolean');
         }
 
         // Non Deleted Only
@@ -815,9 +819,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Save an entity through the repository.
      *
-     * @param bool $flush true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
      */
-    public function saveEntity(object $entity, $flush = true): void
+    public function saveEntity($entity, $flush = true): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -1331,7 +1336,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
-              ->setMaxResults($limit);
+                ->setMaxResults($limit);
         }
     }
 
@@ -1772,8 +1777,11 @@ class CommonRepository extends ServiceEntityRepository
 
     /**
      * Sanitizes a string to alphanum plus characters in the second argument.
+     *
+     * @param string $sqlAttr
+     * @param array  $allowedCharacters
      */
-    protected function sanitize(string $sqlAttr, array $allowedCharacters = []): string
+    protected function sanitize($sqlAttr, $allowedCharacters = []): string
     {
         return InputHelper::alphanum($sqlAttr, false, null, $allowedCharacters);
     }
