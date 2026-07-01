@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends MauticMysqlTestCase
+final class SegmentSubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

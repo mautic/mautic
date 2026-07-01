@@ -9,7 +9,7 @@ use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ProcessSignalServiceTest extends TestCase
+final class ProcessSignalServiceTest extends TestCase
 {
     private ProcessSignalService $processSignalService;
 

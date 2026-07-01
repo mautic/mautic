@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
-class UserNotificationBuilderTest extends MauticMysqlTestCase
+final class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
     private UserNotificationBuilder $notificationBuilder;
 

@@ -21,7 +21,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
+    public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -115,7 +115,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper)
+    public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
@@ -273,7 +273,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
+    public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             $data     = $request->request->all()['fullcontact_lookup'] ?? [];
@@ -366,7 +366,7 @@ class FullContactController extends FormController
      *
      * @throws \InvalidArgumentException
      */
-    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper)
+    public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
     {
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');

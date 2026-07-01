@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DynamicContentSubscriberTest extends TestCase
+final class DynamicContentSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadListRepository

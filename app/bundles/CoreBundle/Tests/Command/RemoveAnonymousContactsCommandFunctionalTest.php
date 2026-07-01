@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 
-class RemoveAnonymousContactsCommandFunctionalTest extends MauticMysqlTestCase
+final class RemoveAnonymousContactsCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception

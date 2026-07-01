@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class UnusedIpDeleteCommandFunctionalTest extends MauticMysqlTestCase
+final class UnusedIpDeleteCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception

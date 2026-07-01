@@ -12,11 +12,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 /**
  * @implements ProcessorInterface<User, User>
  */
-final class UserProcessor implements ProcessorInterface
+final readonly class UserProcessor implements ProcessorInterface
 {
     public function __construct(
-        private readonly ProcessorInterface $persistProcessor,
-        private readonly UserPasswordHasherInterface $passwordHasher,
+        private ProcessorInterface $persistProcessor,
+        private UserPasswordHasherInterface $passwordHasher,
     ) {
     }
 

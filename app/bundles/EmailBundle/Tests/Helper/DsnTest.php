@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\Dsn\Dsn;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class DsnTest extends TestCase
+final class DsnTest extends TestCase
 {
     public function testGettersAndSetters(): void
     {

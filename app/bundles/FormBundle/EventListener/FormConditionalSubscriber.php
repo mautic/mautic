@@ -10,11 +10,11 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class FormConditionalSubscriber implements EventSubscriberInterface
+final readonly class FormConditionalSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FormModel $formModel,
-        private readonly FieldModel $fieldModel,
+        private FormModel $formModel,
+        private FieldModel $fieldModel,
     ) {
     }
 

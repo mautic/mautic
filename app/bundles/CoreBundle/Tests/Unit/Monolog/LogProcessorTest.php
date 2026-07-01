@@ -10,7 +10,7 @@ use Monolog\LogRecord;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LogProcessorTest extends TestCase
+final class LogProcessorTest extends TestCase
 {
     public function testLogProcessor(): void
     {

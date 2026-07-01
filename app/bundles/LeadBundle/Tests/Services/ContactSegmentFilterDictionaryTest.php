@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Services;
 
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
@@ -9,7 +11,7 @@ use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterDictionaryTest extends TestCase
+final class ContactSegmentFilterDictionaryTest extends TestCase
 {
     public function testWorkflow(): void
     {

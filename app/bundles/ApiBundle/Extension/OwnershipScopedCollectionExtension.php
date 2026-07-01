@@ -21,11 +21,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * - other and not own: only foreign (plus unowned) items
  * - own and other: no filtering
  */
-final class OwnershipScopedCollectionExtension implements QueryCollectionExtensionInterface
+final readonly class OwnershipScopedCollectionExtension implements QueryCollectionExtensionInterface
 {
     public function __construct(
-        private readonly Security $security,
-        private readonly EntityManagerInterface $entityManager,
+        private Security $security,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 

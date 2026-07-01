@@ -18,7 +18,7 @@ use PHPUnit\Framework\Assert;
  * After the refactoring from NOT EXISTS to NOT IN the single deleted contact could cause the
  * pending query to find no contacts due to null value in the lead_id column.
  */
-class PendingQueryFunctionalTest extends MauticMysqlTestCase
+final class PendingQueryFunctionalTest extends MauticMysqlTestCase
 {
     public function testDelayedSends(): void
     {
