@@ -870,7 +870,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @return SalesforceIntegration|MockObject
+     * @return SalesforceIntegration&MockObject
      */
     protected function getSalesforceIntegration(int $maxUpdate = 100, int $maxCreate = 200, int $maxSfLeads = 25, int $maxSfContacts = 25, ?string $updateObject = null): MockObject
     {
