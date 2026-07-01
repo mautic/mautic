@@ -460,7 +460,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * @throws \Exception
      */
-    public function exportResults($format, $form, $queryArgs): StreamedResponse|Response
+    public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -569,7 +569,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResultsForPage($format, $page, $queryArgs): StreamedResponse|Response
+    public function exportResultsForPage($format, $page, array $queryArgs): StreamedResponse|Response
     {
         $results    = $this->getEntitiesByPage($queryArgs);
         $results    = $results['results'];

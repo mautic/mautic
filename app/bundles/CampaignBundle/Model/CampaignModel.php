@@ -222,7 +222,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return null;
     }
 
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
+    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -370,7 +370,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return array
      */
-    public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
+    public function setCanvasSettings(object $entity, $settings, $persist = true, $events = null)
     {
         if (null === $events) {
             $events = $entity->getEvents();

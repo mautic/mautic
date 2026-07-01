@@ -145,7 +145,7 @@ class WebhookModel extends FormModel
     /**
      * @param Webhook $entity
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (null === $entity->getSecret()) {
             $entity->setSecret(EncryptionHelper::generateKey());
@@ -441,7 +441,7 @@ class WebhookModel extends FormModel
      * @param string $note
      *                           $runtime variable unit is in seconds
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null): void
+    public function addLog(Webhook $webhook, $statusCode, $runtime, ?string $note = null): void
     {
         if (!$webhook->getId()) {
             return;

@@ -71,7 +71,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity->isNew()) {
             // increase the revision
@@ -89,7 +89,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {

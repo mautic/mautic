@@ -601,7 +601,6 @@ class FieldModel extends FormModel
 
     /**
      * @param LeadField $entity
-     * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
@@ -610,7 +609,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity($entity, $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -893,13 +892,9 @@ class FieldModel extends FormModel
     /**
      * @deprecated Use FieldList::getFieldList method instead
      *
-     * @param bool|true $byGroup
-     * @param bool|true $alphabetical
-     * @param array     $filters
-     *
      * @return mixed[]
      */
-    public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead']): array
+    public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
     {
         return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
