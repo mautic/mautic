@@ -18,6 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
+use Mautic\CoreBundle\Doctrine\Query\Expression;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -445,6 +446,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * @param QueryBuilder|DbalQueryBuilder $q
      * @param array<mixed>                  $filter
+     *
+     * @return array{0: Query\Expr\Func|CompositeExpression, 1: array<string, mixed>}
      */
     public function getFilterExpr($q, array $filter, ?string $unique = null): array
     {
@@ -452,9 +455,9 @@ class CommonRepository extends ServiceEntityRepository
         $parameter = [];
 
         if (isset($filter['group'])) {
-            $expr = $q->expr()->orX();
+            $builder = Expression::or($q);
             foreach ($filter['group'] as $orGroup) {
-                $groupExpr = $q->expr()->andX();
+                $groupExpr = Expression::and($q);
                 foreach ($orGroup as $subFilter) {
                     [$subExpr, $subParameters] = $this->getFilterExpr($q, $subFilter);
 
@@ -464,12 +467,12 @@ class CommonRepository extends ServiceEntityRepository
                         $parameter = array_merge($parameter, $subParameters);
                     }
                 }
-                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                $expr->add($groupExpr);
+                $builder->add($groupExpr->expr());
             }
+            $expr = $builder->expr();
         } elseif (str_contains($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
-            $expr         = $q->expr()->orX();
+            $builder      = Expression::or($q);
             $setParameter = false;
             foreach ($columns as $c) {
                 $subFilter           = $filter;
@@ -481,9 +484,9 @@ class CommonRepository extends ServiceEntityRepository
                     $setParameter = true;
                 }
 
-                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                $expr->add($subExpr);
+                $builder->add($subExpr);
             }
+            $expr = $builder->expr();
             if ($setParameter) {
                 $parameter = [$unique => $filter['value']];
             }
@@ -499,7 +502,7 @@ class CommonRepository extends ServiceEntityRepository
                 if (isset($filter['strict']) && !$filter['strict']) {
                     if (is_numeric($filter['value'])) {
                         // Postgres doesn't like using "LIKE" with numbers
-                        $func = ('like' == $func) ? 'eq' : 'neq';
+                        $func = ('like' === $func) ? 'eq' : 'neq';
                     } else {
                         $filter['value'] = "%{$filter['value']}%";
                     }
@@ -525,12 +528,11 @@ class CommonRepository extends ServiceEntityRepository
      * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
      * The Expr() sets a :now and :true parameter that must be set in the calling function.
      *
-     * @param string|null $alias
-     * @param bool        $setNowParameter
-     * @param bool        $setTrueParameter
-     * @param bool        $allowNullForPublishedUp Allow entities without a published up date
-     *
-     * @return mixed
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param string|null                   $alias
+     * @param bool                          $setNowParameter
+     * @param bool                          $setTrueParameter
+     * @param bool                          $allowNullForPublishedUp Allow entities without a published up date
      */
     public function getPublishedByDateExpression(
         $q,
@@ -538,7 +540,7 @@ class CommonRepository extends ServiceEntityRepository
         $setNowParameter = true,
         $setTrueParameter = true,
         $allowNullForPublishedUp = true,
-    ) {
+    ): CompositeExpression|Query\Expr\Composite {
         $isORM = $q instanceof QueryBuilder;
 
         if (null === $alias) {
@@ -568,31 +570,32 @@ class CommonRepository extends ServiceEntityRepository
             $pubDown = 'publish_down';
         }
 
-        $expr = $q->expr()->andX(
+        $builder = Expression::and($q);
+        $builder->add(
             $q->expr()->eq("{$alias}.{$pub}", ':true'),
-            $q->expr()->orX(
+            Expression::or($q)->add(
                 $q->expr()->isNull("{$alias}.{$pubDown}"),
                 $q->expr()->gte("{$alias}.{$pubDown}", ':now')
-            )
+            )->expr()
         );
 
         if ($allowNullForPublishedUp) {
-            $expr->add(
-                $q->expr()->orX(
+            $builder->add(
+                Expression::or($q)->add(
                     $q->expr()->isNull("{$alias}.{$pubUp}"),
                     $q->expr()->lte("{$alias}.{$pubUp}", ':now')
-                )
+                )->expr()
             );
         } else {
-            $expr->add(
-                $q->expr()->andX(
+            $builder->add(
+                Expression::or($q)->add(
                     $q->expr()->isNotNull("{$alias}.{$pubUp}"),
                     $q->expr()->lte("{$alias}.{$pubUp}", ':now')
-                )
+                )->expr()
             );
         }
 
-        return $expr;
+        return $builder->expr();
     }
 
     /**
@@ -999,7 +1002,7 @@ class CommonRepository extends ServiceEntityRepository
      * @param QueryBuilder|DbalQueryBuilder $qb
      * @param \StdClass|mixed[]             $filters
      *
-     * @return mixed[]
+     * @return array{0: CompositeExpression|Query\Expr\Composite|null, 1: array<mixed>}
      */
     protected function addAdvancedSearchWhereClause($qb, $filters): array
     {
@@ -1021,13 +1024,23 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $parameters  = [];
-        $expressions = $qb->expr()->{"{$type}X"}();
+        if ('and' === $type) {
+            $expressions = Expression::and($qb);
+        } elseif ('or' === $type) {
+            $expressions = Expression::or($qb);
+        } else {
+            throw new \RuntimeException('The type of the condition "'.$type.'" is not supported.');
+        }
 
         if ($parseFilters) {
             $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
         }
 
-        return [$expressions, $parameters];
+        if (0 === $expressions->count()) {
+            return [null, $parameters];
+        }
+
+        return [$expressions->expr(), $parameters];
     }
 
     /**
@@ -1063,7 +1076,7 @@ class CommonRepository extends ServiceEntityRepository
     protected function addDbalCatchAllWhereClause(&$q, $filter, array $columns): array
     {
         $unique = $this->generateRandomParameterName(); // ensure that the string has a unique parameter identifier
-        $string = ($filter->strict) ? $filter->string : "{$filter->string}";
+        $string = ($filter->strict) ? $filter->string : (string) $filter->string;
         if ($filter->not) {
             $xFunc    = 'andX';
             $exprFunc = 'notLike';
@@ -1071,23 +1084,30 @@ class CommonRepository extends ServiceEntityRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-        $expr = $q->expr()->{$xFunc}();
+
+        if ('andX' === $xFunc) {
+            $builder = Expression::and($q);
+        } else {
+            $builder = Expression::or($q);
+        }
 
         foreach ($columns as $column) {
-            $expr->add(
+            $builder->add(
                 $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
         }
 
         return [
-            $expr,
-            ["{$unique}" => $string],
+            $builder->expr(),
+            [$unique => $string],
         ];
     }
 
     /**
      * @param QueryBuilder|DbalQueryBuilder $q
      * @param \StdClass                     $filter
+     *
+     * @return array{0: Query\Expr\Func|string|false, 1: array{}}
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
@@ -1138,26 +1158,34 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $expr = $q->expr()->{$xFunc}();
+        if ('andX' === $xFunc) {
+            $builder = Expression::and($q);
+        } else {
+            $builder = Expression::or($q);
+        }
+
         foreach ($columns as $col) {
-            $expr->add(
+            $builder->add(
                 $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
         }
 
+        $expr = $builder->expr();
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
         return [
             $expr,
-            ["{$unique}" => $string],
+            [$unique => $string],
         ];
     }
 
     /**
      * @param DbalQueryBuilder|QueryBuilder $q
      * @param \StdClass                     $filter
+     *
+     * @return array{0: CompositeExpression|Query\Expr\Comparison|Query\Expr\Func|Query\Expr\Composite|false|string, 1: array<bool|int|string|null>}
      */
     protected function addStandardSearchCommandWhereClause(&$q, $filter): array
     {
@@ -1183,10 +1211,12 @@ class CommonRepository extends ServiceEntityRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
+                $builder = Expression::or($q);
+                $builder->add(
                     $q->expr()->isNull("{$prefix}.category"),
                     $q->expr()->eq("{$prefix}.category", $q->expr()->literal(''))
                 );
+                $expr            = $builder->expr();
                 $returnParameter = false;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
@@ -1225,7 +1255,7 @@ class CommonRepository extends ServiceEntityRepository
                 break;
         }
 
-        if ($expr && $filter->not) {
+        if (!$isDbalQB && $expr && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
@@ -1241,14 +1271,22 @@ class CommonRepository extends ServiceEntityRepository
                 }
             }
 
-            $parameters = ["{$unique}" => $string];
+            $parameters = [$unique => $string];
         }
 
         return [$expr, $parameters];
     }
 
+    /**
+     * @param CompositeExpression|Query\Expr\Composite|Expression $appendTo
+     * @param CompositeExpression|Query\Expr\Composite|string     $expr
+     */
     protected function appendExpression($appendTo, $expr)
     {
+        if (!$appendTo instanceof Expression) {
+            @trigger_error('Passing '.Expression::class.' $appendTo is required.', \E_USER_DEPRECATED);
+        }
+
         if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
             if ($expr->count()) {
                 $appendTo->add($expr);
@@ -1309,6 +1347,9 @@ class CommonRepository extends ServiceEntityRepository
         return $joinAdded;
     }
 
+    /**
+     * @param QueryBuilder $q
+     */
     protected function buildIndexByClause($q, array $args)
     {
         if (!empty($args['index_by'])) {
@@ -1470,20 +1511,24 @@ class CommonRepository extends ServiceEntityRepository
         $this->advancedFilterCommands = [];
         $advancedFilterStrings        = [];
         $queryParameters              = [];
-        $queryExpression              = $q->expr()->andX();
+        $builder                      = Expression::and($q);
 
         if (isset($args['ids'])) {
             $ids   = array_map(intval(...), $args['ids']);
             $param = $this->generateRandomParameterName();
-            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-            $queryExpression->add(
-                $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
-            );
+            if ($q instanceof QueryBuilder) {
+                $builder->add(
+                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
+                );
+            } else {
+                $builder->add(
+                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
+                );
+            }
             $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
         } elseif (!empty($args['ownedBy'])) {
             $param = $this->generateRandomParameterName();
-            // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-            $queryExpression->add(
+            $builder->add(
                 $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], ':'.$param)
             );
             $q->setParameter($param, array_map(strval(...), $args['ownedBy'][1]), ArrayParameterType::STRING);
@@ -1501,8 +1546,7 @@ class CommonRepository extends ServiceEntityRepository
                         // defined columns with keys of column, expr, value
                         foreach ($criteria as $criterion) {
                             if ($criterion instanceof Query\Expr || $criterion instanceof CompositeExpression) {
-                                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                                $queryExpression->add($criterion);
+                                $builder->add($criterion);
 
                                 if (isset($criterion->parameters) && is_array($criterion->parameters)) {
                                     $queryParameters = array_merge($queryParameters, $criterion->parameters);
@@ -1510,8 +1554,7 @@ class CommonRepository extends ServiceEntityRepository
                                 }
                             } elseif (is_array($criterion)) {
                                 [$expr, $parameters] = $this->getFilterExpr($q, $criterion);
-                                // @phpstan-ignore-next-line $q accepts ORM and DBAL QueryBuilder; add() is deprecated only on DBAL CompositeExpression, not on ORM Andx
-                                $queryExpression->add($expr);
+                                $builder->add($expr);
                                 if (is_array($parameters)) {
                                     $queryParameters = array_merge($queryParameters, $parameters);
                                 }
@@ -1543,17 +1586,21 @@ class CommonRepository extends ServiceEntityRepository
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
                 [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
-                $this->appendExpression($queryExpression, $expr);
 
-                if (is_array($parameters)) {
+                // Parameters could be added independently of the where clauses.
+                if (is_array($parameters) && [] !== $parameters) {
                     $queryParameters = array_merge($queryParameters, $parameters);
+                }
+
+                if (null !== $expr) {
+                    $this->appendExpression($builder, $expr);
                 }
             }
         }
 
         // parse the filter if set
-        if ($queryExpression->count()) {
-            $q->andWhere($queryExpression);
+        if ($builder->count()) {
+            $q->andWhere($builder->expr());
         }
 
         // Parameters have to be set even if there are no expressions just in case a search command
@@ -1568,8 +1615,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param QueryBuilder|DbalQueryBuilder $query
-     * @param array                         $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
+     * @param QueryBuilder|DbalQueryBuilder                            $query
+     * @param array                                                    $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
+     * @param CompositeExpression|Query\Expr\Composite|Expression|null $expr
      */
     protected function buildWhereClauseFromArray($query, array $clauses, $expr = null)
     {
@@ -1582,6 +1630,10 @@ class CommonRepository extends ServiceEntityRepository
                 if (!empty($clause['internal']) && 'formula' === $clause['expr']) {
                     $whereClause = array_key_exists('value', $clause) ? $clause['value'] : $clause['val'];
                     if ($expr) {
+                        if (!$expr instanceof Expression) {
+                            @trigger_error('Passing '.Expression::class.' $expr is required.', \E_USER_DEPRECATED);
+                        }
+
                         $expr->add($whereClause);
                     } else {
                         $query->andWhere($whereClause);
@@ -1590,14 +1642,25 @@ class CommonRepository extends ServiceEntityRepository
                     continue;
                 }
 
-                if (in_array($clause['expr'], $andOr)) {
-                    $composite = $query->expr()->{$clause['expr']}();
+                if (in_array($clause['expr'], $andOr, true)) {
+                    if ('andX' === $clause['expr']) {
+                        $composite = Expression::and($query);
+                    } else {
+                        $composite = Expression::or($query);
+                    }
+
                     $this->buildWhereClauseFromArray($query, $clause['val'], $composite);
 
                     if (null === $expr) {
-                        $query->andWhere($composite);
+                        if (0 !== $composite->count()) {
+                            $query->andWhere($composite->expr());
+                        }
                     } else {
-                        $expr->add($composite);
+                        if (!$expr instanceof Expression) {
+                            @trigger_error('Passing '.Expression::class.' $expr is required.', \E_USER_DEPRECATED);
+                        }
+
+                        $expr->add($composite->expr());
                     }
                 } else {
                     $clause = $this->validateWhereClause($clause);
@@ -1620,15 +1683,19 @@ class CommonRepository extends ServiceEntityRepository
                         case 'isEmpty':
                         case 'isNotEmpty':
                             if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->orX(
+                                $builder = Expression::or($query);
+                                $builder->add(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
                                 );
+                                $whereClause = $builder->expr();
                             } else {
-                                $whereClause = $query->expr()->andX(
+                                $builder = Expression::and($query);
+                                $builder->add(
                                     $query->expr()->neq($column, $query->expr()->literal('')),
                                     $query->expr()->isNotNull($column)
                                 );
+                                $whereClause = $builder->expr();
                             }
                             break;
                         case 'in':
@@ -1661,6 +1728,10 @@ class CommonRepository extends ServiceEntityRepository
 
                     if ($whereClause) {
                         if ($expr) {
+                            if (!$expr instanceof Expression) {
+                                @trigger_error('Passing '.Expression::class.' $expr is required.', \E_USER_DEPRECATED);
+                            }
+
                             $expr->add($whereClause);
                         } else {
                             $query->andWhere($whereClause);
@@ -1694,7 +1765,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return mixed
+     * @param QueryBuilder|DbalQueryBuilder $q
+     *
+     * @return Query\Expr\Func|string|false
      */
     protected function getIdsExpr(&$q, $filter)
     {
@@ -1743,16 +1816,24 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \StdClass                     $parseFilters
-     * @param QueryBuilder|DbalQueryBuilder $qb
+     * @param \StdClass                                           $parseFilters
+     * @param QueryBuilder|DbalQueryBuilder                       $qb
+     * @param CompositeExpression|Query\Expr\Composite|Expression $expressions
+     * @param array<mixed>                                        $parameters
      */
     protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
+            // Parameters could be passed by reference.
             if (!empty($params)) {
                 $parameters = array_merge($parameters, $params);
+            }
+
+            // Expr could be not set, false in case CommonRepository::getIdsExpr, empty string in case dispatch(LeadBuildSearchEvent)
+            if (!isset($expr) || false === $expr || '' === $expr) {
+                return;
             }
 
             $this->appendExpression($expressions, $expr);

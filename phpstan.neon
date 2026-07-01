@@ -135,6 +135,10 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			paths:
 				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+		# Backward compatibility.
+        -
+            message: '#^Call to deprecated method add\(\) of class Doctrine\\DBAL\\Query\\Expression\\CompositeExpression#'
+            path: app/bundles/CoreBundle/Entity/CommonRepository.php
 		# exception handler as both handler and standalone method
 		-
 			identifier: argument.type
