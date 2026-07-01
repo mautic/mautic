@@ -43,7 +43,7 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ['onGenerateSegmentFiltersAddBehaviors', 0],
                 ['onGenerateSegmentFiltersNormalizeOperatorLabels', -1000],
             ],
-            LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE => [
+            CompanySegmentFiltersChoicesEvent::class => [
                 ['onCompanySegmentFiltersAddCustomFields', 0],
             ],
         ];

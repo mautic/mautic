@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Entity\CompanySegmentRepository;
 use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\LeadBundle\Event\CompanySegmentFilteringEvent;
 use Mautic\LeadBundle\Event\CompanySegmentQueryBuilderGeneratedEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
@@ -248,12 +247,12 @@ class CompanySegmentQueryBuilder
 
     public function queryBuilderGenerated(CompanySegment $companySegment, QueryBuilder $queryBuilder): void
     {
-        if (!$this->dispatcher->hasListeners(LeadEvents::COMPANY_SEGMENT_QUERYBUILDER_GENERATED)) {
+        if (!$this->dispatcher->hasListeners(CompanySegmentQueryBuilderGeneratedEvent::class)) {
             return;
         }
 
         $event = new CompanySegmentQueryBuilderGeneratedEvent($companySegment, $queryBuilder);
-        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SEGMENT_QUERYBUILDER_GENERATED);
+        $this->dispatcher->dispatch($event);
     }
 
     public function addManuallySubscribedQuery(QueryBuilder $queryBuilder, CompanySegment $companySegment): QueryBuilder
@@ -329,13 +328,13 @@ class CompanySegmentQueryBuilder
 
     private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder): bool
     {
-        if (!$this->dispatcher->hasListeners(LeadEvents::COMPANY_SEGMENT_ON_FILTERING)) {
+        if (!$this->dispatcher->hasListeners(CompanySegmentFilteringEvent::class)) {
             return false;
         }
 
         $alias = $this->generateRandomParameterName();
         $event = new CompanySegmentFilteringEvent($filter->contactSegmentFilterCrate, $alias, $queryBuilder, $this->entityManager);
-        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SEGMENT_ON_FILTERING);
+        $this->dispatcher->dispatch($event);
         if ($event->isFilteringDone()) {
             $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
 

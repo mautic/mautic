@@ -71,7 +71,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleSelect', 200],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
-            LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE => [
+            CompanySegmentFiltersChoicesEvent::class => [
                 ['onCompanySegmentFiltersAddStaticFields', 0],
             ],
             LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => [

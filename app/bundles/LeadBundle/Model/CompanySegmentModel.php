@@ -35,7 +35,6 @@ use Mautic\LeadBundle\Event\CompanySegmentRebuildRemoveEvent;
 use Mautic\LeadBundle\Event\SegmentPreRebuildSegmentEvent;
 use Mautic\LeadBundle\Form\Type\CompanySegmentType;
 use Mautic\LeadBundle\Helper\CompanySegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Services\CompanySegmentService;
 use Psr\Log\LoggerInterface;
@@ -444,14 +443,14 @@ class CompanySegmentModel extends FormModel
 
         $choices = [];
 
-        if ($this->dispatcher->hasListeners(LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE)) {
+        if ($this->dispatcher->hasListeners(CompanySegmentFiltersChoicesEvent::class)) {
             $operatorsForFieldType = [];
             foreach ($this->typeOperatorProvider->getAllTypeOperators() as $type => $definition) {
                 $operatorsForFieldType[$type] = $this->typeOperatorProvider->getOperatorsForFieldType($type);
             }
 
             $event = new CompanySegmentFiltersChoicesEvent([], $operatorsForFieldType, $this->translator, $this->requestStack->getCurrentRequest());
-            $this->dispatcher->dispatch($event, LeadEvents::COMPANY_SEGMENT_FILTERS_CHOICES_ON_GENERATE);
+            $this->dispatcher->dispatch($event);
             $choices = $event->getChoices();
         }
 
