@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class RedirectModelTest extends PageTestAbstract
+final class RedirectModelTest extends PageTestAbstract
 {
     public function testCreateRedirectEntityWhenCalledReturnsRedirect(): void
     {
@@ -36,7 +38,7 @@ class RedirectModelTest extends PageTestAbstract
         $redirectModel = $this->getRedirectModel();
         $url           = $redirectModel->generateRedirectUrl($redirect);
 
-        $this->assertStringContainsString($url, 'http://some-url.com');
+        $this->assertStringContainsString('http://some-url.com', $url);
     }
 
     public function testRedirectGenerationEvent(): void

@@ -366,7 +366,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
-        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
+        if (count(array_diff_key($uniqueLeadFields, $matchedFields)) === count($uniqueLeadFields)) {
             // return if uniqueIdentifiers have no data set to avoid duplicating leads.
             $this->logger->debug('getMauticLead: No unique identifiers', [
                 'uniqueLeadFields' => $uniqueLeadFields,

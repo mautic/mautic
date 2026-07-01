@@ -30,7 +30,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SyncProcessTest extends TestCase
+final class SyncProcessTest extends TestCase
 {
     /**
      * @var MockObject&MauticSyncDataExchange

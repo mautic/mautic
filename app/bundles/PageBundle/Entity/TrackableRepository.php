@@ -154,7 +154,7 @@ class TrackableRepository extends CommonRepository
                     $q->andWhere(
                         $q->expr()->in('cs.leadlist_id', ':listIds')
                     )
-                        ->setParameter('listIds', array_map('intval', $listId), ArrayParameterType::INTEGER);
+                        ->setParameter('listIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
@@ -169,7 +169,7 @@ class TrackableRepository extends CommonRepository
                     ->andWhere(
                         $q->expr()->in('list.leadlist_id', ':listIds')
                     )
-                    ->setParameter('listIds', array_map('intval', $listId), ArrayParameterType::INTEGER);
+                    ->setParameter('listIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                 $q->innerJoin('ph', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = ph.lead_id');
             }

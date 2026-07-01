@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class BulkNotificationTest extends TestCase
+final class BulkNotificationTest extends TestCase
 {
     private BulkNotification $bulkNotification;
 

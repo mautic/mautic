@@ -8,7 +8,7 @@ use Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class LoadAssetDataTest extends MauticMysqlTestCase
+final class LoadAssetDataTest extends MauticMysqlTestCase
 {
     public function testLoadFixtures(): void
     {

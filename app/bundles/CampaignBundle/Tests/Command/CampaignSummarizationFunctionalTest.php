@@ -14,7 +14,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
+final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

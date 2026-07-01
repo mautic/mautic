@@ -13,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&HitRepository

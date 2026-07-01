@@ -15,7 +15,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceTest extends TestCase
+final class TokenPersistenceTest extends TestCase
 {
     /**
      * @var MockObject&IntegrationsHelper

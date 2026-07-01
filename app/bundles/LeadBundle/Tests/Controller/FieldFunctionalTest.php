@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldFunctionalTest extends MauticMysqlTestCase
+final class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

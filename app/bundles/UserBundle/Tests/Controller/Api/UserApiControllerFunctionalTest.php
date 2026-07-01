@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class UserApiControllerFunctionalTest extends MauticMysqlTestCase
+final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotExist(): void
     {

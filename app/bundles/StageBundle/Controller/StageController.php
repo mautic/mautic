@@ -296,7 +296,7 @@ class StageController extends AbstractFormController
         );
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {

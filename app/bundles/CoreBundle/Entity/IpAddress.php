@@ -170,7 +170,7 @@ class IpAddress
                 $wildcard_decimal      = 2 ** (32 - $netmask) - 1;
                 $netmask_decimal       = ~$wildcard_decimal;
 
-                if (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal)) {
+                if (($ip_decimal & $netmask_decimal) === ($range_decimal & $netmask_decimal)) {
                     return false;
                 }
 

@@ -9,7 +9,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Assert;
 
-class FocusControllerTest extends MauticMysqlTestCase
+final class FocusControllerTest extends MauticMysqlTestCase
 {
     public function testFocusWithProject(): void
     {

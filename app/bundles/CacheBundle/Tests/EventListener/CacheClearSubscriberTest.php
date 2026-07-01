@@ -10,7 +10,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&AbstractCacheProvider

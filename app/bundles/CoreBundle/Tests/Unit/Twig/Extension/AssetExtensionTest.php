@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use PHPUnit\Framework\Assert;
 
-class AssetExtensionTest extends AbstractMauticTestCase
+final class AssetExtensionTest extends AbstractMauticTestCase
 {
     public function testGetCountryFlag(): void
     {

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Release;
 
 use Mautic\CoreBundle\Release\Metadata;
 use PHPUnit\Framework\TestCase;
 
-class MetadataTest extends TestCase
+final class MetadataTest extends TestCase
 {
     public function testStableRelease(): void
     {
