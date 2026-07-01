@@ -55,7 +55,7 @@ class GlobalSearchEvent extends Event
      */
     public function getResults()
     {
-        uksort($this->results, 'strnatcmp');
+        uksort($this->results, strnatcmp(...));
 
         return $this->results;
     }

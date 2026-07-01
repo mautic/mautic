@@ -150,7 +150,7 @@ class IcontactIntegration extends EmailAbstractIntegration
                 $leadFields[$f] = [
                     'label'    => $this->translator->trans('mautic.icontact.field.'.$f),
                     'type'     => 'string',
-                    'required' => 'email' == $f,
+                    'required' => 'email' === $f,
                 ];
             }
 

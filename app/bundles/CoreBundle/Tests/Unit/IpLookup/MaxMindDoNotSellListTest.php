@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use PHPUnit\Framework\Assert;
 
-class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
+final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper

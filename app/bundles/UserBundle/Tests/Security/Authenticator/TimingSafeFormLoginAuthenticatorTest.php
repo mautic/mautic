@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 
-class TimingSafeFormLoginAuthenticatorTest extends TestCase
+final class TimingSafeFormLoginAuthenticatorTest extends TestCase
 {
     /**
      * @return array<mixed>

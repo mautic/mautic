@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class ProcessSignalTest extends TestCase
+final class ProcessSignalTest extends TestCase
 {
     public function testGetData(): void
     {

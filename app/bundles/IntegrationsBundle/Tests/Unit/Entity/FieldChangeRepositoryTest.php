@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -9,7 +11,7 @@ use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\LeadBundle\Entity\Company;
 use PHPUnit\Framework\TestCase;
 
-class FieldChangeRepositoryTest extends TestCase
+final class FieldChangeRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

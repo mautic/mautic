@@ -11,10 +11,10 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
  *
  * <?php echo $view['config']->get('default_timezone', 'UTC'); ?>
  */
-final class ConfigHelper
+final readonly class ConfigHelper
 {
     public function __construct(
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

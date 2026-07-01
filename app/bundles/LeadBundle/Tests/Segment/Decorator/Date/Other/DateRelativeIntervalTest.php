@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateRelativeInterval::class)]
-class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
+final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorEqual(): void
     {

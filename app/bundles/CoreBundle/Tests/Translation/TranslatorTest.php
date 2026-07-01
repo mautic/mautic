@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
-class TranslatorTest extends AbstractMauticTestCase
+final class TranslatorTest extends AbstractMauticTestCase
 {
     public function testMissingPluralOptions(): void
     {

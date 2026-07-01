@@ -36,7 +36,7 @@ final class ABTestController extends AbstractFormController
         $data1  = $parent->getVariantSettings();
         $form   =  $this->createForm(GenerateABTestType::class, $data1, ['action' => $action]);
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $isCancelled    = $this->isFormCancelled($form);
             $isValid        = $this->isFormValid($form);
             $data           = $form->getData();

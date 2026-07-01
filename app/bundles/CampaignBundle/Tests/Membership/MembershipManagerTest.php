@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,7 +15,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class MembershipManagerTest extends \PHPUnit\Framework\TestCase
+final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Adder

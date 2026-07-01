@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
@@ -16,7 +18,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class LeadModelFunctionalTest extends MauticMysqlTestCase
+final class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
     private bool $pointsAdded = false;
 

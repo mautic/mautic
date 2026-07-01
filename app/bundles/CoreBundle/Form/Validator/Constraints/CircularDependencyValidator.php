@@ -68,6 +68,6 @@ class CircularDependencyValidator extends ConstraintValidator
 
     private function flatten(array $array): array
     {
-        return array_unique(array_reduce($array, 'array_merge', []));
+        return array_unique(array_reduce($array, array_merge(...), []));
     }
 }

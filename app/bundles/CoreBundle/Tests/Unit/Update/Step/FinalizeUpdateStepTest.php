@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -11,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FinalizeUpdateStepTest extends AbstractStepTestCase
+final class FinalizeUpdateStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface

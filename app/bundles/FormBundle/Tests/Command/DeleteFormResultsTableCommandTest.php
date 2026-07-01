@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
+final class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
 {
     use FormTestHelperTrait;
 

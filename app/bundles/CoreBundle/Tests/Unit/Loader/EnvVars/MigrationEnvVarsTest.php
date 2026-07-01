@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Loader\EnvVars;
 
 use Mautic\CoreBundle\Loader\EnvVars\MigrationsEnvVars;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class MigrationEnvVarsTest extends TestCase
+final class MigrationEnvVarsTest extends TestCase
 {
     /**
      * @var ParameterBag

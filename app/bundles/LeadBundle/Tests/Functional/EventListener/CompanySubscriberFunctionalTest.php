@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 
-class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
+final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws OptimisticLockException

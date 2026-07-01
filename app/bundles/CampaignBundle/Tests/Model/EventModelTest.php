@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class EventModelTest extends TestCase
+final class EventModelTest extends TestCase
 {
     /**
      * @var MockObject&EventRepository

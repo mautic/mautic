@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&DynamicContentModel

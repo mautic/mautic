@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Twig;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Twig\Extension\ThemesExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ThemesExtensionTest extends TestCase
+final class ThemesExtensionTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
 

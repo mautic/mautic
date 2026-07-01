@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Helper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
 use PHPUnit\Framework\TestCase;
 
-class PlainTextHelperTest extends TestCase
+final class PlainTextHelperTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('emailContentProvider')]
     public function testGetText(string $htmlContent, string $expectedPlainText): void
