@@ -32,7 +32,7 @@ class EntityResultHelperTest extends TestCase
         });
 
         foreach ($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
+            $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
     }
 
@@ -68,7 +68,7 @@ class EntityResultHelperTest extends TestCase
         });
 
         foreach ($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
+            $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
     }
 
@@ -102,7 +102,7 @@ class EntityResultHelperTest extends TestCase
         });
 
         foreach ($arrayResult as $entity) {
-            $this->assertEquals($entity->getTitle(), self::NEW_TITLE);
+            $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
     }
 

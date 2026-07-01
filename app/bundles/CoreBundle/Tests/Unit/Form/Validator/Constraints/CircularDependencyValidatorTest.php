@@ -19,8 +19,6 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&ExecutionContext $context;
 
-    private MockObject&RequestStack $requestStack;
-
     private Request $request;
 
     private CircularDependencyValidator $validator;
@@ -31,14 +29,14 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->mockListModel = $this->createMock(ListModel::class);
         $this->context       = $this->createMock(ExecutionContext::class);
-        $this->requestStack  = $this->createMock(RequestStack::class);
+        $requestStack        = $this->createMock(RequestStack::class);
         $this->request       = new Request();
 
-        $this->requestStack->expects($this->once())
+        $requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->validator = new CircularDependencyValidator($this->mockListModel, $this->requestStack);
+        $this->validator = new CircularDependencyValidator($this->mockListModel, $requestStack);
         $this->validator->initialize($this->context);
     }
 

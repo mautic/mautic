@@ -29,15 +29,25 @@ class CampaignEventSubscriberTest extends TestCase
 {
     private CampaignEventSubscriber $fixture;
 
+    /**
+     * @var MockObject&EventRepository
+     */
     private MockObject $eventRepo;
 
+    /**
+     * @var MockObject&CampaignModel
+     */
     private MockObject $campaignModelMock;
 
+    /**
+     * @var MockObject&LeadEventLogRepository
+     */
     private MockObject $leadEventLogRepositoryMock;
 
+    /**
+     * @var MockObject&EventDispatcherInterface
+     */
     private MockObject $eventDispatcherMock;
-
-    private DateHelper $dateHelper;
 
     protected function setUp(): void
     {
@@ -45,20 +55,20 @@ class CampaignEventSubscriberTest extends TestCase
         $this->campaignModelMock          = $this->createMock(CampaignModel::class);
         $this->leadEventLogRepositoryMock = $this->createMock(LeadEventLogRepository::class);
         $this->eventDispatcherMock        = $this->createMock(EventDispatcherInterface::class);
-        $this->dateHelper                 = new DateHelper(
+        $dateHelper                       = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->fixture                    = new CampaignEventSubscriber(
             $this->eventRepo,
             $this->campaignModelMock,
             $this->leadEventLogRepositoryMock,
             $this->eventDispatcherMock,
-            $this->dateHelper
+            $dateHelper
         );
     }
 
@@ -165,7 +175,7 @@ class CampaignEventSubscriberTest extends TestCase
             ->method('dispatch')
             ->willReturn(new NotifyOfFailureEvent($mockLead, $mockEvent));
 
-        $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
+        $failedEvent = new FailedEvent($this->createStub(AbstractEventAccessor::class), $mockEventLog);
 
         $this->fixture->onEventFailed($failedEvent);
     }
@@ -236,7 +246,7 @@ class CampaignEventSubscriberTest extends TestCase
             ->method('transactionalCampaignUnPublish')
             ->with($mockCampaign);
 
-        $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
+        $failedEvent = new FailedEvent($this->createStub(AbstractEventAccessor::class), $mockEventLog);
 
         $this->fixture->onEventFailed($failedEvent);
     }
@@ -266,7 +276,7 @@ class CampaignEventSubscriberTest extends TestCase
             ->with(42, 42)
             ->willReturn(true);
 
-        $executedEvent = new ExecutedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
+        $executedEvent = new ExecutedEvent($this->createStub(AbstractEventAccessor::class), $mockEventLog);
 
         $this->eventRepo->expects($this->once())
             ->method('getFailedCountLeadEvent')
@@ -305,7 +315,7 @@ class CampaignEventSubscriberTest extends TestCase
             ->with($lead->deletedId, 1)
             ->willReturn(true);
 
-        $executedEvent = new ExecutedEvent($this->createMock(AbstractEventAccessor::class), $mockEventLog);
+        $executedEvent = new ExecutedEvent($this->createStub(AbstractEventAccessor::class), $mockEventLog);
 
         $this->eventRepo->expects($this->once())
             ->method('getFailedCountLeadEvent')
@@ -361,7 +371,7 @@ class CampaignEventSubscriberTest extends TestCase
         $this->campaignModelMock->expects($this->never())->method('transactionalCampaignUnPublish');
 
         // Execute the test
-        $failedEvent = new FailedEvent($this->createMock(AbstractEventAccessor::class), $leadEventLogMock);
+        $failedEvent = new FailedEvent($this->createStub(AbstractEventAccessor::class), $leadEventLogMock);
         $this->fixture->onEventFailed($failedEvent);
     }
 }

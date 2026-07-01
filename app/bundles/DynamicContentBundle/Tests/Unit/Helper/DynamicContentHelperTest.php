@@ -25,11 +25,6 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     private MockObject $mockModel;
 
     /**
-     * @var MockObject&RealTimeExecutioner
-     */
-    private MockObject $realTimeExecutioner;
-
-    /**
      * @var MockObject&EventDispatcher
      */
     private MockObject $mockDispatcher;
@@ -44,12 +39,12 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->mockModel           = $this->createMock(DynamicContentModel::class);
-        $this->realTimeExecutioner = $this->createMock(RealTimeExecutioner::class);
+        $realTimeExecutioner       = $this->createMock(RealTimeExecutioner::class);
         $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
         $this->leadModel           = $this->createMock(LeadModel::class);
         $this->helper              = new DynamicContentHelper(
             $this->mockModel,
-            $this->realTimeExecutioner,
+            $realTimeExecutioner,
             $this->mockDispatcher,
             $this->leadModel,
         );

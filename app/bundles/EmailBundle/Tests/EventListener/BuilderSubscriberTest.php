@@ -28,10 +28,6 @@ class BuilderSubscriberTest extends TestCase
 
     private MockObject&EmailModel $emailModel;
 
-    private MockObject&TrackableModel $trackableModel;
-
-    private MockObject&RedirectModel $redirectModel;
-
     private MockObject&TranslatorInterface $translator;
 
     private MockObject&LeadRepository $leadRepository;
@@ -40,16 +36,16 @@ class BuilderSubscriberTest extends TestCase
     {
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->emailModel           = $this->createMock(EmailModel::class);
-        $this->trackableModel       = $this->createMock(TrackableModel::class);
-        $this->redirectModel        = $this->createMock(RedirectModel::class);
+        $trackableModel             = $this->createMock(TrackableModel::class);
+        $redirectModel              = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->leadRepository       = $this->createMock(LeadRepository::class);
         $fromEmailHelper            = new FromEmailHelper($this->coreParametersHelper, $this->leadRepository);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
             $this->emailModel,
-            $this->trackableModel,
-            $this->redirectModel,
+            $trackableModel,
+            $redirectModel,
             $this->translator,
             new MailHashHelper($this->coreParametersHelper),
             $fromEmailHelper
@@ -81,7 +77,7 @@ class BuilderSubscriberTest extends TestCase
                 'signature'  => 'Owner Signature',
             ]);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
             ['unsubscribe_text', null, null],
             ['webview_text', null, null],
             ['default_signature_text', null, 'Default Signature'],
@@ -101,7 +97,7 @@ class BuilderSubscriberTest extends TestCase
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
-        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
+        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key): string|false {
             if ('locale' === $key) {
                 return 'default_locale';
             }
@@ -274,7 +270,7 @@ class BuilderSubscriberTest extends TestCase
             'ACME',
         ];
         $this->coreParametersHelper->method('get')
-            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses) {
+            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): ?string {
                 if ($callCount < count($expectedKeys)) {
                     $this->assertSame($expectedKeys[$callCount], $key);
                 }

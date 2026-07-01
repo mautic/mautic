@@ -140,6 +140,6 @@ class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $string, $match);
         parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
 
-        return unserialize(base64_decode($queryParams['ct']));
+        return \Mautic\CoreBundle\Helper\Serializer::decode(base64_decode($queryParams['ct']));
     }
 }

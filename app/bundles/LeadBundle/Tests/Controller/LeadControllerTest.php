@@ -38,8 +38,11 @@ class LeadControllerTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     private const CONTACT_A_EMAIL               = 'contact@a.email';
+
     private const CONTACT_B_EMAIL               = 'contact@b.email';
+
     private const CONTACT_C_EMAIL               = 'contact@c.email';
+
     private const CLOSE_MODAL_ASSERTION_MESSAGE = 'The response does not contain the `closeModal` param.';
 
     protected function setUp(): void
@@ -461,7 +464,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $this->assertResponseIsSuccessful();
         $content = $this->client->getInternalResponse()->getContent();
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
         $this->assertTrue(strlen($content) > 10000, $content);
     }
 
@@ -1217,7 +1220,7 @@ EMAIL;
         $content = $this->client->getInternalResponse()->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
         $this->assertTrue(strlen($content) > 10000, $content);
 
         /** @var AuditLog $auditLog */

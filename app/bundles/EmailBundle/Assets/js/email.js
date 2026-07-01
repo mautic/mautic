@@ -81,6 +81,10 @@ Mautic.emailOnLoad = function (container, response) {
         });
     }
 
+    if (mQuery('#content_preview_frame').length && Mautic.contentPreviewUrlGenerator) {
+        Mautic.contentPreviewUrlGenerator.init();
+    }
+
     var $loadDeliveredElements = mQuery('[data-email-stat-delivered-for]');
     if ($loadDeliveredElements.length) {
         $loadDeliveredElements.each(function(i, el) {

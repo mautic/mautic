@@ -27,14 +27,9 @@ class ChannelClickQueryBuilderTest extends TestCase
     use MockedConnectionTrait;
 
     /**
-     * @var MockObject|RandomParameterName
+     * @var MockObject&RandomParameterName
      */
     private MockObject $randomParameterMock;
-
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcherMock;
 
     /**
      * @var Connection|MockObject
@@ -46,11 +41,11 @@ class ChannelClickQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
-        $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
+        $dispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ChannelClickQueryBuilder(
             $this->randomParameterMock,
-            $this->dispatcherMock
+            $dispatcherMock
         );
 
         $this->connectionMock->method('quote')
@@ -160,10 +155,10 @@ class ChannelClickQueryBuilderTest extends TestCase
                 ]
             ),
             new BaseDecorator(new ContactSegmentFilterOperator(
-                $this->createMock(FilterOperatorProviderInterface::class)
+                $this->createStub(FilterOperatorProviderInterface::class)
             )),
-            new TableSchemaColumnsCache($this->createMock(EntityManager::class)),
-            $this->createMock(FilterQueryBuilderInterface::class),
+            new TableSchemaColumnsCache($this->createStub(EntityManager::class)),
+            $this->createStub(FilterQueryBuilderInterface::class),
             $batchLimiters
         );
     }

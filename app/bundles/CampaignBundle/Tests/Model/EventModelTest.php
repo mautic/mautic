@@ -23,17 +23,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class EventModelTest extends TestCase
 {
     /**
-     * @var EntityManagerInterface|MockObject
-     */
-    private MockObject $entityManagerMock;
-
-    /**
-     * @var EventRepository|MockObject
+     * @var MockObject&EventRepository
      */
     private MockObject $eventRepositoryMock;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcherMock;
 
@@ -41,22 +36,22 @@ class EventModelTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManagerMock   = $this->createMock(EntityManagerInterface::class);
+        $entityManagerMock         = $this->createMock(EntityManagerInterface::class);
         $this->eventRepositoryMock = $this->createMock(EventRepository::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
 
         $this->eventModel          = new EventModel(
-            $this->entityManagerMock,
-            $this->createMock(CorePermissions::class),
+            $entityManagerMock,
+            $this->createStub(CorePermissions::class),
             $this->dispatcherMock,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
 
-        $this->entityManagerMock
+        $entityManagerMock
             ->method('getRepository')
             ->with(Event::class)
             ->willReturn($this->eventRepositoryMock);

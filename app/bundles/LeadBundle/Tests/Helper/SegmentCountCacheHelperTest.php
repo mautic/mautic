@@ -185,20 +185,11 @@ class SegmentCountCacheHelperTest extends TestCase
 
         $this->cacheProviderMock
             ->method('hasItem')
-            ->willReturnCallback(function ($key) use ($segmentId) {
-                if ($key === 'segment.'.$segmentId.'.lead') {
-                    return true;
-                }
-                if ($key === 'segment.'.$segmentId.'.lead.recount') {
-                    return false;
-                }
-
-                return false;
-            });
+            ->willReturnCallback(fn ($key): bool => $key === 'segment.'.$segmentId.'.lead');
 
         $this->cacheProviderMock
             ->method('getItem')
-            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem) {
+            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {
                 if ($key === 'segment.'.$segmentId.'.lead') {
                     return $cacheItem;
                 }
@@ -225,19 +216,10 @@ class SegmentCountCacheHelperTest extends TestCase
         $this->cacheProviderMock
             ->expects(self::exactly(2))
             ->method('hasItem')
-            ->willReturnCallback(function ($key) use ($segmentId) {
-                if ($key === 'segment.'.$segmentId.'.lead') {
-                    return true;
-                }
-                if ($key === 'segment.'.$segmentId.'.lead.recount') {
-                    return false;
-                }
-
-                return false;
-            });
+            ->willReturnCallback(fn ($key): bool => $key === 'segment.'.$segmentId.'.lead');
         $this->cacheProviderMock
             ->method('getItem')
-            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem) {
+            ->willReturnCallback(function ($key) use ($segmentId, $cacheItem): ?\Symfony\Component\Cache\CacheItem {
                 if (in_array($key, ['segment.'.$segmentId.'.lead', 'segment.'.$segmentId.'.lead.recount'])) {
                     return $cacheItem;
                 }

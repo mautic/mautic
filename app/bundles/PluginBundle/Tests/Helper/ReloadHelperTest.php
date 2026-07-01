@@ -39,7 +39,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->sampleMetaData = [
             'MauticPlugin\MauticZapierBundle' => [
-                'MauticPlugin\MauticZapierBundle\Entity\SomeTest' => $this->createMock(ClassMetadata::class),
+                'MauticPlugin\MauticZapierBundle\Entity\SomeTest' => $this->createStub(ClassMetadata::class),
             ],
         ];
 

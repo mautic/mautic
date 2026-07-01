@@ -12,7 +12,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
     {
         // Config not defined
         $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
+        $paramBag = $this->createStub(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
         $key      = 'undefined';
         $this->assertEquals([], $event->getConfig($key));
@@ -35,7 +35,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
     public function testGetSetPreserved(): void
     {
         $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
+        $paramBag = $this->createStub(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
         $this->assertSame([], $event->getPreservedFields());
@@ -54,7 +54,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
     public function testGetSetErrors(): void
     {
         $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
+        $paramBag = $this->createStub(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
         $this->assertSame([], $event->getErrors());
@@ -85,7 +85,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
     public function testGetFileContent(): void
     {
         $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
+        $paramBag = $this->createStub(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
         $fileContent = 'content';
@@ -105,7 +105,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
     public function testEncodeFileContents(): void
     {
         $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
+        $paramBag = $this->createStub(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
         $string = 'řčžýřžýčř';
@@ -116,7 +116,7 @@ class ConfigEventTest extends \PHPUnit\Framework\TestCase
     public function testNormalizedDataGetSet(): void
     {
         $config   = [];
-        $paramBag = $this->createMock(ParameterBag::class);
+        $paramBag = $this->createStub(ParameterBag::class);
         $event    = new ConfigEvent($config, $paramBag);
 
         $origNormData = ['orig'];

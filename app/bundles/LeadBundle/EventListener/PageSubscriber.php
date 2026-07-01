@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadRepository $leadRepository,

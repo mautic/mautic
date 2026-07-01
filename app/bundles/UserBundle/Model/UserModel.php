@@ -42,7 +42,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
 
     public function __construct(
         protected MailHelper $mailHelper,
-        private UserTokenServiceInterface $userTokenService,
+        private readonly UserTokenServiceInterface $userTokenService,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -51,7 +51,7 @@ class UserModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private Environment $twig,
+        private readonly Environment $twig,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }

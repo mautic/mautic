@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ApiSerializationContextEvent extends CommonEvent
 {
-    public function __construct(private Context $context, private Request $request)
+    public function __construct(private Context $context, private readonly Request $request)
     {
     }
 

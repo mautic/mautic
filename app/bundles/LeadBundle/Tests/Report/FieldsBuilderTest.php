@@ -16,18 +16,18 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->createMock(ListModel::class);
+        $listModel = $this->createStub(ListModel::class);
 
-        $userModel = $this->createMock(UserModel::class);
+        $userModel = $this->createStub(UserModel::class);
 
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
         $fieldModel->expects($this->exactly(2)) // We have 2 asserts
             ->method('getLeadFields')
             ->with()
             ->willReturn($this->getFields());
 
-        $dncReportService = $this->createMock(DncReportService::class);
+        $dncReportService = $this->createStub(DncReportService::class);
 
         $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
@@ -169,7 +169,7 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($tagList);
 
-        $dncReportService = $this->createMock(DncReportService::class);
+        $dncReportService = $this->createStub(DncReportService::class);
 
         $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 
@@ -283,18 +283,18 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $fieldModel = $this->createMock(FieldModel::class);
 
-        $listModel = $this->createMock(ListModel::class);
+        $listModel = $this->createStub(ListModel::class);
 
-        $userModel = $this->createMock(UserModel::class);
+        $userModel = $this->createStub(UserModel::class);
 
         $fieldModel->expects($this->exactly(2)) // We have 2 asserts
         ->method('getCompanyFields')
             ->with()
             ->willReturn($this->getFields());
 
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
-        $dncReportService = $this->createMock(DncReportService::class);
+        $dncReportService = $this->createStub(DncReportService::class);
 
         $fieldsBuilder = new FieldsBuilder($fieldModel, $listModel, $userModel, $leadModel, $dncReportService);
 

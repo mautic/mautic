@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: DeleteCompanyLeads::COMMAND_NAME,
     description: 'Delete Company referance from leads and update leads with new primary company.'
 )]
-final class DeleteCompanyLeads
+final readonly class DeleteCompanyLeads
 {
     public const COMMAND_NAME = 'mautic:company:delete_company_leads';
 

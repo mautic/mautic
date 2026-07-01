@@ -24,10 +24,8 @@ class SourceController extends CommonFormController
 
     /**
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function newAction(Request $request, $objectId = 0)
+    public function newAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -128,10 +126,7 @@ class SourceController extends CommonFormController
         );
     }
 
-    /**
-     * @return Response
-     */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $this->setCampaignElements($request->request);
         $modifiedSources = $this->modifiedSources;

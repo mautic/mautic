@@ -1577,10 +1577,8 @@ class LeadController extends FormController
      * Bulk edit lead campaigns.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0)
+    public function batchCampaignsAction(Request $request, MembershipManager $membershipManager, $objectId = 0): JsonResponse|Response
     {
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
         $campaignModel = $this->getModel('campaign');
@@ -1699,10 +1697,8 @@ class LeadController extends FormController
 
     /**
      * Bulk add leads to the DNC list.
-     *
-     * @return JsonResponse|Response
      */
-    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model)
+    public function batchDncAction(Request $request, DoNotContactModel $doNotContact, LeadModel $model): JsonResponse|Response
     {
         if (Request::METHOD_POST === $request->getMethod()) {
             $data = $request->request->all()['lead_batch_dnc'] ?? [];
@@ -1777,10 +1773,8 @@ class LeadController extends FormController
      * Bulk edit lead stages.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchStagesAction(Request $request, $objectId = 0)
+    public function batchStagesAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if ('POST' === $request->getMethod()) {
             /** @var LeadModel $model */
@@ -1882,10 +1876,8 @@ class LeadController extends FormController
      * Bulk edit lead owner.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|Response
      */
-    public function batchOwnersAction(Request $request, $objectId = 0)
+    public function batchOwnersAction(Request $request, $objectId = 0): JsonResponse|Response
     {
         if (!$this->security->isGranted('user:users:view')) {
             $this->throwAccessDenied();

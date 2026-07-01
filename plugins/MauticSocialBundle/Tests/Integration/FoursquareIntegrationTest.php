@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
-use PHPUnit\Framework\MockObject\MockObject;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FoursquareIntegration::class)]
 class FoursquareIntegrationTest extends AbstractIntegrationTestCase
@@ -14,21 +13,21 @@ class FoursquareIntegrationTest extends AbstractIntegrationTestCase
     private FoursquareIntegration $integration;
 
     /**
-     * @var Translator&MockObject
+     * @var Translator&\PHPUnit\Framework\MockObject\Stub
      */
-    protected MockObject $coreTranslator;
+    protected \PHPUnit\Framework\MockObject\Stub $coreTranslator;
 
     /**
-     * @var IntegrationHelper&MockObject
+     * @var IntegrationHelper&\PHPUnit\Framework\MockObject\Stub
      */
-    protected MockObject $integrationHelper;
+    protected \PHPUnit\Framework\MockObject\Stub $integrationHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->coreTranslator    = $this->createMock(Translator::class);
-        $this->integrationHelper = $this->createMock(IntegrationHelper::class);
+        $this->coreTranslator    = $this->createStub(Translator::class);
+        $this->integrationHelper = $this->createStub(IntegrationHelper::class);
 
         $this->integration = new FoursquareIntegration(
             $this->dispatcher,

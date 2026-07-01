@@ -29,12 +29,12 @@ use Twig\Environment;
 class FieldController extends CommonFormController
 {
     public function __construct(
-        private FormModel $formModel,
-        private FieldModel $formFieldModel,
+        private readonly FormModel $formModel,
+        private readonly FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
         FormFactoryInterface $formFactory,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
-        private AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -54,10 +54,8 @@ class FieldController extends CommonFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request, Environment $twig)
+    public function newAction(Request $request, Environment $twig): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -229,10 +227,8 @@ class FieldController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, Environment $twig, $objectId)
+    public function editAction(Request $request, Environment $twig, $objectId): JsonResponse|Response
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();

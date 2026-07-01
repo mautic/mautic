@@ -50,21 +50,20 @@ class ExportHelperTest extends TestCase
     private array $filePaths = [];
 
     private MockObject&FilePathResolver $filePathResolver;
-    private MockObject&ProcessSignalService $processSignalService;
 
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
-        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
+        $processSignalService           = $this->createMock(ProcessSignalService::class);
 
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $this->processSignalService,
-            $this->createMock(EventDispatcherInterface::class),
+            $processSignalService,
+            $this->createStub(EventDispatcherInterface::class),
         );
     }
 

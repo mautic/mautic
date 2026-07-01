@@ -23,29 +23,35 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallServiceTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject&Configurator
+     */
     private MockObject $configurator;
 
+    /**
+     * @var MockObject&CacheHelper
+     */
     private MockObject $cacheHelper;
 
+    /**
+     * @var MockObject&PathsHelper
+     */
     private MockObject $pathsHelper;
 
     /**
-     * @var EntityManager&MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
+    /**
+     * @var MockObject&TranslatorInterface
+     */
     private MockObject $translator;
 
-    private MockObject $kernel;
-
-    private MockObject $validator;
-
-    private MockObject $hasher;
-
     /**
-     * @var MockObject&FixturesLoaderInterface
+     * @var MockObject&ValidatorInterface
      */
-    private MockObject $fixtureLoader;
+    private MockObject $validator;
 
     private InstallService $installer;
 
@@ -58,10 +64,10 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $this->kernel               = $this->createMock(KernelInterface::class);
+        $kernel                     = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $this->hasher               = $this->createMock(UserPasswordHasher::class);
-        $this->fixtureLoader        = $this->createMock(FixturesLoaderInterface::class);
+        $hasher                     = $this->createMock(UserPasswordHasher::class);
+        $fixtureLoader              = $this->createMock(FixturesLoaderInterface::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -69,10 +75,10 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->pathsHelper,
             $this->entityManager,
             $this->translator,
-            $this->kernel,
+            $kernel,
             $this->validator,
-            $this->hasher,
-            $this->fixtureLoader
+            $hasher,
+            $fixtureLoader
         );
     }
 
@@ -104,7 +110,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             );
 
         $index = 0;
-        $step  = $this->createMock(StepInterface::class);
+        $step  = $this->createStub(StepInterface::class);
 
         $this->configurator->expects($this->once())
             ->method('getStep')
@@ -130,7 +136,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             );
 
         $index = 0;
-        $step  = $this->createMock(StepInterface::class);
+        $step  = $this->createStub(StepInterface::class);
 
         $this->configurator->expects($this->once())
             ->method('getStep')
@@ -294,7 +300,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             'table_prefix' => 'mautic_',
         ];
 
-        $step = $this->createMock(StepInterface::class);
+        $step = $this->createStub(StepInterface::class);
         $this->assertEquals(['error' => null], $this->installer->createDatabaseStep($step, $dbParams));
     }
 

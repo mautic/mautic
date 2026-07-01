@@ -26,8 +26,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReplyTest extends \PHPUnit\Framework\TestCase
 {
-    private EmailAddressHelper $emailAddressHelper;
-
     /**
      * @var MockObject&StatRepository
      */
@@ -44,19 +42,9 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
     private MockObject $contactFinder;
 
     /**
-     * @var MockObject&LeadModel
-     */
-    private MockObject $leadModel;
-
-    /**
      * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
-
-    /**
-     * @var MockObject&Logger
-     */
-    private MockObject $logger;
 
     /**
      * @var MockObject&ContactTracker
@@ -77,21 +65,21 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->statRepo           = $this->createMock(StatRepository::class);
         $this->emailStatModel     = $this->createMock(EmailStatModel::class);
         $this->contactFinder      = $this->createMock(ContactFinder::class);
-        $this->leadModel          = $this->createMock(LeadModel::class);
+        $leadModel                = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $this->logger             = $this->createMock(Logger::class);
+        $logger                   = $this->createMock(Logger::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
-        $this->emailAddressHelper = new EmailAddressHelper();
+        $emailAddressHelper       = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
-        $this->leadModel->method('getRepository')->willReturn($this->leadRepository);
+        $leadModel->method('getRepository')->willReturn($this->leadRepository);
         $this->processor          = new Reply(
             $this->emailStatModel,
             $this->contactFinder,
-            $this->leadModel,
+            $leadModel,
             $this->dispatcher,
-            $this->logger,
+            $logger,
             $this->contactTracker,
-            $this->emailAddressHelper
+            $emailAddressHelper
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepo);
@@ -109,7 +97,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(
-                function ($hash) {
+                function ($hash): Result {
                     $stat = new Stat();
                     $stat->setTrackingHash($hash);
 
@@ -159,7 +147,7 @@ BODY;
     {
         $trackingHash = '@Stat#';
         $stat         = $this->createMock(Stat::class);
-        $contact      = $this->createMock(Lead::class);
+        $contact      = $this->createStub(Lead::class);
 
         $this->statRepo->expects($this->once())
             ->method('findOneBy')
@@ -184,7 +172,7 @@ BODY;
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat) {
+            ->with($this->callback(function (EmailReply $emailReply) use ($stat): true {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
 

@@ -1126,11 +1126,9 @@ class PageController extends FormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse|Response
-     *
      * @throws \Exception
      */
-    public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv')
+    public function exportAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $format = 'csv'): Response
     {
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();

@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -22,8 +21,6 @@ class ImportHelperTest extends TestCase
 
     private ImportHelper $importHelper;
 
-    private PathsHelper&MockObject $pathsHelper;
-
     /**
      * @var array<string>
      */
@@ -32,28 +29,28 @@ class ImportHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->exportHelper = new ExportHelper(
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(CoreParametersHelper::class),
-            $this->createMock(FilePathResolver::class),
-            $this->createMock(ProcessSignalService::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(FilePathResolver::class),
+            $this->createStub(ProcessSignalService::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
 
         $filesystem = new Filesystem();
 
         $systemTempDirBase = sys_get_temp_dir().'/import_helper_test';
         $this->paths[]     = $systemTempDirBase;
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper       = $this->createMock(PathsHelper::class);
 
         $testTempDir = $systemTempDirBase.'/tmp';
-        $this->pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
+        $pathsHelper->method('getTemporaryPath')->willReturn($testTempDir);
         $filesystem->mkdir($testTempDir);
 
         $mediaDir = $systemTempDirBase.'/media';
-        $this->pathsHelper->method('getMediaPath')->willReturn($mediaDir);
+        $pathsHelper->method('getMediaPath')->willReturn($mediaDir);
         $filesystem->mkdir($mediaDir);
 
-        $this->importHelper = new ImportHelper($this->pathsHelper);
+        $this->importHelper = new ImportHelper($pathsHelper);
     }
 
     protected function tearDown(): void

@@ -37,8 +37,6 @@ class RealTimeExecutionerTest extends TestCase
 
     private MockObject&ContactTracker $contactTracker;
 
-    private MockObject&LeadRepository $leadRepository;
-
     private DecisionHelper $decisionHelper;
 
     private EventRedirectionHelper&MockObject $redirectionHelper;
@@ -59,9 +57,9 @@ class RealTimeExecutionerTest extends TestCase
 
         $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $this->leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
 
-        $this->decisionHelper    = new DecisionHelper($this->leadRepository);
+        $this->decisionHelper    = new DecisionHelper($leadRepository);
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
         // Configure the redirection helper mock to return the event it receives
@@ -154,8 +152,8 @@ class RealTimeExecutionerTest extends TestCase
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event->expects($this->once())
             ->method('getPositiveChildren')
@@ -265,8 +263,8 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event = $this->getEventMock(2, 3);
         $event->method('getEventType')

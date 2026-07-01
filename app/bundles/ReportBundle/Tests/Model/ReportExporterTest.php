@@ -118,13 +118,13 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->atLeast(3);
 
         $eventDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow) {
+            ->method('dispatch')->willReturnCallback(function (ReportScheduleSendEvent|JobExtendTimeEvent $event, ?string $eventName) use ($matcher, $scheduler1, $scheduler2, $schedulerNow): JobExtendTimeEvent|\Mautic\ReportBundle\Event\ReportScheduleSendEvent {
                 if ($event instanceof JobExtendTimeEvent) {
                     return $event;
                 }
 
                 $this->assertSame(ReportEvents::REPORT_SCHEDULE_SEND, $eventName);
-                Assert::assertSame($event->getFile(), 'my-path');
+                Assert::assertSame('my-path', $event->getFile());
                 if (1 === $matcher->numberOfInvocations()) {
                     Assert::assertSame($event->getScheduler(), $scheduler1);
                 }

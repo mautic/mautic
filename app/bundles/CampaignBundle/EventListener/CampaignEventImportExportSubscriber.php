@@ -24,7 +24,7 @@ use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CampaignModel $campaignModel,

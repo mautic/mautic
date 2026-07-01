@@ -408,7 +408,7 @@ class EmailRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {

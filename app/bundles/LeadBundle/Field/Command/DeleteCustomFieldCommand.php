@@ -20,9 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DeleteCustomFieldCommand extends Command
 {
     public function __construct(
-        private BackgroundService $backgroundService,
-        private TranslatorInterface $translator,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly BackgroundService $backgroundService,
+        private readonly TranslatorInterface $translator,
+        private readonly LeadFieldRepository $leadFieldRepository,
     ) {
         parent::__construct();
     }

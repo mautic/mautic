@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ObjectProviderTest extends TestCase
 {
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
 
@@ -47,7 +47,7 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectEvent $e) use ($contact) {
+                $this->callback(function (InternalObjectEvent $e) use ($contact): true {
                     // Fake a subscriber.
                     $e->addObject($contact);
 
@@ -78,7 +78,7 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectEvent $e) use ($contact) {
+                $this->callback(function (InternalObjectEvent $e) use ($contact): true {
                     // Fake a subscriber.
                     $e->addObject($contact);
 

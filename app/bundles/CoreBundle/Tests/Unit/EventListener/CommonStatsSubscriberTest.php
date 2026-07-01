@@ -17,27 +17,22 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CorePermissions|MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var EntityManager|MockObject
-     */
-    private MockObject $entityManager;
-
-    /**
-     * @var User|MockObject
+     * @var MockObject&User
      */
     private MockObject $user;
 
     /**
-     * @var MockObject&CommonRepository<object>
+     * @var MockObject&CommonRepository
      */
     private MockObject $repository;
 
     /**
-     * @var StatsEvent|MockObject
+     * @var MockObject&StatsEvent
      */
     private MockObject $statsEvent;
 
@@ -50,7 +45,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
         $this->security      = $this->createMock(CorePermissions::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $entityManager       = $this->createMock(EntityManager::class);
         $this->user          = $this->createMock(User::class);
         $this->repository    = $this->createMock(CommonRepository::class);
         $this->statsEvent    = $this->createMock(StatsEvent::class);
@@ -58,7 +53,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->setConstructorArgs(
                 [
                     $this->security,
-                    $this->entityManager,
+                    $entityManager,
                 ]
             )
             ->onlyMethods([])
@@ -76,7 +71,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)
-            ->method('checkPermissionExists')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('checkPermissionExists')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lead:leads:view', $parameters[0]);
                 }
@@ -205,7 +200,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)
-            ->method('checkPermissionExists')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('checkPermissionExists')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lead:leads:view', $parameters[0]);
                 }
@@ -218,7 +213,7 @@ class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)
-            ->method('isGranted')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('isGranted')->willReturnCallback(function (...$parameters) use ($matcher): false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lead:leads:view', $parameters[0]);
                 }

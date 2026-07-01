@@ -10,29 +10,18 @@ use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
-use PHPUnit\Framework\MockObject\MockObject;
 
 final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&Unsubscribe
-     */
-    private MockObject $unsubscribe;
-
-    /**
-     * @var MockObject&FeedbackLoop
-     */
-    private MockObject $feedbackLoop;
-
     private ProcessUnsubscribeSubscriber $subscriber;
 
     protected function setup(): void
     {
         parent::setUp();
 
-        $this->unsubscribe      = $this->createMock(Unsubscribe::class);
-        $this->feedbackLoop     = $this->createMock(FeedbackLoop::class);
-        $this->subscriber       = new ProcessUnsubscribeSubscriber($this->unsubscribe, $this->feedbackLoop, $this->createMock(CoreParametersHelper::class));
+        $unsubscribe            = $this->createMock(Unsubscribe::class);
+        $feedbackLoop           = $this->createMock(FeedbackLoop::class);
+        $this->subscriber       = new ProcessUnsubscribeSubscriber($unsubscribe, $feedbackLoop, $this->createStub(CoreParametersHelper::class));
     }
 
     public function testOnEmailSend(): void

@@ -217,11 +217,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lead ...$leads
-     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, ...$leads): LeadList
+    private function createLeadList(string $name, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);
@@ -256,10 +254,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         return $category;
     }
 
-    /**
-     * @param Category ...$categories
-     */
-    private function subscribeCategory(Lead $lead, bool $subscribed, ...$categories): void
+    private function subscribeCategory(Lead $lead, bool $subscribed, Category ...$categories): void
     {
         foreach ($categories as $category) {
             $leadCategory = new LeadCategory();

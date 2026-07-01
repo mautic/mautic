@@ -13,7 +13,7 @@ class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
 {
     public function testSave(): void
     {
-        $leadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $leadFieldRepository = $this->createStub(LeadFieldRepository::class);
         $fieldSaveDispatcher = $this->createMock(FieldSaveDispatcher::class);
 
         $leadFieldSaver = new LeadFieldSaver($leadFieldRepository, $fieldSaveDispatcher);
@@ -33,7 +33,7 @@ class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveNoColumnCreated(): void
     {
-        $leadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $leadFieldRepository = $this->createStub(LeadFieldRepository::class);
         $fieldSaveDispatcher = $this->createMock(FieldSaveDispatcher::class);
 
         $leadFieldSaver = new LeadFieldSaver($leadFieldRepository, $fieldSaveDispatcher);

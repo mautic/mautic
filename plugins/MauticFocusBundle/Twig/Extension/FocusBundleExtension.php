@@ -18,8 +18,8 @@ class FocusBundleExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('less_compile', [$this, 'compileLess'], ['is_safe' => ['all']]),
-            new TwigFilter('css_minify', [$this, 'minifyCss'], ['is_safe' => ['all']]),
+            new TwigFilter('less_compile', $this->compileLess(...), ['is_safe' => ['all']]),
+            new TwigFilter('css_minify', $this->minifyCss(...), ['is_safe' => ['all']]),
         ];
     }
 

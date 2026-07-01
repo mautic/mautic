@@ -21,8 +21,8 @@ use Symfony\Component\Routing\RouterInterface;
 class ContactObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private ContactObjectHelper $contactObjectHelper,
-        private RouterInterface $router,
+        private readonly ContactObjectHelper $contactObjectHelper,
+        private readonly RouterInterface $router,
     ) {
     }
 

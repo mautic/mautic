@@ -11,11 +11,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
-
     private FieldFilterTransformer $transformer;
 
     /**
@@ -27,9 +22,9 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator   = $this->createMock(TranslatorInterface::class);
+        $translator         = $this->createMock(TranslatorInterface::class);
         $this->relativeDate = $this->createMock(RelativeDate::class);
-        $this->translator->expects($this->any())
+        $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(fn ($id, $parameters, $domain, $locale): string => match ($id) {
                 'mautic.lead.list.month_last'  => isset($locale) ? 'last month' : 'letzter Monat',
@@ -47,7 +42,7 @@ final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
                 'mautic.lead.list.anniversary' => isset($locale) ? 'anniversary' : 'Jahrestag',
                 default                        => isset($locale) ? 'today' : 'heute',
             });
-        $this->transformer  = new FieldFilterTransformer($this->translator, $this->relativeDate);
+        $this->transformer  = new FieldFilterTransformer($translator, $this->relativeDate);
     }
 
     public function testTransform(): void

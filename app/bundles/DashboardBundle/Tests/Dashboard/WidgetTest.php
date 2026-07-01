@@ -20,22 +20,17 @@ class WidgetTest extends TestCase
     private const USER_ID = 1;
 
     /**
-     * @var DashboardModel&MockObject
+     * @var MockObject&DashboardModel
      */
     private MockObject $dashboardModel;
 
     /**
-     * @var UserHelper&MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelper;
 
     /**
-     * @var MockObject&RequestStack
-     */
-    private MockObject $requestStack;
-
-    /**
-     * @var User&MockObject
+     * @var MockObject&User
      */
     private MockObject $user;
 
@@ -47,7 +42,7 @@ class WidgetTest extends TestCase
 
         $this->dashboardModel = $this->createMock(DashboardModel::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
-        $this->requestStack   = $this->createMock(RequestStack::class);
+        $requestStack         = $this->createMock(RequestStack::class);
 
         $this->user = $this->createMock(User::class);
         $this->user
@@ -57,7 +52,7 @@ class WidgetTest extends TestCase
         $this->widget = new Widget(
             $this->dashboardModel,
             $this->userHelper,
-            $this->requestStack
+            $requestStack
         );
     }
 

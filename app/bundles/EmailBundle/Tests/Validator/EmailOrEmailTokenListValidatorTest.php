@@ -57,7 +57,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             {
             }
 
-            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null): ?object
             {
                 throw new \RuntimeException('Field should not be fetched in single value mode test');
             }
@@ -74,11 +74,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         Assert::assertSame(1, $context->violationCount);
     }
 
-    /**
-     * @param mixed $value
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
-    public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
+    public function testNoEmailsProvided(?string $value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class extends ExecutionContext {
             /**
@@ -250,7 +247,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield|jane@doe.com}',
             1,
-            function (string $alias) {
+            function (string $alias): null {
                 Assert::assertSame('somefield', $alias);
 
                 return null;
@@ -271,7 +268,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield}',
             1,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();
@@ -296,7 +293,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield|jane@doe.com}, jone@doe.email, {contactfield=somefield}',
             0,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();
@@ -314,7 +311,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'jone@doe.email {contactfield=somefield}',
             1,
-            function (string $alias) {
+            function (string $alias): LeadField {
                 Assert::assertSame('somefield', $alias);
 
                 $field = new LeadField();

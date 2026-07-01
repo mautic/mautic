@@ -23,7 +23,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 class UserModelTest extends TestCase
@@ -46,7 +45,7 @@ class UserModelTest extends TestCase
     private MockObject $router;
 
     /**
-     * @var MockObject&TranslatorInterface
+     * @var MockObject&Translator
      */
     private MockObject $translator;
 
@@ -56,9 +55,9 @@ class UserModelTest extends TestCase
     private MockObject $user;
 
     /**
-     * @var MockObject&UserToken
+     * @var \PHPUnit\Framework\MockObject\Stub&UserToken
      */
-    private MockObject $userToken;
+    private \PHPUnit\Framework\MockObject\Stub $userToken;
 
     /**
      * @var MockObject&UserTokenServiceInterface
@@ -83,7 +82,7 @@ class UserModelTest extends TestCase
         $this->user             = $this->createMock(User::class);
         $this->router           = $this->createMock(Router::class);
         $this->translator       = $this->createMock(Translator::class);
-        $this->userToken        = $this->createMock(UserToken::class);
+        $this->userToken        = $this->createStub(UserToken::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
@@ -91,13 +90,13 @@ class UserModelTest extends TestCase
             $this->mailHelper,
             $this->userTokenService,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
             $this->router,
             $this->translator,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $this->logger,
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->twig
         );
     }

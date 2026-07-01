@@ -40,7 +40,7 @@ class IntegrationHelper
     private array $byPlugin = [];
 
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
         protected EntityManager $em,
         protected PathsHelper $pathsHelper,
         protected BundleHelper $bundleHelper,

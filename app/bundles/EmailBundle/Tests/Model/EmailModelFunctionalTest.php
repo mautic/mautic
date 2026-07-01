@@ -31,7 +31,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     private const EMAILS_A_MONTH = 2;
+
     private bool $useDefaultFrequencyRules;
+
     private EmailModel $emailModel;
 
     protected function setUp(): void
@@ -60,11 +62,11 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = $this->createEmail($segment);
 
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
-        $this->assertEquals($sentCount, 7);
+        $this->assertEquals(7, $sentCount);
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
-        $this->assertEquals($sentCount, 8);
+        $this->assertEquals(8, $sentCount);
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
-        $this->assertEquals($sentCount, 8);
+        $this->assertEquals(8, $sentCount);
     }
 
     public function testGetEmailGeneralStats(): void
@@ -196,21 +198,21 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $email = $this->createEmail($segment);
 
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4, 2);
-        $this->assertEquals($sentCount, 4);
+        $this->assertEquals(4, $sentCount);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 3, 2);
-        $this->assertEquals($sentCount, 3);
+        $this->assertEquals(3, $sentCount);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 2);
-        $this->assertEquals($sentCount, 2);
+        $this->assertEquals(2, $sentCount);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], 4);
-        $this->assertEquals($sentCount, 1);
+        $this->assertEquals(1, $sentCount);
 
         $email                                              = $this->createEmail($segment);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment]);
-        $this->assertEquals($sentCount, 10);
+        $this->assertEquals(10, $sentCount);
 
         $email                                              = $this->createEmail($segment);
         [$sentCount, $failedCount, $failedRecipientsByList] = $this->emailModel->sendEmailToLists($email, [$segment], null, 2);
-        $this->assertEquals($sentCount, 10);
+        $this->assertEquals(10, $sentCount);
     }
 
     public function testSendEmailToListsWithContinueSendingFalse(): void

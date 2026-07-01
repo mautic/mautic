@@ -49,7 +49,7 @@ class EmailHitNotificationHandlerTest extends TestCase
         $emailModelMock
             ->expects($this->exactly(1))
             ->method('hitEmail')
-            ->willThrowException($this->createMock(RetryableException::class));
+            ->willThrowException($this->createStub(RetryableException::class));
 
         /** @var MockObject&CoreParametersHelper $parametersHelper */
         $parametersHelper = $this->createMock(CoreParametersHelper::class);

@@ -280,7 +280,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $handlerStack = $this->getClientMockHandler();
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
-                function (RequestInterface $request) use (&$sendRequestCounter) {
+                function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
                     Assert::assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
                     Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
@@ -298,7 +298,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $handlerStack = $this->getClientMockHandler();
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
-                function (RequestInterface $request) use (&$sendRequestCounter) {
+                function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
                     Assert::assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
                     Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));

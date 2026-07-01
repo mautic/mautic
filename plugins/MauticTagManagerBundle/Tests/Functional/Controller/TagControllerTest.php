@@ -103,7 +103,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $tagId = $this->tagRepository->findOneBy([])->getId();
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
 
     public function testTagDeletionRemovesContactAssociations(): void
@@ -123,7 +123,7 @@ class TagControllerTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
         Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
 

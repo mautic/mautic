@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 class ReferenceResolverTest extends TestCase
 {
     /**
-     * @var Connection|MockObject
+     * @var MockObject&Connection
      */
     private MockObject $connection;
 
@@ -97,9 +97,9 @@ class ReferenceResolverTest extends TestCase
     }
 
     /**
-     * @param mixed ...$returnValues
+     * @param mixed $returnValues
      *
-     * @return QueryBuilder|MockObject
+     * @return QueryBuilder&MockObject
      */
     private function createQueryBuilder(...$returnValues): MockObject
     {

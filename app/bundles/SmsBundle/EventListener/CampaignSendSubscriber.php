@@ -16,9 +16,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSendSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SmsModel $smsModel,
-        private TransportChain $transportChain,
-        private TranslatorInterface $translator,
+        private readonly SmsModel $smsModel,
+        private readonly TransportChain $transportChain,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

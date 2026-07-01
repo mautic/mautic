@@ -18,11 +18,11 @@ class ReportDNCSubscriber implements EventSubscriberInterface
     public const DNC = 'contact.dnc';
 
     public function __construct(
-        private FieldsBuilder $fieldsBuilder,
-        private CompanyReportData $companyReportData,
-        private RouterInterface $router,
-        private ChannelListHelper $channelListHelper,
-        private DncFormatterHelper $dncFormatter,
+        private readonly FieldsBuilder $fieldsBuilder,
+        private readonly CompanyReportData $companyReportData,
+        private readonly RouterInterface $router,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly DncFormatterHelper $dncFormatter,
     ) {
     }
 

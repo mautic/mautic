@@ -10,22 +10,16 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class BuilderIntegrationsHelperTest extends TestCase
 {
-    /**
-     * @var IntegrationsHelper|MockObject
-     */
-    private MockObject $integrationsHelper;
-
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 
     protected function setUp(): void
     {
-        $this->integrationsHelper        = $this->createMock(IntegrationsHelper::class);
-        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($this->integrationsHelper);
+        $integrationsHelper              = $this->createMock(IntegrationsHelper::class);
+        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($integrationsHelper);
     }
 
     public function testBuilderNotFoundIfFeatureSupportedButNotEnabled(): void

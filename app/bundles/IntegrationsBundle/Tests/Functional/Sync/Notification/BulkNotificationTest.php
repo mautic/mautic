@@ -11,10 +11,7 @@ use PHPUnit\Framework\Assert;
 
 class BulkNotificationTest extends MauticMysqlTestCase
 {
-    /**
-     * @var BulkNotification
-     */
-    private $bulkNotification;
+    private BulkNotification $bulkNotification;
 
     protected function setUp(): void
     {

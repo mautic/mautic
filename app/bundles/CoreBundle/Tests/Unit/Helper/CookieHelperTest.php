@@ -18,21 +18,16 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class CookieHelperTest extends TestCase
 {
     /**
-     * @var RequestStack&MockObject
+     * @var MockObject&RequestStack
      */
     private MockObject $requestStackMock;
-
-    /**
-     * @var Request&MockObject
-     */
-    private MockObject $requestMock;
 
     protected function setUp(): void
     {
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $this->requestMock      = $this->createMock(Request::class);
+        $requestMock            = $this->createMock(Request::class);
         $this->requestStackMock->method('getMainRequest')
-            ->willReturn($this->requestMock);
+            ->willReturn($requestMock);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]
@@ -56,10 +51,10 @@ class CookieHelperTest extends TestCase
                 Assert::assertStringContainsString('secure', (string) $cookie);
             });
 
-        $response          = $this->createMock(Response::class);
+        $response          = $this->createStub(Response::class);
         $response->headers = $headers;
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createMock(Request::class);
+        $request           = $this->createStub(Request::class);
 
         $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
@@ -87,10 +82,10 @@ class CookieHelperTest extends TestCase
                 Assert::assertStringNotContainsString('secure', (string) $cookie);
             });
 
-        $response          = $this->createMock(Response::class);
+        $response          = $this->createStub(Response::class);
         $response->headers = $headers;
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createMock(Request::class);
+        $request           = $this->createStub(Request::class);
 
         $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
@@ -121,10 +116,10 @@ class CookieHelperTest extends TestCase
                 Assert::assertStringContainsString('secure', (string) $cookie);
             });
 
-        $response          = $this->createMock(Response::class);
+        $response          = $this->createStub(Response::class);
         $response->headers = $headers;
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createMock(Request::class);
+        $request           = $this->createStub(Request::class);
         $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cookieHelper->onResponse($event);

@@ -406,7 +406,7 @@ class FormControllerFunctionalTest extends MauticMysqlTestCase
         $form = $this->createForm('test', 'test');
 
         // Persist entities if provided
-        if (!empty($inputValues['entities'])) {
+        if (isset($inputValues['entities'])) {
             foreach ($inputValues['entities'] as $entity) {
                 $this->em->persist($entity);
             }
