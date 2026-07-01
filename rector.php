@@ -61,8 +61,6 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
 
         Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
-        '*/Test/*',
-        '*/Tests/*',
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
