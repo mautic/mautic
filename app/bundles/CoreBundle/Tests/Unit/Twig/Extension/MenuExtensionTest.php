@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Twig\Extension\MenuExtension;
 use PHPUnit\Framework\Assert;
 
-class MenuExtensionTest extends AbstractMauticTestCase
+final class MenuExtensionTest extends AbstractMauticTestCase
 {
     public function testParseMenuAttributes(): void
     {

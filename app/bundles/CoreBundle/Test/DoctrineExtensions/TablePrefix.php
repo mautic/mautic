@@ -7,10 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 class TablePrefix
 {
-    /**
-     * @var string
-     */
-    protected $prefix = '';
+    protected string $prefix;
 
     /**
      * @param string $prefix
@@ -35,7 +32,7 @@ class TablePrefix
         }
     }
 
-    private function addPrefixToIndexes($prefix, array &$table, $key): void
+    private function addPrefixToIndexes($prefix, array &$table, string $key): void
     {
         if (!isset($table[$key])) {
             return;

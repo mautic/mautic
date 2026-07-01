@@ -126,10 +126,8 @@ class NoteController extends FormController
 
     /**
      * Generate's new note and processes post data.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $leadId)
+    public function newAction(Request $request, $leadId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -214,10 +212,8 @@ class NoteController extends FormController
 
     /**
      * Generate's edit form and processes post data.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $leadId, $objectId)
+    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {

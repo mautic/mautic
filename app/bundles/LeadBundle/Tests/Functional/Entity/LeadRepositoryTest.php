@@ -35,7 +35,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
      * @param array<string, bool> $args
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('joinIpAddressesProvider')]
-    public function testSaveIpAddressToContacts($args): void
+    public function testSaveIpAddressToContacts(array $args): void
     {
         $contactRepo = $this->em->getRepository(Lead::class);
 
@@ -54,7 +54,7 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
         foreach ($results as $r) {
             $ipAddresses = $r->getIpAddresses();
             $ipAddress   = $ipAddresses->first();
-            $this->assertEquals($ipAddress->getIpAddress(), '127.0.0.1');
+            $this->assertEquals('127.0.0.1', $ipAddress->getIpAddress());
         }
 
         $this->client->enableProfiler();

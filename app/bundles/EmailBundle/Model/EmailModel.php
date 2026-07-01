@@ -1580,10 +1580,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array|int $users
-     * @param bool      $saveStat
+     * @param mixed[]|int $users
+     * @param bool        $saveStat
      *
-     * @return bool|string[]
+     * @return false|string[]
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -1597,7 +1597,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         array $to = [],
         array $cc = [],
         array $bcc = [],
-    ) {
+    ): false|array {
         if (!$emailId = $email->getId()) {
             return false;
         }
@@ -2237,7 +2237,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array<string>|Lead|null $leadFields
      * @param bool                    $saveStat
      *
-     * @return bool|string[]
+     * @return false|mixed[]
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -2248,7 +2248,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $tokens = [],
         $assetAttachments = [],
         $saveStat = true,
-    ) {
+    ): false|array {
         if (!$emailId = $email->getId()) {
             return false;
         }

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-class ReportDataResultTest extends \PHPUnit\Framework\TestCase
+final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidData(): void
     {

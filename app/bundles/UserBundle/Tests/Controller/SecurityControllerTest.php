@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class SecurityControllerTest extends MauticMysqlTestCase
+final class SecurityControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

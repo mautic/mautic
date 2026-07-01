@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
+final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
     public const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
 

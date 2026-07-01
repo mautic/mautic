@@ -32,48 +32,12 @@ final class FormModelTest extends TestCase
      */
     private MockObject $userHelperMock;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&CorePermissions
-     */
-    private \PHPUnit\Framework\MockObject\Stub $corePermissionsMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $dispatcherMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $routerMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Translator
-     */
-    private \PHPUnit\Framework\MockObject\Stub $translatorMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&LoggerInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $loggerMock;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper
-     */
-    private \PHPUnit\Framework\MockObject\Stub $coreParametersHelperMock;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->entityManagerMock        = $this->createMock(EntityManager::class);
-        $this->corePermissionsMock      = $this->createStub(CorePermissions::class);
-        $this->dispatcherMock           = $this->createStub(EventDispatcherInterface::class);
-        $this->routerMock               = $this->createStub(UrlGeneratorInterface::class);
-        $this->translatorMock           = $this->createStub(Translator::class);
         $this->userHelperMock           = $this->createMock(UserHelper::class);
-        $this->loggerMock               = $this->createStub(LoggerInterface::class);
-        $this->coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
     }
 
     public function testSaveEntities(): void
@@ -96,7 +60,7 @@ final class FormModelTest extends TestCase
             ->method('getRepository')
             ->willReturn($this->createStub(FormRepository::class));
 
-        $formModel = new class($this->entityManagerMock, $this->corePermissionsMock, $this->dispatcherMock, $this->routerMock, $this->translatorMock, $this->userHelperMock, $this->loggerMock, $this->coreParametersHelperMock) extends FormModel {
+        $formModel = new class($this->entityManagerMock, $this->createStub(CorePermissions::class), $this->createStub(EventDispatcherInterface::class), $this->createStub(UrlGeneratorInterface::class), $this->createStub(Translator::class), $this->userHelperMock, $this->createStub(LoggerInterface::class), $this->createStub(CoreParametersHelper::class)) extends FormModel {
             /**
              * @var array<string>
              */

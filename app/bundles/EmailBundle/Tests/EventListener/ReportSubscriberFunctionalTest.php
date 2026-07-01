@@ -17,7 +17,7 @@ use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testEmailReportGraphWithMostClickedLinks(): void
     {

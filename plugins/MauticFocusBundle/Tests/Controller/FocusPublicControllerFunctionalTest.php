@@ -9,7 +9,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
+final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testGenerateFocusItemScript(): void
     {

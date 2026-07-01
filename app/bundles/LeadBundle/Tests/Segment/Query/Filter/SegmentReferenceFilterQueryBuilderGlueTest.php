@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use PHPUnit\Framework\Assert;
 
-class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
+final class SegmentReferenceFilterQueryBuilderGlueTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

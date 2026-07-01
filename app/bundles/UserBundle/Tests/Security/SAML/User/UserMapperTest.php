@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;
@@ -10,7 +12,7 @@ use Mautic\UserBundle\Security\SAML\User\UserMapper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class UserMapperTest extends TestCase
+final class UserMapperTest extends TestCase
 {
     private UserMapper $mapper;
 

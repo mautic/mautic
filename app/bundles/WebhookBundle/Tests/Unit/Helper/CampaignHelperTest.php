@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;

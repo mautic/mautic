@@ -285,7 +285,7 @@ class SmsController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -449,7 +449,7 @@ class SmsController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -659,7 +659,7 @@ class SmsController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST == $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('sms');
             \assert($model instanceof SmsModel);
             $ids = json_decode($request->query->get('ids', '{}'));

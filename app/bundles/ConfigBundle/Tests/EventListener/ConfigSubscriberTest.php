@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ConfigSubscriberTest extends TestCase
+final class ConfigSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&ConfigChangeLogger

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Validator\Constraints\SafeUrlValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SafeUrlValidatorTest extends ConstraintValidatorTestCase
+final class SafeUrlValidatorTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): ConstraintValidatorInterface
     {

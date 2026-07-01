@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class DetailsTest extends MauticMysqlTestCase
+final class DetailsTest extends MauticMysqlTestCase
 {
     public function testDetailsPageLoadCorrectly(): void
     {
