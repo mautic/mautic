@@ -43,7 +43,9 @@ JSON;
         self::assertArrayHasKey('webinars', $json);
     }
 
-    /** @phpstan-ignore return.deprecatedClass */
+    /**
+     * @phpstan-ignore return.deprecatedClass
+     */
     private function buildAbstractIntegrationDouble(): AbstractIntegration
     {
         // creating a double since we can't instantiate

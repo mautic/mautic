@@ -95,7 +95,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private ReportSubscriber $reportSubscriber;
 
-    /** @var array<string, array<string, string>> */
+    /**
+     * @var array<string, array<string, string>>
+     */
     private array $leadColumns = [
         'xx.yy' => [
             'label' => '',
@@ -104,7 +106,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array<string, array<string, string>> */
+    /**
+     * @var array<string, array<string, string>>
+     */
     private array $leadFilters = [
         'filter' => [
             'label' => 'second',
@@ -112,7 +116,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array<string, array<string, string>> */
+    /**
+     * @var array<string, array<string, string>>
+     */
     private array $companyColumns = [
         'comp.name' => [
             'label' => 'company_name',

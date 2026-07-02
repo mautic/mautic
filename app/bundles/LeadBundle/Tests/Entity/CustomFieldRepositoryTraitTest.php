@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
 final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
 {
-    /** @var array<string, array<string, mixed>> */
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $fields = [
         'firstname' => [
             'id'       => 2,
@@ -40,7 +42,9 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         ],
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private array $fieldValues = [
         'preferred_profile_image' => 'gravatar',
         'firstname'               => 'John',
@@ -48,20 +52,26 @@ final class CustomFieldRepositoryTraitTest extends StandardImportTestHelper
         'twitter'                 => 'johndoe',
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     protected array $fixedFields = [
         'firstname' => 'firstname',
         'lastname'  => 'lastname',
     ];
 
-    /** @var array<int, string> */
+    /**
+     * @var array<int, string>
+     */
     protected array $baseColumns = [
         'preferred_profile_image',
         'firstname',
         'lastname',
     ];
 
-    /** @var array<int, string> */
+    /**
+     * @var array<int, string>
+     */
     protected array $fieldGroups = [
         'core',
         'social',

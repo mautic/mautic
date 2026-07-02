@@ -19,10 +19,14 @@ use PHPUnit\Framework\TestCase;
 
 final class EmailSubscriberTest extends TestCase
 {
-    /** @var MockObject&Config */
+    /**
+     * @var MockObject&Config
+     */
     private MockObject $config;
 
-    /** @var MockObject&GrapesJsBuilderRepository */
+    /**
+     * @var MockObject&GrapesJsBuilderRepository
+     */
     private MockObject $grapesJsBuilderRepo;
 
     private EmailSubscriber $subscriber;
