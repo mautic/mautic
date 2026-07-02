@@ -78,9 +78,7 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
         return array_values(
             array_filter(
                 $this->debugDataHolder->getData()['default'] ?? [],
-                function (array $item): bool {
-                    return 0 !== strpos($item['sql'], 'SELECT NEXTVAL');
-                }
+                fn (array $item): bool => !str_starts_with($item['sql'], 'SELECT NEXTVAL')
             )
         );
     }

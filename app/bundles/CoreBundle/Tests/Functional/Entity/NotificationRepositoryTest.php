@@ -13,7 +13,9 @@ use PHPUnit\Framework\Assert;
 final class NotificationRepositoryTest extends MauticMysqlTestCase
 {
     private const MINUS_DAY_DATE_TIME = '-1 day';
+
     private int $userId1;
+
     private int $userId2;
 
     protected function setUp(): void

@@ -32,6 +32,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     use CreateTestEntitiesTrait;
 
     public const IP_ADDRESS      = '127.0.0.1';
+
     private const EMAILS_A_MONTH = 2;
 
     private bool $useDefaultFrequencyRules;

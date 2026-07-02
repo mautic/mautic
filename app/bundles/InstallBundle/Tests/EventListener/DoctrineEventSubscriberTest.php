@@ -20,15 +20,20 @@ use PHPUnit\Framework\TestCase;
 
 final class DoctrineEventSubscriberTest extends TestCase
 {
+    /*
+     * @var \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $entityManager;
     /**
      * @var \PHPUnit\Framework\MockObject\Stub&Connection
      */
-    private \PHPUnit\Framework\MockObject\Stub $connection;
+    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->connection    = $this->createMock(Connection::class);
 
         // Default to MySQL platform for backward compatibility with existing tests
@@ -48,7 +53,7 @@ final class DoctrineEventSubscriberTest extends TestCase
         $dateColumn = new Column('date_added', new DateTimeType());
         $table      = new Table(MAUTIC_TABLE_PREFIX.'leads', [$idColumn, $textColumn, $dateColumn]);
         $schema     = new Schema([$table]);
-        $args       = new GenerateSchemaEventArgs($this->createStub(EntityManagerInterface::class), $schema);
+        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 
@@ -62,7 +67,7 @@ final class DoctrineEventSubscriberTest extends TestCase
     {
         $table      = new Table(MAUTIC_TABLE_PREFIX.'some_plugin_table', [new Column('id', new BigIntType())]);
         $schema     = new Schema([$table]);
-        $args       = new GenerateSchemaEventArgs($this->createStub(EntityManagerInterface::class), $schema);
+        $args       = new GenerateSchemaEventArgs($this->entityManager, $schema);
         $subscriber = new DoctrineEventSubscriber();
         $subscriber->postGenerateSchema($args);
 

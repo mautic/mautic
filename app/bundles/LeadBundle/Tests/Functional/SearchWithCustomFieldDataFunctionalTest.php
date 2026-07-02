@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
     private const COMPANY_CUSTOM_FIELD     = 'client_id_company';
+
     private const CONTACT_CUSTOM_FIELD     = 'client_id_contact';
 
     protected $useCleanupRollback = false;

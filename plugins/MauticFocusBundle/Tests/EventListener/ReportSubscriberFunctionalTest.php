@@ -18,8 +18,11 @@ use Symfony\Component\HttpFoundation\Request;
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public const EXAMPLE_URL_1   = 'https://example1.com';
+
     public const EXAMPLE_EMAIL_1 = 'lead.1@example.com';
+
     public const EXAMPLE_URL_2   = 'https://example2.com';
+
     public const EXAMPLE_EMAIL_2 = 'lead.2@example.com';
 
     protected function setUp(): void

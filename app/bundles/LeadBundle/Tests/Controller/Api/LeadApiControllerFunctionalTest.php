@@ -28,7 +28,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const ADMIN_USER = 'admin';
+
     private const SALES_USER = 'sales';
 
     protected function setUp(): void

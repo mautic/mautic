@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class PublicControllerTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER         = 'admin';
+
     private const PASSWORD_RESET_URI = '/passwordreset';
 
     protected function setUp(): void

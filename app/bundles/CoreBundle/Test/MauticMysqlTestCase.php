@@ -314,9 +314,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 $schemaManager = $this->connection->createSchemaManager();
                 $tables        = $schemaManager->listTableNames();
 
-                $prefixedTables = array_filter($tables, function ($table) use ($prefix) {
-                    return str_starts_with($table, $prefix);
-                });
+                $prefixedTables = array_filter($tables, fn ($table) => str_starts_with($table, $prefix));
 
                 if (!empty($prefixedTables)) {
                     $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
@@ -395,9 +393,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $schemaManager = $this->connection->createSchemaManager();
         $tables        = $schemaManager->listTableNames();
 
-        $prefixedTables = array_filter($tables, function ($table) use ($prefix) {
-            return str_starts_with($table, $prefix);
-        });
+        $prefixedTables = array_filter($tables, fn ($table) => str_starts_with($table, $prefix));
 
         if (empty($prefixedTables)) {
             // Nothing to do

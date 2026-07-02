@@ -258,7 +258,7 @@ final class ForeignValueFilterQueryBuilderTest extends TestCase
             new ContactSegmentFilterCrate($filter),
             new CustomMappedDecorator(
                 new ContactSegmentFilterOperator(
-                    new FilterOperatorProvider($this->dispatcher, $this->createStub(TranslatorInterface::class))
+                    new FilterOperatorProvider($this->createStub(EventDispatcherInterface::class), $this->createStub(TranslatorInterface::class))
                 ),
                 new ContactSegmentFilterDictionary($this->createStub(EventDispatcherInterface::class))
             ),

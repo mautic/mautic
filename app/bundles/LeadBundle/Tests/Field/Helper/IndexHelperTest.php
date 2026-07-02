@@ -28,10 +28,6 @@ final class IndexHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn([$columnName]);
             $indexes[] = $indexMock;
         }
-        $expectedColumnNames = array_map(
-            fn ($column): string => $column[self::COLUMN_NAME_KEY],
-            $sqlResult
-        );
 
         $expectedColumnNames = $columnNames;
         $expectedCount       = count($expectedColumnNames);
