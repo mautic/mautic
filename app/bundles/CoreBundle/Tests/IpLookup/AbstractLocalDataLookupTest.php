@@ -9,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class AbstractLocalDataLookupTest extends TestCase
+final class AbstractLocalDataLookupTest extends TestCase
 {
     #[DataProvider('provideUrlToClean')]
     public function testCleanUrl(string $url, string $expected): void

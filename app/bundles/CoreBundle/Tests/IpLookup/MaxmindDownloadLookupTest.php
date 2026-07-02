@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class MaxmindDownloadLookupTest extends TestCase
+final class MaxmindDownloadLookupTest extends TestCase
 {
     #[DataProvider('provideMissingOrWrongAuth')]
     public function testNoOrWrongAuth(?string $auth): void
