@@ -218,7 +218,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
     {
@@ -233,7 +233,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
     {

@@ -40,10 +40,7 @@ class TrackingHelper
         return $result;
     }
 
-    /**
-     * @return string|null
-     */
-    private function getCacheKey()
+    private function getCacheKey(): ?string
     {
         $lead = $this->contactTracker->getContact();
 
