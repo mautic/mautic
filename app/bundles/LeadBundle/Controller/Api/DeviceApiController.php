@@ -42,7 +42,7 @@ class DeviceApiController extends CommonApiController
     }
 
     /**
-     * @param LeadDevice           &$entity
+     * @param LeadDevice           $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

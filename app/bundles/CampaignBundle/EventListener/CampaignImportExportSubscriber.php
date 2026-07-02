@@ -745,7 +745,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     /**
      * Set a nested array value using dot notation.
      *
-     * @param array<string, mixed> &$array
+     * @param array<string, mixed> $array
      */
     private function setNestedValue(array &$array, string $path, mixed $value): void
     {
