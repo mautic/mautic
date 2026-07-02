@@ -198,7 +198,7 @@ class TwitterCommandHelper
         foreach ($statusList as $status) {
             $handle = strtolower($status['user']['screen_name']);
 
-            /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
+            /** @var Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
                 $lastActive              = new \DateTime($status['created_at']);
@@ -342,7 +342,7 @@ class TwitterCommandHelper
         $monitorLead->setLead($lead);
         $monitorLead->setDateAdded(new \DateTime());
 
-        /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
+        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
         $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
 
         $monitorRepository->saveEntity($monitorLead);
