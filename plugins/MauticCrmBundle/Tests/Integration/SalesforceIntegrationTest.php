@@ -870,7 +870,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
     }
 
     /**
-     * @return SalesforceIntegration|MockObject
+     * @return SalesforceIntegration&MockObject
      */
     protected function getSalesforceIntegration(int $maxUpdate = 100, int $maxCreate = 200, int $maxSfLeads = 25, int $maxSfContacts = 25, ?string $updateObject = null): MockObject
     {
@@ -999,7 +999,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                 }
             );
 
-        /* @var \PHPUnit\Framework\MockObject\MockObject $this->>dispatcher */
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(
                 function () use ($sf, $integration): PluginIntegrationKeyEvent {

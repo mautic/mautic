@@ -908,7 +908,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($this->getAdminUsers() as $adminUser) {
             if ($preventUnreadDuplicates) {
-                /* @var Notification|null $exists */
+                /** @var Notification|null $exists */
                 $notificationTemplate->setUser($adminUser);
 
                 $searchArray = $transformer->transform($notificationTemplate);
@@ -2197,8 +2197,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 )
                 ) {
                     // Get the lead entity
-                    /* @var Lead $leadEntity */
                     foreach ($updateLead as $mauticField => $sfValue) {
+                        /** @var Lead $leadEntity */
                         $leadEntity->addUpdatedField($mauticField, $sfValue);
                     }
 
@@ -2891,8 +2891,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             )
             ) {
                 // Get the company entity
-                /* @var Lead $leadEntity */
                 foreach ($updateCompany as $mauticField => $sfValue) {
+                    /** @var Company $companyEntity */
                     $companyEntity->addUpdatedField($mauticField, $sfValue);
                 }
 

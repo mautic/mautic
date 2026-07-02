@@ -958,7 +958,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function stageChangeLogEntry($stage, $name, $action): void
+    public function stageChangeLogEntry(Stage $stage, $name, $action): void
     {
         // create a new points change event
         $event = new StagesChangeLog();
@@ -1881,7 +1881,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             $frequencyRules = $rules;
         }
 
-        /* @var FrequencyRule $rule */
+        /** @var FrequencyRule $rule */
         usort(
             $frequencyRules,
             function (array $a, array $b): int {

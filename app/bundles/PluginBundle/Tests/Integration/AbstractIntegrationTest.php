@@ -16,9 +16,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testPopulatedLeadDataReturnsIntAndNotDncEntityForMauticContactIsContactableByEmail(): void
     {
-        /**
-         * @var MockObject&AbstractIntegration
-         */
+        /** @var MockObject&AbstractIntegration $integration */
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
@@ -73,9 +71,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('requestProvider')]
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
-        /**
-         * @var MockObject&AbstractIntegration
-         */
+        /** @var MockObject&AbstractIntegration */
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([

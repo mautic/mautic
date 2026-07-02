@@ -98,7 +98,7 @@ class ContentPreviewSettingsType extends AbstractType
             return;
         }
 
-        /** @var Email|Page */
+        /** @var Email|Page $child */
         $child = $variants['parent'];
 
         $variantChoices = [

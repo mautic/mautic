@@ -413,7 +413,7 @@ class IntegrationHelper
             // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
-            /* @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
+            /** @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();

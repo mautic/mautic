@@ -223,10 +223,7 @@ class EventExecutioner
         }
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getExecutionDate()
+    public function getExecutionDate(): \DateTimeInterface
     {
         return $this->executionDate;
     }
