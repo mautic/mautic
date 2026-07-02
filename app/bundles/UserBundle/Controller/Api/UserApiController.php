@@ -150,7 +150,7 @@ class UserApiController extends CommonApiController
     }
 
     /**
-     * @param User                 &$entity
+     * @param User                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
