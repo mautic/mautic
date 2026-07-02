@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Form\Type;
 
 use Mautic\PageBundle\Form\Type\RedirectListType;

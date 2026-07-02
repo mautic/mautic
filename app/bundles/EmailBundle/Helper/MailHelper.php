@@ -1350,10 +1350,7 @@ class MailHelper
         return true;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
             $lead    = $this->getLead();
@@ -1818,13 +1815,11 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @return string|null
      */
-    protected function cleanName($name)
+    protected function cleanName(?string $name): ?string
     {
         if (null === $name) {
-            return $name;
+            return null;
         }
 
         $name = trim(html_entity_decode($name, ENT_QUOTES));

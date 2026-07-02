@@ -14,18 +14,14 @@ import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
 import grapesjsImageLink from './plugins/grapesjs-image-link';
 import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
-import contentService from 'grapesjs-preset-mautic/dist/content.service';
-import grapesjsmautic from 'grapesjs-preset-mautic';
-import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
+import contentService from './preset-mautic/content.service';
+import grapesjsmautic from './preset-mautic';
+import editorFontsService from './preset-mautic/editorFonts/editorFonts.service';
 import StorageService from './storage.service';
-
-// for local dev
-// import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
-// import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 
 import CodeModeButton from './codeMode/codeMode.button';
 import CompCopyPaste from './commands/compCopyPaste';
-import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import MjmlService from './preset-mautic/mjml/mjml.service';
 import MjmlStylesService from './mjmlStyles.service';
 import EditorStateService from './editorState.service';
 

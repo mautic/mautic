@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\UserBundle\EventListener\SAMLSubscriber;

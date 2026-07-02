@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;

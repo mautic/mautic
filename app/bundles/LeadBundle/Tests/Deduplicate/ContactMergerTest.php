@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -47,6 +49,8 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
         $this->leadModel->method('getRepository')->willReturn($leadRepo);
+
+        $leadRepo->method('getFieldValues')->willReturn([]);
     }
 
     public function testMergeTimestamps(): void

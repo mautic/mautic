@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;

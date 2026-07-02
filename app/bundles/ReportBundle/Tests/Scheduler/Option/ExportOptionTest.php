@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Scheduler\Option;
 
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;

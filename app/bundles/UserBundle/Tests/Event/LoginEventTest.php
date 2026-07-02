@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Event;
 
 use Mautic\UserBundle\Entity\User;

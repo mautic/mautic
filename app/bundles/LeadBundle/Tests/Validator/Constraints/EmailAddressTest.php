@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;

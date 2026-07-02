@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\EventCollector\Builder;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;

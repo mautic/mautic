@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;

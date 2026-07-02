@@ -658,10 +658,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -760,10 +758,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param Company $company
      * @param array   $config
-     *
-     * @return array|bool
      */
-    public function pushCompany($company, $config = [])
+    public function pushCompany($company, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -912,7 +908,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($this->getAdminUsers() as $adminUser) {
             if ($preventUnreadDuplicates) {
-                /* @var Notification|null $exists */
+                /** @var Notification|null $exists */
                 $notificationTemplate->setUser($adminUser);
 
                 $searchArray = $transformer->transform($notificationTemplate);
@@ -2201,8 +2197,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 )
                 ) {
                     // Get the lead entity
-                    /* @var Lead $leadEntity */
                     foreach ($updateLead as $mauticField => $sfValue) {
+                        /** @var Lead $leadEntity */
                         $leadEntity->addUpdatedField($mauticField, $sfValue);
                     }
 
@@ -2300,10 +2296,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return bool|mixed|string
-     */
-    protected function setContactToSync(&$checkEmailsInSF, $lead)
+    protected function setContactToSync(&$checkEmailsInSF, $lead): false|string
     {
         $key = $this->getSyncKey($lead['email']);
         if (isset($checkEmailsInSF[$key])) {
@@ -2321,7 +2314,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return int
      */
-    protected function getSalesforceSyncLimit($currentContactList, $limit)
+    protected function getSalesforceSyncLimit($currentContactList, $limit): float|int
     {
         return $limit - count($currentContactList);
     }
@@ -2898,8 +2891,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             )
             ) {
                 // Get the company entity
-                /* @var Lead $leadEntity */
                 foreach ($updateCompany as $mauticField => $sfValue) {
+                    /** @var Company $companyEntity */
                     $companyEntity->addUpdatedField($mauticField, $sfValue);
                 }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;

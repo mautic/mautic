@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;

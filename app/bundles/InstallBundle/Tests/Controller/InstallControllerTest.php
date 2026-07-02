@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\InstallBundle\Tests\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;

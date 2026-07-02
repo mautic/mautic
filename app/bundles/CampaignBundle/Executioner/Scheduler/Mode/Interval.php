@@ -275,9 +275,9 @@ class Interval implements ScheduleModeInterface
         $eventId,
         \DateTimeInterface $compareFromDateTime,
     ) {
-        /* @var \DateTime $startTime */
+        /** @var \DateTime $startTime */
         $startTime = clone $startTime;
-        /* @var \DateTime $endTime */
+        /** @var \DateTime $endTime */
         $endTime   = clone $endTime;
 
         if ($endTime < $startTime) {

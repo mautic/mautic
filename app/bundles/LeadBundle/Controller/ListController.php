@@ -954,13 +954,13 @@ class ListController extends FormController
         }
 
         if (!empty($filters)) {
-            if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
+            if (in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('manually_removed', $filters['includeEvents'])) {
+            if (in_array('manually_removed', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('filter_added', $filters['includeEvents'])) {
+            if (in_array('filter_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 0]);
             }
         }

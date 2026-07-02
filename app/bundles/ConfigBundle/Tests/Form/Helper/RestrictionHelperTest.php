@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Form\Helper;
 
 use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformerFactory;

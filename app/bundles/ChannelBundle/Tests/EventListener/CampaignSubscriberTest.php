@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -240,7 +242,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Event|\PHPUnit\Framework\MockObject\MockObject
+     * @return Event&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
     {

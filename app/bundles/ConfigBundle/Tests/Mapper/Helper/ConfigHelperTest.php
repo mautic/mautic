@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
 use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;

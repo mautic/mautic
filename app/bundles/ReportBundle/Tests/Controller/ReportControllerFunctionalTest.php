@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;

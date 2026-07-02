@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -57,7 +59,7 @@ final class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $handler->expects($this->once())
             ->method('getContacts')
             ->willReturnCallback(
-                function (): void {
+                function (): never {
                     throw new NumberNotFoundException('');
                 }
             );

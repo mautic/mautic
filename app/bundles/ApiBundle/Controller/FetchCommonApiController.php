@@ -468,10 +468,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
-                ?
-                $this->prepareEntitiesForView($entities)
-                :
-                $this->prepareEntityResultsToArray($entities);
+            ?
+            $this->prepareEntitiesForView($entities)
+            :
+            $this->prepareEntityResultsToArray($entities);
 
         // Set errors
         if ($idHelper->hasErrors()) {

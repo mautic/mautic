@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Translation\Translator;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;

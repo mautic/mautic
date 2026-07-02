@@ -590,7 +590,7 @@ class Stat
     }
 
     /**
-     * @return ArrayCollection|EmailReply[]
+     * @return ArrayCollection<int, EmailReply>
      */
     public function getReplies()
     {

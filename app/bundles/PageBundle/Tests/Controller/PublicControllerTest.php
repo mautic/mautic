@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
@@ -501,7 +503,7 @@ final class PublicControllerTest extends TestCase
     public function testTrackingActionWithInvalidCt(): void
     {
         $this->pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
-            function (): void {
+            function (): never {
                 throw new InvalidDecodedStringException();
             }
         );

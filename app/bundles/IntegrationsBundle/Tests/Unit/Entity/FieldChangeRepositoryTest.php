@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
