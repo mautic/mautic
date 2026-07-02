@@ -60,7 +60,7 @@ final class FieldFilterHelperTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigFormSyncInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject&ConfigFormSyncInterface
      */
     private function getIntegrationObject(): \PHPUnit\Framework\MockObject\MockObject
     {

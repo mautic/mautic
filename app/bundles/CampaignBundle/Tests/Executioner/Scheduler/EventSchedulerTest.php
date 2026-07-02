@@ -312,7 +312,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $contact                     = new Lead();
         $now                         = new \DateTimeImmutable('now');
 
-        /** @var MockObject|CoreParametersHelper */
+        /** @var MockObject|CoreParametersHelper $coreParamtersHelper */
         $coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
 
         $event->setCampaign($campaign);
