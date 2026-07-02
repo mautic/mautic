@@ -19,7 +19,9 @@ use Psr\Log\LoggerInterface;
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
     private MockObject&LoggerInterface $logger;
+
     private MockObject&PackageModel $packageModel;
+
     private MockObject&ResourceInstallerInterface $resourceInstaller;
 
     private string $packageName;

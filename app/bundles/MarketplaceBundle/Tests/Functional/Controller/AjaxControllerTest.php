@@ -47,6 +47,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
     private MockObject $requestStack;
 
     private MockObject&PackageModel $packageModel;
+
     private MockObject&ResourceInstallerInterface $resourceInstaller;
 
     public function testInstallPackageAction(): void

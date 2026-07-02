@@ -22,12 +22,17 @@ use Symfony\Component\Filesystem\Filesystem;
 final class ResourceInstallerTest extends AbstractMauticTestCase
 {
     private MockObject&Connection $marketplaceConnection;
+
     private MockObject&ClientInterface $httpClient;
+
     private MockObject&PathsHelper $pathsHelper;
+
     private MockObject&EventDispatcherInterface $dispatcher;
+
     private MockObject&LoggerInterface $logger;
 
     private string $tmpRoot;
+
     private string $importDir;
 
     private ResourceInstaller $installer;
