@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Symfony\Contracts\EventDispatcher\Event;
 
-final class CompanySegmentFilteringEvent extends CommonEvent
+final class CompanySegmentFilteringEvent extends Event
 {
     private bool $isFilteringDone;
 
@@ -21,9 +20,7 @@ final class CompanySegmentFilteringEvent extends CommonEvent
         private ContactSegmentFilterCrate $details,
         private string $alias,
         private QueryBuilder $queryBuilder,
-        EntityManagerInterface $entityManager,
     ) {
-        $this->em              = $entityManager;
         $this->isFilteringDone = false;
         $this->subQuery        = '';
         $preTableName          = '';
@@ -53,11 +50,6 @@ final class CompanySegmentFilteringEvent extends CommonEvent
         }
 
         return $detailsList['operator'];
-    }
-
-    public function getEntityManager(): EntityManagerInterface
-    {
-        return $this->em;
     }
 
     public function getQueryBuilder(): QueryBuilder

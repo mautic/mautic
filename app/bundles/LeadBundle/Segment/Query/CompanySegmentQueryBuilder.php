@@ -333,7 +333,7 @@ final class CompanySegmentQueryBuilder
         }
 
         $alias = $this->generateRandomParameterName();
-        $event = new CompanySegmentFilteringEvent($filter->contactSegmentFilterCrate, $alias, $queryBuilder, $this->entityManager);
+        $event = new CompanySegmentFilteringEvent($filter->contactSegmentFilterCrate, $alias, $queryBuilder);
         $this->dispatcher->dispatch($event);
         if ($event->isFilteringDone()) {
             $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());

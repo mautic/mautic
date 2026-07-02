@@ -449,7 +449,7 @@ class CompanySegmentModel extends FormModel
                 $operatorsForFieldType[$type] = $this->typeOperatorProvider->getOperatorsForFieldType($type);
             }
 
-            $event = new CompanySegmentFiltersChoicesEvent([], $operatorsForFieldType, $this->translator, $this->requestStack->getCurrentRequest());
+            $event = new CompanySegmentFiltersChoicesEvent([], $operatorsForFieldType, $this->requestStack->getCurrentRequest());
             $this->dispatcher->dispatch($event);
             $choices = $event->getChoices();
         }

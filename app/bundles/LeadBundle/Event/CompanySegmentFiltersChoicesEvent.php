@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\AbstractCustomRequestEvent;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
 {
@@ -17,7 +16,6 @@ final class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
     public function __construct(
         private array $choices,
         private array $operators,
-        protected TranslatorInterface $translator,
         ?Request $request = null,
         private string $search = '',
     ) {
@@ -38,11 +36,6 @@ final class CompanySegmentFiltersChoicesEvent extends AbstractCustomRequestEvent
     public function getOperators(): array
     {
         return $this->operators;
-    }
-
-    public function getTranslator(): TranslatorInterface
-    {
-        return $this->translator;
     }
 
     public function getSearch(): string
