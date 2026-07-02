@@ -798,7 +798,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Persist an array of entities.
      *
-     * @param array<T>|ArrayCollection<int, T> $entities
+     * @template TObject of object
+     * @param TObject[]|ArrayCollection<int, TObject> $entities
      */
     public function saveEntities($entities): void
     {
