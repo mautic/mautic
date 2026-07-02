@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PreUpdateChecksStep implements StepInterface
+final readonly class PreUpdateChecksStep implements StepInterface
 {
     public function __construct(
         private TranslatorInterface $translator,

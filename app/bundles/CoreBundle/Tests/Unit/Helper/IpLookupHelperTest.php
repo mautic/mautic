@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use DeviceDetector\DeviceDetector;
@@ -12,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(IpLookupHelper::class)]
-class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
+final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector
@@ -209,7 +211,7 @@ class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory->expects($this->any())
             ->method('create')
             ->willReturnCallback(
-                fn () => $this->deviceDetector
+                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
             );
 
         $helper = new IpLookupHelper($requestStack, $mockEm, $mockCoreParametersHelper, $this->deviceDetectorFactory);

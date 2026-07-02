@@ -12,8 +12,8 @@ use Mautic\PageBundle\Entity\Page;
 class EmailDefaultsHelper
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-        private EntityManagerInterface $entityManager,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

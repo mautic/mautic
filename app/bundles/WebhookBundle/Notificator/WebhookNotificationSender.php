@@ -19,13 +19,13 @@ use Twig\Environment;
 class WebhookNotificationSender
 {
     public function __construct(
-        private Environment $twig,
-        private NotificationModel $notificationModel,
-        private EntityManager $entityManager,
-        private MailHelper $mailer,
-        private CoreParametersHelper $coreParametersHelper,
-        private UserRepository $userRepository,
-        private EventDispatcherInterface $dispatcher,
+        private readonly Environment $twig,
+        private readonly NotificationModel $notificationModel,
+        private readonly EntityManager $entityManager,
+        private readonly MailHelper $mailer,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly UserRepository $userRepository,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -110,7 +110,7 @@ class WebhookNotificationSender
                 $this->mailer->setCc([$ccToUser->getEmail()]);
             }
         } else {
-            $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));
+            $emailAddresses = array_map(trim(...), explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));
             $this->mailer->setTo($emailAddresses);
         }
 

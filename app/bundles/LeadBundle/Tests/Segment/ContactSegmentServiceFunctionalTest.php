@@ -27,17 +27,14 @@ use PHPUnit\Framework\Assert;
 /**
  * These tests cover same tests like \Mautic\LeadBundle\Tests\Model\ListModelFunctionalTest.
  */
-class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
+final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @var ReferenceRepository
      */
     private $fixtures;
 
-    /**
-     * @var ContactSegmentService
-     */
-    private $contactSegmentService;
+    private ContactSegmentService $contactSegmentService;
 
     protected function setUp(): void
     {

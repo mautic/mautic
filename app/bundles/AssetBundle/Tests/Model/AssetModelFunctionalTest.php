@@ -9,7 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class AssetModelFunctionalTest extends MauticMysqlTestCase
+final class AssetModelFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {

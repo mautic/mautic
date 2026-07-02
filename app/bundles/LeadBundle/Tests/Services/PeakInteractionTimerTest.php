@@ -30,7 +30,7 @@ class TestablePeakInteractionTimer extends PeakInteractionTimer
     }
 }
 
-class PeakInteractionTimerTest extends TestCase
+final class PeakInteractionTimerTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
@@ -55,12 +55,18 @@ class PeakInteractionTimerTest extends TestCase
     private MockObject $cacheProviderMock;
 
     private string $defaultTimezone                       = 'UTC';
+
     private int $peakInteractionTimerCacheTimeout         = 43800;
+
     private int $peakInteractionTimerBestDefaultHourStart = 9;
+
     private int $peakInteractionTimerBestDefaultHourEnd   = 12;
+
     /** @var int[] */
     private array $peakInteractionTimerBestDefaultDays        = [2, 1, 4];
+
     private string $peakInteractionTimerFetchInteractionsFrom = '-60 days';
+
     private int $peakInteractionTimerFetchLimit               = 50;
 
     protected function setUp(): void

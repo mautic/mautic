@@ -29,11 +29,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SmsModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&CacheStorageHelper
-     */
-    private \PHPUnit\Framework\MockObject\Stub $cacheStorageHelper;
-
     private MockObject&EntityManagerInterface $entityManger;
 
     private \PHPUnit\Framework\MockObject\Stub&LeadModel $leadModel;
@@ -63,8 +58,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         $this->pageTrackableModel   = $this->createStub(TrackableModel::class);
         $this->leadModel            = $this->createStub(LeadModel::class);
         $this->transport            = $this->createMock(TransportChain::class);
-        /** @phpstan-ignore classConstant.deprecatedClass */
-        $this->cacheStorageHelper   = $this->createStub(CacheStorageHelper::class);
         $this->entityManger         = $this->createMock(EntityManagerInterface::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
@@ -79,7 +72,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             $this->pageTrackableModel,
             $this->leadModel,
             $this->transport,
-            $this->cacheStorageHelper,
+            $this->createStub(CacheStorageHelper::class),
             $this->entityManger,
             $this->security,
             $this->dispatcher,
@@ -169,7 +162,7 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
                 $this->pageTrackableModel,
                 $this->leadModel,
                 $this->transport,
-                $this->cacheStorageHelper,
+                $this->createStub(CacheStorageHelper::class),
                 $this->entityManger,
                 $this->security,
                 $this->dispatcher,
@@ -200,11 +193,11 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
         if ($isMMS) {
             $this->transport->expects($this->once())
                 ->method('sendMMS')
-                ->willReturnCallback(fn (RecipientCollection $recipientCollection) => $this->setRecipientResult($recipientCollection));
+                ->willReturnCallback(fn (RecipientCollection $recipientCollection): RecipientCollection => $this->setRecipientResult($recipientCollection));
         } else {
             $this->transport->expects($this->once())
                 ->method('sendBatchSms')
-                ->willReturnCallback(fn (RecipientCollection $recipientCollection) => $this->setRecipientResult($recipientCollection));
+                ->willReturnCallback(fn (RecipientCollection $recipientCollection): RecipientCollection => $this->setRecipientResult($recipientCollection));
         }
 
         $results = $smsModel->sendSms($sms, [$lead1, $lead2], ['channel' => ['campaign.event', 1]]);

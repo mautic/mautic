@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Service;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -12,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag as SymfonyFlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FlashBagTest extends TestCase
+final class FlashBagTest extends TestCase
 {
     /**
      * @var MockObject&SymfonyFlashBag

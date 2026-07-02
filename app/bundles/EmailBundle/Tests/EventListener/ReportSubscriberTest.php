@@ -28,9 +28,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     use MockedConnectionTrait;
+
     /**
      * @var MockObject|Connection
      */

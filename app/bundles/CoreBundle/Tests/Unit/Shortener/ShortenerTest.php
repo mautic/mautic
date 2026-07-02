@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ShortenerTest extends TestCase
+final class ShortenerTest extends TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper

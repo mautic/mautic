@@ -18,13 +18,18 @@ use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MigrationCommandSubscriberTest extends TestCase
+final class MigrationCommandSubscriberTest extends TestCase
 {
     private MockObject&GeneratedColumnsProviderInterface $generatedColumnsProvider;
+
     private MockObject&Connection $connection;
+
     private ConsoleTerminateEvent $event;
+
     private MockObject&Command $command;
+
     private MockObject&MySQLSchemaManager $schemaManager;
+
     private MigrationCommandSubscriber $subscriber;
 
     /**

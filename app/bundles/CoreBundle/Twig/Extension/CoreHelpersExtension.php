@@ -16,7 +16,7 @@ use Twig\TwigFunction;
 class CoreHelpersExtension extends AbstractExtension
 {
     public function __construct(
-        private TranslatorInterface $translate,
+        private readonly TranslatorInterface $translate,
     ) {
     }
 

@@ -6,15 +6,15 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 
 class ContactLimiter
 {
-    private int $batchLimit;
+    private readonly int $batchLimit;
 
-    private ?int $contactId;
+    private readonly ?int $contactId;
 
-    private ?int $minContactId;
+    private readonly ?int $minContactId;
 
     private ?int $batchMinContactId = null;
 
-    private ?int $maxContactId;
+    private readonly ?int $maxContactId;
 
     private ?int $threadId = null;
 
@@ -41,7 +41,7 @@ class ContactLimiter
         $contactId = null,
         $minContactId = null,
         $maxContactId = null,
-        private array $contactIdList = [],
+        private readonly array $contactIdList = [],
         $threadId = null,
         $maxThreads = null,
         $campaignLimit = null,
@@ -149,11 +149,9 @@ class ContactLimiter
     }
 
     /**
-     * @return int
-     *
      * @throws \Exception
      */
-    public function getCampaignLimitRemaining()
+    public function getCampaignLimitRemaining(): int
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
@@ -47,7 +49,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-class SubmissionModelTest extends \PHPUnit\Framework\TestCase
+final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&IpLookupHelper
@@ -184,7 +186,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $contactMerger                    = $this->createMock(ContactMerger::class);
         $userRepository                   = $this->createMock(UserRepository::class);
 
-        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
+        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
             Submission::class => $this->submissioRepository,
             Lead::class       => $this->leadRepository,
             User::class       => $userRepository,
@@ -531,7 +533,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         }
 
         fclose($handle);
-        $result = array_map(fn ($line): array => CsvHelper::strGetCsv($line), file($tmpFile));
+        $result = array_map(fn (string $line): array => CsvHelper::strGetCsv($line), file($tmpFile));
 
         $this->assertCount(1, $result);
         $this->assertSame($header, $result[0]);

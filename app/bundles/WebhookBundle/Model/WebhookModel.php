@@ -128,7 +128,7 @@ class WebhookModel extends FormModel
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         protected SerializerInterface $serializer,
-        private Client $httpClient,
+        private readonly Client $httpClient,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -136,7 +136,7 @@ class WebhookModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private WebhookService $webhookService,
+        private readonly WebhookService $webhookService,
     ) {
         $this->setConfigProps($coreParametersHelper);
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -441,7 +441,7 @@ class WebhookModel extends FormModel
      * @param string $note
      *                           $runtime variable unit is in seconds
      */
-    public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null): void
+    public function addLog(Webhook $webhook, $statusCode, $runtime, ?string $note = null): void
     {
         if (!$webhook->getId()) {
             return;

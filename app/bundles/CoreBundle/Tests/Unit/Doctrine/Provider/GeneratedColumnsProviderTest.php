@@ -25,10 +25,7 @@ final class GeneratedColumnsProviderTest extends TestCase
      */
     private MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {
@@ -76,7 +73,6 @@ final class GeneratedColumnsProviderTest extends TestCase
         $generatedColumns = $this->provider->getGeneratedColumns();
         $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
 
-        /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $generatedColumns->current();
         $this->assertSame(MAUTIC_TABLE_PREFIX.'page_hits', $generatedColumn->getTableName());
 

@@ -55,10 +55,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function __construct(
         protected ListModel $leadListModel,
         protected FormModel $formModel,
-        private EventCollector $eventCollector,
-        private MembershipBuilder $membershipBuilder,
-        private ContactTracker $contactTracker,
-        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private readonly EventCollector $eventCollector,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly ContactTracker $contactTracker,
+        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -222,7 +222,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return null;
     }
 
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
+    /**
+     * @param mixed[] $deletedEvents
+     */
+    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -366,11 +369,9 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $persist
-     *
-     * @return array
+     * @return mixed[]
      */
-    public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
+    public function setCanvasSettings(Campaign $entity, $settings, bool $persist = true, $events = null)
     {
         if (null === $events) {
             $events = $entity->getEvents();

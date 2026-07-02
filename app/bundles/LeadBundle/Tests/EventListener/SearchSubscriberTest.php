@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -21,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SearchSubscriberTest extends TestCase
+final class SearchSubscriberTest extends TestCase
 {
     use MockedConnectionTrait;
 

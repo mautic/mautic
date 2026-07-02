@@ -37,7 +37,7 @@ class AssetApiController extends CommonApiController
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
         RequestStack $requestStack,
-        private CoreParametersHelper $parametersHelper,
+        private readonly CoreParametersHelper $parametersHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,

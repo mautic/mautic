@@ -10,7 +10,7 @@ use Twig\TwigFunction;
 
 final class ThemesExtension extends AbstractExtension
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
+    public function __construct(private readonly CoreParametersHelper $coreParametersHelper)
     {
     }
 

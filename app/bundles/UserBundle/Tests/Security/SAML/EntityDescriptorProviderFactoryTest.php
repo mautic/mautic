@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class EntityDescriptorProviderFactoryTest extends TestCase
+final class EntityDescriptorProviderFactoryTest extends TestCase
 {
     public function testBuild(): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Year;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -10,7 +12,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearLast;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateYearLast::class)]
-class DateYearLastTest extends \PHPUnit\Framework\TestCase
+final class DateYearLastTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
     {

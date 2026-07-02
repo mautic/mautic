@@ -30,7 +30,7 @@ class ResultsPaginator
      * @param string $salesforceBaseUrl
      */
     public function __construct(
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         private $salesforceBaseUrl,
     ) {
     }

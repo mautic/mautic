@@ -25,14 +25,17 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerTest extends MauticMysqlTestCase
+final class CampaignControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
 
     private Lead $contactOne;
+
     private Lead $contactTwo;
+
     private Lead $contactThree;
+
     private Campaign $campaign;
 
     /**

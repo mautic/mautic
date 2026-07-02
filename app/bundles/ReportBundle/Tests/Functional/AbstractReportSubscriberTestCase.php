@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
 {
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     /**
@@ -57,7 +58,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         // remove row numbers
-        $resultReportTable = array_map(function ($subArray): array {
+        $resultReportTable = array_map(function (array $subArray): array {
             array_shift($subArray);
 
             return $subArray;

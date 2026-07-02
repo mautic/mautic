@@ -25,7 +25,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\Integration
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 use PHPUnit\Framework\TestCase;
 
-class IntegrationSyncProcessTest extends TestCase
+final class IntegrationSyncProcessTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
@@ -49,15 +49,9 @@ class IntegrationSyncProcessTest extends TestCase
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
 
-    /**
-     * @var InputOptionsDAO
-     */
-    private $inputOptionsDAO;
+    private InputOptionsDAO $inputOptionsDAO;
 
-    /**
-     * @var IntegrationSyncProcess
-     */
-    private $integrationSyncProcess;
+    private IntegrationSyncProcess $integrationSyncProcess;
 
     protected function setUp(): void
     {

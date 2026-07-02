@@ -19,9 +19,10 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
-class TriggerCampaignCommandTest extends AbstractCampaignCommand
+final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;
+
     private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
 
     protected function setUp(): void

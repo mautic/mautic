@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
@@ -8,7 +10,7 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxContainer;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ConfigAccessor::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(MailboxContainer::class)]
-class MailboxContainerTest extends \PHPUnit\Framework\TestCase
+final class MailboxContainerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, string> */
     protected array $config = [

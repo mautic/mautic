@@ -16,8 +16,8 @@ use Twig\TwigFunction;
 final class OverrideIncludeExtension extends AbstractExtension
 {
     public function __construct(
-        private EventDispatcherInterface $eventDispatcher,
-        private RequestStack $requestStack,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

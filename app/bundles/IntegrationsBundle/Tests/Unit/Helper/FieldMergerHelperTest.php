@@ -12,7 +12,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldMergerHelperTest extends TestCase
+final class FieldMergerHelperTest extends TestCase
 {
     public function testNonExistingFieldsAreRemoved(): void
     {

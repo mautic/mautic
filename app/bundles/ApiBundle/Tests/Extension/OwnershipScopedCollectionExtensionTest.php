@@ -19,7 +19,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class OwnershipScopedCollectionExtensionTest extends TestCase
 {
     private Security&MockObject $security;
+
     private EntityManagerInterface&MockObject $entityManager;
+
     private OwnershipScopedCollectionExtension $extension;
 
     protected function setUp(): void

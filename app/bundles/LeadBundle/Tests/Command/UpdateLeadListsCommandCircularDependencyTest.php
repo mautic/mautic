@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\UpdateLeadListsCommand;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTestCase
+final class UpdateLeadListsCommandCircularDependencyTest extends MauticMysqlTestCase
 {
     /**
      * @var LeadList[]

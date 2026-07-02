@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use PHPUnit\Framework\TestCase;
 
-class RememberMeTest extends TestCase
+final class RememberMeTest extends TestCase
 {
     public function testPersistentRemembermeKey(): void
     {

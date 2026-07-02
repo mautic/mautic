@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -13,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CommonRepository::class)]
-class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
+final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&CommonRepository<object>

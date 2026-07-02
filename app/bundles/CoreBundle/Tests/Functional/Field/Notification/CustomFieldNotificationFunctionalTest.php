@@ -12,11 +12,14 @@ use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
+final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private TranslatorInterface $translator;
+
     private CustomFieldNotification $notifier;
+
     private LeadField $leadField;
 
     protected function setUp(): void

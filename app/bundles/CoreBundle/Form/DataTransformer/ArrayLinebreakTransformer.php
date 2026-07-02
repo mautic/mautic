@@ -38,6 +38,6 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
             return [];
         }
 
-        return array_map('trim', explode("\n", $string));
+        return array_map(trim(...), explode("\n", $string));
     }
 }

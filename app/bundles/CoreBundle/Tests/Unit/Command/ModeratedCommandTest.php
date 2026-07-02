@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -14,9 +16,10 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Lock\LockInterface;
 
-class ModeratedCommandTest extends TestCase
+final class ModeratedCommandTest extends TestCase
 {
     private string $lockFilePath;
+
     /**
      * @var MockObject&CoreParametersHelper
      */

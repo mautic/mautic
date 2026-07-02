@@ -24,15 +24,19 @@ final class DynamicFiltersTypeTest extends TestCase
      * @var MockObject&FormBuilderInterface
      */
     private MockObject $formBuilder;
+
     /**
      * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
+
     /**
      * @var MockObject&Report
      */
     private MockObject $report;
+
     private \stdClass $filterDefinitions;
+
     private DynamicFiltersType $dynamicFiltersType;
 
     protected function setUp(): void
@@ -218,7 +222,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 ButtonGroupType::class,
-                $this->callback(fn (array $args) => 0 === $args['data'])
+                $this->callback(fn (array $args): bool => 0 === $args['data'])
             );
 
         $this->dynamicFiltersType->buildForm($this->formBuilder, $this->getBasicOptions());
@@ -310,7 +314,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 ChoiceType::class,
-                $this->callback(fn (array $args) => $args['choices'] === ['Option 1' => 'option1', 'Option 2' => 'option2'])
+                $this->callback(fn (array $args): bool => $args['choices'] === ['Option 1' => 'option1', 'Option 2' => 'option2'])
             );
 
         $this->dynamicFiltersType->buildForm($this->formBuilder, $this->getBasicOptions());
@@ -333,7 +337,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 ChoiceType::class,
-                $this->callback(fn (array $args) => true === $args['multiple']
+                $this->callback(fn (array $args): bool => true === $args['multiple']
                        && $args['choices'] === ['Option 1' => 'option1', 'Option 2' => 'option2'])
             );
 
@@ -352,7 +356,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 ButtonGroupType::class,
-                $this->callback(fn (array $args) => true === $args['data'])
+                $this->callback(fn (array $args): bool => true === $args['data'])
             );
 
         $this->dynamicFiltersType->buildForm($this->formBuilder, $this->getOptionsWithData(['test_alias' => 1]));
@@ -370,7 +374,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 TextType::class,
-                $this->callback(fn (array $args) => 'Test Label (Equals)' === $args['label'])
+                $this->callback(fn (array $args): bool => 'Test Label (Equals)' === $args['label'])
             );
 
         $this->dynamicFiltersType->buildForm($this->formBuilder, $this->getBasicOptions());
@@ -388,7 +392,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 TextType::class,
-                $this->callback(fn (array $args) => 'Test Label (Equals)' === $args['label'])
+                $this->callback(fn (array $args): bool => 'Test Label (Equals)' === $args['label'])
             );
 
         $this->dynamicFiltersType->buildForm($this->formBuilder, $this->getBasicOptions());
@@ -406,7 +410,7 @@ final class DynamicFiltersTypeTest extends TestCase
             ->with(
                 'test_alias',
                 TextType::class,
-                $this->callback(fn (array $args) => 'Test Label' === $args['label'])
+                $this->callback(fn (array $args): bool => 'Test Label' === $args['label'])
             );
 
         $this->dynamicFiltersType->buildForm($this->formBuilder, $this->getBasicOptions());

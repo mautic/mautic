@@ -8,20 +8,18 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictParamRector;
-// use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictNewArrayRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedCallRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
-use Rector\TypeDeclaration\Rector\Closure\ClosureReturnTypeRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 
-$extendableControllers = [
+$extendableClasses = [
     __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
     __DIR__.'/app/bundles/CoreBundle/Controller/CommonController.php',
     __DIR__.'/app/bundles/CoreBundle/Controller/FormController.php',
+    __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
+    __DIR__.'/app/bundles/CoreBundle/Model/FormModel.php',
 ];
 
 return RectorConfig::configure()
@@ -34,11 +32,8 @@ return RectorConfig::configure()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
-        AddParamTypeFromPropertyTypeRector::class,
-        ClosureReturnTypeRector::class,
 
         TypedPropertyFromAssignsRector::class,
-        ReturnTypeFromStrictParamRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
@@ -48,6 +43,22 @@ return RectorConfig::configure()
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(27)
     ->withSkip([
+        UnserializeToSerializerDecodeRector::class => [
+            // tests
+            __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+
+        Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
+            __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
+        ],
+
+        Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
+        // modified with reflection
+        Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
+            __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
+        ],
+
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
@@ -55,8 +66,6 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\Concat\JoinStringConcatRector::class,
 
         Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
-        '*/Test/*',
-        '*/Tests/*',
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -74,10 +83,10 @@ return RectorConfig::configure()
 
         // designed to be overriden by 3rd party, adding return type will break BC
         Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictScalarReturnsRector::class => [
-            ...$extendableControllers,
+            ...$extendableClasses,
         ],
         ReturnTypeFromStrictTypedCallRector::class => [
-            ...$extendableControllers,
+            ...$extendableClasses,
         ],
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
@@ -91,7 +100,7 @@ return RectorConfig::configure()
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnNullableTypeRector::class => [
             __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
             // can be overriden, BC
-            ...$extendableControllers,
+            ...$extendableClasses,
         ],
 
         TypedPropertyFromAssignsRector::class => [

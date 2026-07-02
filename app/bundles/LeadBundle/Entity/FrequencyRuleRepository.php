@@ -167,8 +167,6 @@ class FrequencyRuleRepository extends CommonRepository
      * @param string $statTable
      * @param string $statContactColumn
      * @param string $statSentColumn
-     *
-     * @return array
      */
     private function getDefaultFrequencyRuleViolations(
         array $leadIds,
@@ -177,7 +175,7 @@ class FrequencyRuleRepository extends CommonRepository
         $statTable,
         $statContactColumn,
         $statSentColumn,
-    ) {
+    ): array {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->select("ch.$statContactColumn")

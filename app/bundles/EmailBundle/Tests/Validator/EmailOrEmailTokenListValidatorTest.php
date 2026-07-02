@@ -57,7 +57,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             {
             }
 
-            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+            public function getEntityByAlias($alias, $categoryAlias = null, $lang = null): ?object
             {
                 throw new \RuntimeException('Field should not be fetched in single value mode test');
             }
@@ -74,11 +74,8 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         Assert::assertSame(1, $context->violationCount);
     }
 
-    /**
-     * @param mixed $value
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
-    public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
+    public function testNoEmailsProvided(?string $value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
     {
         $context = new class extends ExecutionContext {
             /**
@@ -158,10 +155,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             null,
             0,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
-            function (): void {
+            function (): never {
                 self::fail('Null value should not be validated.');
             },
         ];
@@ -170,10 +167,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             '',
             0,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
-            function (): void {
+            function (): never {
                 self::fail('Empty string value should not be validated.');
             },
         ];
@@ -182,7 +179,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'somestring',
             1,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
             function ($message, array $parameters = []): void {
@@ -201,10 +198,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com',
             0,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
-            function (): void {
+            function (): never {
                 self::fail('Valid email address value should not add violation.');
             },
         ];
@@ -213,7 +210,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, somestring',
             1,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
             function ($message, array $parameters = []): void {
@@ -231,7 +228,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield | invalid-default-email-address}',
             1,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
             function ($message, array $parameters = []): void {
@@ -305,7 +302,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
                 return $field;
             },
-            function (): void {
+            function (): never {
                 self::fail('There is no violation');
             },
         ];

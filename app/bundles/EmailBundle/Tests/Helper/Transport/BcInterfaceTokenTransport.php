@@ -14,27 +14,24 @@ class BcInterfaceTokenTransport implements TransportInterface
     /**
      * @var array<string, mixed>
      */
-    private $transports = []; // @phpstan-ignore-line
+    private array $transports = []; // @phpstan-ignore-line
 
     /**
      * @var string[]
      */
-    private $fromAddresses = [];
+    private array $fromAddresses = [];
 
     /**
      * @var string[]
      */
-    private $fromNames = [];
+    private array $fromNames = [];
 
     /**
      * @var mixed[]
      */
     private array $metadatas = [];
 
-    /**
-     * @var RawMessage
-     */
-    private $message;
+    private ?RawMessage $message = null;
 
     public function __construct()
     {
