@@ -24,8 +24,8 @@ return (new PhpCsFixer\Config())
         '@Symfony'               => true,
         'binary_operator_spaces' => [
             'operators' => [
-                '=>' => 'align',
-                '='  => 'align',
+                '=>' => null,
+                '='  => null,
             ],
         ],
         'phpdoc_to_comment' => false,

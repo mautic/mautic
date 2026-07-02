@@ -46,7 +46,7 @@ class NoteApiController extends CommonApiController
     }
 
     /**
-     * @param LeadNote             &$entity
+     * @param LeadNote             $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

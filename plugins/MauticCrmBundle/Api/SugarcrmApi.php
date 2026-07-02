@@ -296,8 +296,7 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param $object
-     *                TODO 7.x
+     *                TODO 7.x.
      *
      * @return array|mixed|string
      */
