@@ -126,7 +126,7 @@ class FormApiController extends CommonApiController
     }
 
     /**
-     * @param Form                 &$entity
+     * @param Form                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

@@ -59,7 +59,7 @@ final class ReplyHelperTest extends \PHPUnit\Framework\TestCase
         $handler->expects($this->once())
             ->method('getContacts')
             ->willReturnCallback(
-                function (): void {
+                function (): never {
                     throw new NumberNotFoundException('');
                 }
             );
