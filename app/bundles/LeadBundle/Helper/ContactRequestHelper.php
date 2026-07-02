@@ -118,7 +118,7 @@ class ContactRequestHelper
         } catch (ContactNotFoundException) {
         }
 
-        /* @var Lead $foundContact */
+        /** @var Lead $foundContact */
         if (!empty($this->queryFields)) {
             [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,

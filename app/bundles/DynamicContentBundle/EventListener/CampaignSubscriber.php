@@ -115,7 +115,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
-        /* @var CacheItemInterface $item */
+        /** @var CacheItemInterface $item */
         $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
         $slot = $item->get();
 

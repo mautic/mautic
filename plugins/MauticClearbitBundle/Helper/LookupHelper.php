@@ -41,7 +41,7 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Person $clearbit */
+        /** @var Clearbit_Person $clearbit */
         if ($clearbit = $this->getClearbit()) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
@@ -80,7 +80,7 @@ class LookupHelper
             return;
         }
 
-        /* @var Clearbit_Company $clearbit */
+        /** @var Clearbit_Company $clearbit */
         if ($clearbit = $this->getClearbit(false)) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
@@ -88,7 +88,7 @@ class LookupHelper
                     [$cacheId, $webhookId, $cache]     = $this->getCache($company, $notify);
 
                     if (isset($parse['host']) && !array_key_exists($cacheId, $cache['clearbit'])) {
-                        /* @var Router $router */
+                        /** @var Router $router */
                         $clearbit->setWebhookId($webhookId);
                         $res = $clearbit->lookupByDomain($parse['host']);
                         // Prevent from filling up the cache

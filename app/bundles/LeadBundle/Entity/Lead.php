@@ -1881,7 +1881,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             $frequencyRules = $rules;
         }
 
-        /* @var FrequencyRule $rule */
+        /** @var FrequencyRule $rule */
         usort(
             $frequencyRules,
             function (array $a, array $b): int {

@@ -74,7 +74,7 @@ class TrackingHelper
         $cacheKey   = $this->getCacheKey();
         $cacheValue = [];
 
-        /* @var CacheItemInterface $item */
+        /** @var CacheItemInterface $item */
         if (null !== $cacheKey) {
             $item = $this->cache->getItem($cacheKey);
             if ($item->isHit()) {

@@ -372,8 +372,8 @@ class DynamicContentController extends FormController
             $this->throwAccessDenied();
         }
 
-        /* @var DynamicContent $parent */
-        /* @var DynamicContent[] $children */
+        /** @var DynamicContent $parent */
+        /** @var DynamicContent[] $children */
         [$translationParent, $translationChildren] = $entity->getTranslations();
 
         // Audit Log
