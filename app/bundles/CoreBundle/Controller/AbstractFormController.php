@@ -214,7 +214,7 @@ abstract class AbstractFormController extends CommonController
     /**
      * generate $postActionVars with respect to available referer.
      *
-     * @return array $postActionVars
+     * @return array
      */
     protected function refererPostActionVars($vars)
     {

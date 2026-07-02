@@ -117,10 +117,8 @@ class Widget extends FormEntity
 
     /**
      * Set name.
-     *
-     * @param string $name
      */
-    public function setName($name): static
+    public function setName(string $name): static
     {
         $this->name = InputHelper::string($name);
         $this->isChanged('name', $this->name);
@@ -140,10 +138,8 @@ class Widget extends FormEntity
 
     /**
      * Set type.
-     *
-     * @param string $type
      */
-    public function setType($type): static
+    public function setType(string $type): static
     {
         $this->type = InputHelper::string($type);
         $this->isChanged('type', $this->type);
@@ -256,7 +252,7 @@ class Widget extends FormEntity
     /**
      * Get params.
      *
-     * @return array $params
+     * @return array
      */
     public function getParams()
     {
@@ -300,7 +296,7 @@ class Widget extends FormEntity
     /**
      * Get template data.
      *
-     * @return array $templateData
+     * @return array
      */
     public function getTemplateData()
     {
