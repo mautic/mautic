@@ -411,6 +411,22 @@ final class TrackableModelTest extends TestCase
         $this->assertTrue(str_contains($content, $url), $content);
     }
 
+    public function testMalformedUrlDoesNotCrashTrackingParsing(): void
+    {
+        $url   = '://example.com';
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables);
+        $this->assertStringContainsString($url, $content);
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a token used in place of a URL is not parsed')]
     public function testTokenAsHostIsConvertedToTrackableToken(?bool $useMap): void

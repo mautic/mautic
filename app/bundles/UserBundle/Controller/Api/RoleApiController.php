@@ -43,7 +43,7 @@ class RoleApiController extends CommonApiController
     }
 
     /**
-     * @param Role                 &$entity
+     * @param Role                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

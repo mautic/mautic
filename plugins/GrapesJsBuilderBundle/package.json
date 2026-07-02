@@ -26,8 +26,7 @@
     "prettier-check": "node_modules/.bin/prettier -c Assets/library/js/",
     "start-helloWorld": "parcel Demo/helloWorld/index.html",
     "start-mautic-full": "cp -r Demo/data dist && parcel Demo/mautic/full.html",
-    "start-mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html",
-    "update-mautic-preset": "rm -r node_modules/grapesjs-preset-mautic && npm install mautic/grapesjs-preset-mautic#main"
+    "start-mautic": "cp -r Demo/data dist && parcel Demo/mautic/index.html"
   },
   "repository": {
     "type": "git",
@@ -77,7 +76,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "grapesjs-preset-mautic": "github:mautic/grapesjs-preset-mautic#7.x",
     "parcel": "^2.11.0",
     "prettier": "^2.5.1",
     "process": "^0.11.10",

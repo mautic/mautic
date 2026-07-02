@@ -503,7 +503,7 @@ final class PublicControllerTest extends TestCase
     public function testTrackingActionWithInvalidCt(): void
     {
         $this->pageModel->expects($this->once())->method('hitPage')->willReturnCallback(
-            function (): void {
+            function (): never {
                 throw new InvalidDecodedStringException();
             }
         );
