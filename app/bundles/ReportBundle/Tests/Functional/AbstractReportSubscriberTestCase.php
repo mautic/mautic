@@ -58,7 +58,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         // remove row numbers
-        $resultReportTable = array_map(function ($subArray): array {
+        $resultReportTable = array_map(function (array $subArray): array {
             array_shift($subArray);
 
             return $subArray;

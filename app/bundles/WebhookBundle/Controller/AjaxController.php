@@ -145,7 +145,7 @@ class AjaxController extends CommonAjaxController
      * Iterate through the paths and get the json payloads
      *
      * @param  $paths array
-     * @return $payload array
+     * @return array
      */
     /**
      * @return mixed[]

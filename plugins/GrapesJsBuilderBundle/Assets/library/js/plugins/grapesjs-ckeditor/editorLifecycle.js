@@ -1266,8 +1266,8 @@ export const editorLifecycleMixin = {
             createHtmlElem('style', item.parentNode, {
               innerHTML:
                 `.ck-toolbar {border-bottom-width: 1px !important;}` +
-                `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;} 
-                         .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `,
+                `.ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable) {border: none !important;box-shadow: none !important;}` +
+                ` .ck.ck-dropdown .ck-dropdown__panel.ck-dropdown__panel-visible { max-height: 200px; overflow-y: auto; } `,
             });
             break;
           }

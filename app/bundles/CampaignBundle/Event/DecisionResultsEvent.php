@@ -26,7 +26,7 @@ class DecisionResultsEvent extends Event
     }
 
     /**
-     * @return ArrayCollection|LeadEventLog[]
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getLogs(): ArrayCollection
     {
