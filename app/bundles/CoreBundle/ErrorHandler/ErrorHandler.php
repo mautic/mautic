@@ -154,13 +154,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return false;
         }
 
-        /**
-         * @param bool $returnContent
-         * @param bool $inTemplate
-         *
-         * @return bool|string|void
-         */
-        public function handleException($exception, $returnContent = false, $inTemplate = false): false|array|string
+        public function handleException($exception, bool $returnContent = false, bool $inTemplate = false): false|string
         {
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
@@ -396,11 +390,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         /**
          * @param mixed[] $error
-         * @param bool    $inTemplate
-         *
-         * @return mixed|string
          */
-        private function generateResponse($error, $inTemplate = false): string|false|array
+        private function generateResponse(array $error, bool $inTemplate = false): string|false
         {
             // Get a trace
             if ('dev' == self::$environment) {
