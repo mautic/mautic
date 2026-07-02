@@ -882,7 +882,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId): void
+    public function saveCampaignMembers($allCampaignMembers, IntegrationObject $campaignMemberObject, $campaignId): void
     {
         if (empty($allCampaignMembers)) {
             return;

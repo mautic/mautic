@@ -1105,9 +1105,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
