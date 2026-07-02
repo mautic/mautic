@@ -175,7 +175,7 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * @param Campaign             &$entity
+     * @param Campaign             $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
