@@ -5,25 +5,25 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanySegmentController extends AbstractStandardFormController
+final class CompanySegmentController extends AbstractStandardFormController
 {
     public const SESSION_KEY            = 'company_segments';
 
     private const PERMISSION_EDIT_OTHER = ':editother';
 
-    public function indexAction(CompanySegmentModel $model, Request $request, int $page = 1): Response
+    public function indexAction(CompanySegmentModel $model, Request $request, CorePermissions $security, int $page = 1): Response
     {
         $repository = $model->getRepository();
 
         // set some permissions
-        \assert(null !== $this->security);
-        $permissions = $this->security->isGranted(
+        $permissions = $security->isGranted(
             [
                 'lead:leads:viewown',
                 'lead:leads:viewother',
@@ -116,7 +116,7 @@ class CompanySegmentController extends AbstractStandardFormController
             'page'            => $page,
             'limit'           => $limit,
             'permissions'     => $permissions,
-            'security'        => $this->security,
+            'security'        => $security,
             'tmpl'            => $tmpl,
             'currentUser'     => $this->user,
             'searchValue'     => $search,
@@ -167,18 +167,16 @@ class CompanySegmentController extends AbstractStandardFormController
         return $this->viewStandard($request, $objectId, null, null, null, 'segment');
     }
 
-    public function cloneAction(CompanySegmentModel $model, Request $request, int $objectId, bool $ignorePost = false): Response
+    public function cloneAction(CompanySegmentModel $model, Request $request, CorePermissions $security, int $objectId, bool $ignorePost = false): Response
     {
-        \assert(null !== $this->security);
-
         $segment = $model->getEntity($objectId);
         $page    = $request->getSession()->get('mautic.'.$this->getSessionBase().'.page', 1);
 
-        if (!$segment instanceof CompanySegment || null === $segment->getId()) {
+        if (null === $segment?->getId()) {
             return $this->notFoundRedirect($page, $objectId);
         }
 
-        if (!$this->security->hasEntityAccess(
+        if (!$security->hasEntityAccess(
             true, $this->getPermissionBase().self::PERMISSION_EDIT_OTHER, $segment->getCreatedBy()
         )) {
             $this->throwAccessDenied();

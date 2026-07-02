@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -10,7 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BatchCompanySegmentController extends AbstractFormController
+final class BatchCompanySegmentController extends AbstractFormController
 {
     public function setAction(CompanySegmentActionModel $segmentActionModel, Request $request): JsonResponse
     {

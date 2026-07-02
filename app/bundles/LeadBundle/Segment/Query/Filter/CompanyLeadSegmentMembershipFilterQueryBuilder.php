@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * This filter checks if any of the company's primary contacts are members of specified lead segments.
  */
-class CompanyLeadSegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder implements EventSubscriberInterface
+final class CompanyLeadSegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder implements EventSubscriberInterface
 {
     public static function getServiceId(): string
     {

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Command\UpdateSegmentsCommand;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class UpdateSegmentsCommandCircularDependencyTest extends MauticMysqlTestCase
+final class UpdateSegmentsCommandCircularDependencyTest extends MauticMysqlTestCase
 {
     public function testLeadSegmentCircularDependencyDetection(): void
     {

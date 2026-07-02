@@ -30,7 +30,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use LeadFieldTestTrait;

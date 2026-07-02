@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Segment\Query\CompanySegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Psr\Log\LoggerInterface;
 
-class CompanySegmentService
+final class CompanySegmentService
 {
     use CompanyBatchLimiterTrait;
 

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSegmentRebuildService
+final class LeadSegmentRebuildService
 {
     public function __construct(
         private ListModel $listModel,

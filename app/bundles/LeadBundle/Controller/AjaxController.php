@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CampaignBundle\Membership\MembershipManager;
@@ -36,7 +38,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
     use SegmentFilterIconTrait;

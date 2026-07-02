@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Event\CompanySegmentChangeEvent;
 use PHPUnit\Framework\TestCase;
 
-class CompanySegmentChangeEventTest extends TestCase
+final class CompanySegmentChangeEventTest extends TestCase
 {
     public function testGetCompanyReturnsCompany(): void
     {

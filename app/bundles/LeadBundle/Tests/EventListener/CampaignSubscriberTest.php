@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,7 +29,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, mixed>

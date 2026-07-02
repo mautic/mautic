@@ -90,7 +90,7 @@ final class CompanySegmentApiController extends CommonApiController
 
         $this->model->removeCompany($company, [$entity], true);
 
-        $view = $this->view(['success' => 1], Response::HTTP_OK);
+        $view = $this->view([], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -124,7 +124,7 @@ final class CompanySegmentApiController extends CommonApiController
 
         $this->model->addCompany($company, [$entity], true);
 
-        $view = $this->view(['success' => 1], Response::HTTP_OK);
+        $view = $this->view([], Response::HTTP_OK);
 
         return $this->handleView($view);
     }
@@ -169,7 +169,7 @@ final class CompanySegmentApiController extends CommonApiController
             }
         }
 
-        $view = $this->view(['success' => 1, 'details' => $responseDetail], Response::HTTP_OK);
+        $view = $this->view(['details' => $responseDetail], Response::HTTP_OK);
 
         return $this->handleView($view);
     }

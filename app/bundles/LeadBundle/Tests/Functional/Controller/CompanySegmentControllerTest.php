@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanySegmentControllerTest extends MauticMysqlTestCase
+final class CompanySegmentControllerTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

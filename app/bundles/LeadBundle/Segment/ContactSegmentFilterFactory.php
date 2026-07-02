@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ContactSegmentFilterFactory
+final class ContactSegmentFilterFactory
 {
     public const CUSTOM_OPERATOR = 'custom_operator';
 

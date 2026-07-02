@@ -24,7 +24,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Performance: Uses simple joins on the materialized company_segments_companies table instead of recursive subqueries.
  * The company_segments_companies table is populated by the UpdateCompanySegmentsCommand.
  */
-class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder implements EventSubscriberInterface
+final class CompanySegmentMembershipFilterQueryBuilder extends BaseFilterQueryBuilder implements EventSubscriberInterface
 {
     public static function getServiceId(): string
     {

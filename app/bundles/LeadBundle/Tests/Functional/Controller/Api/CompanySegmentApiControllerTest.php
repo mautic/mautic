@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Functional\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -10,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanySegmentApiControllerTest extends MauticMysqlTestCase
+final class CompanySegmentApiControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
@@ -210,8 +212,6 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($data);
-        self::assertArrayHasKey('success', $data);
-        self::assertSame(1, $data['success']);
 
         // Verify the company was actually added to the segment
         $segmentCompanyRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\SegmentCompany::class);
@@ -239,8 +239,6 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
         self::assertNotFalse($this->client->getResponse()->getContent());
         $data = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($data);
-        self::assertArrayHasKey('success', $data);
-        self::assertSame(1, $data['success']);
 
         // Verify the company was marked as manually removed
         $this->em->clear();
@@ -272,8 +270,6 @@ class CompanySegmentApiControllerTest extends MauticMysqlTestCase
         self::assertNotFalse($this->client->getResponse()->getContent());
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         self::assertIsArray($responseData);
-        self::assertArrayHasKey('success', $responseData);
-        self::assertSame(1, $responseData['success']);
         self::assertArrayHasKey('details', $responseData);
         self::assertIsArray($responseData['details']);
         self::assertArrayHasKey($company1->getId(), $responseData['details']);

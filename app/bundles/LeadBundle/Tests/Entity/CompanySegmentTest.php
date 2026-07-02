@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\LeadBundle\Entity\CompanySegment;
 use PHPUnit\Framework\TestCase;
 
-class CompanySegmentTest extends TestCase
+final class CompanySegmentTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provideEmptyFields')]
     public function testEntitySetsPublicNameAndAliasIfNameIsSet(?string $alias, ?string $publicName): void

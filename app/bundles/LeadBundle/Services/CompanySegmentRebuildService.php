@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Service to handle company segment dependency resolution and rebuilding.
  */
-class CompanySegmentRebuildService
+final class CompanySegmentRebuildService
 {
     public function __construct(
         private CompanySegmentModel $companySegmentModel,

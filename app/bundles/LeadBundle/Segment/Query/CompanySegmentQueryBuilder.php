@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CompanySegmentQueryBuilder
+final class CompanySegmentQueryBuilder
 {
     use CompanyBatchLimiterTrait;
 

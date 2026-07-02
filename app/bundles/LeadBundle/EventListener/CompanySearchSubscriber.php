@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CompanySearchSubscriber implements EventSubscriberInterface
+final class CompanySearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TranslatorInterface $translator,

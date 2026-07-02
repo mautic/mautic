@@ -8,7 +8,7 @@ use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Psr\Cache\InvalidArgumentException;
 
-class CompanySegmentCountCacheHelper
+final class CompanySegmentCountCacheHelper
 {
     public function __construct(
         private CacheProviderInterface $cacheProvider,

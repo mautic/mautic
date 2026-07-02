@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -24,7 +26,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     description: 'Update contacts in smart segments and companies in company segments based on new data.',
     aliases: ['mautic:segments:rebuild']
 )]
-class UpdateSegmentsCommand extends ModeratedCommand
+final class UpdateSegmentsCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:segments:update';
 

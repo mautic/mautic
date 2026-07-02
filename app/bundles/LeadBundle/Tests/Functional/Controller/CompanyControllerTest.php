@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -8,7 +10,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class CompanyControllerTest extends MauticMysqlTestCase
+final class CompanyControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

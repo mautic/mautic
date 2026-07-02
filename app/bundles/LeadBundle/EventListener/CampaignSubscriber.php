@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -52,7 +54,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
@@ -854,7 +856,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    protected function getFields(Lead $lead): array
+    private function getFields(Lead $lead): array
     {
         if (!$this->fields) {
             $contactFields = $lead->getFields(true);

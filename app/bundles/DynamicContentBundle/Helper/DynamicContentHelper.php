@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DynamicContentBundle\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
@@ -14,7 +16,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DynamicContentHelper
+final class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
