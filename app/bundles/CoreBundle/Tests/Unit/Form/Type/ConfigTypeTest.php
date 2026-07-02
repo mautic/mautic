@@ -131,7 +131,9 @@ final class ConfigTypeTest extends TypeTestCase
         return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
     }
 
-    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    /**
+     * @return array<int, PreloadedExtension|ValidatorExtension>
+     */
     protected function getExtensions(): array
     {
         $validator = Validation::createValidator();

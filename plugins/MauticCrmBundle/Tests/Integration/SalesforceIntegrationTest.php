@@ -29,41 +29,57 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
 
-    /** @var array<string, int> */
+    /**
+     * @var array<string, int>
+     */
     protected array $maxInvocations = [];
 
     protected ?string $specialSfCase = null;
 
-    /** @var array<int, mixed> */
+    /**
+     * @var array<int, mixed>
+     */
     protected array $persistedIntegrationEntities = [];
 
-    /** @var array<int, mixed> */
+    /**
+     * @var array<int, mixed>
+     */
     protected array $returnedSfEntities = [];
 
-    /** @var array<int|string, mixed> */
+    /**
+     * @var array<int|string, mixed>
+     */
     protected array $mauticContacts = [
         'Contact' => [],
         'Lead'    => [],
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfObjects = [
         'Lead',
         'Contact',
         'company',
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfMockMethods = [
         'makeRequest',
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfMockResetMethods = [
         'makeRequest',
     ];
 
-    /** @var list<string> */
+    /**
+     * @var list<string>
+     */
     protected array $sfMockResetObjects = [
         'Lead',
         'Contact',
@@ -72,7 +88,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     protected int $idCounter = 1;
 
-    /** @var array<string, int> */
+    /**
+     * @var array<string, int>
+     */
     protected array $leadsUpdatedCounter = [
         'Lead'    => 0,
         'Contact' => 0,
@@ -1339,7 +1357,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         return $entities;
     }
 
-    /** @return array<int, mixed> */
+    /**
+     * @return array<int, mixed>
+     */
     protected function getReturnedSfEntities(): array
     {
         $entities                 = $this->returnedSfEntities;
@@ -1348,7 +1368,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         return $entities;
     }
 
-    /** @return array<int|string, mixed> */
+    /**
+     * @return array<int|string, mixed>
+     */
     protected function getMauticContacts(): array
     {
         $contacts             = $this->mauticContacts;
@@ -1373,7 +1395,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
      *
      * @throws \ReflectionException
      */
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     private static function getParentPrivateProperties(mixed $instance): array
     {
         $reflectionClass       = new \ReflectionClass($instance::class);
