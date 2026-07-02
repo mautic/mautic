@@ -21,15 +21,15 @@ use PHPUnit\Framework\TestCase;
 final class DoctrineEventSubscriberTest extends TestCase
 {
     /*
-     * @var \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&EntityManagerInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $entityManager;
+    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $connection          = $this->createStub(Connection::class);
 
         // Default to MySQL platform for backward compatibility with existing tests
