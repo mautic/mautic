@@ -252,7 +252,7 @@ class Widget extends FormEntity
     /**
      * Get params.
      *
-     * @return array $params
+     * @return array
      */
     public function getParams()
     {
@@ -296,7 +296,7 @@ class Widget extends FormEntity
     /**
      * Get template data.
      *
-     * @return array $templateData
+     * @return array
      */
     public function getTemplateData()
     {
