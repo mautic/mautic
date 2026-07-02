@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
+use Psr\Http\Client\ClientExceptionInterface;
 
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
@@ -67,8 +68,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
             $data = $this->client->get($package, [
                 RequestOptions::ALLOW_REDIRECTS => true,
             ]);
-        } catch (\Exception $exception) {
+        } catch (ClientExceptionInterface $exception) {
             $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
+
+            return false;
         }
 
         $tempTarget        = $this->cacheDir.'/'.basename($package);
@@ -135,6 +138,10 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                 case 'zip' == $tempExt:
                     file_put_contents($tempTarget, $data->getBody());
 
+                    if ('' !== $localTargetExt) {
+                        $localTarget = dirname($localTarget);
+                    }
+
                     $zipper = new \ZipArchive();
 
                     $zipper->open($tempTarget);
@@ -143,13 +150,52 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
                     @unlink($tempTarget);
                     break;
             }
-        } catch (\Exception $exception) {
-            error_log($exception);
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to fetch remote IP data: '.$exception->getMessage());
 
             $success = false;
         }
 
         return $success;
+    }
+
+    public static function cleanUrl(string $url): string
+    {
+        $urlParts = parse_url($url);
+
+        if (!is_array($urlParts) || !isset($urlParts['scheme'], $urlParts['host'])) {
+            return $url;
+        }
+
+        // Skip user:pass authentication.
+        $url = $urlParts['scheme'].'://'.$urlParts['host'];
+
+        if (isset($urlParts['port'])) {
+            $url .= ':'.$urlParts['port'];
+        }
+
+        if (isset($urlParts['path'])) {
+            $url .= $urlParts['path'];
+        }
+
+        if (isset($urlParts['query'])) {
+            $query = [];
+            parse_str($urlParts['query'], $query);
+
+            foreach (['user', 'username', 'pwd', 'pass', 'password'] as $sensitiveField) {
+                if (isset($query[$sensitiveField])) {
+                    unset($query[$sensitiveField]);
+                }
+            }
+
+            $url .= '?'.http_build_query($query);
+        }
+
+        if (!isset($urlParts['fragment'])) {
+            return $url;
+        }
+
+        return $url.('#'.$urlParts['fragment']);
     }
 
     /**
