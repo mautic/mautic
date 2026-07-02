@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,12 +22,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormSubscriberTest extends TestCase
+final class FormSubscriberTest extends TestCase
 {
     private FormSubscriber $subscriber;
 
     /**
-     * @var MailHelper&MockObject
+     * @var MockObject&MailHelper
      */
     private MockObject $mailer;
 
@@ -426,7 +428,7 @@ New line',
         $matcher = self::exactly(3);
 
         $this->mailer->expects($matcher)
-            ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail) {
+            ->method('setTo')->willReturnCallback(function (...$parameters) use ($matcher, $to, $leadEmail, $ownerEmail): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([$to => null], $parameters[0]);
                 }

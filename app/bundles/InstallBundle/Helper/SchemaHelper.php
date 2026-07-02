@@ -315,9 +315,9 @@ class SchemaHelper
     }
 
     /**
-     * @return mixed|string
+     * @return mixed[]|string
      */
-    protected function generateBackupName($prefix, $backupPrefix, $name)
+    protected function generateBackupName($prefix, $backupPrefix, $name): string|array
     {
         if (empty($prefix) || !str_contains($name, $prefix)) {
             return $backupPrefix.$name;

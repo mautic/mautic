@@ -125,7 +125,7 @@ class DoctrineEventsSubscriber
             foreach ($table->getIndexes() as $id => $index) {
                 $index_first_column = $this->trimQuotes(strtolower($index->getColumns()[0]));
 
-                if (!$index->isPrimary() && 1 == count($index->getColumns()) && $index_first_column === $pk_first_column) {
+                if (!$index->isPrimary() && 1 === count($index->getColumns()) && $index_first_column === $pk_first_column) {
                     $table->dropIndex($id);
                 }
             }

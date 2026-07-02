@@ -37,10 +37,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
         private $mainLogger;
 
-        /**
-         * @var string
-         */
-        private static $root;
+        private static string|false $root;
 
         public function __construct()
         {
@@ -235,9 +232,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @return array
+         * @return false|mixed[]
          */
-        public static function prepareExceptionForOutput($exception)
+        public static function prepareExceptionForOutput($exception): false|array
         {
             $inline             = null;
             $logMessage         = null;
@@ -510,7 +507,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 ]);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
-                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn () => realpath(__DIR__.'/../../../../')));
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn (): string|false => realpath(__DIR__.'/../../../../')));
 
                 if ($loader->exists('custom_offline.html.twig')) {
                     $content = $twig->render('custom_offline.html.twig', ['error' => $error]);

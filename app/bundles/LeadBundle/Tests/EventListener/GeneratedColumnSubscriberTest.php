@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -16,12 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GeneratedColumnSubscriberTest extends TestCase
+final class GeneratedColumnSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface
      */
-    private $translator;
+    private \Mautic\CoreBundle\Translation\Translator|MockObject $translator;
 
     private GeneratedColumnSubscriber $generatedColumnSubscriber;
 
@@ -50,7 +49,6 @@ class GeneratedColumnSubscriberTest extends TestCase
 
         $this->generatedColumnSubscriber->onGeneratedColumnsBuild($event);
 
-        /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $event->getGeneratedColumns()->current();
 
         Assert::assertSame(MAUTIC_TABLE_PREFIX.'leads', $generatedColumn->getTableName());

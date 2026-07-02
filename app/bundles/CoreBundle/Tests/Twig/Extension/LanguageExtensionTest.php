@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Extension\LanguageExtension;
@@ -7,7 +9,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class LanguageExtensionTest extends TestCase
+final class LanguageExtensionTest extends TestCase
 {
     public function testGetLanguageNameReturnsEnglishForEn(): void
     {

@@ -17,27 +17,37 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class BuilderSubscriberTest extends MauticMysqlTestCase
+final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     // Custom preference center page
     public const CUSTOM_SEGMENT_SELECTOR           = '.pref-segmentlist input';
+
     public const CUSTOM_CATEGORY_SELECTOR          = '.pref-categorylist input';
+
     public const CUSTOM_PREFERRED_CHANNEL_SELECTOR = '.pref-preferredchannel select';
+
     public const CUSTOM_CHANNEL_FREQ_SELECTOR      = '.pref-channelfrequency div[data-contact-frequency="1"]';
+
     public const CUSTOM_SAVE_BUTTON_SELECTOR       = '.prefs-saveprefs button.btn-save';
 
     // Default preference center page
     public const DEFAULT_SEGMENT_SELECTOR           = '#contact-segments';
+
     public const DEFAULT_CATEGORY_SELECTOR          = '#global-categories';
+
     public const DEFAULT_PREFERRED_CHANNEL_SELECTOR = '#preferred_channel';
+
     public const DEFAULT_CHANNEL_FREQ_SELECTOR      = '[data-contact-frequency="1"]';
+
     public const DEFAULT_PAUSE_DATES_SELECTOR       = '[data-contact-pause-dates="1"]';
+
     public const DEFAULT_SAVE_BUTTON_SELECTOR       = '#lead_contact_frequency_rules_buttons_save';
 
     // Common to both custom and default
     public const TOKEN_SELECTOR = '#lead_contact_frequency_rules__token';
+
     public const FORM_SELECTOR  = 'form[name="lead_contact_frequency_rules"]';
 
     protected function setUp(): void

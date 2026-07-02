@@ -17,10 +17,10 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChang
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
 
@@ -171,10 +171,7 @@ class ObjectChangeGeneratorTest extends TestCase
         return $mappingManual;
     }
 
-    /**
-     * @param bool $includeFirstNameField
-     */
-    private function getInternalSyncReport($includeFirstNameField = true): ReportDAO
+    private function getInternalSyncReport(bool $includeFirstNameField = true): ReportDAO
     {
         $syncReport           = new ReportDAO(MauticSyncDataExchange::NAME);
         $internalReportObject = new ReportObjectDAO(Contact::NAME, 1);

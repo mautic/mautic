@@ -67,7 +67,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         IntegrationEntityModel $integrationEntityModel,
         FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
         protected DoNotContact $doNotContactModel,
-        private UserModel $userModel,
+        private readonly UserModel $userModel,
     ) {
         parent::__construct(
             $eventDispatcher,
@@ -409,7 +409,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getCompanies($params = [], $query = null, $executed = null)
+    public function getCompanies($params = [], $query = null, $executed = null): int|float|null
     {
         $executed = null;
 
@@ -726,7 +726,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $onwerEmailByAssignedUserId = [];
             if ('Leads' == $object || 'Contacts' == $object || 'Accounts' == $object) {
                 foreach ($data[$RECORDS_LIST_NAME] as $record) {
-                    if ('6' == $SUGAR_VERSION) {
+                    if ('6' === $SUGAR_VERSION) {
                         foreach ($record['name_value_list'] as $item) {
                             if ('assigned_user_id' == $item['name'] && $item['value'] && '' != $item['value']) {
                                 $assignedUserIds[] = $item['value'];
@@ -747,7 +747,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             // Get all leads emails
             $checkEmailsInSugar = [];
             if ('Leads' == $object) {
-                if ('6' == $SUGAR_VERSION) {
+                if ('6' === $SUGAR_VERSION) {
                     foreach ($data[$RECORDS_LIST_NAME] as $record) {
                         foreach ($record['name_value_list'] as $item) {
                             if ('email1' == $item['name'] && $item['value'] && '' != $item['value']) {
@@ -766,7 +766,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if (isset($sugarLeads[$RECORDS_LIST_NAME])) {
                     foreach ($sugarLeads[$RECORDS_LIST_NAME] as $record) {
                         $sugarLeadRecord = [];
-                        if ('6' == $SUGAR_VERSION) {
+                        if ('6' === $SUGAR_VERSION) {
                             foreach ($record['name_value_list'] as $item) {
                                 if ('email1' == $item['name'] && $item['value'] && '' != $item['value']) {
                                     $sugarRejectedLeads[] = $item['value'];
@@ -789,7 +789,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 } else {
                     $newName = '__'.$object;
                 }
-                if ('6' == $SUGAR_VERSION) {
+                if ('6' === $SUGAR_VERSION) {
                     foreach ($record['name_value_list'] as $item) {
                         if ($this->checkIfSugarCrmMultiSelectString($item['value'])) {
                             $convertedMultiSelectString         = $this->convertSuiteCrmToMauticMultiSelect($item['value']);
@@ -833,7 +833,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $detachClass           = Lead::class;
                         $company               = null;
                         $this->fetchDncToMautic($entity, $data);
-                        if ($entity && isset($dataObject['account_id'.$newName]) && '' != trim($dataObject['account_id'.$newName])) {
+                        if ($entity && isset($dataObject['account_id'.$newName]) && '' !== trim($dataObject['account_id'.$newName])) {
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
                                     'integration'         => 'Sugarcrm',
@@ -1026,10 +1026,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

@@ -22,25 +22,25 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class AjaxControllerTest extends \PHPUnit\Framework\TestCase
+final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Session
+     * @var MockObject&Session
      */
     private MockObject $sessionMock;
 
     /**
-     * @var MockObject|ModelFactory<EmailModel>
+     * @var MockObject&ModelFactory
      */
     private MockObject $modelFactoryMock;
 
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $modelMock;
 
     /**
-     * @var MockObject|Email
+     * @var MockObject&Email
      */
     private MockObject $emailMock;
 

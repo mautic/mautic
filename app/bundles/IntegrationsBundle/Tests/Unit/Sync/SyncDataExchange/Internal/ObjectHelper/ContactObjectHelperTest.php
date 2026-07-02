@@ -24,35 +24,30 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ContactObjectHelperTest extends TestCase
+final class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel&MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $model;
 
     /**
-     * @var LeadRepository&MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $repository;
 
     /**
-     * @var Connection&MockObject
-     */
-    private MockObject $connection;
-
-    /**
-     * @var DoNotContact&MockObject
+     * @var MockObject&DoNotContact
      */
     private MockObject $doNotContactModel;
 
     /**
-     * @var FieldList&MockObject
+     * @var MockObject&FieldList
      */
     private MockObject $fieldList;
 
     /**
-     * @var FieldsWithUniqueIdentifier&MockObject
+     * @var MockObject&FieldsWithUniqueIdentifier
      */
     private MockObject $fieldsWithUniqueIdentifier;
 
@@ -60,7 +55,6 @@ class ContactObjectHelperTest extends TestCase
     {
         $this->model                      = $this->createMock(LeadModel::class);
         $this->repository                 = $this->createMock(LeadRepository::class);
-        $this->connection                 = $this->createMock(Connection::class);
         $this->doNotContactModel          = $this->createMock(DoNotContact::class);
         $this->fieldList                  = $this->createMock(FieldList::class);
         $this->fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
@@ -360,7 +354,7 @@ class ContactObjectHelperTest extends TestCase
 
     private function getObjectHelper(): ContactObjectHelper
     {
-        return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->doNotContactModel, $this->fieldList, $this->fieldsWithUniqueIdentifier);
+        return new ContactObjectHelper($this->model, $this->repository, $this->createStub(Connection::class), $this->doNotContactModel, $this->fieldList, $this->fieldsWithUniqueIdentifier);
     }
 
     private function assertManipulator(Lead $lead, string $objectName): void

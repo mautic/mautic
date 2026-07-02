@@ -9,7 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class AssetModelFunctionalTest extends MauticMysqlTestCase
+final class AssetModelFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -118,7 +118,7 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
 
         $assetModel = static::getContainer()->get('mautic.asset.model.asset');
         $this->assertInstanceOf(AssetModel::class, $assetModel);
-        $generatedUrl = $assetModel->generateUrl($asset, true, [], null);
+        $generatedUrl = $assetModel->generateUrl($asset, true, []);
         $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
     }
 }

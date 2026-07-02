@@ -30,35 +30,35 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SyncProcessTest extends TestCase
+final class SyncProcessTest extends TestCase
 {
     /**
-     * @var MockObject|MauticSyncDataExchange
+     * @var MockObject&MauticSyncDataExchange
      */
     private MockObject $internalSyncDataExchange;
 
     /**
-     * @var MockObject|SyncDateHelper
+     * @var MockObject&SyncDateHelper
      */
     private MockObject $syncDateHelper;
 
     /**
-     * @var MockObject|IntegrationSyncProcess
+     * @var MockObject&IntegrationSyncProcess
      */
     private MockObject $integrationSyncProcess;
 
     /**
-     * @var MockObject|MauticSyncProcess
+     * @var MockObject&MauticSyncProcess
      */
     private MockObject $mauticSyncProcess;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcher;
 
     /**
-     * @var MockObject|InputOptionsDAO
+     * @var MockObject&InputOptionsDAO
      */
     private MockObject $inputOptionsDAO;
 
@@ -117,7 +117,7 @@ class SyncProcessTest extends TestCase
             ->willReturnOnConsecutiveCalls(true, false);
         $matcher = $this->exactly(2);
         $this->integrationSyncProcess->expects($matcher)
-            ->method('getSyncReport')->willReturnCallback(function (...$parameters) use ($matcher, $integrationSyncReport) {
+            ->method('getSyncReport')->willReturnCallback(function (...$parameters) use ($matcher, $integrationSyncReport): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(1, $parameters[0]);
                 }
@@ -192,7 +192,7 @@ class SyncProcessTest extends TestCase
             ->willReturnOnConsecutiveCalls(true, false);
         $matcher = $this->exactly(2);
         $this->mauticSyncProcess->expects($matcher)
-            ->method('getSyncReport')->willReturnCallback(function (...$parameters) use ($matcher, $internalSyncReport) {
+            ->method('getSyncReport')->willReturnCallback(function (...$parameters) use ($matcher, $internalSyncReport): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(1, $parameters[0]);
                 }

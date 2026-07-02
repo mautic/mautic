@@ -109,6 +109,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Holds max size of uploaded file.
+     *
+     * @var float
      */
     private $maxSize;
 
@@ -809,10 +811,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to the file.
-     *
-     * @return string
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): ?string
     {
         return null === $this->path
             ? null
@@ -821,10 +821,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to temporary file.
-     *
-     * @return string
      */
-    public function getAbsoluteTempPath()
+    public function getAbsoluteTempPath(): ?string
     {
         return null === $this->tempId || null === $this->tempName
             ? null
@@ -833,10 +831,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to temporary file.
-     *
-     * @return string
      */
-    public function getAbsoluteTempDir()
+    public function getAbsoluteTempDir(): ?string
     {
         return null === $this->tempId
             ? null
@@ -873,7 +869,7 @@ class Asset extends FormEntity implements UuidInterface
      * Returns maximal uploadable size in bytes.
      * If not set, 6000000 is default.
      *
-     * @return string
+     * @return float
      */
     protected function getMaxSize()
     {
@@ -887,7 +883,7 @@ class Asset extends FormEntity implements UuidInterface
     /**
      * Set max size.
      *
-     * @param string $maxSize
+     * @param float $maxSize
      */
     public function setMaxSize($maxSize): static
     {
@@ -923,7 +919,7 @@ class Asset extends FormEntity implements UuidInterface
      *
      * @return array<string, float|string|false|null>|string
      */
-    public function getFileInfo()
+    public function getFileInfo(): array|string
     {
         $fileInfo = [];
 
@@ -1282,13 +1278,13 @@ class Asset extends FormEntity implements UuidInterface
     {
         $unit = strtoupper($unit);
 
-        if ((!$unit && $size >= 1 << 30) || 'GB' == $unit || 'G' == $unit) {
+        if ((!$unit && $size >= 1 << 30) || 'GB' === $unit || 'G' === $unit) {
             return [$size / (1 << 30), 'GB'];
         }
-        if ((!$unit && $size >= 1 << 20) || 'MB' == $unit || 'M' == $unit) {
+        if ((!$unit && $size >= 1 << 20) || 'MB' === $unit || 'M' === $unit) {
             return [$size / (1 << 20), 'MB'];
         }
-        if ((!$unit && $size >= 1 << 10) || 'KB' == $unit || 'K' == $unit) {
+        if ((!$unit && $size >= 1 << 10) || 'KB' === $unit || 'K' === $unit) {
             return [$size / (1 << 10), 'KB'];
         }
 

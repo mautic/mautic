@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -10,15 +12,15 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\LeadBundle\Entity\Lead;
 
-class AdderTest extends \PHPUnit\Framework\TestCase
+final class AdderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
 
     /**
-     * @var LeadEventLogRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
 

@@ -43,12 +43,12 @@ class CampaignSubscriber implements EventSubscriberInterface
     protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private NotificationModel $notificationModel,
-        private AbstractNotificationApi $notificationApi,
-        private EventDispatcherInterface $dispatcher,
-        private DoNotContactModel $doNotContact,
-        private TranslatorInterface $translator,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly NotificationModel $notificationModel,
+        private readonly AbstractNotificationApi $notificationApi,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly DoNotContactModel $doNotContact,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

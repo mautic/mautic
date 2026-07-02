@@ -19,9 +19,10 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Assert;
 
-class TriggerCampaignCommandTest extends AbstractCampaignCommand
+final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;
+
     private ?SegmentCountCacheHelper $segmentCountCacheHelper = null;
 
     protected function setUp(): void
@@ -774,7 +775,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         self::assertSame(50, $count);
     }
 
-    /** @return array<string, int> */
+    /**
+     * @return array<string, int>
+     */
     private function getTagCounts(): array
     {
         $tags = $this->db->createQueryBuilder()
@@ -793,7 +796,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         return $tagCounts;
     }
 
-    /** @param array<int, array<string, mixed>> $logs */
+    /**
+     * @param array<int, array<string, mixed>> $logs
+     */
     private function getNonActionPathTakenCount(array $logs): int
     {
         $nonActionCount = 0;

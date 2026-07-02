@@ -232,25 +232,28 @@ class MailHelper
 
     private array $embedImagesReplaces = [];
 
+    /**
+     * @param MailerInterface $mailer @api cannot be readonly as changed in tests via reflection
+     */
     public function __construct(
         private MailerInterface $mailer,
-        private FromEmailHelper $fromEmailHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private Mailbox $mailbox,
-        private LoggerInterface $logger,
-        private MailHashHelper $mailHashHelper,
-        private RouterInterface $router,
-        private Environment $twig,
-        private ThemeHelper $themeHelper,
-        private PathsHelper $pathsHelper,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
-        private EntityManagerInterface $entityManager,
-        private AssetModel $assetModel,
-        private TrackableModel $trackableModel,
-        private RedirectModel $redirectModel,
-        private SMimeHelper $sMimeHelper,
-        private EmailStatModel $emailStatModel,
+        private readonly FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Mailbox $mailbox,
+        private readonly LoggerInterface $logger,
+        private readonly MailHashHelper $mailHashHelper,
+        private readonly RouterInterface $router,
+        private readonly Environment $twig,
+        private readonly ThemeHelper $themeHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AssetModel $assetModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly RedirectModel $redirectModel,
+        private readonly SMimeHelper $sMimeHelper,
+        private readonly EmailStatModel $emailStatModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -1226,7 +1229,7 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                $addresses = array_fill_keys(array_map(trim(...), explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
@@ -1269,7 +1272,7 @@ class MailHelper
         // Set custom headers
         if ($headers = $email->getHeaders()) {
             // HTML decode headers
-            $headers = array_map('html_entity_decode', $headers);
+            $headers = array_map(html_entity_decode(...), $headers);
 
             foreach ($headers as $name => $value) {
                 $this->addCustomHeader($name, $value);
@@ -1347,10 +1350,7 @@ class MailHelper
         return true;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
             $lead    = $this->getLead();
@@ -1815,13 +1815,11 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @return string|null
      */
-    protected function cleanName($name)
+    protected function cleanName(?string $name): ?string
     {
         if (null === $name) {
-            return $name;
+            return null;
         }
 
         $name = trim(html_entity_decode($name, ENT_QUOTES));
@@ -1851,7 +1849,7 @@ class MailHelper
         }
 
         // HTML decode headers
-        $systemHeaders = array_map('html_entity_decode', $systemHeaders);
+        $systemHeaders = array_map(html_entity_decode(...), $systemHeaders);
 
         return $systemHeaders;
     }

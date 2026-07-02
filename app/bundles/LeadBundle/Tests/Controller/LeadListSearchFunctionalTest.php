@@ -21,7 +21,9 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
      */
     protected array $clientOptions = ['debug' => true];
 
-    /** @noinspection SqlResolve */
+    /**
+     * @noinspection SqlResolve
+     */
     public function testSegmentSearch(): void
     {
         // create some leads
@@ -114,7 +116,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $queries = array_map(fn (array $query) => $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']), $queries);
 
         foreach ($expectedQueries as $expectedQuery) {
-            $matchedQueries = array_filter($queries, fn (string $query) => $expectedQuery === $query);
+            $matchedQueries = array_filter($queries, fn (string $query): bool => $expectedQuery === $query);
             Assert::assertCount(1, $matchedQueries, sprintf('The query "%s" was expected to be executed once.', $expectedQuery));
         }
     }
@@ -133,11 +135,9 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lead ...$leads
-     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, ...$leads): LeadList
+    private function createLeadList(string $name, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);

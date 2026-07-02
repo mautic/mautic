@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private MonitoringModel $monitoringModel,
+        private readonly MonitoringModel $monitoringModel,
     ) {
         parent::__construct();
     }
@@ -118,7 +118,7 @@ class MauticSocialMonitoringCommand extends Command
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ('' == $commandName) {
+        if ('' === $commandName) {
             $output->writeln('Matching command not found.');
 
             return 1;

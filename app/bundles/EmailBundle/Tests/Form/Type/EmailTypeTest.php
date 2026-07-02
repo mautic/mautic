@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTypeTest extends \PHPUnit\Framework\TestCase
+final class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&FormBuilderInterface
@@ -28,7 +28,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     private EmailType $form;
 
     /**
-     * @var ThemeHelperInterface&MockObject
+     * @var MockObject&ThemeHelperInterface
      */
     private MockObject $themeHelper;
 
@@ -73,7 +73,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
         $this->formBuilder->method('add')
             ->with(
                 $this->callback(
-                    function ($name) use (&$names) {
+                    function ($name) use (&$names): true {
                         $names[] = $name;
 
                         return true;

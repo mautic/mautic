@@ -14,10 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TriggerController extends FormController
 {
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -191,7 +188,7 @@ class TriggerController extends FormController
         $form->get('sessionId')->setData($sessionId);
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -336,7 +333,7 @@ class TriggerController extends FormController
         $form->get('sessionId')->setData($objectId);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 // set added/updated events

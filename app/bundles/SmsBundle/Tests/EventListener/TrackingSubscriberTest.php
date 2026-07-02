@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -9,10 +11,10 @@ use Mautic\EmailBundle\EventListener\TrackingSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 
-class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|StatRepository
+     * @var \PHPUnit\Framework\MockObject\MockObject&StatRepository
      */
     private \PHPUnit\Framework\MockObject\MockObject $statRepository;
 

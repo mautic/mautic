@@ -14,25 +14,10 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommandTest extends TestCase
+final class CreateCustomFieldCommandTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject $backgroundServiceMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $leadFieldRepositoryMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $pathsHelperMock;
-
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
-
     protected function setUp(): void
     {
-        $this->backgroundServiceMock   = $this->createMock(BackgroundService::class);
-        $this->translatorMock          = $this->createMock(TranslatorInterface::class);
-        $this->leadFieldRepositoryMock = $this->createMock(LeadFieldRepository::class);
-        $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
-        $this->coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('completeRunMethodProvider')]
@@ -40,11 +25,11 @@ class CreateCustomFieldCommandTest extends TestCase
     {
         $command = $this->getMockBuilder(CreateCustomFieldCommand::class)
             ->setConstructorArgs([
-                $this->backgroundServiceMock,
-                $this->translatorMock,
-                $this->leadFieldRepositoryMock,
-                $this->pathsHelperMock,
-                $this->coreParametersHelper,
+                $this->createStub(BackgroundService::class),
+                $this->createStub(TranslatorInterface::class),
+                $this->createStub(LeadFieldRepository::class),
+                $this->createStub(PathsHelper::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['completeRun', 'checkRunStatus'])
             ->getMock();

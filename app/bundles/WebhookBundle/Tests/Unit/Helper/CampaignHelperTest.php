@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +24,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     private MockObject $contact;
 
     /**
-     * @var MockObject|Client
+     * @var MockObject&Client
      */
     private MockObject $client;
 

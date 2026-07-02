@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\Model\ExportHandler;
 
-class ExportHandlerTest extends \PHPUnit\Framework\TestCase
+final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
     public function testHandler(): void
     {

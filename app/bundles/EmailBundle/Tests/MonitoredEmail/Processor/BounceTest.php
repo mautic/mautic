@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -17,7 +19,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
-class BounceTest extends \PHPUnit\Framework\TestCase
+final class BounceTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void
@@ -26,7 +28,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email, $bounceAddress) {
+                function ($email, $bounceAddress): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();
@@ -52,13 +54,13 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
 
@@ -73,7 +75,7 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $contactFinder = $this->createMock(ContactFinder::class);
         $contactFinder->method('find')
             ->willReturnCallback(
-                function ($email, $bounceAddress) {
+                function ($email, $bounceAddress): Result {
                     $stat = new Stat();
 
                     $lead = new Lead();
@@ -99,13 +101,13 @@ class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel = $this->createStub(LeadModel::class);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createStub(Translator::class);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
-        $doNotContact = $this->createMock(DoNotContact::class);
+        $doNotContact = $this->createStub(DoNotContact::class);
 
         $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
 

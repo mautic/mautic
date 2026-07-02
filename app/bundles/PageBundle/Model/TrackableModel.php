@@ -62,7 +62,7 @@ class TrackableModel extends AbstractCommonModel
 
     public function __construct(
         protected RedirectModel $redirectModel,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -302,10 +302,8 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string $content
      * @param string $type    html|text
-     *
-     * @return string
      */
-    protected function prepareContentWithTrackableTokens($content, $type)
+    protected function prepareContentWithTrackableTokens($content, $type): string
     {
         if (empty($content)) {
             return '';
@@ -425,9 +423,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Validate and parse link for tracking.
      *
-     * @return bool|non-empty-array<mixed, mixed>
+     * @return false|array{0: string, 1: string}
      */
-    protected function prepareUrlForTracking(string $url)
+    protected function prepareUrlForTracking(string $url): false|array
     {
         // Ensure it's clean
         $url = trim($url);
@@ -480,7 +478,11 @@ class TrackableModel extends AbstractCommonModel
             }
         } else {
             // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
+            try {
+                $trackableUrl = $this->httpBuildUrl($urlParts);
+            } catch (\InvalidArgumentException) {
+                return false;
+            }
 
             if ($this->isInDoNotTrack($trackableUrl)) {
                 return false;
@@ -553,7 +555,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        return !($forceScheme && !isset($urlParts['scheme'])) && !(isset($urlParts['scheme']) && !in_array(
+        return (!$forceScheme || isset($urlParts['scheme'])) && (!isset($urlParts['scheme']) || in_array(
             $urlParts['scheme'],
             ['http', 'https', 'ftp', 'ftps', 'mailto']
         ));
@@ -652,10 +654,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Build query string while accounting for tokens that include an equal sign.
-     *
-     * @return mixed|string
      */
-    protected function httpBuildQuery(array $queryParts)
+    protected function httpBuildQuery(array $queryParts): ?string
     {
         $query = http_build_query($queryParts);
 

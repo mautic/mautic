@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -24,7 +26,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReplyTest extends \PHPUnit\Framework\TestCase
+final class ReplyTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&StatRepository
@@ -97,7 +99,7 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
 
         $this->contactFinder->method('findByHash')
             ->willReturnCallback(
-                function ($hash) {
+                function ($hash): Result {
                     $stat = new Stat();
                     $stat->setTrackingHash($hash);
 
@@ -147,7 +149,7 @@ BODY;
     {
         $trackingHash = '@Stat#';
         $stat         = $this->createMock(Stat::class);
-        $contact      = $this->createMock(Lead::class);
+        $contact      = $this->createStub(Lead::class);
 
         $this->statRepo->expects($this->once())
             ->method('findOneBy')
@@ -172,7 +174,7 @@ BODY;
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat) {
+            ->with($this->callback(function (EmailReply $emailReply) use ($stat): true {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
 

@@ -8,13 +8,8 @@ class UrlHelper
 {
     /**
      * Append query string to URL.
-     *
-     * @param string $url
-     * @param string $appendQueryString
-     *
-     * @return string
      */
-    public static function appendQueryToUrl($url, $appendQueryString)
+    public static function appendQueryToUrl(string $url, string $appendQueryString): string
     {
         $query     = parse_url($url, PHP_URL_QUERY);
 
@@ -282,7 +277,7 @@ class UrlHelper
     {
         $path = parse_url($url, PHP_URL_PATH);
         if (null !== $path) {
-            $encodedPath = array_map('urlencode', explode('/', $path));
+            $encodedPath = array_map(urlencode(...), explode('/', $path));
             $url         = str_replace($path, implode('/', $encodedPath), $url);
         }
 

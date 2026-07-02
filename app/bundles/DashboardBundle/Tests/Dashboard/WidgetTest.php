@@ -15,22 +15,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class WidgetTest extends TestCase
+final class WidgetTest extends TestCase
 {
     private const USER_ID = 1;
 
     /**
-     * @var DashboardModel&MockObject
+     * @var MockObject&DashboardModel
      */
     private MockObject $dashboardModel;
 
     /**
-     * @var UserHelper&MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelper;
 
     /**
-     * @var User&MockObject
+     * @var MockObject&User
      */
     private MockObject $user;
 

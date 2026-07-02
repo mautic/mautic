@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
@@ -13,32 +15,22 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LanguageHelperTest extends TestCase
+final class LanguageHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
     /**
-     * @var Logger&MockObject
-     */
-    private MockObject $logger;
-
-    /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Client&MockObject
+     * @var MockObject&Client
      */
     private MockObject $client;
-
-    /**
-     * @var TranslatorInterface&MockObject
-     */
-    private MockObject $translator;
 
     private string $translationsPath;
 
@@ -46,10 +38,8 @@ class LanguageHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->logger               = $this->createMock(Logger::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->client               = $this->createMock(Client::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
 
         $this->translationsPath = __DIR__.'/resource/language';
         $this->tmpPath          = $this->translationsPath.'/tmp';
@@ -156,6 +146,6 @@ class LanguageHelperTest extends TestCase
 
     private function getHelper(): LanguageHelper
     {
-        return new LanguageHelper($this->pathsHelper, $this->logger, $this->coreParametersHelper, $this->client, $this->translator);
+        return new LanguageHelper($this->pathsHelper, $this->createStub(Logger::class), $this->coreParametersHelper, $this->client, $this->createStub(TranslatorInterface::class));
     }
 }

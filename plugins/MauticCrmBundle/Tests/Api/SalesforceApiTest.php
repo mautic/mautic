@@ -13,7 +13,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(SalesforceApi::class)]
-class SalesforceApiTest extends \PHPUnit\Framework\TestCase
+final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a locked record request is retried up to 3 times')]
     public function testRecordLockedErrorIsRetriedThreeTimes(): void
@@ -421,7 +421,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
             ->with('Lead')
             ->willReturn(['firstname', 'lastname', 'HasOptedOutOfEmail']);
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createStub(TranslatorInterface::class);
 
         $integration->method('getTranslator')->willReturn($translator);
 
@@ -486,7 +486,7 @@ class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 
         $integration->expects($this->never())->method('upsertUnreadAdminsNotification');
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createStub(EntityManager::class);
 
         $entity = $this
             ->getMockBuilder(Integration::class)

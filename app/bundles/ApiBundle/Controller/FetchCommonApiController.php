@@ -274,7 +274,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Adds the repository alias to the column name if it doesn't exist.
      *
-     * @return string $column name with alias prefix
+     * @return string column name with alias prefix
      */
     protected function addAliasIfNotPresent(string $columns, string $alias): string
     {
@@ -468,10 +468,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
-                ?
-                $this->prepareEntitiesForView($entities)
-                :
-                $this->prepareEntityResultsToArray($entities);
+            ?
+            $this->prepareEntitiesForView($entities)
+            :
+            $this->prepareEntityResultsToArray($entities);
 
         // Set errors
         if ($idHelper->hasErrors()) {

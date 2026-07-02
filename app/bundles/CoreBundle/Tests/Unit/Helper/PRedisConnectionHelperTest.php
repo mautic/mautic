@@ -15,7 +15,7 @@ use Predis\Connection\Cluster\PredisCluster;
 use Predis\Connection\Cluster\RedisCluster;
 use Predis\Connection\Replication\SentinelReplication;
 
-class PRedisConnectionHelperTest extends TestCase
+final class PRedisConnectionHelperTest extends TestCase
 {
     public function testEndpointsArrayInput(): void
     {

@@ -16,7 +16,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExcelExporterTest extends TestCase
+final class ExcelExporterTest extends TestCase
 {
     private ExcelExporter $excelExporter;
 
@@ -36,7 +36,7 @@ class ExcelExporterTest extends TestCase
             'F j, Y',
             'g:i a',
             $translator,
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $formatterHelper  = new FormatterHelper($dateHelperMock, $translator);

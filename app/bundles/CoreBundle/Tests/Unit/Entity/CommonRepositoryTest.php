@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
 use Doctrine\DBAL\Connection;
@@ -13,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CommonRepository::class)]
-class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
+final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&CommonRepository<object>
@@ -23,7 +25,7 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
     private QueryBuilder $qb;
 
     /**
-     * @var MockObject|Connection
+     * @var MockObject&Connection
      */
     private MockObject $connectionMock;
 
@@ -347,7 +349,9 @@ class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
     }
 
-    /** @param array<int, mixed> $args */
+    /**
+     * @param array<int, mixed> $args
+     */
     private function callBuildWhereClauseFromArray(\Doctrine\DBAL\Query\QueryBuilder $qb, array $args): mixed
     {
         $reflection = new \ReflectionClass(CommonRepository::class);

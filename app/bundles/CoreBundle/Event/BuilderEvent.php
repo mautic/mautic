@@ -27,7 +27,7 @@ class BuilderEvent extends Event
     ) {
         $this->tokenFilterTarget = (str_starts_with($tokenFilter, '{@')) ? 'label' : 'token';
         $this->tokenFilterText   = str_replace(['{@', '{', '}'], '', $tokenFilter);
-        $this->tokenFilter       = ('label' == $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
+        $this->tokenFilter       = ('label' === $this->tokenFilterTarget) ? $this->tokenFilterText : str_replace('{@', '{', $tokenFilter);
     }
 
     /**
@@ -145,7 +145,7 @@ class BuilderEvent extends Event
     public function tokensRequested($tokenKeys = null): bool
     {
         if ($requested = $this->getRequested('tokens')) {
-            if (!empty($this->tokenFilter) && 'token' == $this->tokenFilterTarget) {
+            if (!empty($this->tokenFilter) && 'token' === $this->tokenFilterTarget) {
                 if (!is_array($tokenKeys)) {
                     $tokenKeys = [$tokenKeys];
                 }
@@ -193,7 +193,7 @@ class BuilderEvent extends Event
             return $tokens;
         }
 
-        if ('label' == $this->tokenFilterTarget) {
+        if ('label' === $this->tokenFilterTarget) {
             // Do a search against the label
             $tokens = array_filter(
                 $tokens,
@@ -250,7 +250,7 @@ class BuilderEvent extends Event
     {
         return $tokenHelper->getTokens(
             $tokens,
-            'label' == $this->tokenFilterTarget ? $this->tokenFilterText : '',
+            'label' === $this->tokenFilterTarget ? $this->tokenFilterText : '',
             $labelColumn,
             $valueColumn
         );

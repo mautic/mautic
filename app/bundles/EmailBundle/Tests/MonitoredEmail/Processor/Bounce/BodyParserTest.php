@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -9,7 +11,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(BodyParser::class)]
-class BodyParserTest extends \PHPUnit\Framework\TestCase
+final class BodyParserTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a BouncedEmail is returned from a bounce detected in the body')]
     public function testBouncedEmailIsReturnedFromParsedBody(): void

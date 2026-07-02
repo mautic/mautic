@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -15,10 +17,10 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CookieHelper::class)]
-class CookieHelperTest extends TestCase
+final class CookieHelperTest extends TestCase
 {
     /**
-     * @var RequestStack&MockObject
+     * @var MockObject&RequestStack
      */
     private MockObject $requestStackMock;
 
@@ -51,10 +53,10 @@ class CookieHelperTest extends TestCase
                 Assert::assertStringContainsString('secure', (string) $cookie);
             });
 
-        $response          = $this->createMock(Response::class);
+        $response          = $this->createStub(Response::class);
         $response->headers = $headers;
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createMock(Request::class);
+        $request           = $this->createStub(Request::class);
 
         $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
@@ -82,10 +84,10 @@ class CookieHelperTest extends TestCase
                 Assert::assertStringNotContainsString('secure', (string) $cookie);
             });
 
-        $response          = $this->createMock(Response::class);
+        $response          = $this->createStub(Response::class);
         $response->headers = $headers;
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createMock(Request::class);
+        $request           = $this->createStub(Request::class);
 
         $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
@@ -116,10 +118,10 @@ class CookieHelperTest extends TestCase
                 Assert::assertStringContainsString('secure', (string) $cookie);
             });
 
-        $response          = $this->createMock(Response::class);
+        $response          = $this->createStub(Response::class);
         $response->headers = $headers;
         $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createMock(Request::class);
+        $request           = $this->createStub(Request::class);
         $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cookieHelper->onResponse($event);

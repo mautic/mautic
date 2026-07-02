@@ -139,7 +139,7 @@ class SearchStringHelper
             unset($chars[$pos]);
             ++$pos;
 
-            if (':' == $char) {
+            if (':' === $char) {
                 // the string is a command
                 $command = trim(substr($string, 0, -1));
                 // does this have a negative?
@@ -155,9 +155,9 @@ class SearchStringHelper
                     $filters->{$baseName}[$keyCount]->command = $command;
                     $string                                   = '';
                 }
-            } elseif (' ' == $char) {
+            } elseif (' ' === $char) {
                 // arrived at the end of a single word that is not within a quote or parenthesis so add it as standalone
-                if (' ' != $string) {
+                if (' ' !== $string) {
                     $string = trim($string);
                     $type   = ('OR' === $string || 'AND' === $string) ? $string : '';
                     $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, true, $type, !empty($chars));

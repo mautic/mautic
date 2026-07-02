@@ -23,14 +23,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ForeignValueFilterQueryBuilderTest extends TestCase
+final class ForeignValueFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
-
-    /**
-     * @var EventDispatcherInterface&MockObject
-     */
-    private MockObject $dispatcher;
 
     private ForeignValueFilterQueryBuilder $queryBuilder;
 
@@ -43,11 +38,10 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     {
         parent::setUp();
         $randomParameter           = new RandomParameterName();
-        $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
             $randomParameter,
-            $this->dispatcher
+            $this->createStub(EventDispatcherInterface::class)
         );
     }
 
@@ -263,11 +257,11 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
             new ContactSegmentFilterCrate($filter),
             new CustomMappedDecorator(
                 new ContactSegmentFilterOperator(
-                    new FilterOperatorProvider($this->dispatcher, $this->createMock(TranslatorInterface::class))
+                    new FilterOperatorProvider($this->createStub(EventDispatcherInterface::class), $this->createStub(TranslatorInterface::class))
                 ),
-                new ContactSegmentFilterDictionary($this->dispatcher)
+                new ContactSegmentFilterDictionary($this->createStub(EventDispatcherInterface::class))
             ),
-            new TableSchemaColumnsCache($this->createMock(EntityManager::class)),
+            new TableSchemaColumnsCache($this->createStub(EntityManager::class)),
             $this->queryBuilder,
             $batchLimiters
         );

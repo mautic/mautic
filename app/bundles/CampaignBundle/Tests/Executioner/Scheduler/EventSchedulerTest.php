@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,14 +27,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EventSchedulerTest extends \PHPUnit\Framework\TestCase
+final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     private NullLogger $logger;
-
-    /**
-     * @var EventLogger|MockObject
-     */
-    private MockObject $eventLogger;
 
     private Interval $intervalScheduler;
 
@@ -41,21 +38,16 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     private Optimized $optimizedScheduler;
 
     /**
-     * @var EventCollector|MockObject
+     * @var MockObject&EventCollector
      */
     private MockObject $eventCollector;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     private EventScheduler $scheduler;
-
-    /**
-     * @var MockObject&PublishStateService
-     */
-    private MockObject $publishStateService;
 
     protected function setUp(): void
     {
@@ -63,25 +55,23 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $coreParamtersHelper       = $this->createMock(CoreParametersHelper::class);
         $coreParamtersHelper->method('getDefaultTimezone')
             ->willReturn('America/New_York');
-        $this->eventLogger                = $this->createMock(EventLogger::class);
         $peakInteractionTimer             = $this->createMock(PeakInteractionTimer::class);
         $this->intervalScheduler          = new Interval($this->logger, $coreParamtersHelper);
         $this->dateTimeScheduler          = new DateTime($this->logger);
         $this->optimizedScheduler         = new Optimized($peakInteractionTimer);
         $this->eventCollector             = $this->createMock(EventCollector::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $this->publishStateService        = $this->createMock(PublishStateService::class);
         $this->scheduler                  = new EventScheduler(
             $this->logger,
-            $this->eventLogger,
+            $this->createStub(EventLogger::class),
             $this->intervalScheduler,
             $this->dateTimeScheduler,
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
             $coreParamtersHelper,
-            $this->createMock(OptimisticLockServiceInterface::class),
-            $this->publishStateService
+            $this->createStub(OptimisticLockServiceInterface::class),
+            $this->createStub(PublishStateService::class)
         );
     }
 
@@ -322,7 +312,7 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $contact                     = new Lead();
         $now                         = new \DateTimeImmutable('now');
 
-        /** @var MockObject|CoreParametersHelper */
+        /** @var MockObject|CoreParametersHelper $coreParamtersHelper */
         $coreParamtersHelper = $this->createMock(CoreParametersHelper::class);
 
         $event->setCampaign($campaign);
@@ -378,15 +368,15 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
 
         $scheduler         = new EventScheduler(
             $this->logger,
-            $this->eventLogger,
+            $this->createStub(EventLogger::class),
             $this->intervalScheduler,
             $this->dateTimeScheduler,
             $this->optimizedScheduler,
             $this->eventCollector,
             $this->dispatcher,
             $coreParamtersHelper,
-            $this->createMock(OptimisticLockServiceInterface::class),
-            $this->publishStateService
+            $this->createStub(OptimisticLockServiceInterface::class),
+            $this->createStub(PublishStateService::class)
         );
 
         $scheduler->rescheduleFailures(new ArrayCollection([$logWithRescheduleInterval, $logWithNoRescheduleInterval]));

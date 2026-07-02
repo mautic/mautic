@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\Entity\Email;
@@ -13,15 +15,15 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FormSubscriberTest extends TestCase
+final class FormSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
     protected MockObject $emailModel;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     protected MockObject $contactTracker;
 
@@ -161,7 +163,7 @@ class FormSubscriberTest extends TestCase
 
         $action->expects($this->once())
             ->method('getForm')
-            ->willReturn($this->createMock(Form::class));
+            ->willReturn($this->createStub(Form::class));
 
         $this->emailModel->expects($this->once())
             ->method('getEntity')

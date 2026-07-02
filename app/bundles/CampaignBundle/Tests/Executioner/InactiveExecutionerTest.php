@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,11 +22,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
+final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&InactiveContactFinder $inactiveContactFinder;
 
-    private MockObject&Translator $translator;
+    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
 
     private MockObject&EventScheduler $eventScheduler;
 
@@ -38,13 +40,14 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createStub(Translator::class);
 
         $this->eventScheduler = $this->createMock(EventScheduler::class);
 
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
         $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+        $this->eventExecutioner->method('getExecutionDate')->willReturn(new \DateTime());
 
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
@@ -200,9 +203,9 @@ class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventScheduler,
             $this->inactiveHelper,
             $this->eventExecutioner,
-            $this->createMock(ProcessSignalService::class),
+            $this->createStub(ProcessSignalService::class),
             $this->redirectionHelper,
-            $this->createMock(LeadRepository::class)
+            $this->createStub(LeadRepository::class)
         );
     }
 }

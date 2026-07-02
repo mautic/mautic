@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FormatterHelper
+final readonly class FormatterHelper
 {
     public const FLOAT_PRECISION = 4;
 

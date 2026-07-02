@@ -12,12 +12,9 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class LocalFileAdapterServiceTest extends MauticMysqlTestCase
+final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 {
-    /**
-     * @var string
-     */
-    private $folderName;
+    private ?string $folderName = null;
 
     protected function beforeTearDown(): void
     {

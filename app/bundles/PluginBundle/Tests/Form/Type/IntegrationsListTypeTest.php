@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-class IntegrationsListTypeTest extends TestCase
+final class IntegrationsListTypeTest extends TestCase
 {
     public function testDataDoesNotHaveIntegration(): void
     {
@@ -71,7 +71,7 @@ class IntegrationsListTypeTest extends TestCase
         $integrationHelper->method('getIntegrationObject')
             ->willReturn(
                 /** @phpstan-ignore classConstant.deprecatedClass */
-                $this->createMock(AbstractIntegration::class)
+                $this->createStub(AbstractIntegration::class)
             );
 
         $callsForm = 0;
@@ -204,7 +204,7 @@ class IntegrationsListTypeTest extends TestCase
         $integrationHelper->method('getIntegrationObject')
             ->willReturn(
                 /** @phpstan-ignore classConstant.deprecatedClass */
-                $this->createMock(AbstractIntegration::class)
+                $this->createStub(AbstractIntegration::class)
             );
 
         $callsForm = 0;

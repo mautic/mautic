@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
+final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCase
 {
     protected $useCleanupRollback = false;
 

@@ -23,7 +23,9 @@ final class FormTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $form->getChanges());
     }
 
-    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, ['noIndex' => [true, null]]];

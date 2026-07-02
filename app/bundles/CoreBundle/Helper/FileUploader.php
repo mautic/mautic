@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploader
 {
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected array $imageMimes = [
         'image/gif',
         'image/jpeg',
@@ -22,7 +24,9 @@ class FileUploader
         'image/svg+xml',
     ];
 
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected array $imageExtensions = [
         'jpg',
         'jpeg',
@@ -33,8 +37,8 @@ class FileUploader
     ];
 
     public function __construct(
-        private FilePathResolver $filePathResolver,
-        private Translator $translator,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly Translator $translator,
     ) {
     }
 

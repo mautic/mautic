@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,10 +17,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModelTest extends TestCase
+final class IpAddressModelTest extends TestCase
 {
     /**
-     * @var EntityManager|MockObject
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
@@ -47,7 +49,7 @@ class IpAddressModelTest extends TestCase
     public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
         $contact      = $this->createMock(Lead::class);
-        $ipAddress    = $this->createMock(IpAddress::class);
+        $ipAddress    = $this->createStub(IpAddress::class);
         $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
 
         $contact->expects($this->exactly(1))
@@ -142,7 +144,7 @@ class IpAddressModelTest extends TestCase
 
         $queryBuilder->expects($this->once())
             ->method('executeStatement')
-            ->willThrowException(new UniqueConstraintViolationException($this->createMock(DriverException::class), null));
+            ->willThrowException(new UniqueConstraintViolationException($this->createStub(DriverException::class), null));
 
         $connection->expects($this->once())
             ->method('createQueryBuilder')

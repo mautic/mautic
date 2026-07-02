@@ -185,7 +185,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper
             ->method('get')
-            ->willReturnCallback(fn (string $key) => match ($key) {
+            ->willReturnCallback(fn (string $key): array => match ($key) {
                 'do_not_submit_emails'         => ['*@blocked.com'],
                 'blocked_free_email_providers' => [],
                 default                        => [],
@@ -211,7 +211,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper
             ->method('get')
-            ->willReturnCallback(fn (string $key) => match ($key) {
+            ->willReturnCallback(fn (string $key): array => match ($key) {
                 'do_not_submit_emails'         => [],
                 'blocked_free_email_providers' => ['example.com'],
                 default                        => [],

@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadFieldSubscriber implements EventSubscriberInterface
+final readonly class LeadFieldSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FieldModel $fieldModel,

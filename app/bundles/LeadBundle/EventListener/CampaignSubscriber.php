@@ -56,16 +56,16 @@ class CampaignSubscriber implements EventSubscriberInterface
     private ?array $fields = null;
 
     public function __construct(
-        private IpLookupHelper $ipLookupHelper,
-        private LeadModel $leadModel,
-        private FieldModel $leadFieldModel,
-        private ListModel $listModel,
-        private CompanyModel $companyModel,
-        private CampaignModel $campaignModel,
-        private CoreParametersHelper $coreParametersHelper,
-        private DoNotContact $doNotContact,
-        private PointGroupModel $groupModel,
-        private FilterOperatorProvider $filterOperatorProvider,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $leadFieldModel,
+        private readonly ListModel $listModel,
+        private readonly CompanyModel $companyModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly DoNotContact $doNotContact,
+        private readonly PointGroupModel $groupModel,
+        private readonly FilterOperatorProvider $filterOperatorProvider,
     ) {
     }
 
@@ -698,7 +698,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @throws \Exception
      */
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     public function onCampaignTriggerConditionContactAdded(CampaignExecutionEvent $event): bool
     {
         $campaign = $this->campaignModel->getEntity($event->getEvent()['campaign']['id']);
@@ -729,7 +731,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (in_array($triggerIntervalUnit, ['H', 'I'])) {
             $timeNotation = 'T';
             // DateInterval Minutes notation is 'M'
-            $triggerIntervalUnit = ('I' == $triggerIntervalUnit) ? 'M' : $triggerIntervalUnit;
+            $triggerIntervalUnit = ('I' === $triggerIntervalUnit) ? 'M' : $triggerIntervalUnit;
         }
 
         $duration = 'P'.$timeNotation.$triggerInterval.$triggerIntervalUnit;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\Model;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
@@ -10,30 +12,30 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
+final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Lead
+     * @var MockObject&Lead
      */
     private MockObject $contactMock5;
 
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $contactModelMock;
 
     /**
-     * @var MockObject|FrequencyRuleRepository
+     * @var MockObject&FrequencyRuleRepository
      */
     private MockObject $frequencyRepoMock;
 
     /**
-     * @var MockObject|FrequencyRule
+     * @var MockObject&FrequencyRule
      */
     private MockObject $frequencyRuleEmailMock;
 
     /**
-     * @var MockObject|FrequencyRule
+     * @var MockObject&FrequencyRule
      */
     private MockObject $frequencyRuleSmsMock;
 

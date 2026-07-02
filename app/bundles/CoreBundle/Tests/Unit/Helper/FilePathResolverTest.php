@@ -12,15 +12,15 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FilePathResolverTest extends \PHPUnit\Framework\TestCase
+final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|Filesystem
+     * @var MockObject&Filesystem
      */
     private MockObject $filesystemMock;
 
     /**
-     * @var MockObject|UploadedFile
+     * @var MockObject&UploadedFile
      */
     private MockObject $fileMock;
 

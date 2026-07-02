@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 
-class UserControllerFunctionalTest extends MauticMysqlTestCase
+final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

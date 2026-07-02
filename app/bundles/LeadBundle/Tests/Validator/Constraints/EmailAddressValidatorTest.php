@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailAddressValidatorTest extends AbstractMauticTestCase
+final class EmailAddressValidatorTest extends AbstractMauticTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
     public function testValidate(?string $value, int $expectedViolationCount): void
@@ -24,7 +24,7 @@ class EmailAddressValidatorTest extends AbstractMauticTestCase
         $translator = static::getContainer()->get('translator');
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
-        $context = new ExecutionContext($this->createMock(ValidatorInterface::class), null, $translator);
+        $context = new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator);
 
         $emailAddressValidator->initialize($context);
         $emailAddressValidator->validate($value, new EmailAddress());

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityRepository;
@@ -21,7 +23,7 @@ use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebhookFunctionalTest extends MauticMysqlTestCase
+final class WebhookFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
@@ -280,7 +282,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $handlerStack = $this->getClientMockHandler();
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
-                function (RequestInterface $request) use (&$sendRequestCounter) {
+                function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
                     Assert::assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
                     Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));
@@ -298,7 +300,7 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
         $handlerStack = $this->getClientMockHandler();
         for (; $expectedToBeCalled > 0; --$expectedToBeCalled) {
             $handlerStack->append(
-                function (RequestInterface $request) use (&$sendRequestCounter) {
+                function (RequestInterface $request) use (&$sendRequestCounter): GuzzleResponse {
                     Assert::assertSame('/post', $request->getUri()->getPath());
                     $jsonPayload = json_decode($request->getBody()->getContents(), true);
                     Assert::assertNotEmpty($request->getHeader('Webhook-Signature'));

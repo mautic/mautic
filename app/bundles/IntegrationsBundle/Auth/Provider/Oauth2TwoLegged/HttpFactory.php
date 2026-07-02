@@ -100,7 +100,7 @@ class HttpFactory implements AuthProviderInterface
             return false;
         }
 
-        return !($credentials instanceof PasswordCredentialsGrantInterface && (empty($credentials->getUsername()) || empty($credentials->getPassword())));
+        return !$credentials instanceof PasswordCredentialsGrantInterface || !empty($credentials->getUsername()) && !empty($credentials->getPassword());
     }
 
     private function getStackHandler(): HandlerStack

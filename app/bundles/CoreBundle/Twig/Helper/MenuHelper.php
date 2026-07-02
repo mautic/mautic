@@ -9,7 +9,7 @@ use Knp\Menu\Twig\Helper as KnpHelper;
 /**
  * final class MenuHelper.
  */
-final class MenuHelper
+final readonly class MenuHelper
 {
     public function __construct(
         private KnpHelper $helper,
@@ -39,7 +39,7 @@ final class MenuHelper
         foreach ($attributes as $name => $value) {
             $name  = trim($name);
             $value = trim($value);
-            if ($name == $value) {
+            if ($name === $value) {
                 $string .= " $name";
             } else {
                 $string .= " $name=\"$value\"";

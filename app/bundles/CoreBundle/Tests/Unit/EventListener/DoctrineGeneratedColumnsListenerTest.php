@@ -13,20 +13,20 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener;
 use Psr\Log\LoggerInterface;
 
-class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
+final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var GenerateSchemaEventArgs|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&GenerateSchemaEventArgs
      */
     private \PHPUnit\Framework\MockObject\MockObject $event;
 
     /**
-     * @var Schema|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Schema
      */
     private \PHPUnit\Framework\MockObject\MockObject $schema;
 
     /**
-     * @var Table|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Table
      */
     private \PHPUnit\Framework\MockObject\MockObject $table;
 

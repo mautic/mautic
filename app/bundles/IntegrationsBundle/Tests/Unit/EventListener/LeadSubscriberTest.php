@@ -25,37 +25,37 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LeadSubscriberTest extends TestCase
+final class LeadSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|FieldChangeRepository
+     * @var MockObject&FieldChangeRepository
      */
     private MockObject $fieldChangeRepository;
 
     /**
-     * @var MockObject|ObjectMappingRepository
+     * @var MockObject&ObjectMappingRepository
      */
     private MockObject $objectMappingRepository;
 
     /**
-     * @var MockObject|VariableExpresserHelperInterface
+     * @var MockObject&VariableExpresserHelperInterface
      */
     private MockObject $variableExpresserHelper;
 
     /**
-     * @var MockObject|SyncIntegrationsHelper
+     * @var MockObject&SyncIntegrationsHelper
      */
     private MockObject $syncIntegrationsHelper;
 
     /**
-     * @var MockObject|CompanyEvent
+     * @var MockObject&CompanyEvent
      */
     private MockObject $companyEvent;
 
     private LeadSubscriber $subscriber;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcherInterfaceMock;
 
@@ -411,7 +411,9 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onCompanyPostDelete($this->companyEvent);
     }
 
-    /** @param array<string, array{0: mixed, 1: mixed}> $fieldChanges */
+    /**
+     * @param array<string, array{0: mixed, 1: mixed}> $fieldChanges
+     */
     private function handleRecordFieldChanges(array $fieldChanges, int $objectId, string $objectType): void
     {
         $integrationName     = 'testIntegration';
@@ -433,7 +435,7 @@ class LeadSubscriberTest extends TestCase
         $matcher = $this->exactly(1);
 
         $this->variableExpresserHelper->expects($matcher)->method('encodeVariable')
-                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs) {
+                ->willReturnCallback(function (...$parameters) use ($matcher, $values, $valueDAOs): EncodedValueDAO {
                     $this->assertSame($values[$matcher->numberOfInvocations() - 1], $parameters);
 
                     return $valueDAOs[0];

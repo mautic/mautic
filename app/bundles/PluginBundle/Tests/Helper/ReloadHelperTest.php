@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Tests\Helper;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -12,17 +14,23 @@ use Mautic\PluginBundle\PluginEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReloadHelperTest extends \PHPUnit\Framework\TestCase
+final class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 {
     private ReloadHelper $helper;
 
-    /** @var array<string, array<string, mixed>> */
+    /**
+     * @var array<string, array<string, mixed>>
+     */
     private array $sampleAllPlugins = [];
 
-    /** @var array<string, array<string, ClassMetadata>> */
+    /**
+     * @var array<string, array<string, ClassMetadata>>
+     */
     private array $sampleMetaData = [];
 
-    /** @var array<string, Schema> */
+    /**
+     * @var array<string, Schema>
+     */
     private array $sampleSchemas = [];
 
     /**
@@ -39,7 +47,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->sampleMetaData = [
             'MauticPlugin\MauticZapierBundle' => [
-                'MauticPlugin\MauticZapierBundle\Entity\SomeTest' => $this->createMock(ClassMetadata::class),
+                'MauticPlugin\MauticZapierBundle\Entity\SomeTest' => $this->createStub(ClassMetadata::class),
             ],
         ];
 
