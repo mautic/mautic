@@ -160,7 +160,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @return bool|string|void
          */
-        public function handleException($exception, $returnContent = false, $inTemplate = false)
+        public function handleException($exception, $returnContent = false, $inTemplate = false): false|array|string
         {
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
