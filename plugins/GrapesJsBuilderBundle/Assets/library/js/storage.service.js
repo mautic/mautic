@@ -1,5 +1,5 @@
-import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
-import ContentService from 'grapesjs-preset-mautic/dist/content.service';
+import MjmlService from './preset-mautic/mjml/mjml.service';
+import ContentService from './preset-mautic/content.service';
 
 export default class StorageService {
     constructor(editor, mode) {
