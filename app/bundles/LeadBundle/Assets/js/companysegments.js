@@ -175,53 +175,21 @@ Mautic.addCompanySegmentsFilter = function (elId, elObj) {
     });
 
     Mautic.convertCompanySegmentFilterInput('#' + filterIdBase + 'operator');
-    Mautic.updateCompanySegmentFilterPositioning(mQuery('#' + filterIdBase + 'glue'));
+    Mautic.updateFilterPositioning(mQuery('#' + filterIdBase + 'glue'));
 };
 
 Mautic.convertCompanySegmentFilterInput = function(el) {
-    const operatorSelect = mQuery(el);
-
-    // Extract the filter number
-    const regExp = /_filters_(\d+)_operator/;
-    const matches = regExp.exec(operatorSelect.attr('id'));
-    const filterNum = matches[1];
-    const fieldAlias = mQuery('#company_segments_filters_'+filterNum+'_field');
-    const fieldObject = mQuery('#company_segments_filters_'+filterNum+'_object');
-    const filterValue = mQuery('#company_segments_filters_'+filterNum+'_properties_filter').val();
-    const filterId  = '#company_segments_filters_' + filterNum + '_properties_filter';
-
-    Mautic.loadCompanyFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
-        const selector = '#company_segments_filters_'+filterNum;
-        mQuery(selector+'_properties').html(propertiesFields);
-
-        Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent(selector, filterValue);
-    });
-
-    Mautic.setProcessorForFilterValue(filterId, operatorSelect.val());
+    Mautic.convertSegmentFilterInput(
+        el,
+        'company_segments',
+        Mautic.loadCompanyFilterForm,
+        Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent
+    );
 };
 
 Mautic.loadCompanyFilterForm = function(filterNum, fieldObject, fieldAlias, operator, resultHtml) {
-    mQuery.ajax({
-        showLoadingBar: true,
-        url: mauticAjaxUrl,
-        type: 'POST',
-        data: {
-            action: 'lead:loadCompanySegmentFilterForm',
-            fieldAlias: fieldAlias,
-            fieldObject: fieldObject,
-            operator: operator,
-            filterNum: filterNum,
-        },
-        dataType: 'json',
-        success: function (response) {
-            Mautic.stopPageLoadingBar();
-            resultHtml(response.viewParameters.form);
-        },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-        }
-    });
-}
+    Mautic.loadSegmentFilterForm('lead:loadCompanySegmentFilterForm', filterNum, fieldObject, fieldAlias, operator, resultHtml);
+};
 
 Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent = function(selector, filterValue) {
     mQuery('#company_segments_filters').trigger('filter.properties.form.loaded', [selector, filterValue]);
@@ -229,61 +197,9 @@ Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent = function(selector, fil
 
 Mautic.attachJsUiOnCompanySegmentsFilterForms = function() {
     mQuery('#company_segments_filters').on('filter.properties.form.loaded', function(event, selector, filterValue) {
-        Mautic.activateChosenSelect(selector + '_properties select');
-        const fieldType = mQuery(selector + '_type').val();
-        const fieldAlias = mQuery(selector + '_field').val();
-        const filterFieldEl = mQuery(selector + '_properties_filter');
-
-        if (filterValue) {
-            filterFieldEl.val(filterValue);
-            if (filterFieldEl.is('select')) {
-                filterFieldEl.trigger('chosen:updated');
-            }
-        }
-
-        if (fieldType === 'lookup') {
-            Mautic.activateLookupTypeahead(filterFieldEl.parent());
-        } else if (fieldType === 'datetime') {
-            filterFieldEl.datetimepicker({
-                format: 'Y-m-d H:i',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false
-            });
-        } else if (fieldType === 'date') {
-            filterFieldEl.datetimepicker({
-                timepicker: false,
-                format: 'Y-m-d',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false,
-                closeOnDateSelect: true
-            });
-        } else if (fieldType === 'time') {
-            filterFieldEl.datetimepicker({
-                datepicker: false,
-                format: 'H:i',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false
-            });
-        } else if (fieldType === 'lookup_id') {
-            const displayFieldEl = mQuery(selector + '_properties_display');
-            const fieldCallback = displayFieldEl.attr('data-field-callback');
-            if (fieldCallback && typeof Mautic[fieldCallback] === 'function') {
-                const fieldOptions = displayFieldEl.attr('data-field-list');
-                Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
-            }
-        }
+        Mautic.applySegmentFilterFieldUi(selector, filterValue);
     });
 
-    // Trigger event so plugins could attach other JS magic to the form.
     mQuery('#company_segments_filters .filter--row').each(function() {
         Mautic.triggerOnCompanySegmentPropertiesFormLoadedEvent('#' + mQuery(this).attr('id'));
     });
@@ -299,7 +215,7 @@ Mautic.reorderCompanySegmentFilters = function() {
     }
 
     mQuery('#' + prefix + '_filters .filter--row').each(function() {
-        Mautic.updateCompanySegmentFilterPositioning(mQuery(this).find('select.glue-select').first());
+        Mautic.updateFilterPositioning(mQuery(this).find('select.glue-select').first());
         mQuery(this).find('[id^="' + prefix + '_filters_"]').each(function() {
             const id     = mQuery(this).attr('id');
             const name   = mQuery(this).attr('name');
@@ -346,22 +262,6 @@ Mautic.reorderCompanySegmentFilters = function() {
     mQuery('#' + prefix + '_filters .filter--row').first().find('.filter--condition').addClass('hide');
 };
 
-Mautic.updateCompanySegmentFilterPositioning = function (el) {
-    const $el       = mQuery(el);
-    const $parentEl = $el.closest('.filter--row');
-    const list      = $parentEl.parent().children('.filter--row');
-    const isFirst = list.index($parentEl) === 0;
-
-    if (isFirst) {
-        $el.val('and');
-    }
-
-    if ($el.val() === 'and' && !isFirst) {
-        $parentEl.addClass('in-group');
-    } else {
-        $parentEl.removeClass('in-group');
-    }
-};
 
 Mautic.companyBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {

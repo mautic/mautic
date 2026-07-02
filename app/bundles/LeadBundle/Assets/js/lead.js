@@ -396,61 +396,10 @@ Mautic.triggerOnPropertiesFormLoadedEvent = function(selector, filterValue) {
 
 Mautic.attachJsUiOnFilterForms = function() {
     mQuery('#leadlist_filters').on('filter.properties.form.loaded', function(event, selector, filterValue) {
-        Mautic.activateChosenSelect(selector + '_properties select');
-        var fieldType = mQuery(selector + '_type').val();
-        var fieldAlias = mQuery(selector + '_field').val();
-        var filterFieldEl = mQuery(selector + '_properties_filter');
-
-        if (filterValue) {
-            filterFieldEl.val(filterValue);
-            if (filterFieldEl.is('select')) {
-                filterFieldEl.trigger('chosen:updated');
-            }
-        }
-
-        if (fieldType === 'lookup') {
-            Mautic.activateLookupTypeahead(filterFieldEl.parent());
-        } else if (fieldType === 'datetime') {
-            filterFieldEl.datetimepicker({
-                format: 'Y-m-d H:i',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false
-            });
-        } else if (fieldType === 'date') {
-            filterFieldEl.datetimepicker({
-                timepicker: false,
-                format: 'Y-m-d',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false,
-                closeOnDateSelect: true
-            });
-        } else if (fieldType === 'time') {
-            filterFieldEl.datetimepicker({
-                datepicker: false,
-                format: 'H:i',
-                lazyInit: true,
-                validateOnBlur: false,
-                allowBlank: true,
-                scrollMonth: false,
-                scrollInput: false
-            });
-        } else if (fieldType === 'lookup_id') {
-            var displayFieldEl = mQuery(selector + '_properties_display');
-            var fieldCallback = displayFieldEl.attr('data-field-callback');
-            if (fieldCallback && typeof Mautic[fieldCallback] === 'function') {
-                var fieldOptions = displayFieldEl.attr('data-field-list');
-                Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
-            }
-        }
+        Mautic.applySegmentFilterFieldUi(selector, filterValue);
         mQuery('.chosen-search-input').on('keypress', function (event) {
             if ( event.which === 13 ) event.preventDefault();
-        })
+        });
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -538,26 +487,13 @@ Mautic.reorderSegmentFilters = function() {
 };
 
 Mautic.convertLeadFilterInput = function(el) {
-    var operatorSelect = mQuery(el);
-    // Extract the filter number
-    var regExp = /_filters_(\d+)_operator/;
-    var matches = regExp.exec(operatorSelect.attr('id'));
-    var filterNum = matches[1];
-    var fieldAlias = mQuery('#leadlist_filters_'+filterNum+'_field');
-    var fieldObject = mQuery('#leadlist_filters_'+filterNum+'_object');
-    var filterValue = mQuery('#leadlist_filters_'+filterNum+'_properties_filter').val();
-    var filterId  = '#leadlist_filters_' + filterNum + '_properties_filter';
-
-    Mautic.loadFilterForm(filterNum, fieldObject.val(), fieldAlias.val(), operatorSelect.val(), function(propertiesFields) {
-        var selector = '#leadlist_filters_'+filterNum;
-        mQuery(selector+'_properties').html(propertiesFields);
-
-        Mautic.ajaxifyForm('leadlist');
-
-        Mautic.triggerOnPropertiesFormLoadedEvent(selector, filterValue);
-    });
-
-    Mautic.setProcessorForFilterValue(filterId, operatorSelect.val());
+    Mautic.convertSegmentFilterInput(
+        el,
+        'leadlist',
+        Mautic.loadFilterForm,
+        Mautic.triggerOnPropertiesFormLoadedEvent,
+        function() { Mautic.ajaxifyForm('leadlist'); }
+    );
 };
 
 Mautic.setFilterValuesProcessor = function () {
