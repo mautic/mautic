@@ -353,8 +353,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
@@ -393,9 +391,6 @@ class LeadModel extends FormModel
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$event instanceof Event) {
@@ -407,9 +402,6 @@ class LeadModel extends FormModel
         return $this->dispatchEvent($action, $entity, $isNew, $event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
     {
         if (count($entitiesBatchParams) < 1) {

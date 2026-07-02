@@ -18,5 +18,5 @@ return ECSConfig::configure()
         // Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
     ])
     ->withPreparedSets(comments: true)
-    ->withDocblockLevel(17);
+    ->withDocblockLevel(22);
 // ->withPreparedSets(comments: true);
