@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Collector;
@@ -8,7 +10,7 @@ use Mautic\StatsBundle\StatEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CollectorTest extends TestCase
+final class CollectorTest extends TestCase
 {
     private EventDispatcher $eventDispatcher;
 

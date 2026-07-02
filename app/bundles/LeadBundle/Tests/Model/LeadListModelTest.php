@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\Serializer;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadListModelTest extends \PHPUnit\Framework\TestCase
+final class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ListModel&MockObject */
     protected MockObject $fixture;

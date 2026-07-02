@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Segment\TableSchemaColumnsCache;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ContactSegmentFilterTest extends TestCase
+final class ContactSegmentFilterTest extends TestCase
 {
     private ContactSegmentFilterCrate $contactSegmentFilterCrate;
 

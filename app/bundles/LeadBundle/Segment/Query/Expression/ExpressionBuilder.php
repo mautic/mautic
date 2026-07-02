@@ -18,7 +18,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      */
     public function between($x, $arr): string
     {
-        if (!is_array($arr) || 2 != count($arr)) {
+        if (!is_array($arr) || 2 !== count($arr)) {
             throw new SegmentQueryException('Between expression expects second argument to be an array with exactly two elements');
         }
 

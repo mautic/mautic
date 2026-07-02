@@ -35,7 +35,7 @@ final class EmailDefaultsHelperTest extends TestCase
         $page = new Page();
         $page->setTitle('Default PC');
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(5))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, 42],
             ['email_default_utm_source', null, 'config-source'],
             ['email_default_utm_medium', null, 'config-medium'],
@@ -67,12 +67,12 @@ final class EmailDefaultsHelperTest extends TestCase
         $email = new Email();
         $email->setPreferenceCenter($existingPage);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(4))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, 99],
             ['email_default_utm_source', null, 'config-source'],
             ['email_default_utm_medium', null, null],
             ['email_default_utm_campaign', null, null],
-            ['email_default_utm_content', null, null],
+            // ['email_default_utm_content', null, null],
         ]);
 
         // Verify helper skips loading when preference center already set
@@ -95,7 +95,7 @@ final class EmailDefaultsHelperTest extends TestCase
         $email = new Email();
         $email->setUtmTags($existingUtmTags);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(1))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, null],
         ]);
 
@@ -115,7 +115,7 @@ final class EmailDefaultsHelperTest extends TestCase
             'utmContent'  => null,
         ]);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(5))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, null],
             ['email_default_utm_source', null, 'config-source'],
             ['email_default_utm_medium', null, 'config-medium'],
@@ -133,7 +133,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testFiltersOutNullAndEmptyUtmValues(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(5))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, null],
             ['email_default_utm_source', null, 'only-source'],
             ['email_default_utm_medium', null, null],
@@ -161,7 +161,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testHandlesInvalidPreferenceCenterIdGracefully(): void
     {
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(5))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, 999],
             ['email_default_utm_source', null, null],
             ['email_default_utm_medium', null, null],
@@ -187,7 +187,7 @@ final class EmailDefaultsHelperTest extends TestCase
         // Verify the email has tracked changes before applying defaults
         $this->assertNotEmpty($changesBefore);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(5))->method('get')->willReturnMap([
             ['email_default_preference_center_id', null, null],
             ['email_default_utm_source', null, 'src'],
             ['email_default_utm_medium', null, null],

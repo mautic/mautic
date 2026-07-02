@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Segment\Query\QueryException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class QueryBuilderTest extends TestCase
+final class QueryBuilderTest extends TestCase
 {
     private QueryBuilder $queryBuilder;
 

@@ -64,7 +64,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
             preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
             Assert::assertArrayHasKey(1, $match, $body);
             parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
-            $clickThrough = unserialize(base64_decode($queryParams['ct']));
+            $clickThrough = \Mautic\CoreBundle\Helper\Serializer::decode(base64_decode($queryParams['ct']));
             Assert::assertArrayHasKey($message->getTo()[0]->toString(), $leads);
             Assert::assertSame($leads[$message->getTo()[0]->toString()]->getId(), (int) $clickThrough['lead']);
         }

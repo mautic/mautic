@@ -110,7 +110,7 @@ class WebhookNotificationSender
                 $this->mailer->setCc([$ccToUser->getEmail()]);
             }
         } else {
-            $emailAddresses = array_map('trim', explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));
+            $emailAddresses = array_map(trim(...), explode(',', $this->coreParametersHelper->get('webhook_notification_email_addresses')));
             $this->mailer->setTo($emailAddresses);
         }
 

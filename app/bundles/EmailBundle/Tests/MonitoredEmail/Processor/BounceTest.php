@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -17,7 +19,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
-class BounceTest extends \PHPUnit\Framework\TestCase
+final class BounceTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void

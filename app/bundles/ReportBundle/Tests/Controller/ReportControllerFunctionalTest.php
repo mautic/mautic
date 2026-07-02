@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;
@@ -19,7 +21,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReportControllerFunctionalTest extends MauticMysqlTestCase
+final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const TEST_EMAIL         = 'test@email.com';
 

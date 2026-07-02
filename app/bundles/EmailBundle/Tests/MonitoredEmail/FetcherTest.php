@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -10,7 +12,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Fetcher::class)]
-class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array<string, array<string, int|string>> */
     protected array $mailboxes = [

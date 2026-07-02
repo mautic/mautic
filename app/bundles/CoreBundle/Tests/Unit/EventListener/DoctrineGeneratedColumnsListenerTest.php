@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener;
 use Psr\Log\LoggerInterface;
 
-class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
+final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&GenerateSchemaEventArgs

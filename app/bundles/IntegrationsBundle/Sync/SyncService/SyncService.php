@@ -19,18 +19,18 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\SyncProcess;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class SyncService implements SyncServiceInterface
+final readonly class SyncService implements SyncServiceInterface
 {
     public function __construct(
-        private readonly MauticSyncDataExchange $internalSyncDataExchange,
-        private readonly SyncDateHelper $syncDateHelper,
-        private readonly MappingHelper $mappingHelper,
-        private readonly RelationsHelper $relationsHelper,
-        private readonly SyncIntegrationsHelper $syncIntegrationsHelper,
-        private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly Notifier $notifier,
-        private readonly IntegrationSyncProcess $integratinSyncProcess,
-        private readonly MauticSyncProcess $mauticSyncProcess,
+        private MauticSyncDataExchange $internalSyncDataExchange,
+        private SyncDateHelper $syncDateHelper,
+        private MappingHelper $mappingHelper,
+        private RelationsHelper $relationsHelper,
+        private SyncIntegrationsHelper $syncIntegrationsHelper,
+        private EventDispatcherInterface $eventDispatcher,
+        private Notifier $notifier,
+        private IntegrationSyncProcess $integratinSyncProcess,
+        private MauticSyncProcess $mauticSyncProcess,
     ) {
     }
 

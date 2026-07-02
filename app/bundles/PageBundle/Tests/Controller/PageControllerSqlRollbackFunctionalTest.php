@@ -13,7 +13,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
+final class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

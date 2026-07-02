@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -12,7 +14,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use PHPUnit\Framework\TestCase;
 
-class PointSubscriberTest extends TestCase
+final class PointSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {

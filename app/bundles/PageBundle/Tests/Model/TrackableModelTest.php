@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(TrackableModel::class)]
-class TrackableModelTest extends TestCase
+final class TrackableModelTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that content is detected as HTML')]
     public function testHtmlIsDetectedInContent(): void
