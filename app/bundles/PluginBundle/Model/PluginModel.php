@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -78,7 +79,7 @@ class PluginModel extends FormModel
         return $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
-    public function saveFeatureSettings($entity): void
+    public function saveFeatureSettings(Integration $entity): void
     {
         $this->em->persist($entity);
         $this->em->flush();
