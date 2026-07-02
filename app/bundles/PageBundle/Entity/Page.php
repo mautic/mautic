@@ -797,7 +797,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->template;
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();

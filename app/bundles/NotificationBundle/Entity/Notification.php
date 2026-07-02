@@ -342,7 +342,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
             ->build();
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();

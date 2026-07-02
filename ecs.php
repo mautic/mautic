@@ -19,4 +19,3 @@ return ECSConfig::configure()
     ])
     ->withPreparedSets(comments: true)
     ->withDocblockLevel(22);
-// ->withPreparedSets(comments: true);
