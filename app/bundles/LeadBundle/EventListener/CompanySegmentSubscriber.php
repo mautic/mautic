@@ -36,29 +36,21 @@ final class CompanySegmentSubscriber implements EventSubscriberInterface
         // Check for dependencies in other company segments
         $dependentCompanySegments = $this->companySegmentModel->getSegmentsWithDependenciesOnSegment($id, 'name');
         if ([] !== $dependentCompanySegments) {
-            $message = $this->translator->trans(
-                'mautic.company_segments.is_in_use.delete',
-                [
-                    '%segments%'            => implode(', ', $dependentCompanySegments),
-                    '%companySegmentName%'  => $companySegment->getName(),
-                ],
-                'validators'
-            );
-            $event->addDependencyError($message);
+            $event->addDependencyError($this->translator->trans(
+                'mautic.company_segments.error.cannot.delete.inuse',
+                ['%segment%' => $companySegment->getName(), '%segments%' => implode(', ', $dependentCompanySegments)],
+                'flashes'
+            ));
         }
 
         // Check for dependencies in contact segments
         $dependentContactSegments = $this->companySegmentModel->getSegmentsWithDependenciesOnSegment($id, 'name', true);
         if ([] !== $dependentContactSegments) {
-            $message = $this->translator->trans(
-                'mautic.company_segments.is_in_use.delete_contact_segments',
-                [
-                    '%segments%'            => implode(', ', $dependentContactSegments),
-                    '%companySegmentName%'  => $companySegment->getName(),
-                ],
-                'validators'
-            );
-            $event->addDependencyError($message);
+            $event->addDependencyError($this->translator->trans(
+                'mautic.company_segments.segment.error.cannot.delete.inuse',
+                ['%segment%' => $companySegment->getName(), '%segments%' => implode(', ', $dependentContactSegments)],
+                'flashes'
+            ));
         }
     }
 }

@@ -327,6 +327,7 @@ class FormModel extends AbstractCommonModel
     {
         $deleted        = [];
         $unableToDelete = [];
+        $errors         = [];
 
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -337,6 +338,7 @@ class FormModel extends AbstractCommonModel
 
                 if ($event instanceof DependencyErrorEventInterface && $event->getDependencyErrors()) {
                     $unableToDelete[$id] = $entity;
+                    array_push($errors, ...$event->getDependencyErrors());
                     continue;
                 }
 
@@ -353,7 +355,7 @@ class FormModel extends AbstractCommonModel
         $this->em->flush();
 
         if ($unableToDelete) {
-            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
+            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete, $errors);
         }
 
         // retrieving the entities while here so may as well return them so they can be used if needed

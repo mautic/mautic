@@ -15,37 +15,37 @@
                         'target': '#leadListTable',
                     }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'lead.list',
+                        'sessionVar': 'segment',
                         'orderBy': 'l.name',
                         'text': 'mautic.core.name',
                         'class': 'col-leadlist-name',
                 }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'lead.list',
+                        'sessionVar': 'segment',
                         'text': 'mautic.lead.list.thead.leadcount',
                         'class': 'visible-md visible-lg col-leadlist-leadcount',
                 }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'lead.list',
+                        'sessionVar': 'segment',
                         'orderBy': 'l.dateAdded',
                         'text': 'mautic.lead.import.label.dateAdded',
                         'class': 'visible-md visible-lg col-leadlist-dateAdded',
                 }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'lead.list',
+                        'sessionVar': 'segment',
                         'orderBy': 'l.dateModified',
                         'text': 'mautic.lead.import.label.dateModified',
                         'class': 'visible-md visible-lg col-leadlist-dateModified',
                         'default': true,
                 }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'lead.list',
+                        'sessionVar': 'segment',
                         'orderBy': 'l.createdByUser',
                         'text': 'mautic.core.createdby',
                         'class': 'visible-md visible-lg col-leadlist-createdByUser',
                 }) }}
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'lead.list',
+                        'sessionVar': 'segment',
                         'orderBy': 'l.id',
                         'text': 'mautic.core.id',
                         'class': 'visible-md visible-lg col-leadlist-id',
@@ -64,7 +64,7 @@
                     'page': page,
                     'limit': limit,
                     'baseUrl': path('mautic_segment_index'),
-                    'sessionVar': 'lead.list',
+                    'sessionVar': 'segment',
             }) }}
         </div>
     </div>

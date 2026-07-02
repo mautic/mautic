@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,8 @@ class SegmentSubscriberTest extends TestCase
      */
     private MockObject $segmentUsedInCampaignsValidator;
 
+    private CompanySegmentModel&MockObject $companySegmentModel;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -58,6 +61,7 @@ class SegmentSubscriberTest extends TestCase
         $this->translator                      = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
+        $this->companySegmentModel             = $this->createMock(CompanySegmentModel::class);
         $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
     }
 
@@ -70,7 +74,8 @@ class SegmentSubscriberTest extends TestCase
             $this->segmentUsedInCampaignsValidator,
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->translator,
+            $this->companySegmentModel
         );
 
         $this->assertSame(
@@ -127,7 +132,8 @@ class SegmentSubscriberTest extends TestCase
             $this->segmentUsedInCampaignsValidator,
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->translator,
+            $this->companySegmentModel
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -162,7 +168,8 @@ class SegmentSubscriberTest extends TestCase
             $this->segmentUsedInCampaignsValidator,
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->translator,
+            $this->companySegmentModel
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -217,7 +224,8 @@ class SegmentSubscriberTest extends TestCase
             $this->segmentUsedInCampaignsValidator,
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->translator
+            $this->translator,
+            $this->companySegmentModel
         );
 
         $segment = $this->createMock(LeadList::class);

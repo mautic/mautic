@@ -785,6 +785,53 @@ class CompanySegmentModel extends FormModel
         return $dependents;
     }
 
+    /**
+     * Find company segments that use a specific contact segment (leadlist) as a filter.
+     *
+     * @return array<int, mixed>
+     */
+    public function getCompanySegmentsUsingContactSegment(int $contactSegmentId, string $returnProperty = 'name'): array
+    {
+        $tableAlias = $this->getRepository()->getTableAlias();
+        $platform   = $this->connection->getDatabasePlatform();
+        $isMariaDb  = $platform instanceof MariaDBPlatform;
+        $likeQuery  = $isMariaDb ? '%"type":"leadlist"%' : '%"type": "leadlist"%';
+
+        $filter = [
+            'force' => [
+                [
+                    'column' => $tableAlias.'.filters',
+                    'expr'   => 'LIKE',
+                    'value'  => $likeQuery,
+                ],
+            ],
+        ];
+
+        $entities   = $this->getEntities(['filter' => $filter]);
+        $dependents = [];
+        $accessor   = PropertyAccess::createPropertyAccessor();
+        foreach ($entities as $entity) {
+            assert($entity instanceof CompanySegment);
+            $retrFilters = $entity->getFilters();
+            foreach ($retrFilters as $eachFilter) {
+                if (!is_array($eachFilter) || !array_key_exists('properties', $eachFilter) || !is_array($eachFilter['properties']) || !array_key_exists('filter', $eachFilter['properties'])) {
+                    continue;
+                }
+                $filterVal = $eachFilter['properties']['filter'];
+                if (is_array($filterVal) && 'leadlist' === $eachFilter['type'] && in_array($contactSegmentId, $filterVal, true)) {
+                    $value = $accessor->getValue($entity, $returnProperty);
+                    if (('id' !== $returnProperty && !is_string($value)) || ('id' === $returnProperty && !is_numeric($value))) {
+                        continue;
+                    }
+                    $dependents[] = $value;
+                    break;
+                }
+            }
+        }
+
+        return $dependents;
+    }
+
     private function getLikeQueryCompanySegment(): string
     {
         $platform  = $this->connection->getDatabasePlatform();

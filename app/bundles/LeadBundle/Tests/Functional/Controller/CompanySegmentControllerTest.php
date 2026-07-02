@@ -391,7 +391,7 @@ class CompanySegmentControllerTest extends MauticMysqlTestCase
 
         // Try to delete the base segment (should fail)
         $crawler = $this->client->request(Request::METHOD_POST, '/s/company-segments/delete/'.$baseSegment->getId());
-        $this->assertStringContainsString('Company segment cannot be deleted, it is required by', $crawler->text());
+        $this->assertStringContainsString('cannot be deleted, it is required by', $crawler->text());
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // Check that segment still exists
