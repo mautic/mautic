@@ -13,10 +13,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
+    private const ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+
     public function __construct(
         private readonly Config $config,
         private readonly InstallService $installer,
         private readonly RequestStack $requestStack,
+        private readonly string $projectDir,
     ) {
     }
 
@@ -33,10 +36,48 @@ class AssetsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->config->isPublished()) {
-            $assetsEvent->addScript('plugins/GrapesJsBuilderBundle/Assets/library/js/dist/builder.js');
-            $assetsEvent->addStylesheet('plugins/GrapesJsBuilderBundle/Assets/library/js/dist/builder.css');
+        if (!$this->config->isPublished()) {
+            return;
         }
+
+        if ($js = $this->resolveAsset('builder.js')) {
+            $assetsEvent->addScript(self::ASSET_DIR.'/'.$js);
+        }
+        if ($css = $this->resolveAsset('builder.css')) {
+            $assetsEvent->addStylesheet(self::ASSET_DIR.'/'.$css);
+        }
+    }
+
+    /**
+     * Parcel content-hashes output filenames (e.g. builder.abc123.css), so resolve the
+     * logical name to the actual file via the manifest.json emitted by the build.
+     *
+     * Returns null when the asset cannot be resolved to a file that exists on disk, so the
+     * caller can skip injection rather than emit a broken path (which would redirect-loop).
+     */
+    private function resolveAsset(string $logicalName): ?string
+    {
+        $assetDir     = $this->projectDir.'/'.self::ASSET_DIR;
+        $manifestPath = $assetDir.'/manifest.json';
+
+        if (!is_file($manifestPath)) {
+            return null;
+        }
+
+        $manifest = json_decode((string) file_get_contents($manifestPath), true);
+
+        if (!is_array($manifest) || !isset($manifest[$logicalName])) {
+            return null;
+        }
+
+        $fileName = $manifest[$logicalName];
+
+        // Guard against a malformed manifest entry pointing outside the asset dir.
+        if (!is_string($fileName) || basename($fileName) !== $fileName || !is_file($assetDir.'/'.$fileName)) {
+            return null;
+        }
+
+        return $fileName;
     }
 
     /**
