@@ -96,7 +96,7 @@ class AjaxController extends CommonAjaxController
     /*
      * Get an array of all the payload paths we need to load
      *
-     * @param $types array
+     * @param array $types
      * @return array
      */
     /**
@@ -144,10 +144,7 @@ class AjaxController extends CommonAjaxController
     /*
      * Iterate through the paths and get the json payloads
      *
-     * @param  $paths array
-     * @return array
-     */
-    /**
+     * @param mixed[] $paths
      * @return mixed[]
      */
     public function loadPayloads($paths): array
