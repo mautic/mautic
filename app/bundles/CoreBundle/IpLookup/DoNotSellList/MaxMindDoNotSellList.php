@@ -12,7 +12,7 @@ class MaxMindDoNotSellList implements DoNotSellListInterface
 
     private $list = [];
 
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper|string $listPath;
+    private string $listPath;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

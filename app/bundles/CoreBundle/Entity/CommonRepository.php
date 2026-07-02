@@ -194,9 +194,10 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Delete an entity through the repository.
      *
-     * @param bool $flush true by default; use false if persisting in batches
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
      */
-    public function deleteEntity(object $entity, $flush = true): void
+    public function deleteEntity($entity, $flush = true): void
     {
         // delete entity
         $this->_em->remove($entity);
