@@ -45,10 +45,8 @@ class RoleController extends FormController
 
     /**
      * Generate's default role list view.
-     *
-     * @param int $page
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();

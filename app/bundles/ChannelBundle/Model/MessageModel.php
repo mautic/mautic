@@ -90,8 +90,8 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
-     * @param object $entity
-     * @param array  $options
+     * @param object  $entity
+     * @param mixed[] $options
      *
      * @return \Symfony\Component\Form\FormInterface<mixed>
      */

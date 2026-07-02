@@ -21,7 +21,11 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
+use Twig\TwigFilter;
 
 final class ThemeHelperTest extends TestCase
 {
@@ -576,5 +580,48 @@ final class ThemeHelperTest extends TestCase
 
         $this->expectException(FileNotFoundException::class);
         $this->themeHelper->delete('theme-legacy-email-foo');
+    }
+
+    public function testRenderThemeTemplateResolvesRuntimeBackedFiltersInsideSandbox(): void
+    {
+        $twig = new Environment(new ArrayLoader([
+            '@themes/test/html/page.html.twig' => '{{ value|runtime_backed }}',
+        ]));
+        $twig->addExtension(new ThemeHelperRuntimeBackedFilterExtension());
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            ThemeHelperRuntimeBackedFilterRuntime::class => static fn (): ThemeHelperRuntimeBackedFilterRuntime => new ThemeHelperRuntimeBackedFilterRuntime(),
+        ]));
+
+        $themeHelper = new ThemeHelper(
+            $this->pathsHelper,
+            $twig,
+            $this->translator,
+            $this->coreParameterHelper,
+            new Filesystem(),
+            new Finder(),
+            $this->builderIntegrationsHelper
+        );
+
+        $rendered = $themeHelper->renderThemeTemplate('@themes/test/html/page.html.twig', ['value' => 'runtime ok']);
+
+        Assert::assertSame('runtime ok [runtime]', $rendered);
+    }
+}
+
+final class ThemeHelperRuntimeBackedFilterExtension extends AbstractExtension
+{
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('runtime_backed', [ThemeHelperRuntimeBackedFilterRuntime::class, 'transform']),
+        ];
+    }
+}
+
+final class ThemeHelperRuntimeBackedFilterRuntime
+{
+    public function transform(string $value): string
+    {
+        return $value.' [runtime]';
     }
 }
