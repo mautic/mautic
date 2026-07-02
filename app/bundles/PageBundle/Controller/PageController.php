@@ -38,10 +38,7 @@ class PageController extends FormController
 
     private const PERMISSION_PREFCENTER_VIEW_OTHER = 'page:preference_center:viewother';
 
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, $page = 1): Response
+    public function indexAction(Request $request, PageConfig $pageConfig, PageHelperFactoryInterface $pageHelperFactory, PageModel $model, int $page = 1): Response
     {
         // set some permissions
         $permissionBase = 'page:pages';

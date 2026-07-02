@@ -421,7 +421,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters      will be added to where claues
      * @param array  $options      for special behavior
      *
-     * @return QueryBuilder $query
+     * @return QueryBuilder
      */
     public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [], $tablePrefix = 't')
     {
@@ -508,7 +508,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters     will be added to where claues
      * @param string $tablePrefix
      *
-     * @return QueryBuilder $query
+     * @return QueryBuilder
      */
     public function getCountDateDiffQuery($table, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $filters = [], $tablePrefix = 't')
     {
