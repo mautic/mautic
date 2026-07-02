@@ -55,7 +55,8 @@ final class ListCommandTest extends AbstractMauticTestCase
         Execution time:
         EOF;
 
-        Assert::assertStringContainsString($expected, $result->getDisplay());
+        // Normalize line endings so the test passes on checkouts with core.autocrlf enabled.
+        Assert::assertStringContainsString(str_replace("\r", '', $expected), str_replace("\r", '', $result->getDisplay()));
         Assert::assertSame(0, $result->getStatusCode());
     }
 }

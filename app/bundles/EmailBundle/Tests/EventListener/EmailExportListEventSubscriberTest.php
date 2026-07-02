@@ -84,7 +84,7 @@ final class EmailExportListEventSubscriberTest extends TestCase
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')->willReturnCallback(
-            fn (string $key, mixed $default = null) => 'image_path' === $key ? 'media/images' : $default,
+            fn (string $key, mixed $default = null): mixed => 'image_path' === $key ? 'media/images' : $default,
         );
 
         $subscriber = new EmailExportListEventSubscriber(new EmailMediaImageHelper($pathsHelper, $coreParametersHelper));
