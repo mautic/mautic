@@ -24,7 +24,7 @@ class WidgetFormEvent extends CommonEvent
     /**
      * Get the widget type.
      *
-     * @return string $type
+     * @return string
      */
     public function getType()
     {

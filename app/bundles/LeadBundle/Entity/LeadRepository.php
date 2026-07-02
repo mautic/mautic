@@ -223,12 +223,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param int $leadId
-     * @param int $limit
-     *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null)
     {
         $results = $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.*', $leadId, $limit);
 
