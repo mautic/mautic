@@ -478,7 +478,11 @@ class TrackableModel extends AbstractCommonModel
             }
         } else {
             // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
+            try {
+                $trackableUrl = $this->httpBuildUrl($urlParts);
+            } catch (\InvalidArgumentException) {
+                return false;
+            }
 
             if ($this->isInDoNotTrack($trackableUrl)) {
                 return false;

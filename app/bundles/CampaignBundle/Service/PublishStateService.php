@@ -223,7 +223,7 @@ class PublishStateService
      */
     private function buildManualPublishDateRanges(array $publishStates): array
     {
-        /** @var PublishStateDateRange[] */
+        /** @var PublishStateDateRange[] $manualPublishRanges */
         $manualPublishRanges = [];
         $currentRange        = null;
         $currentState        = null;

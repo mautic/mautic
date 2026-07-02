@@ -686,7 +686,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return Collection|Submission[]
+     * @return Collection<int, Submission>
      */
     public function getSubmissions(): Collection
     {

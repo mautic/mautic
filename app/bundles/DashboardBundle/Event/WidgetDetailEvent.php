@@ -123,7 +123,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget type.
      *
-     * @return string $type
+     * @return string
      */
     public function getType()
     {
@@ -184,7 +184,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget template.
      *
-     * @return string $template
+     * @return string
      */
     public function getTemplate()
     {
@@ -249,7 +249,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get an error message.
      *
-     * @return string $errorMessage
+     * @return string
      */
     public function getErrorMessage()
     {

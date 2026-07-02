@@ -62,7 +62,6 @@ class CompanyApiController extends CommonApiController
         return $this->model->getEntity();
     }
 
-    /**
      * @return array<string, mixed>
      */
     protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action): array

@@ -811,10 +811,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to the file.
-     *
-     * @return string
      */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): ?string
     {
         return null === $this->path
             ? null
@@ -823,10 +821,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to temporary file.
-     *
-     * @return string
      */
-    public function getAbsoluteTempPath()
+    public function getAbsoluteTempPath(): ?string
     {
         return null === $this->tempId || null === $this->tempName
             ? null
@@ -835,10 +831,8 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to temporary file.
-     *
-     * @return string
      */
-    public function getAbsoluteTempDir()
+    public function getAbsoluteTempDir(): ?string
     {
         return null === $this->tempId
             ? null
