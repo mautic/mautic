@@ -400,7 +400,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @return mixed|string
          */
-        private function generateResponse($error, $inTemplate = false)
+        private function generateResponse($error, $inTemplate = false): string|false|array
         {
             // Get a trace
             if ('dev' == self::$environment) {

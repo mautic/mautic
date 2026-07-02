@@ -125,7 +125,7 @@ class ArrayHelper
      */
     private static function sumOrSub(array $a1, array $b2, bool $subtracted = false): array
     {
-        return array_map(function ($x, $y) use ($subtracted): int|float|array {
+        return array_map(function ($x, int|string $y) use ($subtracted): int|float|array {
             if ($subtracted) {
                 return $x - $y;
             }
