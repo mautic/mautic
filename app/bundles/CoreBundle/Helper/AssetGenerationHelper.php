@@ -239,8 +239,7 @@ class AssetGenerationHelper
     /**
      * Finds directory assets.
      *
-     * @param "prod"|string $env
-     * @param mixed[]  $assets
+     * @param mixed[] $assets
      *
      * @return array<string, false|int>
      */

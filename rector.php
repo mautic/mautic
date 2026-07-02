@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
@@ -24,6 +25,7 @@ return RectorConfig::configure()
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
         Mautic\CoreBundle\Controller\CommonController::class,
         Mautic\CoreBundle\Controller\AbstractFormController::class,
+        CommonRepository::class,
     ])
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,

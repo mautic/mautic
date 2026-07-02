@@ -258,7 +258,7 @@ trait CustomFieldRepositoryTrait
 
     /**
      * @param object $entity
-     * @param bool $flush
+     * @param bool   $flush
      */
     public function saveEntity($entity, $flush = true): void
     {

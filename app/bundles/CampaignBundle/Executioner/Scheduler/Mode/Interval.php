@@ -180,7 +180,7 @@ class Interval implements ScheduleModeInterface
      * @return \DateTimeInterface
      */
     private function getGroupExecutionDateTime(
-        $eventId,
+        int $eventId,
         Lead $contact,
         \DateTimeInterface $compareFromDateTime,
         ?\DateTimeInterface $hour = null,

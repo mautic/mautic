@@ -312,8 +312,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 register_shutdown_function([self::$handler, 'handleFatal']);
 
                 // Log general PHP errors
-                set_exception_handler([self::$handler, 'handleException']);
-                set_error_handler([self::$handler, 'handleError']);
+                set_exception_handler(self::$handler->handleException(...));
+                set_error_handler(self::$handler->handleError(...));
 
                 // Hide errors by default so we can format them
                 self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); // ini_get('display_errors'));

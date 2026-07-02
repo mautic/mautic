@@ -15,15 +15,13 @@ class FileUploadValidator
     }
 
     /**
-     * @param int    $fileSize          In bytes
+     * @param int    $fileSize      In bytes
      * @param string $fileExtension
-     * @param int    $maxUploadSize     In bytes
-     * @param string $extensionErrorMsg
-     * @param string $sizeErrorMsg
+     * @param int    $maxUploadSize In bytes
      *
      * @throws FileInvalidException
      */
-    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg): void
+    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, string $extensionErrorMsg, string $sizeErrorMsg): void
     {
         $errors = [];
 
