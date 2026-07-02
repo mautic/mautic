@@ -23,14 +23,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ForeignValueFilterQueryBuilderTest extends TestCase
+final class ForeignValueFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
-
-    /**
-     * @var EventDispatcherInterface&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $dispatcher;
 
     private ForeignValueFilterQueryBuilder $queryBuilder;
 
@@ -43,11 +38,10 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     {
         parent::setUp();
         $randomParameter           = new RandomParameterName();
-        $this->dispatcher          = $this->createStub(EventDispatcherInterface::class);
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
             $randomParameter,
-            $this->dispatcher,
+            $this->createStub(EventDispatcherInterface::class),
             $this->connectionMock,
         );
     }
@@ -266,7 +260,7 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
                 new ContactSegmentFilterOperator(
                     new FilterOperatorProvider($this->dispatcher, $this->createStub(TranslatorInterface::class))
                 ),
-                new ContactSegmentFilterDictionary($this->dispatcher)
+                new ContactSegmentFilterDictionary($this->createStub(EventDispatcherInterface::class))
             ),
             new TableSchemaColumnsCache($this->createStub(EntityManager::class)),
             $this->queryBuilder,

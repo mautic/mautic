@@ -190,7 +190,7 @@ class PageSubscriber implements EventSubscriberInterface
         $livePageReflection   = new \ReflectionObject($livePage);
         $editedPageReflection = new \ReflectionObject($editedPage);
         foreach ($livePageReflection->getProperties() as $property) {
-            if ('id' == $property->getName()) {
+            if ('id' === $property->getName()) {
                 continue;
             }
 

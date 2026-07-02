@@ -23,7 +23,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
+final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&EventDispatcherInterface $dispatcher;
 

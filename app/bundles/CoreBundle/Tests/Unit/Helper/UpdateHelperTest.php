@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
@@ -21,7 +23,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class UpdateHelperTest extends TestCase
+final class UpdateHelperTest extends TestCase
 {
     /**
      * @var MockObject&Logger
@@ -412,7 +414,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -481,7 +483,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -548,7 +550,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request);

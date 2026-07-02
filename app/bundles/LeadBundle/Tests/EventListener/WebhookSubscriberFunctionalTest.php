@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -15,7 +17,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 
-class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
+final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
 

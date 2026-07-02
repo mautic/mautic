@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

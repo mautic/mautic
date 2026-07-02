@@ -17,7 +17,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportControllerFunctionalTest extends MauticMysqlTestCase
+final class ImportControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

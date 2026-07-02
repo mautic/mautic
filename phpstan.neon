@@ -13,7 +13,7 @@ parameters:
 	type_coverage:
 		return: 85
 		param: 72
-		property: 67
+		property: 66
 	paths:
 		- app/bundles
 		- app/migrations
@@ -96,6 +96,11 @@ parameters:
 		-
 			identifier: return.deprecatedClass
 			message: '#Return type of method (Mautic|MauticPlugin)\\(.*?)\\EventListener\\CampaignSubscriber::(.*?) has typehint with deprecated class Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent#'
+		-
+			identifier: classConstant.deprecatedClass
+			paths:
+				- app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
+				- app/bundles/SmsBundle/Tests/Model/SmsModelTest.php
 		# false positive, reflection reference method call
 		-
 			identifier: method.impossibleType

@@ -1883,7 +1883,7 @@ class LeadController extends FormController
             $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];

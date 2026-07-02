@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 
-class SegmentFilterFunctionalTest extends MauticMysqlTestCase
+final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @var Lead[]

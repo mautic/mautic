@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FromEmailHelperTest extends TestCase
+final class FromEmailHelperTest extends TestCase
 {
     /** @var MockObject&CoreParametersHelper */
     private MockObject $coreParametersHelper;

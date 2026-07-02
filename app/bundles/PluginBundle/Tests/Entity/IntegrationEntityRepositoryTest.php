@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 /**
  * IntegrationRepository.
  */
-class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
+final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     public const INTEGRATION        = 'someIntegration';
 

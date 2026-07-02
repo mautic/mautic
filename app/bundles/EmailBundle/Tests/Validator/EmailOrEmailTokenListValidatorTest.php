@@ -155,10 +155,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             null,
             0,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
-            function (): void {
+            function (): never {
                 self::fail('Null value should not be validated.');
             },
         ];
@@ -167,10 +167,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             '',
             0,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
-            function (): void {
+            function (): never {
                 self::fail('Empty string value should not be validated.');
             },
         ];
@@ -179,7 +179,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'somestring',
             1,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
             function ($message, array $parameters = []): void {
@@ -198,10 +198,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com',
             0,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
-            function (): void {
+            function (): never {
                 self::fail('Valid email address value should not add violation.');
             },
         ];
@@ -210,7 +210,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, somestring',
             1,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
             function ($message, array $parameters = []): void {
@@ -228,7 +228,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         yield [
             'john@doe.com, {contactfield=somefield | invalid-default-email-address}',
             1,
-            function (): void {
+            function (): never {
                 self::fail('Field should not be fetched');
             },
             function ($message, array $parameters = []): void {
@@ -302,7 +302,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
                 return $field;
             },
-            function (): void {
+            function (): never {
                 self::fail('There is no violation');
             },
         ];

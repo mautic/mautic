@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CommonRepositoryUpsertTest extends MauticMysqlTestCase
+final class CommonRepositoryUpsertTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {

@@ -24,11 +24,6 @@ final class MauticReportBuilderTest extends TestCase
     use MockedConnectionTrait;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub|EventDispatcherInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $dispatcher;
-
-    /**
      * @var MockObject|Connection
      */
     private MockObject $connection;
@@ -38,8 +33,6 @@ final class MauticReportBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->dispatcher          = $this->createStub(EventDispatcherInterface::class);
         $this->connection          = $this->getMockedConnection();
         $this->channelListHelper   = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
 
@@ -284,7 +277,7 @@ final class MauticReportBuilderTest extends TestCase
     private function buildBuilder(Report $report): MauticReportBuilder
     {
         return new MauticReportBuilder(
-            $this->dispatcher,
+            $this->createStub(EventDispatcherInterface::class),
             $this->connection,
             $report,
             $this->channelListHelper

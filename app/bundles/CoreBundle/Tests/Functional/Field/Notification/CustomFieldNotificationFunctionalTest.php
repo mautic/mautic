@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
+final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
+final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 

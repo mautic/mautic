@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateHelperTest extends \PHPUnit\Framework\TestCase
+final class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

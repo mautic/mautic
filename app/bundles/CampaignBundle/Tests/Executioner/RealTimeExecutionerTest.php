@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,7 +23,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends TestCase
+final class RealTimeExecutionerTest extends TestCase
 {
     private MockObject&LeadModel $leadModel;
 

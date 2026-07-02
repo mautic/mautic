@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\InstallBundle\Tests\Install;
 
 use Doctrine\DBAL\Connection;
@@ -15,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @template T of AbstractPlatform
  */
-class InstallSchemaTest extends TestCase
+final class InstallSchemaTest extends TestCase
 {
     private Connection $connection;
 

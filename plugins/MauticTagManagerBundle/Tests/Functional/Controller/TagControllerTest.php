@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class TagControllerTest extends MauticMysqlTestCase
+final class TagControllerTest extends MauticMysqlTestCase
 {
     private const MERGE_ROUTE_BASE = '/s/tags/merge/';
 

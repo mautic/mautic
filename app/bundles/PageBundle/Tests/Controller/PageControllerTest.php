@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -12,7 +14,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PageControllerTest extends MauticMysqlTestCase
+final class PageControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 

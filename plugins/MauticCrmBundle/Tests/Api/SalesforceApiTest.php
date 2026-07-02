@@ -13,7 +13,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(SalesforceApi::class)]
-class SalesforceApiTest extends \PHPUnit\Framework\TestCase
+final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a locked record request is retried up to 3 times')]
     public function testRecordLockedErrorIsRetriedThreeTimes(): void

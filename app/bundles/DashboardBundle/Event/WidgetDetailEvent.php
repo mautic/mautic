@@ -83,7 +83,7 @@ class WidgetDetailEvent extends CommonEvent
 
         // If there are no additional parameters we return uniqueWidgetId as a cache key
         // Otherwise we return hashed $cacheKey value
-        $cacheKey = (1 == count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
+        $cacheKey = (1 === count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
 
         return $this->cacheKeyPath.$cacheKey;
     }

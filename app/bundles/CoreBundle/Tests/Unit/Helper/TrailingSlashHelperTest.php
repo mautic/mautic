@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
+final class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper

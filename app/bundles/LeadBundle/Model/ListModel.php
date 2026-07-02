@@ -150,7 +150,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             $count     = count($existing);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);

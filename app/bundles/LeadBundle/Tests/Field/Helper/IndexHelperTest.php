@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
-class IndexHelperTest extends \PHPUnit\Framework\TestCase
+final class IndexHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetIndexCountAndColumns(): void
     {
@@ -28,6 +28,10 @@ class IndexHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn([$columnName]);
             $indexes[] = $indexMock;
         }
+        $expectedColumnNames = array_map(
+            fn ($column): string => $column[self::COLUMN_NAME_KEY],
+            $sqlResult
+        );
 
         $expectedColumnNames = $columnNames;
         $expectedCount       = count($expectedColumnNames);

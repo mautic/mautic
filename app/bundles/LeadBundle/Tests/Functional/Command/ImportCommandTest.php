@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 
-class ImportCommandTest extends MauticMysqlTestCase
+final class ImportCommandTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
 

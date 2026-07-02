@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Illuminate\Support\Collection;
@@ -34,7 +36,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeadControllerTest extends MauticMysqlTestCase
+final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     private const ADMIN_USER = 'admin';

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GeneratedColumnSubscriberTest extends TestCase
+final class GeneratedColumnSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -25,7 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends MauticMysqlTestCase
+final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

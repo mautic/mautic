@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Doctrine\DBAL\Connection;
@@ -18,7 +20,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
-class AbstractCampaignCommand extends MauticMysqlTestCase
+abstract class AbstractCampaignCommand extends MauticMysqlTestCase
 {
     public const SEND_EMAIL_SECONDS = 3;
 

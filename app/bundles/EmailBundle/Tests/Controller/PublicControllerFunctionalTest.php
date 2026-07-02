@@ -19,7 +19,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerFunctionalTest extends MauticMysqlTestCase
+final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     private ?int $leadId = null;
 

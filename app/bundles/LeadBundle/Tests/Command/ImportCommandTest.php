@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -17,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportCommandTest extends TestCase
+final class ImportCommandTest extends TestCase
 {
     public function testExecuteFailsIfModifiedByIsNotSet(): void
     {

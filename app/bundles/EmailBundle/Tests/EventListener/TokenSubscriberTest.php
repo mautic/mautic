@@ -33,7 +33,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {

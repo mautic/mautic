@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -8,7 +10,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 
-class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
+final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testFieldMatchingPriority(): void
     {

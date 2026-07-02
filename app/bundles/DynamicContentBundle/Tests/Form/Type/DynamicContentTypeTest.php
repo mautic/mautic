@@ -23,7 +23,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DynamicContentTypeTest extends TestCase
+final class DynamicContentTypeTest extends TestCase
 {
     public function testFormBuild(): void
     {

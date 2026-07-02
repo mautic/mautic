@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 
-class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private Lead $lead;
 

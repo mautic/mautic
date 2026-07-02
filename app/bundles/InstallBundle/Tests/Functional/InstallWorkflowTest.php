@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class InstallWorkflowTest extends MauticMysqlTestCase
+final class InstallWorkflowTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
 

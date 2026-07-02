@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 
-class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private EmailRepository $emailRepository;
 

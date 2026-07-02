@@ -10,7 +10,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ConfigControllerFunctionalTest extends MauticMysqlTestCase
+final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
 

@@ -22,7 +22,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ChannelClickQueryBuilderTest extends TestCase
+final class ChannelClickQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
 

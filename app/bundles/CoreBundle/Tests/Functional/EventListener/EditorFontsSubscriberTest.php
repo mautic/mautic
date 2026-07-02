@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class EditorFontsSubscriberTest extends MauticMysqlTestCase
+final class EditorFontsSubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

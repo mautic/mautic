@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -15,7 +17,7 @@ use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class SalesforceIntegrationTest extends AbstractIntegrationTestCase
+final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
     public const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
 

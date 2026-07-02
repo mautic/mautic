@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PointModelTest extends TestCase
+final class PointModelTest extends TestCase
 {
     private IpLookupHelper&MockObject $ipLookupHelper;
 

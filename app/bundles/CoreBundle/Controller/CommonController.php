@@ -555,7 +555,7 @@ class CommonController extends AbstractController implements MauticController
         if ($request->query->has('orderby')) {
             $orderBy = InputHelper::clean($request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = $orderBy === $session->get("$name.orderby") || false == $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
+            $dir     = $orderBy === $session->get("$name.orderby") || false === $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }

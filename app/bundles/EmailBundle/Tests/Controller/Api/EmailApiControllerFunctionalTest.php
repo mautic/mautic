@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
+final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     private SmtpTransport $transport;
 
