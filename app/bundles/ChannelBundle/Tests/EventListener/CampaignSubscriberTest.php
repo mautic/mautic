@@ -242,7 +242,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Event|\PHPUnit\Framework\MockObject\MockObject
+     * @return Event&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
     {
