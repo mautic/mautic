@@ -274,7 +274,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Adds the repository alias to the column name if it doesn't exist.
      *
-     * @return string $column name with alias prefix
+     * @return string column name with alias prefix
      */
     protected function addAliasIfNotPresent(string $columns, string $alias): string
     {

@@ -62,7 +62,7 @@ class CompanyApiController extends CommonApiController
     }
 
     /**
-     * @param Company              &$entity
+     * @param Company              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
