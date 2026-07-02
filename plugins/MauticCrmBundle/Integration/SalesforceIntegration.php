@@ -2197,8 +2197,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 )
                 ) {
                     // Get the lead entity
-                    /** @var Lead $leadEntity */
                     foreach ($updateLead as $mauticField => $sfValue) {
+                        /** @var Lead $leadEntity */
                         $leadEntity->addUpdatedField($mauticField, $sfValue);
                     }
 
@@ -2891,8 +2891,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             )
             ) {
                 // Get the company entity
-                /** @var Lead $leadEntity */
                 foreach ($updateCompany as $mauticField => $sfValue) {
+                    /** @var Company $companyEntity */
                     $companyEntity->addUpdatedField($mauticField, $sfValue);
                 }
 
