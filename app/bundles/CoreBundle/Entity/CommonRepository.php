@@ -1516,15 +1516,9 @@ class CommonRepository extends ServiceEntityRepository
         if (isset($args['ids'])) {
             $ids   = array_map(intval(...), $args['ids']);
             $param = $this->generateRandomParameterName();
-            if ($q instanceof QueryBuilder) {
-                $builder->add(
-                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
-                );
-            } else {
-                $builder->add(
-                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
-                );
-            }
+            $builder->add(
+                $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
+            );
             $q->setParameter($param, $ids, ArrayParameterType::INTEGER);
         } elseif (!empty($args['ownedBy'])) {
             $param = $this->generateRandomParameterName();

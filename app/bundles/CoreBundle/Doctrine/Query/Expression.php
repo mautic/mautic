@@ -14,6 +14,7 @@ use Doctrine\ORM\QueryBuilder;
 class Expression implements \Countable
 {
     private const AND = 'and';
+
     private const OR  = 'or';
 
     private CompositeExpression|Composite $expr;
@@ -22,18 +23,25 @@ class Expression implements \Countable
 
     private int $count = 0;
 
-    private function __construct(private ExpressionBuilder|Expr $builder, private string $type)
+    private function __construct(private ExpressionBuilder|Expr $builder, CompositeExpression|Composite|null $expr, private string $type)
     {
+        if (null === $expr) {
+            return;
+        }
+
+        $this->expr = $expr;
+        $this->count = $expr->count();
+        $this->firstCall = false;
     }
 
-    public static function and(QueryBuilder|DbalQueryBuilder $qb): self
+    public static function and(QueryBuilder|DbalQueryBuilder $qb, CompositeExpression|Composite|null $expr = null): self
     {
-        return new self($qb->expr(), self::AND);
+        return new self($qb->expr(), $expr, self::AND);
     }
 
-    public static function or(QueryBuilder|DbalQueryBuilder $qb): self
+    public static function or(QueryBuilder|DbalQueryBuilder $qb, CompositeExpression|Composite|null $expr = null): self
     {
-        return new self($qb->expr(), self::OR);
+        return new self($qb->expr(), $expr, self::OR);
     }
 
     /**

@@ -11,6 +11,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\CoreBundle\Doctrine\Query\Expression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
@@ -835,16 +836,17 @@ class EmailRepository extends CommonRepository
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
 
-        $expr->add(
+        $builder = Expression::and($qb, $expr);
+        $builder->add(
             $qb->expr()->eq($this->getTableAlias().'.emailType', $qb->expr()->literal('list'))
         );
 
         if (null !== $id && 0 !== $id) {
-            $expr->add(
+            $builder->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
-        $qb->where($expr);
+        $qb->where($builder->expr());
 
         return $qb->getQuery();
     }

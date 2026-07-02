@@ -4,6 +4,7 @@ namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\Query\Expression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -47,17 +48,18 @@ class SmsRepository extends CommonRepository
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+        $builder = Expression::and($qb, $expr);
 
-        $expr->add(
+        $builder->add(
             $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
         );
 
         if (null !== $id && 0 !== $id) {
-            $expr->add(
+            $builder->add(
                 $qb->expr()->eq($this->getTableAlias().'.id', (int) $id)
             );
         }
-        $qb->where($expr);
+        $qb->where($builder->expr());
 
         return $qb->getQuery();
     }

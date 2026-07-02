@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\Query\Expression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -46,9 +47,10 @@ class PointRepository extends CommonRepository
 
         // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q);
-        $expr->add($q->expr()->eq('p.type', ':type'));
+        $builder = Expression::and($q, $expr);
+        $builder->add($q->expr()->eq('p.type', ':type'));
 
-        $q->where($expr);
+        $q->where($builder->expr());
 
         return $q->getQuery()->getResult();
     }

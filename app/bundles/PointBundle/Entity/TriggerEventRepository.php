@@ -4,6 +4,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Mautic\CoreBundle\Doctrine\Query\Expression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -27,12 +28,13 @@ class TriggerEventRepository extends CommonRepository
 
         // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q, 'r');
+        $builder = Expression::and($q, $expr);
 
-        $expr->add(
+        $builder->add(
             $q->expr()->lte('r.points', (int) $points)
         );
 
-        $q->where($expr);
+        $q->where($builder->expr());
         $q->andWhere('r.group IS NULL');
 
         return $q->getQuery()->getArrayResult();
@@ -92,10 +94,11 @@ class TriggerEventRepository extends CommonRepository
 
         // make sure the published up and down dates are good
         $expr = $this->getPublishedByDateExpression($q);
-        $expr->add(
+        $builder = Expression::and($q, $expr);
+        $builder->add(
             $q->expr()->eq('e.type', ':type')
         );
-        $q->where($expr)
+        $q->where($builder->expr())
             ->setParameter('type', $type);
 
         return $q->getQuery()->getResult();
