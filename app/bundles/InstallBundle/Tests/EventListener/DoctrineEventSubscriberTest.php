@@ -24,26 +24,22 @@ final class DoctrineEventSubscriberTest extends TestCase
      * @var \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface
      */
     private \PHPUnit\Framework\MockObject\Stub $entityManager;
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Connection
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->connection    = $this->createMock(Connection::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
+        $connection          = $this->createStub(Connection::class);
 
         // Default to MySQL platform for backward compatibility with existing tests
         $platform = new MySQLPlatform();
 
-        $this->connection->method('getDatabasePlatform')
+        $connection->method('getDatabasePlatform')
             ->willReturn($platform);
 
         $this->entityManager->method('getConnection')
-            ->willReturn($this->connection);
+            ->willReturn($connection);
     }
 
     public function testSubscriberWillAddCorrectIndexes(): void

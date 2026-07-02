@@ -13,6 +13,7 @@ use PHPUnit\Framework\Assert;
 final class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
+
     private const SALES_USER = 'sales';
 
     private UserNotificationBuilder $notificationBuilder;

@@ -29,12 +29,14 @@ final class TagManagerPermissionsTest extends TestCase
 
     public function testBuildFormMethodAddsStandardFormFields(): void
     {
+        $builderStub = $this->createStub(FormBuilderInterface::class);
+
         $options = ['someOption'];
         $data    = ['someData'];
         $this->tagManagerPermissions->expects($this->once())
             ->method('addStandardFormFields')
-            ->with('tagManager', 'tagManager', $this->createStub(FormBuilderInterface::class), $data);
+            ->with('tagManager', 'tagManager', $builderStub, $data);
 
-        $this->tagManagerPermissions->buildForm($this->createStub(FormBuilderInterface::class), $options, $data);
+        $this->tagManagerPermissions->buildForm($builderStub, $options, $data);
     }
 }

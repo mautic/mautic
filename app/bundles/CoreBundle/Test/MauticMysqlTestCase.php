@@ -314,7 +314,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 $schemaManager = $this->connection->createSchemaManager();
                 $tables        = $schemaManager->listTableNames();
 
-                $prefixedTables = array_filter($tables, fn ($table) => str_starts_with($table, $prefix));
+                $prefixedTables = array_filter($tables, fn ($table): bool => str_starts_with($table, $prefix));
 
                 if (!empty($prefixedTables)) {
                     $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
@@ -393,7 +393,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $schemaManager = $this->connection->createSchemaManager();
         $tables        = $schemaManager->listTableNames();
 
-        $prefixedTables = array_filter($tables, fn ($table) => str_starts_with($table, $prefix));
+        $prefixedTables = array_filter($tables, fn ($table): bool => str_starts_with($table, $prefix));
 
         if (empty($prefixedTables)) {
             // Nothing to do
@@ -607,7 +607,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         bool $unique = false,
         bool $withAlter = false,
         bool $ifNotExists = false,
-    ): string {
+    ): int|string {
         return $this->connection->executeStatement(
             DatabasePlatform::getCreateIndexSql(
                 $this->connection->getDatabasePlatform(),
@@ -629,7 +629,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         string $indexName,
         bool $withAlter = false,
         bool $ifExists = false,
-    ): string {
+    ): int|string {
         return $this->connection->executeStatement(
             DatabasePlatform::getDropIndexSql(
                 $this->connection->getDatabasePlatform(),

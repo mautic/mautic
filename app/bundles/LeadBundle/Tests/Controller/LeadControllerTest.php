@@ -39,6 +39,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     private const ADMIN_USER = 'admin';
 
     private const CONTACT_A_EMAIL               = 'contact@a.email';

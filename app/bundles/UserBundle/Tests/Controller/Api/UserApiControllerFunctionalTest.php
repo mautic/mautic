@@ -16,7 +16,9 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const ADMIN_USER = 'admin';
+
     private const ADMIN_ROLE = 'Administrator';
+
     private const SALES_ROLE = 'Sales Team';
 
     public function testRoleUpdateByApiGivesErrorResponseIfUserDoesNotExist(): void
