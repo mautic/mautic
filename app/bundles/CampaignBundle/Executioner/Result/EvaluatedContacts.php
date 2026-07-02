@@ -28,7 +28,7 @@ class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection|Lead[]
+     * @return ArrayCollection<int, Lead>
      */
     public function getPassed(): ArrayCollection
     {
@@ -36,7 +36,7 @@ class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection|Lead[]
+     * @return ArrayCollection<int, Lead>
      */
     public function getFailed(): ArrayCollection
     {

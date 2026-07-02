@@ -65,7 +65,7 @@ jobs:
 
     - name: PHPUnit cache
       if: ${{matrix.php-versions == '8.2' && matrix.db-types == 'mariadb:10.11'}}
-      uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/phpunit
         key: ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -188,7 +188,7 @@ jobs:
 
     - name: Rector Cache
       if: ${{matrix.commands == 'Rector'}}
-      uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/rector
         key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -198,7 +198,7 @@ jobs:
 
     - name: Rector tests Cache
       if: ${{matrix.commands == 'Rector tests'}}
-      uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/rector-tests
         key: ${{ runner.os }}-rector-tests-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -208,7 +208,7 @@ jobs:
 
     - name: PHPStan Cache
       if: ${{matrix.commands == 'PHPSTAN'}}
-      uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/phpstan-cache
         key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
@@ -217,7 +217,7 @@ jobs:
           ${{ runner.os }}-phpstan-
 
     - name: NPM Cache
-      uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./var/cache/js
         key: ${{ runner.os }}-js-${{ hashFiles('**/package-lock.json', 'webpack.config.js') }}-${{ github.run_id }}

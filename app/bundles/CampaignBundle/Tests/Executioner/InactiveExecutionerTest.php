@@ -32,7 +32,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&InactiveHelper $inactiveHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventExecutioner $eventExecutioner;
+    private MockObject&EventExecutioner $eventExecutioner;
 
     private MockObject&EventRedirectionHelper $redirectionHelper;
 
@@ -46,7 +46,8 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
-        $this->eventExecutioner = $this->createStub(EventExecutioner::class);
+        $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+        $this->eventExecutioner->method('getExecutionDate')->willReturn(new \DateTime());
 
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 

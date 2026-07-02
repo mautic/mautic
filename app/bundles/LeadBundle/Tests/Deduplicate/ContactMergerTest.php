@@ -49,6 +49,8 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->companyLeadRepo = $this->createMock(CompanyLeadRepository::class);
 
         $this->leadModel->method('getRepository')->willReturn($leadRepo);
+
+        $leadRepo->method('getFieldValues')->willReturn([]);
     }
 
     public function testMergeTimestamps(): void
