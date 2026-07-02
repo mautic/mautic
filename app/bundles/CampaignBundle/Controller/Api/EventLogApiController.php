@@ -203,6 +203,8 @@ class EventLogApiController extends FetchCommonApiController
             return $valid;
         }
 
+        $errors= [];
+
         $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->getModel('campaign.event'), false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->getModel('lead'), false);
 

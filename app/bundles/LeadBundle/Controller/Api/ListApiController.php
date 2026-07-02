@@ -208,7 +208,7 @@ class ListApiController extends CommonApiController
             } else {
                 $leadModel = $this->getModel('lead');
                 \assert($leadModel instanceof LeadModel);
-                /* @var \Mautic\LeadBundle\Entity\Lead $contact */
+                /** @var \Mautic\LeadBundle\Entity\Lead $contact */
                 $leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
             }

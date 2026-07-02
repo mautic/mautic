@@ -414,7 +414,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -483,7 +483,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -550,7 +550,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request);
