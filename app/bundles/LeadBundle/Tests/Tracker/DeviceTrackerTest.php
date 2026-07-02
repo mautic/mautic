@@ -15,7 +15,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
+final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 {
     private DeviceCreatorService $deviceCreatorService;
 

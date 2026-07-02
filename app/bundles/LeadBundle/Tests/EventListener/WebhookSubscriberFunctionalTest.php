@@ -14,7 +14,7 @@ use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 
-class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
+final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

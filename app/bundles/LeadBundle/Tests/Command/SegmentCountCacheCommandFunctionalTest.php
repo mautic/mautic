@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
+final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ClientControllerTest extends MauticMysqlTestCase
+final class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT = 6;
 

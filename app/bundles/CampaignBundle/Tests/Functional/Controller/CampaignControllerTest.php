@@ -25,7 +25,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerTest extends MauticMysqlTestCase
+final class CampaignControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use UserEntityTrait;

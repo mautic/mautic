@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
+final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoBackground(): void
     {

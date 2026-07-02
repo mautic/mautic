@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
+final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

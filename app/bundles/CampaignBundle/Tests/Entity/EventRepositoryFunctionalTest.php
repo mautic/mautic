@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class EventRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @return iterable<string, array{?\DateTime, ?\DateTime, int}>

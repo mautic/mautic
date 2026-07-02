@@ -11,7 +11,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\Assert;
 
-class HitRepositoryTest extends MauticMysqlTestCase
+final class HitRepositoryTest extends MauticMysqlTestCase
 {
     private HitRepository $hitRepository;
 

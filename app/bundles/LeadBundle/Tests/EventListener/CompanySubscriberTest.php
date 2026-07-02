@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\LeadEvents;
 
-class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {

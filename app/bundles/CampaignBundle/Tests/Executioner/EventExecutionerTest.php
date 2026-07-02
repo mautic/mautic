@@ -31,7 +31,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
-class EventExecutionerTest extends \PHPUnit\Framework\TestCase
+final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var EventCollector&MockObject

@@ -8,7 +8,7 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Twilio\Exceptions\ConfigurationException;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+final class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var IntegrationHelper|\PHPUnit\Framework\MockObject\MockObject

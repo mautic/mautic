@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
+final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
 {
     private BackgroundService $backgroundService;
 

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetBuilderTokensAction(): void
     {

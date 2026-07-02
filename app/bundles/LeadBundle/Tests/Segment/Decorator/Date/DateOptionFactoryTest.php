@@ -24,7 +24,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateOptionFactory::class)]
-class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
+final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testBirthday(): void
     {

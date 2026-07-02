@@ -7,7 +7,7 @@ namespace Mautic\PageBundle\Tests\Entity;
 use Mautic\PageBundle\Entity\Hit;
 use PHPUnit\Framework\Assert;
 
-class HitTest extends \PHPUnit\Framework\TestCase
+final class HitTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('setUrlTitle')]
     public function testSetUrlTitle(string $urlTitle, int $expected): void

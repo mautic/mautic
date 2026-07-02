@@ -5,7 +5,7 @@ namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ConfigHelper::class)]
-class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Ensure a mixed numeric/string keyed array is formatted to all string based keys')]
     public function testNestedLocalParametersAreBoundCorrectly(): void

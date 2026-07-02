@@ -17,7 +17,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTypeTest extends \PHPUnit\Framework\TestCase
+final class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

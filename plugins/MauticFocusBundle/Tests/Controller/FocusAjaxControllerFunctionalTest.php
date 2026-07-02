@@ -12,7 +12,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testViewsCount(): void
     {

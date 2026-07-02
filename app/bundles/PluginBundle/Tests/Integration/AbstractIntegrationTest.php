@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 
-class AbstractIntegrationTest extends AbstractIntegrationTestCase
+final class AbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testPopulatedLeadDataReturnsIntAndNotDncEntityForMauticContactIsContactableByEmail(): void
     {

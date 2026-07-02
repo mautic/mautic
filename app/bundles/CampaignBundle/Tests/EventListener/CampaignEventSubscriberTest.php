@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignEventSubscriberTest extends TestCase
+final class CampaignEventSubscriberTest extends TestCase
 {
     private CampaignEventSubscriber $fixture;
 

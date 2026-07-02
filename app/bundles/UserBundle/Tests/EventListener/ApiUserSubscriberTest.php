@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-class ApiUserSubscriberTest extends TestCase
+final class ApiUserSubscriberTest extends TestCase
 {
     public function testSubscribedEvents(): void
     {

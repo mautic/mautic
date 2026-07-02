@@ -9,7 +9,7 @@ use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FoursquareIntegration::class)]
-class FoursquareIntegrationTest extends AbstractIntegrationTestCase
+final class FoursquareIntegrationTest extends AbstractIntegrationTestCase
 {
     private FoursquareIntegration $integration;
 

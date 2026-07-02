@@ -14,7 +14,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class SyncCommandTest extends TestCase
+final class SyncCommandTest extends TestCase
 {
     use IsolatedTestTrait;
 

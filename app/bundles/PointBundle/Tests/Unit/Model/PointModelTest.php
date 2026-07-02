@@ -32,7 +32,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PointModelTest extends TestCase
+final class PointModelTest extends TestCase
 {
     private RequestStack&MockObject $requestStack;
     private IpLookupHelper&MockObject $ipLookupHelper;

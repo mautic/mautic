@@ -22,7 +22,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
+final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|LeadModel

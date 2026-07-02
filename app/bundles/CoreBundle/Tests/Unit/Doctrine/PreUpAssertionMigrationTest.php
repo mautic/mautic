@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class PreUpAssertionMigrationTest extends TestCase
+final class PreUpAssertionMigrationTest extends TestCase
 {
     public function testPreUpWithoutSkipAssertions(): void
     {

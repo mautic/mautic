@@ -11,7 +11,7 @@ use PHPUnit\Framework\Assert;
 /**
  * IntegrationRepository.
  */
-class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
+final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     /**
      * @var string

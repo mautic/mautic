@@ -10,7 +10,7 @@ use Mautic\StageBundle\Entity\Stage;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class StageControllerFunctionalTest extends MauticMysqlTestCase
+final class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testStageMenuString(): void
     {

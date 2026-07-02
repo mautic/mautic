@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class RedirectModelTest extends PageTestAbstract
+final class RedirectModelTest extends PageTestAbstract
 {
     public function testCreateRedirectEntityWhenCalledReturnsRedirect(): void
     {

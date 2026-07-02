@@ -8,7 +8,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CategoryMapper::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(Definition::class)]
-class CategoryMapperTest extends \PHPUnit\Framework\TestCase
+final class CategoryMapperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the Category object is returned')]
     public function testCategoryIsMapped(): void

@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ForeignValueFilterQueryBuilderTest extends TestCase
+final class ForeignValueFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
     private RandomParameterName $randomParameter;

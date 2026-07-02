@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 
-class ResponsesTest extends \PHPUnit\Framework\TestCase
+final class ResponsesTest extends \PHPUnit\Framework\TestCase
 {
     public function testExtractingResponsesFromLog(): void
     {

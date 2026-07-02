@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\JsonListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ValueListParser::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\ListParser\ArrayListParser::class)]
-class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void

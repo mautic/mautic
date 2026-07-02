@@ -12,7 +12,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageControllerFunctionalTest extends MauticMysqlTestCase
+final class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPagePreview(): void
     {

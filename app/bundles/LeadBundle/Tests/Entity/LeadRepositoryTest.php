@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 

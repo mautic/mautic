@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class TransportCallbackTest extends TestCase
+final class TransportCallbackTest extends TestCase
 {
     public function testStatSave(): void
     {

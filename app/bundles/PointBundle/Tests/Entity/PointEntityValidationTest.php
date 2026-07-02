@@ -12,7 +12,7 @@ use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PointEntityValidationTest extends MauticMysqlTestCase
+final class PointEntityValidationTest extends MauticMysqlTestCase
 {
     /**
      * @throws MappingException

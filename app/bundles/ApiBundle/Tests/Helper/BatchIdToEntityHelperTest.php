@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class BatchIdToEntityHelperTest extends TestCase
+final class BatchIdToEntityHelperTest extends TestCase
 {
     public function testIdsAreExtractedFromIdKeyArray(): void
     {

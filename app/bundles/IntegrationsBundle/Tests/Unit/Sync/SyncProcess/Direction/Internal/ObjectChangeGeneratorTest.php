@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
      * @var SyncJudgeInterface&MockObject

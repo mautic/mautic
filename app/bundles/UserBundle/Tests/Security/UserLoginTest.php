@@ -9,7 +9,7 @@ use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 
-class UserLoginTest extends MauticMysqlTestCase
+final class UserLoginTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;
 

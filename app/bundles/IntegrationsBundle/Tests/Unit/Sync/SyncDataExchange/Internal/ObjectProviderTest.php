@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ObjectProviderTest extends TestCase
+final class ObjectProviderTest extends TestCase
 {
     /**
      * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject

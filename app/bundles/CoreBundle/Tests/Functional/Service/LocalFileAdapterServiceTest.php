@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class LocalFileAdapterServiceTest extends MauticMysqlTestCase
+final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 {
     /**
      * @var string

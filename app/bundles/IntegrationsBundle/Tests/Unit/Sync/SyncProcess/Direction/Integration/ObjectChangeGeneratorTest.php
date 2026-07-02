@@ -17,7 +17,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChang
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeGeneratorTest extends TestCase
+final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
      * @var ValueHelper|\PHPUnit\Framework\MockObject\MockObject

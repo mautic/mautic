@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class BuilderSubscriberTest extends MauticMysqlTestCase
+final class BuilderSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

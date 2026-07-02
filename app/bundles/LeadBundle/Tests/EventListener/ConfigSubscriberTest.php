@@ -10,7 +10,7 @@ use Mautic\LeadBundle\EventListener\ConfigSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ConfigSubscriberTest extends TestCase
+final class ConfigSubscriberTest extends TestCase
 {
     private ConfigSubscriber $configSubscriber;
 

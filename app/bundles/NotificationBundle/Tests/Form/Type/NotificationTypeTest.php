@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class NotificationTypeTest extends TypeTestCase
+final class NotificationTypeTest extends TypeTestCase
 {
     /**
      * @return array<FormExtensionInterface>

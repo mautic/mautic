@@ -24,7 +24,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ContactObjectHelperTest extends TestCase
+final class ContactObjectHelperTest extends TestCase
 {
     /**
      * @var LeadModel&MockObject

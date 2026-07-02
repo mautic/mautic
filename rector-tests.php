@@ -8,6 +8,7 @@ use Rector\PHPUnit\PHPUnit60\Rector\ClassMethod\AddDoesNotPerformAssertionToNonA
 use Rector\PHPUnit\PHPUnit60\Rector\MethodCall\GetMockBuilderGetMockToCreateMockRector;
 use Rector\PHPUnit\PHPUnit80\Rector\MethodCall\SpecificAssertContainsRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Privatization\Rector\Class_\FinalizeTestCaseClassRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -25,8 +26,12 @@ return RectorConfig::configure()
     ->withRules([
         SpecificAssertContainsRector::class,
         GetMockBuilderGetMockToCreateMockRector::class,
+        FinalizeTestCaseClassRector::class,
     ])
     ->withSkip([
         AddDoesNotPerformAssertionToNonAssertingTestRector::class, // Adds annotation where it does not belong to.
         ParentTestClassConstructorRector::class, // Adds unnecessary constructors to test classes without custom logic.
+        FinalizeTestCaseClassRector::class => [
+            'app/bundles/CampaignBundle/Tests/CampaignTestAbstract.php', // This class is extended.
+        ],
     ]);

@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CacheProviderTest extends TestCase
+final class CacheProviderTest extends TestCase
 {
     private CacheProvider $cacheProvider;
 

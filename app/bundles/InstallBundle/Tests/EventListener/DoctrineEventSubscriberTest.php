@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DoctrineEventSubscriberTest extends TestCase
+final class DoctrineEventSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&EntityManagerInterface

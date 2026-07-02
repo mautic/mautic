@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends TestCase
+final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {

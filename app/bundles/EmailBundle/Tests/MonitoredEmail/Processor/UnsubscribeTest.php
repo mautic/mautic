@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
-class UnsubscribeTest extends \PHPUnit\Framework\TestCase
+final class UnsubscribeTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void

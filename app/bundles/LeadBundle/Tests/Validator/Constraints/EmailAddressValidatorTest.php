@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailAddressValidatorTest extends AbstractMauticTestCase
+final class EmailAddressValidatorTest extends AbstractMauticTestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
     public function testValidate(?string $value, int $expectedViolationCount): void

@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class EventLoggerTest extends TestCase
+final class EventLoggerTest extends TestCase
 {
     /**
      * @var IpLookupHelper&MockObject

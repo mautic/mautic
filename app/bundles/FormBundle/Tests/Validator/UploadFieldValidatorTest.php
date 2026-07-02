@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(UploadFieldValidator::class)]
-class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
+final class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('No Files given')]
     public function testNoFilesGiven(): void

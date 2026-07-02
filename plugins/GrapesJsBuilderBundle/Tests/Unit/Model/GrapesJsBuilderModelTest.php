@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
+final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {

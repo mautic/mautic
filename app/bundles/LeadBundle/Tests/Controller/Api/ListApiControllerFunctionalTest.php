@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ListApiControllerFunctionalTest extends MauticMysqlTestCase
+final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected ListModel $listModel;
 

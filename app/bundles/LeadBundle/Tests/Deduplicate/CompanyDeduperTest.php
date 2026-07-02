@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
+final class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&FieldModel

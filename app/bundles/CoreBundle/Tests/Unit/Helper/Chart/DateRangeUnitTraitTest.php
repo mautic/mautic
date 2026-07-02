@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DateRangeUnitTraitTest extends TestCase
+final class DateRangeUnitTraitTest extends TestCase
 {
     /**
      * @var MockObject|DateRangeUnitTrait

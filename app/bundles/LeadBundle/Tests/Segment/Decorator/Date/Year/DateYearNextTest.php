@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateYearNext::class)]
-class DateYearNextTest extends \PHPUnit\Framework\TestCase
+final class DateYearNextTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
     {

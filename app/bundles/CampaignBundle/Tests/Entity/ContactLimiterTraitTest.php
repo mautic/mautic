@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 
-class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
+final class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
 {
     use ContactLimiterTrait;
     use MockedConnectionTrait;

@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Tests\Segment;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterCrate::class)]
-class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyFilter(): void
     {

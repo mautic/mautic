@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateTimeHelper::class)]
-class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void

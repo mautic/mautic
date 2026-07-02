@@ -15,7 +15,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageModelTest extends MauticMysqlTestCase
+final class PageModelTest extends MauticMysqlTestCase
 {
     private HitRepository $pageHitRepository;
 

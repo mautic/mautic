@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
+final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Doctrine\ORM\Exception\ORMException

@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactTrackerTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|LeadRepository

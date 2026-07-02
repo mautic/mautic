@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
+final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContactHelper|\PHPUnit\Framework\MockObject\MockObject

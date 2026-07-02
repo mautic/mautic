@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FileUploader::class)]
-class FileUploaderTest extends \PHPUnit\Framework\TestCase
+final class FileUploaderTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUpload(): void

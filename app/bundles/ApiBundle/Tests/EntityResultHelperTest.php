@@ -7,7 +7,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 
-class EntityResultHelperTest extends TestCase
+final class EntityResultHelperTest extends TestCase
 {
     public const NEW_TITLE = 'Callback Title';
 

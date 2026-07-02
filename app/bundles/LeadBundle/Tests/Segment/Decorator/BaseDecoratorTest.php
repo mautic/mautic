@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(BaseDecorator::class)]
-class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
+final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetField(): void
     {

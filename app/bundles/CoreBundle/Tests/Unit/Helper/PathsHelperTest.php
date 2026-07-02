@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-class PathsHelperTest extends TestCase
+final class PathsHelperTest extends TestCase
 {
     private $cacheDir = __DIR__.'/resource/paths/cache';
 

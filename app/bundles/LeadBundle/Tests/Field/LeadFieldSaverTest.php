@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 
-class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
+final class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
 {
     public function testSave(): void
     {

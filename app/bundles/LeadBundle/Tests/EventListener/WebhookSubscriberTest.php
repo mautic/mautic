@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
 

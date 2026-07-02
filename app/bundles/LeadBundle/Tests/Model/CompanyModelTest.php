@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\CoreBundle\Helper\AbstractFormFieldHelper::class)]
-class CompanyModelTest extends \PHPUnit\Framework\TestCase
+final class CompanyModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject

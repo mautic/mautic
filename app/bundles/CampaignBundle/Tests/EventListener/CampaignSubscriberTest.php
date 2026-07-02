@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\TestCase;
 
-class CampaignSubscriberTest extends TestCase
+final class CampaignSubscriberTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
 

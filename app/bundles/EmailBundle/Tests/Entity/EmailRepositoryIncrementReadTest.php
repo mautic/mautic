@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 
-class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
+final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 

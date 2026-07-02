@@ -9,7 +9,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 
-class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults(): void
     {

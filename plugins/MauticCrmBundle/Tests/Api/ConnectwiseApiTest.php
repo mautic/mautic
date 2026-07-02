@@ -7,7 +7,7 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseApi::class)]
-class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
+final class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
 

@@ -50,7 +50,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class LeadModelTest extends \PHPUnit\Framework\TestCase
+final class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject|RequestStack $requestStack;
 

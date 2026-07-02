@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class TagApiControllerFunctionalTest extends MauticMysqlTestCase
+final class TagApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTagWorkflow(): void
     {

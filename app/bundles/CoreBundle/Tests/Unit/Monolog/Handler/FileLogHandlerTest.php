@@ -9,7 +9,7 @@ use Monolog\Level;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FileLogHandlerTest extends TestCase
+final class FileLogHandlerTest extends TestCase
 {
     /**
      * @var CoreParametersHelper|MockObject

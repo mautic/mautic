@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\TestCase;
 
-class ConfigSaveEventTest extends TestCase
+final class ConfigSaveEventTest extends TestCase
 {
     public function testGetters(): void
     {

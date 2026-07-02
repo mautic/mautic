@@ -33,7 +33,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PageTestAbstract extends TestCase
+abstract class PageTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
 

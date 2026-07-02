@@ -7,7 +7,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayCounter;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 
-class DisplayManagerTest extends \PHPUnit\Framework\TestCase
+final class DisplayManagerTest extends \PHPUnit\Framework\TestCase
 {
     private Form $form;
 

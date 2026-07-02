@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 
-class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
+final class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var ContactTracker|\PHPUnit\Framework\MockObject\MockObject

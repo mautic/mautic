@@ -9,7 +9,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class TransportChainTest extends MauticMysqlTestCase
+final class TransportChainTest extends MauticMysqlTestCase
 {
     private TransportChain $transportChain;
 

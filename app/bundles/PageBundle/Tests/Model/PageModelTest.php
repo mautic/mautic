@@ -13,7 +13,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Tests\PageTestAbstract;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageModelTest extends PageTestAbstract
+final class PageModelTest extends PageTestAbstract
 {
     public function testUtf8CharsInTitleWithTransletirationEnabled(): void
     {

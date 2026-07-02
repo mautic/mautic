@@ -7,7 +7,7 @@ namespace Mautic\UserBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class PublicControllerTest extends MauticMysqlTestCase
+final class PublicControllerTest extends MauticMysqlTestCase
 {
     private const PASSWORD_RESET_URI = '/passwordreset';
 

@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\LeadBundle\Entity\Lead;
 
-class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
+final class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
 {
     public function testPassFail(): void
     {

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailGraphStatsControllerFunctionalTest extends MauticMysqlTestCase
+final class EmailGraphStatsControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

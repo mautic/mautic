@@ -23,7 +23,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignMapStatsControllerTest extends MauticMysqlTestCase
+final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 {
     private MockObject $campaignModelMock;
 

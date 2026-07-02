@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UploadControllerFunctionalTest extends AbstractAssetTestCase
+final class UploadControllerFunctionalTest extends AbstractAssetTestCase
 {
     public function testUploadWithWrongMimetype(): void
     {

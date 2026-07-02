@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
-class BounceTest extends \PHPUnit\Framework\TestCase
+final class BounceTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void

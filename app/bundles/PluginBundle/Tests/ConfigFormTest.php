@@ -18,7 +18,7 @@ use Mautic\PluginBundle\PluginEvents;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Twig\Environment;
 
-class ConfigFormTest extends KernelTestCase
+final class ConfigFormTest extends KernelTestCase
 {
     protected function setUp(): void
     {

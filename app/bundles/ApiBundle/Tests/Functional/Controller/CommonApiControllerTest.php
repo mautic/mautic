@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CommonApiControllerTest extends MauticMysqlTestCase
+final class CommonApiControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

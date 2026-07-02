@@ -6,7 +6,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
-class TokenHelperTest extends \PHPUnit\Framework\TestCase
+final class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     private $lead = [
         'firstname' => 'Bob',

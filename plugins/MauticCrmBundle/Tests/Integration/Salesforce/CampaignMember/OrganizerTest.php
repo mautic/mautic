@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMemb
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
 
-class OrganizerTest extends \PHPUnit\Framework\TestCase
+final class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
     public function testRecordsAreOrganizedIntoLeadsAndContacts(): void
     {

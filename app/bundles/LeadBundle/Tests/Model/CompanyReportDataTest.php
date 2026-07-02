@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CompanyReportData::class)]
-class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
+final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var TranslatorInterface

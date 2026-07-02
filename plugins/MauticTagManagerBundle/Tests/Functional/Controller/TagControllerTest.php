@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class TagControllerTest extends MauticMysqlTestCase
+final class TagControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
     /**

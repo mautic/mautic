@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testAssetDownloadReportWithDncListColumn(): void
     {

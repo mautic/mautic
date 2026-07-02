@@ -11,7 +11,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
 
-class RequestTraitTest extends \PHPUnit\Framework\TestCase
+final class RequestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 

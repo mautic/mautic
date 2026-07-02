@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
-class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends CommonMocks
 {
     /**
      * @var Translator|MockObject

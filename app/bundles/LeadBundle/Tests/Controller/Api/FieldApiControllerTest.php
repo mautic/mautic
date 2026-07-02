@@ -19,7 +19,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class FieldApiControllerTest extends TestCase
+final class FieldApiControllerTest extends TestCase
 {
     private $defaultWhere = [
         [

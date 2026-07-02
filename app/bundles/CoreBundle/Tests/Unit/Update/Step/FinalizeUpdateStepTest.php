@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FinalizeUpdateStepTest extends AbstractStepTestCase
+final class FinalizeUpdateStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface

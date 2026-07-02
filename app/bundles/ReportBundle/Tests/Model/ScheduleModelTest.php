@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class ScheduleModelTest extends \PHPUnit\Framework\TestCase
+final class ScheduleModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|SchedulerRepository

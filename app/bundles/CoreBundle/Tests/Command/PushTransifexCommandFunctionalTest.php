@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
+final class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 

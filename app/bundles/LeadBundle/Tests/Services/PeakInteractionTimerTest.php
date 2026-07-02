@@ -30,7 +30,7 @@ class TestablePeakInteractionTimer extends PeakInteractionTimer
     }
 }
 
-class PeakInteractionTimerTest extends TestCase
+final class PeakInteractionTimerTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 

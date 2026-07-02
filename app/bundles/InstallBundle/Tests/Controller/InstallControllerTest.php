@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
-class InstallControllerTest extends \PHPUnit\Framework\TestCase
+final class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $translatorMock;
 

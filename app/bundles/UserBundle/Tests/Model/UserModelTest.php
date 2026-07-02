@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserModelTest extends TestCase
+final class UserModelTest extends TestCase
 {
     private UserModel $userModel;
 

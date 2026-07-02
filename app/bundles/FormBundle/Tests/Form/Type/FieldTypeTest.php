@@ -19,7 +19,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldTypeTest extends TypeTestCase
+final class FieldTypeTest extends TypeTestCase
 {
     private TranslatorInterface $translator;
     private ObjectCollectorInterface $objectCollector;

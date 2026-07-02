@@ -56,7 +56,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class EmailModelTest extends \PHPUnit\Framework\TestCase
+final class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
     public const SEGMENT_A = 'segment A';
 

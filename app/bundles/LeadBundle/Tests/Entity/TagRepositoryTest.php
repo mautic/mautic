@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
-class TagRepositoryTest extends \PHPUnit\Framework\TestCase
+final class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 

@@ -6,7 +6,7 @@ use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissio
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class TagManagerPermissionsTest extends TestCase
+final class TagManagerPermissionsTest extends TestCase
 {
     /**
      * @var TagManagerPermissions

@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCase
+final class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTestCase
 {
     public function testContactCampaignApiEndpoints(): void
     {

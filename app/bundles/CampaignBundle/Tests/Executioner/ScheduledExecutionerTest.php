@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class ScheduledExecutionerTest extends TestCase
+final class ScheduledExecutionerTest extends TestCase
 {
     private MockObject&LeadEventLogRepository $repository;
 

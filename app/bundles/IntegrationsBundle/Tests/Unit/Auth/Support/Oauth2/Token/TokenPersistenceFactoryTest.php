@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\TestCase;
 
-class TokenPersistenceFactoryTest extends TestCase
+final class TokenPersistenceFactoryTest extends TestCase
 {
     private \PHPUnit\Framework\MockObject\MockObject $integrationsHelper;
 

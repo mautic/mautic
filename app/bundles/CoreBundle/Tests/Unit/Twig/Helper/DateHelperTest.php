@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateHelperTest extends \PHPUnit\Framework\TestCase
+final class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

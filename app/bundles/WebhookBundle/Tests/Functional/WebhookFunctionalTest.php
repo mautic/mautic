@@ -21,7 +21,7 @@ use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebhookFunctionalTest extends MauticMysqlTestCase
+final class WebhookFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 

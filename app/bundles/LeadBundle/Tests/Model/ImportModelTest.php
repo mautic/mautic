@@ -28,7 +28,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImportModelTest extends StandardImportTestHelper
+final class ImportModelTest extends StandardImportTestHelper
 {
     public function testInitEventLog(): void
     {

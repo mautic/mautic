@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Loader\EnvVars\SiteUrlEnvVars;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SiteUrlEnvVarsTest extends TestCase
+final class SiteUrlEnvVarsTest extends TestCase
 {
     /**
      * @var ParameterBag

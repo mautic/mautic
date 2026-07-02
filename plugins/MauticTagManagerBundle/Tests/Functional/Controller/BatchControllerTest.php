@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
-class BatchControllerTest extends MauticMysqlTestCase
+final class BatchControllerTest extends MauticMysqlTestCase
 {
     private TagRepository $tagRepository;
 

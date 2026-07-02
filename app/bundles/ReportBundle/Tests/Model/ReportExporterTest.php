@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporterTest extends \PHPUnit\Framework\TestCase
+final class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessExport(): void
     {

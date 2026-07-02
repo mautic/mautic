@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
-class IndexHelperTest extends \PHPUnit\Framework\TestCase
+final class IndexHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const COLUMN_NAME_KEY = 'Column_name';
 

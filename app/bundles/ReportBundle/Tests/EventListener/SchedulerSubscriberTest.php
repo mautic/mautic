@@ -8,7 +8,7 @@ use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\EventListener\SchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 
-class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided(): void
     {

@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Tag;
 
-class TagTest extends \PHPUnit\Framework\TestCase
+final class TagTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetTagByConstructor(): void
     {

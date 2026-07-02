@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
+final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string

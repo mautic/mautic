@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use PHPUnit\Framework\Exception;
 
-class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
+final class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CompanyLeadRepository|Exception

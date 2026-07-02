@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
+final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

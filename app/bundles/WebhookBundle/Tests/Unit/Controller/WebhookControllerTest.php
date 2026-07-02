@@ -46,7 +46,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class WebhookControllerTest extends TestCase
+final class WebhookControllerTest extends TestCase
 {
     #[DataProvider('provideNewOrUpdate')]
     public function testPayloadsAreSame(bool $isNew): void

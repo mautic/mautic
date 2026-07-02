@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
-class CorePermissionsTest extends MauticMysqlTestCase
+final class CorePermissionsTest extends MauticMysqlTestCase
 {
     /**
      * @return iterable<array{bool}>

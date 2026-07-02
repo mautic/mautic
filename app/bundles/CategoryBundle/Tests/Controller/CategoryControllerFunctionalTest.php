@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategoryControllerFunctionalTest extends MauticMysqlTestCase
+final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
     private TranslatorInterface $translator;
 

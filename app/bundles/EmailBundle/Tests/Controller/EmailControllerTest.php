@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Twig\Environment;
 
-class EmailControllerTest extends TestCase
+final class EmailControllerTest extends TestCase
 {
     /**
      * @var string

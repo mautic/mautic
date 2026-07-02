@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PageControllerTest extends MauticMysqlTestCase
+final class PageControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 

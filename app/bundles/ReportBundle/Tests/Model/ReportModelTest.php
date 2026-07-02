@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class ReportModelTest extends \PHPUnit\Framework\TestCase
+final class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
     private ReportModel $reportModel;
 

@@ -10,7 +10,7 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RemoverTest extends \PHPUnit\Framework\TestCase
+final class RemoverTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject

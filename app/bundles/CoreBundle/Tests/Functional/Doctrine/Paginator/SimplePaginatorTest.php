@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
 
-class SimplePaginatorTest extends MauticMysqlTestCase
+final class SimplePaginatorTest extends MauticMysqlTestCase
 {
     /**
      * Enable debug for enabling DBAL query logger.

@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class CampaignSubscriberTest extends MauticMysqlTestCase
+final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

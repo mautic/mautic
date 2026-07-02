@@ -29,7 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriberTest extends CommonMocks
+final class LeadSubscriberTest extends CommonMocks
 {
     /**
      * @var IpLookupHelper&MockObject

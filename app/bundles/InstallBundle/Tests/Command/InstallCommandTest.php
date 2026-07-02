@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class InstallCommandTest extends TestCase
+final class InstallCommandTest extends TestCase
 {
     /**
      * @var MockObject&InstallService

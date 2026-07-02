@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailFunctionalTest extends MauticMysqlTestCase
+final class EmailFunctionalTest extends MauticMysqlTestCase
 {
     public const SAVE_AND_CLOSE = 'Save & Close';
 

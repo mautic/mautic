@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class BuilderIntegrationsHelperTest extends TestCase
+final class BuilderIntegrationsHelperTest extends TestCase
 {
     /**
      * @var IntegrationsHelper|MockObject

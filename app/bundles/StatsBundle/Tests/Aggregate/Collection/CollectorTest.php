@@ -8,7 +8,7 @@ use Mautic\StatsBundle\StatEvents;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CollectorTest extends TestCase
+final class CollectorTest extends TestCase
 {
     private EventDispatcher $eventDispatcher;
 

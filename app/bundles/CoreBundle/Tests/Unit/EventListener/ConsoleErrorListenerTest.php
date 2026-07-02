@@ -11,7 +11,7 @@ use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
+final class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|LoggerInterface

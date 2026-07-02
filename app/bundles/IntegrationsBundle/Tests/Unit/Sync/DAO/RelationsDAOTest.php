@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use PHPUnit\Framework\TestCase;
 
-class RelationsDAOTest extends TestCase
+final class RelationsDAOTest extends TestCase
 {
     public function testAddRelations(): void
     {

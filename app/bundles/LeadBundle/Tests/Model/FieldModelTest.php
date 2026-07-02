@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends MauticMysqlTestCase
+final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

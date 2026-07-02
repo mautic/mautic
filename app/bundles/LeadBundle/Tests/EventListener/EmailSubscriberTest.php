@@ -11,7 +11,7 @@ use Mautic\LeadBundle\EventListener\EmailSubscriber;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class EmailSubscriberTest extends TestCase
+final class EmailSubscriberTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('onEmailAddressReplacementProvider')]
     public function testOnEmailAddressReplacement(string $value, string $expected): void

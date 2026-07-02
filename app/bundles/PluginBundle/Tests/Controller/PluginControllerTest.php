@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PluginControllerTest extends MauticMysqlTestCase
+final class PluginControllerTest extends MauticMysqlTestCase
 {
     public function testConfigurePluginSuccessValidation(): void
     {

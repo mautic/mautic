@@ -12,7 +12,7 @@ use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CsvExporterTest extends \PHPUnit\Framework\TestCase
+final class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public const DATEONLYFORMAT = 'F j, Y';
 

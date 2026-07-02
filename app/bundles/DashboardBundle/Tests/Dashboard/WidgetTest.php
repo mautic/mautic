@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class WidgetTest extends TestCase
+final class WidgetTest extends TestCase
 {
     private const USER_ID = 1;
 

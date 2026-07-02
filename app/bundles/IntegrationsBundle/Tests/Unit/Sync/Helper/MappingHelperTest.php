@@ -24,7 +24,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MappingHelperTest extends TestCase
+final class MappingHelperTest extends TestCase
 {
     /**
      * @var MockObject&FieldsWithUniqueIdentifier

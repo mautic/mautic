@@ -6,7 +6,7 @@ use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 
-class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
+final class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetOriginalNormData(): void
     {

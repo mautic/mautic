@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CommonRepositoryTest extends MauticMysqlTestCase
+final class CommonRepositoryTest extends MauticMysqlTestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that is:mine does not throw an exception due to bad DQL')]
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQL(): void

@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class FocusModelTest extends TestCase
+final class FocusModelTest extends TestCase
 {
     /**
      * @var ContactTracker|MockObject

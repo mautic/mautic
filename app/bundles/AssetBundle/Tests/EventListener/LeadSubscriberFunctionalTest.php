@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
+final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * Regression test: a contact with an asset_downloads row whose asset_id is NULL

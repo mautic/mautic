@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateDefault::class)]
-class DateDefaultTest extends \PHPUnit\Framework\TestCase
+final class DateDefaultTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetParameterValue(): void
     {

@@ -6,7 +6,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use PHPUnit\Framework\TestCase;
 
-class YearStatTest extends TestCase
+final class YearStatTest extends TestCase
 {
     private $year     = '2019';
 

@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {

@@ -35,7 +35,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class OwnerSubscriberTest extends TestCase
+final class OwnerSubscriberTest extends TestCase
 {
     protected $contacts = [
         [

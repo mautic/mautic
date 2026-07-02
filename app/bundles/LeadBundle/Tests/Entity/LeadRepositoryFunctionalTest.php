@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private Lead $lead;
 

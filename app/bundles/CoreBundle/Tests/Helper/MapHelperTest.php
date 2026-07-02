@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Controller\CampaignMapStatsController;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class MapHelperTest extends MauticMysqlTestCase
+final class MapHelperTest extends MauticMysqlTestCase
 {
     /**
      * @return array<string, array<int, array<string, int|string>>>

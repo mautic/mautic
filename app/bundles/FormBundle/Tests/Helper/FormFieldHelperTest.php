@@ -7,7 +7,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FormFieldHelper

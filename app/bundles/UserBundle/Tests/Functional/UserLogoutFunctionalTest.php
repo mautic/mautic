@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class UserLogoutFunctionalTest extends MauticMysqlTestCase
+final class UserLogoutFunctionalTest extends MauticMysqlTestCase
 {
     public function testLogout(): void
     {

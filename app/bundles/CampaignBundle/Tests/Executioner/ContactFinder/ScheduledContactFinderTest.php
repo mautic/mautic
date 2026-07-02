@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\NullLogger;
 
-class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
+final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|LeadRepository

@@ -9,7 +9,7 @@ use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
 use PHPUnit\Framework\MockObject\MockBuilder;
 
-class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
+final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testFieldMatchingPriority(): void
     {

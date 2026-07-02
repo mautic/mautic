@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 
-class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
+final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

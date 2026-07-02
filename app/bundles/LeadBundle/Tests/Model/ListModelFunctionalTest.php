@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
-class ListModelFunctionalTest extends MauticMysqlTestCase
+final class ListModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testPublicSegmentsInContactPreferences(): void
     {

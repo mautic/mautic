@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
 
-class LeadListRepositoryTest extends TestCase
+final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

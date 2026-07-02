@@ -10,7 +10,7 @@ use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class TweetControllerTest extends MauticMysqlTestCase
+final class TweetControllerTest extends MauticMysqlTestCase
 {
     private TweetRepository $tweetsRepo;
 

@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends TestCase
+final class SegmentSubscriberTest extends TestCase
 {
     /**
      * @var IpLookupHelper&MockObject

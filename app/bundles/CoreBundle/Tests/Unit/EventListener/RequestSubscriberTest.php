@@ -12,7 +12,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
+final class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private RequestSubscriber $subscriber;
 

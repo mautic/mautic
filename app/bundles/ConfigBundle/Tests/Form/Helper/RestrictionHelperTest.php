@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
-class RestrictionHelperTest extends TypeTestCase
+final class RestrictionHelperTest extends TypeTestCase
 {
     /**
      * @var string

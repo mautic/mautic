@@ -13,7 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Routing\Router;
 
-class NotificationHelperTest extends \PHPUnit\Framework\TestCase
+final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject|UserModel

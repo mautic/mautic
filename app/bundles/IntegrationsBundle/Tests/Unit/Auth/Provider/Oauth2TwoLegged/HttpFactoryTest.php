@@ -25,7 +25,7 @@ use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
 
-class HttpFactoryTest extends TestCase
+final class HttpFactoryTest extends TestCase
 {
     public function testType(): void
     {

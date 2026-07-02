@@ -11,7 +11,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
-class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
+final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private Lead $lead;
 

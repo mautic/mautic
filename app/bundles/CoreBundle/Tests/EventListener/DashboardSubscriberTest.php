@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DashboardSubscriberTest extends TestCase
+final class DashboardSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&AuditLogModel

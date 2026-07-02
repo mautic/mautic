@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListFiltersChoicesEventTest extends TestCase
+final class LeadListFiltersChoicesEventTest extends TestCase
 {
     public function testGetters(): void
     {

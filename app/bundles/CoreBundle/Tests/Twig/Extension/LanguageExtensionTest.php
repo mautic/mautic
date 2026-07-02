@@ -7,7 +7,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class LanguageExtensionTest extends TestCase
+final class LanguageExtensionTest extends TestCase
 {
     public function testGetLanguageNameReturnsEnglishForEn(): void
     {

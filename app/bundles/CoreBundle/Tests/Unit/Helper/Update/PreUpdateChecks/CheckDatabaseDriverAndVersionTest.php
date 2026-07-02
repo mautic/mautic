@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersio
 use Mautic\CoreBundle\Release\Metadata;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
+final class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
 {
     public function testDatabaseDriverAndVersionOk(): void
     {

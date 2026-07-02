@@ -13,7 +13,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
+final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

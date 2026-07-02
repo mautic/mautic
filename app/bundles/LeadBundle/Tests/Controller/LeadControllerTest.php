@@ -33,7 +33,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeadControllerTest extends MauticMysqlTestCase
+final class LeadControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

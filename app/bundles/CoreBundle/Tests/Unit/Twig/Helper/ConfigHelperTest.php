@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
 use PHPUnit\Framework\Assert;
 
-class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGet(): void
     {

@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekNext;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast::class)]
-class DateWeekNextTest extends \PHPUnit\Framework\TestCase
+final class DateWeekNextTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
     {

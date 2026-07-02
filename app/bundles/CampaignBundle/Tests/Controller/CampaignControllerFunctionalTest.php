@@ -16,7 +16,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
+final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 

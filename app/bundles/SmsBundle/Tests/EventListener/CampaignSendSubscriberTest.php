@@ -10,7 +10,7 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var mixed[]

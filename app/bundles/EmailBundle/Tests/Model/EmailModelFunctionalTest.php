@@ -23,7 +23,7 @@ use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EmailModelFunctionalTest extends MauticMysqlTestCase
+final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

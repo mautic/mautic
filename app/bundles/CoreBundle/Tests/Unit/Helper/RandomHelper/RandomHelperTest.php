@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper\RandomHelper;
 
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelper;
 
-class RandomHelperTest extends \PHPUnit\Framework\TestCase
+final class RandomHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Based on https://github.com/nette/utils/blob/master/tests/Utils/Random.generate().phpt.

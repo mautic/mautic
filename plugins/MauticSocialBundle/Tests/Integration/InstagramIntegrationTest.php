@@ -9,7 +9,7 @@ use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(InstagramIntegration::class)]
-class InstagramIntegrationTest extends AbstractIntegrationTestCase
+final class InstagramIntegrationTest extends AbstractIntegrationTestCase
 {
     private InstagramIntegration $integration;
 

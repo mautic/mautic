@@ -19,7 +19,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CompanyObjectHelperTest extends TestCase
+final class CompanyObjectHelperTest extends TestCase
 {
     /**
      * @var CompanyModel&MockObject

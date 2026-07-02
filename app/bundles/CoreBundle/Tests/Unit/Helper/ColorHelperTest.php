@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\ColorHelper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ColorHelper::class)]
-class ColorHelperTest extends \PHPUnit\Framework\TestCase
+final class ColorHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly')]
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly(): void

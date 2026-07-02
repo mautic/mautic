@@ -25,7 +25,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
+final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&KickoffContactFinder $kickoffContactFinder;
 

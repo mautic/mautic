@@ -7,7 +7,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class MonitoringControllerTest extends MauticMysqlTestCase
+final class MonitoringControllerTest extends MauticMysqlTestCase
 {
     public const USERNAME = 'jhony';
 

@@ -13,7 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var CorePermissions|MockObject

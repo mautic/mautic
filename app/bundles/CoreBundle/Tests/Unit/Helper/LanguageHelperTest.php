@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LanguageHelperTest extends TestCase
+final class LanguageHelperTest extends TestCase
 {
     /**
      * @var PathsHelper&MockObject

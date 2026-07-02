@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailRepositoryTest extends TestCase
+final class EmailRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

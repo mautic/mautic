@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Loader\EnvVars\TwigEnvVars;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class TwigEnvVarsTest extends TestCase
+final class TwigEnvVarsTest extends TestCase
 {
     /**
      * @var ParameterBag

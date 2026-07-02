@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
-class ImportTest extends StandardImportTestHelper
+final class ImportTest extends StandardImportTestHelper
 {
     public function testSetPath(): void
     {

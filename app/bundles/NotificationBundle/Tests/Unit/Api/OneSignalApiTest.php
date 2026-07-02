@@ -7,7 +7,7 @@ namespace Mautic\NotificationBundle\Tests\Unit\Api;
 use Mautic\NotificationBundle\Api\OneSignalApi;
 use PHPUnit\Framework\TestCase;
 
-class OneSignalApiTest extends TestCase
+final class OneSignalApiTest extends TestCase
 {
     public function testAddMobileData(): void
     {

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommandTest extends TestCase
+final class CreateCustomFieldCommandTest extends TestCase
 {
     private BackgroundService $backgroundServiceMock;
 

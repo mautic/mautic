@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 
-class LeadDeviceRepositoryTest extends MauticMysqlTestCase
+final class LeadDeviceRepositoryTest extends MauticMysqlTestCase
 {
     public function testFindExistingDevice(): void
     {

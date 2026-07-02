@@ -15,7 +15,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanyControllerTest extends MauticMysqlTestCase
+final class CompanyControllerTest extends MauticMysqlTestCase
 {
     private int $company1Id;
 

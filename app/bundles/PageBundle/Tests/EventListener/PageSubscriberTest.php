@@ -20,7 +20,7 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageSubscriberTest extends TestCase
+final class PageSubscriberTest extends TestCase
 {
     public function testGetTokensWhenCalledReturnsValidTokens(): void
     {

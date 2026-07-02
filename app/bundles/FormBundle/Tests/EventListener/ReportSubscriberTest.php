@@ -25,7 +25,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends AbstractMauticTestCase
+final class ReportSubscriberTest extends AbstractMauticTestCase
 {
     /**
      * @var CompanyReportData|MockObject

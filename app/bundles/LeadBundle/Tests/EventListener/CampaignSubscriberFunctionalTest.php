@@ -26,7 +26,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use LeadFieldTestTrait;
 

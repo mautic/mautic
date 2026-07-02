@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Response;
 
-class AbstractFormControllerTest extends MauticMysqlTestCase
+final class AbstractFormControllerTest extends MauticMysqlTestCase
 {
     public function testUnlockActionWithValidReturnUrl(): void
     {

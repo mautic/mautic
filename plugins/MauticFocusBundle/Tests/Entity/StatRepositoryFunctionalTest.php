@@ -11,7 +11,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
-class StatRepositoryFunctionalTest extends MauticMysqlTestCase
+final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private FocusModel $focusModel;
 
