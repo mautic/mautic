@@ -523,7 +523,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 $entity = $model->getEntity();
                 break;
             case 'edit':
-                /** @var $entity FormEntity */
+                /** @var FormEntity $entity */
                 if (is_object($objectId)) {
                     $entity   = $objectId;
                     $isClone  = true;

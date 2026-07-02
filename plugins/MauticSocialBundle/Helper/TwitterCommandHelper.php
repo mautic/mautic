@@ -198,7 +198,7 @@ class TwitterCommandHelper
         foreach ($statusList as $status) {
             $handle = strtolower($status['user']['screen_name']);
 
-            /** @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
+            /** @var Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
                 $lastActive              = new \DateTime($status['created_at']);
