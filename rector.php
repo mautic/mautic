@@ -26,6 +26,7 @@ return RectorConfig::configure()
         Mautic\CoreBundle\Controller\CommonController::class,
         Mautic\CoreBundle\Controller\AbstractFormController::class,
         CommonRepository::class,
+        Mautic\ApiBundle\Controller\FetchCommonApiController::class,
     ])
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
