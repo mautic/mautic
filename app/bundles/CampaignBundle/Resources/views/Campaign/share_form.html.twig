@@ -101,7 +101,9 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <button type="button" id="add-gallery-slot" class="btn btn-default btn-sm">
+                    {# btn-nospin: this button adds a slot client-side only, so the global icon
+                       spinner would never be stopped by an AJAX response. #}
+                    <button type="button" id="add-gallery-slot" class="btn btn-default btn-sm btn-nospin">
                         <i class="ri-add-line"></i> {{ 'mautic.campaign.share.gallery_add_more'|trans }}
                     </button>
                 </div>
@@ -116,7 +118,14 @@
                     <div class="form-group">
                         {{ form_label(form.worksWithVersions) }}
                         <div class="checkbox-group">
-                            {{ form_widget(form.worksWithVersions) }}
+                            {% for child in form.worksWithVersions %}
+                                <div class="checkbox">
+                                    <label>
+                                        {{ form_widget(child) }}
+                                        {{ child.vars.label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
                         </div>
                         {{ form_errors(form.worksWithVersions) }}
                         <span class="help-block">{{ 'mautic.campaign.share.works_with.help'|trans }}</span>

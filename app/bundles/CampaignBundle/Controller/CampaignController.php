@@ -244,9 +244,11 @@ class CampaignController extends AbstractStandardFormController
 
     private function createShareForm(Campaign $campaign): FormInterface
     {
+        // The works-with choices are per major series (5.0, 6.0, 7.0), so map the running
+        // version to its series; e.g. 7.2.0-rc must preselect 7.0 or the choice is dropped.
         $mauticVersion = defined('MAUTIC_VERSION') ? MAUTIC_VERSION : '7.0';
-        if (preg_match('/^(\d+\.\d+)/', $mauticVersion, $matches)) {
-            $mauticVersion = $matches[1];
+        if (preg_match('/^(\d+)\./', $mauticVersion, $matches)) {
+            $mauticVersion = $matches[1].'.0';
         }
 
         $campaignName = $campaign->getName() ?: '';
