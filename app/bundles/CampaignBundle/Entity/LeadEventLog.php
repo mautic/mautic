@@ -100,10 +100,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     /**
      * Subscribers can fail log with custom reschedule interval.
-     *
-     * @var \DateInterval|null
      */
-    private $rescheduleInterval;
+    private ?\DateInterval $rescheduleInterval = null;
 
     private ?\DateTime $dateQueued = null;
 

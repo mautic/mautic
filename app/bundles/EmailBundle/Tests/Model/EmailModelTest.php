@@ -1020,7 +1020,9 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::SEGMENT_B, $result['datasets'][2]['label']);
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     private function getEmailListStats(ArrayCollection $lists): array
     {
         $trackableRepo    = $this->createMock(TrackableRepository::class);

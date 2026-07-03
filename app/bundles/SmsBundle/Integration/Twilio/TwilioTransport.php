@@ -40,10 +40,9 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
     }
 
     /**
-     * @param string       $content
      * @param array<mixed> $media
      */
-    private function sendMessage(Lead $lead, $content, array $media = []): bool|string
+    private function sendMessage(Lead $lead, string $content, array $media = []): bool|string
     {
         $number = $lead->getLeadPhoneNumber();
 

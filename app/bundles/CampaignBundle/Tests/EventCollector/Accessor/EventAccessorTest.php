@@ -15,7 +15,9 @@ use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 
 final class EventAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, array<string, mixed>>> */
+    /**
+     * @var array<string, array<string, array<string, mixed>>>
+     */
     private array $events = [
         Event::TYPE_ACTION    => [
             'lead.scorecontactscompanies' => [
