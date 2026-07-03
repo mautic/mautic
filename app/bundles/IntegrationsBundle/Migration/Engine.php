@@ -81,8 +81,6 @@ class Engine
     }
 
     /**
-     * Get migration file names.
-     *
      * @return string[]
      */
     private function getMigrationFileNames(): array

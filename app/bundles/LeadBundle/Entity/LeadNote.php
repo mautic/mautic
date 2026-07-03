@@ -79,8 +79,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -89,8 +87,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Set text.
-     *
      * @param string $text
      */
     public function setText($text): static
@@ -102,8 +98,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get text.
-     *
      * @return string
      */
     public function getText()
@@ -112,8 +106,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      */
     public function setType($type): static
@@ -125,8 +117,6 @@ class LeadNote extends FormEntity
     }
 
     /**
-     * Get type.
-     *
      * @return string|null
      */
     public function getType()

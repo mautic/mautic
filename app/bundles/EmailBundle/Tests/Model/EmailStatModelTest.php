@@ -18,10 +18,10 @@ final class EmailStatModelTest extends TestCase
 {
     public function testSave(): void
     {
-        /** @var MockObject&EntityManager */
+        /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
 
-        /** @var MockObject&StatRepository */
+        /** @var MockObject&StatRepository $statRepository */
         $statRepository = $this->createMock(StatRepository::class);
 
         $entityManager->method('getRepository')->willReturn($statRepository);

@@ -11,7 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 final class BundleMetadataBuilderTest extends TestCase
 {
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     private array $paths;
 
     protected function setUp(): void
