@@ -143,8 +143,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         return $this->bitwise;
     }
 
-    /**
-     */
     public function setRole(?Role $role = null): static
     {
         $this->role = $role;

@@ -51,8 +51,6 @@ class CompanyLeadRepository extends CommonRepository
         parent::saveEntities($entities);
     }
 
-    /**
-     */
     public function getCompaniesByLeadId($leadId, $companyId = null, ?bool $onlyPrimary = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();

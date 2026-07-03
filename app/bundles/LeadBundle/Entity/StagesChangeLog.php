@@ -128,8 +128,6 @@ class StagesChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
@@ -145,8 +143,6 @@ class StagesChangeLog
         return $this->lead;
     }
 
-    /**
-     */
     public function setStage(Stage $stage): static
     {
         $this->stage = $stage;

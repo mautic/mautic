@@ -214,8 +214,6 @@ class Action implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     */
     public function setForm(Form $form): static
     {
         $this->form = $form;

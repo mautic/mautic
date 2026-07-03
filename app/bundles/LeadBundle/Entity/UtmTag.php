@@ -126,8 +126,6 @@ class UtmTag
         return $this->id;
     }
 
-    /**
-     */
     public function setDateAdded(\DateTimeInterface $date): static
     {
         $this->dateAdded = $date;

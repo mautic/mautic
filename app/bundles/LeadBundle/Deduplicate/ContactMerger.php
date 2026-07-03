@@ -75,8 +75,6 @@ class ContactMerger
         return $winner;
     }
 
-    /**
-     */
     public function mergeTimestamps(Lead $winner, Lead $loser): static
     {
         // The winner should keep the most recent last active timestamp of the two

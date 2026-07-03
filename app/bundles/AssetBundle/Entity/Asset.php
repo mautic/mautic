@@ -514,8 +514,6 @@ class Asset extends FormEntity implements UuidInterface
         return $this->remotePath;
     }
 
-    /**
-     */
     public function setAlias(?string $alias): self
     {
         $this->isChanged('alias', $alias);
@@ -524,8 +522,6 @@ class Asset extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     */
     public function getAlias(): ?string
     {
         return $this->alias;
@@ -624,8 +620,6 @@ class Asset extends FormEntity implements UuidInterface
         return $this->language;
     }
 
-    /**
-     */
     public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category = null): static
     {
         $this->isChanged('category', $category);

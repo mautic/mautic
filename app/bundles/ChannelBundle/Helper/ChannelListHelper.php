@@ -97,7 +97,7 @@ class ChannelListHelper
     }
 
     /**
-     * Done this way to avoid a circular dependency error with LeadModel
+     * Done this way to avoid a circular dependency error with LeadModel.
      */
     private function setupChannels(): void
     {

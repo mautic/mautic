@@ -722,8 +722,6 @@ class FieldModel extends FormModel
         return $this->leadListModel->getFieldSegments($field);
     }
 
-    /**
-     */
     public function filterUsedFieldIds(array $ids): array
     {
         return array_filter($ids, fn ($id): bool => false === $this->isUsedField($this->getEntity($id)));

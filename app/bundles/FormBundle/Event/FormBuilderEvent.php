@@ -60,8 +60,6 @@ class FormBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     */
     public function getSubmitActions(): array
     {
         uasort(

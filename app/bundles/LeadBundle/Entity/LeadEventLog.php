@@ -122,15 +122,11 @@ class LeadEventLog
             ->build();
     }
 
-    /**
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
-    /**
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
@@ -218,8 +214,6 @@ class LeadEventLog
         return $this->action;
     }
 
-    /**
-     */
     public function setProperties(array $properties): static
     {
         $this->properties = $properties;

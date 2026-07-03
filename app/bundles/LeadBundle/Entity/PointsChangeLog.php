@@ -88,8 +88,6 @@ class PointsChangeLog
         $builder->addDateAdded();
     }
 
-    /**
-     */
     public function getId(): int
     {
         return (int) $this->id;
@@ -185,8 +183,6 @@ class PointsChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;

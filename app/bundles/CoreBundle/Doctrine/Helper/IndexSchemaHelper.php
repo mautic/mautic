@@ -121,8 +121,6 @@ class IndexSchemaHelper
         return $this;
     }
 
-    /**
-     */
     public function executeChanges(): void
     {
         $platform = $this->db->getDatabasePlatform();

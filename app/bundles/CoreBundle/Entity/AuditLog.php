@@ -103,8 +103,6 @@ class AuditLog
             ->build();
     }
 
-    /**
-     */
     public function getId(): int
     {
         return (int) $this->id;
@@ -156,8 +154,6 @@ class AuditLog
         return $this;
     }
 
-    /**
-     */
     public function getObjectId(): int
     {
         return (int) $this->objectId;
@@ -181,8 +177,6 @@ class AuditLog
         return $this->action;
     }
 
-    /**
-     */
     public function setDetails(array $details): static
     {
         $this->details = $details;

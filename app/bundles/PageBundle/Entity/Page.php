@@ -647,8 +647,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->redirectUrl;
     }
 
-    /**
-     */
     public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);

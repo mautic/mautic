@@ -292,8 +292,6 @@ class Hit
         $metadata->addConstraint(new PageHit());
     }
 
-    /**
-     */
     public function getId(): int
     {
         return (int) $this->id;
@@ -534,8 +532,6 @@ class Hit
         return $this->remoteHost;
     }
 
-    /**
-     */
     public function setPage(?Page $page = null): static
     {
         $this->page = $page;

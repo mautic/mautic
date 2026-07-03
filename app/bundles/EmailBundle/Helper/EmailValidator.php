@@ -49,8 +49,6 @@ class EmailValidator
 
     /**
      * Validates that email is in an acceptable format.
-     *
-     * @return bool
      */
     public function isValidFormat($address): bool
     {
@@ -59,8 +57,6 @@ class EmailValidator
 
     /**
      * Validates that email does not have invalid characters.
-     *
-     * @return bool
      */
     public function hasValidCharacters($address): string|false
     {
@@ -71,8 +67,6 @@ class EmailValidator
 
     /**
      * Validates if the domain of an email.
-     *
-     * @return bool
      */
     public function hasValidDomain($address): bool
     {

@@ -478,8 +478,6 @@ class CorePermissions implements ResetInterface
         throw new \UnexpectedValueException("There is no permission object for {$bundle}");
     }
 
-    /**
-     */
     private function registerPermissionClasses(): void
     {
         foreach ($this->getBundles() as $bundle) {

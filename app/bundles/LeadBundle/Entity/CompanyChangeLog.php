@@ -173,8 +173,6 @@ class CompanyChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;

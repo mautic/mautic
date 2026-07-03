@@ -193,8 +193,6 @@ class DashboardModel extends FormModel
         return $entity;
     }
 
-    /**
-     */
     public function populateWidgetPreview(Widget $widget): void
     {
         $event = $this->widgetEventFactory->create($widget);

@@ -405,8 +405,6 @@ final class AssetsHelper
         return $headOutput;
     }
 
-    /**
-     */
     public function outputSystemStylesheets(): void
     {
         $assets = $this->assetHelper->getAssets();

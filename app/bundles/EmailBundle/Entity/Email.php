@@ -1022,8 +1022,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->lists;
     }
 
-    /**
-     */
     public function addList(LeadList $list): static
     {
         $this->listsChangedAdd('lists', $list->getId());
@@ -1044,8 +1042,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     */
     public function removeList(LeadList $list): void
     {
         $this->listsChangedRemove('lists', $list->getId());

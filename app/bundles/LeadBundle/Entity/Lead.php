@@ -635,15 +635,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
-    /**
-     */
     public function setOwner(?User $owner = null): static
     {
         $this->isChanged('owner', $owner);
@@ -898,8 +894,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->pointChanges = [];
     }
 
-    /**
-     */
     public function resetPointChanges(): static
     {
         $this->actualPoints  = null;
@@ -934,8 +928,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->addPointsChangeLog($event);
     }
 
-    /**
-     */
     public function addPointsChangeLog(PointsChangeLog $pointsChangeLog): static
     {
         $this->pointsChangeLog[] = $pointsChangeLog;
@@ -976,8 +968,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->stageChangeLog;
     }
 
-    /**
-     */
     public function removePointsChangeLog(PointsChangeLog $pointsChangeLog): void
     {
         $this->pointsChangeLog->removeElement($pointsChangeLog);
@@ -1011,8 +1001,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $event;
     }
 
-    /**
-     */
     public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog): static
     {
         $this->companyChangeLog[] = $companyChangeLog;
@@ -1152,8 +1140,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->internal;
     }
 
-    /**
-     */
     public function setSocialCache($cache): void
     {
         $this->socialCache = $cache;
@@ -1315,8 +1301,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->availableSocialFields = $availableSocialFields;
     }
 
-    /**
-     */
     public function addTag(Tag $tag): static
     {
         $this->isChanged('tags', $tag);
@@ -1325,8 +1309,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     */
     public function removeTag(Tag $tag): void
     {
         $this->isChanged('tags', $tag->getTag());
@@ -1341,8 +1323,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->tags;
     }
 
-    /**
-     */
     public function setTags($tags): static
     {
         $this->tags = $tags;
@@ -1358,8 +1338,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->utmtags;
     }
 
-    /**
-     */
     public function setUtmTags($utmTags): static
     {
         $this->isChanged('utmtags', $utmTags);
@@ -1374,8 +1352,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->utmtags->removeElement($utmTag);
     }
 
-    /**
-     */
     public function setStage(?Stage $stage = null): static
     {
         $this->isChanged('stage', $stage);
@@ -1410,16 +1386,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this->frequencyRules;
     }
 
-    /**
-     */
     public function removeFrequencyRule(FrequencyRule $frequencyRule): void
     {
         $this->isChanged('frequencyRules', $frequencyRule->getId(), false);
         $this->frequencyRules->removeElement($frequencyRule);
     }
 
-    /**
-     */
     public function addFrequencyRule(FrequencyRule $frequencyRule): void
     {
         $this->isChanged('frequencyRules', $frequencyRule, false);

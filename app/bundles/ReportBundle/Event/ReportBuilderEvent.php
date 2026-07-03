@@ -280,8 +280,6 @@ class ReportBuilderEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     */
     public function getGraphs(): array
     {
         return $this->graphArray;

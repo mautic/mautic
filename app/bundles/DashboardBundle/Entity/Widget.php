@@ -113,8 +113,6 @@ class Widget extends FormEntity
         return $this->id;
     }
 
-    /**
-     */
     public function setName(string $name): static
     {
         $this->name = InputHelper::string($name);
@@ -131,8 +129,6 @@ class Widget extends FormEntity
         return $this->name;
     }
 
-    /**
-     */
     public function setType(string $type): static
     {
         $this->type = InputHelper::string($type);
@@ -233,8 +229,6 @@ class Widget extends FormEntity
         return $this->params;
     }
 
-    /**
-     */
     public function setParams(array $params): static
     {
         $this->isChanged('params', $params);
@@ -270,8 +264,6 @@ class Widget extends FormEntity
         return $this->templateData;
     }
 
-    /**
-     */
     public function setTemplateData(array $templateData): static
     {
         $this->isChanged('templateData', $templateData);

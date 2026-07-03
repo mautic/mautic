@@ -470,8 +470,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->id;
     }
 
-    /**
-     */
     public function setUsername(?string $username): static
     {
         $this->isChanged('username', $username);
@@ -490,8 +488,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     */
     public function setPlainPassword($plainPassword): static
     {
         $this->plainPassword = $plainPassword;
@@ -499,8 +495,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this;
     }
 
-    /**
-     */
     public function setCurrentPassword($currentPassword): static
     {
         $this->currentPassword = $currentPassword;
@@ -575,8 +569,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->email;
     }
 
-    /**
-     */
     public function setRole(?Role $role = null): static
     {
         $this->isChanged('role', $role);
@@ -593,8 +585,6 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         return $this->role;
     }
 
-    /**
-     */
     public function setActivePermissions(array $permissions): static
     {
         $this->activePermissions = $permissions;

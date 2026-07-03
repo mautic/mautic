@@ -94,8 +94,6 @@ trait VariantEntityTrait
         $this->getVariantChildren()->removeElement($child);
     }
 
-    /**
-     */
     public function getVariantChildren(): ArrayCollection|Collection
     {
         return $this->variantChildren;
@@ -117,8 +115,6 @@ trait VariantEntityTrait
         return $this->variantParent;
     }
 
-    /**
-     */
     public function removeVariantParent(): void
     {
         $this->setVariantParent();
@@ -196,8 +192,6 @@ trait VariantEntityTrait
         return $this->getVariantChildren()->count();
     }
 
-    /**
-     */
     public function clearVariants(): void
     {
         $this->variantChildren = new ArrayCollection();

@@ -60,8 +60,6 @@ class StageBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     */
     public function getActions(): array
     {
         uasort($this->actions, fn ($a, $b): int => strnatcasecmp(

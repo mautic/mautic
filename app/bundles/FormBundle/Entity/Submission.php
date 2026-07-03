@@ -130,8 +130,6 @@ class Submission
             ->build();
     }
 
-    /**
-     */
     public function getId(): int
     {
         return (int) $this->id;
@@ -173,8 +171,6 @@ class Submission
         return $this->referer;
     }
 
-    /**
-     */
     public function setForm(Form $form): static
     {
         $this->form = $form;
@@ -190,8 +186,6 @@ class Submission
         return $this->form;
     }
 
-    /**
-     */
     public function setIpAddress(?IpAddress $ipAddress = null): static
     {
         $this->ipAddress = $ipAddress;
@@ -225,8 +219,6 @@ class Submission
         return $this;
     }
 
-    /**
-     */
     public function setPage(?Page $page = null): static
     {
         $this->page = $page;
