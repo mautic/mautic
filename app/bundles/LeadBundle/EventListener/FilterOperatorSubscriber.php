@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FilterOperatorSubscriber implements EventSubscriberInterface
+class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     use SegmentFilterIconTrait;
 

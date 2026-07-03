@@ -29,7 +29,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, mixed>

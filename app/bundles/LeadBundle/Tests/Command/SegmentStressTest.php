@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Command\UpdateSegmentsCommand;
 use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Console\Command\Command;
 
-final class SegmentStressTest extends MauticMysqlTestCase
+class SegmentStressTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class CompanyController extends FormController
+class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
