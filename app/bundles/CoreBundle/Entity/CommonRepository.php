@@ -215,7 +215,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param mixed $entity
+     * @param object $entity
      */
     public function detachEntity($entity): void
     {

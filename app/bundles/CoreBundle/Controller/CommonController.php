@@ -117,8 +117,6 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * eventAwareRenderView.
-     *
      * @param array<string, string> $parameters
      */
     public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string

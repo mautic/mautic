@@ -639,7 +639,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         return $this->prepareEntityResultsToArray(
             $results,
-            function ($entity): void {
+            function (object $entity): void {
                 $this->preSerializeEntity($entity);
             }
         );

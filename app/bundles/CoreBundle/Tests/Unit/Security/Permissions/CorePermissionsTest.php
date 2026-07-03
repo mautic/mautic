@@ -162,7 +162,9 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
         $this->assertContains('viewown', $permissions['leads']);
     }
 
-    /** @return array{permissionClasses: array<class-string, class-string>} */
+    /**
+     * @return array{permissionClasses: array<class-string, class-string>}
+     */
     private function mockBundleArray(string $permissionClass): array
     {
         return ['permissionClasses' => [$permissionClass => $permissionClass]];

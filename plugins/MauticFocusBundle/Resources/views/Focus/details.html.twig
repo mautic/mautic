@@ -6,7 +6,14 @@
 
 {% block publishStatus %}
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
-    <div class="label__divider"></div>
+    {% set hasFocusTags = (item.type is defined and item.type is not empty)
+        or (item.style is defined and item.style is not empty)
+        or (item.properties.when is defined and item.properties.when is not empty)
+        or (item.properties.frequency is defined and item.properties.frequency is not empty)
+        or (item.properties.timeout is defined and item.properties.timeout is not empty) %}
+    {% if hasFocusTags %}
+        <div class="label__divider"></div>
+    {% endif %}
     {% if item.type is defined and item.type is not empty %}
         {% include '@MauticCore/Helper/_tag.html.twig' with {
             tags: [{
