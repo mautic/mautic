@@ -24,7 +24,7 @@ final class DynamicContentSubscriberTest extends TestCase
     /**
      * @var MockObject&SegmentCompanyRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companySegmentRepository;
+    private MockObject $companySegmentRepository;
 
     private DynamicContentSubscriber $subscriber;
 
