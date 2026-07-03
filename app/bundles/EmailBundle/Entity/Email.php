@@ -624,7 +624,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addProjectsInLoadApiMetadata($metadata, 'email');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
