@@ -23,7 +23,11 @@ trait FormThemeTrait
 
         // Extract form theme from options if applicable
         $fieldThemes = [];
+<<<<<<< HEAD
         $findThemes  = function (FormInterface $form, FormView $formView) use ($twig, &$findThemes, &$fieldThemes): void {
+=======
+        $findThemes  = function ($form, array $formView) use ($twig, &$findThemes, &$fieldThemes): void {
+>>>>>>> 79f874056e ([types] add strict param array based on dim fetch)
             /** @var Form $field */
             foreach ($form as $name => $field) {
                 $fieldView = $formView[$name];

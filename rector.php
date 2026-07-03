@@ -39,8 +39,20 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
+<<<<<<< HEAD
 
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+        ReturnTypeFromGetRepositoryDocblockRector::class,
+=======
+
+        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class,
+>>>>>>> 053bb503d4 ([types] add strict param array based on dim fetch)
+>>>>>>> 79f874056e ([types] add strict param array based on dim fetch)
+>>>>>>> 96bd13cf5f ([types] add strict param array based on dim fetch)
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)

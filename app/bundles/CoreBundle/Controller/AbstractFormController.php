@@ -216,7 +216,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return array
      */
-    protected function refererPostActionVars($vars)
+    protected function refererPostActionVars(array $vars)
     {
         $request = $this->getCurrentRequest();
         if (empty($request->server->get('HTTP_REFERER'))) {

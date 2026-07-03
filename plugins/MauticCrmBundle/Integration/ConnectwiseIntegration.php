@@ -627,7 +627,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $leadPushed;
     }
 
-    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = []): array
+    public function getMappedFields($object, $lead, $personFound, array $config, array $cwContactData = []): array
     {
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
@@ -967,7 +967,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @throws ApiErrorException
      */
-    public function createActivity($config, $cwContactId, $leadId): ?IntegrationEntity
+    public function createActivity(array $config, $cwContactId, $leadId): ?IntegrationEntity
     {
         if ($cwContactId and !empty($config['activity_name'])) {
             $activity = [

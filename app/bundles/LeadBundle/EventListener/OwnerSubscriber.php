@@ -156,7 +156,7 @@ class OwnerSubscriber implements EventSubscriberInterface
      *
      * @return array|string[]
      */
-    private function getOwnerTokens($contact, string $content): array
+    private function getOwnerTokens(array $contact, string $content): array
     {
         if (empty($contact['owner_id'])) {
             return $this->getEmptyTokens();

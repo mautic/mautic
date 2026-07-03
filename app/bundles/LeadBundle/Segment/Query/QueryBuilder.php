@@ -297,7 +297,11 @@ class QueryBuilder extends BaseQueryBuilder
     public function getTableAliases()
     {
         $queryParts = $this->getQueryParts();
+<<<<<<< HEAD
         $tables     = array_reduce($queryParts['from'], function (array $result, array $item): array {
+=======
+        $tables     = array_reduce($queryParts['from'], function (array $result, array $item) {
+>>>>>>> 2a0195828e ([types] add strict param array based on dim fetch)
             $result[$item['table']] = $item['alias'];
 
             return $result;

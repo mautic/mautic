@@ -25,13 +25,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class AjaxController extends CommonController
 {
     /**
-     * @param array $dataArray
-     * @param int   $statusCode
-     * @param bool  $addIgnoreWdt
+     * @param int  $statusCode
+     * @param bool $addIgnoreWdt
      *
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
+    protected function sendJsonResponse(array $dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 

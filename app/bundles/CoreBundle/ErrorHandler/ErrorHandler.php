@@ -362,9 +362,12 @@ namespace Mautic\CoreBundle\ErrorHandler {
             return $this;
         }
 
+<<<<<<< HEAD
         /**
          * @param mixed[] $context
          */
+=======
+>>>>>>> 2a0195828e ([types] add strict param array based on dim fetch)
         protected function log($logLevel, $message, array $context = [], $debugTrace = null)
         {
             $message = strip_tags($message);

@@ -31,7 +31,7 @@ trait CustomFieldsApiControllerTrait
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, array $parameters, $entity, $action)
     {
         if ('company' === $this->entityNameOne) {
             $object = 'company';

@@ -249,7 +249,7 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @return array|mixed|null
      */
-    protected function getContactAccessToken(&$socialCache)
+    protected function getContactAccessToken(array &$socialCache)
     {
         if (!$this->requestStack->getCurrentRequest()->hasSession()) {
             return null;
