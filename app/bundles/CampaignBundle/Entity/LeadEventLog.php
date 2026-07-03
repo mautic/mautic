@@ -285,10 +285,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->event;
     }
 
-    /*
-     *
-     * @return $this
-     */
     public function setEvent(Event $event): static
     {
         $this->event = $event;
