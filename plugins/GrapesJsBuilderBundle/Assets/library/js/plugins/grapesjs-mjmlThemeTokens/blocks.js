@@ -2,10 +2,8 @@ export const createBlockPatcher = ({ editor, options, classNames }) => {
   const splitTokens = (value = '') => value.split(/\s+/).filter(Boolean);
   const getDefaultValue = (key) => options.defaults?.[key] || '';
   const getMjClassAttribute = (mjClass) => (mjClass ? ` mj-class="${mjClass}"` : '');
-  const getTypographyCategoryLabel = () =>
-    Mautic.translate('grapesjsbuilder.categoryTypographyLabel');
   const getTypographyCategory = () => ({
-    label: getTypographyCategoryLabel(),
+    label: Mautic.translate('grapesjsbuilder.categoryTypographyLabel'),
     order: -0.5,
     open: false,
   });
@@ -74,9 +72,10 @@ export const createBlockPatcher = ({ editor, options, classNames }) => {
       id: 'mj-text',
       action: 'patch',
       defaultKey: 'text',
+      requiresTokens: false,
       getPatch: (mjClass) => ({
         category: getTypographyCategory(),
-        content: `<mj-text mj-class="${mjClass}">Insert text here</mj-text>`,
+        content: `<mj-text${getMjClassAttribute(mjClass)}>Insert text here</mj-text>`,
       }),
     },
     {
