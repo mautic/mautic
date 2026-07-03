@@ -286,8 +286,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Add lead to company.
-     *
      * @param array|Company $companies
      * @param array|Lead    $lead
      *

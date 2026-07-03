@@ -6,7 +6,9 @@ use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 
 trait DefaultValueTrait
 {
-    /** @var array<string, array<string, array<string, mixed>>> */
+    /**
+     * @var array<string, array<string, array<string, mixed>>>
+     */
     private array $cachedDefaultFields = [];
 
     /**

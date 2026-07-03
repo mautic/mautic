@@ -1227,7 +1227,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /*
      * Cleans query params saving url values.
      *
-     * @param $query array
+     * @param array $query
      *
      * @return array
      */

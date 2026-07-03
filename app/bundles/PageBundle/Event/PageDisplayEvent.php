@@ -44,17 +44,11 @@ class PageDisplayEvent extends Event
         $this->content = $content;
     }
 
-    /**
-     * Get params.
-     */
     public function getParams(): array
     {
         return $this->params;
     }
 
-    /**
-     * Set params.
-     */
     public function setParams(array $params): void
     {
         $this->params = $params;

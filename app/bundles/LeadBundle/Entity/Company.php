@@ -305,7 +305,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         ];
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $prefix = 'company';
 
