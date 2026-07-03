@@ -42,7 +42,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertCount(2, $rows, 'Should display exactly 2 companies in the segment');
 
         $rowTexts = [];
-        $rows->each(function ($row) use (&$rowTexts) {
+        $rows->each(function ($row) use (&$rowTexts): void {
             $rowTexts[] = $row->text();
         });
 

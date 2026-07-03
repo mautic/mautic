@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 class DynamicContentSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
     protected $useCleanupRollback = false;
 
     public function testLeadSeesContentWhenPrimaryCompanyIsInSegment(): void

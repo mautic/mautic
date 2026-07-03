@@ -289,7 +289,7 @@ final class CompanySegmentControllerTest extends MauticMysqlTestCase
         $id2 = $segment2->getId();
         $id3 = $segment3->getId();
 
-        \assert(null !== $id1 && null !== $id2 && null !== $id3);
+        \assert(!in_array(null, [$id1, $id2, $id3], true));
 
         // Send POST request with JSON ids in query string
         $ids = json_encode([$id1, $id2, $id3]);
