@@ -31,11 +31,11 @@ final class UpdateSegmentsCommand extends ModeratedCommand
     public const NAME = 'mautic:segments:update';
 
     public function __construct(
-        private ListModel $listModel,
-        private CompanySegmentModel $companySegmentModel,
-        private LeadSegmentRebuildService $leadRebuildService,
-        private CompanySegmentRebuildService $companyRebuildService,
-        private TranslatorInterface $translator,
+        private readonly ListModel $listModel,
+        private readonly CompanySegmentModel $companySegmentModel,
+        private readonly LeadSegmentRebuildService $leadRebuildService,
+        private readonly CompanySegmentRebuildService $companyRebuildService,
+        private readonly TranslatorInterface $translator,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
