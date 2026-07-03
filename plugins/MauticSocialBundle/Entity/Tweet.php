@@ -92,7 +92,7 @@ class Tweet extends FormEntity
 
     /**
      * @var Category|null
-     **/
+     */
     private $category;
 
     /**

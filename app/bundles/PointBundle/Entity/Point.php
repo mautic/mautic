@@ -110,7 +110,7 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['point:read', 'point:write'])]
     private $category;
 
