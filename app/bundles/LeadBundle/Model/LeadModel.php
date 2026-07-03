@@ -1016,14 +1016,8 @@ class LeadModel extends FormModel
      *
      * @param array<string, mixed> $data
      * @param array<LeadList>      $leadLists
-     *
-     * @return bool Returns true
      */
-<<<<<<< HEAD
-    public function setFrequencyRules(Lead $lead, array $data, $leadLists, $persist = true): bool
-=======
     public function setFrequencyRules(Lead $lead, array $data, array $leadLists, $persist = true): bool
->>>>>>> 2a0195828e ([types] add strict param array based on dim fetch)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();

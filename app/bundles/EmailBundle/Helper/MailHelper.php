@@ -876,11 +876,7 @@ class MailHelper
             $addresses = [$addresses => $name];
         } elseif (0 === array_keys($addresses)[0]) {
             // We need an array of $email => $name pairs
-<<<<<<< HEAD
             $addresses = array_reduce($addresses, function (array $address, $item) use ($name): array {
-=======
-            $addresses = array_reduce($addresses, function (array $address, $item) use ($name) {
->>>>>>> 2a0195828e ([types] add strict param array based on dim fetch)
                 $address[$item] = $name;
 
                 return $address;

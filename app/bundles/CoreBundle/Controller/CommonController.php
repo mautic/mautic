@@ -273,7 +273,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param array $args [parameters, contentTemplate, passthroughVars, forwardController]
      */
-    public function ajaxAction(Request $request, array $args = []): Response
+    public function ajaxAction(Request $request, $args = []): Response
     {
         defined('MAUTIC_AJAX_VIEW') || define('MAUTIC_AJAX_VIEW', 1);
 

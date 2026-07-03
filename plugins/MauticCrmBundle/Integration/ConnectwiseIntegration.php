@@ -627,7 +627,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $leadPushed;
     }
 
-    public function getMappedFields($object, $lead, $personFound, array $config, array $cwContactData = []): array
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function getMappedFields(string $object, $lead, bool $personFound, array $config, array $cwContactData = []): array
     {
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());

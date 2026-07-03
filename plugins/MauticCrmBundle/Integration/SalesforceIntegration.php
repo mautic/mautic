@@ -1449,6 +1449,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     */
     public function getMixedLeadFields(array $fields, $object): array
     {
         $mixedFields = array_filter($fields['leadFields'] ?? []);

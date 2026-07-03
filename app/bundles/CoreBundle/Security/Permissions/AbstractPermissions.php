@@ -183,10 +183,11 @@ abstract class AbstractPermissions
     /**
      * Determines if the user has access to the specified permission.
      *
-     * @param string $name
-     * @param string $level
+     * @param array<string, mixed> $userPermissions
+     * @param string               $name
+     * @param string               $level
      */
-    public function isGranted(array $userPermissions, $name, $level): bool
+    public function isGranted($userPermissions, $name, $level): bool
     {
         [$name, $level] = $this->getSynonym($name, $level);
 

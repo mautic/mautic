@@ -141,7 +141,7 @@ class CommonRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray($className, array &$data): object
+    public function createFromArray($className, &$data): object
     {
         $entity        = new $className();
         $meta          = $this->_em->getClassMetadata($className);
@@ -947,7 +947,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @throws \InvalidArgumentException
      */
-    protected function validateOrderByClause(array $clause)
+    protected function validateOrderByClause($clause)
     {
         $msg = '"%s" is missing in the order by clause array.';
         if (empty($clause['col'])) {

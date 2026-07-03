@@ -49,14 +49,9 @@ class EntityResultHelper
     }
 
     /**
-<<<<<<< HEAD
      * @param mixed[] $array
-     *
-=======
->>>>>>> 2a0195828e ([types] add strict param array based on dim fetch)
-     * @return mixed
      */
-    private function getDataForArray(array $array)
+    private function getDataForArray(array $array): mixed
     {
         if (is_object($array[0])) {
             return $this->getDataForObject($array);
@@ -66,11 +61,9 @@ class EntityResultHelper
     }
 
     /**
-     * @param mixed[] $object
-     *
-     * @return mixed
+     * @param object[] $object
      */
-    private function getDataForObject(array $object)
+    private function getDataForObject(array $object): mixed
     {
         foreach ($object as $key => $value) {
             if (0 === $key) {

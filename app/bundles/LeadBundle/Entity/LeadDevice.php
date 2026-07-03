@@ -307,7 +307,10 @@ class LeadDevice
         return $this->deviceOsName;
     }
 
-    public function setDeviceOs(array $deviceOs): void
+    /**
+     * @param array<string, mixed>|null $deviceOs
+     */
+    public function setDeviceOs(?array $deviceOs): void
     {
         if (isset($deviceOs['name'])) {
             $this->deviceOsName = $deviceOs['name'];

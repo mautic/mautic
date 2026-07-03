@@ -53,6 +53,9 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $socialCache
+     */
     public function getPublicActivity($identifier, &$socialCache): void
     {
         $socialCache['has']['activity'] = false;
@@ -107,6 +110,9 @@ class InstagramIntegration extends SocialIntegration
         ];
     }
 
+    /**
+     * @param array<string, mixed> $socialCache
+     */
     private function getContactUserId(&$identifier, array &$socialCache)
     {
         if (!empty($socialCache['id'])) {
