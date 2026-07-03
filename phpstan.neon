@@ -14,6 +14,8 @@ parameters:
 		return: 85
 		param: 72
 		property: 66
+		# wait for PHP 8.3 before changing
+		constant: 3
 	paths:
 		- app/bundles
 		- app/migrations
