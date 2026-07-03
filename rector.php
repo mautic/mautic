@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticRector\UnserializeToSerializerDecodeRector;
 use Rector\CodeQuality\Rector\ClassMethod\OptionalParametersAfterRequiredRector;
 use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
@@ -24,6 +25,8 @@ return RectorConfig::configure()
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
         Mautic\CoreBundle\Controller\CommonController::class,
         Mautic\CoreBundle\Controller\AbstractFormController::class,
+        CommonRepository::class,
+        Mautic\ApiBundle\Controller\FetchCommonApiController::class,
     ])
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
@@ -36,7 +39,7 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(36)
+    ->withTypeCoverageLevel(50)
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(27)
     ->withSkip([

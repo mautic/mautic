@@ -1105,9 +1105,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
@@ -1771,10 +1770,8 @@ class MailHelper
 
     /**
      * Generate bounce email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
@@ -1793,10 +1790,8 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 

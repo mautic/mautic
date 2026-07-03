@@ -108,13 +108,11 @@ final class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string      $path
-     * @param string|null $packageName
-     * @param string|null $version
-     * @param bool|false  $absolute
-     * @param bool|false  $ignorePrefix
+     * @param string     $path
+     * @param bool|false $absolute
+     * @param bool|false $ignorePrefix
      */
-    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getUrl($path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
     {
         // if we have http in the url it is absolute and we can just return it
         if (str_starts_with($path, 'http')) {
