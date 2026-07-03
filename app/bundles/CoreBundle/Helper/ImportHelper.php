@@ -187,7 +187,9 @@ class ImportHelper
                         throw new \RuntimeException(sprintf('Failed to copy file to destination: %s', $destinationPath));
                     }
                 }
-            } elseif ('json' === pathinfo($normalizedFilename, PATHINFO_EXTENSION)) {
+            } elseif ('json' === pathinfo($normalizedFilename, PATHINFO_EXTENSION) && 'composer.json' !== basename($normalizedFilename)) {
+                // composer.json carries package metadata in marketplace resource ZIPs,
+                // never entity data — picking it here would corrupt the import.
                 $jsonFilePath = $tempDir.'/'.$normalizedFilename;
             }
         }

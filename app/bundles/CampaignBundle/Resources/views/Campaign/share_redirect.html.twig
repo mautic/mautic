@@ -36,6 +36,7 @@
     const archiveUrl    = root.getAttribute('data-archive-url');
     const marketplace   = root.getAttribute('data-marketplace-url').replace(/\/$/, '');
     const marketplaceUploadUrl = marketplace + '/publish/upload';
+    const marketplaceOrigin = new URL(marketplace).origin;
 
     const popup = window.open(marketplaceUploadUrl, 'mautic-marketplace-publish');
     if (!popup) {
@@ -49,6 +50,11 @@
         if (event.source !== popup) {
             return;
         }
+        // The popup window may navigate anywhere (Auth0, user clicks a link), and any
+        // page occupying it can post messages — only the marketplace may get the archive.
+        if (event.origin !== marketplaceOrigin) {
+            return;
+        }
         if (!event.data || typeof event.data !== 'object') {
             return;
         }
@@ -58,7 +64,7 @@
         // gets bounced to login and back), at which point it has lost its in-memory
         // Blob and needs us to push it again.
         if (event.data.type === 'marketplace:ready' && !done) {
-            sendArchiveToPopup(event.origin);
+            sendArchiveToPopup();
         }
 
         if (event.data.type === 'marketplace:done') {
@@ -78,21 +84,40 @@
         }
     }, 800);
 
-    function sendArchiveToPopup(targetOrigin) {
+    // The server deletes the transient ZIP after the first download, but the popup can
+    // ask for the archive again (e.g. after an Auth0 round-trip) — so fetch it once and
+    // hand out the cached Blob on every subsequent 'marketplace:ready'.
+    let archivePromise = null;
+
+    function getArchive() {
+        if (!archivePromise) {
+            archivePromise = fetch(archiveUrl, { credentials: 'same-origin' })
+                .then(function (resp) {
+                    if (!resp.ok) {
+                        throw new Error('HTTP ' + resp.status);
+                    }
+                    return resp.blob();
+                })
+                .catch(function (err) {
+                    // Allow a retry on the next 'marketplace:ready' — the fetch may have
+                    // failed before the server served (and deleted) the file.
+                    archivePromise = null;
+                    throw err;
+                });
+        }
+
+        return archivePromise;
+    }
+
+    function sendArchiveToPopup() {
         statusEl.textContent = '{{ 'mautic.campaign.share.sending_archive'|trans|e('js') }}';
-        fetch(archiveUrl, { credentials: 'same-origin' })
-            .then(function (resp) {
-                if (!resp.ok) {
-                    throw new Error('HTTP ' + resp.status);
-                }
-                return resp.blob();
-            })
+        getArchive()
             .then(function (blob) {
                 popup.postMessage({
                     type:     'mautic:upload',
                     archive:  blob,
                     filename: 'campaign.zip',
-                }, targetOrigin);
+                }, marketplaceOrigin);
                 statusEl.textContent = '{{ 'mautic.campaign.share.waiting_for_marketplace'|trans|e('js') }}';
             })
             .catch(function (err) {

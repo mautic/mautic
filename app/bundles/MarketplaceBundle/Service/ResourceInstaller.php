@@ -9,6 +9,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\MarketplaceBundle\Api\Connection;
 use Psr\Log\LoggerInterface;
@@ -28,6 +29,7 @@ final class ResourceInstaller implements ResourceInstallerInterface
         private PathsHelper $pathsHelper,
         private EventDispatcherInterface $dispatcher,
         private LoggerInterface $logger,
+        private ImportHelper $importHelper,
     ) {
     }
 
@@ -59,7 +61,15 @@ final class ResourceInstaller implements ResourceInstallerInterface
         }
 
         try {
-            $fileData = $this->readCampaignJsonFromZip($zipPath);
+            // Extract through the shared import path so packaged assets (e.g. email
+            // builder images) are restored to the media dir before the import events run.
+            $fileData = $this->importHelper->readZipFile($zipPath);
+
+            // Wrap in array if not already (EntityImportEvent expects a list of entity groups)
+            if (!isset($fileData[0])) {
+                $fileData = [$fileData];
+            }
+
             $this->prepareImportData($fileData);
 
             foreach ($fileData as $entity) {
@@ -153,66 +163,6 @@ final class ResourceInstaller implements ResourceInstallerInterface
         }
 
         return $filePath;
-    }
-
-    /**
-     * Reads campaign.json from the ZIP, skipping composer.json.
-     * Returns the data wrapped in an array matching the format expected by EntityImportEvent.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function readCampaignJsonFromZip(string $zipPath): array
-    {
-        $zip = new \ZipArchive();
-
-        if (true !== $zip->open($zipPath)) {
-            throw new \RuntimeException('Unable to open ZIP file');
-        }
-
-        $jsonContent = null;
-
-        // Look for campaign.json specifically, skip composer.json
-        for ($i = 0; $i < $zip->numFiles; ++$i) {
-            $name     = $zip->getNameIndex($i);
-            $basename = basename($name);
-
-            if ('campaign.json' === $basename) {
-                $jsonContent = $zip->getFromIndex($i);
-                break;
-            }
-        }
-
-        // Fallback: find any JSON that is not composer.json
-        if (null === $jsonContent) {
-            for ($i = 0; $i < $zip->numFiles; ++$i) {
-                $name     = $zip->getNameIndex($i);
-                $basename = basename($name);
-
-                if ('json' === pathinfo($basename, PATHINFO_EXTENSION) && 'composer.json' !== $basename) {
-                    $jsonContent = $zip->getFromIndex($i);
-                    break;
-                }
-            }
-        }
-
-        $zip->close();
-
-        if (null === $jsonContent || false === $jsonContent) {
-            throw new \RuntimeException('No campaign JSON file found in the package ZIP');
-        }
-
-        $data = json_decode($jsonContent, true);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new \RuntimeException('Invalid JSON in package: '.json_last_error_msg());
-        }
-
-        // Wrap in array if not already (ImportController expects array of entity groups)
-        if (!isset($data[0])) {
-            $data = [$data];
-        }
-
-        return $data;
     }
 
     /**

@@ -8,6 +8,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\TransferException;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Api\Connection;
@@ -54,6 +55,8 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $this->pathsHelper->method('getImportCampaignsPath')->willReturn($this->importDir);
         $this->pathsHelper->method('getSystemPath')->with('root')->willReturn($this->tmpRoot);
+        $this->pathsHelper->method('getTemporaryPath')->willReturn($this->tmpRoot.'/tmp');
+        $this->pathsHelper->method('getMediaPath')->willReturn($this->tmpRoot.'/media');
 
         $this->installer = new ResourceInstaller(
             $this->marketplaceConnection,
@@ -61,6 +64,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
             $this->pathsHelper,
             $this->dispatcher,
             $this->logger,
+            new ImportHelper($this->pathsHelper),
         );
     }
 
@@ -180,6 +184,41 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         Assert::assertTrue($result['success']);
         Assert::assertNotEmpty($result['summary']);
         Assert::assertTrue($this->installer->isInstalled('vendor/pkg'));
+    }
+
+    public function testInstallRestoresPackagedAssetsToMediaDir(): void
+    {
+        $this->mockPackageWithDistUrl('https://example.test/pkg.zip');
+
+        $campaignJson = json_encode([
+            'campaign'       => [['id' => 1, 'name' => 'Test campaign']],
+            'campaign_event' => [],
+            'lists'          => [],
+        ]);
+        $zipContents = $this->buildZip([
+            'campaign.json'          => $campaignJson,
+            'composer.json'          => '{"name":"vendor/pkg"}',
+            'assets/images/logo.png' => 'png-bytes',
+        ]);
+
+        $this->httpClient->method('request')
+            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents): ResponseInterface {
+                file_put_contents($options['sink'], $zipContents);
+
+                return $this->successfulResponse();
+            });
+
+        $this->dispatcher->method('dispatch')
+            ->willReturnCallback(function (EntityImportEvent $event): EntityImportEvent {
+                $event->setStatus('imported', ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
+
+                return $event;
+            });
+
+        $result = $this->installer->install('vendor/pkg', 1);
+
+        Assert::assertTrue($result['success']);
+        Assert::assertFileExists($this->tmpRoot.'/media/files/images/logo.png');
     }
 
     public function testUninstallIsNoOpWhenPackageWasNeverInstalled(): void
