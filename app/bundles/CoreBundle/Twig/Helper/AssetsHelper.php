@@ -136,8 +136,6 @@ final class AssetsHelper
     }
 
     /**
-     * Get base URL.
-     *
      * @return string
      */
     public function getBaseUrl()
@@ -407,9 +405,6 @@ final class AssetsHelper
         return $headOutput;
     }
 
-    /**
-     * Output system stylesheets.
-     */
     public function outputSystemStylesheets(): void
     {
         $assets = $this->assetHelper->getAssets();
@@ -422,8 +417,6 @@ final class AssetsHelper
     }
 
     /**
-     * Output system scripts.
-     *
      * @param bool|false $includeEditor
      */
     public function outputSystemScripts($includeEditor = false): void
@@ -514,8 +507,6 @@ final class AssetsHelper
     }
 
     /**
-     * Include stylesheet.
-     *
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
      */
     public function includeStylesheet($assetFilePath): string

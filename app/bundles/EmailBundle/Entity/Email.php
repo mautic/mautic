@@ -624,7 +624,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addProjectsInLoadApiMetadata($metadata, 'email');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -1022,9 +1022,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->lists;
     }
 
-    /**
-     * Add list.
-     */
     public function addList(LeadList $list): static
     {
         $this->listsChangedAdd('lists', $list->getId());
@@ -1045,9 +1042,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->listsChangedRemove('lists', $list->getId());
@@ -1213,8 +1207,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Get assetAttachments.
-     *
      * @return Collection
      */
     public function getAssetAttachments()
