@@ -492,8 +492,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * Get action route.
-     *
      * @return string
      */
     protected function getActionRoute()
@@ -572,8 +570,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * Get index route.
-     *
      * @return string
      */
     protected function getIndexRoute()

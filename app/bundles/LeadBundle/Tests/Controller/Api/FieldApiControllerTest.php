@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class FieldApiControllerTest extends TestCase
 {
-    /** @var array<int, array<string, mixed>> */
+    /**
+     * @var array<int, array<string, mixed>>
+     */
     private array $defaultWhere = [
         [
             'col'  => 'object',

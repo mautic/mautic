@@ -9,7 +9,9 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 
 final class CompanyLeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository */
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository
+     */
     private \PHPUnit\Framework\MockObject\MockObject $repoMock;
 
     protected function setUp(): void

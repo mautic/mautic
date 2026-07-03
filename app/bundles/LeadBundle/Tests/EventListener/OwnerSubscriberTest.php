@@ -39,7 +39,9 @@ use Twig\Environment;
 
 final class OwnerSubscriberTest extends TestCase
 {
-    /** @var array<int, array<string, int|string|null>> */
+    /**
+     * @var array<int, array<string, int|string|null>>
+     */
     protected array $contacts = [
         [
             'id'        => 1,

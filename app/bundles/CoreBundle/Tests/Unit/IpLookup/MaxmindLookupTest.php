@@ -204,7 +204,9 @@ RESPONSE);
         $this->checkDetails($details);
     }
 
-    /** @param array<string, string> $details */
+    /**
+     * @param array<string, string> $details
+     */
     private function checkDetails(array $details): void
     {
         $this->assertEquals('Los Angeles', $details['city']);
