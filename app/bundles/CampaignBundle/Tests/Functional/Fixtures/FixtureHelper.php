@@ -387,7 +387,9 @@ final class FixtureHelper
         return $campaign;
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public static function getPayload(): array
     {
         $fileContents = file_get_contents(__DIR__.'/entity_data.json');

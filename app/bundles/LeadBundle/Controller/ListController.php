@@ -829,9 +829,6 @@ class ListController extends FormController
         return $this->getModel('lead.list')->getPermissionBase();
     }
 
-    /**
-     * Get List Model.
-     */
     protected function getListModel(): ListModel
     {
         /** @var ListModel $model */

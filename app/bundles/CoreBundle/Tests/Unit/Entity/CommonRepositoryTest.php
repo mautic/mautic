@@ -349,7 +349,9 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(trim($args[0]['val'], '"'), array_shift($parameters));
     }
 
-    /** @param array<int, mixed> $args */
+    /**
+     * @param array<int, mixed> $args
+     */
     private function callBuildWhereClauseFromArray(\Doctrine\DBAL\Query\QueryBuilder $qb, array $args): mixed
     {
         $reflection = new \ReflectionClass(CommonRepository::class);

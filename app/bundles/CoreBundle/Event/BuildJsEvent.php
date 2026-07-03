@@ -26,8 +26,6 @@ class BuildJsEvent extends Event
     }
 
     /**
-     * Append JS.
-     *
      * @param string $js
      * @param string $section The section name. Shows when in debug mode
      */
