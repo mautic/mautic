@@ -384,9 +384,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 
     private function getReference(string $name): object
     {
-        $reference = $this->fixtures->getReference($name);
-
-        return $reference;
+        return $this->fixtures->getReference($name);
     }
 
     public function testSegmentRebuildCommandFailsOnMissingTable(): void
