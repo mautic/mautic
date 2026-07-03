@@ -445,7 +445,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress('127.0.0.1'));
         $userRepository       = $this->createMock(UserRepository::class);
         $submissionRepository = $this->createMock(SubmissionRepository::class);
-        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class) => match ($class) {
+        $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class): MockObject => match ($class) {
             User::class       => $userRepository,
             Submission::class => $submissionRepository,
             default           => $submissionRepository,

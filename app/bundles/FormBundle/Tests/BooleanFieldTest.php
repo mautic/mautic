@@ -12,10 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
 final class BooleanFieldTest extends MauticMysqlTestCase
 {
     private const FORM_SELECTOR          = 'form[data-mautic-form]';
+
     private const FORM_SELECTOR_BY_ALIAS = 'form[data-mautic-form="%s"]';
+
     private const VALUE_ZERO             = 'value="0"';
 
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     /**
