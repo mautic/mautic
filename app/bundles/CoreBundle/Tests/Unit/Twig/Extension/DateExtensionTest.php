@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\TwigFunction;
 
-class DateExtensionTest extends TestCase
+final class DateExtensionTest extends TestCase
 {
     private DateExtension $dateExtension;
 
@@ -56,7 +56,7 @@ class DateExtensionTest extends TestCase
         $this->assertContainsOnlyInstancesOf(TwigFunction::class, $functions);
         $this->assertCount(9, $functions);
 
-        $functionNames = array_map(fn (TwigFunction $function) => $function->getName(), $functions);
+        $functionNames = array_map(fn (TwigFunction $function): string => $function->getName(), $functions);
 
         $this->assertContains('dateToText', $functionNames);
         $this->assertContains('dateToFull', $functionNames);

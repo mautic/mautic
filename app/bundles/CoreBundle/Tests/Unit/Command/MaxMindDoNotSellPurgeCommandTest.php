@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Doctrine\DBAL\Connection;
@@ -17,6 +19,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class MaxMindDoNotSellPurgeCommandTest extends TestCase
 {
+    /**
+     * @var MockObject&LeadRepository
+     */
     private MockObject $mockLeadRepository;
 
     protected function setUp(): void
@@ -40,7 +45,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     public function testCommandDryRun(): void
     {
         $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);
-        $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
+        $mockDoNotSellList = $this->createStub(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
@@ -57,7 +62,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     public function testNoContactsFound(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([]);
-        $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
+        $mockDoNotSellList = $this->createStub(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
@@ -73,7 +78,7 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
     public function testPurge(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([['id' => 1, 'ip_address' => '123.123.123.123']]);
-        $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
+        $mockDoNotSellList = $this->createStub(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $this->mockLeadRepository, $mockDoNotSellList);
         $commandTester = new CommandTester($command);
@@ -87,7 +92,9 @@ final class MaxMindDoNotSellPurgeCommandTest extends TestCase
         $this->assertSame(0, $result);
     }
 
-    /** @param array<int, mixed> $dataToReturn */
+    /**
+     * @param array<int, mixed> $dataToReturn
+     */
     private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);

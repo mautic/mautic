@@ -35,7 +35,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     use ControllerTrait;
 
     private const CLICK_URL_LOW  = 'https://example.com/low';
+
     private const CLICK_URL_MID  = 'https://example.com/mid';
+
     private const CLICK_URL_HIGH = 'https://example.com/high';
 
     protected function setUp(): void
@@ -656,7 +658,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $pendingCountQuery = array_filter(
             $queries['default'],
-            fn (array $query) => $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"
+            fn (array $query): bool => $query['sql'] === "SELECT count(*) as count FROM {$prefix}leads l WHERE (EXISTS (SELECT null FROM {$prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN ({$segment->getId()})) AND (ll.manually_removed = :false))) AND (NOT EXISTS (SELECT null FROM {$prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {$prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.email_id IN ({$email->getId()})))) AND (NOT EXISTS (SELECT null FROM {$prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN ({$email->getId()})))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"
         );
 
         $this->assertCount(0, $pendingCountQuery);
@@ -1378,6 +1380,29 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('a[href="#advanced-container"] span.text-danger'));
     }
 
+    public function testEmailWithMalformedLinkCannotBeSaved(): void
+    {
+        $name = 'Malformed email link validation';
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue($name);
+        $form['emailform[subject]']->setValue('Malformed email link validation');
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<a href="://example.com">Broken link</a>');
+
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
+
+        $this->assertNull($email);
+        $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());
+    }
+
     /**
      * Test email subject length validation (190 character limit).
      */
@@ -1461,7 +1486,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setTemplate($template);
         $email->setCustomHtml($customHtml);
         $email->setVariantSettings($varientSetting);
-        if (!empty($segment)) {
+        if ($segment instanceof LeadList) {
             $email->addList($segment);
         }
         $this->em->persist($email);

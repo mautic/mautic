@@ -14,7 +14,7 @@ class ChannelPreferences
     private array $organizedByPriority = [];
 
     public function __construct(
-        private Event $event,
+        private readonly Event $event,
     ) {
     }
 
@@ -68,7 +68,7 @@ class ChannelPreferences
     /**
      * @param int $priority
      *
-     * @return ArrayCollection|LeadEventLog[]
+     * @return ArrayCollection<int, LeadEventLog>
      */
     public function getLogsByPriority($priority)
     {

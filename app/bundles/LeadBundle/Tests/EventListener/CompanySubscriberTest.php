@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -13,16 +15,16 @@ use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper        = $this->createMock(IpLookupHelper::class);
-        $auditLogModel         = $this->createMock(AuditLogModel::class);
-        $entityManager         = $this->createMock(EntityManager::class);
-        $coreParameters        = $this->createMock(CoreParametersHelper::class);
-        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
-        $companyModel          = $this->createMock(CompanyModel::class);
+        $ipLookupHelper        = $this->createStub(IpLookupHelper::class);
+        $auditLogModel         = $this->createStub(AuditLogModel::class);
+        $entityManager         = $this->createStub(EntityManager::class);
+        $coreParameters        = $this->createStub(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createStub(CompanyLeadRepository::class);
+        $companyModel          = $this->createStub(CompanyModel::class);
         $subscriber            = new CompanySubscriber(
             $ipLookupHelper,
             $auditLogModel,
@@ -74,10 +76,10 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
 
-        $entityManager         = $this->createMock(EntityManager::class);
-        $coreParameters        = $this->createMock(CoreParametersHelper::class);
-        $companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
-        $companyModel          = $this->createMock(CompanyModel::class);
+        $entityManager         = $this->createStub(EntityManager::class);
+        $coreParameters        = $this->createStub(CoreParametersHelper::class);
+        $companyLeadRepository = $this->createStub(CompanyLeadRepository::class);
+        $companyModel          = $this->createStub(CompanyModel::class);
         $subscriber            = new CompanySubscriber(
             $ipLookupHelper,
             $auditLogModel,
@@ -103,10 +105,8 @@ class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Test create or update company logging.
-     *
-     * @param bool $isNew
      */
-    private function onCompanyPostSaveMethodCall($isNew): void
+    private function onCompanyPostSaveMethodCall(bool $isNew): void
     {
         $companyId = 1;
         $changes   = ['changes'];

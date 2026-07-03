@@ -14,9 +14,9 @@ final class DeleteEntitiesDependencyException extends \Exception
      * @param string[] $errors
      */
     public function __construct(
-        private array $deletedEntities,
-        private array $unableToDeleteEntities,
-        private array $errors = [],
+        private readonly array $deletedEntities,
+        private readonly array $unableToDeleteEntities,
+        private readonly array $errors = [],
         string $message = '',
         int $code = Response::HTTP_CONFLICT,
     ) {

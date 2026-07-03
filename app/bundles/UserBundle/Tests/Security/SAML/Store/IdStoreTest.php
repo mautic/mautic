@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Security\SAML\Store;
 
 use Doctrine\Persistence\ObjectManager;
@@ -9,15 +11,15 @@ use Mautic\UserBundle\Security\SAML\Store\IdStore;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class IdStoreTest extends TestCase
+final class IdStoreTest extends TestCase
 {
     /**
-     * @var ObjectManager|MockObject
+     * @var MockObject&ObjectManager
      */
     private MockObject $manager;
 
     /**
-     * @var TimeProviderInterface|MockObject
+     * @var MockObject&TimeProviderInterface
      */
     private MockObject $timeProvider;
 

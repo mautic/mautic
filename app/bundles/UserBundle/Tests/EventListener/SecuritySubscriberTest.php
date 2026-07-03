@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -9,12 +11,12 @@ use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
 use Mautic\UserBundle\UserEvents;
 
-class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
+final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetSubscribedEvents(): void
     {
-        $ipLookupHelper = $this->createMock(IpLookupHelper::class);
-        $auditLogModel  = $this->createMock(AuditLogModel::class);
+        $ipLookupHelper = $this->createStub(IpLookupHelper::class);
+        $auditLogModel  = $this->createStub(AuditLogModel::class);
         $subscriber     = new SecuritySubscriber($ipLookupHelper, $auditLogModel);
 
         $this->assertSame(

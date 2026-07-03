@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;

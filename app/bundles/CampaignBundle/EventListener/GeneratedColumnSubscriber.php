@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class GeneratedColumnSubscriber implements EventSubscriberInterface
+final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
     public function __construct(private VersionProviderInterface $versionProvider)
     {

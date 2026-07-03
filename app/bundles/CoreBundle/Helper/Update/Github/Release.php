@@ -12,16 +12,16 @@ class Release
      */
     private $version;
 
-    private string $downloadUrl;
+    private readonly string $downloadUrl;
 
     /**
      * @var string
      */
     private $announcementUrl;
 
-    private string $stability;
+    private readonly string $stability;
 
-    private Metadata $metadata;
+    private readonly Metadata $metadata;
 
     /**
      * @throws UpdatePackageNotFoundException

@@ -18,7 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExampleSendTypeTest extends TestCase
+final class ExampleSendTypeTest extends TestCase
 {
     private ExampleSendType $form;
 
@@ -28,12 +28,12 @@ class ExampleSendTypeTest extends TestCase
     private MockObject $translator;
 
     /**
-     * @var CorePermissions&MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
     /**
-     * @var UserHelper|MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelperMock;
 
@@ -53,7 +53,7 @@ class ExampleSendTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $matcher = self::exactly(2);
         $builder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('emails', $parameters[0]);
                     $this->assertSame(SortableListType::class, $parameters[1]);
@@ -119,7 +119,7 @@ class ExampleSendTypeTest extends TestCase
         $builder = $this->createMock(FormBuilderInterface::class);
         $matcher = self::exactly(4);
         $builder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher, $builder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('emails', $parameters[0]);
                     $this->assertSame(SortableListType::class, $parameters[1]);

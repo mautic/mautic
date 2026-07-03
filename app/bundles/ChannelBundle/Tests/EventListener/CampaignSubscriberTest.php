@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,7 +31,7 @@ use Mautic\SmsBundle\SmsEvents;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private EventDispatcher $dispatcher;
 
@@ -224,7 +226,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * BC support for old campaign.
      */
-    /** @phpstan-ignore parameter.deprecatedClass */
+    /**
+     * @phpstan-ignore parameter.deprecatedClass
+     */
     public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
@@ -240,7 +244,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Event|\PHPUnit\Framework\MockObject\MockObject
+     * @return Event&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
     {

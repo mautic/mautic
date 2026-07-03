@@ -9,7 +9,7 @@ use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use PHPUnit\Framework\TestCase;
 
-class HubspotApiTest extends TestCase
+final class HubspotApiTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test Hubspot api when the api-key is invalid')]
     public function testHubspotWhenKeyIsInvalid(): void

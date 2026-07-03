@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -10,10 +12,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PageListTypeTest extends TestCase
+final class PageListTypeTest extends TestCase
 {
     private PageListType $page;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&PageModel
+     */
     private \PHPUnit\Framework\MockObject\MockObject $pageModelMock;
 
     protected function setUp(): void

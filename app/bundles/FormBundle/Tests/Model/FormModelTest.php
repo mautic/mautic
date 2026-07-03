@@ -35,7 +35,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-class FormModelTest extends \PHPUnit\Framework\TestCase
+final class FormModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&FormRepository
@@ -112,13 +112,13 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $tableSchemaHelper,
             $mappedObjectCollector,
             $entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 

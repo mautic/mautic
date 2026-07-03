@@ -23,10 +23,10 @@ final class ContactSegmentFilterFactory
     private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
-        private TableSchemaColumnsCache $schemaCache,
-        private Container $container,
-        private DecoratorFactory $decoratorFactory,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TableSchemaColumnsCache $schemaCache,
+        private readonly Container $container,
+        private readonly DecoratorFactory $decoratorFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

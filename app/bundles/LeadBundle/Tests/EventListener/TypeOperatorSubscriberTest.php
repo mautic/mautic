@@ -31,7 +31,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
 
@@ -66,7 +66,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     private MockObject $assetModel;
 
     /**
-     * @var MockObject&FormInterface<FormInterface<mixed>>
+     * @var MockObject&FormInterface
      */
     private MockObject $form;
 
@@ -280,7 +280,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher  = $this->exactly(2);
 
         $this->form->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);
@@ -332,7 +332,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher  = $this->exactly(2);
 
         $this->form->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('display', $parameters[0]);
                     $this->assertSame(TextType::class, $parameters[1]);

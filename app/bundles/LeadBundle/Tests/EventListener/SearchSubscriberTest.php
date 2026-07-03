@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -21,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SearchSubscriberTest extends TestCase
+final class SearchSubscriberTest extends TestCase
 {
     use MockedConnectionTrait;
 
@@ -31,16 +33,16 @@ class SearchSubscriberTest extends TestCase
     public function testOnBuildSearchCommands(): void
     {
         $contactRepository = $this->createMock(LeadRepository::class);
-        $emailRepository   = $this->createMock(EmailRepository::class);
+        $emailRepository   = $this->createStub(EmailRepository::class);
         $connection        = $this->getMockedConnection();
         $mockPlatform      = $this->createMock(AbstractPlatform::class);
         $leadModel         = $this->createMock(LeadModel::class);
-        $companyModel      = $this->createMock(CompanyModel::class);
-        $listModel         = $this->createMock(ListModel::class);
+        $companyModel      = $this->createStub(CompanyModel::class);
+        $listModel         = $this->createStub(ListModel::class);
         $translator        = $this->createMock(TranslatorInterface::class);
-        $security          = $this->createMock(CorePermissions::class);
-        $twig              = $this->createMock(Environment::class);
-        $globalSearch      = $this->createMock(GlobalSearch::class);
+        $security          = $this->createStub(CorePermissions::class);
+        $twig              = $this->createStub(Environment::class);
+        $globalSearch      = $this->createStub(GlobalSearch::class);
 
         $contactRepository->method('applySearchQueryRelationship')
             ->willReturnCallback(
@@ -88,7 +90,7 @@ class SearchSubscriberTest extends TestCase
 
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function ($key) {
+            ->willReturnCallback(function ($key): string|array|null {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
             });
 

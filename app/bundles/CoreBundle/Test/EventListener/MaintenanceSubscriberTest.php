@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -11,7 +13,7 @@ use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
+final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private MaintenanceSubscriber $subscriber;
 
@@ -93,7 +95,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $qb
             ->expects($this->exactly(4))
             ->method('executeQuery')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): \PHPUnit\Framework\MockObject\MockObject {
                 static $callCount = 0;
                 ++$callCount;
                 $result = $this->createMock(\Doctrine\DBAL\Result::class);
@@ -120,7 +122,7 @@ class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($qb);
 
         $translator          = $this->createMock(TranslatorInterface::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
+        $userTokenRepository = $this->createStub(UserTokenRepositoryInterface::class);
         $subscriber          = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
 
         $translator

@@ -14,9 +14,10 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
+final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
+
     private EmailFixturesHelper $emailFixturesHelper;
 
     protected function setUp(): void

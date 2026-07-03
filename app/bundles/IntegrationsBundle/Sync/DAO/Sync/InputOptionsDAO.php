@@ -15,23 +15,23 @@ class InputOptionsDAO
      */
     private $integration;
 
-    private bool $firstTimeSync;
+    private readonly bool $firstTimeSync;
 
-    private bool $disablePush;
+    private readonly bool $disablePush;
 
-    private bool $disablePull;
+    private readonly bool $disablePull;
 
-    private bool $disableActivityPush;
+    private readonly bool $disableActivityPush;
 
-    private ?ObjectIdsDAO $mauticObjectIds;
+    private readonly ?ObjectIdsDAO $mauticObjectIds;
 
-    private ?ObjectIdsDAO $integrationObjectIds;
+    private readonly ?ObjectIdsDAO $integrationObjectIds;
 
-    private ?\DateTimeInterface $startDateTime;
+    private readonly ?\DateTimeInterface $startDateTime;
 
-    private ?\DateTimeInterface $endDateTime;
+    private readonly ?\DateTimeInterface $endDateTime;
 
-    private array $options;
+    private readonly array $options;
 
     /**
      * Example $input:

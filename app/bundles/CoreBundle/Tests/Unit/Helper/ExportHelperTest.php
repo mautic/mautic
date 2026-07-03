@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportHelperTest extends TestCase
+final class ExportHelperTest extends TestCase
 {
     private MockObject&TranslatorInterface $translatorInterfaceMock;
 
@@ -63,7 +63,7 @@ class ExportHelperTest extends TestCase
             $this->coreParametersHelperMock,
             $this->filePathResolver,
             $processSignalService,
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
     }
 

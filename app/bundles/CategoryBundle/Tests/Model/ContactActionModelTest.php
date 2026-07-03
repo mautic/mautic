@@ -9,14 +9,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class ContactActionModelTest extends \PHPUnit\Framework\TestCase
+final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 {
     private Lead $contactMock5;
 
     private Lead $contactMock6;
 
     /**
-     * @var MockObject|LeadModel
+     * @var MockObject&LeadModel
      */
     private MockObject $contactModelMock;
 
@@ -111,7 +111,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }
@@ -124,7 +124,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('addToCategory')->willReturnCallback(function (...$parameters) use ($matcher, $categories) {
+            ->method('addToCategory')->willReturnCallback(function (...$parameters) use ($matcher, $categories): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                     $this->assertSame($categories, $parameters[1]);
@@ -152,7 +152,7 @@ class ContactActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
                 }

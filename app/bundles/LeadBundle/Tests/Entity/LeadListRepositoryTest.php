@@ -15,19 +15,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
 
-class LeadListRepositoryTest extends TestCase
+final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
     private LeadListRepository $repository;
 
     /**
-     * @var QueryBuilder&MockObject
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilderMock;
 
     /**
-     * @var Expr&MockObject
+     * @var MockObject&Expr
      */
     private MockObject $expressionMock;
 
@@ -260,7 +260,7 @@ SQL;
         ];
         $this->queryBuilderMock->expects(self::exactly(2))
             ->method('setParameter')
-            ->willReturnCallback(function (...$parameters) use (&$expectedCalls) {
+            ->willReturnCallback(function (...$parameters) use (&$expectedCalls): MockObject {
                 $this->assertSame(array_shift($expectedCalls), $parameters);
 
                 return $this->queryBuilderMock;
@@ -312,7 +312,7 @@ SQL;
         $matcher = self::exactly(2);
 
         $this->expressionMock->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds) {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.leadlist_id', $parameters[0]);
                     $this->assertSame($listIds[0], $parameters[1]);

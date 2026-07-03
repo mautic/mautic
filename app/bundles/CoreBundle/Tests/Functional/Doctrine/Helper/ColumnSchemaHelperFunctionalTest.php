@@ -11,9 +11,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
+final class ColumnSchemaHelperFunctionalTest extends MauticMysqlTestCase
 {
     private LeadField $field;
+
     private ColumnSchemaHelper $schemaHelper;
 
     protected $useCleanupRollback = false;

@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class NotificationTypeTest extends TypeTestCase
+final class NotificationTypeTest extends TypeTestCase
 {
     /**
      * @return array<FormExtensionInterface>
@@ -33,10 +33,10 @@ class NotificationTypeTest extends TypeTestCase
             new ValidatorExtension($validatorBuilder->getValidator()),
             new PreloadedExtension([
                 new CategoryListType(
-                    $this->createMock(EntityManager::class),
-                    $this->createMock(TranslatorInterface::class),
-                    $this->createMock(CategoryModel::class),
-                    $this->createMock(RouterInterface::class),
+                    $this->createStub(EntityManager::class),
+                    $this->createStub(TranslatorInterface::class),
+                    $this->createStub(CategoryModel::class),
+                    $this->createStub(RouterInterface::class),
                 ),
             ], []),
         ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -19,25 +21,25 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EmailModel
+     * @var MockObject&EmailModel
      */
     private MockObject $emailModel;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|CustomFieldValidator
+     * @var MockObject&CustomFieldValidator
      */
     private MockObject $customFieldValidator;
 
     /**
-     * @var MockObject|EmailValidator
+     * @var MockObject&EmailValidator
      */
     private MockObject $emailValidator;
 
@@ -167,7 +169,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    function (TokenReplacementEvent $event) use ($lead) {
+                    function (TokenReplacementEvent $event) use ($lead): true {
                         Assert::assertSame('{contactfield=active-field}', $event->getContent());
                         Assert::assertSame($lead, $event->getLead());
 
@@ -209,7 +211,7 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel
             ->expects($this->once())
             ->method('sendEmailToUser')
-            ->willReturnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc): void {
+            ->willReturnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc): array {
                 $expectedUsers = [
                     ['id' => 6],
                     ['id' => 7],
@@ -221,6 +223,8 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 $this->assertEquals(['hello@there.com', 'bob@bobek.cz', 'default@email.com'], $to);
                 $this->assertEquals([], $cc);
                 $this->assertEquals([0 => 'hidden@translation.in', 2 => 'replaced.token@email.address'], $bcc);
+
+                return [];
             });
 
         $config = [

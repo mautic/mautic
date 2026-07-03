@@ -30,11 +30,11 @@ class PartialObjectReportBuilder
     private ?ReportDAO $syncReport = null;
 
     public function __construct(
-        private FieldChangeRepository $fieldChangeRepository,
-        private FieldHelper $fieldHelper,
-        private FieldBuilder $fieldBuilder,
-        private ObjectProvider $objectProvider,
-        private EventDispatcherInterface $dispatcher,
+        private readonly FieldChangeRepository $fieldChangeRepository,
+        private readonly FieldHelper $fieldHelper,
+        private readonly FieldBuilder $fieldBuilder,
+        private readonly ObjectProvider $objectProvider,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -105,8 +105,9 @@ class PartialObjectReportBuilder
         }
 
         if (!array_key_exists($objectId, $this->reportObjects[$object])) {
-            /* @var ReportObjectDAO $reportObjectDAO */
-            $this->reportObjects[$object][$objectId] = $reportObjectDAO = new ReportObjectDAO($object, $objectId);
+            $reportObjectDAO = new ReportObjectDAO($object, $objectId);
+            $this->reportObjects[$object][$objectId] = $reportObjectDAO;
+
             $this->syncReport->addObject($reportObjectDAO);
             $reportObjectDAO->setChangeDateTime($modifiedDateTime);
         }

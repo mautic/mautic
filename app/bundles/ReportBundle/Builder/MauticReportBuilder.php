@@ -84,10 +84,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private ?string $contentTemplate = null;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Connection $db,
-        private Report $entity,
-        private ChannelListHelper $channelListHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Connection $db,
+        private readonly Report $entity,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
     }
 
@@ -353,7 +353,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $exprFunction = $filter['expr'] ?? $filter['condition'];
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
-                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' == trim((string) $filter['value'])) {
+                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' === trim((string) $filter['value'])) {
                     // Ignore empty values before applying glue so they do not create empty OR groups.
                     continue;
                 }

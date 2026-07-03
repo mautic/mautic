@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
@@ -17,20 +19,20 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateSchemaStepTest extends AbstractStepTestCase
+final class UpdateSchemaStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|MigrateCommand
+     * @var MockObject&MigrateCommand
      */
     private MockObject $migrateCommand;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcher;
 
@@ -107,7 +109,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleEvent $event, string $eventName) {
+                function (ConsoleEvent $event, string $eventName): ConsoleEvent {
                     switch (true) {
                         case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
@@ -133,7 +135,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleEvent $event, string $eventName) {
+                function (ConsoleEvent $event, string $eventName): ConsoleEvent {
                     switch (true) {
                         case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();

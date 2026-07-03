@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -7,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(InputHelper::class)]
-class InputHelperTest extends TestCase
+final class InputHelperTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The html returns correct values')]
     public function testHtmlFilter(): void
@@ -138,7 +140,9 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
-    /** @return iterable<array{0: string, 1: string, 2: string, 3?: bool}> */
+    /**
+     * @return iterable<array{0: string, 1: string, 2: string, 3?: bool}>
+     */
     public static function urlProvider(): iterable
     {
         yield [

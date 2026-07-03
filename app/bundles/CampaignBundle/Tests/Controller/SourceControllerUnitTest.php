@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class SourceControllerUnitTest extends TestCase
+final class SourceControllerUnitTest extends TestCase
 {
     public function testNewActionBuildsBooleanModifiedSourceMap(): void
     {
@@ -122,8 +122,8 @@ class SourceControllerUnitTest extends TestCase
     public function testDeleteActionRemovesSubmittedSourceTypeFromModifiedSources(): void
     {
         $controller = $this->createController(
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(CampaignModel::class)
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(CampaignModel::class)
         );
 
         $request = $this->ajaxRequest('POST', [
@@ -147,8 +147,8 @@ class SourceControllerUnitTest extends TestCase
     public function testDeleteActionWithNonPostRequestReturnsUnsuccessfulResponse(): void
     {
         $controller = $this->createController(
-            $this->createMock(FormFactoryInterface::class),
-            $this->createMock(CampaignModel::class)
+            $this->createStub(FormFactoryInterface::class),
+            $this->createStub(CampaignModel::class)
         );
 
         $request = $this->ajaxRequest('GET', [

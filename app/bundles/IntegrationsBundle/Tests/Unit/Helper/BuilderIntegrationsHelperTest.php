@@ -12,7 +12,7 @@ use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class BuilderIntegrationsHelperTest extends TestCase
+final class BuilderIntegrationsHelperTest extends TestCase
 {
     private BuilderIntegrationsHelper $builderIntegrationsHelper;
 

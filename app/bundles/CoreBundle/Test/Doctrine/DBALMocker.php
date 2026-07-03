@@ -13,8 +13,6 @@ use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 
 class DBALMocker
 {
-    protected $testCase;
-
     protected $mockEm;
 
     protected $mockConnection;
@@ -34,9 +32,8 @@ class DBALMocker
         'parameters' => [],
     ];
 
-    public function __construct(\PHPUnit\Framework\TestCase $testCase)
+    public function __construct(protected \PHPUnit\Framework\TestCase $testCase)
     {
-        $this->testCase = $testCase;
     }
 
     public function setQueryResponse($queryResponse): void
@@ -105,7 +102,7 @@ class DBALMocker
 
             $mock->expects(new AnyInvokedCount())
                 ->method('getReference')
-                ->willReturnCallback(function () {
+                ->willReturnCallback(function (): Lead {
                     switch (func_get_arg(0)) {
                         case Lead::class:
                             $entity = new Lead();
@@ -185,7 +182,7 @@ class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('select')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['select'][] = func_get_args();
 
                         return $mock;
@@ -195,7 +192,7 @@ class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('from')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['from'][] = func_get_args();
 
                         return $mock;
@@ -211,7 +208,7 @@ class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('where')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['where'][] = func_get_args();
 
                         return $mock;
@@ -221,7 +218,7 @@ class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('andWhere')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['where'][] = func_get_args();
 
                         return $mock;
@@ -231,7 +228,7 @@ class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('setParameter')
                 ->willReturnCallback(
-                    function () use ($mock) {
+                    function () use ($mock): \PHPUnit\Framework\MockObject\MockObject {
                         $this->queryParts['parameters'][] = func_get_args();
 
                         return $mock;
@@ -267,7 +264,7 @@ class DBALMocker
             ->getMock();
 
         $mock->method('columnCount')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(function (): int {
                 if (isset($this->queryResponse[0]) && is_array($this->queryResponse[0])) {
                     return count($this->queryResponse[0]);
                 }

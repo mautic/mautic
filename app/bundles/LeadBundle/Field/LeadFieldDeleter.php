@@ -15,10 +15,10 @@ use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 class LeadFieldDeleter
 {
     public function __construct(
-        private LeadFieldRepository $leadFieldRepository,
-        private FieldDeleteDispatcher $fieldDeleteDispatcher,
-        private UserHelper $userHelper,
-        private BackgroundSettings $backgroundSettings,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly FieldDeleteDispatcher $fieldDeleteDispatcher,
+        private readonly UserHelper $userHelper,
+        private readonly BackgroundSettings $backgroundSettings,
     ) {
     }
 

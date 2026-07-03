@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\SegmentCompanyRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LeadListRepository $segmentRepository,

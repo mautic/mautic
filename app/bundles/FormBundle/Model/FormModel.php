@@ -55,13 +55,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         protected ActionModel $formActionModel,
         protected FieldModel $formFieldModel,
         protected FormFieldHelper $fieldHelper,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
         protected LeadFieldModel $leadFieldModel,
-        private FormUploader $formUploader,
-        private ContactTracker $contactTracker,
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private TableSchemaHelper $tableSchemaHelper,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly FormUploader $formUploader,
+        private readonly ContactTracker $contactTracker,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly TableSchemaHelper $tableSchemaHelper,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -555,9 +555,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param object $entity
+     */
     public function deleteEntity($entity): void
     {
-        /* @var Form $entity */
+        /** @var Form $entity */
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
@@ -577,7 +580,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
-            /* @var Form $entity */
+            /** @var Form $entity */
             // delete the associated results table
             $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
@@ -895,7 +898,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    private function saveHTML(\DOMDocument $dom, $html): string|false|null
+    private function saveHTML(\DOMDocument $dom, ?\DOMNode $html): string|false|null
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);

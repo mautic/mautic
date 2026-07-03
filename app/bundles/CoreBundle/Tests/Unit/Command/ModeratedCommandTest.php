@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -14,18 +16,22 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Lock\LockInterface;
 
-class ModeratedCommandTest extends TestCase
+final class ModeratedCommandTest extends TestCase
 {
     private string $lockFilePath;
+
+    /**
+     * @var MockObject&CoreParametersHelper
+     */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var MockObject|InputInterface
+     * @var MockObject&InputInterface
      */
     private MockObject $input;
 
     /**
-     * @var MockObject|PathsHelper
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
@@ -284,7 +290,7 @@ class ModeratedCommandTest extends TestCase
     public function testCompleteRunHandlesNullLockObject(): void
     {
         // Ensure lock object is null
-        $this->fakeModeratedCommand->setLock(null);
+        $this->fakeModeratedCommand->setLock();
 
         // Create a dummy lock file
         file_put_contents($this->lockFilePath, 'test_lock');

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\EventListener\CoreSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class CoreSubscriberTest extends TestCase
+final class CoreSubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {

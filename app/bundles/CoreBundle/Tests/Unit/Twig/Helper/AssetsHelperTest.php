@@ -11,10 +11,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 
-class AssetsHelperTest extends TestCase
+final class AssetsHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper&MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\Serializer;
@@ -7,9 +9,11 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadListModelTest extends \PHPUnit\Framework\TestCase
+final class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ListModel&MockObject */
+    /**
+     * @var ListModel&MockObject
+     */
     protected MockObject $fixture;
 
     protected function setUp(): void
@@ -21,7 +25,7 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
 
         $mockListModel->expects($this->any())
             ->method('getEntity')
-            ->willReturnCallback(function ($id) {
+            ->willReturnCallback(function ($id): MockObject {
                 $mockEntity = $this->getMockBuilder(LeadList::class)
                     ->disableOriginalConstructor()
                     ->onlyMethods(['getName'])
@@ -96,7 +100,9 @@ class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $message);
     }
 
-    /** @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}> */
+    /**
+     * @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}>
+     */
     public static function segmentTestDataProvider(): array
     {
         return [

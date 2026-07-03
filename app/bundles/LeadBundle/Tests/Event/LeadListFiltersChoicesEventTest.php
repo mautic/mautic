@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListFiltersChoicesEventTest extends TestCase
+final class LeadListFiltersChoicesEventTest extends TestCase
 {
     public function testGetters(): void
     {
@@ -45,7 +45,7 @@ class LeadListFiltersChoicesEventTest extends TestCase
 
         $choices                     = [0 => 'Choice1', 1 => 'Choice2'];
         $search                      = 'Test Search';
-        $translator                  = $this->createMock(TranslatorInterface::class);
+        $translator                  = $this->createStub(TranslatorInterface::class);
         $leadListFiltersChoicesEvent = new LeadListFiltersChoicesEvent($choices, $operators, $translator, new Request(), $search);
         $this->assertSame($operators, $leadListFiltersChoicesEvent->getOperators());
         $this->assertSame($choices, $leadListFiltersChoicesEvent->getChoices());

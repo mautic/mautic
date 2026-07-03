@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ClientController extends AbstractStandardFormController
 {
     public function __construct(
-        private ClientModel $clientModel,
+        private readonly ClientModel $clientModel,
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
         ManagerRegistry $doctrine,
@@ -45,10 +45,8 @@ class ClientController extends AbstractStandardFormController
 
     /**
      * Generate's default client list.
-     *
-     * @param int $page
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         if (!$this->security->isGranted('api:clients:view')) {
             $this->throwAccessDenied();
@@ -149,7 +147,7 @@ class ClientController extends AbstractStandardFormController
         $success = 0;
         $flashes = [];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $client = $this->clientModel->getEntity($clientId);
 
             if (null === $client) {
@@ -219,7 +217,7 @@ class ClientController extends AbstractStandardFormController
         $form->remove('consumerSecret');
 
         // /Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -336,7 +334,7 @@ class ClientController extends AbstractStandardFormController
         $form->remove('api_mode');
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data

@@ -119,7 +119,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $unlock
+     * @param LeadList $entity
+     * @param bool     $unlock
      *
      * @throws \Doctrine\DBAL\Exception
      */
@@ -149,7 +150,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             $count     = count($existing);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);

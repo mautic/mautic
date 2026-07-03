@@ -7,9 +7,10 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
 use PHPUnit\Framework\TestCase;
 
-class PrivateAddressCheckerTest extends TestCase
+final class PrivateAddressCheckerTest extends TestCase
 {
     private PrivateAddressChecker $checker;
+
     private PrivateAddressChecker $checkerWithMockedDns;
 
     protected function setUp(): void
@@ -19,7 +20,7 @@ class PrivateAddressCheckerTest extends TestCase
 
         // Checker with mocked DNS resolver for URL tests
         $this->checkerWithMockedDns = new PrivateAddressChecker(
-            fn (string $host) => match ($host) {
+            fn (string $host): array|false => match ($host) {
                 'private.example.com' => ['192.168.1.1'],
                 'public.example.com'  => ['203.0.113.1'],
                 'api.example.com'     => ['8.8.8.8'],

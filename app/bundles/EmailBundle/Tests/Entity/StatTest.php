@@ -9,7 +9,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class StatTest extends TestCase
+final class StatTest extends TestCase
 {
     /**
      * @param int $count How many openDetails to add to the entity
@@ -39,7 +39,9 @@ class StatTest extends TestCase
     /**
      * Data provider for addOpenDetails.
      */
-    /** @return array<string, array{0: int}> */
+    /**
+     * @return array<string, array{0: int}>
+     */
     public static function addOpenDetailsTestProvider(): array
     {
         return [

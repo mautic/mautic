@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class BuilderSubscriberTest extends TestCase
+final class BuilderSubscriberTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
@@ -77,7 +77,7 @@ class BuilderSubscriberTest extends TestCase
                 'signature'  => 'Owner Signature',
             ]);
 
-        $this->coreParametersHelper->method('get')->willReturnMap([
+        $this->coreParametersHelper->expects($this->exactly(7))->method('get')->willReturnMap([
             ['unsubscribe_text', null, null],
             ['webview_text', null, null],
             ['default_signature_text', null, 'Default Signature'],
@@ -97,7 +97,7 @@ class BuilderSubscriberTest extends TestCase
     {
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
-        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key) {
+        $this->coreParametersHelper->method('get')->willReturnCallback(function ($key): string|false {
             if ('locale' === $key) {
                 return 'default_locale';
             }
@@ -270,7 +270,7 @@ class BuilderSubscriberTest extends TestCase
             'ACME',
         ];
         $this->coreParametersHelper->method('get')
-            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses) {
+            ->willReturnCallback(function ($key) use (&$callCount, $expectedKeys, $expectedResponses): ?string {
                 if ($callCount < count($expectedKeys)) {
                     $this->assertSame($expectedKeys[$callCount], $key);
                 }
@@ -280,7 +280,7 @@ class BuilderSubscriberTest extends TestCase
 
         $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
         $this->emailModel->method('buildUrl')
-            ->willReturnCallback(fn ($route) => match ($route) {
+            ->willReturnCallback(fn ($route): ?string => match ($route) {
                 'mautic_email_unsubscribe' => '/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash,
                 'mautic_email_webview'     => '/email/webview/'.$emailHash,
                 'mautic_email_preview'     => '/email/preview/111',

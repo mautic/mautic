@@ -35,7 +35,7 @@ class WebhookApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
@@ -63,7 +63,7 @@ class WebhookApiController extends CommonApiController
     }
 
     /**
-     * @param Webhook              &$entity
+     * @param Webhook              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

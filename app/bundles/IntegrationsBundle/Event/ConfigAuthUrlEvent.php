@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class ConfigAuthUrlEvent extends Event
 {
-    public function __construct(private Integration $integrationConfiguration, private string $authUrl)
+    public function __construct(private readonly Integration $integrationConfiguration, private string $authUrl)
     {
     }
 

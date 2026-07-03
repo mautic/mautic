@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Test\ReflectionHelper;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 
-class TokenHelperTest extends \PHPUnit\Framework\TestCase
+final class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, mixed>
@@ -262,11 +264,8 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         yield ['{contactfield=randomField}', 'randomField'];
     }
 
-    /**
-     * @param string|int $result
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataLabelProvider')]
-    public function testLabelFormatForSelect(string $token, $result): void
+    public function testLabelFormatForSelect(string $token, string|int $result): void
     {
         $lead         = $this->lead;
         $tokenList    = TokenHelper::findLeadTokens($token, $lead);

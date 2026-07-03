@@ -29,8 +29,8 @@ class ImportValidateEvent extends Event
      * @param FormInterface<mixed> $form
      */
     public function __construct(
-        private string $routeObjectName,
-        private FormInterface $form,
+        private readonly string $routeObjectName,
+        private readonly FormInterface $form,
     ) {
     }
 

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ClientTypeTest extends TestCase
+final class ClientTypeTest extends TestCase
 {
     private ClientType $clientType;
 
@@ -69,7 +69,7 @@ class ClientTypeTest extends TestCase
         $matcher            = $this->exactly(2);
 
         $this->builder->expects($matcher)
-            ->method('addEventSubscriber')->willReturnCallback(function (...$parameters) use ($matcher, $cleanSubscriber, $formExitSubscriber) {
+            ->method('addEventSubscriber')->willReturnCallback(function (...$parameters) use ($matcher, $cleanSubscriber, $formExitSubscriber): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($cleanSubscriber, $parameters[0]);
                 }

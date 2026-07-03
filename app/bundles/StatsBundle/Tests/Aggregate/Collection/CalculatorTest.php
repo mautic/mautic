@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use PHPUnit\Framework\TestCase;
 
-class CalculatorTest extends TestCase
+final class CalculatorTest extends TestCase
 {
     public function testSumByYearReturnsExpectedCount(): void
     {

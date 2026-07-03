@@ -28,26 +28,27 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     use MockedConnectionTrait;
+
     /**
      * @var MockObject|Connection
      */
     private MockObject $connectionMock;
 
     /**
-     * @var MockObject|CompanyReportData
+     * @var MockObject&CompanyReportData
      */
     private MockObject $companyReportDataMock;
 
     /**
-     * @var MockObject|EmailRepository
+     * @var MockObject&EmailRepository
      */
     private MockObject $emailRepository;
 
     /**
-     * @var MockObject|Report
+     * @var MockObject&Report
      */
     private MockObject $report;
 
@@ -58,7 +59,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private ReportSubscriber $subscriber;
 
     /**
-     * @var MockObject|FieldsBuilder
+     * @var MockObject&FieldsBuilder
      */
     private MockObject $fieldsBuilderMock;
 
@@ -84,7 +85,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->report             = $this->createMock(Report::class);
-        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->channelListHelper  = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
@@ -218,9 +219,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $eventMock         = $this->createMock(ReportGraphEvent::class);
         $queryBuilderMock  = $this->createMock(QueryBuilder::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $chartQueryMock    = $this->createStub(ChartQuery::class);
         $resultMock        = $this->createMock(Result::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $translatorMock    = $this->createStub(TranslatorInterface::class);
 
         $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
@@ -230,7 +231,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['mautic.email.graph.pie.read.ingored.unsubscribed.bounced']);
         $matcher = $this->any();
 
-        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+        $eventMock->expects($matcher)->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): true {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame(['email.stats', 'emails'], $parameters[0]);
             }
@@ -276,14 +277,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGraphGenerateForEmailContextWithEmailMultiSieriesPieGraph(): void
     {
-        $queryBuilderMock  = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock  = $this->createStub(QueryBuilder::class);
         $eventMock         = $this->createMock(ReportGraphEvent::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $chartQueryMock    = $this->createStub(ChartQuery::class);
+        $translatorMock    = $this->createStub(TranslatorInterface::class);
         $matcher           = $this->any();
 
         $eventMock->expects($matcher)
-            ->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('checkContext')->willReturnCallback(function (...$parameters) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(['email.stats', 'emails'], $parameters[0]);
                 }
@@ -329,9 +330,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $eventMock         = $this->createMock(ReportGraphEvent::class);
         $queryBuilderMock  = $this->createMock(QueryBuilder::class);
-        $chartQueryMock    = $this->createMock(ChartQuery::class);
+        $chartQueryMock    = $this->createStub(ChartQuery::class);
         $resultMock        = $this->createMock(Result::class);
-        $translatorMock    = $this->createMock(TranslatorInterface::class);
+        $translatorMock    = $this->createStub(TranslatorInterface::class);
 
         $queryBuilderMock->method('executeQuery')->willReturn($resultMock);
         $resultMock->method('fetchOne')->willReturn([]);
@@ -387,8 +388,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportBuilderWithEmailSentContext(): void
     {
-        $translatorMock     = $this->createMock(TranslatorInterface::class);
-        $reportHelper       = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $translatorMock     = $this->createStub(TranslatorInterface::class);
+        $reportHelper       = new ReportHelper($this->createStub(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
             ->expects($this->any())

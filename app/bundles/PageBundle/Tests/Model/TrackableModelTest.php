@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,26 +22,26 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(TrackableModel::class)]
-class TrackableModelTest extends TestCase
+final class TrackableModelTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that content is detected as HTML')]
     public function testHtmlIsDetectedInContent(): void
     {
-        $mockRedirectModel       = $this->createMock(RedirectModel::class);
-        $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $mockRedirectModel       = $this->createStub(RedirectModel::class);
+        $mockLeadFieldRepository = $this->createStub(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
                 $mockRedirectModel,
                 $mockLeadFieldRepository,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromHtml'])
             ->getMock();
@@ -76,21 +78,21 @@ class TrackableModelTest extends TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Test that content is detected as plain text')]
     public function testPlainTextIsDetectedInContent(): void
     {
-        $mockRedirectModel       = $this->createMock(RedirectModel::class);
-        $mockLeadFieldRepository = $this->createMock(LeadFieldRepository::class);
+        $mockRedirectModel       = $this->createStub(RedirectModel::class);
+        $mockLeadFieldRepository = $this->createStub(LeadFieldRepository::class);
 
         $mockModel = $this->getMockBuilder(TrackableModel::class)
             ->setConstructorArgs([
                 $mockRedirectModel,
                 $mockLeadFieldRepository,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
@@ -409,6 +411,22 @@ class TrackableModelTest extends TestCase
         $this->assertTrue(str_contains($content, $url), $content);
     }
 
+    public function testMalformedUrlDoesNotCrashTrackingParsing(): void
+    {
+        $url   = '://example.com';
+        $model = $this->getModel();
+
+        [$content, $trackables] = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables);
+        $this->assertStringContainsString($url, $content);
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a token used in place of a URL is not parsed')]
     public function testTokenAsHostIsConvertedToTrackableToken(?bool $useMap): void
@@ -584,14 +602,14 @@ TEXT;
             ->setConstructorArgs([
                 $mockRedirectModel,
                 $mockLeadFieldRepository,
-                $this->createMock(EntityManagerInterface::class),
-                $this->createMock(CorePermissions::class),
-                $this->createMock(EventDispatcherInterface::class),
-                $this->createMock(UrlGeneratorInterface::class),
-                $this->createMock(Translator::class),
-                $this->createMock(UserHelper::class),
-                $this->createMock(LoggerInterface::class),
-                $this->createMock(CoreParametersHelper::class),
+                $this->createStub(EntityManagerInterface::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcherInterface::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
             ])
             ->onlyMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'getContactFieldUrlTokens'])
             ->getMock();
@@ -603,7 +621,7 @@ TEXT;
         $mockModel->expects($this->any())
             ->method('getEntitiesFromUrls')
             ->willReturnCallback(
-                function ($trackableUrls, $channel, $channelId) {
+                function ($trackableUrls, $channel, $channelId): array {
                     $entities = [];
                     foreach ($trackableUrls as $url) {
                         $entities[$url] = $this->getTrackableEntity($url);

@@ -28,7 +28,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImportModelTest extends StandardImportTestHelper
+final class ImportModelTest extends StandardImportTestHelper
 {
     public function testInitEventLog(): void
     {
@@ -60,7 +60,7 @@ class ImportModelTest extends StandardImportTestHelper
         $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                $this->callback(function (ImportProcessEvent $event) {
+                $this->callback(function (ImportProcessEvent $event): true {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
 
@@ -411,7 +411,7 @@ class ImportModelTest extends StandardImportTestHelper
         $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                $this->callback(function (ImportProcessEvent $event) {
+                $this->callback(function (ImportProcessEvent $event): true {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
                     $event->addWarning('test warning message');
@@ -437,10 +437,10 @@ class ImportModelTest extends StandardImportTestHelper
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
         /** @var MockObject&UserHelper */
-        $userHelper = $this->createMock(UserHelper::class);
+        $userHelper = $this->createStub(UserHelper::class);
 
         /** @var MockObject&LeadEventLogRepository */
-        $logRepository = $this->createMock(LeadEventLogRepository::class);
+        $logRepository = $this->createStub(LeadEventLogRepository::class);
 
         /** @var MockObject&ImportRepository */
         $importRepository = $this->createMock(ImportRepository::class);
@@ -488,7 +488,7 @@ class ImportModelTest extends StandardImportTestHelper
         $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                $this->callback(function (ImportProcessEvent $event) {
+                $this->callback(function (ImportProcessEvent $event): true {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
 
@@ -504,12 +504,12 @@ class ImportModelTest extends StandardImportTestHelper
             $coreParametersHelper,
             $companyModel,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
+            $this->createStub(CorePermissions::class),
             $this->dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translator,
             $userHelper,
-            $this->createMock(LoggerInterface::class),
+            $this->createStub(LoggerInterface::class),
             new ProcessSignalService()
         );
 

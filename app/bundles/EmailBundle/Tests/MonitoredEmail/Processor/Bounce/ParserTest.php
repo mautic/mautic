@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Parser::class)]
-class ParserTest extends \PHPUnit\Framework\TestCase
+final class ParserTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Test that a bounce is found through DsnReport')]
     public function testBouncedEmailIsReturnedFromParsedDsnReport(): void

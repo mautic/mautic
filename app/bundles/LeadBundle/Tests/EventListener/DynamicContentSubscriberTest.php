@@ -14,22 +14,19 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DynamicContentSubscriberTest extends TestCase
+final class DynamicContentSubscriberTest extends TestCase
 {
     /**
-     * @var LeadListRepository|MockObject
+     * @var MockObject&LeadListRepository
      */
     private MockObject $segmentRepository;
 
     /**
-     * @var SegmentCompanyRepository|MockObject
+     * @var MockObject&SegmentCompanyRepository
      */
     private $companySegmentRepository;
 
-    /**
-     * @var DynamicContentSubscriber
-     */
-    private $subscriber;
+    private DynamicContentSubscriber $subscriber;
 
     protected function setUp(): void
     {

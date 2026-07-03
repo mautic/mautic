@@ -20,10 +20,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private FormModel $formModel,
-        private SubmissionModel $formSubmissionModel,
-        private RealTimeExecutioner $realTimeExecutioner,
-        private FormFieldHelper $formFieldHelper,
+        private readonly FormModel $formModel,
+        private readonly SubmissionModel $formSubmissionModel,
+        private readonly RealTimeExecutioner $realTimeExecutioner,
+        private readonly FormFieldHelper $formFieldHelper,
     ) {
     }
 
