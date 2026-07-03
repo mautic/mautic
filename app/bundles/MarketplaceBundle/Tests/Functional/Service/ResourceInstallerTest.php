@@ -119,7 +119,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $this->mockPackageWithDistUrl('https://example.test/pkg.zip');
 
         $this->httpClient->method('request')
-            ->willReturnCallback(function (string $method, string $url, array $options) {
+            ->willReturnCallback(function (string $method, string $url, array $options): ResponseInterface {
                 file_put_contents($options['sink'], '');
 
                 return $this->successfulResponse();
@@ -137,7 +137,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $zipContents = $this->buildZip(['composer.json' => '{"name":"vendor/pkg"}']);
 
         $this->httpClient->method('request')
-            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents) {
+            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents): ResponseInterface {
                 file_put_contents($options['sink'], $zipContents);
 
                 return $this->successfulResponse();
@@ -161,7 +161,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $zipContents = $this->buildZip(['campaign.json' => $campaignJson]);
 
         $this->httpClient->method('request')
-            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents) {
+            ->willReturnCallback(function (string $method, string $url, array $options) use ($zipContents): ResponseInterface {
                 file_put_contents($options['sink'], $zipContents);
 
                 return $this->successfulResponse();
@@ -169,7 +169,7 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function (EntityImportEvent $event) {
+            ->willReturnCallback(function (EntityImportEvent $event): EntityImportEvent {
                 $event->setStatus('imported', ['campaign' => ['ids' => [1], 'names' => ['Test'], 'count' => 1]]);
 
                 return $event;
