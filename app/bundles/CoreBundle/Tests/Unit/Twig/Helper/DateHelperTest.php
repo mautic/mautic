@@ -23,12 +23,19 @@ final class DateHelperTest extends TestCase
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
     private const TEN_MINUTES_AGO    = '-10 minutes';
+
     private const TEN_MINUTES_IN     = '+10 minutes';
+
     private const MINUTES_AGO        = 'minute(s) ago';
+
     private const MINUTES            = 'minute(s)';
+
     private const REGEX_MINUTES_AGO  = '/\d+ minute\(s\) ago/';
+
     private const REGEX_MINUTES_IN   = '/in \d+ minute\(s\)/';
+
     private const TIMEZONE_NEW_YORK  = 'America/New_York';
+
     private const DATE_FORMAT_CUSTOM = 'Y/m/d H:i';
 
     public static function setUpBeforeClass(): void
@@ -56,35 +63,20 @@ final class DateHelperTest extends TestCase
 
         // Setup translator mock for humanized dates
         $this->translator->method('trans')
-            ->willReturnCallback(function (string $key, array $parameters = []): string {
-                switch ($key) {
-                    case 'mautic.core.date.years.ago':
-                        return $parameters['%count%'].' year(s) ago';
-                    case 'mautic.core.date.years.in':
-                        return 'in '.$parameters['%count%'].' year(s)';
-                    case 'mautic.core.date.months.ago':
-                        return $parameters['%count%'].' month(s) ago';
-                    case 'mautic.core.date.months.in':
-                        return 'in '.$parameters['%count%'].' month(s)';
-                    case 'mautic.core.date.days.ago':
-                        return $parameters['%count%'].' day(s) ago';
-                    case 'mautic.core.date.days.in':
-                        return 'in '.$parameters['%count%'].' day(s)';
-                    case 'mautic.core.date.hours.ago':
-                        return $parameters['%count%'].' hour(s) ago';
-                    case 'mautic.core.date.hours.in':
-                        return 'in '.$parameters['%count%'].' hour(s)';
-                    case 'mautic.core.date.minutes.ago':
-                        return $parameters['%count%'].' minute(s) ago';
-                    case 'mautic.core.date.minutes.in':
-                        return 'in '.$parameters['%count%'].' minute(s)';
-                    case 'mautic.core.date.just.now':
-                        return 'just now';
-                    case 'mautic.core.date.today':
-                        return 'Today';
-                    default:
-                        return $key;
-                }
+            ->willReturnCallback(fn (string $key, array $parameters = []): string => match ($key) {
+                'mautic.core.date.years.ago' => $parameters['%count%'].' year(s) ago',
+                'mautic.core.date.years.in' => 'in '.$parameters['%count%'].' year(s)',
+                'mautic.core.date.months.ago' => $parameters['%count%'].' month(s) ago',
+                'mautic.core.date.months.in' => 'in '.$parameters['%count%'].' month(s)',
+                'mautic.core.date.days.ago' => $parameters['%count%'].' day(s) ago',
+                'mautic.core.date.days.in' => 'in '.$parameters['%count%'].' day(s)',
+                'mautic.core.date.hours.ago' => $parameters['%count%'].' hour(s) ago',
+                'mautic.core.date.hours.in' => 'in '.$parameters['%count%'].' hour(s)',
+                'mautic.core.date.minutes.ago' => $parameters['%count%'].' minute(s) ago',
+                'mautic.core.date.minutes.in' => 'in '.$parameters['%count%'].' minute(s)',
+                'mautic.core.date.just.now' => 'just now',
+                'mautic.core.date.today' => 'Today',
+                default => $key,
             });
     }
 
