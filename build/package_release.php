@@ -105,13 +105,17 @@ if (!isset($args['repackage'])) {
         $releaseFiles = array_merge($releaseFiles, $files);
     }
 
-    // The GrapesJs builder assets are generated during packaging (see build step above) and are
-    // not tracked in git, so add them to the release files explicitly like the media files above.
+    // The GrapesJs builder assets are generated during packaging and not tracked in git. Add them
+    // to $releaseFiles (so old names aren't flagged deleted) and $modifiedFiles (so they ship in
+    // the update package). Mirrors the media files above.
     $grapesJsDistDir = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
     if (is_dir(__DIR__.'/packaging/'.$grapesJsDistDir)) {
         $files = array_diff(scandir(__DIR__.'/packaging/'.$grapesJsDistDir), ['..', '.']);
         array_walk($files, function (&$item) use ($grapesJsDistDir) { $item = $grapesJsDistDir.'/'.$item; });
         $releaseFiles = array_merge($releaseFiles, $files);
+        foreach ($files as $file) {
+            $modifiedFiles[$file] = true;
+        }
     }
 
     // Create a flag to check if the vendors changed
