@@ -76,7 +76,7 @@ abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
             {
                 if (is_array($argument)) {
                     return array_map(
-                        static fn ($value) => ':'.$value,
+                        static fn ($value): string => ':'.$value,
                         $argument
                     );
                 }
