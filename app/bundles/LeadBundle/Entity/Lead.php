@@ -626,8 +626,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set id.
-     *
      * @param int $id
      */
     public function setId($id): static
@@ -638,7 +636,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get id.
      */
     public function getId(): int
     {
@@ -646,7 +643,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set owner.
      */
     public function setOwner(?User $owner = null): static
     {
@@ -729,8 +725,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get preferred locale.
-     *
      * @return string
      */
     public function getPreferredLocale()
@@ -868,8 +862,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set points.
-     *
      * @param int $points
      */
     public function setPoints($points): static
@@ -884,8 +876,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get points.
-     *
      * @return int
      */
     public function getPoints()
@@ -909,7 +899,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Reset point changes.
      */
     public function resetPointChanges(): static
     {
@@ -946,7 +935,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Add pointsChangeLog.
      */
     public function addPointsChangeLog(PointsChangeLog $pointsChangeLog): static
     {
@@ -989,7 +977,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Remove pointsChangeLog.
      */
     public function removePointsChangeLog(PointsChangeLog $pointsChangeLog): void
     {
@@ -997,8 +984,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get pointsChangeLog.
-     *
      * @return Collection
      */
     public function getPointsChangeLog()
@@ -1027,7 +1012,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Add Company ChangeLog.
      */
     public function addCompanyChangeLog(CompanyChangeLog $companyChangeLog): static
     {
@@ -1169,7 +1153,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set social cache.
      */
     public function setSocialCache($cache): void
     {
@@ -1177,8 +1160,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get social cache.
-     *
      * @return array<mixed>
      */
     public function getSocialCache()
@@ -1335,7 +1316,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Add tag.
      */
     public function addTag(Tag $tag): static
     {
@@ -1346,7 +1326,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Remove tag.
      */
     public function removeTag(Tag $tag): void
     {
@@ -1355,8 +1334,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get tags.
-     *
      * @return Collection<string, Tag>
      */
     public function getTags()
@@ -1365,7 +1342,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set tags.
      */
     public function setTags($tags): static
     {
@@ -1375,8 +1351,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get utm tags.
-     *
      * @return Collection<int, UtmTag>
      */
     public function getUtmTags()
@@ -1385,7 +1359,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set utm tags.
      */
     public function setUtmTags($utmTags): static
     {
@@ -1402,7 +1375,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set stage.
      */
     public function setStage(?Stage $stage = null): static
     {
@@ -1413,8 +1385,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get stage.
-     *
      * @return Stage|null
      */
     public function getStage()
@@ -1423,8 +1393,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Set frequency rules.
-     *
      * @param FrequencyRule[] $frequencyRules
      */
     public function setFrequencyRules($frequencyRules): static
@@ -1435,8 +1403,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Get frequency rules.
-     *
      * @return Collection<int, FrequencyRule>
      */
     public function getFrequencyRules()
@@ -1445,7 +1411,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Remove frequencyRule.
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule): void
     {
@@ -1454,7 +1419,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * Add frequency rule.
      */
     public function addFrequencyRule(FrequencyRule $frequencyRule): void
     {

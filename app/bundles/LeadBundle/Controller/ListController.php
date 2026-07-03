@@ -828,7 +828,6 @@ class ListController extends FormController
     }
 
     /**
-     * Get List Model.
      */
     protected function getListModel(): ListModel
     {

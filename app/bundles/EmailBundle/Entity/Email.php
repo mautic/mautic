@@ -1023,7 +1023,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Add list.
      */
     public function addList(LeadList $list): static
     {
@@ -1046,7 +1045,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Remove list.
      */
     public function removeList(LeadList $list): void
     {
@@ -1213,8 +1211,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Get assetAttachments.
-     *
      * @return Collection
      */
     public function getAssetAttachments()

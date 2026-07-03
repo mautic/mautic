@@ -334,7 +334,6 @@ class AppKernel extends Kernel
     }
 
     /**
-     * Get local config file.
      */
     public function getLocalConfigFile(): string
     {

@@ -131,7 +131,6 @@ class Submission
     }
 
     /**
-     * Get id.
      */
     public function getId(): int
     {
@@ -139,8 +138,6 @@ class Submission
     }
 
     /**
-     * Set dateSubmitted.
-     *
      * @param \DateTime $dateSubmitted
      */
     public function setDateSubmitted($dateSubmitted): static
@@ -151,8 +148,6 @@ class Submission
     }
 
     /**
-     * Get dateSubmitted.
-     *
      * @return \DateTimeInterface|null
      */
     public function getDateSubmitted()
@@ -161,8 +156,6 @@ class Submission
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
      */
     public function setReferer($referer): static
@@ -173,8 +166,6 @@ class Submission
     }
 
     /**
-     * Get referer.
-     *
      * @return string|null
      */
     public function getReferer()
@@ -183,7 +174,6 @@ class Submission
     }
 
     /**
-     * Set form.
      */
     public function setForm(Form $form): static
     {
@@ -193,8 +183,6 @@ class Submission
     }
 
     /**
-     * Get form.
-     *
      * @return Form|null
      */
     public function getForm()
@@ -203,7 +191,6 @@ class Submission
     }
 
     /**
-     * Set ipAddress.
      */
     public function setIpAddress(?IpAddress $ipAddress = null): static
     {
@@ -221,8 +208,6 @@ class Submission
     }
 
     /**
-     * Get results.
-     *
      * @return array
      */
     public function getResults()
@@ -241,7 +226,6 @@ class Submission
     }
 
     /**
-     * Set page.
      */
     public function setPage(?Page $page = null): static
     {
@@ -251,8 +235,6 @@ class Submission
     }
 
     /**
-     * Get page.
-     *
      * @return Page|null
      */
     public function getPage()

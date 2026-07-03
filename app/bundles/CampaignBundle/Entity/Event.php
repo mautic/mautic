@@ -692,7 +692,6 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * Remove log.
      */
     public function removeLog(LeadEventLog $log): void
     {
@@ -801,7 +800,6 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * Set parent.
      */
     public function setParent(?Event $parent = null): static
     {
@@ -815,7 +813,6 @@ class Event implements ChannelInterface, UuidInterface
     }
 
     /**
-     * Remove parent.
      */
     public function removeParent(): void
     {

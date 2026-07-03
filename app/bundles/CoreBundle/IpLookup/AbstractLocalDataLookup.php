@@ -48,8 +48,6 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     }
 
     /**
-     * Download remote data store.
-     *
      * Used by the mautic:iplookup:update_data command and form fetch button (if applicable) to update local IP data stores
      *
      * @return bool

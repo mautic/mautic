@@ -479,7 +479,6 @@ class CorePermissions implements ResetInterface
     }
 
     /**
-     * Register permission classes.
      */
     private function registerPermissionClasses(): void
     {

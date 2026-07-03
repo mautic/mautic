@@ -210,7 +210,6 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * Check Lead segments by ids.
      */
     public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {

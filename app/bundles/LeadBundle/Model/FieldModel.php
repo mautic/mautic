@@ -723,7 +723,6 @@ class FieldModel extends FormModel
     }
 
     /**
-     * Filter used field ids.
      */
     public function filterUsedFieldIds(array $ids): array
     {

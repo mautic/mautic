@@ -175,7 +175,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * Clear stats.
      */
     public function clearStats(): void
     {
@@ -395,8 +394,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -572,7 +569,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * Add list.
      */
     public function addList(LeadList $list): static
     {
@@ -582,7 +578,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * Remove list.
      */
     public function removeList(LeadList $list): void
     {

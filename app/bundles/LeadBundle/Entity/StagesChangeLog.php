@@ -67,8 +67,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -77,8 +75,6 @@ class StagesChangeLog
     }
 
     /**
-     * Set eventName.
-     *
      * @param string $eventName
      */
     public function setEventName($eventName): static
@@ -89,8 +85,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get eventName.
-     *
      * @return string
      */
     public function getEventName()
@@ -99,8 +93,6 @@ class StagesChangeLog
     }
 
     /**
-     * Set actionName.
-     *
      * @param string $actionName
      */
     public function setActionName($actionName): static
@@ -111,8 +103,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get actionName.
-     *
      * @return string
      */
     public function getActionName()
@@ -121,8 +111,6 @@ class StagesChangeLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
@@ -133,8 +121,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -143,7 +129,6 @@ class StagesChangeLog
     }
 
     /**
-     * Set lead.
      */
     public function setLead(Lead $lead): static
     {
@@ -153,8 +138,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get lead.
-     *
      * @return Lead
      */
     public function getLead()
@@ -163,7 +146,6 @@ class StagesChangeLog
     }
 
     /**
-     * Set stage.
      */
     public function setStage(Stage $stage): static
     {
@@ -173,8 +155,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get stage.
-     *
      * @return Stage|null
      */
     public function getStage()

@@ -695,7 +695,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * Get contact membership.
      */
     public function getContactMembership(Contact $contact): Collection
     {

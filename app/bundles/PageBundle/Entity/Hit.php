@@ -293,7 +293,6 @@ class Hit
     }
 
     /**
-     * Get id.
      */
     public function getId(): int
     {
@@ -301,8 +300,6 @@ class Hit
     }
 
     /**
-     * Set dateHit.
-     *
      * @param \DateTime $dateHit
      */
     public function setDateHit($dateHit): static
@@ -313,8 +310,6 @@ class Hit
     }
 
     /**
-     * Get dateHit.
-     *
      * @return \DateTimeInterface
      */
     public function getDateHit()
@@ -341,8 +336,6 @@ class Hit
     }
 
     /**
-     * Set country.
-     *
      * @param string $country
      */
     public function setCountry($country): static
@@ -353,8 +346,6 @@ class Hit
     }
 
     /**
-     * Get country.
-     *
      * @return string
      */
     public function getCountry()
@@ -363,8 +354,6 @@ class Hit
     }
 
     /**
-     * Set region.
-     *
      * @param string $region
      */
     public function setRegion($region): static
@@ -375,8 +364,6 @@ class Hit
     }
 
     /**
-     * Get region.
-     *
      * @return string
      */
     public function getRegion()
@@ -385,8 +372,6 @@ class Hit
     }
 
     /**
-     * Set city.
-     *
      * @param string $city
      */
     public function setCity($city): static
@@ -397,8 +382,6 @@ class Hit
     }
 
     /**
-     * Get city.
-     *
      * @return string
      */
     public function getCity()
@@ -407,8 +390,6 @@ class Hit
     }
 
     /**
-     * Set isp.
-     *
      * @param string $isp
      */
     public function setIsp($isp): static
@@ -419,8 +400,6 @@ class Hit
     }
 
     /**
-     * Get isp.
-     *
      * @return string
      */
     public function getIsp()
@@ -429,8 +408,6 @@ class Hit
     }
 
     /**
-     * Set organization.
-     *
      * @param string $organization
      */
     public function setOrganization($organization): static
@@ -441,8 +418,6 @@ class Hit
     }
 
     /**
-     * Get organization.
-     *
      * @return string
      */
     public function getOrganization()
@@ -451,8 +426,6 @@ class Hit
     }
 
     /**
-     * Set code.
-     *
      * @param int $code
      */
     public function setCode($code): static
@@ -463,8 +436,6 @@ class Hit
     }
 
     /**
-     * Get code.
-     *
      * @return int
      */
     public function getCode()
@@ -473,8 +444,6 @@ class Hit
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
      */
     public function setReferer($referer): static
@@ -485,8 +454,6 @@ class Hit
     }
 
     /**
-     * Get referer.
-     *
      * @return string
      */
     public function getReferer()
@@ -495,8 +462,6 @@ class Hit
     }
 
     /**
-     * Set url.
-     *
      * @param string $url
      */
     public function setUrl($url): static
@@ -507,8 +472,6 @@ class Hit
     }
 
     /**
-     * Get url.
-     *
      * @return string
      */
     public function getUrl()
@@ -517,8 +480,6 @@ class Hit
     }
 
     /**
-     * Set url title.
-     *
      * @param string $urlTitle
      */
     public function setUrlTitle($urlTitle): static
@@ -530,8 +491,6 @@ class Hit
     }
 
     /**
-     * Get url title.
-     *
      * @return string
      */
     public function getUrlTitle()
@@ -540,8 +499,6 @@ class Hit
     }
 
     /**
-     * Set userAgent.
-     *
      * @param string $userAgent
      */
     public function setUserAgent($userAgent): static
@@ -552,8 +509,6 @@ class Hit
     }
 
     /**
-     * Get userAgent.
-     *
      * @return string
      */
     public function getUserAgent()
@@ -562,8 +517,6 @@ class Hit
     }
 
     /**
-     * Set remoteHost.
-     *
      * @param string $remoteHost
      */
     public function setRemoteHost($remoteHost): static
@@ -574,8 +527,6 @@ class Hit
     }
 
     /**
-     * Get remoteHost.
-     *
      * @return string
      */
     public function getRemoteHost()
@@ -584,7 +535,6 @@ class Hit
     }
 
     /**
-     * Set page.
      */
     public function setPage(?Page $page = null): static
     {
@@ -624,8 +574,6 @@ class Hit
     }
 
     /**
-     * Get trackingId.
-     *
      * @return string|null
      */
     public function getTrackingId()
@@ -634,8 +582,6 @@ class Hit
     }
 
     /**
-     * Set pageLanguage.
-     *
      * @param string $pageLanguage
      */
     public function setPageLanguage($pageLanguage): static
@@ -646,8 +592,6 @@ class Hit
     }
 
     /**
-     * Get pageLanguage.
-     *
      * @return string
      */
     public function getPageLanguage()
@@ -656,8 +600,6 @@ class Hit
     }
 
     /**
-     * Set browserLanguages.
-     *
      * @param array<string> $browserLanguages
      */
     public function setBrowserLanguages($browserLanguages): static
@@ -668,8 +610,6 @@ class Hit
     }
 
     /**
-     * Get browserLanguages.
-     *
      * @return array<string>
      */
     public function getBrowserLanguages()

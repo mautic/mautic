@@ -61,7 +61,6 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * Get submit actions.
      */
     public function getSubmitActions(): array
     {
@@ -141,8 +140,6 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * Get form fields.
-     *
      * @return array<string, mixed>
      */
     public function getFormFields(): array

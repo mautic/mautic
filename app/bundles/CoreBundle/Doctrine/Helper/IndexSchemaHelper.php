@@ -122,7 +122,6 @@ class IndexSchemaHelper
     }
 
     /**
-     * Execute changes.
      */
     public function executeChanges(): void
     {

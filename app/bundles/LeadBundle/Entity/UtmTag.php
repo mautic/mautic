@@ -119,8 +119,6 @@ class UtmTag
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -129,7 +127,6 @@ class UtmTag
     }
 
     /**
-     * Set date added.
      */
     public function setDateAdded(\DateTimeInterface $date): static
     {
@@ -139,8 +136,6 @@ class UtmTag
     }
 
     /**
-     * Get date added.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -182,8 +177,6 @@ class UtmTag
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
      */
     public function setReferer($referer): static
@@ -194,8 +187,6 @@ class UtmTag
     }
 
     /**
-     * Get referer.
-     *
      * @return string|null
      */
     public function getReferer()
@@ -204,8 +195,6 @@ class UtmTag
     }
 
     /**
-     * Set remoteHost.
-     *
      * @param string $remoteHost
      */
     public function setRemoteHost($remoteHost): static
@@ -216,8 +205,6 @@ class UtmTag
     }
 
     /**
-     * Get remoteHost.
-     *
      * @return string|null
      */
     public function getRemoteHost()
@@ -226,8 +213,6 @@ class UtmTag
     }
 
     /**
-     * Set url.
-     *
      * @param string $url
      */
     public function setUrl($url): static
@@ -238,8 +223,6 @@ class UtmTag
     }
 
     /**
-     * Get url.
-     *
      * @return string
      */
     public function getUrl()
@@ -248,8 +231,6 @@ class UtmTag
     }
 
     /**
-     * Set userAgent.
-     *
      * @param string $userAgent
      */
     public function setUserAgent($userAgent): static
@@ -260,8 +241,6 @@ class UtmTag
     }
 
     /**
-     * Get userAgent.
-     *
      * @return string|null
      */
     public function getUserAgent()

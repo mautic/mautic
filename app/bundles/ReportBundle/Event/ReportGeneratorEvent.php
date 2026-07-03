@@ -107,8 +107,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add category left join.
-     *
      * @param string $prefix
      * @param string $categoryPrefix
      */
@@ -122,8 +120,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add lead left join.
-     *
      * @param string $prefix
      * @param string $leadPrefix
      */
@@ -227,7 +223,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add company left join.
      */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder, string $companyPrefix = self::COMPANY_PREFIX, string $contactPrefix = self::CONTACT_PREFIX): void
     {

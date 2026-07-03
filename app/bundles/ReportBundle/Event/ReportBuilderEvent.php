@@ -281,7 +281,6 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
-     * Get graphs.
      */
     public function getGraphs(): array
     {

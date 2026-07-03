@@ -194,7 +194,6 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * Populate widget preview.
      */
     public function populateWidgetPreview(Widget $widget): void
     {

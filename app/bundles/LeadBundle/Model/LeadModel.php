@@ -2198,7 +2198,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get contact channels.
      */
     public function getContactChannels(Lead $lead): array
     {

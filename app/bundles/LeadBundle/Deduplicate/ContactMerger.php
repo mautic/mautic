@@ -76,7 +76,6 @@ class ContactMerger
     }
 
     /**
-     * Merge timestamps.
      */
     public function mergeTimestamps(Lead $winner, Lead $loser): static
     {

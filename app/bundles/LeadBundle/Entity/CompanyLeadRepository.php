@@ -52,7 +52,6 @@ class CompanyLeadRepository extends CommonRepository
     }
 
     /**
-     * Get companies by leadId.
      */
     public function getCompaniesByLeadId($leadId, $companyId = null, ?bool $onlyPrimary = null): array
     {

@@ -45,7 +45,6 @@ class PageDisplayEvent extends Event
     }
 
     /**
-     * Get params.
      */
     public function getParams(): array
     {
@@ -53,7 +52,6 @@ class PageDisplayEvent extends Event
     }
 
     /**
-     * Set params.
      */
     public function setParams(array $params): void
     {

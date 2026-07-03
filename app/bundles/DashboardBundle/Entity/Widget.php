@@ -106,8 +106,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -116,7 +114,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set name.
      */
     public function setName(string $name): static
     {
@@ -127,8 +124,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -137,7 +132,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set type.
      */
     public function setType(string $type): static
     {
@@ -148,8 +142,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get type.
-     *
      * @return string|null
      */
     public function getType()
@@ -158,8 +150,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set width.
-     *
      * @param int $width
      */
     public function setWidth($width): static
@@ -171,8 +161,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get width.
-     *
      * @return int|null
      */
     public function getWidth()
@@ -181,8 +169,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set height.
-     *
      * @param int $height
      */
     public function setHeight($height): static
@@ -194,8 +180,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get cache timeout.
-     *
      * @return int|null (minutes)
      */
     public function getCacheTimeout()
@@ -204,8 +188,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set cache timeout.
-     *
      * @param int $cacheTimeout (minutes)
      */
     public function setCacheTimeout($cacheTimeout): static
@@ -217,8 +199,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get height.
-     *
      * @return int|null
      */
     public function getHeight()
@@ -227,8 +207,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set ordering.
-     *
      * @param int $ordering
      */
     public function setOrdering($ordering): static
@@ -240,8 +218,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get ordering.
-     *
      * @return int|null
      */
     public function getOrdering()
@@ -250,8 +226,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get params.
-     *
      * @return array
      */
     public function getParams()
@@ -260,7 +234,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set params.
      */
     public function setParams(array $params): static
     {
@@ -271,8 +244,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set template.
-     *
      * @param string $template
      */
     public function setTemplate($template): static
@@ -284,8 +255,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get template.
-     *
      * @return string|null
      */
     public function getTemplate()
@@ -294,8 +263,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get template data.
-     *
      * @return array
      */
     public function getTemplateData()
@@ -304,7 +271,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set template data.
      */
     public function setTemplateData(array $templateData): static
     {
@@ -315,8 +281,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set errorMessage.
-     *
      * @param string $errorMessage
      */
     public function setErrorMessage($errorMessage): static
@@ -327,8 +291,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get errorMessage.
-     *
      * @return string|null
      */
     public function getErrorMessage()
@@ -359,8 +321,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set loadTime.
-     *
      * @param string|float|int $loadTime
      */
     public function setLoadTime($loadTime): static
@@ -371,8 +331,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get loadTime.
-     *
      * @return int
      */
     public function getLoadTime()

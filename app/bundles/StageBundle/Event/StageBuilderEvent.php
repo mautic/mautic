@@ -61,7 +61,6 @@ class StageBuilderEvent extends Event
     }
 
     /**
-     * Get actions.
      */
     public function getActions(): array
     {

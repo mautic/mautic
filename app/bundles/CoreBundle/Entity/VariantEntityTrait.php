@@ -95,7 +95,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get variantChildren.
      */
     public function getVariantChildren(): ArrayCollection|Collection
     {
@@ -119,7 +118,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Remove variant parent.
      */
     public function removeVariantParent(): void
     {
@@ -127,8 +125,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Set variantSettings.
-     *
      * @param array<mixed> $variantSettings
      */
     public function setVariantSettings(array $variantSettings): static
@@ -149,8 +145,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Get variantSettings.
-     *
      * @return array<mixed>
      */
     public function getVariantSettings(): array
@@ -203,7 +197,6 @@ trait VariantEntityTrait
     }
 
     /**
-     * Clear variants.
      */
     public function clearVariants(): void
     {
