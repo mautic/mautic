@@ -44,6 +44,10 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
+            /**
+             * @param object $entity
+             * @param bool   $flush
+             */
             public function saveEntity($entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
@@ -64,6 +68,10 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                 return null;
             }
 
+            /**
+             * @param object $entity
+             * @param bool   $flush
+             */
             public function saveEntity($entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;

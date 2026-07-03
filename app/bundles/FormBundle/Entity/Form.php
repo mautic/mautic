@@ -400,7 +400,7 @@ class Form extends FormEntity implements UuidInterface
         self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
