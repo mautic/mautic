@@ -27,6 +27,7 @@ return RectorConfig::configure()
         Mautic\CoreBundle\Controller\CommonController::class,
         Mautic\CoreBundle\Controller\AbstractFormController::class,
         CommonRepository::class,
+        Mautic\ApiBundle\Controller\CommonApiController::class,
         Mautic\ApiBundle\Controller\FetchCommonApiController::class,
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
