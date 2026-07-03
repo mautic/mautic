@@ -22,8 +22,12 @@ class DeleteContactSecondaryCompaniesCommand extends Command
 {
     public const NAME                    = 'mautic:contact:delete:secondary-companies';
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly TranslatorInterface $translator, private readonly CoreParametersHelper $coreParametersHelper, private readonly CompanyLeadRepository $companyLeadsRepository)
-    {
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly CompanyLeadRepository $companyLeadsRepository,
+    ) {
         parent::__construct();
     }
 

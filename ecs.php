@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return ECSConfig::configure()
@@ -23,7 +22,25 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
     ])
     ->withRules([
-        NoUnusedImportsFixer::class,
-        // Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+        PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
     ])
+    ->withSkip([
+        PhpCsFixer\Fixer\Operator\ConcatSpaceFixer::class,
+        PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
+        PhpCsFixer\Fixer\Operator\NotOperatorWithSpaceFixer::class,
+        PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
+        PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
+        Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
+    ])
+<<<<<<< HEAD
     ->withPreparedSets(comments: true, docblocks: true);
+=======
+    ->withPreparedSets(comments: true)
+//    ->withSets([
+//        \Symplify\EasyCodingStandard\ValueObject\Set\SetList::CLEAN_CODE,
+//        \Symplify\EasyCodingStandard\ValueObject\Set\SetList::CASING,
+//        \Symplify\EasyCodingStandard\ValueObject\Set\SetList::SPACES,
+//    ])
+    ->withDocblockLevel(22);
+>>>>>>> d7a6be6922 ([cs] newline per promoted property, to ease modiff)
