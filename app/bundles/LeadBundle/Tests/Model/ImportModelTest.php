@@ -436,13 +436,13 @@ final class ImportModelTest extends StandardImportTestHelper
         $this->entityManager  = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
-        /** @var MockObject&UserHelper */
+        /** @var MockObject&UserHelper $userHelper */
         $userHelper = $this->createStub(UserHelper::class);
 
-        /** @var MockObject&LeadEventLogRepository */
+        /** @var MockObject&LeadEventLogRepository $logRepository */
         $logRepository = $this->createStub(LeadEventLogRepository::class);
 
-        /** @var MockObject&ImportRepository */
+        /** @var MockObject&ImportRepository $importRepository */
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->expects($this->exactly(3))->method('getValue')

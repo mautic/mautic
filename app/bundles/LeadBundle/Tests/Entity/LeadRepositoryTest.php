@@ -77,7 +77,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLeadsByFieldValueArrayMapReturn(): void
     {
-        /** @var MockObject&LeadRepository */
+        /** @var MockObject&LeadRepository $repository */
         $repository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])

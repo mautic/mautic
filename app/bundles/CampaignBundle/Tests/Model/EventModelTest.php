@@ -152,7 +152,7 @@ final class EventModelTest extends TestCase
 
     public function testDeleteEventsByCampaignId(): void
     {
-        /** @var EventModel&MockObject */
+        /** @var EventModel&MockObject $mockModel */
         $mockModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRepository', 'deleteEventsByEventIds'])
