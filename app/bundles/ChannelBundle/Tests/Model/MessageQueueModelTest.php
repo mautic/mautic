@@ -38,13 +38,19 @@ final class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
      */
     protected $message;
 
-    /** @var MockObject&LeadModel */
+    /**
+     * @var MockObject&LeadModel
+     */
     protected MockObject $leadModel;
 
-    /** @var MockObject&EntityManagerInterface */
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
     protected MockObject $entityManager;
 
-    /** @var MockObject&MessageQueueRepository */
+    /**
+     * @var MockObject&MessageQueueRepository
+     */
     protected MockObject $messageQueueRepository;
 
     protected function setUp(): void

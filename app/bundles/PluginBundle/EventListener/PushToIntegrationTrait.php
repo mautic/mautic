@@ -9,8 +9,6 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 /**
  * Static methods must be used due to the Point triggers not being converted to Events yet
  * Once that happens, this can be converted to a standard method classes.
- *
- * Trait PushToIntegrationTrait
  */
 trait PushToIntegrationTrait
 {
