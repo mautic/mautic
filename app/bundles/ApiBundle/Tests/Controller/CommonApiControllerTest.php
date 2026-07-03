@@ -83,7 +83,9 @@ final class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals($where, $result);
     }
 
-    /** @param array<int, mixed> $args */
+    /**
+     * @param array<int, mixed> $args
+     */
     protected function getResultFromProtectedMethod(string $method, array $args): mixed
     {
         $controller = new CommonApiController(

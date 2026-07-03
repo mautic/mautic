@@ -14,7 +14,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\CoversClass(Fetcher::class)]
 final class FetcherTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, int|string>> */
+    /**
+     * @var array<string, array<string, int|string>>
+     */
     protected array $mailboxes = [
         'EmailBundle_bounces' => [
             'address'           => 'bounces@test.com',

@@ -1161,8 +1161,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * Check lead owner.
-     *
      * @param array $ownerIds
      */
     public function checkLeadOwner(Lead $lead, $ownerIds = []): bool

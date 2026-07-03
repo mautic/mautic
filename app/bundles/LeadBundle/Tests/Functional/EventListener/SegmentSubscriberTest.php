@@ -36,7 +36,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
 
-        $expectedTranslationString = implode(' ', array_map(fn ($trans) => $translator->trans($trans), $expectedTranslations));
+        $expectedTranslationString = implode(' ', array_map(fn (string $trans) => $translator->trans($trans), $expectedTranslations));
 
         $crawlerText = $crawler->filter('#leadlist_filters_0_properties')->filter('.alert')->text();
         $this->assertStringContainsString($expectedTranslationString, $crawlerText);

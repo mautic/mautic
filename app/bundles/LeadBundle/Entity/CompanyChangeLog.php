@@ -74,8 +74,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -84,8 +82,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
      */
     public function setType($type): static
@@ -96,8 +92,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -106,8 +100,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Set eventName.
-     *
      * @param string $eventName
      */
     public function setEventName($eventName): static
@@ -118,8 +110,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get eventName.
-     *
      * @return string
      */
     public function getEventName()
@@ -128,8 +118,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Set actionName.
-     *
      * @param string $actionName
      */
     public function setActionName($actionName): static
@@ -140,8 +128,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get actionName.
-     *
      * @return string
      */
     public function getActionName()
@@ -162,8 +148,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get company.
-     *
      * @return int
      */
     public function getCompany()
@@ -172,8 +156,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
@@ -184,8 +166,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -193,9 +173,6 @@ class CompanyChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     * Set lead.
-     */
     public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
@@ -204,8 +181,6 @@ class CompanyChangeLog
     }
 
     /**
-     * Get lead.
-     *
      * @return Lead
      */
     public function getLead()
