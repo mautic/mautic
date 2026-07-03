@@ -18,6 +18,9 @@ return ECSConfig::configure()
             // in docbclock on purpose, to avoid BC return on child classes
             __DIR__ . '/app/bundles/CoreBundle/Entity/CommonEntity.php',
         ],
+
+        \PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
+        \PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
     ])
     ->withRules([
         NoUnusedImportsFixer::class,
