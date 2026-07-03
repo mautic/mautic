@@ -12,8 +12,11 @@ use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\EventListener\TypeOperatorSubscriber;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Model\StageModel;
@@ -73,17 +76,20 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->leadModel       = $this->createMock(LeadModel::class);
-        $this->listModel       = $this->createMock(ListModel::class);
-        $this->campaignModel   = $this->createMock(CampaignModel::class);
-        $this->emailModel      = $this->createMock(EmailModel::class);
-        $stageModel            = $this->createMock(StageModel::class);
-        $this->stageRepository = $this->createMock(StageRepository::class);
-        $this->categoryModel   = $this->createMock(CategoryModel::class);
-        $this->assetModel      = $this->createMock(AssetModel::class);
-        $translator            = $this->createMock(TranslatorInterface::class);
-        $this->form            = $this->createMock(FormInterface::class);
-        $this->subscriber      = new TypeOperatorSubscriber(
+        $this->leadModel             = $this->createMock(LeadModel::class);
+        $this->listModel             = $this->createMock(ListModel::class);
+        $this->campaignModel         = $this->createMock(CampaignModel::class);
+        $this->emailModel            = $this->createMock(EmailModel::class);
+        $stageModel                  = $this->createMock(StageModel::class);
+        $this->stageRepository       = $this->createMock(StageRepository::class);
+        $this->categoryModel         = $this->createMock(CategoryModel::class);
+        $this->assetModel            = $this->createMock(AssetModel::class);
+        $translator                  = $this->createMock(TranslatorInterface::class);
+        $companySegmentModel         = $this->createMock(CompanySegmentModel::class);
+        $fieldChoicesProvider        = $this->createMock(FieldChoicesProviderInterface::class);
+        $typeOperatorProvider        = $this->createMock(TypeOperatorProviderInterface::class);
+        $this->form                  = $this->createMock(FormInterface::class);
+        $this->subscriber            = new TypeOperatorSubscriber(
             $this->leadModel,
             $this->listModel,
             $this->campaignModel,
@@ -91,7 +97,10 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $stageModel,
             $this->categoryModel,
             $this->assetModel,
-            $translator
+            $translator,
+            $companySegmentModel,
+            $fieldChoicesProvider,
+            $typeOperatorProvider
         );
 
         $stageModel->method('getRepository')->willReturn($this->stageRepository);

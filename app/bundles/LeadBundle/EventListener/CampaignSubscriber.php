@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
 use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
+use Mautic\LeadBundle\Form\Type\CampaignEventCompanySegmentsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadAttachedType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
@@ -30,6 +31,7 @@ use Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventPointType;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
+use Mautic\LeadBundle\Form\Type\CompanySegmentActionType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
 use Mautic\LeadBundle\Form\Type\PointActionType;
@@ -40,6 +42,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -49,7 +52,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber implements EventSubscriberInterface
 {
     public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
@@ -61,6 +64,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         private readonly FieldModel $leadFieldModel,
         private readonly ListModel $listModel,
         private readonly CompanyModel $companyModel,
+        private readonly CompanySegmentModel $companySegmentModel,
         private readonly CampaignModel $campaignModel,
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly DoNotContact $doNotContact,
@@ -85,6 +89,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             ],
             LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
                 ['onCampaignTriggerActionUpdateLead', 0],
+                ['onCampaignTriggerActionChangeCompanySegments', 1],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => [
                 ['onCampaignTriggerCondition', 0],
@@ -164,6 +169,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
         $event->addAction('lead.scorecontactscompanies', $action);
 
+        $action = [
+            'label'          => 'mautic.company_segments.campaign.action.change_segments',
+            'description'    => 'mautic.company_segments.campaign.action.change_segments_descr',
+            'formType'       => CompanySegmentActionType::class,
+            'batchEventName' => LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        ];
+        $event->addAction('lead.changecompanysegments', $action);
+
         $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
             'description' => 'mautic.lead.lead.events.field_value_descr',
@@ -207,6 +220,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.segments', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.company_segments.campaign.condition.segments',
+            'description' => 'mautic.company_segments.campaign.condition.segments_descr',
+            'formType'    => CampaignEventCompanySegmentsType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.company_segments', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.stages',
@@ -331,6 +353,55 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $event->setResult($somethingHappened);
+    }
+
+    public function onCampaignTriggerActionChangeCompanySegments(PendingEvent $event): void
+    {
+        if (!$event->checkContext('lead.changecompanysegments')) {
+            return;
+        }
+
+        $properties = $event->getEvent()->getProperties();
+        $addTo      = $properties['addToLists'] ?? [];
+        $removeFrom = $properties['removeFromLists'] ?? [];
+
+        $logs = $event->getPending();
+
+        foreach ($logs as $log) {
+            $lead = $log->getLead();
+
+            $primaryCompany = $lead->getPrimaryCompany();
+            if (empty($primaryCompany) || !is_array($primaryCompany) || empty($primaryCompany['id'])) {
+                $event->fail($log, 'No primary company found for contact');
+
+                continue;
+            }
+
+            $companyEntity = $this->companyModel->getRepository()->find($primaryCompany['id']);
+            if (!$companyEntity) {
+                $event->fail($log, 'Company not found');
+
+                continue;
+            }
+
+            $somethingHappened = false;
+
+            if (!empty($addTo)) {
+                $this->companySegmentModel->addCompany($companyEntity, $addTo, true);
+                $somethingHappened = true;
+            }
+
+            if (!empty($removeFrom)) {
+                $this->companySegmentModel->removeCompany($companyEntity, $removeFrom, true);
+                $somethingHappened = true;
+            }
+
+            if ($somethingHappened) {
+                $event->pass($log);
+            } else {
+                $event->fail($log, 'No segments to add or remove');
+            }
+        }
     }
 
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void
@@ -514,6 +585,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.segments')) {
             $listRepo = $this->listModel->getRepository();
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+        } elseif ($event->checkContext('lead.company_segments')) {
+            $result = $this->checkCompanySegmentMembership($lead, $event->getConfig()['companySegments'] ?? []);
         } elseif ($event->checkContext('lead.stages')) {
             $result   = $this->leadModel->getRepository()->isContactInOneOfStages($lead, $event->getConfig()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
@@ -783,7 +856,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
-    protected function getFields(Lead $lead): array
+    private function getFields(Lead $lead): array
     {
         if (!$this->fields) {
             $contactFields = $lead->getFields(true);
@@ -807,5 +880,44 @@ class CampaignSubscriber implements EventSubscriberInterface
         $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];
 
         return !empty($leadDeviceRepository->getDevice($contact, $deviceType, $deviceBrands, null, $deviceOs));
+    }
+
+    /**
+     * Check if the lead's primary company is in one of the specified company segments.
+     *
+     * @param array<int> $companySegmentIds
+     */
+    private function checkCompanySegmentMembership(Lead $lead, array $companySegmentIds): bool
+    {
+        if ([] === $companySegmentIds || !$lead->getId()) {
+            return false;
+        }
+
+        $primaryCompany = $lead->getPrimaryCompany();
+
+        if (
+            [] === $primaryCompany
+            || !is_array($primaryCompany)
+            || !array_key_exists('id', $primaryCompany)
+            || empty($primaryCompany['id'])
+        ) {
+            return false;
+        }
+
+        $company = $this->companyModel->getRepository()->find($primaryCompany['id']);
+
+        if (null === $company) {
+            return false;
+        }
+
+        $companySegments = $this->companySegmentModel->getSegmentCompanyRepository()->findBy(
+            [
+                'company'         => $company,
+                'companySegment'  => $companySegmentIds,
+                'manuallyRemoved' => false,
+            ]
+        );
+
+        return is_array($companySegments) && count($companySegments) > 0;
     }
 }

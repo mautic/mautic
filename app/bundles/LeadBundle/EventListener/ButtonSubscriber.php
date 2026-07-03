@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -10,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ButtonSubscriber implements EventSubscriberInterface
+final class ButtonSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -49,6 +51,8 @@ class ButtonSubscriber implements EventSubscriberInterface
                     ButtonHelper::LOCATION_PAGE_ACTIONS
                 );
             }
+
+            $this->injectCompanyBatchButton($event);
 
             return;
         }
@@ -146,6 +150,28 @@ class ButtonSubscriber implements EventSubscriberInterface
                 'iconClass' => 'ri-file-text-line',
             ],
             ButtonHelper::LOCATION_PAGE_ACTIONS
+        );
+    }
+
+    private function injectCompanyBatchButton(CustomButtonEvent $event): void
+    {
+        if (!$this->security->isGranted('lead:leads:editother')) {
+            return;
+        }
+
+        $event->addButton(
+            [
+                'attr'      => [
+                    'class'       => 'btn btn-default btn-sm btn-nospin',
+                    'data-toggle' => 'ajaxmodal',
+                    'data-target' => '#MauticSharedModal',
+                    'href'        => $this->router->generate('mautic_company_segments_batch_company_view'),
+                    'data-header' => $this->translator->trans('mautic.company_segments.action.change'),
+                ],
+                'btnText'   => $this->translator->trans('mautic.company_segments.action.change'),
+                'iconClass' => 'ri-pie-chart-line',
+            ],
+            ButtonHelper::LOCATION_BULK_ACTIONS
         );
     }
 }

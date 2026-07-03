@@ -21,7 +21,10 @@ return function (ContainerConfigurator $configurator): void {
         'Segment/Decorator',
         'Segment/DoNotContact',
         'Segment/IntegrationCampaign',
-        'Segment/Query',
+        'Segment/Query/*Trait.php',
+        'Segment/Query/QueryBuilder.php',
+        'Segment/Query/QueryException.php',
+        'Segment/Query/Expression',
         'Segment/Stat',
     ];
 
@@ -43,6 +46,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.lead.model.note', Mautic\LeadBundle\Model\NoteModel::class);
     $services->alias('mautic.lead.model.device', Mautic\LeadBundle\Model\DeviceModel::class);
     $services->alias('mautic.lead.model.company', Mautic\LeadBundle\Model\CompanyModel::class);
+    $services->alias('mautic.lead.model.company_segment', Mautic\LeadBundle\Model\CompanySegmentModel::class);
     $services->alias('mautic.lead.model.import', Mautic\LeadBundle\Model\ImportModel::class);
     $services->alias('mautic.lead.model.tag', Mautic\LeadBundle\Model\TagModel::class);
     $services->alias('mautic.lead.model.company_report_data', Mautic\LeadBundle\Model\CompanyReportData::class);
@@ -69,6 +73,10 @@ return function (ContainerConfigurator $configurator): void {
     $services->alias('mautic.tracker.contact', Mautic\LeadBundle\Tracker\ContactTracker::class);
     $services->alias('mautic.lead.field.settings.background_service', Mautic\LeadBundle\Field\BackgroundService::class);
     $services->alias('mautic.lead.report.dnc_report_service', Mautic\LeadBundle\Report\DncReportService::class);
+    $services->alias('mautic.lead.service.company_segment', Mautic\LeadBundle\Services\CompanySegmentService::class);
     $services->alias('mautic.helper.segment.count.cache', Mautic\LeadBundle\Helper\SegmentCountCacheHelper::class);
     $services->get(Mautic\LeadBundle\Validator\Constraints\SegmentDateValidator::class)->tag('validator.constraint_validator');
+    $services->alias('mautic.lead.repository.lead_segment_query_builder', Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class);
+    $services->alias('mautic.lead.repository.company_segment_query_builder', Mautic\LeadBundle\Segment\Query\CompanySegmentQueryBuilder::class);
+    $services->alias('mautic.lead.model.lead_segment_service', Mautic\LeadBundle\Segment\ContactSegmentService::class);
 };

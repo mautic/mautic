@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -39,6 +40,8 @@ final class SegmentSubscriberTest extends TestCase
 
     private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
 
+    private CompanySegmentModel&MockObject $companySegmentModel;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -48,6 +51,7 @@ final class SegmentSubscriberTest extends TestCase
         $this->listModel                       = $this->createMock(ListModel::class);
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
         $this->segmentCountCacheHelper         = $this->createStub(SegmentCountCacheHelper::class);
+        $this->companySegmentModel             = $this->createMock(CompanySegmentModel::class);
         $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
     }
 
@@ -60,7 +64,8 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->createStub(TranslatorInterface::class)
+            $this->createStub(TranslatorInterface::class),
+            $this->companySegmentModel,
         );
 
         $this->assertSame(
@@ -117,7 +122,8 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->createStub(TranslatorInterface::class)
+            $this->createStub(TranslatorInterface::class),
+            $this->companySegmentModel,
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -152,7 +158,8 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->createStub(TranslatorInterface::class)
+            $this->createStub(TranslatorInterface::class),
+            $this->companySegmentModel,
         );
 
         $segment            = $this->createMock(LeadList::class);
@@ -205,7 +212,8 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(SegmentUsedInCampaignsValidator::class),
             $this->coreParametersHelper,
             $this->segmentCountCacheHelper,
-            $this->createStub(TranslatorInterface::class)
+            $this->createStub(TranslatorInterface::class),
+            $this->companySegmentModel,
         );
 
         $segment = $this->createMock(LeadList::class);

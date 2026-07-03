@@ -1,0 +1,105 @@
+{#
+Variables
+  - segment
+  - segmentCount
+  - permissions
+  - security
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}company_segments{% endblock %}
+
+{% block headerTitle %}{{ segment.name }}{% endblock %}
+
+{% block indexButton %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig',
+        {
+            'item'            : segment,
+            'langVar'         : 'company_segments',
+            'customButtons': customButtons|default([]),
+            'templateButtons' : {
+                'close' : securityHasEntityAccess(true, true, segment.createdBy),
+            },
+            'routeBase'   : 'company_segments',
+            'targetLabel' : 'mautic.company_segments.menu.index'|trans
+        }
+    ) -}}
+{% endblock %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'item': segment,
+        'customButtons': customButtons|default([]),
+        'templateButtons': {
+            'edit': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:editother'], segment.createdBy),
+            'delete': securityHasEntityAccess(permissions['lead:lists:deleteother'], permissions['lead:lists:editother'], segment.createdBy),
+            'clone': securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:lists:viewother'], segment.createdBy),
+        },
+        'routeBase': 'company_segments',
+    }) -}}
+{% endblock %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': segment}) -}}
+{% endblock %}
+
+{% block content %}
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- left section -->
+        <div class="col-md-9 bg-white height-auto">
+            <div class="bg-auto">
+                <!-- segment detail collapsible toggle -->
+                <div class="pr-md pl-md pt-lg pb-lg">
+                    <div class="box-layout">
+                        <div class="col-xs-10">
+                            <div class="text-white dark-sm mb-0">{{ segment.description|purify }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse" id="segment-details">
+                    <div class="pr-md pl-md pb-md">
+                        <div class="panel shd-none mb-0">
+                            <table class="table table-bordered table-striped mb-0">
+                                <tbody>
+                                {{ include('@MauticCore/Helper/details.html.twig', {'entity': segment}) }}
+                                <tr>
+                                    <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.lead.companies'|trans }}</span></td>
+                                    <td>{{ segmentCount }}</td>
+                                </tr>
+                                {% if segment.lastBuiltTime %}
+                                    <tr>
+                                        <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.list.last_built_time'|trans }}</span></td>
+                                        <td>
+                                            {{ 'mautic.core.date.second'|trans({'%count%': segment.lastBuiltTime}) }} ({{ dateToFull(segment.lastBuiltDate) }})
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ segment detail collapseable toggler -->
+            <div class="bg-auto bg-dark-xs">
+                <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#segment-details">
+                        <span class="caret"></span> {{ 'mautic.core.details'|trans }}
+                    </a>
+                </span>
+                </div>
+            </div>
+        </div>
+        <!--/ left section -->
+
+        <!-- right section -->
+        <div class="col-md-3 bg-white bdr-l height-auto">
+            <!-- Placeholder for usage stats, will be added in a later step -->
+        </div>
+        <!--/ right section -->
+        <input name="entityId" id="entityId" type="hidden" value="{{ segment.id|e }}" />
+    </div>
+    <!--/ end: box layout -->
+{% endblock %}

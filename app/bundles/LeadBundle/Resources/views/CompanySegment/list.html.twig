@@ -1,0 +1,79 @@
+{#
+Variables
+  - items
+  - companyCounts
+  - page
+  - limit
+  - tableAlias
+#}
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover" id="companySegmentsTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall': 'true',
+                    'target': '#companySegmentsTable',
+                    'langVar': 'company_segments',
+                    'routeBase': constant('Mautic\\LeadBundle\\Model\\CompanySegmentModel::PROPERTIES_FIELD'),
+                    'templateButtons': {
+                        'delete': permissions['lead:lists:deleteother'],
+                    },
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'company_segments',
+                    'orderBy': tableAlias~'.name',
+                    'text': 'mautic.core.name',
+                    'class': 'col-leadlist-name',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'company_segments',
+                    'text': 'mautic.company_segments.table.companycount',
+                    'class': 'visible-md visible-lg col-leadlist-leadcount',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'company_segments',
+                    'orderBy': tableAlias~'.dateAdded',
+                    'text': 'mautic.company_segments.table.dateAdded',
+                    'class': 'visible-md visible-lg col-leadlist-dateAdded',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'company_segments',
+                    'orderBy': tableAlias~'.dateModified',
+                    'text': 'mautic.company_segments.table.dateModified',
+                    'class': 'visible-md visible-lg col-leadlist-dateModified',
+                    'default': true,
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'company_segments',
+                    'orderBy': tableAlias~'.createdByUser',
+                    'text': 'mautic.core.createdby',
+                    'class': 'visible-md visible-lg col-leadlist-createdByUser',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar': 'company_segments',
+                    'orderBy': tableAlias~'.id',
+                    'text': 'mautic.core.id',
+                    'class': 'visible-md visible-lg col-leadlist-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                {{ include('@MauticLead/CompanySegment/list_row.html.twig', {'item': item}) }}
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': items|length,
+                'page': page,
+                'limit': limit,
+                'baseUrl': path('mautic_company_segments_index'),
+                'sessionVar': 'company_segments',
+            }) }}
+        </div>
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

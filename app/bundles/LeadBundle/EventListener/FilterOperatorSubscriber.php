@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
@@ -18,7 +20,7 @@ use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FilterOperatorSubscriber implements EventSubscriberInterface
+class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     use SegmentFilterIconTrait;
 
@@ -41,6 +43,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 ['onGenerateSegmentFiltersAddBehaviors', 0],
                 ['onGenerateSegmentFiltersNormalizeOperatorLabels', -1000],
             ],
+            CompanySegmentFiltersChoicesEvent::class => [
+                ['onCompanySegmentFiltersAddCustomFields', 0],
+            ],
         ];
     }
 
@@ -53,38 +58,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
-        $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event): void {
-            $type               = $field->getType();
-            $properties         = $field->getProperties();
-            $properties['type'] = $type;
-
-            if ('boolean' === $type) {
-                $properties['list'] = [
-                    $properties['no']  => 0,
-                    $properties['yes'] => 1,
-                ];
-            } elseif (in_array($type, ['select', 'multiselect'], true)) {
-                $properties['list'] = FormFieldHelper::parseListForChoices($properties['list'] ?? []);
-            } else {
-                try {
-                    $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
-                } catch (ChoicesNotFoundException) {
-                    // That's fine. Not all fields should have choices.
-                }
-            }
-
-            $event->addChoice(
-                $field->getObject(),
-                $field->getAlias(),
-                [
-                    'label'      => $field->getLabel(),
-                    'properties' => $properties,
-                    'object'     => $field->getObject(),
-                    'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
-                    'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
-                ]
-            );
-        });
+        $fields = $this->leadFieldRepository->getListablePublishedFields();
+        $this->addCustomFieldsToFilterChoices($fields, $event);
     }
 
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
@@ -369,80 +344,37 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_sent_date'),
                 'object'     => 'lead',
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
+                'operators'  => $this->getDatetimeComparisonOperators(),
             ],
             'lead_email_read_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getDatetimeComparisonOperators(),
+                'object'     => 'lead',
             ],
             'lead_email_read_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_count'),
                 'object'     => 'lead',
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
+                'operators'  => $this->getNumberComparisonOperators(),
             ],
             'hit_url' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getTextOperators(),
+                'object'     => 'lead',
             ],
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getDatetimeComparisonOperators(),
+                'object'     => 'lead',
             ],
             'hit_url_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_count'),
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getNumberComparisonOperators(),
+                'object'     => 'lead',
             ],
             // Clicked any link from any email
             'email_id' => [ // kept as email_id for BC
@@ -458,15 +390,8 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'email_clicked_link_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.email_clicked_link_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getDatetimeComparisonOperators(),
+                'object'     => 'lead',
             ],
             // Clicked any link from any sms
             'sms_clicked_link' => [
@@ -482,75 +407,32 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
             'sms_clicked_link_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.sms_clicked_link_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getDatetimeComparisonOperators(),
+                'object'     => 'lead',
             ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
                 'properties' => ['type' => 'number'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::GREATER_THAN,
-                    OperatorOptions::LESS_THAN,
-                    OperatorOptions::GREATER_THAN_OR_EQUAL,
-                    OperatorOptions::LESS_THAN_OR_EQUAL,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getNumberComparisonOperators(),
+                'object'     => 'lead',
             ],
             'referer' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getTextOperators(),
+                'object'     => 'lead',
             ],
             'url_title' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.url_title'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getTextOperators(),
+                'object'     => 'lead',
             ],
             'source' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.source'),
                 'properties' => ['type' => 'text'],
-                'operators'  => $this->typeOperatorProvider->getOperatorsIncluding([
-                    OperatorOptions::EQUAL_TO,
-                    OperatorOptions::NOT_EQUAL_TO,
-                    OperatorOptions::LIKE,
-                    OperatorOptions::NOT_LIKE,
-                    OperatorOptions::REGEXP,
-                    OperatorOptions::NOT_REGEXP,
-                    OperatorOptions::STARTS_WITH,
-                    OperatorOptions::ENDS_WITH,
-                    OperatorOptions::CONTAINS,
-                ]),
-                'object' => 'lead',
+                'operators'  => $this->getTextOperators(),
+                'object'     => 'lead',
             ],
             'source_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.source.id'),
@@ -661,5 +543,99 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         return $operators;
+    }
+
+    private function addCustomFieldsToFilterChoices(
+        ArrayCollection $fields,
+        LeadListFiltersChoicesEvent|CompanySegmentFiltersChoicesEvent $event,
+    ): void {
+        $fields->map(function (LeadField $field) use ($event): void {
+            $type               = $field->getType();
+            $properties         = $field->getProperties();
+            $properties['type'] = $type;
+
+            if ('boolean' === $type) {
+                $properties['list'] = [
+                    $properties['no']  => 0,
+                    $properties['yes'] => 1,
+                ];
+            } elseif (in_array($type, ['select', 'multiselect'], true)) {
+                $properties['list'] = FormFieldHelper::parseListForChoices($properties['list'] ?? []);
+            } else {
+                try {
+                    $properties['list'] = $this->fieldChoicesProvider->getChoicesForField($type, $field->getAlias());
+                } catch (ChoicesNotFoundException) {
+                    // That's fine. Not all fields should have choices.
+                }
+            }
+
+            $event->addChoice(
+                $field->getObject(),
+                $field->getAlias(),
+                [
+                    'label'      => $field->getLabel(),
+                    'properties' => $properties,
+                    'object'     => $field->getObject(),
+                    'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType($type),
+                    'iconClass'  => $this->getSegmentFilterIcon($field->getAlias()),
+                ]
+            );
+        });
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getDatetimeComparisonOperators(): array
+    {
+        return $this->typeOperatorProvider->getOperatorsIncluding([
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::NOT_EQUAL_TO,
+            OperatorOptions::GREATER_THAN,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+        ]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getNumberComparisonOperators(): array
+    {
+        return $this->typeOperatorProvider->getOperatorsIncluding([
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::GREATER_THAN,
+            OperatorOptions::LESS_THAN,
+            OperatorOptions::GREATER_THAN_OR_EQUAL,
+            OperatorOptions::LESS_THAN_OR_EQUAL,
+        ]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getTextOperators(): array
+    {
+        return $this->typeOperatorProvider->getOperatorsIncluding([
+            OperatorOptions::EQUAL_TO,
+            OperatorOptions::NOT_EQUAL_TO,
+            OperatorOptions::LIKE,
+            OperatorOptions::NOT_LIKE,
+            OperatorOptions::REGEXP,
+            OperatorOptions::NOT_REGEXP,
+            OperatorOptions::STARTS_WITH,
+            OperatorOptions::ENDS_WITH,
+            OperatorOptions::CONTAINS,
+        ]);
+    }
+
+    public function onCompanySegmentFiltersAddCustomFields(CompanySegmentFiltersChoicesEvent $event): void
+    {
+        $companyFields = $this->leadFieldRepository
+            ->getListablePublishedFields()
+            ->filter(static fn (LeadField $leadField): bool => 'company' === $leadField->getObject());
+
+        $this->addCustomFieldsToFilterChoices($companyFields, $event);
     }
 }

@@ -174,6 +174,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     {
         $deleted        = [];
         $unableToDelete = [];
+        $errors         = [];
 
         foreach ($ids as $id) {
             $entity = $this->getEntity($id);
@@ -182,14 +183,15 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 try {
                     $this->deleteEntity($entity);
                     $deleted[$id] = $entity;
-                } catch (DeleteEntityDependencyException) {
+                } catch (DeleteEntityDependencyException $e) {
                     $unableToDelete[$id] = $entity;
+                    array_push($errors, ...$e->getErrors());
                 }
             }
         }
 
         if ($unableToDelete) {
-            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
+            throw new DeleteEntitiesDependencyException($deleted, $unableToDelete, $errors);
         }
 
         return $deleted;

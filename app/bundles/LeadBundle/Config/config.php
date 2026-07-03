@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -136,6 +138,22 @@ return [
                     'companyId' => '\d+',
                 ],
             ],
+            'mautic_company_segments_index' => [
+                'path'       => '/company-segments/{page}',
+                'controller' => 'Mautic\LeadBundle\Controller\CompanySegmentController::indexAction',
+            ],
+            'mautic_company_segments_action' => [
+                'path'       => '/company-segments/{objectAction}/{objectId}',
+                'controller' => 'Mautic\LeadBundle\Controller\CompanySegmentController::executeAction',
+            ],
+            'mautic_company_segments_batch_company_set' => [
+                'path'       => '/company-segments/batch/company/set',
+                'controller' => 'Mautic\LeadBundle\Controller\BatchCompanySegmentController::setAction',
+            ],
+            'mautic_company_segments_batch_company_view' => [
+                'path'       => '/company-segments/batch/company/view',
+                'controller' => 'Mautic\LeadBundle\Controller\BatchCompanySegmentController::indexAction',
+            ],
             'mautic_segment_contacts' => [
                 'path'       => '/segment/view/{objectId}/contact/{page}',
                 'controller' => 'Mautic\LeadBundle\Controller\ListController::contactsAction',
@@ -240,6 +258,27 @@ return [
                 'controller' => 'Mautic\LeadBundle\Controller\Api\ListApiController::removeLeadAction',
                 'method'     => 'POST',
             ],
+            'mautic_api_companysegmentsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'companysegments',
+                'path'            => '/companysegments',
+                'controller'      => Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::class,
+            ],
+            'mautic_api_companysegmentaddcompany' => [
+                'path'       => '/companysegments/{id}/company/{companyId}/add',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::addCompanyAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companysegmentaddcompanies' => [
+                'path'       => '/companysegments/{id}/companies/add',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::addCompaniesAction',
+                'method'     => 'POST',
+            ],
+            'mautic_api_companysegmentremovecompany' => [
+                'path'       => '/companysegments/{id}/company/{companyId}/remove',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanySegmentApiController::removeCompanyAction',
+                'method'     => 'POST',
+            ],
             'mautic_api_companiesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'companies',
@@ -294,11 +333,23 @@ return [
                     'route'     => 'mautic_contact_index',
                     'priority'  => 80,
                 ],
-                'mautic.companies.menu.index' => [
-                    'route'     => 'mautic_company_index',
+                'mautic.companies.menu.root' => [
+                    'id'        => 'mautic_companies_root',
                     'iconClass' => 'ri-building-2-fill',
                     'access'    => ['lead:leads:viewother'],
                     'priority'  => 75,
+                ],
+                'mautic.companies.menu.index' => [
+                    'route'     => 'mautic_company_index',
+                    'parent'    => 'mautic.companies.menu.root',
+                    'access'    => ['lead:leads:viewother'],
+                    'priority'  => 100,
+                ],
+                'mautic.company_segments.menu.index' => [
+                    'route'     => 'mautic_company_segments_index',
+                    'access'    => ['lead:leads:viewown', 'lead:leads:viewother'],
+                    'parent'    => 'mautic.companies.menu.root',
+                    'priority'  => 90,
                 ],
                 'mautic.lead.list.menu.index' => [
                     'iconClass' => 'ri-pie-chart-fill',
@@ -548,22 +599,6 @@ return [
                     'router',
                 ],
             ],
-            'mautic.lead.repository.lead_segment_query_builder' => [
-                'class'     => Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.random_parameter_name',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.lead.model.lead_segment_service' => [
-                'class'     => Mautic\LeadBundle\Segment\ContactSegmentService::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_factory',
-                    'mautic.lead.repository.lead_segment_query_builder',
-                    'monolog.logger.mautic',
-                ],
-            ],
             'mautic.lead.model.lead_segment_schema_cache' => [
                 'class'     => Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class,
                 'arguments' => [
@@ -805,6 +840,20 @@ return [
             ],
             'mautic.lead.query.builder.channel_click.value' => [
                 'class'     => Mautic\LeadBundle\Segment\Query\Filter\ChannelClickQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.query.builder.company_segment_membership' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\CompanySegmentMembershipFilterQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.query.builder.company_lead_segment_membership' => [
+                'class'     => Mautic\LeadBundle\Segment\Query\Filter\CompanyLeadSegmentMembershipFilterQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',

@@ -12,16 +12,22 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
+use Mautic\LeadBundle\Event\CompanySegmentFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -33,6 +39,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TypeOperatorSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
+    use SegmentFilterIconTrait;
 
     private const EMAIL_ALIAS = 'email';
 
@@ -45,6 +52,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
         private TranslatorInterface $translator,
+        private CompanySegmentModel $companySegmentModel,
+        private FieldChoicesProviderInterface $fieldChoicesProvider,
+        private TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
     }
 
@@ -60,6 +70,12 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleGlobalCategory', 400],
                 ['onSegmentFilterFormHandleSelect', 200],
                 ['onSegmentFilterFormHandleDefault', 0],
+            ],
+            CompanySegmentFiltersChoicesEvent::class => [
+                ['onCompanySegmentFiltersAddStaticFields', 0],
+            ],
+            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => [
+                ['onLeadSegmentFiltersAddCompanySegments', 0],
             ],
         ];
     }
@@ -111,6 +127,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldType('locale', FormFieldHelper::getLocaleChoices());
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
         $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
+        $event->setChoicesForFieldAlias(CompanySegmentModel::PROPERTIES_FIELD, $this->getCompanySegmentChoices());
     }
 
     public function onSegmentFilterFormHandleTags(FormAdjustmentEvent $event): void
@@ -277,7 +294,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         )
             || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
-        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'assets', 'lead_email_received');
+        $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'assets', 'lead_email_received', CompanySegmentModel::PROPERTIES_FIELD);
 
         if (!$mustBeText && $isSelect) {
             $filter = $data['filter'] ?? '';
@@ -426,5 +443,141 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         }
 
         return $choices;
+    }
+
+    public function onCompanySegmentFiltersAddStaticFields(CompanySegmentFiltersChoicesEvent $event): void
+    {
+        $this->addIncludeExcludeOperatorsToTextFilters($event);
+
+        // Static company fields (date_added, date_modified)
+        $staticFields = [
+            'date_added' => [
+                'label'      => $this->translator->trans('mautic.core.date.added'),
+                'properties' => ['type' => 'date'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'object'     => 'company',
+            ],
+            'date_modified' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.date_modified'),
+                'properties' => ['type' => 'datetime'],
+                'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('default'),
+                'object'     => 'company',
+            ],
+        ];
+
+        foreach ($staticFields as $alias => $fieldOptions) {
+            $fieldOptions['iconClass'] = $this->getSegmentFilterIcon($alias);
+            $event->addChoice('company', $alias, $fieldOptions);
+        }
+
+        $companySegmentFieldOptions = [
+            'label'      => $this->translator->trans('mautic.company_segments.filter.lists'),
+            'properties' => [
+                'type' => CompanySegmentModel::PROPERTIES_FIELD,
+                'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', CompanySegmentModel::PROPERTIES_FIELD, $event->getSearch()),
+            ],
+            'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+            'object'     => 'company',
+        ];
+        $companySegmentFieldOptions['iconClass'] = $this->getSegmentFilterIcon('leadlist');
+        $event->addChoice(CompanySegmentModel::PROPERTIES_FIELD, CompanySegmentModel::PROPERTIES_FIELD, $companySegmentFieldOptions);
+
+        $leadSegmentMembership = [
+            'label'      => $this->translator->trans('mautic.company_segments.filter.lead_lists'),
+            'properties' => [
+                'type' => 'leadlist',
+                'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', 'leadlist'),
+            ],
+            'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+        ];
+        $leadSegmentMembership['iconClass'] = $this->getSegmentFilterIcon('leadlist');
+        $event->addChoice('any_companycontact', 'contactsegmentmembership', $leadSegmentMembership);
+    }
+
+    public function onLeadSegmentFiltersAddCompanySegments(LeadListFiltersChoicesEvent $event): void
+    {
+        // Only add the company_segments filter - other company fields are already handled by Core
+        $companySegmentFieldOptions = [
+            'label'      => $this->translator->trans('mautic.company_segments.filter.lists'),
+            'properties' => [
+                'type' => CompanySegmentModel::PROPERTIES_FIELD,
+                'list' => $this->fieldChoicesProvider->getChoicesForField('multiselect', CompanySegmentModel::PROPERTIES_FIELD, $event->getSearch()),
+            ],
+            'operators'  => $this->typeOperatorProvider->getOperatorsForFieldType('multiselect'),
+            'object'     => 'company',
+            'iconClass'  => $this->getSegmentFilterIcon('leadlist'),
+        ];
+        $event->addChoice(CompanySegmentModel::PROPERTIES_FIELD, CompanySegmentModel::PROPERTIES_FIELD, $companySegmentFieldOptions);
+    }
+
+    /**
+     * @param CompanySegmentFiltersChoicesEvent|LeadListFiltersChoicesEvent $event
+     * @param array<int,string>                                             $groupAllow
+     */
+    private function addIncludeExcludeOperatorsToTextFilters(object $event, array $groupAllow = []): void
+    {
+        $choices = $event->getChoices();
+
+        if (!is_array($choices)) {
+            $choices = [];
+        }
+
+        $normalized = [];
+
+        foreach ($choices as $group => $groups) {
+            if (!is_string($group) || !is_array($groups)) {
+                continue;
+            }
+
+            foreach ($groups as $alias => $choice) {
+                if (!is_string($alias) || !is_array($choice)) {
+                    continue;
+                }
+
+                $normalized[$group][$alias] = $choice;
+            }
+        }
+
+        foreach ($normalized as $group => $groups) {
+            if ([] !== $groupAllow && !in_array($group, $groupAllow, true)) {
+                continue;
+            }
+
+            foreach ($groups as $alias => $choice) {
+                $type = null;
+                if (isset($choice['properties']) && is_array($choice['properties'])) {
+                    $type = $choice['properties']['type'] ?? null;
+                }
+
+                if ('text' === $type) {
+                    $normalized[$group][$alias]['operators'] = $this->typeOperatorProvider->getOperatorsIncluding([
+                        OperatorOptions::EQUAL_TO,
+                        OperatorOptions::NOT_EQUAL_TO,
+                        OperatorOptions::EMPTY,
+                        OperatorOptions::NOT_EMPTY,
+                        OperatorOptions::LIKE,
+                        OperatorOptions::NOT_LIKE,
+                        OperatorOptions::REGEXP,
+                        OperatorOptions::NOT_REGEXP,
+                        OperatorOptions::INCLUDING_ANY,
+                        OperatorOptions::EXCLUDING_ANY,
+                        OperatorOptions::STARTS_WITH,
+                        OperatorOptions::ENDS_WITH,
+                        OperatorOptions::CONTAINS,
+                    ]);
+                }
+            }
+        }
+
+        // @phpstan-ignore-next-line
+        $event->setChoices($normalized);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function getCompanySegmentChoices(): array
+    {
+        return $this->makeChoices($this->companySegmentModel->getCompanySegments(), 'name', 'id');
     }
 }

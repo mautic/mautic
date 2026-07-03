@@ -507,7 +507,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         // The segment $segmentA is used as filter in $segmentB.
-        $this->assertStringContainsString("Segment(s) \"{$segmentA->getName()}\" cannot be deleted because they are in use by other entities. For more details, please attempt to delete each segment individually.", $crawler->text());
+        $this->assertStringContainsString("The segment {$segmentA->getName()} is used in {$segmentB->getName()}, please go back and check segments before deleting", $crawler->text());
     }
 
     public function testViewSegment(): void

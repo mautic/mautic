@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
@@ -87,6 +89,18 @@ trait FilterTrait
                 }
 
                 $customOptions['choices']                   = $options['lists'];
+                $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in']);
+                $customOptions['choice_translation_domain'] = false;
+                $type                                       = ChoiceType::class;
+                break;
+            case 'company_segments':
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+
+                $customOptions['choices']                   = $options['companySegments'] ?? [];
                 $customOptions['multiple']                  = in_array($data['operator'], ['in', '!in']);
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = ChoiceType::class;

@@ -12,11 +12,13 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanySegment;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\SegmentCompany;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\User;
 
@@ -199,6 +201,52 @@ trait CreateTestEntitiesTrait
         return $project;
     }
 
+    private function createCompanyLead(Company $company, Lead $lead, bool $isPrimary = true): CompanyLead
+    {
+        $companyLead = new CompanyLead();
+        $companyLead->setCompany($company);
+        $companyLead->setLead($lead);
+        $companyLead->setPrimary($isPrimary);
+        $companyLead->setDateAdded(new \DateTime());
+
+        $this->em->persist($companyLead);
+        $this->em->flush();
+
+        return $companyLead;
+    }
+
+    /**
+     * @param array<array<mixed>> $filters
+     */
+    private function createCompanySegment(string $name, string $alias, bool $isPublished = true, array $filters = []): CompanySegment
+    {
+        $companySegment = new CompanySegment();
+        $companySegment->setName($name);
+        $companySegment->setAlias($alias);
+        $companySegment->setIsPublished($isPublished);
+        if ([] !== $filters) {
+            $companySegment->setFilters($filters);
+        }
+
+        $this->em->persist($companySegment);
+        $this->em->flush();
+
+        return $companySegment;
+    }
+
+    private function addCompanyToCompanySegment(Company $company, CompanySegment $companySegment): SegmentCompany
+    {
+        $segmentCompany = new SegmentCompany();
+        $segmentCompany->setCompany($company);
+        $segmentCompany->setCompanySegment($companySegment);
+        $segmentCompany->setDateAdded(new \DateTime());
+
+        $this->em->persist($segmentCompany);
+        $this->em->flush();
+
+        return $segmentCompany;
+    }
+
     private function createCampaignLeadEventLog(Lead $lead, Event $event, ?Campaign $campaign, int $rotation = 1, bool $isScheduled =  false): CampaignLeadEventLog
     {
         $campaignLeadEventLog = new CampaignLeadEventLog();
@@ -211,5 +259,16 @@ trait CreateTestEntitiesTrait
         $this->em->persist($campaignLeadEventLog);
 
         return $campaignLeadEventLog;
+    }
+
+    private function manuallyRemoveCompanyFromCompanySegment(Company $company, CompanySegment $companySegment): void
+    {
+        $segmentCompany = $this->em->getRepository(SegmentCompany::class)->findOneBy([
+            'company'        => $company,
+            'companySegment' => $companySegment,
+        ]);
+        $segmentCompany->setManuallyRemoved(true);
+        $this->em->persist($segmentCompany);
+        $this->em->flush();
     }
 }

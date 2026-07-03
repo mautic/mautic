@@ -547,11 +547,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $expectedErrorMessage = $this->translator->trans(
-            'mautic.lead.list.error.cannot.delete.batch',
+            'mautic.lead.lists.used_in_campaigns.delete',
             [
-                '%segments%'  => $list1->getName().', '.$list2->getName(),
+                '%campaignNames%' => '"'.$campaignName.'"',
+                '%segmentNames%'  => $list1->getName(),
+                '%count%'         => 1,
             ],
-            'flashes'
+            'validators'
         );
 
         $parameters = 'ids=["'.$list1->getId().'","'.$list2->getId().'"]';

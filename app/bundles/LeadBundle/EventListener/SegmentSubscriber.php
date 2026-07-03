@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,6 +28,7 @@ class SegmentSubscriber implements EventSubscriberInterface
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly SegmentCountCacheHelper $segmentCountCacheHelper,
         private readonly TranslatorInterface $translator,
+        private readonly CompanySegmentModel $companySegmentModel,
     ) {
     }
 
@@ -103,6 +105,18 @@ class SegmentSubscriber implements EventSubscriberInterface
                 'mautic.lead_list.is_in_use.delete',
                 [
                     '%segments%'     => implode(',', $lists),
+                    '%segmentNames%' => $leadList->getName(),
+                ],
+                'validators');
+            $event->addDependencyError($message);
+        }
+
+        $companySegments = $this->companySegmentModel->getCompanySegmentsUsingContactSegment($leadList->getId());
+        if (count($companySegments)) {
+            $message = $this->translator->trans(
+                'mautic.lead_list.is_in_use.delete.company_segments',
+                [
+                    '%segments%'     => implode(', ', $companySegments),
                     '%segmentNames%' => $leadList->getName(),
                 ],
                 'validators');

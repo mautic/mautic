@@ -18,6 +18,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Model\CompanySegmentModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\RelativeDate;
@@ -82,6 +83,11 @@ class DynamicContentType extends AbstractType
     private array $tagChoices = [];
 
     /**
+     * @var array<string, int>|null
+     */
+    private ?array $companySegmentsChoices = null;
+
+    /**
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -91,6 +97,7 @@ class DynamicContentType extends AbstractType
         private readonly LeadModel $leadModel,
         private TypeList $typeList,
         private readonly RelativeDate $relativeDate,
+        private readonly CompanySegmentModel $companySegmentModel,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -268,15 +275,16 @@ class DynamicContentType extends AbstractType
                 [
                     'entry_type'    => DwcEntryFiltersType::class,
                     'entry_options' => [
-                        'countries'    => $this->countryChoices,
-                        'regions'      => $this->regionChoices,
-                        'timezones'    => $this->timezoneChoices,
-                        'locales'      => $this->localeChoices,
-                        'fields'       => $this->fieldChoices,
-                        'deviceTypes'  => $this->deviceTypesChoices,
-                        'deviceBrands' => $this->deviceBrandsChoices,
-                        'deviceOs'     => $this->deviceOsChoices,
-                        'tags'         => $this->tagChoices,
+                        'countries'       => $this->countryChoices,
+                        'regions'         => $this->regionChoices,
+                        'timezones'       => $this->timezoneChoices,
+                        'locales'         => $this->localeChoices,
+                        'fields'          => $this->fieldChoices,
+                        'deviceTypes'     => $this->deviceTypesChoices,
+                        'deviceBrands'    => $this->deviceBrandsChoices,
+                        'deviceOs'        => $this->deviceOsChoices,
+                        'tags'            => $this->tagChoices,
+                        'companySegments' => $this->getCompanySegmentChoices(),
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -328,15 +336,16 @@ class DynamicContentType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $view->vars['fields']       = $this->fieldChoices;
-        $view->vars['countries']    = $this->countryChoices;
-        $view->vars['regions']      = $this->regionChoices;
-        $view->vars['timezones']    = $this->timezoneChoices;
-        $view->vars['deviceTypes']  = $this->deviceTypesChoices;
-        $view->vars['deviceBrands'] = $this->deviceBrandsChoices;
-        $view->vars['deviceOs']     = $this->deviceOsChoices;
-        $view->vars['tags']         = $this->tagChoices;
-        $view->vars['locales']      = $this->localeChoices;
+        $view->vars['fields']          = $this->fieldChoices;
+        $view->vars['countries']       = $this->countryChoices;
+        $view->vars['regions']         = $this->regionChoices;
+        $view->vars['timezones']       = $this->timezoneChoices;
+        $view->vars['deviceTypes']     = $this->deviceTypesChoices;
+        $view->vars['deviceBrands']    = $this->deviceBrandsChoices;
+        $view->vars['deviceOs']        = $this->deviceOsChoices;
+        $view->vars['tags']            = $this->tagChoices;
+        $view->vars['locales']         = $this->localeChoices;
+        $view->vars['companySegments'] = $this->getCompanySegmentChoices();
     }
 
     private function filterFieldChoices(): void
@@ -382,6 +391,25 @@ class DynamicContentType extends AbstractType
             ],
             'required' => false,
         ]);
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function getCompanySegmentChoices(): array
+    {
+        if (null === $this->companySegmentsChoices) {
+            $companySegments = $this->companySegmentModel->getCompanySegments();
+            $choices         = [];
+
+            foreach ($companySegments as $segment) {
+                $choices[$segment['name']] = $segment['id'];
+            }
+
+            $this->companySegmentsChoices = $choices;
+        }
+
+        return $this->companySegmentsChoices;
     }
 
     public function getBlockPrefix(): string
