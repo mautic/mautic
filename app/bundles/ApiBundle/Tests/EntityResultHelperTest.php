@@ -29,7 +29,7 @@ final class EntityResultHelperTest extends TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function ($entity): void {
+        $arrayResult = $resultHelper->getArray($results, function (Lead $entity): void {
             $this->modifyEntityData($entity);
         });
 
@@ -65,7 +65,7 @@ final class EntityResultHelperTest extends TestCase
 
         $this->assertEquals($results, $arrayResult);
 
-        $arrayResult = $resultHelper->getArray($results, function ($entity): void {
+        $arrayResult = $resultHelper->getArray($results, function (Lead $entity): void {
             $this->modifyEntityData($entity);
         });
 
@@ -99,7 +99,7 @@ final class EntityResultHelperTest extends TestCase
             $this->assertEquals($entity->getTitle(), 'Title '.$entity->getId());
         }
 
-        $arrayResult = $resultHelper->getArray($data, function ($entity): void {
+        $arrayResult = $resultHelper->getArray($data, function (Lead $entity): void {
             $this->modifyEntityData($entity);
         });
 

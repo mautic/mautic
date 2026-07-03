@@ -17,5 +17,5 @@ return ECSConfig::configure()
         NoUnusedImportsFixer::class,
         // Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
     ])
-    ->withDocblockLevel(8);
-// ->withPreparedSets(comments: true);
+    ->withPreparedSets(comments: true)
+    ->withDocblockLevel(22);

@@ -33,7 +33,9 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /** @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}> */
+    /**
+     * @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}>
+     */
     public static function fieldProvider(): array
     {
         return [
