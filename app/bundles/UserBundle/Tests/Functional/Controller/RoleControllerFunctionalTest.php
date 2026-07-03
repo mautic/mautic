@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class RoleControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const ROLE_NAME_FIELD        = 'role[name]';
+
     private const ROLE_DESCRIPTION_FIELD = 'role[description]';
 
     public function testNewRoleAction(): void
