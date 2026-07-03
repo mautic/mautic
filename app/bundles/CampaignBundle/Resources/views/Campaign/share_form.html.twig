@@ -149,11 +149,9 @@
                         {{ form_label(form.price) }}
                         {{ form_widget(form.price) }}
                         {{ form_errors(form.price) }}
-                        <span class="help-block">{{ 'mautic.campaign.share.price.help'|trans }}</span>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="ri-information-line"></i>
-                        {{ 'mautic.campaign.share.price.notice'|trans }}
+                        {# Paid packages are temporarily disabled; swap back to price.help
+                           and the price.notice alert when the field is re-enabled. #}
+                        <span class="help-block">{{ 'mautic.campaign.share.price.coming_soon'|trans }}</span>
                     </div>
                 </div>
             </div>

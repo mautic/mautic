@@ -239,7 +239,12 @@ final class CampaignShareType extends AbstractType
                 'label'    => 'mautic.campaign.share.price',
                 'required' => false,
                 'currency' => 'EUR',
-                'attr'     => ['class' => 'form-control'],
+                // Temporarily disabled until the marketplace supports paid packages.
+                'disabled' => true,
+                'attr'     => [
+                    'class'       => 'form-control',
+                    'placeholder' => '0.00',
+                ],
             ]
         );
     }
