@@ -136,8 +136,6 @@ class oAuthHelper
     }
 
     /**
-     * Normalize parameters.
-     *
      * @param array<string, mixed> $parameters
      * @param bool                 $encode
      *

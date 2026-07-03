@@ -691,9 +691,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * Remove log.
-     */
     public function removeLog(LeadEventLog $log): void
     {
         $this->log->removeElement($log);
@@ -800,9 +797,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this->getChildren()->matching($criteria);
     }
 
-    /**
-     * Set parent.
-     */
     public function setParent(?Event $parent = null): static
     {
         $isChanged = $this->isChanged('parent', $parent);
@@ -814,9 +808,6 @@ class Event implements ChannelInterface, UuidInterface
         return $this;
     }
 
-    /**
-     * Remove parent.
-     */
     public function removeParent(): void
     {
         $this->isChanged('parent', '');
