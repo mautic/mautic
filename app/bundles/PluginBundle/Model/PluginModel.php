@@ -70,8 +70,6 @@ class PluginModel extends FormModel
     }
 
     /**
-     * Get Company fields.
-     *
      * @return mixed[]
      */
     public function getCompanyFields(): array

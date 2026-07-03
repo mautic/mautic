@@ -63,7 +63,9 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($permissionObjects['campaign'], $this->corePermissions->getPermissionObject(CampaignPermissions::class));
     }
 
-    /** @return array{permissionClasses: array<class-string, class-string>} */
+    /**
+     * @return array{permissionClasses: array<class-string, class-string>}
+     */
     private function mockBundleArray(string $permissionClass): array
     {
         return ['permissionClasses' => [$permissionClass => $permissionClass]];
