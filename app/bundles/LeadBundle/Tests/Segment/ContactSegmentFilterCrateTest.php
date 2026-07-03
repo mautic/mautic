@@ -247,7 +247,9 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /** @return array<int, array{0: string}> */
+    /**
+     * @return array<int, array{0: string}>
+     */
     public static function specialFieldsToConvertToEmptyProvider(): array
     {
         return [

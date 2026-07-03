@@ -564,7 +564,7 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
-     * @param $urlParts Array from parse_url
+     * @param array<string, mixed> $urlParts from parse_url
      *
      * @return array|false
      */

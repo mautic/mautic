@@ -143,8 +143,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Add tags to leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *
@@ -156,8 +154,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Update tags in leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *
@@ -195,8 +191,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Remove tags from leads.
-     *
      * @param array<int> $leadIds
      * @param array<int> $tagIds
      *

@@ -165,8 +165,6 @@ class CampaignBuilderEvent extends Event
     }
 
     /**
-     * Get actions.
-     *
      * @return array
      */
     public function getActions()

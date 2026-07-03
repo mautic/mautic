@@ -698,7 +698,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @throws \Exception
      */
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     public function onCampaignTriggerConditionContactAdded(CampaignExecutionEvent $event): bool
     {
         $campaign = $this->campaignModel->getEntity($event->getEvent()['campaign']['id']);

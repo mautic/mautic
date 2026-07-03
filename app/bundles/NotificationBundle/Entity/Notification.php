@@ -174,9 +174,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $this->translationChildren = new ArrayCollection();
     }
 
-    /**
-     * Clear stats.
-     */
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
@@ -342,7 +339,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
             ->build();
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -395,8 +392,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -571,9 +566,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->lists;
     }
 
-    /**
-     * Add list.
-     */
     public function addList(LeadList $list): static
     {
         $this->lists[] = $list;
@@ -581,9 +573,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->lists->removeElement($list);
