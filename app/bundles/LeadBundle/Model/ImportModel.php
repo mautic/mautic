@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;

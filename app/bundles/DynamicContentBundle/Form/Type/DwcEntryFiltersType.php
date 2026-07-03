@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\FilterTrait;
