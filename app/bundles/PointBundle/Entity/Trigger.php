@@ -214,8 +214,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -224,8 +222,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      */
     public function setDescription($description): static
@@ -237,8 +233,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string|null
      */
     public function getDescription()
@@ -247,8 +241,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      */
     public function setName($name): static
@@ -260,8 +252,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -291,8 +281,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get events.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getEvents()
@@ -301,8 +289,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      */
     public function setPublishUp($publishUp): static
@@ -314,8 +300,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -324,8 +308,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      */
     public function setPublishDown($publishDown): static
@@ -337,8 +319,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishDown()

@@ -694,9 +694,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return !is_null($this->deleted);
     }
 
-    /**
-     * Get contact membership.
-     */
     public function getContactMembership(Contact $contact): Collection
     {
         return $this->leads->matching(

@@ -330,8 +330,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Merge api keys.
-     *
      * @param bool|false $return Returns the key array rather than setting them
      *
      * @return void|array

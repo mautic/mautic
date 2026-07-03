@@ -2197,9 +2197,6 @@ class LeadModel extends FormModel
         return false;
     }
 
-    /**
-     * Get contact channels.
-     */
     public function getContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();

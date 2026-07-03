@@ -223,8 +223,6 @@ class Import extends FormEntity
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()

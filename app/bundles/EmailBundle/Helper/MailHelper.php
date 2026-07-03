@@ -1282,8 +1282,6 @@ class MailHelper
     }
 
     /**
-     * Set custom headers.
-     *
      * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true): void

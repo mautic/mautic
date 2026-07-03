@@ -288,8 +288,6 @@ class LeadList extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publicName.
-     *
      * @return string|null
      */
     public function getPublicName()
