@@ -283,7 +283,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * @param string $prop
      * @param mixed  $val
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -694,9 +694,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return !is_null($this->deleted);
     }
 
-    /**
-     * Get contact membership.
-     */
     public function getContactMembership(Contact $contact): Collection
     {
         return $this->leads->matching(

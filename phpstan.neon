@@ -14,6 +14,8 @@ parameters:
 		return: 85
 		param: 72
 		property: 66
+		# wait for PHP 8.3 before changing
+		constant: 3
 	paths:
 		- app/bundles
 		- app/migrations
@@ -111,6 +113,10 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			paths:
 				- app/bundles/LeadBundle/Tests/Entity/LeadRepositoryTest.php
+		# exception handler as both handler and standalone method
+		-
+			identifier: argument.type
+			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

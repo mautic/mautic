@@ -33,7 +33,9 @@ final class EntityImportEvent extends Event
         self::ERRORS => [],
     ];
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     public function __construct(private readonly string $entityName, private readonly array $data, private readonly ?int $userId)
     {
     }

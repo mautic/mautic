@@ -451,7 +451,9 @@ final class FieldMergerHelperTest extends TestCase
         return $integrationObject;
     }
 
-    /** @return array<string, array<string, array<string, string>>> */
+    /**
+     * @return array<string, array<string, array<string, string>>>
+     */
     private function getCurrentFieldMappings(): array
     {
         return [
