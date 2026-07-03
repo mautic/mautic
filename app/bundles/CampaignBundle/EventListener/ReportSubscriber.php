@@ -222,7 +222,6 @@ class ReportSubscriber implements EventSubscriberInterface
                     $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
-
                     $event->setGraph($g, $data);
                     break;
                 */

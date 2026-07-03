@@ -62,7 +62,9 @@ final class PeakInteractionTimerTest extends TestCase
 
     private int $peakInteractionTimerBestDefaultHourEnd   = 12;
 
-    /** @var int[] */
+    /**
+     * @var int[]
+     */
     private array $peakInteractionTimerBestDefaultDays        = [2, 1, 4];
 
     private string $peakInteractionTimerFetchInteractionsFrom = '-60 days';

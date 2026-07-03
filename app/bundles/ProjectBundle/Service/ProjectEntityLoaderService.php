@@ -19,7 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ProjectEntityLoaderService
 {
-    /** @var array<string, EntityTypeConfig> */
+    /**
+     * @var array<string, EntityTypeConfig>
+     */
     private array $entityTypesCache = [];
 
     public function __construct(

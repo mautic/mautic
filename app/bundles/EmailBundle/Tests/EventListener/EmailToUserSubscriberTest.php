@@ -13,7 +13,9 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
 final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private array $config = [
         'useremail' => [
             'email' => 33,

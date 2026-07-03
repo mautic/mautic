@@ -198,8 +198,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * Get locale choices.
-     *
      * @return array<string, string>
      */
     public static function getLocaleChoices(): array
