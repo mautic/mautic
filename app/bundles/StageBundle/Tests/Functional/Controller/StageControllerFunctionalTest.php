@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class StageControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const COUNT_SQL_PREFIX    = 'SELECT COUNT(*) FROM ';
+
     private const MERGE_TEST_LOG_DATE = '2026-01-01 00:00:00';
 
     public function testStageMenuString(): void
