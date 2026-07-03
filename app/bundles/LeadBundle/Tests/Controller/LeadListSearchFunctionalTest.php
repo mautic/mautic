@@ -31,7 +31,9 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
     }
 
-    /** @noinspection SqlResolve */
+    /**
+     * @noinspection SqlResolve
+     */
     public function testSegmentSearch(): void
     {
         // create some leads

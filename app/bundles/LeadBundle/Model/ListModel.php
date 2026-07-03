@@ -120,7 +120,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $unlock
+     * @param LeadList $entity
+     * @param bool     $unlock
      *
      * @throws \Doctrine\DBAL\Exception
      */

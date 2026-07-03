@@ -519,7 +519,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertEmpty($primaryCompanyName);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()
@@ -530,7 +532,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
             ->fetchAllAssociative();
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getLeadLists(): array
     {
         return $this->connection->createQueryBuilder()

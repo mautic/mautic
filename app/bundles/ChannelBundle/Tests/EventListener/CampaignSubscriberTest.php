@@ -226,7 +226,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * BC support for old campaign.
      */
-    /** @phpstan-ignore parameter.deprecatedClass */
+    /**
+     * @phpstan-ignore parameter.deprecatedClass
+     */
     public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
@@ -242,7 +244,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Event|\PHPUnit\Framework\MockObject\MockObject
+     * @return Event&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
     {

@@ -112,7 +112,7 @@ class FieldApiController extends CommonApiController
     }
 
     /**
-     * @param LeadField            &$entity
+     * @param LeadField            $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action

@@ -800,7 +800,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param Email|int $email
      * @param bool      $includeVariants
      */
-    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null): array
+    public function getEmailDeviceStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -1351,17 +1351,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param $options = array()
-     *                 array source array('model', 'id')
-     *                 array emailSettings
-     *                 int   listId
-     *                 bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                 bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                 array assetAttachments Array of optional Asset IDs to attach
+     * @param mixed[] $options = array()
+     *                         array source array('model', 'id')
+     *                         array emailSettings
+     *                         int   listId
+     *                         bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                         bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                         array assetAttachments Array of optional Asset IDs to attach
      *
      * @return string[]|bool|string|null
      */
-    public function sendEmail(Email $email, $leads, $options = [])
+    public function sendEmail(Email $email, $leads, array $options = [])
     {
         $listId              = ArrayHelper::getValue('listId', $options);
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
@@ -1926,9 +1926,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string|null $dateFormat
-     * @param bool        $canViewOthers
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
@@ -1938,7 +1937,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         \DateTime $dateTo,
         $dateFormat = null,
         array $filter = [],
-        $canViewOthers = true,
+        bool $canViewOthers = true,
     ): array {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
@@ -2053,7 +2052,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get pie chart data of ignored vs opened emails.
      */
-    public function getDeviceGranularityPieChartData($dateFrom, $dateTo): array
+    public function getDeviceGranularityPieChartData(?\DateTime $dateFrom, ?\DateTime $dateTo): array
     {
         $chart = new PieChart();
 
@@ -2238,7 +2237,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array                   $tokens
      * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
      * @param bool                    $saveStat
@@ -2251,7 +2249,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $email,
         $users,
         $leadFields = null,
-        $tokens = [],
+        array $tokens = [],
         $assetAttachments = [],
         $saveStat = true,
     ): false|array {
@@ -2393,14 +2391,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param string                                   $route
      * @param array<string, string>|array<string, int> $routeParams
      * @param bool                                     $absolute
      * @param array<array<string>>                     $clickthrough
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 

@@ -67,7 +67,7 @@ class DecisionExecutioner implements EventInterface
             }
 
             try {
-                /* @var DecisionAccessor $config */
+                /** @var DecisionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
 

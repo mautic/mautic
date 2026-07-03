@@ -531,7 +531,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param object $entity
+     * @param Lead $entity
      */
     public function deleteEntity($entity): void
     {
@@ -878,7 +878,7 @@ class LeadModel extends FormModel
     /**
      * @param bool $returnWithQueryFields
      *
-     * @return array|Lead
+     * @return array{Lead, mixed[]}|Lead
      */
     public function checkForDuplicateContact(array $queryFields, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {

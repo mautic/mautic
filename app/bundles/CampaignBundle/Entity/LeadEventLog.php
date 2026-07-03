@@ -288,7 +288,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /***
-     * @param $event
      *
      * @return $this
      */

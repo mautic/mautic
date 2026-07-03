@@ -198,7 +198,9 @@ final class PageControllerTest extends MauticMysqlTestCase
         }
     }
 
-    /** @param array<string, mixed> $pageParams */
+    /**
+     * @param array<string, mixed> $pageParams
+     */
     protected function createTestPage(array $pageParams = []): Page
     {
         $page        = new Page();

@@ -86,7 +86,7 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with(
                 $this->callback(
-                    /* @var AddColumnBackgroundEvent $event */
+                    /** @var AddColumnBackgroundEvent $event */
                     fn ($event): bool => $event instanceof UpdateColumnEvent),
                 'mautic.lead_field_pre_update_column'
             );
