@@ -189,8 +189,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Add company left join.
-     *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void

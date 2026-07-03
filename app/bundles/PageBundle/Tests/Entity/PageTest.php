@@ -22,7 +22,9 @@ final class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, null, []];
@@ -46,7 +48,9 @@ final class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];

@@ -173,7 +173,9 @@ final class PageModelTest extends PageTestAbstract
         self::assertFalse($result);
     }
 
-    /** @param array<string, string> $query */
+    /**
+     * @param array<string, string> $query
+     */
     private function assertUtmQuery(array $query): void
     {
         $this->assertArrayHasKey('utm_source', $query, 'utm_source not found');
@@ -188,7 +190,9 @@ final class PageModelTest extends PageTestAbstract
         }
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getQueryParams(): array
     {
         $utm = [

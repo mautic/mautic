@@ -414,8 +414,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -424,8 +422,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set title.
-     *
      * @param string $title
      */
     public function setTitle($title): static
@@ -437,8 +433,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get title.
-     *
      * @return string
      */
     public function getTitle()
@@ -447,8 +441,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set alias.
-     *
      * @param string $alias
      */
     public function setAlias($alias): static
@@ -460,8 +452,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get alias.
-     *
      * @return string
      */
     public function getAlias()
@@ -470,8 +460,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set content.
-     *
      * @param array<string> $content
      */
     public function setContent($content): static
@@ -483,8 +471,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get content.
-     *
      * @return array<string>
      */
     public function getContent()
@@ -493,8 +479,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
      */
     public function setPublishUp($publishUp): static
@@ -506,8 +490,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -516,8 +498,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
      */
     public function setPublishDown($publishDown): static
@@ -529,8 +509,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishDown()
@@ -539,8 +517,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set hits.
-     *
      * @param int $hits
      */
     public function setHits($hits): static
@@ -551,8 +527,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get hits.
-     *
      * @param bool $includeVariants
      *
      * @return int|mixed
@@ -563,8 +537,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set revision.
-     *
      * @param int $revision
      */
     public function setRevision($revision): static
@@ -575,8 +547,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get revision.
-     *
      * @return int
      */
     public function getRevision()
@@ -585,8 +555,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set metaDescription.
-     *
      * @param string $metaDescription
      */
     public function setMetaDescription($metaDescription): static
@@ -598,8 +566,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get metaDescription.
-     *
      * @return string|null
      */
     public function getMetaDescription()
@@ -608,8 +574,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set headScript.
-     *
      * @param string $headScript
      */
     public function setHeadScript($headScript): static
@@ -620,8 +584,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get headScript.
-     *
      * @return string|null
      */
     public function getHeadScript()
@@ -630,8 +592,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set footerScript.
-     *
      * @param string $footerScript
      */
     public function setFooterScript($footerScript): static
@@ -642,8 +602,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get footerScript.
-     *
      * @return string|null
      */
     public function getFooterScript()
@@ -671,8 +629,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set redirectUrl.
-     *
      * @param string $redirectUrl
      */
     public function setRedirectUrl($redirectUrl): static
@@ -684,8 +640,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get redirectUrl.
-     *
      * @return string|null
      */
     public function getRedirectUrl()
@@ -693,9 +647,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->redirectUrl;
     }
 
-    /**
-     * Set category.
-     */
     public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
@@ -705,8 +656,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get category.
-     *
      * @return Category|null
      */
     public function getCategory()
@@ -753,8 +702,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set sessionId.
-     *
      * @param string $id
      */
     public function setSessionId($id): static
@@ -765,8 +712,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get sessionId.
-     *
      * @return string
      */
     public function getSessionId()
@@ -775,8 +720,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set template.
-     *
      * @param string $template
      */
     public function setTemplate($template): static
@@ -788,8 +731,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get template.
-     *
      * @return string|null
      */
     public function getTemplate()
@@ -797,7 +738,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->template;
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -814,8 +755,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Set uniqueHits.
-     *
      * @param int $uniqueHits
      */
     public function setUniqueHits($uniqueHits): static
@@ -826,8 +765,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * Get uniqueHits.
-     *
      * @return int
      */
     public function getUniqueHits($includeVariants = false)

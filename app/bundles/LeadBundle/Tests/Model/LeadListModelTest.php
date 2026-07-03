@@ -11,7 +11,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 final class LeadListModelTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ListModel&MockObject */
+    /**
+     * @var ListModel&MockObject
+     */
     protected MockObject $fixture;
 
     protected function setUp(): void
@@ -98,7 +100,9 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result, $message);
     }
 
-    /** @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}> */
+    /**
+     * @return array<int, array{0: array<int, mixed>, 1: array<int, mixed>, 2: string}>
+     */
     public static function segmentTestDataProvider(): array
     {
         return [

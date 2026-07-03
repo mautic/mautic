@@ -33,9 +33,6 @@ final class SegmentStatCommand extends ModeratedCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io         = new SymfonyStyle($input, $output);
