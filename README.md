@@ -80,6 +80,8 @@ The GitHub version is recommended for both development and testing. The producti
 
 Check out the [requirements for installation][requirements] and [supported versions][supported-versions].
 
+Managed hosting is also available [via Zenith](https://zenith.hosting/host/mautic?ref=gh), which handles storage, backups and email for you.
+
 ### Installation
 > [!WARNING]
 > <sub>*Install from GitHub only if you are comfortable using the command line and are working locally. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend installing with Composer, or using the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
