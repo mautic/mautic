@@ -18,7 +18,7 @@ final class FormFieldTelTypeTest extends TypeTestCase
 {
     private const COUNTRY_UNITED_STATES = 'United States';
 
-    private TranslatorInterface $translator;
+    private \PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
