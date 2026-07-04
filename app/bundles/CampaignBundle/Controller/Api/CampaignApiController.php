@@ -267,7 +267,7 @@ class CampaignApiController extends CommonApiController
                 fn (Event $event): ConstraintViolationListInterface => $this->validator->validate($event),
                 $entity->getEvents()->toArray()
             ),
-            fn ($error): bool => $error->count() > 0
+            fn (\Symfony\Component\Validator\ConstraintViolationListInterface $error): bool => $error->count() > 0
         );
 
         if (count($eventViolations) > 0) {

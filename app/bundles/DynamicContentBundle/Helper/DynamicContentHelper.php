@@ -99,7 +99,7 @@ class DynamicContentHelper
      *
      * @return string Content with the {content} tokens replaced with dynamic content
      */
-    public function replaceTokensInContent($content, $lead)
+    public function replaceTokensInContent($content, \Mautic\LeadBundle\Entity\Lead|array|null $lead)
     {
         // Find all dynamic content tags
         preg_match_all(self::DYNAMIC_CONTENT_REGEX, $content, $matches, PREG_SET_ORDER);

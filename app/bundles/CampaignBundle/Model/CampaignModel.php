@@ -371,7 +371,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @return mixed[]
      */
+<<<<<<< HEAD
     public function setCanvasSettings(Campaign $entity, $settings, bool $persist = true, $events = null)
+=======
+    public function setCanvasSettings(Campaign $entity, array $settings, bool $persist = true, $events = null): array
+>>>>>>> 7f7c04ad02 ([rector] apply rest of type declaration set)
     {
         if (null === $events) {
             $events = $entity->getEvents();

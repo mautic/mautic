@@ -1747,7 +1747,7 @@ class LeadModel extends FormModel
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, function (&$val): void {
+        array_walk($tags, function (string &$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::_($val, 'string');
         });

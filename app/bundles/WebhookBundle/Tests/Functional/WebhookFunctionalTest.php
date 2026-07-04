@@ -29,20 +29,14 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
-    /**
-     * @var WebhookQueueRepository
-     */
-    private $webhookQueueRepository;
+    private \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepository;
 
-    /**
-     * @var NotificationRepository
-     */
-    private $notificationRepository;
+    private \Mautic\CoreBundle\Entity\NotificationRepository $notificationRepository;
 
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private $webhhokRepository;
+    private \Mautic\WebhookBundle\Entity\WebhookRepository|\Doctrine\ORM\EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {

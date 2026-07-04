@@ -18,7 +18,7 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
     ])
-    ->withPreparedSets(deadCode: true)
+    ->withPreparedSets(deadCode: true, typeDeclarations: true)
     ->withPhpSets(php80: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([

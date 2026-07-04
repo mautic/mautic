@@ -29,10 +29,7 @@ use PHPUnit\Framework\Assert;
  */
 final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var ReferenceRepository
-     */
-    private $fixtures;
+    private \Doctrine\Common\DataFixtures\ReferenceRepository $fixtures;
 
     private ContactSegmentService $contactSegmentService;
 

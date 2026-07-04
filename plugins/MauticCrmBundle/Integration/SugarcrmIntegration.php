@@ -161,12 +161,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $settings
      * @param array $parameters
-     *
      * @return array
      */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback(array $settings = [], $parameters = [])
     {
         if (isset($this->keys['version']) && '6' == $this->keys['version']) {
             $success = $this->isAuthorized();
@@ -614,7 +612,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    public function prepareRequest($url, $parameters, $method, array $settings, $authType)
     {
         if ('oauth2' == $authType && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
             // Append the access token as the oauth-token header

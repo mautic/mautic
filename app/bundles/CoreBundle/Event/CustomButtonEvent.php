@@ -82,7 +82,7 @@ class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this;
     }
 
-    public function removeButton($button): void
+    public function removeButton(array $button): void
     {
         $buttonKey = $this->generateButtonKey($button);
         if (isset($this->buttons[$buttonKey])) {

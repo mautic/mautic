@@ -115,11 +115,10 @@ namespace Mautic\CoreBundle\ErrorHandler {
         /**
          * @param string $file
          * @param int    $line
-         * @param array  $context
          *
          * @throws \ErrorException
          */
-        public function handleError($level, $message, $file = 'unknown', $line = 0, $context = []): bool
+        public function handleError($level, $message, $file = 'unknown', $line = 0, array $context = []): bool
         {
             $errorReporting = ('dev' === self::$environment) ? -1 : error_reporting();
             if ($level & $errorReporting) {

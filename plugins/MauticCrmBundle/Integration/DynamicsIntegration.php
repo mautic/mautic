@@ -179,7 +179,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
-    public function populateLeadData($lead, $config = [], $object = 'Contacts')
+    public function populateLeadData(array|\Mautic\LeadBundle\Entity\Lead $lead, array $config = [], $object = 'Contacts')
     {
         if ('company' === $object) {
             $object = 'accounts';
