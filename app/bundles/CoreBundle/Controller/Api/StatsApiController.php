@@ -20,6 +20,7 @@ class StatsApiController extends CommonApiController
      * @param string $table
      * @param array  $order
      * @param array  $where
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction(Request $request, UserHelper $userHelper, $table = null, string $itemsName = 'stats', $order = [], $where = [], $start = 0, $limit = 100)

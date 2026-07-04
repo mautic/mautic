@@ -23,7 +23,7 @@ final class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getYears();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function (\Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat $stat): void {
+        array_walk($stats, function (YearStat $stat): void {
             $this->assertInstanceOf(YearStat::class, $stat);
         });
     }
@@ -39,7 +39,7 @@ final class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getMonths();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function (\Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat $stat): void {
+        array_walk($stats, function (MonthStat $stat): void {
             $this->assertInstanceOf(MonthStat::class, $stat);
         });
     }
@@ -55,7 +55,7 @@ final class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getWeeks();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function (\Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat $stat): void {
+        array_walk($stats, function (WeekStat $stat): void {
             $this->assertInstanceOf(WeekStat::class, $stat);
         });
     }
@@ -72,7 +72,7 @@ final class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getDays();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function (\Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat $stat): void {
+        array_walk($stats, function (DayStat $stat): void {
             $this->assertInstanceOf(DayStat::class, $stat);
         });
     }

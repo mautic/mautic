@@ -9,6 +9,9 @@ class EventHelper
 {
     use PushToIntegrationTrait;
 
+    /**
+     * @param array<string, mixed> $config
+     */
     public static function pushLead(array $config, $lead, EntityManagerInterface $em, IntegrationHelper $integrationHelper): bool
     {
         $contact = $em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getEntityWithPrimaryCompany($lead);

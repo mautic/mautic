@@ -89,7 +89,7 @@ class IcontactIntegration extends EmailAbstractIntegration
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
+    public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
     {
         $settings['headers'] = [
             'Except:',

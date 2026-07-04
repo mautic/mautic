@@ -19,7 +19,7 @@ use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 
 final class RelativeDateFunctionalTest extends MauticMysqlTestCase
 {
-    private \Doctrine\Common\DataFixtures\ReferenceRepository $fixtures;
+    private ReferenceRepository $fixtures;
 
     protected function setUp(): void
     {

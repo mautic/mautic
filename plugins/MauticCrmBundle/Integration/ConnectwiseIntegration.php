@@ -140,7 +140,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array<mixed>
      */
-    public function prepareRequest($url, $parameters, $method, array $settings, $authType): array
+    public function prepareRequest($url, $parameters, $method, $settings, $authType): array
     {
         [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
 

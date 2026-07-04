@@ -1040,12 +1040,12 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param array<mixed>    $data
-     * @param array<LeadList> $leadLists
+     * @param array<string, mixed> $data
+     * @param array<LeadList>      $leadLists
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true): bool
+    public function setFrequencyRules(Lead $lead, array $data, $leadLists, $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();

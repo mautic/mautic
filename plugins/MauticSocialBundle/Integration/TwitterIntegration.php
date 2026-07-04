@@ -62,7 +62,7 @@ class TwitterIntegration extends SocialIntegration
         return 'oauth1a';
     }
 
-    public function prepareRequest($url, $parameters, $method, array $settings, $authType)
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
         // Prevent SSL issues
         $settings['ssl_verifypeer'] = false;

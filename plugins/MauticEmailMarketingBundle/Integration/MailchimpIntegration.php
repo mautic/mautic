@@ -52,9 +52,10 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
     /**
      * @param array $parameters
+     *
      * @return bool|string
      */
-    public function authCallback(array $settings = [], $parameters = [])
+    public function authCallback($settings = [], $parameters = [])
     {
         $error = parent::authCallback($settings, $parameters);
 
