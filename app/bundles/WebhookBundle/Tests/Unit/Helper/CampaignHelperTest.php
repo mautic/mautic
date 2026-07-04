@@ -163,7 +163,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-        if ('application/json' == $type) {
+        if ('application/json' === $type) {
             array_push($sample['headers']['list'],
                 [
                     'label' => 'content-type',

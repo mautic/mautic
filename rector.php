@@ -48,6 +48,9 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
+        \Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+        \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
             __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
         ],
