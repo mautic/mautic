@@ -41,7 +41,7 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withTypeCoverageLevel(50)
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(27)
+    ->withCodeQualityLevel(30)
     ->withSkip([
         UnserializeToSerializerDecodeRector::class => [
             // tests
