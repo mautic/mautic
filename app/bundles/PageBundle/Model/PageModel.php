@@ -132,10 +132,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\HitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
     {
         return $this->em->getRepository(Hit::class);
     }

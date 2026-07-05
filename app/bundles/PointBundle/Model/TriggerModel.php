@@ -59,20 +59,15 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PointBundle\Entity\TriggerRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PointBundle\Entity\TriggerRepository
     {
         return $this->em->getRepository(Trigger::class);
     }
 
     /**
      * Retrieves an instance of the TriggerEventRepository.
-     *
-     * @return \Mautic\PointBundle\Entity\TriggerEventRepository
      */
-    public function getEventRepository()
+    public function getEventRepository(): \Mautic\PointBundle\Entity\TriggerEventRepository
     {
         return $this->em->getRepository(TriggerEvent::class);
     }

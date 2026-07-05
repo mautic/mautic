@@ -184,10 +184,7 @@ class WebhookModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @return WebhookRepository
-     */
-    public function getRepository()
+    public function getRepository(): WebhookRepository
     {
         return $this->em->getRepository(Webhook::class);
     }
@@ -461,26 +458,17 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
     }
 
-    /**
-     * @return WebhookQueueRepository
-     */
-    public function getQueueRepository()
+    public function getQueueRepository(): WebhookQueueRepository
     {
         return $this->em->getRepository(WebhookQueue::class);
     }
 
-    /**
-     * @return EventRepository
-     */
-    public function getEventRepository()
+    public function getEventRepository(): EventRepository
     {
         return $this->em->getRepository(Event::class);
     }
 
-    /**
-     * @return LogRepository
-     */
-    public function getLogRepository()
+    public function getLogRepository(): LogRepository
     {
         return $this->em->getRepository(Log::class);
     }

@@ -29,10 +29,8 @@ class PostCountModel extends AbstractCommonModel
 
     /**
      * Get this model's repository.
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
      */
-    public function getRepository()
+    public function getRepository(): \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository
     {
         return $this->em->getRepository(PostCount::class);
     }

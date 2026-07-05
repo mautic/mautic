@@ -105,10 +105,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Returns the repository for the table that houses the leads associated with a list.
-     *
-     * @return ListLeadRepository
      */
-    public function getListLeadRepository()
+    public function getListLeadRepository(): ListLeadRepository
     {
         return $this->em->getRepository(ListLead::class);
     }

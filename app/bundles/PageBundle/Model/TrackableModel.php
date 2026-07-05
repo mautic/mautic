@@ -75,10 +75,7 @@ class TrackableModel extends AbstractCommonModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\TrackableRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
     {
         return $this->em->getRepository(Trackable::class);
     }

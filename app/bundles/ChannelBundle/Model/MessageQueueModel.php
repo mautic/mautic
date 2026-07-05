@@ -46,10 +46,7 @@ class MessageQueueModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ChannelBundle\Entity\MessageQueueRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\ChannelBundle\Entity\MessageQueueRepository
     {
         return $this->em->getRepository(MessageQueue::class);
     }

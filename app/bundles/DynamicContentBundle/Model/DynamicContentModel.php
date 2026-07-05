@@ -54,10 +54,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $repo;
     }
 
-    /**
-     * @return \Mautic\DynamicContentBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \Mautic\DynamicContentBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }

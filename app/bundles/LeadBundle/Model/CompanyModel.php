@@ -124,10 +124,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $repo;
     }
 
-    /**
-     * @return CompanyLeadRepository
-     */
-    public function getCompanyLeadRepository()
+    public function getCompanyLeadRepository(): CompanyLeadRepository
     {
         return $this->em->getRepository(CompanyLead::class);
     }
