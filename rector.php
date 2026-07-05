@@ -41,11 +41,18 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withTypeCoverageLevel(50)
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(34)
+    ->withCodeQualityLevel(38)
     ->withSkip([
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
+        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // checking child classes
+        Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
