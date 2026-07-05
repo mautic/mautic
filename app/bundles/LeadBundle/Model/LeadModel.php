@@ -138,10 +138,7 @@ class LeadModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return LeadRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadRepository
     {
         /** @var LeadRepository $repo */
         $repo = $this->em->getRepository(Lead::class);

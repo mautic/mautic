@@ -40,10 +40,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return 'dynamiccontent:dynamiccontents';
     }
 
-    /**
-     * @return DynamicContentRepository
-     */
-    public function getRepository()
+    public function getRepository(): DynamicContentRepository
     {
         /** @var DynamicContentRepository $repo */
         $repo = $this->em->getRepository(DynamicContent::class);

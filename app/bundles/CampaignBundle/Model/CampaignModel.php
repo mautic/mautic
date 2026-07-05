@@ -71,10 +71,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return CampaignRepository
-     */
-    public function getRepository()
+    public function getRepository(): CampaignRepository
     {
         $repo = $this->em->getRepository(Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
