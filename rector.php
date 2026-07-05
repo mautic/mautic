@@ -41,15 +41,15 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withTypeCoverageLevel(50)
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(30)
+    ->withCodeQualityLevel(34)
     ->withSkip([
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
 
-        \Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
             __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',

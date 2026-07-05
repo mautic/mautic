@@ -177,7 +177,7 @@ class EmailSubscriber implements EventSubscriberInterface
         $editedEmail = $event->getCurrentEmail();
 
         if (
-            ((true === $event->isSaveAndClose()) || (true === $event->isApply()))
+            ($event->isSaveAndClose() || $event->isApply())
             && $editedEmail->hasDraft()
         ) {
             $emailDraft = $editedEmail->getDraft();
@@ -189,7 +189,7 @@ class EmailSubscriber implements EventSubscriberInterface
             $this->entityManager->persist($editedEmail);
         }
 
-        if (true === $event->isSaveAsDraft()) {
+        if ($event->isSaveAsDraft()) {
             $emailDraft = $this
                 ->emailDraftModel
                 ->createDraft($editedEmail, $editedEmail->getCustomHtml(), $editedEmail->getTemplate());
@@ -200,14 +200,14 @@ class EmailSubscriber implements EventSubscriberInterface
             $this->emailModel->saveEntity($editedEmail);
         }
 
-        if (true === $event->isDiscardDraft()) {
+        if ($event->isDiscardDraft()) {
             $this->revertEmailModifications($liveEmail, $editedEmail);
             $this->emailDraftModel->deleteDraft($editedEmail);
             $editedEmail->setDraft(null);
             $this->entityManager->persist($editedEmail);
         }
 
-        if (true === $event->isApplyDraft()) {
+        if ($event->isApplyDraft()) {
             $this->emailDraftModel->deleteDraft($editedEmail);
             $editedEmail->setDraft(null);
         }

@@ -62,7 +62,7 @@ EOT
             $output->writeln($e->getMessage());
         }
 
-        if (true === $this->sendWinnerService->shouldTryAgain()) {
+        if ($this->sendWinnerService->shouldTryAgain()) {
             return Command::FAILURE;
         }
 
