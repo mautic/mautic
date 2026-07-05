@@ -386,7 +386,6 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         $points = $lead->getPoints();
 
         // find all published triggers that is applicable to this points
-        /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
         $repo         = $this->getEventRepository();
         $events       = $repo->getPublishedByPointTotal($points);
         $groupEvents  = $repo->getPublishedByGroupScore($lead->getGroupScores());

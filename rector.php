@@ -9,6 +9,7 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
@@ -37,6 +38,7 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
+        ReturnTypeFromGetRepositoryDocblockRector::class,
     ])
     ->reportUnusedSkips()
     ->withTypeCoverageLevel(50)
@@ -46,6 +48,13 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+
+        ReturnTypeFromGetRepositoryDocblockRector::class => [
+            // double getRepository() override
+            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
+            // list lead vs lead list diff
+            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
         ],
 
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [

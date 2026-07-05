@@ -529,7 +529,6 @@ class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook)
     {
-        /** @var WebhookQueueRepository $queueRepo */
         $queueRepo = $this->getQueueRepository();
 
         $webhookRetryTime = (new \DateTimeImmutable())

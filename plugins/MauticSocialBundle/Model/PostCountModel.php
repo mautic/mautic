@@ -51,7 +51,6 @@ class PostCountModel extends AbstractCommonModel
         // ignore paginator so we can use the array later
         $args['ignore_paginator'] = true;
 
-        /** @var \MauticPlugin\MauticSocialBundle\Entity\PostCountRepository $postCountsRepository */
         $postCountsRepository = $this->getRepository();
 
         // get any existing records

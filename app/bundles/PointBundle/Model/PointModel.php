@@ -187,7 +187,6 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         // find all the actions for published points
-        /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         if (empty($availablePoints)) {
