@@ -81,7 +81,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['webhook:read', 'webhook:write'])]
     private $category;
 

@@ -425,7 +425,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * For the API
      */
@@ -441,7 +441,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * For the API
      */
