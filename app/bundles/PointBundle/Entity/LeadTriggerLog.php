@@ -12,22 +12,22 @@ class LeadTriggerLog
 
     /**
      * @var TriggerEvent
-     **/
+     */
     private $event;
 
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
-     **/
+     */
     private $lead;
 
     /**
      * @var IpAddress|null
-     **/
+     */
     private $ipAddress;
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

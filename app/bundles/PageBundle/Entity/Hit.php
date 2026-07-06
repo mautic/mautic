@@ -111,7 +111,7 @@ class Hit
 
     /**
      * @var string
-     **/
+     */
     private $trackingId;
 
     /**

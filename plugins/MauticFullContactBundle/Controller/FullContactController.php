@@ -264,7 +264,7 @@ class FullContactController extends FormController
         return new Response('Bad Request', 400);
     }
 
-    /***************** COMPANY ***********************/
+    /* COMPANY */
 
     /**
      * @param string $objectId
