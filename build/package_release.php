@@ -75,6 +75,11 @@ if (!isset($args['repackage'])) {
         exit;
     }
 
+    // Drop the build-only deps and cache so they don't ship in the packages. The nested plugin
+    // node_modules isn't caught by the root-anchored node_modules/* exclude, and the whole plugin
+    // dir is added to the update package, so remove them explicitly.
+    system('rm -rf '.__DIR__.'/packaging/plugins/GrapesJsBuilderBundle/node_modules '.__DIR__.'/packaging/plugins/GrapesJsBuilderBundle/.parcel-cache');
+
     // Common steps
     include_once __DIR__.'/processfiles.php';
 
