@@ -220,7 +220,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['email:read', 'email:write'])]
     private $category;
 
