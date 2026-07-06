@@ -8,6 +8,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -20,6 +21,7 @@ class AssetsSubscriber implements EventSubscriberInterface
         private readonly InstallService $installer,
         private readonly RequestStack $requestStack,
         private readonly string $projectDir,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
@@ -37,6 +39,13 @@ class AssetsSubscriber implements EventSubscriberInterface
         }
 
         if (!$this->config->isPublished()) {
+            return;
+        }
+
+        $assetDir = $this->projectDir.'/'.self::ASSET_DIR;
+        if (!is_file($assetDir.'/manifest.json')) {
+            $this->logger->warning('GrapesJS builder assets are missing (no manifest.json). Run "composer gjs-build" to generate them.');
+
             return;
         }
 
