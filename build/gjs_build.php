@@ -1,6 +1,5 @@
 <?php
 
-// Builds the GrapesJS builder assets during composer post-install/update.
 //
 // The build is intentionally non-fatal: it runs a separate npm project (Parcel) that needs a
 // Node toolchain, so a missing/incompatible Node must not abort `composer install`. On failure we
