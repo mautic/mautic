@@ -10,6 +10,7 @@ use MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -195,6 +196,7 @@ final class AssetsSubscriberTest extends TestCase
             $installer,
             $requestStack,
             $this->projectDir,
+            $this->createStub(LoggerInterface::class),
         );
     }
 
