@@ -683,8 +683,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 );
             }
 
+            $isAlreadyCounted = false;
+
             if (null != $listLead) {
                 if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
+                    $isAlreadyCounted = !$listLead->wasManuallyRemoved();
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
@@ -707,10 +710,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $dispatchEvents[] = $listId;
             }
 
-            if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
-                $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
-            } else {
-                $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+            if (!$isAlreadyCounted) {
+                if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
+                    $this->segmentCountCacheHelper->invalidateSegmentContactCount($listId);
+                } else {
+                    $this->segmentCountCacheHelper->incrementSegmentContactCount($listId);
+                }
             }
         }
 
