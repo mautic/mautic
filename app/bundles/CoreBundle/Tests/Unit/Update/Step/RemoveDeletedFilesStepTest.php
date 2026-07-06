@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -8,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RemoveDeletedFilesStepTest extends AbstractStepTestCase
+final class RemoveDeletedFilesStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&TranslatorInterface

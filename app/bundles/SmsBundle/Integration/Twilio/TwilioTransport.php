@@ -25,10 +25,8 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
 
     /**
      * @param string $content
-     *
-     * @return bool|string
      */
-    public function sendSms(Lead $lead, $content)
+    public function sendSms(Lead $lead, $content): bool|string
     {
         return $this->sendMessage($lead, $content);
     }
@@ -42,12 +40,9 @@ class TwilioTransport implements TransportInterface, MMSTransportInterface
     }
 
     /**
-     * @param string       $content
      * @param array<mixed> $media
-     *
-     * @return bool|string
      */
-    private function sendMessage(Lead $lead, $content, array $media = [])
+    private function sendMessage(Lead $lead, string $content, array $media = []): bool|string
     {
         $number = $lead->getLeadPhoneNumber();
 

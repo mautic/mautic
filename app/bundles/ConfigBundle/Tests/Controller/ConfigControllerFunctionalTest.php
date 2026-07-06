@@ -10,7 +10,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ConfigControllerFunctionalTest extends MauticMysqlTestCase
+final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const SUBDOMAIN_URL = 'subdomain_url.com';
 
@@ -94,7 +94,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return static::getContainer()->get('kernel')->getLocalConfigFile();
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * @return array<string, mixed>
+     */
     private function getConfigParameters(): array
     {
         $parameters = [];

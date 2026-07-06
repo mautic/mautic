@@ -444,7 +444,7 @@ class ImportModel extends FormModel
      */
     public function trimArrayValues(array $data): array
     {
-        return array_map('trim', $data);
+        return array_map(trim(...), $data);
     }
 
     /**
@@ -467,10 +467,8 @@ class ImportModel extends FormModel
 
     /**
      * Save log about errored line.
-     *
-     * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
+    public function logImportRowError(LeadEventLog $eventLog, string $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');

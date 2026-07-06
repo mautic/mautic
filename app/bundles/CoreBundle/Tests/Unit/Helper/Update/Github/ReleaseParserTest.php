@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\Github;
 
 use GuzzleHttp\Client;
@@ -10,7 +12,7 @@ use Mautic\CoreBundle\Helper\Update\Exception\LatestVersionSupportedException;
 use Mautic\CoreBundle\Helper\Update\Github\ReleaseParser;
 use PHPUnit\Framework\TestCase;
 
-class ReleaseParserTest extends TestCase
+final class ReleaseParserTest extends TestCase
 {
     private ReleaseParser $releaseParser;
 
@@ -137,7 +139,9 @@ class ReleaseParserTest extends TestCase
         (new ReleaseParser($client))->getLatestSupportedRelease([['html_url' => 'foo://bar']], $mauticVersion, $stability);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getReleases(): array
     {
         return json_decode(file_get_contents(__DIR__.'/json/releases.json'), true);

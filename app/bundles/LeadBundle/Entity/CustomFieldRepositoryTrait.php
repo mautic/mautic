@@ -184,10 +184,8 @@ trait CustomFieldRepositoryTrait
     /**
      * @param bool   $byGroup
      * @param string $object
-     *
-     * @return array
      */
-    public function getFieldValues($id, $byGroup = true, $object = 'lead')
+    public function getFieldValues($id, $byGroup = true, $object = 'lead'): array
     {
         // use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
@@ -258,6 +256,10 @@ trait CustomFieldRepositoryTrait
         }
     }
 
+    /**
+     * @param object $entity
+     * @param bool   $flush
+     */
     public function saveEntity($entity, $flush = true): void
     {
         $this->preSaveEntity($entity);

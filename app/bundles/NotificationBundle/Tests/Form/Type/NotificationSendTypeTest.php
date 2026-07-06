@@ -17,33 +17,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class NotificationSendTypeTest extends TypeTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&RouterInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $router;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&TranslatorInterface
-     */
-    private \PHPUnit\Framework\MockObject\Stub $translator;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Connection
-     */
-    private \PHPUnit\Framework\MockObject\Stub $connection;
-
-    /**
-     * @var ModelFactory<object>&\PHPUnit\Framework\MockObject\Stub
-     */
-    private \PHPUnit\Framework\MockObject\Stub $modelFactory;
-
     protected function setUp(): void
     {
-        $this->router       = $this->createStub(RouterInterface::class);
-        $this->translator   = $this->createStub(TranslatorInterface::class);
-        $this->modelFactory = $this->createStub(ModelFactory::class);
-        $this->connection   = $this->createStub(Connection::class);
-
         parent::setup();
     }
 
@@ -55,8 +30,8 @@ final class NotificationSendTypeTest extends TypeTestCase
         return [
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension([
-                new NotificationSendType($this->router),
-                new EntityLookupType($this->modelFactory, $this->translator, $this->connection, $this->router),
+                new NotificationSendType($this->createStub(RouterInterface::class)),
+                new EntityLookupType($this->createStub(ModelFactory::class), $this->createStub(TranslatorInterface::class), $this->createStub(Connection::class), $this->createStub(RouterInterface::class)),
             ], []),
         ];
     }

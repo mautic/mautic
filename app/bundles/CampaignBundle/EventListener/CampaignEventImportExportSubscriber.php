@@ -24,15 +24,15 @@ use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly CampaignModel $campaignModel,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly AuditLogModel $auditLogModel,
-        private readonly IpLookupHelper $ipLookupHelper,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly EventModel $eventModel,
+        private CampaignModel $campaignModel,
+        private EntityManagerInterface $entityManager,
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper,
+        private EventDispatcherInterface $dispatcher,
+        private EventModel $eventModel,
     ) {
     }
 
@@ -116,7 +116,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         ];
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function handleChannelExport(Event $campaignEvent, array &$data, EntityExportEvent $event): void
     {
         $channel      = $campaignEvent->getChannel();
@@ -192,7 +194,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function mergeExportData(array &$data, EntityExportEvent $subEvent): void
     {
         foreach ($subEvent->getEntities() as $key => $values) {
@@ -205,7 +209,9 @@ final class CampaignEventImportExportSubscriber implements EventSubscriberInterf
         }
     }
 
-    /** @phpstan-ignore-next-line */
+    /**
+     * @phpstan-ignore-next-line
+     */
     private function exportEntity(string $entityName, ?int $entityId, array &$data, EntityExportEvent $event): void
     {
         if ($entityId) {

@@ -16,7 +16,7 @@ use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ToBcBccFieldsTraitTest extends TypeTestCase
+final class ToBcBccFieldsTraitTest extends TypeTestCase
 {
     protected function getExtensions(): array
     {

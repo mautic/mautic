@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert;
 use Ramsey\Uuid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
+final class SearchSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     private Email $email;
 

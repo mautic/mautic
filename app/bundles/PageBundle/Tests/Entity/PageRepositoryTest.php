@@ -11,7 +11,7 @@ use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageRepositoryTest extends TestCase
+final class PageRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

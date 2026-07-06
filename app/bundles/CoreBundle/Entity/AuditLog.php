@@ -103,17 +103,12 @@ class AuditLog
             ->build();
     }
 
-    /**
-     * Get id.
-     */
     public function getId(): int
     {
         return (int) $this->id;
     }
 
     /**
-     * Set userId.
-     *
      * @param int $userId
      */
     public function setUserId($userId): static
@@ -124,8 +119,6 @@ class AuditLog
     }
 
     /**
-     * Get userId.
-     *
      * @return int|null
      */
     public function getUserId()
@@ -134,8 +127,6 @@ class AuditLog
     }
 
     /**
-     * Set object.
-     *
      * @param string $object
      */
     public function setObject($object): static
@@ -146,8 +137,6 @@ class AuditLog
     }
 
     /**
-     * Get object.
-     *
      * @return string|null
      */
     public function getObject()
@@ -156,8 +145,6 @@ class AuditLog
     }
 
     /**
-     * Set objectId.
-     *
      * @param int $objectId
      */
     public function setObjectId($objectId): static
@@ -167,17 +154,12 @@ class AuditLog
         return $this;
     }
 
-    /**
-     * Get objectId.
-     */
     public function getObjectId(): int
     {
         return (int) $this->objectId;
     }
 
     /**
-     * Set action.
-     *
      * @param string $action
      */
     public function setAction($action): static
@@ -188,8 +170,6 @@ class AuditLog
     }
 
     /**
-     * Get action.
-     *
      * @return string|null
      */
     public function getAction()
@@ -197,9 +177,6 @@ class AuditLog
         return $this->action;
     }
 
-    /**
-     * Set details.
-     */
     public function setDetails(array $details): static
     {
         $this->details = $details;
@@ -208,8 +185,6 @@ class AuditLog
     }
 
     /**
-     * Get details.
-     *
      * @return array
      */
     public function getDetails()
@@ -218,8 +193,6 @@ class AuditLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
@@ -230,8 +203,6 @@ class AuditLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface|null
      */
     public function getDateAdded()
@@ -240,8 +211,6 @@ class AuditLog
     }
 
     /**
-     * Set ipAddress.
-     *
      * @param string $ipAddress
      */
     public function setIpAddress($ipAddress): static
@@ -252,8 +221,6 @@ class AuditLog
     }
 
     /**
-     * Get ipAddress.
-     *
      * @return string|null
      */
     public function getIpAddress()
@@ -262,8 +229,6 @@ class AuditLog
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
      */
     public function setBundle($bundle): static
@@ -274,8 +239,6 @@ class AuditLog
     }
 
     /**
-     * Get bundle.
-     *
      * @return string|null
      */
     public function getBundle()
@@ -284,8 +247,6 @@ class AuditLog
     }
 
     /**
-     * Set userName.
-     *
      * @param string $userName
      */
     public function setUserName($userName): static
@@ -296,8 +257,6 @@ class AuditLog
     }
 
     /**
-     * Get userName.
-     *
      * @return string|null
      */
     public function getUserName()

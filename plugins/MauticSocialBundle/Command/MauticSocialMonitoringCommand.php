@@ -118,7 +118,7 @@ class MauticSocialMonitoringCommand extends Command
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ('' == $commandName) {
+        if ('' === $commandName) {
             $output->writeln('Matching command not found.');
 
             return 1;

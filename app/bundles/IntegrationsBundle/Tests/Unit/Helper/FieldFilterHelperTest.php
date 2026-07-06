@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use PHPUnit\Framework\TestCase;
 
-class FieldFilterHelperTest extends TestCase
+final class FieldFilterHelperTest extends TestCase
 {
     public function testFieldsFilteredByPage(): void
     {
@@ -60,7 +60,7 @@ class FieldFilterHelperTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigFormSyncInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject&ConfigFormSyncInterface
      */
     private function getIntegrationObject(): \PHPUnit\Framework\MockObject\MockObject
     {

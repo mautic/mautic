@@ -18,10 +18,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 {
     private WebhookModel $webhookModel;
 
-    /**
-     * @var MockHandler
-     */
-    private $clientMockHandler;
+    private MockHandler $clientMockHandler;
 
     protected function setUp(): void
     {

@@ -16,7 +16,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {
@@ -229,7 +229,7 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
     {
@@ -244,7 +244,7 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
     {

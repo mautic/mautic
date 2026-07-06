@@ -14,7 +14,7 @@ use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CorePermissionsTest extends \PHPUnit\Framework\TestCase
+final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
 {
     private CorePermissions $corePermissions;
 
@@ -63,7 +63,9 @@ class CorePermissionsTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($permissionObjects['campaign'], $this->corePermissions->getPermissionObject(CampaignPermissions::class));
     }
 
-    /** @return array{permissionClasses: array<class-string, class-string>} */
+    /**
+     * @return array{permissionClasses: array<class-string, class-string>}
+     */
     private function mockBundleArray(string $permissionClass): array
     {
         return ['permissionClasses' => [$permissionClass => $permissionClass]];

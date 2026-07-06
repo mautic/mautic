@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
-class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
+final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
 {
     public function testCheckLeadSegmentsByIds(): void
     {

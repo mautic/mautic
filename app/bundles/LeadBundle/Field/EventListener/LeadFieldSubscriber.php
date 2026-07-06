@@ -11,18 +11,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadFieldSubscriber implements EventSubscriberInterface
+final readonly class LeadFieldSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly FieldModel $fieldModel,
-        private readonly RouterInterface $router,
-        private readonly TranslatorInterface $translator,
+        private FieldModel $fieldModel,
+        private RouterInterface $router,
+        private TranslatorInterface $translator,
     ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [

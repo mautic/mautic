@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 
-class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
+final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testUpdateLead(): void
     {

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\TestCase;
 
-class MatchFilterForLeadTraitTest extends TestCase
+final class MatchFilterForLeadTraitTest extends TestCase
 {
     /**
      * @var mixed[]
@@ -233,7 +233,9 @@ class MatchFilterForLeadTraitTest extends TestCase
         $this->assertSame($expect, $this->matchFilterForLeadTrait->match($filters, $lead));
     }
 
-    /** @return iterable<array{0: ?string, 1: string, 2: bool}> */
+    /**
+     * @return iterable<array{0: ?string, 1: string, 2: bool}>
+     */
     public static function dateMatchTestProvider(): iterable
     {
         $date = '2021-05-01';

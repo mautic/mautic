@@ -176,7 +176,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
                 ++$aliasTag;
             }
-            if ($testAlias != $alias) {
+            if ($testAlias !== $alias) {
                 $alias = $testAlias;
             }
             $entity->setAlias($alias);
@@ -1224,12 +1224,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->saveEntities($save, false);
     }
 
-    /*
+    /**
      * Cleans query params saving url values.
-     *
-     * @param $query array
-     *
-     * @return array
      */
     private function cleanQuery(array $query): array
     {

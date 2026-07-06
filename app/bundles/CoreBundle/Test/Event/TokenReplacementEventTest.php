@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\TestCase;
 
-class TokenReplacementEventTest extends TestCase
+final class TokenReplacementEventTest extends TestCase
 {
     public function testGetPassthrough(): void
     {

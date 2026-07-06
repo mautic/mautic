@@ -120,8 +120,8 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Focus      $entity
-     * @param bool|false $unlock
+     * @param Focus $entity
+     * @param bool  $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {

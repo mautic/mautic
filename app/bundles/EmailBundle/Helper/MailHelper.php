@@ -1105,9 +1105,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
@@ -1229,7 +1228,7 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                $addresses = array_fill_keys(array_map(trim(...), explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
@@ -1272,7 +1271,7 @@ class MailHelper
         // Set custom headers
         if ($headers = $email->getHeaders()) {
             // HTML decode headers
-            $headers = array_map('html_entity_decode', $headers);
+            $headers = array_map(html_entity_decode(...), $headers);
 
             foreach ($headers as $name => $value) {
                 $this->addCustomHeader($name, $value);
@@ -1283,8 +1282,6 @@ class MailHelper
     }
 
     /**
-     * Set custom headers.
-     *
      * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true): void
@@ -1350,10 +1347,7 @@ class MailHelper
         return true;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
             $lead    = $this->getLead();
@@ -1774,10 +1768,8 @@ class MailHelper
 
     /**
      * Generate bounce email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
@@ -1796,10 +1788,8 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
@@ -1818,13 +1808,11 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @return string|null
      */
-    protected function cleanName($name)
+    protected function cleanName(?string $name): ?string
     {
         if (null === $name) {
-            return $name;
+            return null;
         }
 
         $name = trim(html_entity_decode($name, ENT_QUOTES));
@@ -1854,7 +1842,7 @@ class MailHelper
         }
 
         // HTML decode headers
-        $systemHeaders = array_map('html_entity_decode', $systemHeaders);
+        $systemHeaders = array_map(html_entity_decode(...), $systemHeaders);
 
         return $systemHeaders;
     }

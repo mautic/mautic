@@ -1380,6 +1380,29 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $crawler->filter('a[href="#advanced-container"] span.text-danger'));
     }
 
+    public function testEmailWithMalformedLinkCannotBeSaved(): void
+    {
+        $name = 'Malformed email link validation';
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('emailform[buttons][save]')->form();
+        $form['emailform[name]']->setValue($name);
+        $form['emailform[subject]']->setValue('Malformed email link validation');
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<a href="://example.com">Broken link</a>');
+
+        $crawler = $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+
+        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
+
+        $this->assertNull($email);
+        $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());
+    }
+
     /**
      * Test email subject length validation (190 character limit).
      */
@@ -1463,7 +1486,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->setTemplate($template);
         $email->setCustomHtml($customHtml);
         $email->setVariantSettings($varientSetting);
-        if (!empty($segment)) {
+        if ($segment instanceof LeadList) {
             $email->addList($segment);
         }
         $this->em->persist($email);

@@ -47,7 +47,7 @@ class NotificationController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $this->setListFilters();
         }
 
@@ -270,7 +270,7 @@ class NotificationController extends AbstractFormController
         $page         = $session->get('mautic.notification.page', 1);
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
         $notification = $request->request->all()['notification'] ?? [];
-        $updateSelect = ('POST' == $method)
+        $updateSelect = ('POST' === $method)
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 

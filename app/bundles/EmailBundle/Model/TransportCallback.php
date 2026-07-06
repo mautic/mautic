@@ -40,11 +40,10 @@ class TransportCallback
 
     /**
      * @param string   $address
-     * @param string   $comments
      * @param int      $dncReason
      * @param int|null $channelId
      */
-    public function addFailureByAddress($address, $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
+    public function addFailureByAddress($address, ?string $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
     {
         $result = $this->finder->findByAddress($address);
 
@@ -60,7 +59,7 @@ class TransportCallback
      * @param int      $dncReason
      * @param int|null $channelId
      */
-    public function addFailureByContactId($id, $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
+    public function addFailureByContactId($id, ?string $comments, $dncReason = DNC::BOUNCED, $channelId = null): void
     {
         $channel = ($channelId) ? ['email' => $channelId] : 'email';
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);

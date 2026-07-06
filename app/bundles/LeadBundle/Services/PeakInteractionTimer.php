@@ -53,10 +53,14 @@ class PeakInteractionTimer
 
     private readonly int $bestDefaultHourEnd;
 
-    /** @var int[] */
+    /**
+     * @var int[]
+     */
     private array $bestDays;
 
-    /** @var int[] */
+    /**
+     * @var int[]
+     */
     private readonly array $bestDefaultDays;
 
     private readonly string $fetchInteractionsFrom;
@@ -125,7 +129,7 @@ class PeakInteractionTimer
     {
         $this->bestHourStart  = (int) $this->bestDefaultHourStart;
         $this->bestHourEnd    = (int) $this->bestDefaultHourEnd;
-        $bestDays             = array_map('intval', $this->bestDefaultDays);
+        $bestDays             = array_map(intval(...), $this->bestDefaultDays);
         $this->bestDays       = !empty($bestDays) ? $bestDays : self::DEFAULT_BEST_DAYS;
         $this->maxOptimalDays = count($this->bestDays);
     }

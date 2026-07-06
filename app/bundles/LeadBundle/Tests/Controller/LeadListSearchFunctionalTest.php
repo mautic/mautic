@@ -21,7 +21,9 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
      */
     protected array $clientOptions = ['debug' => true];
 
-    /** @noinspection SqlResolve */
+    /**
+     * @noinspection SqlResolve
+     */
     public function testSegmentSearch(): void
     {
         // create some leads
@@ -133,11 +135,9 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lead ...$leads
-     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, ...$leads): LeadList
+    private function createLeadList(string $name, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);

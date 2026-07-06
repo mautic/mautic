@@ -10,13 +10,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FinalizeUpdateStep implements StepInterface
+final readonly class FinalizeUpdateStep implements StepInterface
 {
     public function __construct(
-        private readonly TranslatorInterface $translator,
-        private readonly PathsHelper $pathsHelper,
-        private readonly RequestStack $requestStack,
-        private readonly AppVersion $appVersion,
+        private TranslatorInterface $translator,
+        private PathsHelper $pathsHelper,
+        private RequestStack $requestStack,
+        private AppVersion $appVersion,
     ) {
     }
 

@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ContactSegmentQueryBuilderTest extends TestCase
+final class ContactSegmentQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
 

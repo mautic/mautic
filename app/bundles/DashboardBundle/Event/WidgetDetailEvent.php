@@ -83,7 +83,7 @@ class WidgetDetailEvent extends CommonEvent
 
         // If there are no additional parameters we return uniqueWidgetId as a cache key
         // Otherwise we return hashed $cacheKey value
-        $cacheKey = (1 == count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
+        $cacheKey = (1 === count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
 
         return $this->cacheKeyPath.$cacheKey;
     }
@@ -123,7 +123,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget type.
      *
-     * @return string $type
+     * @return string
      */
     public function getType()
     {
@@ -184,7 +184,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget template.
      *
-     * @return string $template
+     * @return string
      */
     public function getTemplate()
     {
@@ -249,7 +249,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get an error message.
      *
-     * @return string $errorMessage
+     * @return string
      */
     public function getErrorMessage()
     {
@@ -336,12 +336,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Check if the user has defined permission to see the widgets.
-     *
-     * @param string $permission
-     *
-     * @return bool
      */
-    public function hasPermission($permission)
+    public function hasPermission(string $permission): bool
     {
         return $this->security->isGranted($permission);
     }

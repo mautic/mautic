@@ -7,7 +7,7 @@ namespace MauticPlugin\MauticSocialBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class SocialCommandsTest extends MauticMysqlTestCase
+final class SocialCommandsTest extends MauticMysqlTestCase
 {
     public function testSocialMonitoringCommand(): void
     {

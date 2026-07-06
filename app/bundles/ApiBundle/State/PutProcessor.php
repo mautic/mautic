@@ -16,11 +16,11 @@ use Doctrine\ORM\EntityManagerInterface;
  * to load existing entities from the database and completely replace them with incoming data,
  * following proper HTTP PUT semantics. It applies globally to all API Platform entities.
  */
-final class PutProcessor implements ProcessorInterface
+final readonly class PutProcessor implements ProcessorInterface
 {
     public function __construct(
-        private readonly ProcessorInterface $persistProcessor,
-        private readonly EntityManagerInterface $entityManager,
+        private ProcessorInterface $persistProcessor,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
