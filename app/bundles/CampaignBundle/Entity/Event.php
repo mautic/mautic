@@ -172,25 +172,25 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * @var ArrayCollection<int, Event>
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $children;
 
     /**
      * @var Event|null
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $parent;
 
     /**
      * @var string|null
-     **/
+     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     private $decisionPath;
 
     /**
      * @var string|null
-     **/
+     */
     private $tempId;
 
     /**

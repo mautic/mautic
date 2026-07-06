@@ -28,9 +28,6 @@ class IntegrationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /*
-     * Request event
-     */
     public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
@@ -64,9 +61,6 @@ class IntegrationSubscriber implements EventSubscriberInterface
         }
     }
 
-    /*
-     * Response event
-     */
     public function onResponse(PluginIntegrationRequestEvent $event): void
     {
         $response = $event->getResponse();
