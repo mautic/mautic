@@ -17,10 +17,13 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 final class ExportControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     public const PERMISSION_LEAD_EXPORT     = 'lead:export:enable';
+
     public const PERMISSION_FORM_EXPORT     = 'form:export:enable';
+
     public const PERMISSION_REPORT_EXPORT   = 'report:export:enable';
 
     public function testContactExportAction(): void
@@ -140,7 +143,7 @@ final class ExportControllerTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
 

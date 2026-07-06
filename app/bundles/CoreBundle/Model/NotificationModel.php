@@ -41,7 +41,7 @@ class NotificationModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -138,8 +138,8 @@ class NotificationModel extends FormModel
     /**
      * Clears a notification for a user.
      *
-     * @param $id    Notification to clear; will clear all if empty
-     * @param $limit Maximum number of notifications to clear if $id is empty
+     * @param int  $id    Notification to clear; will clear all if empty
+     * @param ?int $limit Maximum number of notifications to clear if $id is empty
      */
     public function clearNotification($id, $limit = null): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -17,18 +19,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImportCommandTest extends TestCase
+final class ImportCommandTest extends TestCase
 {
     public function testExecuteFailsIfModifiedByIsNotSet(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
         $translatorMock->method('trans')->willReturnCallback(fn ($id) => $id);
-        $importMock       = $this->createMock(Import::class);
+        $importMock       = $this->createStub(Import::class);
         $importModelMock  = $this->createMock(ImportModel::class);
-        $loggerMock       = $this->createMock(Logger::class);
-        $notificationMock = $this->createMock(NotificationModel::class);
-        $userModelMock    = $this->createMock(UserModel::class);
-        $tokenStorageMock = $this->createMock(TokenStorage::class);
+        $loggerMock       = $this->createStub(Logger::class);
+        $notificationMock = $this->createStub(NotificationModel::class);
+        $userModelMock    = $this->createStub(UserModel::class);
+        $tokenStorageMock = $this->createStub(TokenStorage::class);
         $userTokenSetter  = new UserTokenSetter($userModelMock, $tokenStorageMock);
 
         $importModelMock->expects($this->once())
@@ -41,8 +43,8 @@ class ImportCommandTest extends TestCase
                 return $this->execute($input, $output);
             }
         };
-        $inputInterfaceMock  = $this->createMock(InputInterface::class);
-        $outputInterfaceMock = $this->createMock(OutputInterface::class);
+        $inputInterfaceMock  = $this->createStub(InputInterface::class);
+        $outputInterfaceMock = $this->createStub(OutputInterface::class);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Import does not have "modifiedBy" property set.');
@@ -84,8 +86,8 @@ class ImportCommandTest extends TestCase
             ->method('setToken');
         $userTokenSetter  = new UserTokenSetter($userModelMock, $tokenStorageMock);
 
-        $loggerMock       = $this->createMock(Logger::class);
-        $notificationMock = $this->createMock(NotificationModel::class);
+        $loggerMock       = $this->createStub(Logger::class);
+        $notificationMock = $this->createStub(NotificationModel::class);
         // No notification expected for successful imports - they're handled in ImportModel
 
         $importCommand =  new class($translatorMock, $importModelMock, new ProcessSignalService(), $userTokenSetter, $loggerMock, $notificationMock) extends ImportCommand {
@@ -112,7 +114,7 @@ class ImportCommandTest extends TestCase
         });
 
         // OutputInterface
-        $outputInterfaceMock = $this->createMock(OutputInterface::class);
+        $outputInterfaceMock = $this->createStub(OutputInterface::class);
         // Start test
         $this->assertSame(0, $importCommand->getExecute($inputInterfaceMock, $outputInterfaceMock));
     }
@@ -151,7 +153,7 @@ class ImportCommandTest extends TestCase
         $tokenStorageMock->expects($this->once())->method('setToken');
         $userTokenSetter    = new UserTokenSetter($userModelMock, $tokenStorageMock);
 
-        $loggerMock       = $this->createMock(Logger::class);
+        $loggerMock       = $this->createStub(Logger::class);
         $notificationMock = $this->createMock(NotificationModel::class);
         $notificationMock->expects($this->once())->method('addNotification');
 
@@ -163,12 +165,12 @@ class ImportCommandTest extends TestCase
         };
 
         $inputInterfaceMock = $this->createMock(InputInterface::class);
-        $inputInterfaceMock->method('getOption')->willReturnMap([
+        $inputInterfaceMock->expects($this->exactly(2))->method('getOption')->willReturnMap([
             ['id', 42],
             ['limit', 10],
         ]);
 
-        $outputInterfaceMock = $this->createMock(OutputInterface::class);
+        $outputInterfaceMock = $this->createStub(OutputInterface::class);
 
         $this->assertSame(1, $importCommand->getExecute($inputInterfaceMock, $outputInterfaceMock));
     }

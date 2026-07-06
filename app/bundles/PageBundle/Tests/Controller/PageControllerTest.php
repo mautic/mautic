@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -12,14 +14,11 @@ use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PageControllerTest extends MauticMysqlTestCase
+final class PageControllerTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
     /**
      * @var int
@@ -175,9 +174,9 @@ class PageControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * Create a page for testing.
+     * @param array<string, mixed> $pageParams
      */
-    protected function createTestPage($pageParams = []): Page
+    protected function createTestPage(array $pageParams = []): Page
     {
         $page        = new Page();
         $title       = $pageParams['title'] ?? 'Page:Page:LandingPageTracking';
@@ -197,7 +196,7 @@ class PageControllerTest extends MauticMysqlTestCase
         return $page;
     }
 
-    /*
+    /**
      * Get page's view.
      */
     public function testViewActionPage(): void
@@ -242,7 +241,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/csv; charset=UTF-8');
+        $this->assertEquals('text/csv; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     /**
@@ -257,7 +256,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     /**
@@ -272,7 +271,7 @@ class PageControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals($this->client->getInternalResponse()->getHeader('content-type'), 'text/html; charset=UTF-8');
+        $this->assertEquals('text/html; charset=UTF-8', $this->client->getInternalResponse()->getHeader('content-type'));
     }
 
     public function testSavePageAliasWithUnderscores(): void

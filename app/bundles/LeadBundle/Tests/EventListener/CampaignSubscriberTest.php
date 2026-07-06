@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,12 +28,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $configFrom = [
+    private array $configFrom = [
         'id'          => 111,
         'companyname' => 'Mautic',
         'companemail' => 'mautic@mautic.com',
@@ -40,7 +42,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configTo = [
+    private array $configTo = [
         'id'          => '112',
         'companyname' => 'Mautic2',
         'companemail' => 'mautic@mauticsecond.com',
@@ -94,7 +96,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configPageHit = [
+    private array $configPageHit = [
         'startDate'         => '2022-06-08 12:45:22.0',
         'endDate'           => '2023-06-08 12:45:22.0',
         'page'              => '1',
@@ -105,7 +107,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHit = [
+    private array $configUrlPageHit = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -116,7 +118,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var array<string, string>
      */
-    private $configUrlPageHitWithoutSpentTime = [
+    private array $configUrlPageHitWithoutSpentTime = [
         'startDate'         => '',
         'endDate'           => '',
         'page'              => '',
@@ -125,26 +127,21 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
-    private $mockLeadModel;
+    private MockObject $mockLeadModel;
 
     /**
-     * @var CompanyModel|MockObject
+     * @var MockObject&CompanyModel
      */
-    private $mockCompanyModel;
+    private MockObject $mockCompanyModel;
+
+    private CampaignSubscriber $subscriber;
 
     /**
-     * @var CampaignSubscriber
+     * @var MockObject&DoNotContact
      */
-    private $subscriber;
-
-    private FilterOperatorProvider $filterOperatorProvider;
-
-    /**
-     * @var DoNotContact|MockObject
-     */
-    private $doNotContact;
+    private MockObject $doNotContact;
 
     protected function setUp(): void
     {
@@ -156,9 +153,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCampaignModel            = $this->createMock(CampaignModel::class);
         $this->doNotContact           = $this->createMock(DoNotContact::class);
         $mockGroupModel               = $this->createMock(PointGroupModel::class);
-        $this->filterOperatorProvider = new FilterOperatorProvider(
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(TranslatorInterface::class)
+        $filterOperatorProvider       = new FilterOperatorProvider(
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(TranslatorInterface::class)
         );
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('getDefaultTimezone')
@@ -174,7 +171,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockCoreParametersHelper,
             $this->doNotContact,
             $mockGroupModel,
-            $this->filterOperatorProvider
+            $filterOperatorProvider
         );
     }
 
@@ -220,11 +217,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
 
-        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')->willReturnCallback(
-            function () use ($lead): void {
-                $lead->setPrimaryCompany($this->configTo);
-            }
-        );
+        $this->mockLeadModel->expects($this->once())->method('setPrimaryCompany')
+            ->willReturnCallback(
+                function () use ($lead): array {
+                    $lead->setPrimaryCompany($this->configTo);
+
+                    return ['oldPrimary' => $this->configTo['id'], 'newPrimary' => $this->configTo['id']];
+                }
+            );
 
         $args = [
             'lead'  => $lead,
@@ -237,6 +237,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerActionUpdateCompany($event);
         $this->assertTrue($event->getResult());
@@ -274,6 +275,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertSame($expected, $event->getResult());
@@ -317,6 +319,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -361,6 +364,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -405,6 +409,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             'eventSettings'   => [],
         ];
 
+        // @phpstan-ignore new.deprecated
         $event = new CampaignExecutionEvent($args, true);
         $this->subscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
@@ -412,7 +417,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerActionUpdateLead(): void
     {
-        $eventAccessor = $this->createMock(ActionAccessor::class);
+        $eventAccessor = $this->createStub(ActionAccessor::class);
         $properties    = [
             'points' => 10,
         ];

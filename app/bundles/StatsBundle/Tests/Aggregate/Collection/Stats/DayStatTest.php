@@ -1,20 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use PHPUnit\Framework\TestCase;
 
-class DayStatTest extends TestCase
+final class DayStatTest extends TestCase
 {
-    private $day  = '2019-11-07';
+    private string $day = '2019-11-07';
 
-    private $hour = 11;
+    private int $hour = 11;
 
     private DayStat $dayStat;
 
-    private $hourStat;
+    private HourStat $hourStat;
 
     protected function setUp(): void
     {

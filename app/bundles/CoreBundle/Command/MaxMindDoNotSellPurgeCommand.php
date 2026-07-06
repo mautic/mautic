@@ -24,9 +24,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MaxMindDoNotSellPurgeCommand extends Command
 {
     public function __construct(
-        private EntityManager $em,
-        private LeadRepository $leadRepository,
-        private MaxMindDoNotSellList $doNotSellList,
+        private readonly EntityManager $em,
+        private readonly LeadRepository $leadRepository,
+        private readonly MaxMindDoNotSellList $doNotSellList,
     ) {
         parent::__construct();
     }
@@ -62,12 +62,12 @@ EOT
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();
-            $doNotSellListIPs = array_map(fn ($item): string =>
+            $doNotSellListIPs = array_map(fn (array $item): string =>
                 // strip subnet mask characters
                 $this->doNotSellList->stripCIDR($item['value']), $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 
-            if (0 == count($doNotSellContacts)) {
+            if (0 === count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
 
                 return Command::SUCCESS;

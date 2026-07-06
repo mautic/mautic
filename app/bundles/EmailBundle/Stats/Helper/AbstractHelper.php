@@ -56,7 +56,7 @@ abstract class AbstractHelper implements StatHelperInterface
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 
-        if ('W' == $unit) {   // We won't support week storage, we will store it by date
+        if ('W' === $unit) {   // We won't support week storage, we will store it by date
             $unit = 'd';
         }
         $query = new ChartQuery($this->connection, $fromDateTime, $toDateTime, $unit);

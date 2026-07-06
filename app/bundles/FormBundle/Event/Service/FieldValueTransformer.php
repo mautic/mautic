@@ -16,7 +16,7 @@ class FieldValueTransformer
     private bool $isTransformed = false;
 
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -63,18 +63,12 @@ class FieldValueTransformer
         $this->isTransformed = true;
     }
 
-    /**
-     * @return array
-     */
-    public function getContactFieldsToUpdate()
+    public function getContactFieldsToUpdate(): array
     {
         return $this->contactFieldsToUpdate;
     }
 
-    /**
-     * @return array
-     */
-    public function getTokensToUpdate()
+    public function getTokensToUpdate(): array
     {
         return $this->tokensToUpdate;
     }

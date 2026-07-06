@@ -30,10 +30,10 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private array $companiesCreated = [];
 
     public function __construct(
-        private CompanyModel $model,
-        private CompanyRepository $repository,
-        private Connection $connection,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly CompanyModel $model,
+        private readonly CompanyRepository $repository,
+        private readonly Connection $connection,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -184,8 +184,9 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->where(
-                $qb->expr()->in('id', $ids)
-            );
+                $qb->expr()->in('id', ':ids')
+            )
+            ->setParameter('ids', $ids, ArrayParameterType::INTEGER);
 
         return $qb->executeQuery()->fetchAllAssociative();
     }

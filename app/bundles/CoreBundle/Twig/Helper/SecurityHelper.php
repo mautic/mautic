@@ -13,7 +13,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 /**
  * final class SecurityHelper.
  */
-final class SecurityHelper
+final readonly class SecurityHelper
 {
     public function __construct(
         private CorePermissions $security,
@@ -48,12 +48,7 @@ final class SecurityHelper
         return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
 
-    /**
-     * @param string[]|string $permission
-     *
-     * @return mixed
-     */
-    public function isGranted($permission)
+    public function isGranted(string $permission): bool
     {
         return $this->security->isGranted($permission);
     }
@@ -79,10 +74,8 @@ final class SecurityHelper
 
     /**
      * Returns CSRF token string for an intention.
-     *
-     * @param string $intention
      */
-    public function getCsrfToken($intention): string
+    public function getCsrfToken(string $intention): string
     {
         return $this->tokenManager->getToken($intention)->getValue();
     }

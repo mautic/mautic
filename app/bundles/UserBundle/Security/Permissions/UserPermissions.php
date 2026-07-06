@@ -8,7 +8,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class UserPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
         $this->permissions = [

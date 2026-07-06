@@ -51,12 +51,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     public function __construct(
         protected LeadModel $leadModel,
         protected CategoryModel $categoryModel,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
-        private DeviceCreatorServiceInterface $deviceCreatorService,
-        private DeviceDetectorFactoryInterface $deviceDetectorFactory,
-        private DeviceTrackingServiceInterface $deviceTrackingService,
-        private ContactTracker $contactTracker,
+        private readonly DeviceCreatorServiceInterface $deviceCreatorService,
+        private readonly DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        private readonly DeviceTrackingServiceInterface $deviceTrackingService,
+        private readonly ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -89,7 +89,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -306,9 +306,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    /**
-     * @throws NotFoundHttpException
-     */
     public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
     {
         if (!$entity instanceof Asset) {
@@ -363,7 +360,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new AssetEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -457,10 +454,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return $number;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getTotalFilesize($assets)
+    public function getTotalFilesize($assets): int|string
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
@@ -609,7 +603,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Asset-specific override for legacy public asset URLs.
      *

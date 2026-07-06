@@ -46,7 +46,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         protected RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
-        private ContactTracker $contactTracker,
+        private readonly ContactTracker $contactTracker,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -55,7 +55,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private PointGroupModel $pointGroupModel,
+        private readonly PointGroupModel $pointGroupModel,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -129,7 +129,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new PointEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -145,9 +145,9 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * Gets array of custom actions from bundles subscribed PointEvents::POINT_ON_BUILD.
      *
-     * @return mixed
+     * @return array{actions: array<string, mixed>, list: array<int, string>, choices: array<string, string>}
      */
-    public function getPointActions()
+    public function getPointActions(): array
     {
         if ([] === $this->actions) {
             // build them

@@ -9,11 +9,7 @@ class PointActionHelper
         $assetId       = $eventDetails->getId();
         $limitToAssets = $action['properties']['assets'];
 
-        if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
-            // no points change
-            return false;
-        }
-
-        return true;
+        // no points change
+        return empty($limitToAssets) || in_array($assetId, $limitToAssets);
     }
 }

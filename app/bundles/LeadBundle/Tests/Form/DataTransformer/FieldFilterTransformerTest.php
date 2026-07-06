@@ -11,45 +11,38 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|TranslatorInterface
-     */
-    private MockObject $translator;
-
     private FieldFilterTransformer $transformer;
 
     /**
      * @var MockObject&RelativeDate
      */
-    private $relativeDate;
+    private MockObject $relativeDate;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator   = $this->createMock(TranslatorInterface::class);
+        $translator         = $this->createMock(TranslatorInterface::class);
         $this->relativeDate = $this->createMock(RelativeDate::class);
-        $this->translator->expects($this->any())
+        $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function ($id, $parameters, $domain, $locale): string {
-                return match ($id) {
-                    'mautic.lead.list.month_last'  => isset($locale) ? 'last month' : 'letzter Monat',
-                    'mautic.lead.list.month_next'  => isset($locale) ? 'next month' : 'nächster Monat',
-                    'mautic.lead.list.month_this'  => isset($locale) ? 'this month' : 'dieser Monat',
-                    'mautic.lead.list.tomorrow'    => isset($locale) ? 'tomorrow' : 'morgen',
-                    'mautic.lead.list.yesterday'   => isset($locale) ? 'yesterday' : 'gestern',
-                    'mautic.lead.list.week_last'   => isset($locale) ? 'last week' : 'letzte Woche',
-                    'mautic.lead.list.week_next'   => isset($locale) ? 'next week' : 'nächste Woche',
-                    'mautic.lead.list.week_this'   => isset($locale) ? 'this week' : 'diese Woche',
-                    'mautic.lead.list.year_last'   => isset($locale) ? 'last year' : 'letztes Jahr',
-                    'mautic.lead.list.year_next'   => isset($locale) ? 'next year' : 'nächstes Jahr',
-                    'mautic.lead.list.year_this'   => isset($locale) ? 'this year' : 'dieses Jahr',
-                    'mautic.lead.list.birthday'    => isset($locale) ? 'birthday' : 'dieses Jahr',
-                    'mautic.lead.list.anniversary' => isset($locale) ? 'anniversary' : 'Jahrestag',
-                    default                        => isset($locale) ? 'today' : 'heute',
-                };
+            ->willReturnCallback(fn ($id, $parameters, $domain, $locale): string => match ($id) {
+                'mautic.lead.list.month_last'  => isset($locale) ? 'last month' : 'letzter Monat',
+                'mautic.lead.list.month_next'  => isset($locale) ? 'next month' : 'nächster Monat',
+                'mautic.lead.list.month_this'  => isset($locale) ? 'this month' : 'dieser Monat',
+                'mautic.lead.list.tomorrow'    => isset($locale) ? 'tomorrow' : 'morgen',
+                'mautic.lead.list.yesterday'   => isset($locale) ? 'yesterday' : 'gestern',
+                'mautic.lead.list.week_last'   => isset($locale) ? 'last week' : 'letzte Woche',
+                'mautic.lead.list.week_next'   => isset($locale) ? 'next week' : 'nächste Woche',
+                'mautic.lead.list.week_this'   => isset($locale) ? 'this week' : 'diese Woche',
+                'mautic.lead.list.year_last'   => isset($locale) ? 'last year' : 'letztes Jahr',
+                'mautic.lead.list.year_next'   => isset($locale) ? 'next year' : 'nächstes Jahr',
+                'mautic.lead.list.year_this'   => isset($locale) ? 'this year' : 'dieses Jahr',
+                'mautic.lead.list.birthday'    => isset($locale) ? 'birthday' : 'dieses Jahr',
+                'mautic.lead.list.anniversary' => isset($locale) ? 'anniversary' : 'Jahrestag',
+                default                        => isset($locale) ? 'today' : 'heute',
             });
-        $this->transformer  = new FieldFilterTransformer($this->translator, $this->relativeDate);
+        $this->transformer  = new FieldFilterTransformer($translator, $this->relativeDate);
     }
 
     public function testTransform(): void

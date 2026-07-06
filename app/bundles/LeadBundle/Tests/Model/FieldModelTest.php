@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Logging\SQLLogger;
@@ -24,7 +26,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FieldModelTest extends MauticMysqlTestCase
+final class FieldModelTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -178,7 +180,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
         $repoMock->method('__call')
             ->with('findOneByAlias', $this->anything())
-            ->willReturnCallback(function ($method, $args) {
+            ->willReturnCallback(function ($method, $args): ?LeadField {
                 $alias = $args[0];
 
                 // Simulate alias and alias_1 are taken, alias_2 is available
@@ -191,40 +193,40 @@ class FieldModelTest extends MauticMysqlTestCase
 
         // Anonymous subclass that overrides getRepository
         $fieldModel = new FieldModel(
-            $this->createMock(ColumnSchemaHelper::class),
-            $this->createMock(ListModel::class),
-            $this->createMock(CustomFieldColumn::class),
-            $this->createMock(FieldSaveDispatcher::class),
+            $this->createStub(ColumnSchemaHelper::class),
+            $this->createStub(ListModel::class),
+            $this->createStub(CustomFieldColumn::class),
+            $this->createStub(FieldSaveDispatcher::class),
             $repoMock,
-            $this->createMock(FieldList::class),
-            $this->createMock(LeadFieldSaver::class),
-            $this->createMock(LeadFieldDeleter::class),
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(FieldList::class),
+            $this->createStub(LeadFieldSaver::class),
+            $this->createStub(LeadFieldDeleter::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
         );
 
         $result = $fieldModel->generateUniqueFieldAlias('alias');
-        $this->assertEquals('alias_2', $result);
+        $this->assertSame('alias_2', $result);
     }
 
     public function testIsUsedField(): void
     {
         $leadField = new LeadField();
 
-        $columnSchemaHelper         = $this->createMock(ColumnSchemaHelper::class);
+        $columnSchemaHelper         = $this->createStub(ColumnSchemaHelper::class);
         $leadListModel              = $this->createMock(ListModel::class);
-        $customFieldColumn          = $this->createMock(CustomFieldColumn::class);
-        $fieldSaveDispatcher        = $this->createMock(FieldSaveDispatcher::class);
-        $leadFieldRepository        = $this->createMock(LeadFieldRepository::class);
-        $fieldList                  = $this->createMock(FieldList::class);
-        $leadFieldSaver             = $this->createMock(LeadFieldSaver::class);
-        $leadFieldDeleter           = $this->createMock(LeadFieldDeleter::class);
+        $customFieldColumn          = $this->createStub(CustomFieldColumn::class);
+        $fieldSaveDispatcher        = $this->createStub(FieldSaveDispatcher::class);
+        $leadFieldRepository        = $this->createStub(LeadFieldRepository::class);
+        $fieldList                  = $this->createStub(FieldList::class);
+        $leadFieldSaver             = $this->createStub(LeadFieldSaver::class);
+        $leadFieldDeleter           = $this->createStub(LeadFieldDeleter::class);
         $leadListModel->expects($this->once())
             ->method('isFieldUsed')
             ->with($leadField)
@@ -239,14 +241,14 @@ class FieldModelTest extends MauticMysqlTestCase
             $fieldList,
             $leadFieldSaver,
             $leadFieldDeleter,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
         );
         $this->assertTrue($model->isUsedField($leadField));
     }
@@ -256,10 +258,12 @@ class FieldModelTest extends MauticMysqlTestCase
         // Log queries so we can detect if alter queries were executed
         /**  $stack */
         $stack                    = new class implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
-            /** @var array<mixed> */
+            /**
+             * @var array<mixed>
+             */
             private array $indexQueries = [];
 
-            public function startQuery($sql, ?array $params = null, ?array $types = null)
+            public function startQuery($sql, ?array $params = null, ?array $types = null): void
             {
                 if (false !== stripos($sql, 'create index')) {
                     $this->indexQueries[] = $sql;
@@ -270,7 +274,7 @@ class FieldModelTest extends MauticMysqlTestCase
                 }
             }
 
-            public function stopQuery()
+            public function stopQuery(): void
             {
                 // not used
             }

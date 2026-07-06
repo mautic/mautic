@@ -745,7 +745,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     /**
      * Set a nested array value using dot notation.
      *
-     * @param array<string, mixed> &$array
+     * @param array<string, mixed> $array
      */
     private function setNestedValue(array &$array, string $path, mixed $value): void
     {
@@ -764,11 +764,10 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
     /**
      * @param array<int, array<string, mixed>> $dependencies
-     * @param string                           $entity
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSubDependencies(array $dependencies, $entity): array
+    private function getSubDependencies(array $dependencies, string $entity): array
     {
         foreach ($dependencies as $dependencyGroup) {
             if (isset($dependencyGroup[$entity])) {

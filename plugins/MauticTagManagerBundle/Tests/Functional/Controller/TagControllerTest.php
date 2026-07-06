@@ -23,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class TagControllerTest extends MauticMysqlTestCase
+final class TagControllerTest extends MauticMysqlTestCase
 {
     private const MERGE_ROUTE_BASE = '/s/tags/merge/';
 
@@ -80,12 +80,12 @@ class TagControllerTest extends MauticMysqlTestCase
     public function testIndexActionWhenFilteredByDescription(): void
     {
         $matchingTag = $this->tagRepository->findOneBy(['tag' => 'tag1']);
-        \assert($matchingTag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $matchingTag);
         $matchingTag->setDescription('Contains the test keyword.');
         $this->tagRepository->saveEntity($matchingTag, false);
 
         $otherTag = $this->tagRepository->findOneBy(['tag' => 'tag2']);
-        \assert($otherTag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $otherTag);
         $otherTag->setDescription('No related content.');
         $this->tagRepository->saveEntity($otherTag);
 
@@ -103,13 +103,13 @@ class TagControllerTest extends MauticMysqlTestCase
         $tagId = $this->tagRepository->findOneBy([])->getId();
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
 
     public function testTagDeletionRemovesContactAssociations(): void
     {
         $tag = $this->tagRepository->findOneBy([]);
-        \assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $contact = new Lead();
         $contact->setEmail('tagged-contact@example.com');
@@ -123,7 +123,7 @@ class TagControllerTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
         Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
 
@@ -372,8 +372,8 @@ class TagControllerTest extends MauticMysqlTestCase
     {
         $primaryTag   = $this->tagRepository->findOneBy(['tag' => 'tag1']);
         $secondaryTag = $this->tagRepository->findOneBy(['tag' => 'tag2']);
-        \assert($primaryTag instanceof Tag);
-        \assert($secondaryTag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $primaryTag);
+        $this->assertInstanceOf(Tag::class, $secondaryTag);
 
         $primaryTagId     = (int) $primaryTag->getId();
         $secondaryTagId   = (int) $secondaryTag->getId();
@@ -399,29 +399,29 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $campaignChangeEvent = $this->em->find(Event::class, $campaignChangeEventId);
-        \assert($campaignChangeEvent instanceof Event);
+        $this->assertInstanceOf(Event::class, $campaignChangeEvent);
         Assert::assertSame([$primaryTagName], $campaignChangeEvent->getProperties()['add_tags']);
         Assert::assertSame([$primaryTagId], $campaignChangeEvent->getProperties()['properties']['add_tags']);
 
         $campaignTagCondition = $this->em->find(Event::class, $campaignConditionId);
-        \assert($campaignTagCondition instanceof Event);
+        $this->assertInstanceOf(Event::class, $campaignTagCondition);
         Assert::assertSame([$primaryTagName], $campaignTagCondition->getProperties()['tags']);
         Assert::assertSame([$primaryTagId], $campaignTagCondition->getProperties()['properties']['tags']);
 
         $segment = $this->em->find(LeadList::class, $segmentId);
-        \assert($segment instanceof LeadList);
+        $this->assertInstanceOf(LeadList::class, $segment);
         Assert::assertSame([$primaryTagId], $segment->getFilters()[0]['properties']['filter']);
 
         $formAction = $this->em->find(Action::class, $formActionId);
-        \assert($formAction instanceof Action);
+        $this->assertInstanceOf(Action::class, $formAction);
         Assert::assertSame([$primaryTagName], $formAction->getProperties()['add_tags']);
 
         $pointTriggerEvent = $this->em->find(TriggerEvent::class, $pointTriggerEventId);
-        \assert($pointTriggerEvent instanceof TriggerEvent);
+        $this->assertInstanceOf(TriggerEvent::class, $pointTriggerEvent);
         Assert::assertSame([$primaryTagName], $pointTriggerEvent->getProperties()['add_tags']);
 
         $report = $this->em->find(Report::class, $reportId);
-        \assert($report instanceof Report);
+        $this->assertInstanceOf(Report::class, $report);
         Assert::assertSame([$primaryTagId], $report->getFilters()[0]['value']);
         Assert::assertNull($this->tagRepository->find($secondaryTagId));
     }

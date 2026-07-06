@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -87,14 +87,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contact  = $this->createContact('blabla@contact.email');
 
         $userRepository = $this->em->getRepository(User::class);
-        \assert($userRepository instanceof UserRepository);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
         $roleRepository = $this->em->getRepository(Role::class);
-        \assert($roleRepository instanceof RoleRepository);
+        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -848,6 +848,9 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()

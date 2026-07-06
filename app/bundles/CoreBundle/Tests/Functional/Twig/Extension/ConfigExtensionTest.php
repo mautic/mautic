@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class ConfigExtensionTest extends MauticMysqlTestCase
+final class ConfigExtensionTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

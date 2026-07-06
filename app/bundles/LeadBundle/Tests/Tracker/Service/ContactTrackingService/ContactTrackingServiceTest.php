@@ -17,29 +17,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|CookieHelper
+     * @var MockObject&CookieHelper
      */
     private MockObject $cookieHelperMock;
 
     /**
-     * @var MockObject|LeadDeviceRepository
+     * @var MockObject&LeadDeviceRepository
      */
     private MockObject $leadDeviceRepositoryMock;
 
     /**
-     * @var MockObject|LeadRepository
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepositoryMock;
 
     /**
-     * @var MockObject|RequestStack
+     * @var MockObject&RequestStack
      */
     private MockObject $requestStackMock;
-
-    /**
-     * @var MockObject|MergeRecordRepository
-     */
-    private MockObject $mergeRecordRepository;
 
     protected function setUp(): void
     {
@@ -47,7 +42,6 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $this->leadDeviceRepositoryMock = $this->createMock(LeadDeviceRepository::class);
         $this->leadRepositoryMock       = $this->createMock(LeadRepository::class);
         $this->requestStackMock         = $this->createMock(RequestStack::class);
-        $this->mergeRecordRepository    = $this->createMock(MergeRecordRepository::class);
     }
 
     public function testGetTrackedIdentifier(): void
@@ -75,7 +69,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTrackedLeadNoTrackedIdentifier(): void
     {
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = $this->createStub(Request::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -180,7 +174,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
-        $leadMock    = $this->createMock(Lead::class);
+        $leadMock    = $this->createStub(Lead::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -230,7 +224,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $requestMock = $this->createMock(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
-        $leadMock    = $this->createMock(Lead::class);
+        $leadMock    = $this->createStub(Lead::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -277,10 +271,10 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetTrackedLeadCookieLeadIdAndAnotherDeviceNotTracked(): void
     {
-        $requestMock = $this->createMock(Request::class);
+        $requestMock = $this->createStub(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
-        $leadMock    = $this->createMock(Lead::class);
+        $leadMock    = $this->createStub(Lead::class);
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -323,7 +317,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             $this->cookieHelperMock,
             $this->leadDeviceRepositoryMock,
             $this->leadRepositoryMock,
-            $this->mergeRecordRepository,
+            $this->createStub(MergeRecordRepository::class),
             $this->requestStackMock
         );
     }

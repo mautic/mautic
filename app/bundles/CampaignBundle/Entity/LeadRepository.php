@@ -111,8 +111,10 @@ class LeadRepository extends CommonRepository
 
         if (!empty($campaigns)) {
             $q->andWhere(
-                $q->expr()->notIn('campaign_id', $campaigns)
-            )->executeStatement();
+                $q->expr()->notIn('campaign_id', ':ids')
+            )
+                ->setParameter('ids', $campaigns, ArrayParameterType::INTEGER)
+                ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -141,9 +143,10 @@ class LeadRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('l.lead_id', ':leadId'),
-                $q->expr()->in('l.campaign_id', $options['campaigns'])
+                $q->expr()->in('l.campaign_id', ':campaigns')
             )
-        );
+        )
+            ->setParameter('campaigns', $options['campaigns'], ArrayParameterType::INTEGER);
 
         if (!empty($options['dataAddedLimit'])) {
             $q->andWhere($q->expr()
@@ -363,9 +366,10 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.manually_removed', 0),
-                    $qb->expr()->in('ll.leadlist_id', $segments)
+                    $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
-            );
+            )
+            ->setParameter('segments', $segments, ArrayParameterType::INTEGER);
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
@@ -402,9 +406,11 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.manually_removed', 0),
-                    $qb->expr()->in('ll.leadlist_id', $segments)
+                    $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
-            )->orderBy('ll.lead_id');
+            )
+            ->setParameter('segments', $segments, ArrayParameterType::INTEGER)
+            ->orderBy('ll.lead_id');
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
@@ -571,9 +577,11 @@ class LeadRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
                     $qb->expr()->eq('ll.manually_removed', 0),
-                    $qb->expr()->in('ll.leadlist_id', $segments)
+                    $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             );
+
+        $qb->setParameter('segments', $segments, ArrayParameterType::INTEGER);
 
         $qb->andWhere(
             sprintf('NOT EXISTS (%s)', $subq->getSQL())

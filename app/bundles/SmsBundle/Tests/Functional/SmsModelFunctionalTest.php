@@ -48,7 +48,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
             ->method('sendBatchSms')
             ->with(
                 $this->anything(),
-                $this->callback(function (string $template) use ($expectedMessage) {
+                $this->callback(function (string $template) use ($expectedMessage): true {
                     $this->assertSame($expectedMessage, $template);
 
                     return true;
@@ -140,7 +140,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
                     return true;
                 }),
-                $this->callback(function (string $message) use (&$callIndex, $expectedBatches) {
+                $this->callback(function (string $message) use (&$callIndex, $expectedBatches): true {
                     $this->assertSame($expectedBatches[$callIndex]['message'], $message);
                     ++$callIndex;
 

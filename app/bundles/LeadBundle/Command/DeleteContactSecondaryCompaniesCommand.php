@@ -22,14 +22,11 @@ class DeleteContactSecondaryCompaniesCommand extends Command
 {
     public const NAME                    = 'mautic:contact:delete:secondary-companies';
 
-    public function __construct(private LoggerInterface $logger, private TranslatorInterface $translator, private CoreParametersHelper $coreParametersHelper, private CompanyLeadRepository $companyLeadsRepository)
+    public function __construct(private readonly LoggerInterface $logger, private readonly TranslatorInterface $translator, private readonly CoreParametersHelper $coreParametersHelper, private readonly CompanyLeadRepository $companyLeadsRepository)
     {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
         $this
@@ -42,9 +39,6 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $allowMultiple = $this->coreParametersHelper->get('contact_allow_multiple_companies');

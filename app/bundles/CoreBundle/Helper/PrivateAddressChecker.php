@@ -17,7 +17,9 @@ class PrivateAddressChecker
         '::1/128',         // Localhost IPv6
     ];
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $allowedPrivateAddresses = [];
 
     /**

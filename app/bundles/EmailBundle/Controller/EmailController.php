@@ -5,12 +5,13 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
@@ -21,7 +22,6 @@ use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Form\Type\ScheduleSendType;
 use Mautic\EmailBundle\Helper\EmailConfig;
-use Mautic\EmailBundle\Helper\PlainTextHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
@@ -44,10 +44,8 @@ class EmailController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1)
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -67,7 +65,7 @@ class EmailController extends FormController
         );
 
         if (!$permissions['email:emails:viewown'] && !$permissions['email:emails:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -256,10 +254,8 @@ class EmailController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, $objectId)
+    public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId): Response
     {
         $security = $this->security;
 
@@ -302,64 +298,19 @@ class EmailController extends FormController
             $email->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // get A/B test information
-        [$parent, $children]     = $email->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        $weight                  = 0;
-        if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
-
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
-                        if (!isset($lastCriteria)) {
-                            $lastCriteria = $variantSettings['winnerCriteria'];
-                        }
-
-                        // make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
-
-                        $weight += $variantSettings['weight'];
-                    }
-                } else {
-                    $variantSettings['winnerCriteria'] = '';
-                    $variantSettings['weight']         = 0;
-                }
-
-                $properties[$c->getId()] = $variantSettings;
-            }
-
-            $properties[$parent->getId()]['weight']         = 100 - $weight;
-            $properties[$parent->getId()]['winnerCriteria'] = '';
-        }
+        [$parent, $children] = $email->getVariants();
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
-        if (!empty($lastCriteria) && empty($variantError)) {
-            if (isset($criteria['criteria'][$lastCriteria])) {
-                $testSettings = $criteria['criteria'][$lastCriteria];
 
-                $args = [
-                    'email'      => $email,
-                    'parent'     => $parent,
-                    'children'   => $children,
-                    'properties' => $properties,
-                ];
-
-                $event = new DetermineWinnerEvent($args);
-                $this->dispatcher->dispatch(
-                    $event,
-                    $testSettings['event']
-                );
-
-                $abTestResults = $event->getAbTestResults();
-            }
+        $abTestSettings = null;
+        if (count($children) > 0) {
+            $abTestSettings = $abTestSettingsService->getAbTestSettings($parent);
+            $abTestResults  = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']] ?? []);
         }
 
         // get related translations
@@ -428,20 +379,23 @@ class EmailController extends FormController
             }
 
             $variants = [
-                'parent'             => $parent,
-                'children'           => $children,
-                'properties'         => $properties,
-                'criteria'           => $criteria['criteria'],
+                'parent'                     => $parent,
+                'children'                   => $children,
+                'properties'                 => $abTestSettings ? $abTestSettings['variants'] : null,
+                'criteria'                   => $criteria['criteria'],
+                'winnerCriteria'             => $abTestSettings ? $abTestSettings['winnerCriteria'] : null,
+                'configurationError'         => $abTestSettings ? $abTestSettings['configurationError'] : null,
+                'hoursLeftToDetermineWinner' => $parent ? $model->timeLeftToDetermineWinner(
+                    $parent->getId(),
+                    $abTestSettings['sendWinnerDelay'] ?? null
+                ) : null,
+                'abTestSettings'             => $abTestSettings ?? [],
             ];
 
             $translations = [
                 'parent'   => $translationParent,
                 'children' => $translationChildren,
             ];
-
-            $plainTextHelper = new PlainTextHelper();
-            $plainTextHelper->setHtml($email->getCustomHtml());
-            $emailPreview = $plainTextHelper->getPreview();
 
             $view = [
                 'returnUrl' => $this->generateUrl(
@@ -453,7 +407,6 @@ class EmailController extends FormController
                 ),
                 'viewParameters' => [
                     'email'              => $email,
-                    'emailPreview'       => $emailPreview,
                     'trackables'         => $trackableLinks,
                     'logs'               => $logs,
                     'isEmbedded'         => $request->get('isEmbedded') ?: false,
@@ -537,7 +490,7 @@ class EmailController extends FormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('email:emails:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -740,7 +693,7 @@ class EmailController extends FormController
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'email');
@@ -996,7 +949,7 @@ class EmailController extends FormController
                 $emailEntity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'email');
@@ -1149,7 +1102,7 @@ class EmailController extends FormController
                 $emailEntity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if ($model->isLocked($emailEntity)) {
@@ -1239,7 +1192,7 @@ class EmailController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
@@ -1283,7 +1236,7 @@ class EmailController extends FormController
         if (str_contains($objectId, 'new')) {
             $isNew = true;
             if (!$this->security->isGranted('email:emails:create')) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
             $entity = $model->getEntity();
             $entity->setSessionId($objectId);
@@ -1297,7 +1250,7 @@ class EmailController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
         }
 
@@ -1330,16 +1283,10 @@ class EmailController extends FormController
     /**
      * Create an AB test.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array<string, mixed>|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function abtestAction(
-        Request $request,
-        AssetModel $assetModel,
-        CorePermissions $corePermissions,
-        EmailConfig $emailConfig,
-        EmailModel $model,
-        ThemeHelper $themeHelper, $objectId,
-    ) {
+    public function abTestAction(Request $request, AssetModel $assetModel, CorePermissions $corePermissions, EmailConfig $emailConfig, EmailModel $model, ThemeHelper $themeHelper, int $objectId)
+    {
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
@@ -1352,7 +1299,7 @@ class EmailController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             // Note this since it's cleared on __clone()
@@ -1407,7 +1354,7 @@ class EmailController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
@@ -1416,7 +1363,7 @@ class EmailController extends FormController
             $parent = $entity->getVariantParent() ?? $entity;
             \assert($parent instanceof Email);
 
-            $model->convertVariant($entity);
+            $model->convertWinnerVariant($entity);
 
             $this->dispatcher->dispatch(new ManualWinnerEvent($parent));
 
@@ -1449,10 +1396,8 @@ class EmailController extends FormController
 
     /**
      * Manually sends emails.
-     *
-     * @return Response
      */
-    public function sendAction(Request $request, $objectId)
+    public function sendAction(Request $request, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
     {
         /** @var EmailModel $model */
         $model   = $this->getModel('email');
@@ -1518,7 +1463,7 @@ class EmailController extends FormController
                 $entity->getCreatedBy()
             )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // Check that the parent is getting sent
@@ -1543,7 +1488,7 @@ class EmailController extends FormController
         $form     = $this->formFactory->create(BatchSendType::class, [], ['action' => $action]);
         $complete = $request->request->get('complete', false);
 
-        if ('POST' == $request->getMethod() && ($complete || $this->isFormValid($form))) {
+        if ('POST' === $request->getMethod() && ($complete || $this->isFormValid($form))) {
             if (!$complete) {
                 $progress = [0, (int) $pending];
                 $session->set('mautic.email.send.progress', $progress);
@@ -1633,7 +1578,7 @@ class EmailController extends FormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'email', true);
                 } else {
@@ -1840,7 +1785,7 @@ class EmailController extends FormController
                     }
                 }
 
-                if (0 != count($errors)) {
+                if (0 !== count($errors)) {
                     $this->addFlashMessage(implode('; ', $errors));
                 } else {
                     $this->addFlashMessage('mautic.email.notice.test_sent_multiple.success');

@@ -18,9 +18,9 @@ class FileManager
     public const GRAPESJS_IMAGES_DIRECTORY = '';
 
     public function __construct(
-        private FileUploader $fileUploader,
-        private CoreParametersHelper $coreParametersHelper,
-        private PathsHelper $pathsHelper,
+        private readonly FileUploader $fileUploader,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
     ) {
     }
 
@@ -83,10 +83,9 @@ class FileManager
     }
 
     /**
-     * @param bool   $fullPath
      * @param string $separator
      */
-    private function getGrapesJsImagesPath($fullPath = false, $separator = '/'): string
+    private function getGrapesJsImagesPath(bool $fullPath = false, $separator = '/'): string
     {
         return $this->pathsHelper->getSystemPath('images', $fullPath)
             .$separator

@@ -4,31 +4,26 @@ declare(strict_types=1);
 
 use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
-use Symplify\EasyCodingStandard\ValueObject\Set\SetList;
 
-return function (ECSConfig $ecsConfig): void {
-    $ecsConfig->paths([
+return ECSConfig::configure()
+    ->withPaths([
         __DIR__.'/app',
         __DIR__.'/config',
         __DIR__.'/plugins',
         __DIR__.'/tests',
-    ]);
+    ])
+    ->withRootFiles()
+    ->withSkip([
+        PhpCsFixer\Fixer\Phpdoc\PhpdocNoEmptyReturnFixer::class => [
+            // in docbclock on purpose, to avoid BC return on child classes
+            __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
+        ],
 
-    // this way you add a single rule
-    $ecsConfig->rules([
+        PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
+        PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
+    ])
+    ->withRules([
         NoUnusedImportsFixer::class,
-        Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer::class,
-    ]);
-
-    // this way you can add sets - group of rules
-    $ecsConfig->sets([
-        // run and fix, one by one
-        // SetList::SPACES,
-        // SetList::ARRAY,
-        SetList::DOCBLOCK,
-        SetList::NAMESPACES,
-        SetList::COMMENTS,
-        // SetList::PSR_12,
-    ]);
-};
+        // Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+    ])
+    ->withPreparedSets(comments: true, docblocks: true);

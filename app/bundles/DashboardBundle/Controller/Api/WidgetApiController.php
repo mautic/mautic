@@ -70,7 +70,7 @@ class WidgetApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getDataAction(Request $request, $type)
+    public function getDataAction(Request $request, string $type)
     {
         $start      = microtime(true);
         $timezone   = InputHelper::clean($request->get('timezone'));

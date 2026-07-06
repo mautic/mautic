@@ -16,25 +16,13 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var User
-     */
-    private $nonAdminUser;
+    private User $nonAdminUser;
 
-    /**
-     * @var User
-     */
-    private $userOne;
+    private User $userOne;
 
-    /**
-     * @var User
-     */
-    private $userTwo;
+    private User $userTwo;
 
-    /**
-     * @var LeadList
-     */
-    private $segmentA;
+    private LeadList $segmentA;
 
     protected function setUp(): void
     {
@@ -701,7 +689,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
 
         $this->em->persist($user);

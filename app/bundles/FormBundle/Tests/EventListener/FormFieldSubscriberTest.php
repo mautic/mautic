@@ -11,12 +11,9 @@ use PHPUnit\Framework\TestCase;
 
 final class FormFieldSubscriberTest extends TestCase
 {
-    /**
-     * @var FormFieldSubscriber
-     */
-    private $subscriber;
+    private FormFieldSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

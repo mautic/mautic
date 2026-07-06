@@ -26,7 +26,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     use UserEntityTrait;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->configParams['mailer_from_name']  = 'Mautic Admin';
         $this->configParams['mailer_from_email'] = 'admin@email.com';
@@ -253,7 +253,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertQueuedEmailCount(2);
 
         $email1 = $this->getMailerMessagesByToAddress('contact@one.email')[0];
-        \assert($email1 instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $email1);
 
         // The email is has mailer is owner ON but this contact doesn't have any owner. So it uses default FROM and Reply-To.
         Assert::assertSame('Ahoy contact@one.email', $email1->getSubject());
@@ -270,7 +270,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($this->configParams['mailer_from_email'], $email1->getReplyTo()[0]->getAddress());
 
         $email2 = $this->getMailerMessagesByToAddress('contact@two.email')[0];
-        \assert($email2 instanceof MauticMessage);
+        $this->assertInstanceOf(MauticMessage::class, $email2);
 
         // This contact does have an owner so it uses FROM and Rply-to from the owner.
         Assert::assertSame('Ahoy contact@two.email', $email2->getSubject());

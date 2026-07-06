@@ -21,7 +21,7 @@ class NotificationHelper
         protected IntegrationHelper $integrationHelper,
         protected RouterInterface $router,
         protected RequestStack $requestStack,
-        private DoNotContactModel $doNotContact,
+        private readonly DoNotContactModel $doNotContact,
     ) {
     }
 
@@ -188,10 +188,6 @@ JS;
         }
 
         // disable on Landing pages
-        if (false === $landingPage && !in_array('tracking_page_enabled', $supportedFeatures)) {
-            return false;
-        }
-
-        return true;
+        return false !== $landingPage || in_array('tracking_page_enabled', $supportedFeatures);
     }
 }

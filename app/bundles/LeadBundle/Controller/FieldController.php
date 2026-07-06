@@ -24,8 +24,6 @@ class FieldController extends FormController
      * Generate's default list view.
      *
      * @param int $page
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function indexAction(Request $request, FieldModel $fieldModel, FieldGroupModel $fieldGroupModel, $page = 1)
     {
@@ -35,7 +33,7 @@ class FieldController extends FormController
         $session = $request->getSession();
 
         if (!$permissions['lead:fields:view'] && !$permissions['lead:fields:full']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -125,7 +123,7 @@ class FieldController extends FormController
     public function newAction(Request $request, ?LeadField $entity = null)
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // retrieve the entity
@@ -245,7 +243,7 @@ class FieldController extends FormController
     public function editAction(Request $request, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /** @var FieldModel $model */
@@ -407,7 +405,7 @@ class FieldController extends FormController
     public function deleteAction(Request $request, $objectId)
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
@@ -437,7 +435,7 @@ class FieldController extends FormController
                 return $this->isLocked($postActionVars, $field, 'lead.field');
             } elseif ($field->isFixed()) {
                 // cannot delete fixed fields
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             try {
@@ -469,13 +467,11 @@ class FieldController extends FormController
 
     /**
      * Deletes a group of entities.
-     *
-     * @return Response
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $returnUrl = $this->generateUrl('mautic_contactfield_index');
@@ -550,7 +546,7 @@ class FieldController extends FormController
                 'msgVars' => ['%id%' => $objectId],
             ];
         } elseif ($entity->isFixed()) {
-            $flashes[] = $this->accessDenied(true);
+            $flashes[] = $this->getAccessDeniedFlash();
         } elseif ($model->isLocked($entity)) {
             $flashes[] = $this->isLocked($postActionVars, $entity, 'lead.field', true);
         } else {
@@ -586,7 +582,7 @@ class FieldController extends FormController
                 'type'    => 'error',
                 'msg'     => 'mautic.core.notice.used.fields',
                 'msgVars' => [
-                    '%fields%' => implode(', ', array_map(fn ($entity) => $entity->getName().' ('.$entity->getId().')', $unableToDeleteEntities)),
+                    '%fields%' => implode(', ', array_map(fn ($entity): string => $entity->getName().' ('.$entity->getId().')', $unableToDeleteEntities)),
                 ],
             ];
         }

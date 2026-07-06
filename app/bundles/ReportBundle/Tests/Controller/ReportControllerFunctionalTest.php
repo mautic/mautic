@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Controller;
 
 use Doctrine\ORM\Exception\NotSupported;
@@ -19,9 +21,10 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReportControllerFunctionalTest extends MauticMysqlTestCase
+final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const TEST_EMAIL         = 'test@email.com';
+
     private const DEFAULT_TEST_EMAIL = 'default@email.com';
 
     public function testHitRepositoryMostVisited(): void
@@ -330,7 +333,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $result = $this->parseReportTable($response->getContent());
-        $this->assertEquals(2, count($result));
+        $this->assertCount(2, $result);
     }
 
     public function testUtmTagReportContainsExpression(): void
@@ -508,7 +511,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $schedulerRepository = self::getContainer()->get(SchedulerRepository::class);
-        \assert($schedulerRepository instanceof SchedulerRepository);
+        $this->assertInstanceOf(SchedulerRepository::class, $schedulerRepository);
         $scheduler = $schedulerRepository->getSchedulerByReport($report);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
@@ -536,7 +539,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:reports:scheduler');
 
         $reportFileWriter = self::getContainer()->get(ReportFileWriter::class);
-        \assert($reportFileWriter instanceof ReportFileWriter);
+        $this->assertInstanceOf(ReportFileWriter::class, $reportFileWriter);
 
         $csvPath = $reportFileWriter->getFilePath($scheduler);
         self::assertFileExists($csvPath);
@@ -580,7 +583,7 @@ class ReportControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        return $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
     }
 
     /**

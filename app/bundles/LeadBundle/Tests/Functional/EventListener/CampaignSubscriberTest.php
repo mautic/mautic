@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class CampaignSubscriberTest extends MauticMysqlTestCase
+final class CampaignSubscriberTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -84,9 +84,9 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         ];
 
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore new.deprecated
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        Assert::assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore classConstant.deprecatedClass
-        Assert::assertTrue($result->getResult());
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        Assert::assertTrue($campaignExecutionEvent->getResult());
     }
 
     /**
@@ -147,9 +147,10 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         ];
 
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore new.deprecated
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore classConstant.deprecatedClass
-        $this->assertSame($expected, $result->getResult());
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        $this->assertInstanceOf(CampaignExecutionEvent::class, $campaignExecutionEvent); // @phpstan-ignore classConstant.deprecatedClass
+        $this->assertSame($expected, $campaignExecutionEvent->getResult());
     }
 
     public function testOnCampaignTriggerConditionReturnsCorrectResultsForContactAddedContext(): void
@@ -185,9 +186,10 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         ];
 
         $campaignExecutionEvent = new CampaignExecutionEvent($eventProperties, false); // @phpstan-ignore-line classConstant.deprecatedClass
-        $result                 = $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
-        $this->assertInstanceOf(CampaignExecutionEvent::class, $result); // @phpstan-ignore-line classConstant.deprecatedClass
-        $this->assertFalse($result->getResult());
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($campaignExecutionEvent);
+        $this->assertInstanceOf(CampaignExecutionEvent::class, $campaignExecutionEvent); // @phpstan-ignore-line classConstant.deprecatedClass
+        $this->assertFalse($campaignExecutionEvent->getResult());
     }
 
     /**

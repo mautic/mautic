@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\Form\Helper;
 
 use Mautic\ConfigBundle\Form\DataTransformer\DsnTransformerFactory;
@@ -43,17 +45,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Mocking a representative ConfigForm by leveraging Symfony's TypeTestCase to test RestrictionHelper.
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(RestrictionHelper::class)]
-class RestrictionHelperTest extends TypeTestCase
+final class RestrictionHelperTest extends TypeTestCase
 {
-    /**
-     * @var string
-     */
-    private $displayMode = RestrictionHelper::MODE_REMOVE;
+    private string $displayMode = RestrictionHelper::MODE_REMOVE;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $restrictedFields = [
+    private array $restrictedFields = [
         'monitored_email' => [
             'EmailBundle_bounces',
             'EmailBundle_unsubscribes' => [
@@ -62,7 +61,10 @@ class RestrictionHelperTest extends TypeTestCase
         ],
     ];
 
-    private $forms = [
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $forms = [
         'emailconfig' => [
             'bundle'     => 'EmailBundle',
             'formAlias'  => 'emailconfig',
@@ -200,9 +202,9 @@ class RestrictionHelperTest extends TypeTestCase
     }
 
     /**
-     * @return array
+     * @return array<int, PreloadedExtension|ValidatorExtension>
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $translator = $this->createMock(Translator::class);
         $translator->method('trans')
@@ -227,7 +229,7 @@ class RestrictionHelperTest extends TypeTestCase
 
         $unsubscriber = $this->createMock(Unsubscribe::class);
         $looper       = $this->createMock(FeedbackLoop::class);
-        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createMock(CoreParametersHelper::class)));
+        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper, $this->createStub(CoreParametersHelper::class)));
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
@@ -251,8 +253,8 @@ class RestrictionHelperTest extends TypeTestCase
                     new FormButtonsType(),
                     new ButtonGroupType(),
                     new EmailConfigType($translator),
-                    new DsnType($this->createMock(DsnTransformerFactory::class), $this->createMock(CoreParametersHelper::class)),
-                    new PreferenceCenterListType($pageModelMock, $this->createMock(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
+                    new DsnType($this->createStub(DsnTransformerFactory::class), $this->createStub(CoreParametersHelper::class)),
+                    new PreferenceCenterListType($pageModelMock, $this->createStub(\Mautic\CoreBundle\Security\Permissions\CorePermissions::class)),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
                     new ConfigType($restrictionHelper, $escapeTransformer),

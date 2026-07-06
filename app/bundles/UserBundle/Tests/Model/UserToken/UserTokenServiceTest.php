@@ -11,15 +11,15 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
+final class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|RandomHelperInterface
+     * @var MockObject&RandomHelperInterface
      */
     private MockObject $randomHelperMock;
 
     /**
-     * @var MockObject|UserTokenRepositoryInterface
+     * @var MockObject&UserTokenRepositoryInterface
      */
     private MockObject $userTokenRepositoryMock;
 
@@ -66,7 +66,7 @@ class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
         $authorizator = 'authorizator';
         $token->setUser($user)
             ->setOneTimeOnly(true)
-            ->setExpiration(null)
+            ->setExpiration()
             ->setAuthorizator($authorizator);
 
         $this->userTokenRepositoryMock->expects($this->once())

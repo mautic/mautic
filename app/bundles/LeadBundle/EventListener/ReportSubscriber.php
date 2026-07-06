@@ -65,16 +65,16 @@ class ReportSubscriber implements EventSubscriberInterface
     private ?array $channelActions = null;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private FieldModel $fieldModel,
-        private StageModel $stageModel,
-        private CampaignModel $campaignModel,
-        private EventCollector $eventCollector,
-        private CompanyModel $companyModel,
-        private CompanyReportData $companyReportData,
-        private FieldsBuilder $fieldsBuilder,
-        private Translator $translator,
-        private DncReportService $dncReportService,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly StageModel $stageModel,
+        private readonly CampaignModel $campaignModel,
+        private readonly EventCollector $eventCollector,
+        private readonly CompanyModel $companyModel,
+        private readonly CompanyReportData $companyReportData,
+        private readonly FieldsBuilder $fieldsBuilder,
+        private readonly Translator $translator,
+        private readonly DncReportService $dncReportService,
     ) {
     }
 
@@ -781,10 +781,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }
 
-    /**
-     * @param string $type
-     */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type): void
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, string $type): void
     {
         $attributionColumns = [
             'log.campaign_id' => [

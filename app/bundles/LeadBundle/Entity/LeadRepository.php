@@ -211,7 +211,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->getArrayResult();
 
         return array_map(
-            fn ($row): int => (int) $row['id'],
+            fn (array $row): int => (int) $row['id'],
             $result
         );
     }
@@ -219,12 +219,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param int $leadId
-     * @param int $limit
-     *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null)
     {
         $results = $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.*', $leadId, $limit);
 
@@ -694,7 +691,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     protected function addCatchAllWhereClause($q, $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
-        $availableForSearch = array_map(fn ($alias) => 'l.'.$alias, $customFields);
+        $availableForSearch = array_map(fn ($alias): string => 'l.'.$alias, $customFields);
 
         $columns = array_merge(
             [
@@ -1134,8 +1131,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * Check lead owner.
-     *
      * @param array $ownerIds
      */
     public function checkLeadOwner(Lead $lead, $ownerIds = []): bool
@@ -1166,8 +1161,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->in('l.id', $contactIds)
-            );
+                $qb->expr()->in('l.id', ':ids')
+            )
+            ->setParameter('ids', $contactIds, ArrayParameterType::INTEGER);
 
         $results = $qb->executeQuery()->fetchAllAssociative();
 
@@ -1412,7 +1408,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private function buildDuplicateValuesQuery(array $uniqueFields): string
     {
-        $fieldsAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
+        $fieldsAliases = array_map(fn ($uniqueField): string => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
 
         if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return $this->getDuplicateValuesQuery($fieldsAliases)->getSQL();

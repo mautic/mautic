@@ -15,11 +15,11 @@ final class TimezoneResolverTest extends TestCase
     public function testTimezones(?string $configuredTimezone, string $expectedTimezone): void
     {
         $coreParametersHelper = new class($configuredTimezone) extends CoreParametersHelper {
-            public function __construct(private ?string $configuredTimezone)
+            public function __construct(private readonly ?string $configuredTimezone)
             {
             }
 
-            public function get($name, $default = null)
+            public function get($name, $default = null): ?string
             {
                 Assert::assertSame('default_timezone', $name);
 

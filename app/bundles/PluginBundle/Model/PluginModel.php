@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -26,9 +27,9 @@ class PluginModel extends FormModel
 {
     public function __construct(
         protected FieldModel $leadFieldModel,
-        private FieldList $fieldList,
+        private readonly FieldList $fieldList,
         CoreParametersHelper $coreParametersHelper,
-        private BundleHelper $bundleHelper,
+        private readonly BundleHelper $bundleHelper,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -69,8 +70,6 @@ class PluginModel extends FormModel
     }
 
     /**
-     * Get Company fields.
-     *
      * @return mixed[]
      */
     public function getCompanyFields(): array
@@ -78,7 +77,7 @@ class PluginModel extends FormModel
         return $this->fieldList->getFieldList(true, true, ['isPublished' => true, 'object' => 'company']);
     }
 
-    public function saveFeatureSettings($entity): void
+    public function saveFeatureSettings(Integration $entity): void
     {
         $this->em->persist($entity);
         $this->em->flush();
@@ -86,10 +85,8 @@ class PluginModel extends FormModel
 
     /**
      * Loads config.php arrays for all plugins.
-     *
-     * @return array
      */
-    public function getAllPluginsConfig()
+    public function getAllPluginsConfig(): array
     {
         return $this->bundleHelper->getPluginBundles();
     }

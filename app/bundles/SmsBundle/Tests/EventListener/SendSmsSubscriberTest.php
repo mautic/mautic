@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\ChannelBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\DncEvent;
@@ -22,7 +23,7 @@ final class SendSmsSubscriberTest extends TestCase
 
     private MessageQueueModel&MockObject $mqmMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->subscriber = new SendSmsSubscriber(
             $this->dncRepoMock = $this->createMock(DoNotContactRepository::class),
@@ -100,9 +101,9 @@ final class SendSmsSubscriberTest extends TestCase
             2 => $contact2 = new Lead(),
         ]);
 
-        $this->setProperty($contact1, 'id', 1);
+        ReflectionHelper::setValue($contact1, 'id', 1);
         $contact1->setPhone('+1234567890');
-        $this->setProperty($contact2, 'id', 2);
+        ReflectionHelper::setValue($contact2, 'id', 2);
         $contact2->setPhone('+1234567890');
 
         $this->subscriber->genericFilter($event);
@@ -117,22 +118,12 @@ final class SendSmsSubscriberTest extends TestCase
             2 => $contact2 = new Lead(),
         ]);
 
-        $this->setProperty($contact1, 'id', 1);
-        $this->setProperty($contact2, 'id', 2);
+        ReflectionHelper::setValue($contact1, 'id', 1);
+        ReflectionHelper::setValue($contact2, 'id', 2);
 
         $this->subscriber->genericFilter($event);
 
         $this->assertCount(0, $event->getContacts());
         $this->assertCount(2, $event->getRemovedContacts());
-    }
-
-    /**
-     * @param mixed $value
-     */
-    private function setProperty(object $object, string $property, $value): void
-    {
-        \Closure::bind(function (object $object) use ($property, $value) {
-            $object->$property = $value;
-        }, null, $object)($object);
     }
 }

@@ -10,7 +10,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserInvite;
 use Symfony\Component\HttpFoundation\Request;
 
-class PublicControllerTest extends MauticMysqlTestCase
+final class PublicControllerTest extends MauticMysqlTestCase
 {
     private const PASSWORD_RESET_URI = '/passwordreset';
 
@@ -103,7 +103,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     public function testInviteShowsErrorWhenInvitedEmailAlreadyExists(): void
     {
         $user = $this->em->getRepository(User::class)->find(1);
-        \assert($user instanceof User);
+        $this->assertInstanceOf(User::class, $user);
 
         [, $token] = $this->createInvite($user->getEmail(), 'existing-user-invite-token');
 

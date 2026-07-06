@@ -312,10 +312,7 @@ class MessageQueueModel extends FormModel
         $message->setProcessed();
     }
 
-    /**
-     * @param array $channelIds
-     */
-    public function getQueuedChannelCount($channel, $channelIds = []): int
+    public function getQueuedChannelCount($channel, ?array $channelIds = []): int
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }
@@ -342,7 +339,7 @@ class MessageQueueModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

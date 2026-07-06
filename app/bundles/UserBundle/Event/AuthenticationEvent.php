@@ -107,7 +107,7 @@ class AuthenticationEvent extends Event
      *
      * @return PluginToken
      */
-    public function getToken()
+    public function getToken(): TokenInterface
     {
         return $this->token;
     }
@@ -134,7 +134,7 @@ class AuthenticationEvent extends Event
      *
      * @return UserProvider
      */
-    public function getUserProvider()
+    public function getUserProvider(): UserProviderInterface
     {
         return $this->userProvider;
     }
@@ -241,10 +241,8 @@ class AuthenticationEvent extends Event
 
     /**
      * Get the request.
-     *
-     * @return Request
      */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

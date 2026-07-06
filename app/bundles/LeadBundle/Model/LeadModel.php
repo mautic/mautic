@@ -353,8 +353,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
@@ -381,7 +379,7 @@ class LeadModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new LeadEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -393,12 +391,9 @@ class LeadModel extends FormModel
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        if (empty($event)) {
+        if (!$event instanceof Event) {
             $event = new LeadEvent($entity, $isNew);
             $event->setAlreadyProcessedInBatch(true);
             $event->setEntityManager($this->em);
@@ -407,9 +402,6 @@ class LeadModel extends FormModel
         return $this->dispatchEvent($action, $entity, $isNew, $event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
     {
         if (count($entitiesBatchParams) < 1) {
@@ -434,7 +426,7 @@ class LeadModel extends FormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             $leadEvents = [];
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 foreach ($entitiesBatchParams as $entityParam) {
                     if (!$leadEvent = $entityParam['event']) {
                         $leadEvent = new LeadEvent($entityParam['entity'], $entityParam['isNew']);
@@ -530,7 +522,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param object $entity
+     * @param Lead $entity
      */
     public function deleteEntity($entity): void
     {
@@ -877,7 +869,7 @@ class LeadModel extends FormModel
     /**
      * @param bool $returnWithQueryFields
      *
-     * @return array|Lead
+     * @return array{Lead, mixed[]}|Lead
      */
     public function checkForDuplicateContact(array $queryFields, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
@@ -989,10 +981,8 @@ class LeadModel extends FormModel
      * @param array|Lead  $lead
      * @param array|Stage $stage
      * @param bool        $manuallyAdded
-     *
-     * @return $this
      */
-    public function addToStages($lead, $stage, $manuallyAdded = true)
+    public function addToStages($lead, $stage, $manuallyAdded = true): static
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
@@ -1012,10 +1002,8 @@ class LeadModel extends FormModel
      * Remove lead from Stage.
      *
      * @param bool $manuallyRemoved
-     *
-     * @return $this
      */
-    public function removeFromStages($lead, $stage, $manuallyRemoved = true)
+    public function removeFromStages($lead, $stage, $manuallyRemoved = true): static
     {
         $lead->setStage(null);
         $lead->stageChangeLogEntry(
@@ -1764,7 +1752,7 @@ class LeadModel extends FormModel
             $val = InputHelper::_($val, 'string');
         });
         // Remove any tags that became empty after filtering
-        $tags = array_filter($tags, fn ($tag) => strlen($tag) > 0);
+        $tags = array_filter($tags, fn ($tag): bool => strlen($tag) > 0);
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1804,7 +1792,7 @@ class LeadModel extends FormModel
                 $val = InputHelper::_($val, 'string');
             });
             // Remove any tags that became empty after filtering
-            $removeTags = array_filter($removeTags, fn ($tag) => strlen($tag) > 0);
+            $removeTags = array_filter($removeTags, fn ($tag): bool => strlen($tag) > 0);
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
@@ -2209,9 +2197,6 @@ class LeadModel extends FormModel
         return false;
     }
 
-    /**
-     * Get contact channels.
-     */
     public function getContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();
@@ -2262,9 +2247,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @return mixed[]
+     * @return array{oldPrimary: int|false, newPrimary: int|false}
      */
-    public function setPrimaryCompany($companyId, $leadId)
+    public function setPrimaryCompany($companyId, $leadId): array
     {
         $companyArray      = [];
         $oldPrimaryCompany = $newPrimaryCompany = false;
@@ -2469,7 +2454,7 @@ class LeadModel extends FormModel
         }
         $idFilters = array_values(array_filter(
             $args['filter']['force'],
-            fn ($filter) => is_array($filter) && isset($filter['column']) && 'l.id' === $filter['column']
+            fn ($filter): bool => is_array($filter) && isset($filter['column']) && 'l.id' === $filter['column']
         ));
 
         if (isset($idFilters[0]['value']) && is_array($idFilters[0]['value'])) {
@@ -2498,7 +2483,7 @@ class LeadModel extends FormModel
                     ? $field['properties']
                     : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
 
-                $flattenedAllowedValues = array_map(fn ($item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
+                $flattenedAllowedValues = array_map(fn (array $item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 
                 $fieldValue = $entity->getFieldValue($field['alias'], $group);
                 if (!empty($allowedValues['list']) && !in_array($fieldValue, $flattenedAllowedValues)) {

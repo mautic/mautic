@@ -19,18 +19,12 @@ class Result
      */
     private $email;
 
-    /**
-     * @return Stat
-     */
-    public function getStat()
+    public function getStat(): ?Stat
     {
         return $this->stat;
     }
 
-    /**
-     * @return Result
-     */
-    public function setStat(Stat $stat)
+    public function setStat(Stat $stat): static
     {
         $this->stat = $stat;
 
@@ -44,15 +38,12 @@ class Result
     /**
      * @return Lead[]
      */
-    public function getContacts()
+    public function getContacts(): array
     {
         return $this->contacts;
     }
 
-    /**
-     * @return Result
-     */
-    public function addContact(Lead $contact)
+    public function addContact(Lead $contact): static
     {
         $this->contacts[] = $contact;
 
@@ -77,10 +68,8 @@ class Result
 
     /**
      * @param mixed $email
-     *
-     * @return Result
      */
-    public function setEmail($email)
+    public function setEmail($email): static
     {
         $this->email = $email;
 

@@ -25,15 +25,15 @@ final class TransportChainTest extends MauticMysqlTestCase
     /**
      * Call protected/private method of a class.
      *
-     * @param object &$object    Instantiated object that we will run method on
-     * @param string $methodName Method name to call
-     * @param array  $parameters array of parameters to pass into method
+     * @param object            $object     Instantiated object that we will run method on
+     * @param string            $methodName Method name to call
+     * @param array<int, mixed> $parameters array of parameters to pass into method
      *
      * @return mixed method return
      *
      * @throws \ReflectionException
      */
-    public function invokeMethod(&$object, $methodName, array $parameters = [])
+    public function invokeMethod(object $object, string $methodName, array $parameters = []): mixed
     {
         $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);
@@ -79,7 +79,7 @@ final class TransportChainTest extends MauticMysqlTestCase
             $this->transportChain->sendSms($lead, 'Yeah');
         } catch (\Exception $e) {
             $message = $e->getMessage();
-            $this->assertEquals('Primary SMS transport is not enabled', $message);
+            $this->assertSame('Primary SMS transport is not enabled', $message);
         }
     }
 
@@ -106,7 +106,7 @@ final class TransportChainTest extends MauticMysqlTestCase
     public function testSendMessage(): void
     {
         $mmsTransport = new class implements TransportInterface, MMSTransportInterface {
-            public function sendMms(Lead $lead, string $content, array $media): bool|string
+            public function sendMms(Lead $lead, string $content, array $media): bool
             {
                 return true;
             }
@@ -126,7 +126,7 @@ final class TransportChainTest extends MauticMysqlTestCase
             {
                 $transports = $this->getTransports();
 
-                return array_map(fn ($v) => $v['service'], $transports);
+                return array_map(fn (array $v): TransportInterface => $v['service'], $transports);
             }
         };
 
@@ -157,6 +157,6 @@ final class TransportChainTest extends MauticMysqlTestCase
             }
         }
 
-        self::assertEquals(2, $sentCount);
+        self::assertSame(2, $sentCount);
     }
 }

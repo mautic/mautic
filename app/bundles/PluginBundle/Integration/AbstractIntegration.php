@@ -92,6 +92,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected array $persistIntegrationEntities = [];
 
     protected array $commandParameters = [];
+
     private \Closure $clientFactory;
 
     public function __construct(
@@ -329,8 +330,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * Merge api keys.
-     *
      * @param bool|false $return Returns the key array rather than setting them
      *
      * @return void|array
@@ -688,7 +687,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             ];
         }
 
-        if ('GET' == $method && !empty($parameters)) {
+        if ('GET' === $method && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
             $url .= (!str_contains($url, '?')) ? '?'.$query : '&'.$query;
@@ -1477,7 +1476,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             if ('leadFields' === $fieldType) {
                 if ((is_array($details) && !empty($details['required'])) || 'email' === $field
                     || (isset($details['optionLabel'])
-                        && 'email' == strtolower(
+                        && 'email' === strtolower(
                             $details['optionLabel']
                         ))
                 ) {
@@ -2149,7 +2148,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array
      */
-    protected function dispatchIntegrationKeyEvent($eventName, $keys = [])
+    protected function dispatchIntegrationKeyEvent(?string $eventName, $keys = [])
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(

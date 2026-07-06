@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class CampaignEventLeadAttachedType extends AbstractType
 {
-    public function __construct(private ListModel $listModel)
+    public function __construct(private readonly ListModel $listModel)
     {
     }
 
@@ -96,9 +96,6 @@ final class CampaignEventLeadAttachedType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'campaignevent_lead_contact_added';

@@ -189,8 +189,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Add company left join.
-     *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void
@@ -339,7 +337,7 @@ class LeadFieldRepository extends CommonRepository
                 switch ($operatorExpr) {
                     case 'startsWith':
                         $operatorExpr    = 'like';
-                        $value           = $value.'%';
+                        $value .= '%';
                         break;
                     case 'endsWith':
                         $operatorExpr   = 'like';
@@ -398,7 +396,7 @@ class LeadFieldRepository extends CommonRepository
      * Compare a form result value with defined date value for defined lead.
      *
      * @param int    $lead  ID
-     * @param int    $field alias
+     * @param string $field alias
      * @param string $value to compare with
      */
     public function compareDateValue($lead, $field, $value): bool

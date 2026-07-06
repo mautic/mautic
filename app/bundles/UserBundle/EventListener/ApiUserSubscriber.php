@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
 class ApiUserSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private UserProviderInterface $userProvider, private TokenPermissions $tokenPermissions)
+    public function __construct(private readonly UserProviderInterface $userProvider, private readonly TokenPermissions $tokenPermissions)
     {
     }
 

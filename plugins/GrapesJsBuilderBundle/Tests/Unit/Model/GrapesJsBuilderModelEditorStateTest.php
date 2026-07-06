@@ -40,7 +40,7 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
 
         /** @var MockObject&EmailRepository $emailRepository */
         $emailRepository = $this->createMock(EmailRepository::class);
-        $emailRepository->expects(self::once())
+        $emailRepository->expects($this->once())
             ->method('saveEntity')
             ->with(self::isInstanceOf(Email::class));
 
@@ -52,11 +52,9 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         /** @var MockObject&GrapesJsBuilderRepository $grapesRepository */
         $grapesRepository = $this->createMock(GrapesJsBuilderRepository::class);
         $grapesRepository->method('findOneBy')->willReturn(null);
-        $grapesRepository->expects(self::once())
+        $grapesRepository->expects($this->once())
             ->method('saveEntity')
-            ->with(self::callback(static function ($entity): bool {
-                return $entity instanceof GrapesJsBuilder && '<mjml/>' === $entity->getCustomMjml();
-            }));
+            ->with(self::callback(static fn ($entity): bool => $entity instanceof GrapesJsBuilder && '<mjml/>' === $entity->getCustomMjml()));
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
@@ -116,12 +114,12 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
         ]));
 
         /** @var MockObject&EmailModel $emailModel */
-        $emailModel = $this->createMock(EmailModel::class);
+        $emailModel = $this->createStub(EmailModel::class);
 
         /** @var MockObject&EntityManager $entityManager */
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects(self::once())->method('persist');
-        $entityManager->expects(self::once())->method('flush');
+        $entityManager->expects($this->once())->method('persist');
+        $entityManager->expects($this->once())->method('flush');
 
         $model = $this->getModel($requestStack, $emailModel, $entityManager);
 
@@ -161,13 +159,13 @@ final class GrapesJsBuilderModelEditorStateTest extends TestCase
             $requestStack,
             $emailModel,
             $entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(Router::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Router::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 }

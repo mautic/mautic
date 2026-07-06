@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class SegmentStatCommand extends ModeratedCommand
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
@@ -33,9 +33,6 @@ final class SegmentStatCommand extends ModeratedCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io         = new SymfonyStyle($input, $output);

@@ -15,7 +15,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailFunctionalTest extends MauticMysqlTestCase
+final class EmailFunctionalTest extends MauticMysqlTestCase
 {
     public const SAVE_AND_CLOSE = 'Save & Close';
 
@@ -215,9 +215,7 @@ class EmailFunctionalTest extends MauticMysqlTestCase
      */
     private function assertEmailLists(array $expectedListIds, Collection $collection): void
     {
-        $this->assertArrayValuesEquals($expectedListIds, $collection->map(function (LeadList $leadList) {
-            return $leadList->getId();
-        })->toArray());
+        $this->assertArrayValuesEquals($expectedListIds, $collection->map(fn (LeadList $leadList) => $leadList->getId())->toArray());
     }
 
     private function createEmail(): Email

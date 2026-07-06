@@ -12,15 +12,15 @@ use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|EntityManagerInterface
+     * @var MockObject&EntityManagerInterface
      */
     private MockObject $em;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 

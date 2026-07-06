@@ -14,10 +14,7 @@ trait LeadDetailsTrait
 {
     private ?RequestStack $requestStack = null;
 
-    /**
-     * @param int $page
-     */
-    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -97,7 +94,7 @@ trait LeadDetailsTrait
      *
      * @return array
      *
-     * @throws InvalidArgumentException if not an array
+     * @throws \InvalidArgumentException if not an array
      */
     public function sanitizeEventFilter($filters)
     {
@@ -222,7 +219,7 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(fn ($l): array => [
+        $logEvents = array_map(fn (array $l): array => [
             'eventType'       => $l['action'],
             'userName'        => $l['userName'],
             'timestamp'       => $l['dateAdded'],
@@ -251,11 +248,7 @@ trait LeadDetailsTrait
         ];
     }
 
-    /**
-     * @param int $page
-     * @param int $limit
-     */
-    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -338,8 +331,8 @@ trait LeadDetailsTrait
             $model->getRepository()->refetchEntity($lead);
             $engagementsData = $this->getStatsCount($lead);
 
-            $engagements = array_map(fn ($a, $b) => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
-            $points      = array_map(fn ($points_first_user, $points_second_user) => $points_first_user + $points_second_user, $engagementsData['points'], $points);
+            $engagements = array_map(fn ($a, $b): float|int => $a + $b, $engagementsData['engagements']['byUnit'], $engagements);
+            $points      = array_map(fn ($points_first_user, $points_second_user): float|int => $points_first_user + $points_second_user, $engagementsData['points'], $points);
         }
 
         return [
