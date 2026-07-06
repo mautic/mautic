@@ -603,7 +603,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Asset-specific override for legacy public asset URLs.
      *
