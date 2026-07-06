@@ -171,7 +171,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     private $category;
 
