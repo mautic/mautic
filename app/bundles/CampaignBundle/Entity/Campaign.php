@@ -103,7 +103,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['campaign:read', 'campaign:write'])]
     private $category;
 

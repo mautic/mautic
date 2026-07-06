@@ -11,7 +11,7 @@ class CompanyLead
 
     /**
      * @var Company
-     **/
+     */
     private $company;
 
     /**
