@@ -53,6 +53,60 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->assertContains((int) $contactB->getId(), $contactIds);
     }
 
+    public function testEmptyAndNotEmptyOperators(): void
+    {
+        $submitter    = $this->createContact('submitter@example.com');
+        $nonSubmitter = $this->createContact('non-submitter@example.com');
+        $form         = $this->createForm('Empty Operator Form');
+        $this->em->flush();
+
+        $this->createSubmission($form, $submitter);
+        $this->em->flush();
+
+        // "empty" returns contacts who have not submitted any form.
+        $empty    = $this->buildAndRunFormSubmissionSegment('No Form Submissions', 'no-form-submissions', 'empty', []);
+        $emptyIds = array_column($empty['contacts'], 'id');
+        $this->assertContains((int) $nonSubmitter->getId(), $emptyIds);
+        $this->assertNotContains((int) $submitter->getId(), $emptyIds);
+
+        // "not empty" returns contacts who have submitted at least one form.
+        $notEmpty    = $this->buildAndRunFormSubmissionSegment('Any Form Submission', 'any-form-submission', '!empty', []);
+        $notEmptyIds = array_column($notEmpty['contacts'], 'id');
+        $this->assertContains((int) $submitter->getId(), $notEmptyIds);
+        $this->assertNotContains((int) $nonSubmitter->getId(), $notEmptyIds);
+    }
+
+    public function testIncludingAllAndExcludingAllOperators(): void
+    {
+        $both  = $this->createContact('both-forms@example.com');
+        $one   = $this->createContact('one-form@example.com');
+        $none  = $this->createContact('no-forms@example.com');
+        $formA = $this->createForm('All Operator Form A');
+        $formB = $this->createForm('All Operator Form B');
+        $this->em->flush();
+
+        $this->createSubmission($formA, $both);
+        $this->createSubmission($formB, $both);
+        $this->createSubmission($formA, $one);
+        $this->em->flush();
+
+        $formIds = [$formA->getId(), $formB->getId()];
+
+        // "including all of" returns only contacts who submitted every selected form.
+        $includingAll    = $this->buildAndRunFormSubmissionSegment('Submitted All Forms', 'submitted-all-forms', 'in_all', $formIds);
+        $includingAllIds = array_column($includingAll['contacts'], 'id');
+        $this->assertContains((int) $both->getId(), $includingAllIds);
+        $this->assertNotContains((int) $one->getId(), $includingAllIds);
+        $this->assertNotContains((int) $none->getId(), $includingAllIds);
+
+        // "excluding all of" returns contacts who did not submit the complete selected set.
+        $excludingAll    = $this->buildAndRunFormSubmissionSegment('Not Submitted All Forms', 'not-submitted-all-forms', '!in_all', $formIds);
+        $excludingAllIds = array_column($excludingAll['contacts'], 'id');
+        $this->assertNotContains((int) $both->getId(), $excludingAllIds);
+        $this->assertContains((int) $one->getId(), $excludingAllIds);
+        $this->assertContains((int) $none->getId(), $excludingAllIds);
+    }
+
     /**
      * Persists a segment filtered by the form-submission filter, runs the segment update command
      * and returns the decoded contacts API response for the resulting members.
