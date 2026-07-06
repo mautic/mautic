@@ -14,7 +14,7 @@ class ListLead
 
     /**
      * @var LeadList
-     **/
+     */
     private $list;
 
     /**
