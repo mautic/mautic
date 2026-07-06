@@ -25,7 +25,7 @@ class FieldController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, FieldModel $fieldModel, FieldGroupModel $fieldGroupModel, $page = 1)
+    public function indexAction(Request $request, FieldModel $fieldModel, FieldGroupModel $fieldGroupModel, $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');

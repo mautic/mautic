@@ -18,7 +18,9 @@ final class FieldGroupControllerTest extends MauticMysqlTestCase
     protected $useCleanupRollback = false;
 
     private const INDEX_URL       = '/s/contacts/field-groups';
+
     private const ACTION_URL      = '/s/contacts/field-groups/%s/%s';
+
     private const SAVE_AND_CLOSE  = 'Save & Close';
 
     private FieldGroupModel $fieldGroupModel;

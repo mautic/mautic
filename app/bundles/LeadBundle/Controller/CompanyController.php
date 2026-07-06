@@ -513,7 +513,7 @@ class CompanyController extends FormController
     /**
      * Loads a specific company into the detailed panel.
      */
-    public function viewAction($objectId, FieldGroupModel $fieldGroupModel)
+    public function viewAction($objectId, FieldGroupModel $fieldGroupModel): Response
     {
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');

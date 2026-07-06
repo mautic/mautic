@@ -337,7 +337,7 @@ class LeadController extends FormController
     /**
      * Loads a specific lead into the detailed panel.
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, FieldGroupModel $fieldGroupModel, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, PointGroupModel $pointGroupModel, CoreParametersHelper $coreParametersHelper, FieldGroupModel $fieldGroupModel, $objectId): Response
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');

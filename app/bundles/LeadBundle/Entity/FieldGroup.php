@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class FieldGroup extends FormEntity
 {
     public const TABLE_NAME  = 'lead_field_groups';
+
     public const ENTITY_NAME = 'lead_field_group';
 
     /** Default groups for lead object. */
