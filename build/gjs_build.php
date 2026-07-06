@@ -1,6 +1,5 @@
 <?php
 
-//
 // The build is intentionally non-fatal: it runs a separate npm project (Parcel) that needs a
 // Node toolchain, so a missing/incompatible Node must not abort `composer install`. On failure we
 // warn and point the user to `composer gjs-build`, mirroring the resilience of the other asset
