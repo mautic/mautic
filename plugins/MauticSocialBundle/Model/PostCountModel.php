@@ -37,10 +37,8 @@ class PostCountModel extends AbstractCommonModel
         return $this->em->getRepository(PostCount::class);
     }
 
-    /*
-     * Updates a monitor record's post count on a daily basis
-     *
-     * @return boolean
+    /**
+     * Updates a monitor record's post count on a daily basis.
      */
     public function updatePostCount($monitor, \DateTime $postDate): bool
     {

@@ -70,7 +70,7 @@ class MessageQueue
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $datePublished;
 
     /**

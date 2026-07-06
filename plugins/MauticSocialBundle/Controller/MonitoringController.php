@@ -21,7 +21,7 @@ class MonitoringController extends FormController
 {
     use EntityContactsTrait;
 
-    /*
+    /**
      * @param int $page
      */
     public function indexAction(Request $request, MonitoringModel $model, $page = 1): Response
@@ -649,9 +649,6 @@ class MonitoringController extends FormController
         );
     }
 
-    /*
-     * Update the audit log
-     */
     public function updateAuditLog(Monitoring $monitoring, IpLookupHelper $ipLookupHelper, $action): void
     {
         $log = [

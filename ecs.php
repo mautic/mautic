@@ -13,9 +13,17 @@ return ECSConfig::configure()
         __DIR__.'/tests',
     ])
     ->withRootFiles()
+    ->withSkip([
+        PhpCsFixer\Fixer\Phpdoc\PhpdocNoEmptyReturnFixer::class => [
+            // in docbclock on purpose, to avoid BC return on child classes
+            __DIR__.'/app/bundles/CoreBundle/Entity/CommonEntity.php',
+        ],
+
+        PhpCsFixer\Fixer\Comment\SingleLineCommentStyleFixer::class,
+        PhpCsFixer\Fixer\Phpdoc\GeneralPhpdocAnnotationRemoveFixer::class,
+    ])
     ->withRules([
         NoUnusedImportsFixer::class,
         // Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
     ])
-    ->withPreparedSets(comments: true)
-    ->withDocblockLevel(22);
+    ->withPreparedSets(comments: true, docblocks: true);
