@@ -48,7 +48,7 @@ class PointInsight extends FormEntity
 
     /**
      * @var Category|null
-     **/
+     */
     private $category;
 
     public function __clone()

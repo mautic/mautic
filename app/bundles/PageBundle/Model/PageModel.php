@@ -1224,12 +1224,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->saveEntities($save, false);
     }
 
-    /*
+    /**
      * Cleans query params saving url values.
-     *
-     * @param $query array
-     *
-     * @return array
      */
     private function cleanQuery(array $query): array
     {

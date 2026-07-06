@@ -108,13 +108,11 @@ final class AssetsHelper
     /**
      * Set asset url path.
      *
-     * @param string      $path
-     * @param string|null $packageName
-     * @param string|null $version
-     * @param bool|false  $absolute
-     * @param bool|false  $ignorePrefix
+     * @param string     $path
+     * @param bool|false $absolute
+     * @param bool|false $ignorePrefix
      */
-    public function getUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
+    public function getUrl($path, ?string $packageName = null, ?string $version = null, $absolute = false, $ignorePrefix = false): string
     {
         // if we have http in the url it is absolute and we can just return it
         if (str_starts_with($path, 'http')) {
@@ -138,8 +136,6 @@ final class AssetsHelper
     }
 
     /**
-     * Get base URL.
-     *
      * @return string
      */
     public function getBaseUrl()
@@ -409,9 +405,6 @@ final class AssetsHelper
         return $headOutput;
     }
 
-    /**
-     * Output system stylesheets.
-     */
     public function outputSystemStylesheets(): void
     {
         $assets = $this->assetHelper->getAssets();
@@ -424,8 +417,6 @@ final class AssetsHelper
     }
 
     /**
-     * Output system scripts.
-     *
      * @param bool|false $includeEditor
      */
     public function outputSystemScripts($includeEditor = false): void
@@ -516,8 +507,6 @@ final class AssetsHelper
     }
 
     /**
-     * Include stylesheet.
-     *
      * @param string $assetFilePath the path to the file location. Can use full path or relative to mautic web root
      */
     public function includeStylesheet($assetFilePath): string
