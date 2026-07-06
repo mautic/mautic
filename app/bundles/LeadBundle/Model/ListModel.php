@@ -684,7 +684,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
 
             if (null != $listLead) {
-                if ($manuallyAdded && $listLead->wasManuallyRemoved()) {
+                if ($manuallyAdded && ($listLead->wasManuallyRemoved() || !$listLead->wasManuallyAdded())) {
                     $listLead->setManuallyRemoved(false);
                     $listLead->setManuallyAdded($manuallyAdded);
 
