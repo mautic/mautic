@@ -63,8 +63,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param mixed $x the left expression
-     * @param mixed $y the right expression
+     * @param string $x the left expression
+     * @param string $y the right expression
      */
     public function regexp(string $x, string $y): string
     {
@@ -81,8 +81,8 @@ class ExpressionBuilder extends BaseExpressionBuilder
      *     // u.id = ?
      *     $expr->eq('u.id', '?');
      *
-     * @param mixed $x the left expression
-     * @param mixed $y the right expression
+     * @param string $x the left expression
+     * @param string $y the right expression
      */
     public function notRegexp(string $x, string $y): string
     {
