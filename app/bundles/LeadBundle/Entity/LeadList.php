@@ -76,7 +76,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 

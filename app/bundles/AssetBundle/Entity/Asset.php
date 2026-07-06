@@ -177,7 +177,7 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
+     */
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $category;
 
