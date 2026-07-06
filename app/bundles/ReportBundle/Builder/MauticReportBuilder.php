@@ -363,13 +363,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
             // 1. Normalize GROUP BY columns
             $normalizedGroupBy = array_map(
-                fn ($col): string => DatabasePlatform::unquoteIdentifier($platform, $col),
+                fn (string $col): string => DatabasePlatform::unquoteIdentifier($platform, $col),
                 (array) $groupByColumns
             );
 
             // 2. Normalize aggregated columns
             $normalizedAggregated = array_map(
-                fn ($col): string => DatabasePlatform::unquoteIdentifier($platform, $col),
+                fn (string $col): string => DatabasePlatform::unquoteIdentifier($platform, $col),
                 $aggregatedColumns
             );
             // 3. Extract base column names from selectColumns

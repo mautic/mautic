@@ -66,7 +66,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      * @param mixed $x the left expression
      * @param mixed $y the right expression
      */
-    public function regexp($x, $y): string
+    public function regexp(string $x, string $y): string
     {
         return DatabasePlatform::getRegexpExpression($this->platform, $x, $y);
     }
@@ -84,7 +84,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
      * @param mixed $x the left expression
      * @param mixed $y the right expression
      */
-    public function notRegexp($x, $y): string
+    public function notRegexp(string $x, string $y): string
     {
         return DatabasePlatform::getRegexpExpression($this->platform, $x, $y, true);
     }
