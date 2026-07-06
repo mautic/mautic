@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -66,6 +67,15 @@ class FieldGroup extends FormEntity
             'pattern' => '/^[\p{L}\p{N}\p{S}\s]+$/u',
             'match'   => true,
             'message' => 'mautic.lead.field_group.name.help',
+        ]));
+
+        // The alias (auto-generated from the name) is unique in the DB; validate
+        // it here so a duplicate or near-duplicate name returns a form error on
+        // the name field instead of an unhandled UniqueConstraintViolationException.
+        $metadata->addConstraint(new UniqueEntity([
+            'fields'    => ['alias'],
+            'errorPath' => 'name',
+            'message'   => 'mautic.lead.field_group.name.unique',
         ]));
     }
 
