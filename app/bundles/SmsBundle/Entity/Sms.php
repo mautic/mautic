@@ -110,7 +110,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['sms:read', 'sms:write'])]
     private $category;
 

@@ -19,7 +19,7 @@ class Summary
 
     /**
      * @var \DateTimeImmutable|null
-     **/
+     */
     private \DateTimeImmutable|\DateTimeInterface|null $dateTriggered = null;
 
     /**

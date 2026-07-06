@@ -69,7 +69,7 @@ final class DsnTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array<string|string>>
+     * @return iterable<string, array<string>>
      */
     public static function dataInvalidFromString(): iterable
     {
