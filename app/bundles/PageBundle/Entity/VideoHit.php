@@ -262,8 +262,6 @@ class VideoHit
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -272,8 +270,6 @@ class VideoHit
     }
 
     /**
-     * Set dateHit.
-     *
      * @param \DateTime $dateHit
      */
     public function setDateHit($dateHit): static
@@ -284,8 +280,6 @@ class VideoHit
     }
 
     /**
-     * Get dateHit.
-     *
      * @return \DateTimeInterface
      */
     public function getDateHit()
@@ -312,8 +306,6 @@ class VideoHit
     }
 
     /**
-     * Set country.
-     *
      * @param string $country
      */
     public function setCountry($country): static
@@ -324,8 +316,6 @@ class VideoHit
     }
 
     /**
-     * Get country.
-     *
      * @return string
      */
     public function getCountry()
@@ -334,8 +324,6 @@ class VideoHit
     }
 
     /**
-     * Set region.
-     *
      * @param string $region
      */
     public function setRegion($region): static
@@ -346,8 +334,6 @@ class VideoHit
     }
 
     /**
-     * Get region.
-     *
      * @return string
      */
     public function getRegion()
@@ -356,8 +342,6 @@ class VideoHit
     }
 
     /**
-     * Set city.
-     *
      * @param string $city
      */
     public function setCity($city): static
@@ -368,8 +352,6 @@ class VideoHit
     }
 
     /**
-     * Get city.
-     *
      * @return string
      */
     public function getCity()
@@ -378,8 +360,6 @@ class VideoHit
     }
 
     /**
-     * Set isp.
-     *
      * @param string $isp
      */
     public function setIsp($isp): static
@@ -390,8 +370,6 @@ class VideoHit
     }
 
     /**
-     * Get isp.
-     *
      * @return string
      */
     public function getIsp()
@@ -400,8 +378,6 @@ class VideoHit
     }
 
     /**
-     * Set organization.
-     *
      * @param string $organization
      */
     public function setOrganization($organization): static
@@ -412,8 +388,6 @@ class VideoHit
     }
 
     /**
-     * Get organization.
-     *
      * @return string
      */
     public function getOrganization()
@@ -422,8 +396,6 @@ class VideoHit
     }
 
     /**
-     * Set code.
-     *
      * @param int $code
      */
     public function setCode($code): static
@@ -434,8 +406,6 @@ class VideoHit
     }
 
     /**
-     * Get code.
-     *
      * @return int
      */
     public function getCode()
@@ -444,8 +414,6 @@ class VideoHit
     }
 
     /**
-     * Set referer.
-     *
      * @param string $referer
      */
     public function setReferer($referer): static
@@ -456,8 +424,6 @@ class VideoHit
     }
 
     /**
-     * Get referer.
-     *
      * @return string
      */
     public function getReferer()
@@ -466,8 +432,6 @@ class VideoHit
     }
 
     /**
-     * Set url.
-     *
      * @param string $url
      */
     public function setUrl($url): static
@@ -478,8 +442,6 @@ class VideoHit
     }
 
     /**
-     * Get url.
-     *
      * @return string
      */
     public function getUrl()
@@ -488,8 +450,6 @@ class VideoHit
     }
 
     /**
-     * Set userAgent.
-     *
      * @param string $userAgent
      */
     public function setUserAgent($userAgent): static
@@ -500,8 +460,6 @@ class VideoHit
     }
 
     /**
-     * Get userAgent.
-     *
      * @return string
      */
     public function getUserAgent()
@@ -510,8 +468,6 @@ class VideoHit
     }
 
     /**
-     * Set remoteHost.
-     *
      * @param string $remoteHost
      */
     public function setRemoteHost($remoteHost): static
@@ -522,8 +478,6 @@ class VideoHit
     }
 
     /**
-     * Get remoteHost.
-     *
      * @return string
      */
     public function getRemoteHost()
@@ -547,8 +501,6 @@ class VideoHit
     }
 
     /**
-     * Set pageLanguage.
-     *
      * @param string $pageLanguage
      */
     public function setPageLanguage($pageLanguage): static
@@ -559,8 +511,6 @@ class VideoHit
     }
 
     /**
-     * Get pageLanguage.
-     *
      * @return string
      */
     public function getPageLanguage()
@@ -569,8 +519,6 @@ class VideoHit
     }
 
     /**
-     * Set browserLanguages.
-     *
      * @param array<string> $browserLanguages
      */
     public function setBrowserLanguages($browserLanguages): static
@@ -581,8 +529,6 @@ class VideoHit
     }
 
     /**
-     * Get browserLanguages.
-     *
      * @return array<string>
      */
     public function getBrowserLanguages()

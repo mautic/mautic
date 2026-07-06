@@ -1767,7 +1767,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return bool|DoNotContact
      */
-    public function setDoNotContact(Stat $stat, $comments, $reason = DoNotContact::BOUNCED, $flush = true)
+    public function setDoNotContact(Stat $stat, ?string $comments, $reason = DoNotContact::BOUNCED, $flush = true)
     {
         $lead = $stat->getLead();
 
@@ -1810,11 +1810,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param int    $reason
-     * @param string $comments
-     * @param bool   $flush
+     * @param int  $reason
+     * @param bool $flush
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', $flush = true, $leadId = null): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(Lead::class);

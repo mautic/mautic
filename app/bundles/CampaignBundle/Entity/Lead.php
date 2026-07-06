@@ -20,7 +20,7 @@ class Lead
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateAdded;
 
     /**

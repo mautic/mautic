@@ -116,7 +116,7 @@ class Client extends BaseClient
      */
     protected $changes;
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();

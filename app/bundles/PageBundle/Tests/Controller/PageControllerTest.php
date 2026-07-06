@@ -221,7 +221,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         return $page;
     }
 
-    /*
+    /**
      * Get page's view.
      */
     public function testViewActionPage(): void

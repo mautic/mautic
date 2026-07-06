@@ -76,7 +76,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     private $category;
 
@@ -115,17 +115,11 @@ class LeadList extends FormEntity implements UuidInterface
      */
     private $leads;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    private $lastBuiltDate;
+    private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
-    /**
-     * @var float|null
-     */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
-    private $lastBuiltTime;
+    private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     private ?\DateTimeInterface $deleted = null;
@@ -294,8 +288,6 @@ class LeadList extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publicName.
-     *
      * @return string|null
      */
     public function getPublicName()

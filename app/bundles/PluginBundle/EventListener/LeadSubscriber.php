@@ -30,9 +30,6 @@ class LeadSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /*
-     * Delete lead event
-     */
     public function onLeadDelete(LeadEvent $event): bool
     {
         $lead                  = $event->getLead();
@@ -42,9 +39,6 @@ class LeadSubscriber implements EventSubscriberInterface
         return false;
     }
 
-    /*
-     * Delete company event
-     */
     public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var \Mautic\LeadBundle\Entity\Company $company */

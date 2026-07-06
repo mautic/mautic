@@ -210,9 +210,6 @@ class LeadListRepository extends CommonRepository
         return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
     }
 
-    /**
-     * Check Lead segments by ids.
-     */
     public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {
         if (empty($ids)) {

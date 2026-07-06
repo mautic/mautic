@@ -197,8 +197,6 @@ class HitRepository extends CommonRepository
     }
 
     /**
-     * Count email clickthrough.
-     *
      * @return int
      */
     public function countEmailClickthrough()

@@ -17,6 +17,10 @@ class SubmissionRepository extends CommonRepository
 {
     use TimelineTrait;
 
+    /**
+     * @param Submission $entity
+     * @param bool       $flush
+     */
     public function saveEntity($entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
