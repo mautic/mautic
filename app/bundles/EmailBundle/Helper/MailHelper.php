@@ -1784,7 +1784,11 @@ class MailHelper
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
@@ -1806,7 +1810,11 @@ class MailHelper
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
