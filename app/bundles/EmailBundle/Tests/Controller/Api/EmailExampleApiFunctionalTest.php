@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -158,6 +160,41 @@ final class EmailExampleApiFunctionalTest extends MauticMysqlTestCase
         );
 
         self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testDeniedWithoutEmailViewPermission(): void
+    {
+        $email = $this->createEmail();
+        $this->em->flush();
+        $emailId = $email->getId();
+
+        // This endpoint can send to arbitrary addresses, so the permission check is the main
+        // guard: a non-admin user without Email view access must be denied.
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        \assert($user instanceof User);
+        $this->setPermission($user->getRole(), ['email:emails' => []]);
+        $this->loginUser($user);
+        $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
+        $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            "/api/emails/{$emailId}/example/send",
+            ['recipients' => [self::RECIPIENT]]
+        );
+
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * @param array<string, string[]> $permissions
+     */
+    private function setPermission(Role $role, array $permissions): void
+    {
+        $roleModel = static::getContainer()->get('mautic.user.model.role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+        $this->em->flush();
     }
 
     private function createEmail(bool $isPublished = true): Email
