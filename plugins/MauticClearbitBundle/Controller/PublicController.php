@@ -164,7 +164,7 @@ class PublicController extends FormController
                     }
                 }
             } else {
-                /******************  COMPANY STUFF  *********************/
+                /*  COMPANY STUFF */
 
                 if ('company' === $request->request->get('type')) {
                     /** @var \Mautic\LeadBundle\Model\CompanyModel $model */

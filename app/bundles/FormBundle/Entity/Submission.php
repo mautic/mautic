@@ -20,7 +20,7 @@ class Submission
 
     /**
      * @var Form
-     **/
+     */
     private $form;
 
     /**
