@@ -90,7 +90,7 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "94f61dfb3df6d29e75c96d2efe71ba88",
+    "content-hash": "450116e89ddd51bad6163cb8574bd273",
     "packages": [
         {
             "name": "api-platform/core",
@@ -19303,16 +19303,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "13.2.3",
+            "version": "13.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ecsphp/ecs.git",
-                "reference": "94f56bce0420d4e837a85c4b2c6501293a5974eb"
+                "reference": "68aa41b5ff540e66d103422af9c991851a936cc5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/94f56bce0420d4e837a85c4b2c6501293a5974eb",
-                "reference": "94f56bce0420d4e837a85c4b2c6501293a5974eb",
+                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/68aa41b5ff540e66d103422af9c991851a936cc5",
+                "reference": "68aa41b5ff540e66d103422af9c991851a936cc5",
                 "shasum": ""
             },
             "require": {
@@ -19347,9 +19347,9 @@
                 "static analysis"
             ],
             "support": {
-                "source": "https://github.com/ecsphp/ecs/tree/13.2.3"
+                "source": "https://github.com/ecsphp/ecs/tree/13.2.5"
             },
-            "time": "2026-06-15T22:08:41+00:00"
+            "time": "2026-07-03T09:42:43+00:00"
         },
         {
             "name": "theseer/tokenizer",
