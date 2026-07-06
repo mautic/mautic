@@ -177,9 +177,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param mixed[]|Lead $lead
-     *
-     * @paramm array<string, mixed> $config
+     * @param mixed[]|Lead         $lead
+     * @param array<string, mixed> $config
      *
      * @return mixed[]
      */
