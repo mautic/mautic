@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Functional;
 
+use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
+use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -150,5 +153,71 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('"users":[', $this->client->getResponse()->getContent());
+    }
+
+    public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
+    {
+        $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        self::assertInstanceOf(User::class, $adminUser);
+
+        $accessToken = $this->createUserBoundAccessToken($adminUser);
+
+        $this->client->enableReboot();
+        $this->clientServer = [];
+        $this->setUpSymfony($this->configParams);
+
+        $this->requestWithBearerToken('/api/users', $accessToken->getToken());
+        self::assertResponseIsSuccessful();
+        Assert::assertStringContainsString('"users":[', $this->client->getResponse()->getContent());
+
+        $this->requestWithBearerToken('/api/v2/users', $accessToken->getToken());
+        self::assertResponseIsSuccessful();
+        Assert::assertStringContainsString('"member"', $this->client->getResponse()->getContent());
+    }
+
+    private function requestWithBearerToken(string $uri, string $accessToken): void
+    {
+        $this->client->request(
+            Request::METHOD_GET,
+            $uri,
+            [],
+            [],
+            [
+                'HTTP_Authorization' => sprintf('Bearer %s', $accessToken),
+            ],
+        );
+    }
+
+    private function createUserBoundAccessToken(User $user): AccessToken
+    {
+        $existingToken = $this->em->getRepository(AccessToken::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
+        if ($existingToken instanceof AccessToken) {
+            $this->em->remove($existingToken);
+            $this->em->flush();
+        }
+
+        $client = new Client();
+        $client->setName('OAuth API regression client');
+        $client->setRedirectUris(['https://example.test/callback']);
+        $client->addUser($user);
+
+        $this->em->persist($client);
+        $this->em->flush();
+
+        $accessToken = new AccessToken();
+        $accessToken->setClient($client);
+        $accessToken->setUser($user);
+        $accessToken->setToken('test_user_bound_bearer_token');
+        $accessToken->setExpiresAt(time() + 3600);
+        $accessToken->setScope(null);
+
+        $this->em->persist($accessToken);
+        $this->em->flush();
+        $this->em->clear();
+
+        $reloadedToken = $this->em->getRepository(AccessToken::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
+        self::assertInstanceOf(AccessToken::class, $reloadedToken);
+
+        return $reloadedToken;
     }
 }

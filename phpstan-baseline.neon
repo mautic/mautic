@@ -40061,18 +40061,6 @@ parameters:
 			path: plugins/MauticFocusBundle/Form/Type/FocusListType.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\IframeAvailabilityChecker\:\:checkHeaders\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticFocusBundle/Helper/IframeAvailabilityChecker.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\IframeAvailabilityChecker\:\:headerContains\(\) has parameter \$headers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: plugins/MauticFocusBundle/Helper/IframeAvailabilityChecker.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFocusBundle\\Helper\\TokenHelper\:\:findFocusTokens\(\) has parameter \$content with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1

@@ -34,10 +34,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
     operations: [
         new GetCollection(security: "is_granted('asset:assets:viewown')"),
         new Post(security: "is_granted('asset:assets:create')"),
-        new Get(security: "is_granted('asset:assets:viewown')"),
-        new Put(security: "is_granted('asset:assets:editown')"),
-        new Patch(security: "is_granted('asset:assets:editother')"),
-        new Delete(security: "is_granted('asset:assets:deleteown')"),
+        new Get(security: "is_granted('asset:assets:viewown', object)"),
+        new Put(security: "is_granted('asset:assets:editown', object)"),
+        new Patch(security: "is_granted('asset:assets:editother', object)"),
+        new Delete(security: "is_granted('asset:assets:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['asset:read'],

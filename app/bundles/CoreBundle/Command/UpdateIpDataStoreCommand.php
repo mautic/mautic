@@ -51,7 +51,7 @@ EOT
                     $output->writeln('<error>'.$this->translator->trans(
                         'mautic.core.ip_lookup.remote_fetch_error',
                         [
-                            '%remoteUrl%' => $remoteUrl,
+                            '%remoteUrl%' => AbstractLocalDataLookup::cleanUrl($remoteUrl),
                             '%localPath%' => $localPath,
                         ]
                     ).'</error>');

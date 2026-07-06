@@ -20,10 +20,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(security: "is_granted('user:roles:viewown')"),
         new Post(security: "is_granted('user:roles:create')"),
-        new Get(security: "is_granted('user:roles:viewown')"),
-        new Put(security: "is_granted('user:roles:editown')"),
-        new Patch(security: "is_granted('user:roles:editother')"),
-        new Delete(security: "is_granted('user:roles:deleteown')"),
+        new Get(security: "is_granted('user:roles:viewown', object)"),
+        new Put(security: "is_granted('user:roles:editown', object)"),
+        new Patch(security: "is_granted('user:roles:editother', object)"),
+        new Delete(security: "is_granted('user:roles:deleteown', object)"),
     ],
     normalizationContext: [
         'groups'                  => ['permission:read'],
@@ -91,6 +91,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('permissions')
             ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addField('bitwise', 'integer');
@@ -205,5 +206,10 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     public function getCacheNamespacesToDelete(): array
     {
         return [self::CACHE_NAMESPACE];
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->getRole()->getCreatedBy();
     }
 }
