@@ -13,8 +13,10 @@ final class RecipientCollection extends \ArrayIterator
     /**
      * @param array<SmsRecipientDTO> $recipients
      */
-    public function __construct(private readonly Sms $sms, array $recipients = [])
-    {
+    public function __construct(
+        private readonly Sms $sms,
+        array $recipients = [],
+    ) {
         parent::__construct($recipients);
     }
 
