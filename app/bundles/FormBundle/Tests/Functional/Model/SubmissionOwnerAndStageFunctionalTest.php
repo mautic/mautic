@@ -140,7 +140,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
      */
     private function replacePlaceholders(array $data, array $replacements): array
     {
-        return array_map(fn ($value): string => str_replace(array_keys($replacements), array_values($replacements), $value), $data);
+        return array_map(fn (string $value): string => str_replace(array_keys($replacements), array_values($replacements), $value), $data);
     }
 
     /**

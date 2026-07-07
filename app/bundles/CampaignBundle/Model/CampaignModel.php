@@ -369,9 +369,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param array<string, mixed> $settings
+     *
      * @return mixed[]
      */
-    public function setCanvasSettings(Campaign $entity, $settings, bool $persist = true, $events = null)
+    public function setCanvasSettings(Campaign $entity, array $settings, bool $persist = true, $events = null): array
     {
         if (null === $events) {
             $events = $entity->getEvents();

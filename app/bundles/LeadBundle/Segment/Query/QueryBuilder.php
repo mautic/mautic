@@ -297,7 +297,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function getTableAliases()
     {
         $queryParts = $this->getQueryParts();
-        $tables     = array_reduce($queryParts['from'], function ($result, $item) {
+        $tables     = array_reduce($queryParts['from'], function (array $result, array $item): array {
             $result[$item['table']] = $item['alias'];
 
             return $result;

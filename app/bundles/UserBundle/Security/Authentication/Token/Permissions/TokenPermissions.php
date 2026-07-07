@@ -18,8 +18,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class TokenPermissions
 {
-    public function __construct(private readonly TokenStorageInterface $tokenStorage, private readonly PermissionRepository $permissionRepository, private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly PermissionRepository $permissionRepository,
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
     /**

@@ -12,8 +12,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private VersionProviderInterface $versionProvider)
-    {
+    public function __construct(
+        private VersionProviderInterface $versionProvider,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
