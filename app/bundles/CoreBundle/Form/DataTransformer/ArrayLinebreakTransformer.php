@@ -16,7 +16,7 @@ class ArrayLinebreakTransformer implements DataTransformerInterface
      */
     public function transform(mixed $array): mixed
     {
-        if (null === $array) {
+        if (null === $array || '' === $array) {
             return '';
         }
 
