@@ -659,7 +659,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @return Stat|null
+     * @param string $idHash
+     *
+     * @return ?Stat
      */
     public function getEmailStatus($idHash)
     {
