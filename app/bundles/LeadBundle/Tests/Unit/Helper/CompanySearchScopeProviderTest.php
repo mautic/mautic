@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Helper\CompanySearchScopeProvider;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -15,7 +15,7 @@ final class CompanySearchScopeProviderTest extends TestCase
 {
     private CompanyModel&MockObject $companyModel;
 
-    private FieldModel&MockObject $fieldModel;
+    private FieldList&MockObject $fieldList;
 
     private TranslatorInterface&MockObject $translator;
 
@@ -24,7 +24,7 @@ final class CompanySearchScopeProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->companyModel = $this->createMock(CompanyModel::class);
-        $this->fieldModel   = $this->createMock(FieldModel::class);
+        $this->fieldList = $this->createMock(FieldList::class);
         $this->translator   = $this->createMock(TranslatorInterface::class);
 
         $this->translator->method('trans')
@@ -35,7 +35,7 @@ final class CompanySearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldList->method('getFieldList')
             ->with(false, true, ['isPublished' => true, 'object' => 'company'])
             ->willReturn([
                 'companyindustry' => 'Industry',
@@ -50,7 +50,7 @@ final class CompanySearchScopeProviderTest extends TestCase
 
         $this->provider = new CompanySearchScopeProvider(
             $this->companyModel,
-            $this->fieldModel,
+            $this->fieldList,
             $this->translator
         );
     }

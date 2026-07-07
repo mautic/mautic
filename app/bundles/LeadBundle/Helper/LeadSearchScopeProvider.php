@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -44,7 +44,7 @@ final class LeadSearchScopeProvider
 
     public function __construct(
         private LeadModel $leadModel,
-        private FieldModel $fieldModel,
+        private FieldList $fieldList,
         private TranslatorInterface $translator,
     ) {
     }
@@ -54,7 +54,7 @@ final class LeadSearchScopeProvider
      */
     public function getScopes(): array
     {
-        $fieldLabels = $this->fieldModel->getFieldList(false, true);
+        $fieldLabels = $this->fieldList->getFieldList(false, true);
         $scopes      = [];
         $seen        = [];
 

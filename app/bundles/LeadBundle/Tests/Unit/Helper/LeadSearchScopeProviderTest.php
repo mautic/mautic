@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +15,7 @@ final class LeadSearchScopeProviderTest extends TestCase
 {
     private LeadModel&MockObject $leadModel;
 
-    private FieldModel&MockObject $fieldModel;
+    private FieldList&MockObject $fieldList;
 
     private TranslatorInterface&MockObject $translator;
 
@@ -24,7 +24,7 @@ final class LeadSearchScopeProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->leadModel  = $this->createMock(LeadModel::class);
-        $this->fieldModel = $this->createMock(FieldModel::class);
+        $this->fieldList = $this->createMock(FieldList::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->translator->method('trans')
@@ -37,7 +37,7 @@ final class LeadSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->fieldModel->method('getFieldList')
+        $this->fieldList->method('getFieldList')
             ->willReturn([
                 'instagram' => 'Instagram',
                 'custom_field' => 'My Custom Field',
@@ -53,7 +53,7 @@ final class LeadSearchScopeProviderTest extends TestCase
 
         $this->provider = new LeadSearchScopeProvider(
             $this->leadModel,
-            $this->fieldModel,
+            $this->fieldList,
             $this->translator
         );
     }

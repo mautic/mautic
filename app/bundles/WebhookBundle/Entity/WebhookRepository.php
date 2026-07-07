@@ -11,6 +11,9 @@ class WebhookRepository extends CommonRepository
 {
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param object                                                       $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addCatchAllWhereClause($q, $filter): array
     {
@@ -19,6 +22,9 @@ class WebhookRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param object                                                       $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {

@@ -11,9 +11,9 @@ use Mautic\UserBundle\Entity\User;
 final class ClientRepository extends CommonRepository
 {
     /**
-     * @return array
+     * @return list<Client>
      */
-    public function getUserClients(User $user)
+    public function getUserClients(User $user): array
     {
         $query = $this->createQueryBuilder($this->getTableAlias());
 
@@ -24,6 +24,12 @@ final class ClientRepository extends CommonRepository
         return $query->getQuery()->getResult();
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param object                                                       $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
+     */
     protected function addCatchAllWhereClause($q, $filter): array
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
@@ -32,6 +38,12 @@ final class ClientRepository extends CommonRepository
         ]);
     }
 
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param object                                                       $filter
+     *
+     * @return array{0: mixed, 1: array<string, mixed>}
+     */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
         [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
@@ -72,6 +84,9 @@ final class ClientRepository extends CommonRepository
         ], parent::getSearchCommands());
     }
 
+    /**
+     * @return array<array<string>>
+     */
     protected function getDefaultOrder(): array
     {
         return [

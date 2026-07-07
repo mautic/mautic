@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -39,7 +39,7 @@ final class CompanySearchScopeProvider
 
     public function __construct(
         private CompanyModel $companyModel,
-        private FieldModel $fieldModel,
+        private FieldList $fieldList,
         private TranslatorInterface $translator,
     ) {
     }
@@ -49,7 +49,7 @@ final class CompanySearchScopeProvider
      */
     public function getScopes(): array
     {
-        $fieldLabels = $this->fieldModel->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
+        $fieldLabels = $this->fieldList->getFieldList(false, true, ['isPublished' => true, 'object' => 'company']);
         $scopes      = [];
         $seen        = [];
 
