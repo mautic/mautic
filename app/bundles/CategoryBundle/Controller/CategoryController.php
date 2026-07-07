@@ -4,6 +4,7 @@ namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
+use Mautic\CategoryBundle\Helper\CategorySearchScopeProvider;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -54,7 +55,7 @@ final class CategoryController extends AbstractFormController
      * @param string $bundle
      * @param int    $page
      */
-    public function indexAction(Request $request, $bundle, $page = 1): Response
+    public function indexAction(Request $request, CategorySearchScopeProvider $categorySearchScopeProvider, $bundle, $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -170,10 +171,12 @@ final class CategoryController extends AbstractFormController
             [
                 'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
                 'viewParameters' => [
-                    'bundle'         => $bundle,
-                    'permissionBase' => $permissionBase,
-                    'searchValue'    => $search,
-                    'items'          => $entities,
+                    'bundle'          => $bundle,
+                    'permissionBase'  => $permissionBase,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $categorySearchScopeProvider->getScopes(),
+                    'searchScopeHint' => 'mautic.core.search.scope.hint',
+                    'items'           => $entities,
                     'page'           => $page,
                     'limit'          => $limit,
                     'permissions'    => $permissions,
