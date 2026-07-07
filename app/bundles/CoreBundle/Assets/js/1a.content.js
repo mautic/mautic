@@ -1376,7 +1376,8 @@ Mautic.composeScopedSearchValue = function (command, value) {
         return value;
     }
 
-    if (!value && command.indexOf(':') > 0) {
+    // Flag-style commands (is:published, is:mine, etc.) are complete on their own.
+    if (command.indexOf(':') > 0) {
         return command;
     }
 
@@ -1444,7 +1445,14 @@ Mautic.activateSearchScope = function (searchEl) {
     MauticVars.lastSearchStr = initialSearch;
 
     scopeSelect.off('change.searchScope').on('change.searchScope', function () {
-        var scopedValue = Mautic.composeScopedSearchValue(scopeSelect.val(), searchInput.val().trim());
+        var command = scopeSelect.val();
+
+        if (command && command.indexOf(':') > 0) {
+            searchInput.val('');
+            searchInput.typeahead('val', '');
+        }
+
+        var scopedValue = Mautic.composeScopedSearchValue(command, searchInput.val().trim());
         MauticVars.lastSearchStr = scopedValue;
 
         var scopeChangeEvent = mQuery.Event('keyup', {which: 13});
@@ -2224,12 +2232,14 @@ Mautic.removeFilterCommands = function (searchValue) {
  *
  * @returns {Array<string>}
  */
-Mautic.getActiveFilterCommands = function () {
-    const searchInput = document.getElementById('list-search');
-    if (!searchInput) {
-        return []; // Return an empty array if there's no search input
+Mautic.getActiveFilterCommands = function (searchValue) {
+    if (typeof searchValue === 'undefined' || searchValue === null) {
+        const searchInput = document.getElementById('list-search');
+        if (!searchInput) {
+            return [];
+        }
+        searchValue = searchInput.value || '';
     }
-    const searchValue = searchInput.value || '';
 
     if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
         Mautic.initFilterCommands();

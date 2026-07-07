@@ -173,7 +173,17 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                 scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
                 value = '';
             } else {
-                value = Mautic.composeScopedSearchValue(scopeSelect.val(), value);
+                if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {
+                    Mautic.initFilterCommands();
+                }
+
+                var filterCommands = Mautic.getActiveFilterCommands(value);
+                var scopedInputValue = Mautic.removeFilterCommands(value);
+                value = Mautic.composeScopedSearchValue(scopeSelect.val(), scopedInputValue);
+
+                if (filterCommands.length) {
+                    value = (value + ' ' + filterCommands.join(' ')).trim();
+                }
             }
         }
 
