@@ -86,8 +86,14 @@ return [
                 'defaults'   => ['urlEmail' => null, 'secretHash' => null],
             ],
             'mautic_email_resubscribe' => [
-                'path'       => '/email/resubscribe/{idHash}',
+                'path'       => '/email/resubscribe/{idHash}/{urlEmail}/{secretHash}',
                 'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
+                'defaults'   => ['urlEmail' => null, 'secretHash' => null], // @todo make the secretHash required after a few years.
+            ],
+            'mautic_email_validate_email_form' => [
+                'path'       => '/email/validate/{action}/{secretHash}/{idHash}',
+                'controller' => 'MauticEmailBundle:Public:validateEmail',
+                'defaults'   => ['idHash' => null],
             ],
             'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/callback',

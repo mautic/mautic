@@ -27,6 +27,14 @@ final class BuilderSubscriberTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
+    private MockObject&EmailModel $emailModel;
+
+    private MockObject&TrackableModel $trackableModelMock;
+
+    private MockObject&RedirectModel $redirectModelMock;
+
+    private MockObject&TranslatorInterface $translator;
+
     private BuilderSubscriber $builderSubscriber;
 
     private MockObject&EmailModel $emailModel;
@@ -89,9 +97,33 @@ final class BuilderSubscriberTest extends TestCase
             ['mailer_from_name', null, 'No Body'],
             ['secret_key', null, 'secret'],
         ]);
+        $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
+        $this->emailModel
+            ->method('buildUrl')
+            ->willReturnCallback(static function (string $route, array $parameters): string {
+                if ('mautic_email_validate_email_form' === $route) {
+                    return sprintf('/email/validate/%s/%s/%s', $parameters['action'], $parameters['secretHash'], $parameters['idHash']);
+                }
+
+                if ('mautic_email_webview' === $route) {
+                    return sprintf('/email/view/%s', $parameters['idHash']);
+                }
+
+                return sprintf('/email/%s/%s', str_replace('mautic_email_', '', $route), $parameters['idHash']);
+            });
+
+        $this->translator->expects($this->never())
+            ->method('trans')
+            ->withConsecutive([$unsubscribeTokenizedText], [])
+            ->willReturn($unsubscribeTokenizedText);
 
         $this->builderSubscriber->onEmailGenerate($event);
-
+        $this->assertEquals(
+            '<a href="/email/validate/unsubscribe/'.$emailHash.'/hash">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
+            $event->getTokens()['{unsubscribe_text}']
+        );
+        $this->assertSame('/email/validate/unsubscribe/'.$emailHash.'/hash', $event->getTokens()['{unsubscribe_url}']);
+        $this->assertSame('/email/validate/resubscribe/'.$emailHash.'/hash', $event->getTokens()['{resubscribe_url}']);
         $this->assertSame('Owner Signature', $event->getTokens()['{signature}']);
     }
 
