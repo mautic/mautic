@@ -58,4 +58,20 @@ final class SearchScopeHelperTest extends TestCase
         self::assertSame('email', $parsed['command']);
         self::assertSame('test@example.com', $parsed['value']);
     }
+
+    public function testFormatLabelCapitalizesSimpleCommand(): void
+    {
+        self::assertSame('Name', SearchScopeHelper::formatLabel('name'));
+    }
+
+    public function testFormatLabelCapitalizesColonSeparatedCommand(): void
+    {
+        self::assertSame('Is:Published', SearchScopeHelper::formatLabel('is:published'));
+        self::assertSame('Is:Mine', SearchScopeHelper::formatLabel('is:mine'));
+    }
+
+    public function testFormatLabelPreservesAlreadyCapitalizedLabel(): void
+    {
+        self::assertSame('Standard', SearchScopeHelper::formatLabel('Standard'));
+    }
 }

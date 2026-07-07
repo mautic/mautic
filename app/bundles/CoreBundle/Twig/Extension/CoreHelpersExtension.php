@@ -41,6 +41,7 @@ final class CoreHelpersExtension extends AbstractExtension
         return [
             new TwigFilter('json_decode', fn (string $json): mixed => json_decode($json, true)),
             new TwigFilter('parse_str', $this->parseString(...)),
+            new TwigFilter('search_scope_label', static fn (string $label): string => SearchScopeHelper::formatLabel($label)),
         ];
     }
 

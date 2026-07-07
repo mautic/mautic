@@ -81,4 +81,21 @@ final class SearchScopeHelper
 
         return $commands;
     }
+
+    /**
+     * Format a scope label for display in the dropdown (e.g. "is:published" -> "Is:Published").
+     */
+    public static function formatLabel(string $label): string
+    {
+        if (!str_contains($label, ':')) {
+            return ucfirst($label);
+        }
+
+        $parts = explode(':', $label);
+
+        return implode(':', array_map(
+            static fn (string $part): string => ucfirst($part),
+            $parts
+        ));
+    }
 }

@@ -23,7 +23,7 @@
             value="{{ scopeCommand|escape('html_attr') }}"
             {% if scope.disabled|default(false) %}disabled{% endif %}
             {% if isSelected %}selected{% endif %}
-        >{{ scopeLabel }}{% if scope.suffix|default(false) %}{{ scope.suffix }}{% endif %}</option>
+        >{{ scopeLabel|search_scope_label }}{% if scope.suffix|default(false) %}{{ scope.suffix }}{% endif %}</option>
     {% endfor %}
 </select>
 {% endif %}
