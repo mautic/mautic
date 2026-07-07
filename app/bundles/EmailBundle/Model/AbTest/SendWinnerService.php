@@ -89,7 +89,7 @@ final class SendWinnerService
 
         $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-        if (true === $this->isAllowedToSendWinner($email, $abTestSettings)) {
+        if ($this->isAllowedToSendWinner($email, $abTestSettings)) {
             $winner = $this->getWinner($email, $abTestSettings['winnerCriteria']);
 
             if (null === $winner) {

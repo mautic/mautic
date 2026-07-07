@@ -279,7 +279,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ('prod' == $env) {
+                    if ('prod' === $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
                             $modifiedLast[$group] = $lastModified;
@@ -309,7 +309,7 @@ class AssetGenerationHelper
                 'relPath'  => $relPath,
             ];
 
-            if ('prod' == $env) {
+            if ('prod' === $env) {
                 $lastModified = filemtime($fullPath);
                 if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
                     $modifiedLast['app'] = $lastModified;

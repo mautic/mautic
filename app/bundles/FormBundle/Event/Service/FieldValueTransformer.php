@@ -22,7 +22,7 @@ class FieldValueTransformer
 
     public function transformValuesAfterSubmit(SubmissionEvent $submissionEvent): void
     {
-        if (true === $this->isTransformed) {
+        if ($this->isTransformed) {
             return;
         }
 

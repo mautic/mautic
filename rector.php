@@ -41,7 +41,7 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(27)
+    ->withCodeQualityLevel(38)
     ->withSkip([
         Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class,
 
@@ -53,6 +53,16 @@ return RectorConfig::configure()
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
+        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
+        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // checking child classes
+        Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
+        ],
+
+        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
             __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
