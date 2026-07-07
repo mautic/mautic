@@ -1393,7 +1393,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
          * @param $mauticFields
          * @param $fieldType
          */
-        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
+        $cleanup = function (array &$mappedFields, array $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings): void {
             $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
             $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
 
@@ -2406,7 +2406,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * @return bool
      */
-    public function isCompoundMauticField($fieldName)
+    public function isCompoundMauticField(string $fieldName)
     {
         $compoundFields = [
             'mauticContactTimelineLink' => 'mauticContactTimelineLink',

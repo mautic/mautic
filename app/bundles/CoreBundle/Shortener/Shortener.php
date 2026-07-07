@@ -49,7 +49,7 @@ class Shortener
      */
     public function getEnabledServices(): array
     {
-        return array_filter($this->services, fn ($service) => $service->isEnabled());
+        return array_filter($this->services, fn (ShortenerServiceInterface $service): bool => $service->isEnabled());
     }
 
     public function shortenUrl(string $url): string

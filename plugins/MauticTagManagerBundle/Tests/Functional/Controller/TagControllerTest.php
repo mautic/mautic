@@ -27,10 +27,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 {
     private const MERGE_ROUTE_BASE = '/s/tags/merge/';
 
-    /**
-     * @var TagRepository
-     */
-    private $tagRepository;
+    private TagRepository $tagRepository;
 
     protected function setUp(): void
     {
@@ -360,7 +357,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $remainingTags   = $this->tagRepository->findAll();
-        $remainingTagIds = array_map(fn ($tag) => $tag->getId(), $remainingTags);
+        $remainingTagIds = array_map(fn (Tag $tag) => $tag->getId(), $remainingTags);
 
         Assert::assertSame(2, $this->countLeadTagAssociations($primaryTagId));
         Assert::assertSame(0, $this->countLeadTagAssociations($secondaryTagId));

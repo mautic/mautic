@@ -49,11 +49,11 @@ class EntityResultHelper
     }
 
     /**
-     * @param array $array
+     * @param mixed[] $array
      *
      * @return mixed
      */
-    private function getDataForArray($array)
+    private function getDataForArray(array $array)
     {
         if (is_object($array[0])) {
             return $this->getDataForObject($array);
@@ -63,11 +63,11 @@ class EntityResultHelper
     }
 
     /**
-     * @param object $object
+     * @param mixed[] $object
      *
      * @return mixed
      */
-    private function getDataForObject($object)
+    private function getDataForObject(array $object)
     {
         foreach ($object as $key => $value) {
             if (0 === $key) {
