@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
+use Mautic\ReportBundle\Helper\ReportSearchScopeProvider;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
@@ -32,7 +33,7 @@ final class ReportController extends FormController
         $this->reportModel = $reportModel;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, ReportSearchScopeProvider $reportSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -109,8 +110,10 @@ final class ReportController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $reports,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $reportSearchScopeProvider->getScopes(),
+                    'searchScopeHint' => 'mautic.core.search.scope.hint',
+                    'items'           => $reports,
                     'totalItems'  => $count,
                     'page'        => $page,
                     'limit'       => $limit,
