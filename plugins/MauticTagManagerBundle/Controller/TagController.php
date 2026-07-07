@@ -12,6 +12,8 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
+use MauticPlugin\MauticTagManagerBundle\Helper\TagSearchScopeProvider;
+
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -53,7 +55,7 @@ final class TagController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, TagSearchScopeProvider $tagSearchScopeProvider, $page = 1): Response
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
@@ -135,15 +137,17 @@ final class TagController extends FormController
         $tagsCount = ([] !== $tagIds) ? $this->tagRepository->countByLeads($tagIds) : [];
 
         $parameters = [
-            'items'       => $items,
-            'tagsCount'   => $tagsCount,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->security,
-            'tmpl'        => $tmpl,
-            'currentUser' => $this->user,
-            'searchValue' => $search,
+            'items'           => $items,
+            'tagsCount'       => $tagsCount,
+            'page'            => $page,
+            'limit'           => $limit,
+            'permissions'     => $permissions,
+            'security'        => $this->security,
+            'tmpl'            => $tmpl,
+            'currentUser'     => $this->user,
+            'searchValue'     => $search,
+            'searchScopes'    => $tagSearchScopeProvider->getScopes(),
+            'searchScopeHint' => 'mautic.core.search.scope.hint',
         ];
 
         return $this->delegateView([
