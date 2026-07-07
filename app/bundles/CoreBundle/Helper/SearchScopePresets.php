@@ -33,51 +33,81 @@ final class SearchScopePresets
         return ['key' => $fieldKey, 'label' => $labelKey];
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function category(): array
     {
         return self::command('mautic.core.searchcommand.category');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function ids(): array
     {
         return self::command('mautic.core.searchcommand.ids');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function name(): array
     {
         return self::command('mautic.core.searchcommand.name');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function lang(): array
     {
         return self::command('mautic.core.searchcommand.lang');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function email(): array
     {
         return self::command('mautic.core.searchcommand.email');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function isPublished(): array
     {
         return self::command('mautic.core.searchcommand.ispublished');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function isUnpublished(): array
     {
         return self::command('mautic.core.searchcommand.isunpublished');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function isUncategorized(): array
     {
         return self::command('mautic.core.searchcommand.isuncategorized');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function isMine(): array
     {
         return self::command('mautic.core.searchcommand.ismine');
     }
 
+    /**
+     * @return array{key: string, label: string}
+     */
     public static function project(): array
     {
         return self::command('mautic.project.searchcommand.name');
