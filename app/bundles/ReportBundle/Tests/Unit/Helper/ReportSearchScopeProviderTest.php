@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\ReportBundle\Helper\ReportSearchScopeProvider;
 use Mautic\ReportBundle\Model\ReportModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportSearchScopeProviderTest extends TestCase
+final class ReportSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private ReportModel&MockObject $reportModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private ReportSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->reportModel = $this->createMock(ReportModel::class);
-        $this->translator  = $this->createMock(TranslatorInterface::class);
+        $reportModel = $this->createMock(ReportModel::class);
+        $translator  = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.ismine' => 'is:mine',
@@ -31,7 +25,7 @@ final class ReportSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->reportModel->method('getCommandList')
+        $reportModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.ispublished',
                 'mautic.core.searchcommand.isunpublished',
@@ -39,28 +33,11 @@ final class ReportSearchScopeProviderTest extends TestCase
                 'mautic.core.searchcommand.ids',
             ]);
 
-        $this->provider = new ReportSearchScopeProvider(
-            $this->reportModel,
-            $this->translator
-        );
+        return new ReportSearchScopeProvider($reportModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('is:mine', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['is:mine'];
     }
 }

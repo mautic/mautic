@@ -6,24 +6,18 @@ namespace Mautic\AssetBundle\Tests\Unit\Helper;
 
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class AssetSearchScopeProviderTest extends TestCase
+final class AssetSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private AssetModel&MockObject $assetModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private AssetSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->assetModel = $this->createMock(AssetModel::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $assetModel = $this->createMock(AssetModel::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.asset.asset.searchcommand.lang' => 'lang',
@@ -31,34 +25,17 @@ final class AssetSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->assetModel->method('getCommandList')
+        $assetModel->method('getCommandList')
             ->willReturn([
                 'mautic.asset.asset.searchcommand.lang',
                 'mautic.core.searchcommand.ismine',
             ]);
 
-        $this->provider = new AssetSearchScopeProvider(
-            $this->assetModel,
-            $this->translator
-        );
+        return new AssetSearchScopeProvider($assetModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('lang', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['lang'];
     }
 }

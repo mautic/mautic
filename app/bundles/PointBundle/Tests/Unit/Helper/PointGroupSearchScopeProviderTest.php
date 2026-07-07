@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PointBundle\Helper\PointGroupSearchScopeProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PointGroupSearchScopeProviderTest extends TestCase
+final class PointGroupSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private PointGroupModel&MockObject $pointGroupModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private PointGroupSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->pointGroupModel = $this->createMock(PointGroupModel::class);
-        $this->translator      = $this->createMock(TranslatorInterface::class);
+        $pointGroupModel = $this->createMock(PointGroupModel::class);
+        $translator      = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.name' => 'name',
@@ -31,33 +25,16 @@ final class PointGroupSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->pointGroupModel->method('getCommandList')
+        $pointGroupModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.ids',
             ]);
 
-        $this->provider = new PointGroupSearchScopeProvider(
-            $this->pointGroupModel,
-            $this->translator
-        );
+        return new PointGroupSearchScopeProvider($pointGroupModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('ids', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['ids'];
     }
 }

@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\DynamicContentBundle\Helper\DynamicContentSearchScopeProvider;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DynamicContentSearchScopeProviderTest extends TestCase
+final class DynamicContentSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private DynamicContentModel&MockObject $dynamicContentModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private DynamicContentSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->dynamicContentModel = $this->createMock(DynamicContentModel::class);
-        $this->translator          = $this->createMock(TranslatorInterface::class);
+        $dynamicContentModel = $this->createMock(DynamicContentModel::class);
+        $translator          = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.lang' => 'lang',
@@ -31,34 +25,17 @@ final class DynamicContentSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->dynamicContentModel->method('getCommandList')
+        $dynamicContentModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.lang',
                 'mautic.core.searchcommand.ismine',
             ]);
 
-        $this->provider = new DynamicContentSearchScopeProvider(
-            $this->dynamicContentModel,
-            $this->translator
-        );
+        return new DynamicContentSearchScopeProvider($dynamicContentModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('lang', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['lang'];
     }
 }

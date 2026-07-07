@@ -4,22 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\ThemeSearchScopeProvider;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ThemeSearchScopeProviderTest extends TestCase
+final class ThemeSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private TranslatorInterface&MockObject $translator;
-
-    private ThemeSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.theme.searchcommand.feature' => 'feature',
@@ -27,25 +22,11 @@ final class ThemeSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->provider = new ThemeSearchScopeProvider($this->translator);
+        return new ThemeSearchScopeProvider($translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesIncludesFeatureAndBuilder(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('feature', $commands);
-        $this->assertContains('builder', $commands);
+        return ['feature', 'builder'];
     }
 }

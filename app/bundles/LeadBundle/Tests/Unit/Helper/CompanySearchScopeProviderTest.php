@@ -4,30 +4,22 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Helper\CompanySearchScopeProvider;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CompanySearchScopeProviderTest extends TestCase
+final class CompanySearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private CompanyModel&MockObject $companyModel;
-
-    private FieldList&MockObject $fieldList;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private CompanySearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->companyModel = $this->createMock(CompanyModel::class);
-        $this->fieldList = $this->createMock(FieldList::class);
-        $this->translator   = $this->createMock(TranslatorInterface::class);
+        $companyModel = $this->createMock(CompanyModel::class);
+        $fieldList    = $this->createMock(FieldList::class);
+        $translator   = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.lead.field.companyname' => 'Company Name',
@@ -35,42 +27,24 @@ final class CompanySearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->fieldList->method('getFieldList')
+        $fieldList->method('getFieldList')
             ->with(false, true, ['isPublished' => true, 'object' => 'company'])
             ->willReturn([
                 'companyindustry' => 'Industry',
             ]);
 
-        $this->companyModel->method('getCommandList')
+        $companyModel->method('getCommandList')
             ->willReturn([
                 'companyname',
                 'companyindustry',
                 'mautic.core.searchcommand.ismine',
             ]);
 
-        $this->provider = new CompanySearchScopeProvider(
-            $this->companyModel,
-            $this->fieldList,
-            $this->translator
-        );
+        return new CompanySearchScopeProvider($companyModel, $fieldList, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesIncludesCompanyFields(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('companyindustry', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['companyindustry'];
     }
 }

@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Helper\FieldSearchScopeProvider;
 use Mautic\LeadBundle\Model\FieldModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FieldSearchScopeProviderTest extends TestCase
+final class FieldSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private FieldModel&MockObject $fieldModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private FieldSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->fieldModel = $this->createMock(FieldModel::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $fieldModel = $this->createMock(FieldModel::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.lead.field.searchcommand.isindexed' => 'is:indexed',
@@ -32,7 +26,7 @@ final class FieldSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->fieldModel->method('getCommandList')
+        $fieldModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.ispublished',
                 'mautic.lead.field.searchcommand.isindexed',
@@ -40,28 +34,11 @@ final class FieldSearchScopeProviderTest extends TestCase
                 'mautic.core.searchcommand.ismine',
             ]);
 
-        $this->provider = new FieldSearchScopeProvider(
-            $this->fieldModel,
-            $this->translator
-        );
+        return new FieldSearchScopeProvider($fieldModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('is:indexed', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['is:indexed'];
     }
 }

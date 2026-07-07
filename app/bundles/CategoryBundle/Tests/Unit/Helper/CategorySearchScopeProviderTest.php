@@ -6,24 +6,18 @@ namespace Mautic\CategoryBundle\Tests\Unit\Helper;
 
 use Mautic\CategoryBundle\Helper\CategorySearchScopeProvider;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CategorySearchScopeProviderTest extends TestCase
+final class CategorySearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private CategoryModel&MockObject $categoryModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private CategorySearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->categoryModel = $this->createMock(CategoryModel::class);
-        $this->translator    = $this->createMock(TranslatorInterface::class);
+        $categoryModel = $this->createMock(CategoryModel::class);
+        $translator    = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.ispublished' => 'is:published',
@@ -32,35 +26,18 @@ final class CategorySearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->categoryModel->method('getCommandList')
+        $categoryModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.ispublished',
                 'mautic.core.searchcommand.isunpublished',
                 'mautic.core.searchcommand.ids',
             ]);
 
-        $this->provider = new CategorySearchScopeProvider(
-            $this->categoryModel,
-            $this->translator
-        );
+        return new CategorySearchScopeProvider($categoryModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('is:published', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['is:published'];
     }
 }

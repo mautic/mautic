@@ -6,24 +6,18 @@ namespace Mautic\CampaignBundle\Tests\Unit\Helper;
 
 use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CampaignSearchScopeProviderTest extends TestCase
+final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private CampaignModel&MockObject $campaignModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private CampaignSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->campaignModel = $this->createMock(CampaignModel::class);
-        $this->translator    = $this->createMock(TranslatorInterface::class);
+        $campaignModel = $this->createMock(CampaignModel::class);
+        $translator    = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.campaign.campaign.searchcommand.isexpired' => 'is:expired',
@@ -31,34 +25,17 @@ final class CampaignSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->campaignModel->method('getCommandList')
+        $campaignModel->method('getCommandList')
             ->willReturn([
                 'mautic.campaign.campaign.searchcommand.isexpired',
                 'mautic.core.searchcommand.ismine',
             ]);
 
-        $this->provider = new CampaignSearchScopeProvider(
-            $this->campaignModel,
-            $this->translator
-        );
+        return new CampaignSearchScopeProvider($campaignModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('is:expired', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['is:expired'];
     }
 }

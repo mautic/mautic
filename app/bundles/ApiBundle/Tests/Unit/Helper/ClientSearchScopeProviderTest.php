@@ -6,24 +6,18 @@ namespace Mautic\ApiBundle\Tests\Unit\Helper;
 
 use Mautic\ApiBundle\Helper\ClientSearchScopeProvider;
 use Mautic\ApiBundle\Model\ClientModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ClientSearchScopeProviderTest extends TestCase
+final class ClientSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private ClientModel&MockObject $clientModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private ClientSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->clientModel = $this->createMock(ClientModel::class);
-        $this->translator  = $this->createMock(TranslatorInterface::class);
+        $clientModel = $this->createMock(ClientModel::class);
+        $translator  = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.core.searchcommand.name' => 'name',
@@ -32,7 +26,7 @@ final class ClientSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->clientModel->method('getCommandList')
+        $clientModel->method('getCommandList')
             ->willReturn([
                 'mautic.core.searchcommand.name',
                 'mautic.api.client.searchcommand.callback',
@@ -40,28 +34,11 @@ final class ClientSearchScopeProviderTest extends TestCase
                 'mautic.core.searchcommand.ids',
             ]);
 
-        $this->provider = new ClientSearchScopeProvider(
-            $this->clientModel,
-            $this->translator
-        );
+        return new ClientSearchScopeProvider($clientModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardFirst(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
-    }
-
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('callback', $commands);
-        $this->assertCount(count(array_unique($commands)), $commands);
+        return ['callback'];
     }
 }

@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Unit\Helper;
 
+use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
+use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class EmailSearchScopeProviderTest extends TestCase
+final class EmailSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    private EmailModel&MockObject $emailModel;
-
-    private TranslatorInterface&MockObject $translator;
-
-    private EmailSearchScopeProvider $provider;
-
-    protected function setUp(): void
+    protected function createProvider(): AbstractSearchScopeProvider
     {
-        $this->emailModel = $this->createMock(EmailModel::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $emailModel = $this->createMock(EmailModel::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
-        $this->translator->method('trans')
+        $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
                 'mautic.email.email.searchcommand.subject' => 'subject',
@@ -33,54 +27,33 @@ final class EmailSearchScopeProviderTest extends TestCase
                 default => $key,
             });
 
-        $this->emailModel->method('getCommandList')
+        $emailModel->method('getCommandList')
             ->willReturn([
                 'mautic.email.email.searchcommand.subject',
                 'mautic.core.searchcommand.ids',
                 'mautic.core.searchcommand.ismine',
             ]);
 
-        $this->provider = new EmailSearchScopeProvider(
-            $this->emailModel,
-            $this->translator
-        );
+        return new EmailSearchScopeProvider($emailModel, $translator);
     }
 
-    public function testGetScopesIncludesStandardLabel(): void
+    protected function expectedDynamicCommands(): array
     {
-        $scopes = $this->provider->getScopes();
-
-        $this->assertSame('mautic.core.search.scope.standard', $scopes[0]['label']);
-        $this->assertTrue($scopes[0]['translate'] ?? true);
-    }
-
-    public function testGetScopesIncludesAllCommands(): void
-    {
-        $scopes = $this->provider->getScopes();
-
-        $commands = array_column($scopes, 'command');
-
-        $this->assertContains('ids', $commands);
-        $this->assertSame('', $scopes[0]['command']);
-        $this->assertTrue($scopes[0]['default'] ?? false);
+        return ['ids'];
     }
 
     public function testGetScopesUsesFriendlyLabelWhenAvailable(): void
     {
-        $scopes = $this->provider->getScopes();
-
+        $scopes       = $this->getScopes();
         $subjectScope = array_values(array_filter($scopes, static fn (array $scope): bool => 'subject' === $scope['command']))[0];
 
-        $this->assertSame('mautic.email.email.searchcommand.subject', $subjectScope['label']);
+        self::assertSame('mautic.email.email.searchcommand.subject', $subjectScope['label']);
     }
 
-    public function testGetScopesDoesNotDuplicatePinnedCommands(): void
+    public function testSubjectCommandAppearsExactlyOnce(): void
     {
-        $scopes = $this->provider->getScopes();
+        $commands = array_column($this->getScopes(), 'command');
 
-        $commands = array_column($scopes, 'command');
-
-        $this->assertCount(count(array_unique($commands)), $commands);
-        $this->assertCount(1, array_filter($commands, static fn (string $command): bool => 'subject' === $command));
+        self::assertCount(1, array_filter($commands, static fn (string $command): bool => 'subject' === $command));
     }
 }
