@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Helper\RoleSearchScopeProvider;
 use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +57,7 @@ final class RoleController extends FormController
     /**
      * Generate's default role list view.
      */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, RoleSearchScopeProvider $roleSearchScopeProvider, int $page = 1): Response
     {
         if (!$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
@@ -108,9 +109,11 @@ final class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'       => $items,
-                'searchValue' => $filter,
-                'page'        => $page,
+                'items'           => $items,
+                'searchValue'     => $filter,
+                'searchScopes'    => $roleSearchScopeProvider->getScopes(),
+                'searchScopeHint' => 'mautic.core.search.scope.hint',
+                'page'            => $page,
                 'limit'       => $limit,
                 'tmpl'        => $tmpl,
                 'permissions' => [
