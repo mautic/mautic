@@ -32,6 +32,46 @@ final class ClientRepository extends CommonRepository
         ]);
     }
 
+    protected function addSearchCommandWhereClause($q, $filter): array
+    {
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
+
+        if (false !== $expr) {
+            return [$expr, $parameters];
+        }
+
+        $command = $filter->command;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                return $this->addStandardCatchAllWhereClause($q, $filter, [
+                    $this->getTableAlias().'.name',
+                ]);
+            case $this->translator->trans('mautic.api.client.searchcommand.callback'):
+            case $this->translator->trans('mautic.api.client.searchcommand.callback', [], null, 'en_US'):
+            case $this->translator->trans('mautic.api.client.searchcommand.redirecturi'):
+            case $this->translator->trans('mautic.api.client.searchcommand.redirecturi', [], null, 'en_US'):
+                return $this->addStandardCatchAllWhereClause($q, $filter, [
+                    $this->getTableAlias().'.redirectUris',
+                ]);
+        }
+
+        return [$expr, $parameters];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getSearchCommands(): array
+    {
+        return array_merge([
+            'mautic.core.searchcommand.name',
+            'mautic.api.client.searchcommand.callback',
+            'mautic.api.client.searchcommand.redirecturi',
+        ], parent::getSearchCommands());
+    }
+
     protected function getDefaultOrder(): array
     {
         return [
