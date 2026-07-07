@@ -1040,12 +1040,12 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param array<mixed>    $data
-     * @param array<LeadList> $leadLists
+     * @param array<string, mixed> $data
+     * @param array<LeadList>      $leadLists
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true): bool
+    public function setFrequencyRules(Lead $lead, array $data, $leadLists, $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1747,12 +1747,12 @@ class LeadModel extends FormModel
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, function (&$val): void {
+        array_walk($tags, function (string &$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::_($val, 'string');
         });
         // Remove any tags that became empty after filtering
-        $tags = array_filter($tags, fn ($tag): bool => strlen($tag) > 0);
+        $tags = array_filter($tags, fn (string $tag): bool => '' !== $tag);
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1792,7 +1792,7 @@ class LeadModel extends FormModel
                 $val = InputHelper::_($val, 'string');
             });
             // Remove any tags that became empty after filtering
-            $removeTags = array_filter($removeTags, fn ($tag): bool => strlen($tag) > 0);
+            $removeTags = array_filter($removeTags, fn (string $tag): bool => '' !== $tag);
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);

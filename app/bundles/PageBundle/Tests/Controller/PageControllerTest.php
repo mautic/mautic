@@ -20,10 +20,7 @@ final class PageControllerTest extends MauticMysqlTestCase
 
     private string $prefix;
 
-    /**
-     * @var int
-     */
-    private $id;
+    private int $id;
 
     /**
      * @throws \Exception

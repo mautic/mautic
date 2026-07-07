@@ -51,7 +51,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param array $settings
      * @param array $parameters
      *
      * @return bool|string
