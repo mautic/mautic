@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PointInsightSearchScopeProviderTest extends TestCase
+final class PointInsightSearchScopeProviderTest extends TestCase
 {
     private InsightModel&MockObject $insightModel;
 

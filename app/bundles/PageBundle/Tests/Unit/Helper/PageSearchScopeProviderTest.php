@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PageSearchScopeProviderTest extends TestCase
+final class PageSearchScopeProviderTest extends TestCase
 {
     private PageModel&MockObject $pageModel;
 

@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ProjectSearchScopeProviderTest extends TestCase
+final class ProjectSearchScopeProviderTest extends TestCase
 {
     private ProjectRepository&MockObject $projectRepository;
 

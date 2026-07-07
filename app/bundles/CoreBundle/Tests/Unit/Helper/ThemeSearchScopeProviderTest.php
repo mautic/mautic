@@ -9,7 +9,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ThemeSearchScopeProviderTest extends TestCase
+final class ThemeSearchScopeProviderTest extends TestCase
 {
     private TranslatorInterface&MockObject $translator;
 

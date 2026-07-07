@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSearchScopeProviderTest extends TestCase
+final class CampaignSearchScopeProviderTest extends TestCase
 {
     private CampaignModel&MockObject $campaignModel;
 

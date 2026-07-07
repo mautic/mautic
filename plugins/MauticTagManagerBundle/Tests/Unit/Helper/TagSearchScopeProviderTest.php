@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TagSearchScopeProviderTest extends TestCase
+final class TagSearchScopeProviderTest extends TestCase
 {
     private TagRepository&MockObject $tagRepository;
 

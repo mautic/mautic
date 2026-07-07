@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSearchScopeProviderTest extends TestCase
+final class LeadSearchScopeProviderTest extends TestCase
 {
     private LeadModel&MockObject $leadModel;
 

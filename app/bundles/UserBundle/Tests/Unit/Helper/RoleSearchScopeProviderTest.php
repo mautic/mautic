@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class RoleSearchScopeProviderTest extends TestCase
+final class RoleSearchScopeProviderTest extends TestCase
 {
     private RoleModel&MockObject $roleModel;
 

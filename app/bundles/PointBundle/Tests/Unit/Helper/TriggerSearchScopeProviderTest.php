@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TriggerSearchScopeProviderTest extends TestCase
+final class TriggerSearchScopeProviderTest extends TestCase
 {
     private TriggerModel&MockObject $triggerModel;
 

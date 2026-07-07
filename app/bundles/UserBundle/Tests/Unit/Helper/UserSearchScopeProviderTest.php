@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserSearchScopeProviderTest extends TestCase
+final class UserSearchScopeProviderTest extends TestCase
 {
     private UserModel&MockObject $userModel;
 
