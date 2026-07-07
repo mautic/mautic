@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
 {
+    private string $uri = '/api/v2/projects/';
+
     protected function setUp(): void
     {
         $this->configParams['api_enabled'] = true;
@@ -26,7 +28,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/api/v2/projects',
+            rtrim($this->uri, '/'),
             [],
             [],
             [
@@ -56,7 +58,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_GET,
-            '/api/v2/projects/'.$projectId,
+            $this->uri.$projectId,
             [],
             [],
             [
@@ -83,7 +85,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/api/v2/projects/99999',
+            $this->uri.'99999',
             [],
             [],
             [
@@ -105,7 +107,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/v2/projects',
+            rtrim($this->uri, '/'),
             [],
             [],
             [
@@ -141,7 +143,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             Request::METHOD_POST,
-            '/api/v2/projects',
+            rtrim($this->uri, '/'),
             [],
             [],
             [
@@ -160,12 +162,15 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
         $this->assertNull($content['description'] ?? null);
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
     #[DataProvider('invalidCreateProjectV2PayloadProvider')]
     public function testCreateProjectV2ValidationErrors(array $payload, int $expectedStatusCode): void
     {
         $this->client->request(
             Request::METHOD_POST,
-            '/api/v2/projects',
+            rtrim($this->uri, '/'),
             [],
             [],
             [
@@ -182,7 +187,7 @@ final class ProjectApiV2ControllerTest extends MauticMysqlTestCase
     {
         $projectId = $this->getProjectIdByName('API V2 Project 1');
 
-        $this->client->request(Request::METHOD_DELETE, '/api/v2/projects/'.$projectId);
+        $this->client->request(Request::METHOD_DELETE, $this->uri.$projectId);
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
