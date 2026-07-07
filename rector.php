@@ -43,6 +43,8 @@ return RectorConfig::configure()
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(27)
     ->withSkip([
+        __DIR__.'/plugins/*/node_modules/*',
+
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
