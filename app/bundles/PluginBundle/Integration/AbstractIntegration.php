@@ -2413,7 +2413,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             'mauticContactId'           => 'mauticContactId',
         ];
 
-        if (true === $this->updateDncByDate()) {
+        if ($this->updateDncByDate()) {
             $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
         }
 

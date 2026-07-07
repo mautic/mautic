@@ -1649,7 +1649,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
-            if (true === $firstMail) {
+            if ($firstMail) {
                 try {
                     $this->flushQueue($mailer);
                 } catch (EmailCouldNotBeSentException $e) {
@@ -1698,7 +1698,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
-            if (true === $firstMail) {
+            if ($firstMail) {
                 try {
                     $this->flushQueue($mailer);
                 } catch (EmailCouldNotBeSentException $e) {
