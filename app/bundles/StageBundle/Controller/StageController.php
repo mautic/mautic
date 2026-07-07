@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Form\Type\StageMergeType;
+use Mautic\StageBundle\Helper\StageSearchScopeProvider;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -30,7 +31,7 @@ final class StageController extends AbstractFormController
         $this->stageRepository = $stageRepository;
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, StageSearchScopeProvider $stageSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -97,8 +98,10 @@ final class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $stages,
+                    'searchValue'     => $search,
+                    'searchScopes'    => $stageSearchScopeProvider->getScopes(),
+                    'searchScopeHint' => 'mautic.core.search.scope.hint',
+                    'items'           => $stages,
                     'actions'     => $actions['actions'],
                     'page'        => $page,
                     'limit'       => $limit,
