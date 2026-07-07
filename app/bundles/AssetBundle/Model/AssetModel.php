@@ -233,10 +233,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         $download->setTrackingId($trackingId);
+        $download->setAsset($asset);
 
         if (empty($systemEntry)) {
-            $download->setAsset($asset);
-
             $this->getRepository()->upDownloadCount($asset->getId(), 1, $isUnique);
         }
 
