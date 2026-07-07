@@ -39,7 +39,6 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
-        ReturnTypeFromGetRepositoryDocblockRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
