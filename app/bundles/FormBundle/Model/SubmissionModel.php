@@ -328,10 +328,10 @@ class SubmissionModel extends CommonFormModel
         $submission->setTrackingId($trackingId)
             ->setLead($lead);
 
-        /*
+        /**
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
-         * The action can still be invalidated below - deleteEntity takes care for File deletion
+         * The action can still be invalidated below - deleteEntity takes care for File deletion.
          *
          * @todo Refactor form validation to execute this code only if Submission is valid
          */
