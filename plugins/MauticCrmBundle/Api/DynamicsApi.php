@@ -85,14 +85,18 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param Lead $lead
+     * @param mixed[] $data
+     * @param Lead    $lead
      */
-    public function createLead($data, $lead, $object = 'contacts'): ResponseInterface
+    public function createLead(array $data, $lead, $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }
 
-    public function updateLead($data, $objectId): ResponseInterface
+    /**
+     * @param mixed[] $data
+     */
+    public function updateLead(array $data, string $objectId): ResponseInterface
     {
         //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
         return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', []);

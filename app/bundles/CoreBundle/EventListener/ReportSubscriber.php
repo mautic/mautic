@@ -17,8 +17,9 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_AUDIT_LOG = 'audit.log';
 
-    public function __construct(private readonly CorePermissions $security)
-    {
+    public function __construct(
+        private readonly CorePermissions $security,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

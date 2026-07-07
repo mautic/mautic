@@ -23,8 +23,11 @@ final class SendWinnerService
 
     private bool $tryAgain = false;
 
-    public function __construct(private readonly EmailModel $emailModel, private readonly AbTestResultService $abTestResultService, private readonly AbTestSettingsService $abTestSettingsService)
-    {
+    public function __construct(
+        private readonly EmailModel $emailModel,
+        private readonly AbTestResultService $abTestResultService,
+        private readonly AbTestSettingsService $abTestSettingsService,
+    ) {
     }
 
     /**

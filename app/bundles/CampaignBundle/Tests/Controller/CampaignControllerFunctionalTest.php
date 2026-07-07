@@ -23,10 +23,7 @@ final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 
     private CampaignModel $campaignModel;
 
-    /**
-     * @var string
-     */
-    private $campaignLeadsLabel;
+    private string $campaignLeadsLabel;
 
     protected function setUp(): void
     {

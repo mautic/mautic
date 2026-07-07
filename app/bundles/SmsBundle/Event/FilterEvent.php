@@ -17,8 +17,9 @@ final class FilterEvent extends Event
     /**
      * @param array<int, Lead> $contacts
      */
-    public function __construct(private array $contacts)
-    {
+    public function __construct(
+        private array $contacts,
+    ) {
     }
 
     /**
