@@ -58,6 +58,6 @@ final class PointInsightSearchScopeProviderTest extends TestCase
         $commands = array_column($scopes, 'command');
 
         $this->assertContains('is:mine', $commands);
-        $this->assertSame(count($commands), count(array_unique($commands)));
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 }

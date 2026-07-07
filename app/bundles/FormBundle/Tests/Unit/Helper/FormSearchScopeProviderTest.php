@@ -61,6 +61,6 @@ final class FormSearchScopeProviderTest extends TestCase
         $commands = array_column($scopes, 'command');
 
         $this->assertContains('has:results', $commands);
-        $this->assertSame(count($commands), count(array_unique($commands)));
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 }

@@ -63,7 +63,10 @@ final class WebhookController extends FormController
     }
 
     /**
-     * @return mixed[]
+     * @param array<string, mixed> $args
+     * @param string               $action
+     *
+     * @return array<string, mixed>
      */
     public function getViewArguments(array $args, $action): array
     {
@@ -73,6 +76,7 @@ final class WebhookController extends FormController
             $this->indexSearchScopes                   = null;
         }
 
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
         return parent::getViewArguments($args, $action);
     }
 

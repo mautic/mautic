@@ -76,7 +76,7 @@ final class LeadSearchScopeProviderTest extends TestCase
 
         $commands = array_column($scopes, 'command');
 
-        $this->assertSame(count($commands), count(array_unique($commands)));
-        $this->assertSame(1, count(array_filter($commands, static fn (string $command): bool => 'segment' === $command)));
+        $this->assertCount(count(array_unique($commands)), $commands);
+        $this->assertCount(1, array_filter($commands, static fn (string $command): bool => 'segment' === $command));
     }
 }

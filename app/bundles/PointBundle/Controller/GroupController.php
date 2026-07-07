@@ -37,6 +37,12 @@ final class GroupController extends AbstractStandardFormController
         return parent::indexStandard($request, $page);
     }
 
+    /**
+     * @param array<string, mixed> $args
+     * @param string               $action
+     *
+     * @return array<string, mixed>
+     */
     protected function getViewArguments(array $args, $action): array
     {
         if ('index' === $action && null !== $this->indexSearchScopes) {

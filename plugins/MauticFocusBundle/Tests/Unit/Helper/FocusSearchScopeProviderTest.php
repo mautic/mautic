@@ -59,6 +59,6 @@ final class FocusSearchScopeProviderTest extends TestCase
         $commands = array_column($scopes, 'command');
 
         $this->assertContains('category', $commands);
-        $this->assertSame(count($commands), count(array_unique($commands)));
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 }

@@ -61,6 +61,6 @@ final class PageSearchScopeProviderTest extends TestCase
         $commands = array_column($scopes, 'command');
 
         $this->assertContains('is:prefcenter', $commands);
-        $this->assertSame(count($commands), count(array_unique($commands)));
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 }

@@ -61,6 +61,6 @@ final class WebhookSearchScopeProviderTest extends TestCase
 
         $this->assertContains('name', $commands);
         $this->assertContains('is:mine', $commands);
-        $this->assertSame(count($commands), count(array_unique($commands)));
+        $this->assertCount(count(array_unique($commands)), $commands);
     }
 }

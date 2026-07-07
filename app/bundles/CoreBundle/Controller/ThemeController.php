@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\ThemeSearchFilter;
 use Mautic\CoreBundle\Helper\ThemeSearchScopeProvider;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
