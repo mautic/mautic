@@ -26,6 +26,34 @@ final class ContactTrackerFunctionalTest extends MauticMysqlTestCase
         $this->requestStack   = static::getContainer()->get(RequestStack::class);
     }
 
+    public function testDeletedContactTrackedDeviceDoesNotThrow(): void
+    {
+        static::getContainer()->get(TokenStorageInterface::class)->setToken(null);
+        $this->contactTracker->setUseSystemContact(false);
+
+        $contact = $this->createContact('deleted-contact@domain.tld');
+        $device  = $this->createDevice($contact, 'track-deleted-contact');
+        $this->em->flush();
+
+        $contactId = $contact->getId();
+
+        // Simulate the race condition: delete the lead row directly via DBAL, bypassing
+        // Doctrine's ON DELETE CASCADE so the device record remains orphaned.
+        // This replicates the window where a request has already loaded the lead_id
+        // from the device table but the lead is deleted before it can be fetched.
+        $this->em->getConnection()
+            ->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'leads WHERE id = :id', ['id' => $contactId]);
+
+        $this->em->clear();
+
+        // A returning visitor whose cookie still references the deleted contact ID must NOT
+        // throw EntityNotFoundException; they are handled as a brand-new anonymous visitor.
+        $result = $this->trackContactByDevice($device);
+
+        Assert::assertInstanceOf(Lead::class, $result, 'Expected a fresh anonymous visitor contact when the tracked device references a deleted contact.');
+        Assert::assertNotSame($contactId, $result->getId(), 'A deleted contact must not be re-tracked.');
+    }
+
     public function testReset(): void
     {
         static::getContainer()->get(TokenStorageInterface::class)->setToken(null);

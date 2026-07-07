@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tracker;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -223,10 +224,23 @@ class ContactTracker
 
         // Is there a device being tracked?
         if ($trackedDevice = $this->deviceTracker->getTrackedDevice()) {
-            $lead = $trackedDevice->getLead();
+            try {
+                $lead = $trackedDevice->getLead();
 
-            // Lead associations are not hydrated with custom field values by default
-            $this->hydrateCustomFieldData($lead);
+                if ($lead instanceof \Doctrine\Persistence\Proxy && !$lead->__isInitialized()) {
+                    // Force the proxy to initialize so a deleted contact throws here,
+                    // inside the guard, instead of later in unguarded code
+                    $lead->__load();
+                }
+
+                // Lead associations are not hydrated with custom field values by default
+                $this->hydrateCustomFieldData($lead);
+            } catch (EntityNotFoundException) {
+                // The contact was deleted but the device tracking record still references
+                // the old ID. Treat as a new anonymous visitor.
+                $lead = null;
+                $this->logger->debug('CONTACT: Tracked device references a deleted contact, treating as new visitor.');
+            }
         }
 
         if (null === $lead) {
