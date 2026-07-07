@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class SegmentSubscriberTest extends TestCase
+final class SegmentSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&EmailModel
