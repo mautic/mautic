@@ -1325,14 +1325,14 @@ Mautic.activateDateTimeInputs = function(el, type) {
  * Apply parsed scope state to the search input and optional scope dropdown.
  */
 Mautic.applySearchScopeState = function (searchEl, searchString) {
-    var searchInput = mQuery(searchEl);
+    const searchInput = mQuery(searchEl);
     if (!searchInput.length) {
         return;
     }
 
-    var searchId = searchInput.attr('id');
-    var scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
-    var initialSearch = (searchString || '').trim();
+    const searchId = searchInput.attr('id');
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
+    const initialSearch = (searchString || '').trim();
 
     if (!scopeSelect.length) {
         searchInput.val(initialSearch);
@@ -1341,14 +1341,15 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
         return;
     }
 
-    var scopeCommands = [];
+    let scopeCommands = [];
     try {
         scopeCommands = JSON.parse(scopeSelect.attr('data-scopes') || '[]');
-    } catch (e) {
+    } catch (parseError) {
+        console.warn('Invalid search scope JSON', parseError);
         scopeCommands = [];
     }
 
-    var parsed = Mautic.parseScopedSearchValue(initialSearch, scopeCommands);
+    const parsed = Mautic.parseScopedSearchValue(initialSearch, scopeCommands);
     scopeSelect.val(parsed.command);
     if ((null === scopeSelect.val() || '' === scopeSelect.val()) && parsed.command === '') {
         scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
@@ -1360,7 +1361,7 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
         return;
     }
 
-    var visibleValue = parsed.command ? parsed.value : initialSearch;
+    const visibleValue = parsed.command ? parsed.value : initialSearch;
     searchInput.val(visibleValue);
     searchInput.typeahead('val', visibleValue);
 };
@@ -1399,12 +1400,12 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
         return {command: '', value: ''};
     }
 
-    var sorted = scopeCommands.slice().sort(function (a, b) {
+    const sorted = scopeCommands.slice().sort(function (a, b) {
         return b.length - a.length;
     });
 
-    for (var i = 0; i < sorted.length; i++) {
-        var command = sorted[i];
+    for (let i = 0; i < sorted.length; i++) {
+        const command = sorted[i];
         if (!command) {
             continue;
         }
@@ -1413,7 +1414,7 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
             return {command: command, value: ''};
         }
 
-        var prefix = command + ':';
+        const prefix = command + ':';
         if (searchValue.indexOf(prefix) === 0) {
             return {
                 command: command,
@@ -1429,33 +1430,33 @@ Mautic.parseScopedSearchValue = function (searchValue, scopeCommands) {
  * Wire the optional field-scope dropdown to a livesearch input.
  */
 Mautic.activateSearchScope = function (searchEl) {
-    var searchInput = mQuery(searchEl);
+    const searchInput = mQuery(searchEl);
     if (!searchInput.length) {
         return;
     }
 
-    var searchId = searchInput.attr('id');
-    var scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
+    const searchId = searchInput.attr('id');
+    const scopeSelect = mQuery("select[data-livesearch-scope-for='" + searchId + "']");
     if (!scopeSelect.length) {
         return;
     }
 
-    var initialSearch = (scopeSelect.attr('data-initial-search') || searchInput.val() || '').trim();
+    const initialSearch = (scopeSelect.attr('data-initial-search') || searchInput.val() || '').trim();
     Mautic.applySearchScopeState(searchInput, initialSearch);
     MauticVars.lastSearchStr = initialSearch;
 
     scopeSelect.off('change.searchScope').on('change.searchScope', function () {
-        var command = scopeSelect.val();
+        const command = scopeSelect.val();
 
         if (command && command.indexOf(':') > 0) {
             searchInput.val('');
             searchInput.typeahead('val', '');
         }
 
-        var scopedValue = Mautic.composeScopedSearchValue(command, searchInput.val().trim());
+        const scopedValue = Mautic.composeScopedSearchValue(command, searchInput.val().trim());
         MauticVars.lastSearchStr = scopedValue;
 
-        var scopeChangeEvent = mQuery.Event('keyup', {which: 13});
+        const scopeChangeEvent = mQuery.Event('keyup', {which: 13});
         scopeChangeEvent.data = {livesearch: true, scopeChange: true};
         Mautic.filterList(
             scopeChangeEvent,
@@ -2233,7 +2234,7 @@ Mautic.removeFilterCommands = function (searchValue) {
  * @returns {Array<string>}
  */
 Mautic.getActiveFilterCommands = function (searchValue) {
-    if (typeof searchValue === 'undefined' || searchValue === null) {
+    if (searchValue === undefined || searchValue === null) {
         const searchInput = document.getElementById('list-search');
         if (!searchInput) {
             return [];

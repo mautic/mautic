@@ -124,8 +124,9 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
     //only submit if the element exists, its a livesearch, or on button click
 
     if (el.length && (e.data.livesearch || mQuery(e.target).prop('tagName') == 'BUTTON' || mQuery(e.target).parent().prop('tagName') == 'BUTTON')) {
-        var scopeChange = e.data && e.data.scopeChange;
-        var value = el.val().trim();
+        const scopeChange = e.data && e.data.scopeChange;
+        let value = el.val().trim();
+        const scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
         //should the content be cleared?
         if (!value && !scopeChange) {
             //force action since we have no content
@@ -135,7 +136,6 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             el.typeahead('val', '');
             value = '';
 
-            var scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
             if (scopeSelect.length) {
                 scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
             }
@@ -167,7 +167,6 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             Mautic.startIconSpinOnEvent(btn);
         }
 
-        var scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
         if (scopeSelect.length) {
             if (action === 'clear' && !scopeChange) {
                 scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
@@ -177,8 +176,8 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
                     Mautic.initFilterCommands();
                 }
 
-                var filterCommands = Mautic.getActiveFilterCommands(value);
-                var scopedInputValue = Mautic.removeFilterCommands(value);
+                const filterCommands = Mautic.getActiveFilterCommands(value);
+                const scopedInputValue = Mautic.removeFilterCommands(value);
                 value = Mautic.composeScopedSearchValue(scopeSelect.val(), scopedInputValue);
 
                 if (filterCommands.length) {
