@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class WebhookController extends FormController
 {
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -49,9 +55,25 @@ final class WebhookController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getViewArguments(array $args, $action): array
+    {
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes']    = $this->indexSearchScopes;
+            $args['viewParameters']['searchScopeHint'] = 'mautic.core.search.scope.hint';
+            $this->indexSearchScopes                   = null;
+        }
+
+        return parent::getViewArguments($args, $action);
     }
 
     /**

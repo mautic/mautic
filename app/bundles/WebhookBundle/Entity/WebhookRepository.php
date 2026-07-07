@@ -22,6 +22,22 @@ class WebhookRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter): array
     {
+        [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
+
+        if (false !== $expr) {
+            return [$expr, $parameters];
+        }
+
+        $command = $filter->command;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                return $this->addStandardCatchAllWhereClause($q, $filter, [
+                    $this->getTableAlias().'.name',
+                ]);
+        }
+
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 
@@ -30,7 +46,10 @@ class WebhookRepository extends CommonRepository
      */
     public function getSearchCommands(): array
     {
-        return $this->getStandardSearchCommands();
+        return array_merge(
+            ['mautic.core.searchcommand.name'],
+            $this->getStandardSearchCommands()
+        );
     }
 
     /**
