@@ -53,18 +53,12 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface, G
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\NotificationRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\NotificationBundle\Entity\NotificationRepository
     {
         return $this->em->getRepository(Notification::class);
     }
 
-    /**
-     * @return \Mautic\NotificationBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \Mautic\NotificationBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }

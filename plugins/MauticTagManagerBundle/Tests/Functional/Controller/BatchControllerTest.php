@@ -32,6 +32,8 @@ final class BatchControllerTest extends MauticMysqlTestCase
             'tag3',
             'tag4',
         ];
+
+        /** @var \Mautic\LeadBundle\Model\TagModel $tagModel */
         $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
         $this->tags          = $this->addTags($tags);
