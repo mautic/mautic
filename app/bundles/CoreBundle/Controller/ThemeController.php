@@ -8,7 +8,8 @@ use Mautic\CoreBundle\Form\Type\ThemeUploadType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Helper\ThemeSearchFilter;
+use Mautic\CoreBundle\Helper\ThemeSearchScopeProvider;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ThemeController extends FormController
 {
-    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper): Response
+    public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper, ThemeSearchScopeProvider $themeSearchScopeProvider, ThemeSearchFilter $themeSearchFilter): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -31,6 +32,13 @@ final class ThemeController extends FormController
             $this->throwAccessDenied();
         }
 
+        $this->setListFilters();
+
+        $session = $request->getSession();
+        $search  = $request->get('search', $session->get('mautic.theme.filter', ''));
+        $session->set('mautic.theme.filter', $search);
+
+        $tmpl   = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $dir    = $pathsHelper->getSystemPath('themes', true);
         $action = $this->generateUrl('mautic_themes_index');
         $form   = $this->formFactory->create(ThemeUploadType::class, [], ['action' => $action]);
@@ -78,16 +86,29 @@ final class ThemeController extends FormController
             }
         }
 
+        $searchScopes    = $themeSearchScopeProvider->getScopes();
+        $scopeCommands   = array_column($searchScopes, 'command');
+        $items           = $themeHelper->getInstalledThemes('all', true, true);
+        $items           = $themeSearchFilter->filter($items, $search, $scopeCommands, $this->translator);
+
+        $contentTemplate = ('list' === $tmpl)
+            ? '@MauticCore/Theme/list_results.html.twig'
+            : '@MauticCore/Theme/list.html.twig';
+
         return $this->delegateView([
             'viewParameters' => [
-                'items'         => $themeHelper->getInstalledThemes('all', true, true),
-                'builders'      => $builderIntegrationsHelper->getBuilderNames(),
-                'defaultThemes' => $themeHelper->getDefaultThemes(),
-                'form'          => $form->createView(),
-                'permissions'   => $permissions,
-                'security'      => $this->security,
+                'items'           => $items,
+                'builders'        => $builderIntegrationsHelper->getBuilderNames(),
+                'defaultThemes'   => $themeHelper->getDefaultThemes(),
+                'form'            => $form->createView(),
+                'permissions'     => $permissions,
+                'security'        => $this->security,
+                'searchValue'     => $search,
+                'searchScopes'    => $searchScopes,
+                'searchScopeHint' => 'mautic.core.search.scope.hint',
+                'tmpl'            => $tmpl,
             ],
-            'contentTemplate' => '@MauticCore/Theme/list.html.twig',
+            'contentTemplate' => $contentTemplate,
             'passthroughVars' => [
                 'activeLink'    => '#mautic_themes_index',
                 'mauticContent' => 'theme',
