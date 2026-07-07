@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\LeadEvents;
 
-class SegmentSubscriberFunctionalTest extends MauticMysqlTestCase
+final class SegmentSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadListChangeEventHasListeners(): void
     {
