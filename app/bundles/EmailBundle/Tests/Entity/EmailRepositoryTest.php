@@ -31,7 +31,9 @@ final class EmailRepositoryTest extends TestCase
         $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.email.email.searchcommand.isexpired' => 'is:expired',
             'mautic.email.email.searchcommand.ispending' => 'is:pending',
-            default                                      => $id,
+            'mautic.core.searchcommand.name'              => 'name',
+            'mautic.email.email.searchcommand.subject'    => 'subject',
+            default                                       => $id,
         });
         $this->repo->autowireCommonRepository($translator);
     }
@@ -327,7 +329,35 @@ final class EmailRepositoryTest extends TestCase
     public function testGetSearchCommandsContainsExpirationFilters(): void
     {
         $commands = $this->repo->getSearchCommands();
-        $this->assertContains('mautic.email.email.searchcommand.isexpired', $commands);
-        $this->assertContains('mautic.email.email.searchcommand.ispending', $commands);
+        self::assertContains('mautic.email.email.searchcommand.isexpired', $commands);
+        self::assertContains('mautic.email.email.searchcommand.ispending', $commands);
+        self::assertContains('mautic.core.searchcommand.name', $commands);
+        self::assertContains('mautic.email.email.searchcommand.subject', $commands);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesNameFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'name', 'string' => 'Newsletter', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        self::assertStringContainsString('e.name', (string) $expr);
+        self::assertCount(1, $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesSubjectFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'subject', 'string' => 'Welcome', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        self::assertStringContainsString('e.subject', (string) $expr);
+        self::assertCount(1, $params);
     }
 }

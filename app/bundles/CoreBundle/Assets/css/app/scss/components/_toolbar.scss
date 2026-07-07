@@ -2,9 +2,10 @@
     position: relative;
 }
 
-.toolbar--toolbar-content {
+    .toolbar--toolbar-content {
     .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
     .form-control.search,
+    .search-scope-select,
     .input-group .input-group-btn button,
     .btn,
     div {
@@ -14,10 +15,31 @@
     }
     .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
     .form-control.search,
+    .search-scope-select,
     .input-group .input-group-btn button,
     .btn-ghost {
         border: var(--border-no-width);
         &:hover { background-color: var(--field-hover); }
+    }
+
+    .search-scope-select {
+      flex: 0 0 60px;
+      inline-size: 60px;
+      min-inline-size: 60px;
+      max-inline-size: 60px;
+      border-inline-end: none;
+      padding-inline: var(--spacing-02);
+      background-color: var(--field);
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .search-scope-select option.search-scope-hint {
+      color: var(--text-secondary);
+      font-style: italic;
+      white-space: normal;
     }
 
     > .btn {

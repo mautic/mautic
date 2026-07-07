@@ -1,0 +1,29 @@
+{% if searchScopes is defined and searchScopes is not empty %}
+{% set scopeId = scopeId|default(id ~ '-scope') %}
+<select
+    id="{{ scopeId }}"
+    class="form-control not-chosen search-scope-select"
+    data-livesearch-scope-for="{{ id }}"
+    data-toggle="searchscope"
+    data-scopes="{{ scopeCommands|default([])|json_encode|e('html_attr') }}"
+    data-initial-search="{{ searchValue|default('')|e('html_attr') }}"
+    aria-label="{{ 'mautic.core.search.scope.label'|trans }}"
+>
+    {% if searchScopeHint is defined and searchScopeHint is not empty %}
+        <option value="__hint__" disabled class="search-scope-hint">{{ searchScopeHint|trans }}</option>
+    {% endif %}
+    {% for scope in searchScopes %}
+        {% set scopeCommand = scope.command|default('') %}
+        {% set scopeLabel = scope.translate|default(true) ? scope.label|trans : scope.label %}
+        {% set isSelected = scope.default|default(false) and parsedScope.command|default('') == '' %}
+        {% if not isSelected and scope.disabled|default(false) is same as(false) %}
+            {% set isSelected = parsedScope.command|default('') == scopeCommand %}
+        {% endif %}
+        <option
+            value="{{ scopeCommand|escape('html_attr') }}"
+            {% if scope.disabled|default(false) %}disabled{% endif %}
+            {% if isSelected %}selected{% endif %}
+        >{{ scopeLabel }}{% if scope.suffix|default(false) %}{{ scope.suffix }}{% endif %}</option>
+    {% endfor %}
+</select>
+{% endif %}

@@ -124,15 +124,21 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
     //only submit if the element exists, its a livesearch, or on button click
 
     if (el.length && (e.data.livesearch || mQuery(e.target).prop('tagName') == 'BUTTON' || mQuery(e.target).parent().prop('tagName') == 'BUTTON')) {
+        var scopeChange = e.data && e.data.scopeChange;
         var value = el.val().trim();
         //should the content be cleared?
-        if (!value) {
+        if (!value && !scopeChange) {
             //force action since we have no content
             action = 'clear';
-        } else if (action == 'clear') {
+        } else if (action == 'clear' && !scopeChange) {
             el.val('');
             el.typeahead('val', '');
             value = '';
+
+            var scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
+            if (scopeSelect.length) {
+                scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+            }
         }
 
         //make the request
@@ -157,11 +163,21 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
             }
 
             var btn = "button[data-livesearch-parent='" + elId + "']";
-            if (mQuery(btn).length && !mQuery(btn).hasClass('btn-nospin') && !Mautic.filterButtonClicked) {
-                Mautic.startIconSpinOnEvent(btn);
-            }
+        if (mQuery(btn).length && !mQuery(btn).hasClass('btn-nospin') && !Mautic.filterButtonClicked) {
+            Mautic.startIconSpinOnEvent(btn);
+        }
 
-            var tmpl = mQuery('#' + elId).data('tmpl');
+        var scopeSelect = mQuery("select[data-livesearch-scope-for='" + elId + "']");
+        if (scopeSelect.length) {
+            if (action === 'clear' && !scopeChange) {
+                scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+                value = '';
+            } else {
+                value = Mautic.composeScopedSearchValue(scopeSelect.val(), value);
+            }
+        }
+
+        var tmpl = mQuery('#' + elId).data('tmpl');
             if (!tmpl) {
                 tmpl = 'list';
             }
@@ -263,18 +279,18 @@ Mautic.setSearchFilter = function (el, searchId, string) {
         var current = mQuery('#list-search').typeahead('val') + " " + filter;
     }
 
-    //append the filter
-    mQuery(searchId).typeahead('val', current);
+    var searchEl = mQuery(searchId);
+    Mautic.applySearchScopeState(searchEl, current);
+    MauticVars.lastSearchStr = current;
 
     //submit search
     var e = mQuery.Event("keypress", {which: 13});
-    e.data = {};
-    e.data.livesearch = true;
+    e.data = {livesearch: true, scopeChange: true};
     Mautic.filterList(
         e,
-        'list-search',
-        mQuery(searchId).attr('data-action'),
-        mQuery(searchId).attr('data-target'),
+        searchEl.attr('id'),
+        searchEl.attr('data-action'),
+        searchEl.attr('data-target'),
         'liveCache'
     );
 };

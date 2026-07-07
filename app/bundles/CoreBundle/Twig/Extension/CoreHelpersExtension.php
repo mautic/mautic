@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
+use Mautic\CoreBundle\Helper\SearchScopeHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -27,6 +28,7 @@ final class CoreHelpersExtension extends AbstractExtension
             new TwigFunction('getFilterAttributes', $this->getFilterAttributes(...), ['is_safe' => 'all']),
             // Used by CoreBundle:Helper:pagination.html.twig
             new TwigFunction('getPaginationAction', $this->getPaginationAction(...), ['is_safe' => 'all']),
+            new TwigFunction('search_scope_parse', $this->parseSearchScope(...)),
             new TwigFunction('md5', fn (string $string): string => md5($string), ['is_safe' => 'all']),
         ];
     }
@@ -121,5 +123,15 @@ final class CoreHelpersExtension extends AbstractExtension
         }
 
         return "href=\"{$baseUrl}/{$page}{$queryString}\"";
+    }
+
+    /**
+     * @param list<string> $scopeCommands
+     *
+     * @return array{command: string, value: string}
+     */
+    public function parseSearchScope(string $search, array $scopeCommands): array
+    {
+        return SearchScopeHelper::parse($search, $scopeCommands);
     }
 }
