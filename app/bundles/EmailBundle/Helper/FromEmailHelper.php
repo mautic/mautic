@@ -25,8 +25,10 @@ class FromEmailHelper
      */
     private ?array $lastOwner = null;
 
-    public function __construct(private readonly CoreParametersHelper $coreParametersHelper, private readonly LeadRepository $leadRepository)
-    {
+    public function __construct(
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly LeadRepository $leadRepository,
+    ) {
     }
 
     public function setDefaultFrom(AddressDTO $from): void

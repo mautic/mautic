@@ -10,8 +10,9 @@ use Twig\TwigFunction;
 
 class EntityHelper extends AbstractExtension
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
     /**
