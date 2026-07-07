@@ -36,15 +36,12 @@ class WebhookRepository extends CommonRepository
 
         $command = $filter->command;
 
-        switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.name'):
-            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                return $this->addStandardCatchAllWhereClause($q, $filter, [
-                    $this->getTableAlias().'.name',
-                ]);
-        }
-
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        return match ($command) {
+            $this->translator->trans('mautic.core.searchcommand.name'), $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US') => $this->addStandardCatchAllWhereClause($q, $filter, [
+                $this->getTableAlias().'.name',
+            ]),
+            default => $this->addStandardSearchCommandWhereClause($q, $filter),
+        };
     }
 
     /**

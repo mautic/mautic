@@ -54,22 +54,15 @@ final class ClientRepository extends CommonRepository
 
         $command = $filter->command;
 
-        switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.name'):
-            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                return $this->addStandardCatchAllWhereClause($q, $filter, [
-                    $this->getTableAlias().'.name',
-                ]);
-            case $this->translator->trans('mautic.api.client.searchcommand.callback'):
-            case $this->translator->trans('mautic.api.client.searchcommand.callback', [], null, 'en_US'):
-            case $this->translator->trans('mautic.api.client.searchcommand.redirecturi'):
-            case $this->translator->trans('mautic.api.client.searchcommand.redirecturi', [], null, 'en_US'):
-                return $this->addStandardCatchAllWhereClause($q, $filter, [
-                    $this->getTableAlias().'.redirectUris',
-                ]);
-        }
-
-        return [$expr, $parameters];
+        return match ($command) {
+            $this->translator->trans('mautic.core.searchcommand.name'), $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US') => $this->addStandardCatchAllWhereClause($q, $filter, [
+                $this->getTableAlias().'.name',
+            ]),
+            $this->translator->trans('mautic.api.client.searchcommand.callback'), $this->translator->trans('mautic.api.client.searchcommand.callback', [], null, 'en_US'), $this->translator->trans('mautic.api.client.searchcommand.redirecturi'), $this->translator->trans('mautic.api.client.searchcommand.redirecturi', [], null, 'en_US') => $this->addStandardCatchAllWhereClause($q, $filter, [
+                $this->getTableAlias().'.redirectUris',
+            ]),
+            default => [$expr, $parameters],
+        };
     }
 
     /**
