@@ -143,7 +143,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
     private function getTableHeader(array $columns, array $columnOrder): array
     {
         return array_values(array_filter(
-            array_map(fn ($key) => $columns[$key]['label'] ?? null, $columnOrder)
+            array_map(fn (string $key) => $columns[$key]['label'] ?? null, $columnOrder)
         ));
     }
 }

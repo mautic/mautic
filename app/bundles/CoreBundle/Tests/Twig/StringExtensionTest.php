@@ -59,7 +59,7 @@ final class StringExtensionTest extends TestCase
 
     public function testGetFiltersContainsUFilter(): void
     {
-        $filterNames = array_map(static fn ($filter) => $filter->getName(), $this->extension->getFilters());
+        $filterNames = array_map(static fn (\Twig\TwigFilter $filter): string => $filter->getName(), $this->extension->getFilters());
 
         self::assertContains('u', $filterNames);
     }

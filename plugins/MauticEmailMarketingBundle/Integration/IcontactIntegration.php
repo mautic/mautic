@@ -86,7 +86,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
      *
      * @return mixed|string
      */

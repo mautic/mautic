@@ -24,7 +24,7 @@ class ReportController extends FormController
 {
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model = $this->getModel('report');
 
         // set some permissions

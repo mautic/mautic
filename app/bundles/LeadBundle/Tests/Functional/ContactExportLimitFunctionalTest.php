@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,7 @@ final class ContactExportLimitFunctionalTest extends MauticMysqlTestCase
         $this->loadFixtures([LoadLeadData::class]);
 
         // Create additional contacts to exceed the limit
+        /** @var LeadModel $contactModel */
         $contactModel = self::getContainer()->get('mautic.lead.model.lead');
         for ($i = 0; $i < 3; ++$i) {
             $contact = new Lead();

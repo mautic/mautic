@@ -141,18 +141,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $this->emailStatModel->getRepository();
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\CopyRepository
-     */
-    public function getCopyRepository()
+    public function getCopyRepository(): \Mautic\EmailBundle\Entity\CopyRepository
     {
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\Copy::class);
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\StatDeviceRepository
-     */
-    public function getStatDeviceRepository()
+    public function getStatDeviceRepository(): \Mautic\EmailBundle\Entity\StatDeviceRepository
     {
         return $this->em->getRepository(StatDevice::class);
     }
@@ -1648,7 +1642,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
-            if (true === $firstMail) {
+            if ($firstMail) {
                 try {
                     $this->flushQueue($mailer);
                 } catch (EmailCouldNotBeSentException $e) {
@@ -1697,7 +1691,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
-            if (true === $firstMail) {
+            if ($firstMail) {
                 try {
                     $this->flushQueue($mailer);
                 } catch (EmailCouldNotBeSentException $e) {
