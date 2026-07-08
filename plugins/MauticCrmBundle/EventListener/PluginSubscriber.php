@@ -13,8 +13,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PluginSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly PluginDatabase $pluginDatabase)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly PluginDatabase $pluginDatabase,
+    ) {
     }
 
     public function onInstall(PluginInstallEvent $event): void

@@ -29,8 +29,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MobileNotificationType extends AbstractType
 {
-    public function __construct(private readonly EntityManager $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManager $entityManager,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
