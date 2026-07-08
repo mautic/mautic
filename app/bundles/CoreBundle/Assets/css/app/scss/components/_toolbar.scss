@@ -23,17 +23,13 @@
     }
 
     .search-scope-select {
-      flex: 0 0 60px;
-      inline-size: 60px;
-      min-inline-size: 60px;
-      max-inline-size: 60px;
+      flex: 0 0 auto;
+      inline-size: auto;
+      max-inline-size: 220px;
       border-inline-end: none;
-      padding-inline: var(--spacing-02);
+      padding-inline: var(--spacing-04);
       background-color: var(--field);
       color: var(--text-primary);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .search-scope-select option.search-scope-hint {
