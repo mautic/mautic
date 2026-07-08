@@ -19,7 +19,7 @@ return RectorConfig::configure()
         __DIR__.'/plugins',
     ])
     ->withPreparedSets(deadCode: true, typeDeclarations: true)
-    ->withPhpSets(php81: true)
+    ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         // common controllers
@@ -68,7 +68,7 @@ return RectorConfig::configure()
         ],
 
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+        // Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
             __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
