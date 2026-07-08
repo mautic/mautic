@@ -482,7 +482,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $mockHandler = $this->getClientMockHandler();
         $mockHandler->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 Assert::assertSame('GET', $request->getMethod());
 
                 // Later check the logged/displayed URL has no auth details.

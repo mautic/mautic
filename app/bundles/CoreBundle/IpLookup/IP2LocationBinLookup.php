@@ -11,10 +11,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
         return 'IP2Location Local Bin File DB9BIN only';
     }
 
-    /**
-     * @return string
-     */
-    public function getLocalDataStoreFilepath()
+    public function getLocalDataStoreFilepath(): string
     {
         return $this->getDataDir().'/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE.BIN';
     }

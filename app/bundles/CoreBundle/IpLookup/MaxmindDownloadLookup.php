@@ -16,10 +16,7 @@ class MaxmindDownloadLookup extends AbstractLocalDataLookup
         return $this->getDataDir().'/GeoLite2-City.mmdb';
     }
 
-    /**
-     * @return string
-     */
-    public function getRemoteDateStoreDownloadUrl()
+    public function getRemoteDateStoreDownloadUrl(): string
     {
         $baseAuth = $this->getLicenceKey();
 
