@@ -681,10 +681,13 @@ export default class BuilderService {
     this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
     this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
 
-    this.editor.on('load', () => this.normalizeTextComponentContainers());
-    this.editor.on('component:add', (component) =>
-      this.normalizeTextComponentContainers(component)
-    );
+    this.editor.on('load', () => {
+      if (this.isPageContext()) {
+        this.addMobileCssFix();
+      }
+      this.normalizeTextComponentContainers();
+    });
+    this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('mautic:code-editor-update', () => this.normalizeTextComponentContainers());
 
@@ -1540,6 +1543,21 @@ export default class BuilderService {
           order: -1,
         });
       }
+    });
+  }
+
+  addMobileCssFix() {
+    const cssc = this.editor.CssComposer;
+    if (!cssc || typeof cssc.setRule !== 'function') {
+      return;
+    }
+
+    cssc.setRule('.gjs-cell, .gjs-cell30, .gjs-cell70', {
+      height: 'auto',
+    }, {
+      atRuleType: 'media',
+      atRuleParams: '(max-width: 768px)',
+      addStyles: true,
     });
   }
 
