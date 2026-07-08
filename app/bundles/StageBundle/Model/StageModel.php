@@ -43,10 +43,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\StageBundle\Entity\StageRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
     {
         return $this->em->getRepository(Stage::class);
     }

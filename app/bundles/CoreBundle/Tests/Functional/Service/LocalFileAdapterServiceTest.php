@@ -18,6 +18,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
     protected function beforeTearDown(): void
     {
+        /** @var PathsHelper $pathsHelper */
         $pathsHelper = static::getContainer()->get('mautic.helper.paths');
         $folderPath  = "{$pathsHelper->getImagePath()}/$this->folderName";
 

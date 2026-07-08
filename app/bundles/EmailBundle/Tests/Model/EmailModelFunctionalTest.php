@@ -44,6 +44,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->configParams['email_frequency_time']   = 'MONTH';
         parent::setUp();
 
+        /** @var EmailModel $emailModel */
         $emailModel = static::getContainer()->get('mautic.email.model.email');
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
@@ -138,6 +139,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
