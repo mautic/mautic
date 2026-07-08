@@ -20,7 +20,7 @@ return RectorConfig::configure()
         __DIR__.'/plugins',
     ])
     ->withPreparedSets(deadCode: true, typeDeclarations: true)
-    ->withPhpSets(php80: true)
+    ->withPhpSets(php81: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,

@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FocusListType extends AbstractType
 {
-    private FocusRepository $repo;
+    private readonly FocusRepository $repo;
 
     public function __construct(
         protected FocusModel $focusModel,
