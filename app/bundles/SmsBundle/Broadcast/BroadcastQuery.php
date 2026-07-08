@@ -8,10 +8,12 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
 class BroadcastQuery
 {
     use ContactLimiterTrait;
+    use QueryBuilderManipulatorTrait;
 
     /**
      * @var \Doctrine\DBAL\Query\QueryBuilder
@@ -27,10 +29,42 @@ class BroadcastQuery
     public function getPendingContacts(Sms $sms, ContactLimiter $contactLimiter): array
     {
         $query = $this->getBasicQuery($sms);
-        $query->select('DISTINCT l.id, ll.id as listId');
+        $query->select('l.id, ll.id as listId');
         $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
 
         return $query->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getPendingLeadsRangeWithCount(Sms $sms, ContactLimiter $contactLimiter): array
+    {
+        $query = $this->getBasicQuery($sms);
+        $query->select('COUNT(DISTINCT l.id) as count, MIN(l.id) as min_id, MAX(l.id) as max_id');
+        $this->updateQueryFromContactLimiter('lll', $query, $contactLimiter);
+
+        $results = $query->executeQuery()->fetchAllAssociative();
+
+        return $results[0];
+    }
+
+    public function getBatchMaxContactId(Sms $sms, int $minId, int $batchSize): int
+    {
+        $query = $this->getBasicQuery($sms);
+        $query->select('DISTINCT(l.id)');
+        $query->andWhere('l.id >= :minId');
+        $query->setParameter('minId', $minId);
+        $query->orderBy('l.id', 'ASC');
+        $query->setMaxResults($batchSize);
+
+        $outerQb = $this->entityManager->getConnection()->createQueryBuilder();
+        $outerQb->select('MAX(id)');
+        $outerQb->from("({$query->getSQL()})", 'subquery');
+
+        $this->copyParams($query, $outerQb);
+
+        return (int) $outerQb->executeQuery()->fetchOne();
     }
 
     /**
@@ -47,7 +81,7 @@ class BroadcastQuery
     /**
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    private function getBasicQuery(Sms $sms)
+    public function getBasicQuery(Sms $sms)
     {
         $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(
