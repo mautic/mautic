@@ -90,7 +90,7 @@ final class ArchiveBuilder
 
     private function closeZipArchive(\ZipArchive $zipArchive, string $zipPath): void
     {
-        if (true !== $zipArchive->close()) {
+        if (!$zipArchive->close()) {
             @unlink($zipPath);
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.zip_creation');
         }
