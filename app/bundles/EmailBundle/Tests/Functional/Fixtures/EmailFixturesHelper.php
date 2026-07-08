@@ -15,8 +15,9 @@ use Mautic\PageBundle\Entity\Trackable;
 
 final class EmailFixturesHelper
 {
-    public function __construct(private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+    ) {
     }
 
     /**

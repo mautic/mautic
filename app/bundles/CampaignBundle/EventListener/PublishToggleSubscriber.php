@@ -13,8 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class PublishToggleSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper, private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+        private TranslatorInterface $translator,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
