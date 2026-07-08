@@ -611,10 +611,9 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param int[] $campaignIds
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
         $connection = $this->getEntityManager()->getConnection();
         $platform   = $connection->getDatabasePlatform();

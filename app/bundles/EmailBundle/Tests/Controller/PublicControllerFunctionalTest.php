@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -511,6 +512,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail($rightEmail);
         $this->em->persist($lead);
         // Email hash
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper   = self::getContainer()->get('mautic.helper.core_parameters');
         $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
         $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);

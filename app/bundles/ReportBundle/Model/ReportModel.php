@@ -81,10 +81,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ReportBundle\Entity\ReportRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\ReportBundle\Entity\ReportRepository
     {
         return $this->em->getRepository(Report::class);
     }

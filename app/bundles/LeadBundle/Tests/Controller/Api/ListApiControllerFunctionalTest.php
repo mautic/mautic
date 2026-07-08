@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -635,6 +636,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
         $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
         $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
 
