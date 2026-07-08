@@ -17,26 +17,17 @@ use Mautic\CoreBundle\Model\FormModel;
  */
 class EventModel extends FormModel
 {
-    /**
-     * @return \Mautic\CampaignBundle\Entity\EventRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\CampaignBundle\Entity\EventRepository
     {
         return $this->em->getRepository(Event::class);
     }
 
-    /**
-     * @return \Mautic\CampaignBundle\Entity\CampaignRepository
-     */
-    public function getCampaignRepository()
+    public function getCampaignRepository(): \Mautic\CampaignBundle\Entity\CampaignRepository
     {
         return $this->em->getRepository(Campaign::class);
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getLeadEventLogRepository()
+    public function getLeadEventLogRepository(): LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }
@@ -100,7 +91,7 @@ class EventModel extends FormModel
      */
     public function deleteEventsByEventIds(array $eventIds): void
     {
-        $deletedData = array_map(fn ($id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
+        $deletedData = array_map(fn (string $id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
         $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
         $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }

@@ -12,6 +12,7 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Model\RedirectModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -228,6 +229,7 @@ final class PageModelTest extends MauticMysqlTestCase
         $this->em->persist($redirect);
         $this->em->flush();
 
+        /** @var RedirectModel $redirectModel */
         $redirectModel = $this->getContainer()->get('mautic.page.model.redirect');
         $redirectURL   = $redirectModel->generateRedirectUrl($redirect, $clickThrough);
         // Send Request

@@ -11,8 +11,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class FormFieldSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FieldModel $fieldModel)
-    {
+    public function __construct(
+        private FieldModel $fieldModel,
+    ) {
     }
 
     /**

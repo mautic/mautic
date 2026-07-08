@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -52,6 +53,7 @@ final class ReportModelTest extends MauticMysqlTestCase
         /** @var RequestStack $requestStack */
         $requestStack = self::getContainer()->get('request_stack');
         $requestStack->push($request);
+        /** @var ReportModel $reportModel */
         $reportModel = self::getContainer()->get('mautic.report.model.report');
 
         $aDayAgoBeginningOfTheDay = (clone $aDayAgo)->setTime(0, 0, 0);

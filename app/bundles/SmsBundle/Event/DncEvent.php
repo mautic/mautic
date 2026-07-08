@@ -17,8 +17,9 @@ final class DncEvent extends Event
     /**
      * @param array<int, Lead> $contacts
      */
-    public function __construct(private array $contacts)
-    {
+    public function __construct(
+        private array $contacts,
+    ) {
     }
 
     /**

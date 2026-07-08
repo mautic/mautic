@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
@@ -115,6 +116,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(3, $hoursDatasets);  // Assuming there are 3 datasets: Email sent, Email read, Email clicked
 
         // Get the time format from CoreParametersHelper
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = self::getContainer()->get('mautic.helper.core_parameters');
         $timeFormat           = $coreParametersHelper->get('date_format_timeonly');
 
