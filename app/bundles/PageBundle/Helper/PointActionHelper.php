@@ -8,8 +8,9 @@ use Mautic\PageBundle\Entity\Page;
 
 class PointActionHelper
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+    ) {
     }
 
     public static function validatePageHit($eventDetails, $action): bool

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\Filesystem;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
@@ -22,6 +23,7 @@ final class GenerateProductionAssetsCommandTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->filesystem = self::getContainer()->get('mautic.filesystem');
+        /** @var PathsHelper $pathHelper */
         $pathHelper       = self::getContainer()->get('mautic.helper.paths');
 
         $this->ckeditorFilePath = $pathHelper->getVendorRootPath().'/media/libraries/ckeditor/';

@@ -69,6 +69,9 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
+    /**
+     * @param mixed[] $fields
+     */
     public function setFields($fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
