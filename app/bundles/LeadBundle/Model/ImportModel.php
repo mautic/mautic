@@ -216,7 +216,7 @@ class ImportModel extends FormModel
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            throw new ImportFailedException('Database had been overloaded');
+            throw new ImportFailedException('Database had been overloaded', $e->getCode(), $e);
         }
 
         $import->end();

@@ -39,6 +39,8 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
+
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
