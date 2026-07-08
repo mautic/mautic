@@ -14,8 +14,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class FixtureHelper
 {
-    public function __construct(private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+    ) {
     }
 
     public function createContact(string $email): Lead

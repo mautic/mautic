@@ -68,18 +68,12 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\SmsBundle\Entity\SmsRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
     {
         return $this->em->getRepository(Sms::class);
     }
 
-    /**
-     * @return \Mautic\SmsBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }

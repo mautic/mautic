@@ -720,12 +720,11 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param array  $vars
      * @param bool   $returnContent
      *
      * @return void|string
      */
-    public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
     {
         $content = $this->twig->render($template, $vars);
 
@@ -877,7 +876,7 @@ class MailHelper
             $addresses = [$addresses => $name];
         } elseif (0 === array_keys($addresses)[0]) {
             // We need an array of $email => $name pairs
-            $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
+            $addresses = array_reduce($addresses, function (array $address, $item) use ($name): array {
                 $address[$item] = $name;
 
                 return $address;
