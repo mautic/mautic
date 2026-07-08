@@ -121,10 +121,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->catInUrl = $catInUrl;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\PageRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PageBundle\Entity\PageRepository
     {
         $repo = $this->em->getRepository(Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -132,10 +129,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\HitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
     {
         return $this->em->getRepository(Hit::class);
     }

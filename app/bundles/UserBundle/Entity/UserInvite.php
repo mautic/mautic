@@ -22,8 +22,9 @@ class UserInvite
 
     private bool $used = false;
 
-    public function __construct(private Role $role)
-    {
+    public function __construct(
+        private Role $role,
+    ) {
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

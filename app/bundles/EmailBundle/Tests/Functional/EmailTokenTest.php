@@ -11,6 +11,8 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -173,7 +175,9 @@ final class EmailTokenTest extends MauticMysqlTestCase
 
     private function createLeadWithAllFields(): Lead
     {
+        /** @var LeadModel $leadModel */
         $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
+        /** @var FieldModel $fieldModel */
         $fieldModel = self::getContainer()->get('mautic.lead.model.field');
 
         $lead = new Lead();

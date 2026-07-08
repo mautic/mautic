@@ -42,6 +42,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $translator = static::getContainer()->get('translator');
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
@@ -114,6 +115,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $translator = static::getContainer()->get('translator');
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');

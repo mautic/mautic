@@ -212,7 +212,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -229,7 +229,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -249,7 +249,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -267,7 +267,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -288,7 +288,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 
@@ -306,7 +306,7 @@ final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
             ],
         ];
         $matchArgs = explode(',', $args[0]['val']);
-        array_walk($matchArgs, function (&$element): void { $element = trim($element, '"'); });
+        array_walk($matchArgs, function (string &$element): void { $element = trim($element, '"'); });
 
         $this->callBuildWhereClauseFromArray($qb, $args);
 

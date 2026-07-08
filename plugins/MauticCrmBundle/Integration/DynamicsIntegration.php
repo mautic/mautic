@@ -177,7 +177,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param mixed[]|Lead         $lead
+     * @param array<string, mixed> $config
+     *
+     * @return mixed[]
      */
     public function populateLeadData($lead, $config = [], $object = 'Contacts')
     {

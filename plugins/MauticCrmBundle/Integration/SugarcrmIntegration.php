@@ -161,7 +161,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $settings
      * @param array $parameters
      *
      * @return array
