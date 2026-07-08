@@ -203,6 +203,63 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * A published segment (list) email that has no publish up date must still be
+     * picked up for broadcast. Previously such an email was shown as active in the
+     * UI but silently excluded from sending because a publish up date was required.
+     *
+     * @see https://github.com/mautic/mautic/issues/16165
+     */
+    public function testGetPublishedBroadcastsIncludesSegmentEmailWithoutPublishUp(): void
+    {
+        // Published segment email without any start date - should be broadcast now.
+        $noPublishUp = $this->createSegmentEmail('No publish up', true, null);
+
+        // Published segment email whose start date is already in the past - should be broadcast.
+        $pastPublishUp = $this->createSegmentEmail('Past publish up', true, new \DateTime('-1 day'));
+
+        // Published segment email scheduled to start in the future - must be held back.
+        $futurePublishUp = $this->createSegmentEmail('Future publish up', true, new \DateTime('+1 day'));
+
+        // Unpublished segment email without a start date - must not be broadcast.
+        $unpublished = $this->createSegmentEmail('Unpublished', false, null);
+
+        // Template email without a start date - must not be broadcast.
+        $template = $this->createSegmentEmail('Template', true, null);
+        $template->setEmailType('template');
+        $this->em->persist($template);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $broadcastIds = [];
+        foreach ($this->emailRepository->getPublishedBroadcastsIterable() as $email) {
+            $broadcastIds[] = $email->getId();
+        }
+        sort($broadcastIds);
+
+        $expectedIds = [$noPublishUp->getId(), $pastPublishUp->getId()];
+        sort($expectedIds);
+
+        Assert::assertSame($expectedIds, $broadcastIds);
+        Assert::assertNotContains($futurePublishUp->getId(), $broadcastIds);
+        Assert::assertNotContains($unpublished->getId(), $broadcastIds);
+        Assert::assertNotContains($template->getId(), $broadcastIds);
+    }
+
+    private function createSegmentEmail(string $name, bool $isPublished, ?\DateTimeInterface $publishUp): Email
+    {
+        $email = new Email();
+        $email->setName($name);
+        $email->setSubject($name);
+        $email->setEmailType('list');
+        $email->setIsPublished($isPublished);
+        $email->setPublishUp($publishUp);
+        $this->em->persist($email);
+
+        return $email;
+    }
+
+    /**
      * @throws ORMException
      */
     private function createLead(string $lastName): Lead
