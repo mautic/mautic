@@ -45,6 +45,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
         $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $leadModel);
         $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');

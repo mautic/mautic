@@ -65,10 +65,7 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
-    /**
-     * @return \Mautic\FormBundle\Entity\FieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\FormBundle\Entity\FieldRepository
     {
         return $this->em->getRepository(Field::class);
     }

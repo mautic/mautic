@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 
@@ -30,6 +32,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $company = new Company();
         $company->setName('Test company');
         $company->setOwner($user);
+        /** @var CompanyModel $companyModel */
         $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $companyModel->saveEntity($company);
 
@@ -45,11 +48,13 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $company = new Company();
         $company->setName('Test Delete Company');
+        /** @var CompanyModel $companyModel */
         $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $companyModel->saveEntity($company);
 
         $lead = new Lead();
         $lead->setFirstname('Test name');
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $leadModel->saveEntity($lead);
         $companyModel->addLeadToCompany($company, $lead);

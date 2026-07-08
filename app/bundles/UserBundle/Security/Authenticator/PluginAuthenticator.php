@@ -33,8 +33,16 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class PluginAuthenticator extends AbstractAuthenticator
 {
-    public function __construct(private readonly TokenPermissions $tokenPermissions, private readonly EventDispatcherInterface $dispatcher, private readonly IntegrationHelper $integrationHelper, private readonly UserProviderInterface $userProvider, private readonly AuthenticationHandler $authenticationHandler, private readonly OAuth2 $oAuth2, private readonly LoggerInterface $logger, private readonly string $firewallName)
-    {
+    public function __construct(
+        private readonly TokenPermissions $tokenPermissions,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly UserProviderInterface $userProvider,
+        private readonly AuthenticationHandler $authenticationHandler,
+        private readonly OAuth2 $oAuth2,
+        private readonly LoggerInterface $logger,
+        private readonly string $firewallName,
+    ) {
     }
 
     public function supports(Request $request): ?bool
