@@ -97,9 +97,8 @@ final class MessageController extends AbstractStandardFormController
                 ];
 
                 if (null !== $this->indexSearchScopes) {
-                    $viewParameters['searchScopes']    = $this->indexSearchScopes;
-                    $viewParameters['searchScopeHint'] = 'mautic.core.search.scope.hint';
-                    $this->indexSearchScopes           = null;
+                    $viewParameters['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes        = null;
                 }
 
                 break;

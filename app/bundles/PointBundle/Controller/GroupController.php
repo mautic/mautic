@@ -46,9 +46,8 @@ final class GroupController extends AbstractStandardFormController
     protected function getViewArguments(array $args, $action): array
     {
         if ('index' === $action && null !== $this->indexSearchScopes) {
-            $args['viewParameters']['searchScopes']    = $this->indexSearchScopes;
-            $args['viewParameters']['searchScopeHint'] = 'mautic.core.search.scope.hint';
-            $this->indexSearchScopes                   = null;
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
         }
 
         return parent::getViewArguments($args, $action);

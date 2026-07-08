@@ -161,7 +161,6 @@ final class ListController extends FormController
             'currentUser'                    => $this->user,
             'searchValue'                    => $search,
             'searchScopes'                   => $segmentSearchScopeProvider->getScopes(),
-            'searchScopeHint'                => 'mautic.core.search.scope.hint',
             'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
             'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
         ];

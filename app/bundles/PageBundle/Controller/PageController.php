@@ -150,7 +150,6 @@ final class PageController extends FormController
             'viewParameters' => [
                 'searchValue'     => $search,
                 'searchScopes'    => $pageSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'items'           => $pages,
                 'categories'  => $model->getLookupResults('category', '', 0),
                 'page'        => $page,

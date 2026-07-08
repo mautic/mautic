@@ -136,7 +136,6 @@ class FormController extends CommonFormController
                 'viewParameters'  => [
                     'searchValue'     => $search,
                     'searchScopes'    => $formSearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                     'items'           => $forms,
                     'totalItems'  => $count,
                     'page'        => $page,

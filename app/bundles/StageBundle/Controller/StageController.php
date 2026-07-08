@@ -100,7 +100,6 @@ final class StageController extends AbstractFormController
                 'viewParameters' => [
                     'searchValue'     => $search,
                     'searchScopes'    => $stageSearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                     'items'           => $stages,
                     'actions'     => $actions['actions'],
                     'page'        => $page,

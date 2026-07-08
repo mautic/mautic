@@ -116,7 +116,6 @@ final class AssetController extends FormController
             'viewParameters' => [
                 'searchValue'     => $search,
                 'searchScopes'    => $assetSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'items'           => $assets,
                 'categories'  => $categories,
                 'limit'       => $limit,

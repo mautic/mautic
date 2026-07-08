@@ -147,7 +147,6 @@ final class TagController extends FormController
             'currentUser'     => $this->user,
             'searchValue'     => $search,
             'searchScopes'    => $tagSearchScopeProvider->getScopes(),
-            'searchScopeHint' => 'mautic.core.search.scope.hint',
         ];
 
         return $this->delegateView([

@@ -178,7 +178,6 @@ final class CompanyController extends FormController
                     'tmpl'            => $tmpl,
                     'totalItems'      => $count,
                     'searchScopes'    => $companySearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                 ],
                 'contentTemplate' => '@MauticLead/Company/list.html.twig',
                 'passthroughVars' => [

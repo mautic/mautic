@@ -112,7 +112,6 @@ final class ReportController extends FormController
                 'viewParameters' => [
                     'searchValue'     => $search,
                     'searchScopes'    => $reportSearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                     'items'           => $reports,
                     'totalItems'  => $count,
                     'page'        => $page,

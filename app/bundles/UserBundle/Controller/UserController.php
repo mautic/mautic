@@ -121,7 +121,6 @@ final class UserController extends FormController
                 'items'           => $users,
                 'searchValue'     => $search,
                 'searchScopes'    => $userSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'page'            => $page,
                 'limit'         => $limit,
                 'tmpl'          => $tmpl,

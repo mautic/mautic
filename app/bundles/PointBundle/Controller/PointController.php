@@ -84,7 +84,6 @@ final class PointController extends AbstractFormController
             'viewParameters' => [
                 'searchValue'     => $search,
                 'searchScopes'    => $pointSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'items'           => $points,
                 'actions'     => $actions['actions'],
                 'page'        => $page,

@@ -109,7 +109,6 @@ final class FieldController extends FormController
                 'items'           => $fields,
                 'searchValue'     => $search,
                 'searchScopes'    => $fieldSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'permissions'     => $permissions,
                 'tmpl'        => $tmpl,
                 'totalItems'  => $count,

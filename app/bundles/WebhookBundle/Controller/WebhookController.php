@@ -71,9 +71,8 @@ final class WebhookController extends FormController
     public function getViewArguments(array $args, $action): array
     {
         if ('index' === $action && null !== $this->indexSearchScopes) {
-            $args['viewParameters']['searchScopes']    = $this->indexSearchScopes;
-            $args['viewParameters']['searchScopeHint'] = 'mautic.core.search.scope.hint';
-            $this->indexSearchScopes                   = null;
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
         }
 
         // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring

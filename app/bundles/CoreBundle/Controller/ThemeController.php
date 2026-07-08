@@ -106,7 +106,6 @@ final class ThemeController extends FormController
                 'security'        => $this->security,
                 'searchValue'     => $search,
                 'searchScopes'    => $searchScopes,
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'tmpl'            => $tmpl,
             ],
             'contentTemplate' => $contentTemplate,

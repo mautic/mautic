@@ -1031,9 +1031,8 @@ class CampaignController extends AbstractStandardFormController
                         true));
                 $args['viewParameters']['enableExportPermission'] = $this->security->isAdmin() || $this->security->isGranted('campaign:export:enable', 'MATCH_ONE');
                 if (null !== $this->indexSearchScopes) {
-                    $args['viewParameters']['searchScopes']    = $this->indexSearchScopes;
-                    $args['viewParameters']['searchScopeHint'] = 'mautic.core.search.scope.hint';
-                    $this->indexSearchScopes                   = null;
+                    $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+                    $this->indexSearchScopes                = null;
                 }
                 break;
             case 'view':

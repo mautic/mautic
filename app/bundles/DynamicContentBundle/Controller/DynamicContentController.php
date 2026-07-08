@@ -113,7 +113,6 @@ final class DynamicContentController extends FormController
                 'viewParameters' => [
                     'searchValue'     => $search,
                     'searchScopes'    => $dynamicContentSearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                     'items'           => $entities,
                     'categories'  => $categories,
                     'page'        => $page,

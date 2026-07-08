@@ -175,7 +175,6 @@ final class CategoryController extends AbstractFormController
                     'permissionBase'  => $permissionBase,
                     'searchValue'     => $search,
                     'searchScopes'    => $categorySearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                     'items'           => $entities,
                     'page'           => $page,
                     'limit'          => $limit,

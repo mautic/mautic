@@ -88,7 +88,6 @@ final class TriggerController extends FormController
             'viewParameters' => [
                 'searchValue'     => $search,
                 'searchScopes'    => $triggerSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'items'           => $triggers,
                 'page'        => $page,
                 'limit'       => $limit,

@@ -120,9 +120,8 @@ final class FocusController extends AbstractStandardFormController
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 
         if ('index' === $action && null !== $this->indexSearchScopes) {
-            $args['viewParameters']['searchScopes']    = $this->indexSearchScopes;
-            $args['viewParameters']['searchScopeHint'] = 'mautic.core.search.scope.hint';
-            $this->indexSearchScopes                   = null;
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
         }
 
         if ('view' == $action) {

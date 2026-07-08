@@ -112,7 +112,6 @@ final class RoleController extends FormController
                 'items'           => $items,
                 'searchValue'     => $filter,
                 'searchScopes'    => $roleSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
                 'page'            => $page,
                 'limit'       => $limit,
                 'tmpl'        => $tmpl,

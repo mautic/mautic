@@ -103,7 +103,6 @@ final class ClientController extends AbstractStandardFormController
                     'tmpl'            => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'searchValue'     => $filter,
                     'searchScopes'    => $clientSearchScopeProvider->getScopes(),
-                    'searchScopeHint' => 'mautic.core.search.scope.hint',
                     'filters'         => $filters,
                 ],
                 'contentTemplate' => '@MauticApi/Client/list.html.twig',

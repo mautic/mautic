@@ -127,7 +127,6 @@ final class ProjectController extends AbstractFormController
                 'currentUser'     => $this->user,
                 'searchValue'     => $search,
                 'searchScopes'    => $projectSearchScopeProvider->getScopes(),
-                'searchScopeHint' => 'mautic.core.search.scope.hint',
             ],
             'contentTemplate' => '@MauticProject/Project/list.html.twig',
             'passthroughVars' => [
