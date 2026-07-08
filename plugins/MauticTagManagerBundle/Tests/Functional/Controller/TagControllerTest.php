@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\TagModel;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
@@ -32,6 +33,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        /** @var TagModel $tagModel */
         $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
 
@@ -351,6 +353,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         Assert::assertSame(2, $this->countLeadTagAssociations($secondaryTagId));
 
         // Test the actual merge functionality by calling the model directly
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
@@ -390,6 +393,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $pointTriggerEventId   = (int) $pointTriggerEvent->getId();
         $reportId              = (int) $report->getId();
 
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
