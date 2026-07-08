@@ -103,6 +103,7 @@ final class SegmentSubscriberTest extends MauticMysqlTestCase
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
+        /** @var ListModel $listModel */
         $listModel = $this->getContainer()->get('mautic.lead.model.list');
         $this->assertInstanceOf(ListModel::class, $listModel);
 

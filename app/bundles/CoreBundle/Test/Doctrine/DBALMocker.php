@@ -32,8 +32,9 @@ class DBALMocker
         'parameters' => [],
     ];
 
-    public function __construct(protected \PHPUnit\Framework\TestCase $testCase)
-    {
+    public function __construct(
+        protected \PHPUnit\Framework\TestCase $testCase,
+    ) {
     }
 
     public function setQueryResponse($queryResponse): void

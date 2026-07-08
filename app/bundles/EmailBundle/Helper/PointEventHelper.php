@@ -7,8 +7,9 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class PointEventHelper
 {
-    public function __construct(private readonly EmailModel $emailModel)
-    {
+    public function __construct(
+        private readonly EmailModel $emailModel,
+    ) {
     }
 
     public static function validateEmail($eventDetails, $action): bool

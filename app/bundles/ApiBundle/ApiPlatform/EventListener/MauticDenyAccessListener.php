@@ -16,8 +16,8 @@ final readonly class MauticDenyAccessListener
 {
     public function __construct(
         private CorePermissions $security,
-        private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory)
-    {
+        private ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+    ) {
     }
 
     public function onSecurity(RequestEvent $event): void
