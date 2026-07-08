@@ -62,10 +62,7 @@ class NotificationModel extends FormModel
         $this->disableUpdates = $disableUpdates;
     }
 
-    /**
-     * @return NotificationRepository
-     */
-    public function getRepository()
+    public function getRepository(): NotificationRepository
     {
         return $this->em->getRepository(Notification::class);
     }

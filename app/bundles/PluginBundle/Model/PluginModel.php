@@ -41,10 +41,7 @@ class PluginModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PluginBundle\Entity\PluginRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PluginBundle\Entity\PluginRepository
     {
         return $this->em->getRepository(Plugin::class);
     }

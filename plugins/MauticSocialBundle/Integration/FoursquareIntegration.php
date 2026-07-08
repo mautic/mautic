@@ -52,7 +52,6 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
      *
      * @return mixed|string
      */

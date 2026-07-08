@@ -24,10 +24,7 @@ class SubmissionResultLoader implements MauticModelInterface
         return $repository->getEntity($id);
     }
 
-    /**
-     * @return SubmissionRepository
-     */
-    private function getRepository()
+    private function getRepository(): SubmissionRepository
     {
         return $this->entityManager->getRepository(Submission::class);
     }
