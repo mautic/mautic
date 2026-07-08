@@ -262,7 +262,5 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertStringContainsString('Edit Dynamic Content', $content);
         Assert::assertStringContainsString('Test Locale Timezone Filter Validation', $content);
-
-        $this->assertTrue(true, 'Dynamic content created successfully without choice validation errors');
     }
 }
