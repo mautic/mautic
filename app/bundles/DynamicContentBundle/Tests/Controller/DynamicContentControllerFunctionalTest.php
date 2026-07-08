@@ -239,7 +239,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser(self::PERMISSION_CREATE);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/dwc/new');
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $formHtml = $crawler->html();
 
@@ -259,7 +259,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringNotContainsString('This value is not valid', $content);
         Assert::assertStringNotContainsString('form-error', $crawler->html());
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('Edit Dynamic Content', $content);
         Assert::assertStringContainsString('Test Locale Timezone Filter Validation', $content);
     }
