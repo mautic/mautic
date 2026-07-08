@@ -10,8 +10,11 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityValidateEvent extends Event
 {
-    public function __construct(private readonly object $entity, private readonly EntityEvent $constraint, private readonly ExecutionContextInterface $context)
-    {
+    public function __construct(
+        private readonly object $entity,
+        private readonly EntityEvent $constraint,
+        private readonly ExecutionContextInterface $context,
+    ) {
     }
 
     public function getEntity(): object

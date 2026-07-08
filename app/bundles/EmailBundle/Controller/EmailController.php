@@ -718,7 +718,7 @@ class EmailController extends FormController
                     try {
                         $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                        if (true === $emailConfig->isDraftEnabled() && !empty($entity->getId())) {
+                        if ($emailConfig->isDraftEnabled() && !empty($entity->getId())) {
                             $this->dispatcher->dispatch(new EmailEditSubmitEvent(
                                 $existingEmail,
                                 $entity,
@@ -840,7 +840,7 @@ class EmailController extends FormController
             'RETURN_ARRAY'
         );
         $draftPreviewUrl = '';
-        if (true === $emailConfig->isDraftEnabled() && $entity->hasDraft()) {
+        if ($emailConfig->isDraftEnabled() && $entity->hasDraft()) {
             $draftPreviewUrl = $this->generateUrl(
                 'mautic_email_preview',
                 ['objectId'       => $entity->getId(),

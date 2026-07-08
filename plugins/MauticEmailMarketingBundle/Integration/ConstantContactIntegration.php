@@ -40,7 +40,6 @@ class ConstantContactIntegration extends EmailAbstractIntegration
     /**
      * Retrieves and stores tokens returned from oAuthLogin.
      *
-     * @param array $settings
      * @param array $parameters
      *
      * @return bool|string false if no error; otherwise the error string
