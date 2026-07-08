@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -182,6 +183,13 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $response['results'][0]['status']);
         Assert::assertSame('Contact added to company', $response['results'][0]['message']);
         Assert::assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+
+        $logs = $this->getCompanyChangeLogsForContact($contact->getId());
+        Assert::assertCount(1, $logs);
+        Assert::assertSame('api', $logs[0]->getType());
+        Assert::assertSame('API batch assignment', $logs[0]->getEventName());
+        Assert::assertSame('Lead added to the company, Batch Co A', $logs[0]->getActionName());
+        Assert::assertSame($company->getId(), $logs[0]->getCompany());
     }
 
     public function testBatchAddContactsPartialFailure(): void
@@ -208,6 +216,7 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Company not found', $response['results'][1]['message']);
         Assert::assertSame(Response::HTTP_NOT_FOUND, $response['results'][2]['status']);
         Assert::assertSame('Contact not found', $response['results'][2]['message']);
+        Assert::assertCount(1, $this->getCompanyChangeLogsForContact($contact->getId()));
     }
 
     public function testBatchAddContactsEmptyBody(): void
@@ -259,6 +268,23 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(Response::HTTP_OK, $response['results'][0]['status']);
         Assert::assertSame(1, $response['summary']['succeeded']);
         Assert::assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+        Assert::assertCount(0, $this->getCompanyChangeLogsForContact($contact->getId()));
+    }
+
+    public function testSingleAddContactDoesNotCreateBatchChangeLog(): void
+    {
+        $company = $this->createCompany('Single Co', 'single-co@example.com');
+        $contact = $this->createLead('Single', 'Add', 'single-add@example.com');
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf('/api/companies/%d/contact/%d/add', $company->getId(), $contact->getId())
+        );
+
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertTrue($this->hasContactCompany($contact->getId(), $company->getId()));
+        Assert::assertCount(0, $this->getCompanyChangeLogsForContact($contact->getId()));
     }
 
     public function testBatchAddContactsNoPermissionPerItem(): void
@@ -343,6 +369,21 @@ class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertNotFalse($content);
 
         return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @return list<CompanyChangeLog>
+     */
+    private function getCompanyChangeLogsForContact(int $contactId): array
+    {
+        $this->em->clear();
+        $contact = $this->leadModel->getEntity($contactId);
+        \assert(null !== $contact);
+
+        return $this->em->getRepository(CompanyChangeLog::class)->findBy(
+            ['lead' => $contact],
+            ['dateAdded' => 'ASC']
+        );
     }
 
     private function hasContactCompany(int $contactId, int $companyId): bool

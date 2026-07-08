@@ -284,9 +284,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
+     * @return list<int> IDs of companies the lead was newly added to
+     *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function addLeadToCompany($companies, $lead): bool
+    public function addLeadToCompany($companies, $lead): array
     {
         // Primary company name to be persisted to the lead's contact company field
         $companyName        = '';
@@ -338,7 +340,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $persistCompany = [];
         $dispatchEvents = [];
-        $contactAdded   = false;
         foreach ($companies as $companyId) {
             if (!isset($companyLeadAdd[$companyId])) {
                 // List no longer exists in the DB so continue to the next
@@ -362,7 +363,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $companyLead->setCompany($companyLeadAdd[$companyId]);
                 $companyLead->setLead($lead);
                 $companyLead->setDateAdded($dateManipulated);
-                $contactAdded     = true;
                 $persistCompany[] = $companyLead;
                 $dispatchEvents[] = $companyId;
 
@@ -404,7 +404,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         // Clear CompanyLead entities from Doctrine memory
         $this->getCompanyLeadRepository()->detachEntities($persistCompany);
 
-        return $contactAdded;
+        return $dispatchEvents;
     }
 
     /**

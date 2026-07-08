@@ -16,6 +16,9 @@ class BatchCompanyContactAssignmentModel
     private const MESSAGE_COMPANY_NOT_FOUND = 'Company not found';
     private const MESSAGE_ACCESS_DENIED     = 'Access denied';
     private const MESSAGE_UNEXPECTED        = 'An unexpected error occurred';
+    private const LOG_TYPE                  = 'api';
+    private const LOG_EVENT_NAME            = 'API batch assignment';
+    private const LOG_ACTION_PREFIX         = 'Lead added to the company, ';
 
     public function __construct(
         private CompanyModel $companyModel,
@@ -101,12 +104,20 @@ class BatchCompanyContactAssignmentModel
             sort($companyIdsForContact);
 
             try {
-                $this->companyModel->addLeadToCompany($companyIdsForContact, $contact);
-                $status  = Response::HTTP_OK;
-                $message = self::MESSAGE_ADDED;
+                $addedCompanyIds = $this->companyModel->addLeadToCompany($companyIdsForContact, $contact);
+                $status          = Response::HTTP_OK;
+                $message         = self::MESSAGE_ADDED;
             } catch (\Throwable) {
                 $status  = Response::HTTP_INTERNAL_SERVER_ERROR;
                 $message = self::MESSAGE_UNEXPECTED;
+            }
+
+            if (Response::HTTP_OK === $status) {
+                try {
+                    $this->logBatchAssignments($contact, $addedCompanyIds ?? [], $companiesById);
+                } catch (\Throwable) {
+                    // Assignment succeeded; logging failure must not change the API outcome.
+                }
             }
 
             foreach ($companyIdsForContact as $companyId) {
@@ -241,6 +252,33 @@ class BatchCompanyContactAssignmentModel
         }
 
         return $indexed;
+    }
+
+    /**
+     * @param list<int>           $addedCompanyIds
+     * @param array<int, Company> $companiesById
+     */
+    private function logBatchAssignments(Lead $contact, array $addedCompanyIds, array $companiesById): void
+    {
+        if ([] === $addedCompanyIds) {
+            return;
+        }
+
+        foreach ($addedCompanyIds as $companyId) {
+            $company = $companiesById[$companyId] ?? null;
+            if (!$company instanceof Company) {
+                continue;
+            }
+
+            $contact->addCompanyChangeLogEntry(
+                self::LOG_TYPE,
+                self::LOG_EVENT_NAME,
+                self::LOG_ACTION_PREFIX.$company->getName(),
+                $companyId
+            );
+        }
+
+        $this->leadModel->getRepository()->saveEntity($contact);
     }
 
     /**
