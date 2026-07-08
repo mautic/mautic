@@ -566,12 +566,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $tags = explode(',', $tags);
         }
 
-        array_walk($tags, function (&$val): void {
+        array_walk($tags, function (string &$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::_($val, 'string');
         });
 
-        return array_filter($tags, fn ($tag): bool => strlen($tag) > 0);
+        return array_filter($tags, fn ($tag): bool => '' !== (string) $tag);
     }
 
     /**
