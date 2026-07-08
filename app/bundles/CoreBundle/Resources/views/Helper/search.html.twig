@@ -46,7 +46,7 @@
             parsedScope: parsedScope,
         }) }}
     {% endif %}
-    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ displaySearchValue|escape }}" autocomplete="false" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
+    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ displaySearchValue|escape }}" autocomplete="off" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
 </div>
 {% if (filters is defined and filters is not empty) or (quickFilters is defined and quickFilters is not empty) %}
 {% set filtering %}
