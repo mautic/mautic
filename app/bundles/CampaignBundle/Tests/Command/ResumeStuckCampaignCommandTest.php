@@ -71,6 +71,44 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->assertStringContainsString('Campaign with ID '.$campaign->getId().' is not published', $output);
     }
 
+    public function testCommandIgnoresConditionWithoutFinalPath(): void
+    {
+        $campaign = $this->createCampaign('Incomplete Condition Campaign');
+        $campaign->setIsPublished(true);
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        $contact = $this->createLead('Incomplete Condition Contact');
+        $this->createCampaignLead($campaign, $contact);
+
+        $condition = $this->createEvent('Incomplete Condition', $campaign, 'lead.field_value', 'condition', [
+            'field'    => 'points',
+            'operator' => 'gt',
+            'value'    => '4',
+        ]);
+
+        $yesPathAction = $this->createEvent('Incomplete Condition Child', $campaign, 'lead.changetags', 'action', [
+            'add_tags' => [
+                'greater than 4',
+            ],
+        ]);
+        $yesPathAction->setParent($condition);
+        $yesPathAction->setDecisionPath(Event::PATH_ACTION);
+
+        $log = $this->createEventLog($contact, $condition, $campaign, 1);
+        $log->setNonActionPathTaken(null);
+        $this->em->flush();
+
+        $output = $this->executeCommand(
+            [
+                'campaign-id' => $campaign->getId(),
+                '--dry-run'   => true,
+            ]
+        );
+
+        $this->assertStringNotContainsString('Incomplete Condition Child', $output);
+    }
+
     public function testComplexCampaignExecution(): void
     {
         $campaign = $this->createCampaign('Complex Campaign');
