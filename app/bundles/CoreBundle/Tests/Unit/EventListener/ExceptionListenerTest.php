@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 
-class ExceptionListenerTest extends TestCase
+final class ExceptionListenerTest extends TestCase
 {
     /**
      * Regression test for https://github.com/mautic/mautic/issues/15952.
