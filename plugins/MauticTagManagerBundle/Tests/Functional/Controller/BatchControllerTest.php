@@ -9,6 +9,8 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\TagModel;
 
 final class BatchControllerTest extends MauticMysqlTestCase
 {
@@ -40,6 +42,8 @@ final class BatchControllerTest extends MauticMysqlTestCase
             'tag3',
             'tag4',
         ];
+
+        /** @var TagModel $tagModel */
         $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
         $this->tags          = $this->addTags($tags);
@@ -69,6 +73,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('3 contacts affected', $this->client->getResponse()->getContent());
 
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $lead1     = $leadModel->getEntity($this->leads[0]->getId());
         $tagIds    = $this->getTagIds($lead1);
@@ -79,6 +84,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
 
     public function testAddAndRemoveBatchSetAction(): void
     {
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $this->leads[0]->addTag($this->tags[1]);
         $this->leads[0]->addTag($this->tags[2]);
@@ -143,6 +149,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
      */
     public function addLeads(): array
     {
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $lead      = $leadModel->getEntity();
 

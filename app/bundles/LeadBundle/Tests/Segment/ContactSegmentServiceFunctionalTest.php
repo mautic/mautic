@@ -38,10 +38,7 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @var ReferenceRepository
-     */
-    private $fixtures;
+    private ReferenceRepository $fixtures;
 
     private ContactSegmentService $contactSegmentService;
 

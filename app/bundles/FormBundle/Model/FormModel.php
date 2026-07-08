@@ -74,10 +74,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return FormRepository
-     */
-    public function getRepository()
+    public function getRepository(): FormRepository
     {
         return $this->em->getRepository(Form::class);
     }
