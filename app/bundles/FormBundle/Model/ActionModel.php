@@ -12,10 +12,7 @@ use Symfony\Component\Form\FormFactoryInterface;
  */
 class ActionModel extends CommonFormModel
 {
-    /**
-     * @return \Mautic\FormBundle\Entity\ActionRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\FormBundle\Entity\ActionRepository
     {
         return $this->em->getRepository(Action::class);
     }

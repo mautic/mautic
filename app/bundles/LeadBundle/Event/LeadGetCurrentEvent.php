@@ -14,8 +14,9 @@ final class LeadGetCurrentEvent extends Event
 
     private bool $skipContactLastActiveLogged = false;
 
-    public function __construct(private readonly ?Request $request = null)
-    {
+    public function __construct(
+        private readonly ?Request $request = null,
+    ) {
     }
 
     public function getRequest(): ?Request

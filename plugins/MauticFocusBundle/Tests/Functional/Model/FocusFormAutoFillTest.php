@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
 final class FocusFormAutoFillTest extends MauticMysqlTestCase
@@ -78,6 +79,7 @@ final class FocusFormAutoFillTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Step 4: Track the contact using setSystemContact (bypasses HTTP request requirement)
+        /** @var ContactTracker $contactTracker */
         $contactTracker = self::getContainer()->get('mautic.tracker.contact');
         $contactTracker->setSystemContact($contact);
 

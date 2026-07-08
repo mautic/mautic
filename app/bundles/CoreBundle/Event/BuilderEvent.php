@@ -203,7 +203,7 @@ class BuilderEvent extends Event
             // Do a search against the token
             $found = array_filter(
                 array_keys($tokens),
-                fn ($k): bool => 0 === stripos($k, $filter)
+                fn (int|string $k): bool => 0 === stripos($k, $filter)
             );
 
             $tokens = array_intersect_key($tokens, array_flip($found));
