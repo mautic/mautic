@@ -6,13 +6,12 @@ namespace Mautic\CampaignBundle\Tests\Unit\Helper;
 
 use Mautic\CampaignBundle\Helper\CampaignSearchScopeProvider;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): CampaignSearchScopeProvider
     {
         $campaignModel = $this->createMock(CampaignModel::class);
         $translator    = $this->createMock(TranslatorInterface::class);

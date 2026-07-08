@@ -21,9 +21,10 @@
         {% endif %}
         <option
             value="{{ scopeCommand|escape('html_attr') }}"
+            {% if scope.indent|default(false) %}class="search-scope-option--indent"{% endif %}
             {% if scope.disabled|default(false) %}disabled{% endif %}
             {% if isSelected %}selected{% endif %}
-        >{{ scopeLabel|search_scope_label }}{% if scope.suffix|default(false) %}{{ scope.suffix }}{% endif %}</option>
+        >{{ scopeLabel|search_scope_label(scope.indent|default(false)) }}{% if scope.suffix|default(false) %}{{ scope.suffix }}{% endif %}</option>
     {% endfor %}
 </select>
 {% endif %}

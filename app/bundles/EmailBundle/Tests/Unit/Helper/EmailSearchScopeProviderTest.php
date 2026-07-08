@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\EmailBundle\Helper\EmailSearchScopeProvider;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): EmailSearchScopeProvider
     {
         $emailModel = $this->createMock(EmailModel::class);
         $translator = $this->createMock(TranslatorInterface::class);

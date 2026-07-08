@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Helper\ThemeSearchScopeProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ThemeSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): ThemeSearchScopeProvider
     {
         $translator = $this->createMock(TranslatorInterface::class);
 

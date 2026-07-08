@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PageBundle\Helper\PageSearchScopeProvider;
 use Mautic\PageBundle\Model\PageModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): PageSearchScopeProvider
     {
         $pageModel  = $this->createMock(PageModel::class);
         $translator = $this->createMock(TranslatorInterface::class);

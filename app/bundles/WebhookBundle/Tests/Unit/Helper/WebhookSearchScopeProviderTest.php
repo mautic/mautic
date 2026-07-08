@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class WebhookSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): WebhookSearchScopeProvider
     {
         $webhookModel = $this->createMock(WebhookModel::class);
         $translator   = $this->createMock(TranslatorInterface::class);

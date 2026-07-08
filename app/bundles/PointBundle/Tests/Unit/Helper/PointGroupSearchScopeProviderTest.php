@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\PointBundle\Helper\PointGroupSearchScopeProvider;
 use Mautic\PointBundle\Model\PointGroupModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PointGroupSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): PointGroupSearchScopeProvider
     {
         $pointGroupModel = $this->createMock(PointGroupModel::class);
         $translator      = $this->createMock(TranslatorInterface::class);

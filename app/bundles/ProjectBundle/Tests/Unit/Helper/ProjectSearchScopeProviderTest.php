@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Helper\ProjectSearchScopeProvider;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ProjectSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): ProjectSearchScopeProvider
     {
         $projectRepository = $this->createMock(ProjectRepository::class);
         $translator        = $this->createMock(TranslatorInterface::class);

@@ -52,6 +52,9 @@ final class LeadSearchScopeProvider extends AbstractSearchScopeProvider
         return $this->leadModel->getCommandList();
     }
 
+    /**
+     * @return array{label: string, translate: bool, indent?: bool}
+     */
     protected function resolveDynamicLabel(string $commandKey, string $command): array
     {
         if (!str_starts_with($commandKey, 'mautic.')) {
@@ -62,10 +65,10 @@ final class LeadSearchScopeProvider extends AbstractSearchScopeProvider
 
             $fieldLabels = $this->fieldList->getFieldList(false, true);
             if (isset($fieldLabels[$commandKey])) {
-                return ['label' => $fieldLabels[$commandKey], 'translate' => false];
+                return ['label' => $fieldLabels[$commandKey], 'translate' => false, 'indent' => true];
             }
 
-            return ['label' => $command, 'translate' => false];
+            return ['label' => $command, 'translate' => false, 'indent' => true];
         }
 
         return parent::resolveDynamicLabel($commandKey, $command);

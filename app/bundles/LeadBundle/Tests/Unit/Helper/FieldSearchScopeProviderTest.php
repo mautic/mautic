@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Helper\FieldSearchScopeProvider;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FieldSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): FieldSearchScopeProvider
     {
         $fieldModel = $this->createMock(FieldModel::class);
         $translator = $this->createMock(TranslatorInterface::class);

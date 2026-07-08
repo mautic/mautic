@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Helper\CompanySearchScopeProvider;
@@ -13,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CompanySearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): CompanySearchScopeProvider
     {
         $companyModel = $this->createMock(CompanyModel::class);
         $fieldList    = $this->createMock(FieldList::class);
@@ -46,5 +45,17 @@ final class CompanySearchScopeProviderTest extends SearchScopeProviderTestCase
     protected function expectedDynamicCommands(): array
     {
         return ['companyindustry'];
+    }
+
+    public function testCustomFieldIsIndentedAndSortedAfterKnownFields(): void
+    {
+        $scopes = $this->getScopes();
+
+        $byCommand = array_column($scopes, null, 'command');
+
+        self::assertTrue($byCommand['companyindustry']['indent'] ?? false);
+
+        $commands = array_column($scopes, 'command');
+        self::assertGreaterThan(array_search('is:mine', $commands, true), array_search('companyindustry', $commands, true));
     }
 }

@@ -74,4 +74,14 @@ final class SearchScopeHelperTest extends TestCase
     {
         self::assertSame('Standard', SearchScopeHelper::formatLabel('Standard'));
     }
+
+    public function testFormatLabelIndentsCustomFieldLabel(): void
+    {
+        self::assertSame("\u{00A0}\u{00A0}\u{00A0}\u{00A0}My Custom Field", SearchScopeHelper::formatLabel('My Custom Field', true));
+    }
+
+    public function testFormatLabelDoesNotIndentByDefault(): void
+    {
+        self::assertStringStartsNotWith("\u{00A0}", SearchScopeHelper::formatLabel('My Custom Field'));
+    }
 }

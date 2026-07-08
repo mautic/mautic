@@ -6,13 +6,12 @@ namespace Mautic\AssetBundle\Tests\Unit\Helper;
 
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AssetSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): AssetSearchScopeProvider
     {
         $assetModel = $this->createMock(AssetModel::class);
         $translator = $this->createMock(TranslatorInterface::class);

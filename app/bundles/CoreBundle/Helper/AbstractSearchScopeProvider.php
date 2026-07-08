@@ -17,7 +17,7 @@ abstract class AbstractSearchScopeProvider
     }
 
     /**
-     * @return list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>
+     * @return list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool, indent?: bool, disabled?: bool}>
      */
     final public function getScopes(): array
     {
@@ -43,18 +43,46 @@ abstract class AbstractSearchScopeProvider
             }
 
             $label          = $this->resolveDynamicLabel($commandKey, $command);
-            $additional[]   = $this->buildScope($command, $label['label'], false, $label['translate']);
+            $additional[]   = $this->buildScope($command, $label['label'], false, $label['translate'], $label['indent'] ?? false);
             $seen[$command] = true;
         }
 
         if ([] !== $additional) {
-            usort(
-                $additional,
-                fn (array $a, array $b): int => strcasecmp($this->displayLabel($a), $this->displayLabel($b))
-            );
+            usort($additional, function (array $a, array $b): int {
+                $indentComparison = ($a['indent'] ?? false) <=> ($b['indent'] ?? false);
+
+                return 0 !== $indentComparison ? $indentComparison : strcasecmp($this->displayLabel($a), $this->displayLabel($b));
+            });
+
+            $additional = $this->insertCustomFieldsHeader($additional);
         }
 
         return array_merge($scopes, $additional);
+    }
+
+    /**
+     * Inserts a disabled "Custom fields" header option right before the first indented (custom field) entry.
+     *
+     * @param list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool, indent?: bool, disabled?: bool}> $additional
+     *
+     * @return list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool, indent?: bool, disabled?: bool}>
+     */
+    private function insertCustomFieldsHeader(array $additional): array
+    {
+        foreach ($additional as $index => $scope) {
+            if ($scope['indent'] ?? false) {
+                array_splice($additional, $index, 0, [[
+                    'command'   => '__custom_fields__',
+                    'label'     => 'mautic.core.search.scope.custom_fields',
+                    'translate' => true,
+                    'disabled'  => true,
+                ]]);
+
+                break;
+            }
+        }
+
+        return $additional;
     }
 
     /**
@@ -71,7 +99,7 @@ abstract class AbstractSearchScopeProvider
     }
 
     /**
-     * @return array{label: string, translate: bool}
+     * @return array{label: string, translate: bool, indent?: bool}
      */
     protected function resolveDynamicLabel(string $commandKey, string $command): array
     {
@@ -101,9 +129,9 @@ abstract class AbstractSearchScopeProvider
     }
 
     /**
-     * @return array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}
+     * @return array{command: string, label: string, suffix?: string, default?: bool, translate?: bool, indent?: bool}
      */
-    protected function buildScope(string $command, string $label, bool $default, bool $translate = true): array
+    protected function buildScope(string $command, string $label, bool $default, bool $translate = true, bool $indent = false): array
     {
         $scope = [
             'command'   => $command,
@@ -113,6 +141,10 @@ abstract class AbstractSearchScopeProvider
 
         if ($default) {
             $scope['default'] = true;
+        }
+
+        if ($indent) {
+            $scope['indent'] = true;
         }
 
         if ('' !== $command && !str_contains($command, ':')) {

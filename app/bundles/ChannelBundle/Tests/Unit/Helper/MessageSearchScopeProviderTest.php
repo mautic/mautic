@@ -6,13 +6,12 @@ namespace Mautic\ChannelBundle\Tests\Unit\Helper;
 
 use Mautic\ChannelBundle\Helper\MessageSearchScopeProvider;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MessageSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): MessageSearchScopeProvider
     {
         $messageModel = $this->createMock(MessageModel::class);
         $translator   = $this->createMock(TranslatorInterface::class);

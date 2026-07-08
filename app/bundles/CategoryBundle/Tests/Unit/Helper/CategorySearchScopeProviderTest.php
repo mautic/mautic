@@ -6,13 +6,12 @@ namespace Mautic\CategoryBundle\Tests\Unit\Helper;
 
 use Mautic\CategoryBundle\Helper\CategorySearchScopeProvider;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CategorySearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): CategorySearchScopeProvider
     {
         $categoryModel = $this->createMock(CategoryModel::class);
         $translator    = $this->createMock(TranslatorInterface::class);

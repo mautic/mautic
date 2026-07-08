@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\StageBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\StageBundle\Helper\StageSearchScopeProvider;
 use Mautic\StageBundle\Model\StageModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class StageSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): StageSearchScopeProvider
     {
         $stageModel = $this->createMock(StageModel::class);
         $translator = $this->createMock(TranslatorInterface::class);

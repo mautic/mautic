@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use MauticPlugin\MauticFocusBundle\Helper\FocusSearchScopeProvider;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -12,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FocusSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): FocusSearchScopeProvider
     {
         $focusModel = $this->createMock(FocusModel::class);
         $translator = $this->createMock(TranslatorInterface::class);

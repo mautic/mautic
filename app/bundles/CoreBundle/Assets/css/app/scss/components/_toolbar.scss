@@ -42,6 +42,13 @@
       white-space: normal;
     }
 
+    // Custom fields are prefixed with non-breaking spaces (see SearchScopeHelper::formatLabel)
+    // for indentation support in browsers that ignore padding on <option>; this padding is a
+    // progressive enhancement for browsers that do honor it (e.g. Firefox).
+    .search-scope-select option.search-scope-option--indent {
+      padding-inline-start: var(--spacing-05);
+    }
+
     > .btn {
       &:last-child, &:only-of-type + .input-group > input { border-radius: 0 var(--border-radius-lg) 0 0; }
       &:first-child { border-radius: var(--border-radius-lg) 0 0 0; }

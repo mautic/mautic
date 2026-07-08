@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Unit\Helper;
 
-use Mautic\CoreBundle\Helper\AbstractSearchScopeProvider;
 use Mautic\CoreBundle\Tests\Unit\Helper\SearchScopeProviderTestCase;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
@@ -13,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
 {
-    protected function createProvider(): AbstractSearchScopeProvider
+    protected function createProvider(): LeadSearchScopeProvider
     {
         $leadModel  = $this->createMock(LeadModel::class);
         $fieldList  = $this->createMock(FieldList::class);
@@ -56,5 +55,19 @@ final class LeadSearchScopeProviderTest extends SearchScopeProviderTestCase
         $commands = array_column($this->getScopes(), 'command');
 
         self::assertCount(1, array_filter($commands, static fn (string $command): bool => 'segment' === $command));
+    }
+
+    public function testCustomFieldIsIndentedAndSortedAfterKnownFields(): void
+    {
+        $scopes = $this->getScopes();
+
+        $byCommand = array_column($scopes, null, 'command');
+
+        self::assertFalse($byCommand['instagram']['indent'] ?? false);
+        self::assertTrue($byCommand['custom_field']['indent'] ?? false);
+
+        $commands = array_column($scopes, 'command');
+        self::assertGreaterThan(array_search('instagram', $commands, true), array_search('custom_field', $commands, true));
+        self::assertGreaterThan(array_search('segment', $commands, true), array_search('custom_field', $commands, true));
     }
 }

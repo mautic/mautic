@@ -83,19 +83,27 @@ final class SearchScopeHelper
     }
 
     /**
-     * Format a scope label for display in the dropdown (e.g. "is:published" -> "Is:Published").
+     * Number of non-breaking spaces used to visually indent custom-field options.
      */
-    public static function formatLabel(string $label): string
+    private const INDENT = "\u{00A0}\u{00A0}\u{00A0}\u{00A0}";
+
+    /**
+     * Format a scope label for display in the dropdown (e.g. "is:published" -> "Is:Published").
+     *
+     * @param bool $indent Visually indent the label (e.g. to set it apart as a custom field)
+     */
+    public static function formatLabel(string $label, bool $indent = false): string
     {
         if (!str_contains($label, ':')) {
-            return ucfirst($label);
+            $formatted = ucfirst($label);
+        } else {
+            $parts     = explode(':', $label);
+            $formatted = implode(':', array_map(
+                static fn (string $part): string => ucfirst($part),
+                $parts
+            ));
         }
 
-        $parts = explode(':', $label);
-
-        return implode(':', array_map(
-            static fn (string $part): string => ucfirst($part),
-            $parts
-        ));
+        return $indent ? self::INDENT.$formatted : $formatted;
     }
 }
