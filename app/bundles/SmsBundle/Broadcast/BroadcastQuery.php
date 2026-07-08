@@ -8,12 +8,10 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
 class BroadcastQuery
 {
     use ContactLimiterTrait;
-    use QueryBuilderManipulatorTrait;
 
     /**
      * @var \Doctrine\DBAL\Query\QueryBuilder
