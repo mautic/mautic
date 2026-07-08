@@ -16,6 +16,7 @@ export default class ButtonApplyCommand {
    * @param sender
    */
   static applyForm(editor, sender) {
+    ButtonApplyCommand.prepareDynamicContentForSubmit(editor);
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
     if (ContentService.isMjmlMode(editor)) {
@@ -31,6 +32,9 @@ export default class ButtonApplyCommand {
       const html = ContentService.getEditorHtmlContent(editor);
       ButtonCloseCommands.returnContentToTextarea(editor, html);
     }
+
+    // Tokens are captured in the textarea; restore human readable content on the canvas
+    editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
 
     ButtonApplyCommand.postForm(editor, sender);
   }
@@ -122,6 +126,18 @@ export default class ButtonApplyCommand {
         class: 'modal-content',
       },
     });
+  }
+
+  /**
+   * Move dynamic content fields back into the email form before saving.
+   * The GrapesJS modal detaches them outside the form while editing.
+   */
+  static prepareDynamicContentForSubmit(editor) {
+    const command = 'preset-mautic:dynamic-content-open';
+
+    if (editor.Commands.isActive(command)) {
+      editor.stopCommand(command);
+    }
   }
 
   /**
