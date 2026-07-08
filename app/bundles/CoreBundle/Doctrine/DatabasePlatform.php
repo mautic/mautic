@@ -1513,7 +1513,7 @@ class DatabasePlatform
         string $expression,
     ): string {
         $sql = sprintf('%s(%s)', $aggregator, $expression);
-        if (self::isPostgreSQL($platform) && 'AVG' == $aggregator) {
+        if (self::isPostgreSQL($platform) && 'AVG' === $aggregator) {
             return $sql.'::numeric(10, 4)';
         }
 
