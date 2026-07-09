@@ -413,7 +413,7 @@ class InputHelper
 
             // Was a doctype found?
             if ($doctypeFound && false === $hasUnicode) {
-                $value = "$doctype[0]$value";
+                $value = "{$doctype[0]}{$value}";
             }
 
             if ($cdataCount) {
@@ -582,7 +582,7 @@ class InputHelper
      */
     public static function stripTags(string $input, array $allowedTags = []): string
     {
-        $allowed = implode('', array_map(fn (string $tag): string => "<$tag>", $allowedTags));
+        $allowed = implode('', array_map(fn (string $tag): string => "<{$tag}>", $allowedTags));
 
         return strip_tags($input, $allowed);
     }

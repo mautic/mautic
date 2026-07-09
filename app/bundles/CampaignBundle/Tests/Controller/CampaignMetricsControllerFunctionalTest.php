@@ -314,8 +314,8 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
     private function assertEventDetails(array $actual, array $expected, array $notEmptyFields = []): void
     {
         foreach ($notEmptyFields as $field) {
-            $this->assertNotEmpty($actual[$field]['value'], "$field value should not be empty");
-            $this->assertNotEmpty($actual[$field]['tooltip'], "$field tooltip should not be empty");
+            $this->assertNotEmpty($actual[$field]['value'], "{$field} value should not be empty");
+            $this->assertNotEmpty($actual[$field]['tooltip'], "{$field} tooltip should not be empty");
         }
         foreach ($expected as $key => $value) {
             $this->assertEquals($value, $actual[$key]);

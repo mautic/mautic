@@ -49,7 +49,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
 
         $formValues = [];
         foreach ($formData as $field => $value) {
-            $formValues["mauticform[$field]"] = $value;
+            $formValues["mauticform[{$field}]"] = $value;
         }
 
         $formElement->setValues($formValues);
@@ -63,7 +63,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
                 $diff        = abs($actualValue->getTimestamp() - (new \DateTime())->getTimestamp());
                 $this->assertLessThan(60, $diff, "The {$field} is not within 60 seconds of now.");
             } else {
-                $this->assertEquals($value, $leadFieldValue ?? null, "Field $field does not match");
+                $this->assertEquals($value, $leadFieldValue ?? null, "Field {$field} does not match");
             }
         }
     }

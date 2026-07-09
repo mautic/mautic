@@ -872,7 +872,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -1105,7 +1105,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details

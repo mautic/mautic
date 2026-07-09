@@ -34,6 +34,6 @@ final class Allowlist
             }
         }
 
-        throw new RecordNotFoundException("Package '$packageName' not found in allowlist.");
+        throw new RecordNotFoundException("Package '{$packageName}' not found in allowlist.");
     }
 }

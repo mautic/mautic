@@ -42,7 +42,7 @@ class Version20220429091934 extends PreUpAssertionMigration
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;"
         );
 
-        $this->addSql("ALTER TABLE {$contactExportSchedulerTableName} ADD CONSTRAINT {$userIdFK} FOREIGN KEY (user_id) REFERENCES $usersTableName (id)");
+        $this->addSql("ALTER TABLE {$contactExportSchedulerTableName} ADD CONSTRAINT {$userIdFK} FOREIGN KEY (user_id) REFERENCES {$usersTableName} (id)");
     }
 
     public function down(Schema $schema): void

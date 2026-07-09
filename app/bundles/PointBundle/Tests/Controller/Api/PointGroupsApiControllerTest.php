@@ -158,7 +158,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
 
     private function adjustPointsAndAssert(Lead $contact, Group $pointGroup, string $operator, int $value, int $expectedScore): void
     {
-        $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/$operator/{$value}");
+        $this->client->request('POST', "/api/contacts/{$contact->getId()}/points/groups/{$pointGroup->getId()}/{$operator}/{$value}");
         $adjustResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = json_decode($adjustResponse->getContent(), true);

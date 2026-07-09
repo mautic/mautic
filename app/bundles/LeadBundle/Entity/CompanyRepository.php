@@ -191,7 +191,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if (in_array($command, $this->availableSearchFields)) {
-            $expr = $q->expr()->like($this->getTableAlias().".$command", ":$unique");
+            $expr = $q->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
         }
 
         if ($this->dispatcher) {
@@ -519,7 +519,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 

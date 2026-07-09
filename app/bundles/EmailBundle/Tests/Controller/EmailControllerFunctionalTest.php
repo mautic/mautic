@@ -1242,7 +1242,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('Save')->form();
         $form->setValues([
             'emailform[name]'            => 'Child Email - Updated',
-            "emailform[$parentField]"    => $parentEmail->getId(),
+            "emailform[{$parentField}]"    => $parentEmail->getId(),
         ]);
 
         $this->client->submit($form);
