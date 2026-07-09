@@ -29,7 +29,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = static::getContainer()->get('event_dispatcher');
-        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, [$this, 'addPointsListener']);
+        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, $this->addPointsListener(...));
 
         /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');

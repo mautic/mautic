@@ -12,7 +12,7 @@ class PointEventHelper
     ) {
     }
 
-    public static function validateEmail($eventDetails, $action): bool
+    public static function validateEmail($eventDetails, array $action): bool
     {
         if (null === $eventDetails) {
             return false;
@@ -28,7 +28,7 @@ class PointEventHelper
         return empty($limitToEmails) || in_array($emailId, $limitToEmails);
     }
 
-    public function sendEmail($event, Lead $lead): bool
+    public function sendEmail(array $event, Lead $lead): bool
     {
         $properties = $event['properties'];
         $emailId    = (int) $properties['email'];
