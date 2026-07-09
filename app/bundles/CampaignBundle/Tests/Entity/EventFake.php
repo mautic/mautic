@@ -12,7 +12,7 @@ use Mautic\CampaignBundle\Entity\Event;
 final class EventFake extends Event
 {
     public function __construct(
-        private ?int $id = null,
+        private readonly ?int $id = null,
     ) {
     }
 

@@ -49,7 +49,7 @@ class UserRepository extends CommonRepository
      *
      * @return array
      */
-    public function checkUniqueUsernameEmail($params)
+    public function checkUniqueUsernameEmail(array $params)
     {
         $q = $this->createQueryBuilder('u');
 

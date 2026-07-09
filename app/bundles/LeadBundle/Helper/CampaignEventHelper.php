@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 
 class CampaignEventHelper
 {
-    public static function validatePointChange($event, Lead $lead): bool
+    public static function validatePointChange(array $event, Lead $lead): bool
     {
         $properties  = $event['properties'];
         $checkPoints = $properties['points'];
@@ -22,7 +22,7 @@ class CampaignEventHelper
         return true;
     }
 
-    public static function validateListChange(ListChangeEvent $eventDetails, $event): bool
+    public static function validateListChange(ListChangeEvent $eventDetails, array $event): bool
     {
         $limitAddTo      = $event['properties']['addedTo'];
         $limitRemoveFrom = $event['properties']['removedFrom'];

@@ -13,14 +13,12 @@ class PostCountRepository extends CommonRepository
     /**
      * Fetch Lead stats for some period of time.
      *
-     * @param array $options
-     *
      * @return PostCount[]
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStatsPost($dateFrom, $dateTo, $options): array
+    public function getLeadStatsPost($dateFrom, $dateTo, array $options): array
     {
         $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
