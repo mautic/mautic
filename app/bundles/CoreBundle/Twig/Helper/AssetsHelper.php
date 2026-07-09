@@ -534,7 +534,7 @@ final class AssetsHelper
         $links = [];
 
         // Extract existing links and tags
-        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function ($match) use (&$links): string {
+        $text = preg_replace_callback('~(<a .*?>.*?</a>|<.*?>)~i', function (array $match) use (&$links): string {
             return '<'.array_push($links, $match[1]).'>';
         }, $text);
 
@@ -549,18 +549,18 @@ final class AssetsHelper
 
                     return '<'.array_push($links, "<a $attr href=\"$protocol://$link\">$link</a>").'>';
                 }, $text),
-                'mail' => preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function ($match) use (&$links, $attr): string {
+                'mail' => preg_replace_callback('~([^\s<]+?@[^\s<]+?\.[^\s<]+)(?<![\.,:])~', function (array $match) use (&$links, $attr): string {
                     $match[1] = $this->escape($match[1]);
 
                     return '<'.array_push($links, "<a $attr href=\"mailto:{$match[1]}\">{$match[1]}</a>").'>';
                 }, $text),
-                'twitter' => preg_replace_callback('~(?<!\w)[@#](\w++)~', function ($match) use (&$links, $attr): string {
+                'twitter' => preg_replace_callback('~(?<!\w)[@#](\w++)~', function (array $match) use (&$links, $attr): string {
                     $match[0] = $this->escape($match[0]);
                     $match[1] = $this->escape($match[1]);
 
                     return '<'.array_push($links, "<a $attr href=\"https://twitter.com/".('@' == $match[0][0] ? '' : 'search/%23').$match[1]."\">{$match[0]}</a>").'>';
                 }, $text),
-                default => preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
+                default => preg_replace_callback('~'.preg_quote($protocol, '~').'://([^\s<]+?)(?<![\.,:])~i', function (array $match) use ($protocol, &$links, $attr): string {
                     $match[1] = $this->escape($match[1]);
 
                     return '<'.array_push($links, "<a $attr href=\"$protocol://{$match[1]}\">{$match[1]}</a>").'>';
