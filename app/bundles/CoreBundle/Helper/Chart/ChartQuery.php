@@ -427,7 +427,7 @@ class ChartQuery extends AbstractChart
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
-        $this->modifyCountQuery($query, $uniqueColumn, $dateColumn, $tablePrefix);
+        $this->modifyCountQuery($query, $uniqueColumn, $options, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn);
 
