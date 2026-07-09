@@ -15,9 +15,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private CampaignEventHelper $campaignEventHelper,
-        private IntegrationHelper $integrationHelper,
-        private TranslatorInterface $translator,
+        private readonly CampaignEventHelper $campaignEventHelper,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -47,14 +47,16 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onCampaignAction(CampaignExecutionEvent $event)
+    public function onCampaignAction(CampaignExecutionEvent $event): void
     {
         $event->setChannel('social.twitter');
         if ($response = $this->campaignEventHelper->sendTweetAction($event->getLead(), $event->getEvent())) {
-            return $event->setResult($response);
+            $event->setResult($response);
+
+            return;
         }
 
-        return $event->setFailed(
+        $event->setFailed(
             $this->translator->trans('mautic.social.twitter.error.handle_not_found')
         );
     }

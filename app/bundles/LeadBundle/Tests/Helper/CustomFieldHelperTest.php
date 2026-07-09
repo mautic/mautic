@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use PHPUnit\Framework\TestCase;
 
-class CustomFieldHelperTest extends TestCase
+final class CustomFieldHelperTest extends TestCase
 {
     protected function setUp(): void
     {

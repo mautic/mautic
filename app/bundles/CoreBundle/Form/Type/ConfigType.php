@@ -36,8 +36,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private LanguageHelper $langHelper, private IpLookupFactory $ipLookupFactory, private ?AbstractLookup $ipLookup, private Shortener $shortenerFactory, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $langHelper,
+        private readonly IpLookupFactory $ipLookupFactory,
+        private readonly ?AbstractLookup $ipLookup,
+        private readonly Shortener $shortenerFactory,
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -583,7 +589,7 @@ class ConfigType extends AbstractType
         );
 
         $enabledServices = $this->shortenerFactory->getEnabledServices();
-        $choices         = array_flip(array_map(fn ($enabledService) => $enabledService->getPublicName(), $enabledServices));
+        $choices         = array_flip(array_map(fn (\Mautic\CoreBundle\Shortener\ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
 
         $builder->add(
             Shortener::SHORTENER_SERVICE,

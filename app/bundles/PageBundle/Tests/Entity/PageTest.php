@@ -7,7 +7,7 @@ namespace Mautic\PageBundle\Tests\Entity;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 
-class PageTest extends \PHPUnit\Framework\TestCase
+final class PageTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array<string, array<int, mixed>> $changes
@@ -22,7 +22,9 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, null, []];
@@ -46,7 +48,9 @@ class PageTest extends \PHPUnit\Framework\TestCase
         Assert::assertSame($changes, $page->getChanges());
     }
 
-    /** @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}> */
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];

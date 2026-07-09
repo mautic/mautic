@@ -86,7 +86,7 @@ class DynamicContentHelper
                 continue;
             }
             if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadArray)) {
-                return $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
+                return $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc);
             }
         }
 
@@ -94,12 +94,11 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string     $content
-     * @param Lead|array $lead
+     * @param string $content
      *
      * @return string Content with the {content} tokens replaced with dynamic content
      */
-    public function replaceTokensInContent($content, $lead)
+    public function replaceTokensInContent($content, Lead|array|null $lead)
     {
         // Find all dynamic content tags
         preg_match_all(self::DYNAMIC_CONTENT_REGEX, $content, $matches, PREG_SET_ORDER);

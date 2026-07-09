@@ -124,10 +124,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $repo;
     }
 
-    /**
-     * @return CompanyLeadRepository
-     */
-    public function getCompanyLeadRepository()
+    public function getCompanyLeadRepository(): CompanyLeadRepository
     {
         return $this->em->getRepository(CompanyLead::class);
     }
@@ -259,7 +256,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen((string) $newValue) > 0 || $overwriteWithBlank)) {
+                    if ($curValue !== $newValue && ('' !== (string) $newValue || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -270,8 +267,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * Add lead to company.
-     *
      * @param array|Company $companies
      * @param array|Lead    $lead
      *
@@ -647,7 +642,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new CompanyEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -803,11 +798,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array $fields
      * @param array $data
      *
-     * @return Company|null
-     *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false)
+    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));

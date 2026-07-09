@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -17,17 +19,17 @@ final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCa
     public const TEMP_TEST_FILE = './DoNotSellTest.json';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&LoggerInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|HttpClientInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&HttpClientInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CoreParametersHelper
+     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
 

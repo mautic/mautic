@@ -54,7 +54,7 @@ class ImportModel extends FormModel
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private ProcessSignalService $processSignalService,
+        private readonly ProcessSignalService $processSignalService,
     ) {
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
 
@@ -63,10 +63,8 @@ class ImportModel extends FormModel
 
     /**
      * Returns the Import entity which should be processed next.
-     *
-     * @return Import|null
      */
-    public function getImportToProcess()
+    public function getImportToProcess(): ?Import
     {
         $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
 
@@ -85,7 +83,7 @@ class ImportModel extends FormModel
         $parallelImportLimit = $this->getParallelImportLimit();
         $importsInProgress   = $this->getRepository()->countImportsInProgress();
 
-        return !($importsInProgress >= $parallelImportLimit);
+        return $importsInProgress < $parallelImportLimit;
     }
 
     /**
@@ -167,12 +165,6 @@ class ImportModel extends FormModel
         }
 
         $this->setGhostImportsAsFailed();
-
-        if (!$import) {
-            $msg = 'import is empty, closing the import process';
-            $this->logDebug($msg, $import);
-            throw new ImportFailedException($msg);
-        }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
@@ -438,7 +430,7 @@ class ImportModel extends FormModel
             if ($diffCount > 0) {
                 // Fill in the data with empty string
                 $fill = array_fill($dataCount, $diffCount, '');
-                $data = $data + $fill;
+                $data += $fill;
             } else {
                 return true;
             }
@@ -452,7 +444,7 @@ class ImportModel extends FormModel
      */
     public function trimArrayValues(array $data): array
     {
-        return array_map('trim', $data);
+        return array_map(trim(...), $data);
     }
 
     /**
@@ -475,10 +467,8 @@ class ImportModel extends FormModel
 
     /**
      * Save log about errored line.
-     *
-     * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
+    public function logImportRowError(LeadEventLog $eventLog, string $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');
@@ -555,18 +545,12 @@ class ImportModel extends FormModel
         return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
-    /**
-     * @return ImportRepository
-     */
-    public function getRepository()
+    public function getRepository(): ImportRepository
     {
         return $this->em->getRepository(Import::class);
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getEventLogRepository()
+    public function getEventLogRepository(): LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }
@@ -634,7 +618,7 @@ class ImportModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ImportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

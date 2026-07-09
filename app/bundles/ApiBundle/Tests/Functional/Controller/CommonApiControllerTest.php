@@ -12,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CommonApiControllerTest extends MauticMysqlTestCase
+final class CommonApiControllerTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -40,10 +40,11 @@ class CommonApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
         $translator = static::getContainer()->get('translator');
-        assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
-        assert($coreParametersHelper instanceof CoreParametersHelper);
+        $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
 
@@ -112,10 +113,11 @@ class CommonApiControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_CONFLICT, $error['code']);
 
         $translator = static::getContainer()->get('translator');
-        assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
-        assert($coreParametersHelper instanceof CoreParametersHelper);
+        $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
         $timeFormat = $coreParametersHelper->get('date_format_timeonly');
 

@@ -84,10 +84,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private ?string $contentTemplate = null;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Connection $db,
-        private Report $entity,
-        private ChannelListHelper $channelListHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Connection $db,
+        private readonly Report $entity,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
     }
 
@@ -148,7 +148,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                         switch ($condition) {
                             case 'startsWith':
-                                $value = $value.'%';
+                                $value .= '%';
                                 break;
                             case 'endsWith':
                                 $value = '%'.$value;
@@ -353,7 +353,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $exprFunction = $filter['expr'] ?? $filter['condition'];
                 $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
-                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' == trim((string) $filter['value'])) {
+                if (!$this->isEmptyValueSupportedCondition($exprFunction) && !is_array($filter['value']) && '' === trim((string) $filter['value'])) {
                     // Ignore empty values before applying glue so they do not create empty OR groups.
                     continue;
                 }
@@ -444,7 +444,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                         break;
                                     case 'startsWith':
                                         $exprFunction    = 'like';
-                                        $filter['value'] = $filter['value'].'%';
+                                        $filter['value'] .= '%';
                                         break;
                                     case 'endsWith':
                                         $exprFunction    = 'like';
@@ -537,7 +537,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Parse and validate filter values
         $conditions = array_map(
-            function (string $item) {
+            function (string $item): array {
                 $parts = explode(':', $item);
                 if (2 !== count($parts)) {
                     throw new \InvalidArgumentException('Invalid DNC filter format');
@@ -560,7 +560,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ->select('DISTINCT lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'ldnc')
             ->where(implode(' OR ', array_map(
-                fn ($condition) => sprintf(
+                fn (array $condition): string => sprintf(
                     '(ldnc.channel = %s AND ldnc.reason = %d)',
                     $condition['channel'],
                     $condition['reason']

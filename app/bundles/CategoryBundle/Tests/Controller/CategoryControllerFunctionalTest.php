@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Tests\Controller;
 
 use Mautic\CategoryBundle\Entity\Category;
@@ -13,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategoryControllerFunctionalTest extends MauticMysqlTestCase
+final class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
     private TranslatorInterface $translator;
 
@@ -97,6 +99,39 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $body           = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('categoryId', $body);
         $this->assertArrayHasKey('categoryName', $body);
+    }
+
+    public function testEditCategorySavesWhenApplyButtonIsDisabled(): void
+    {
+        $category = $this->createCategory(
+            'Category for color edit',
+            'Category for color edit',
+            'global',
+            'category-for-color-edit'
+        );
+
+        $crawler        = $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $clientResponse = json_decode($this->client->getResponse()->getContent(), true);
+        $html           = $clientResponse['newContent'];
+        $crawler->addHtmlContent($html);
+
+        $saveButton = $crawler->selectButton('category_form[buttons][save]');
+        $form       = $saveButton->form();
+        $form['category_form[title]']->setValue('Category for color edit');
+        $form['category_form[color]']->setValue('4e5d9d');
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
+
+        $this->client->submit($form);
+
+        // Regression test for #16163: CategoryType builds its buttons with apply_text => false,
+        // so the form has no "apply" child. editAction used to call
+        // $form->get('buttons')->get('apply') unconditionally, which threw
+        // OutOfBoundsException "Child \"apply\" does not exist" (HTTP 500) on a valid save.
+        $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
+
+        $body = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertSame('Category for color edit', $body['categoryName']);
     }
 
     public function testEditLockCategory(): void
@@ -283,7 +318,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('mautic'));
         $user->setRole($role);
 

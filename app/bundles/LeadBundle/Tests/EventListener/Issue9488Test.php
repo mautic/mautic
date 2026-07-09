@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -13,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 
-class Issue9488Test extends MauticMysqlTestCase
+final class Issue9488Test extends MauticMysqlTestCase
 {
     private LeadRepository $contactRepository;
 

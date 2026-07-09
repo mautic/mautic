@@ -9,9 +9,10 @@ use Mautic\CoreBundle\Entity\IpAddress;
 class LeadPointLog
 {
     public const TABLE_NAME = 'point_lead_action_log';
+
     /**
      * @var Point
-     **/
+     */
     private $point;
 
     /**
@@ -26,7 +27,7 @@ class LeadPointLog
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

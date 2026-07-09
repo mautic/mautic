@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class ContentHelperTest extends \PHPUnit\Framework\TestCase
+final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContentHelper
-     */
-    private $contentHelper;
+    private ContentHelper $contentHelper;
 
     protected function setUp(): void
     {

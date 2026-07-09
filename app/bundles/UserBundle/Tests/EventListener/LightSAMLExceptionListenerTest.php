@@ -12,7 +12,6 @@ use LightSaml\Model\Protocol\Status;
 use LightSaml\Model\Protocol\StatusCode;
 use Mautic\CoreBundle\EventListener\ExceptionListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -20,17 +19,11 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Router;
 
-class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
+final class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
 {
-    /**
-     * @var MockObject|LoggerInterface
-     */
-    private $logger;
-
     protected function setUp(): void
     {
         parent::setup();
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->router = $this->createMock(Router::class);
         $this->router->expects($this->once())->method('generate')->willReturn('saml/login_retry');
     }
@@ -57,10 +50,10 @@ class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
         $exception = new LightSamlContextException($context, 'Unknown Inresponse');
 
         $request = new Request();
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $request->attributes->set('_session', $session);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $event  = new ExceptionEvent(
             $kernel,
             $request,
@@ -68,7 +61,7 @@ class LightSAMLExceptionListenerTest extends MauticMysqlTestCase
             $exception
         );
 
-        $subscriber = new ExceptionListener($this->router, 'MauticCoreBundle:Exception:show', $this->logger);
+        $subscriber = new ExceptionListener($this->router, 'MauticCoreBundle:Exception:show', $this->createStub(LoggerInterface::class));
 
         $subscriber->onKernelException($event);
     }

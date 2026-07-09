@@ -65,8 +65,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         protected ChannelListHelper $channelListHelper,
         protected FieldModel $fieldModel,
         protected ReportHelper $reportHelper,
-        private CsvExporter $csvExporter,
-        private ExcelExporter $excelExporter,
+        private readonly CsvExporter $csvExporter,
+        private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -74,17 +74,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ReportBundle\Entity\ReportRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\ReportBundle\Entity\ReportRepository
     {
         return $this->em->getRepository(Report::class);
     }
@@ -166,7 +163,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ReportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -451,7 +448,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         $debugData     = [];
 
         // UI doesn't set time so reset it to midnight. API can set time so do not reset it. Using DateTimeImmutable to distinguish.
-        $resetTime = !(isset($options['dateFrom']) && $options['dateFrom'] instanceof \DateTimeImmutable);
+        $resetTime = !isset($options['dateFrom']) || !$options['dateFrom'] instanceof \DateTimeImmutable;
 
         if ($resetTime && isset($options['dateFrom'])) {
             $now = new \DateTime();
@@ -726,11 +723,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      */
     private function orderByIsValid(string $orderBy, string $orderByDirection, array $allowedColumns): bool
     {
-        if (!array_key_exists($orderBy, $allowedColumns) || !in_array($orderByDirection, ['ASC', 'DESC', ''], true)) {
-            return false;
-        }
-
-        return true;
+        return array_key_exists($orderBy, $allowedColumns) && in_array($orderByDirection, ['ASC', 'DESC', ''], true);
     }
 
     /**

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class AnonymizeIpCommandTest extends MauticMysqlTestCase
+final class AnonymizeIpCommandTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

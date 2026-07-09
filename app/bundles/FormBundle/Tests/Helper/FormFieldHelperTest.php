@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -7,7 +9,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FormFieldHelper
@@ -31,7 +33,9 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /** @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}> */
+    /**
+     * @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}>
+     */
     public static function fieldProvider(): array
     {
         return [
@@ -153,13 +157,60 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         return $list;
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('selectAutoFillProvider')]
+    public function testPopulateFieldSelectAutoFill(string $type, string $value, string $options, string $expectedOptions, string $message): void
+    {
+        $open = '<select name="mauticform['.$type.']" id="mauticform_input_mautic_'.$type.'" class="form-control">';
+        $html = $open.$options.'</select>';
+
+        $this->fixture->populateField(self::getField(ucfirst($type), $type), $value, 'mautic', $html);
+
+        $this->assertSame($open.$expectedOptions.'</select>', $html, $message);
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string, string, string}>
+     */
+    public static function selectAutoFillProvider(): iterable
+    {
+        yield 'attributes precede the id attribute' => [
+            'select',
+            'myvalue',
+            '<option value="myvalue">My Value</option>',
+            '<option value="myvalue" selected="selected">My Value</option>',
+            'Select lists should be auto-filled even when other attributes precede the id attribute.',
+        ];
+
+        yield 'whitespace precedes the option closing bracket' => [
+            'select',
+            'myvalue',
+            '<option value="myvalue" >My Value</option>',
+            '<option value="myvalue" selected="selected">My Value</option>',
+            'Select options should be auto-filled even when whitespace precedes the closing bracket.',
+        ];
+
+        yield 'only the matching option is selected' => [
+            'country',
+            'myvalue',
+            '<option value="other">Other</option><option value="myvalue" >My Value</option>',
+            '<option value="other">Other</option><option value="myvalue" selected="selected">My Value</option>',
+            'Country lists should auto-fill only the option matching the submitted value.',
+        ];
+
+        yield 'regex backreference characters preserved verbatim' => [
+            'select',
+            '$1promo',
+            '<option value="$1promo">Promo</option>',
+            '<option value="$1promo" selected="selected">Promo</option>',
+            'Option values containing regex backreference characters should be preserved verbatim when marked selected.',
+        ];
+    }
+
     /**
      * @param string $name
      * @param string $type
-     *
-     * @return Field
      */
-    protected static function getField($name, $type)
+    protected static function getField($name, $type): Field
     {
         $field = new Field();
 
@@ -172,10 +223,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $name
-     *
-     * @return string
      */
-    private static function getAliasFromName($name)
+    private static function getAliasFromName($name): string
     {
         return strtolower(str_replace(' ', '', $name));
     }

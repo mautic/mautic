@@ -69,6 +69,9 @@ trait CustomFieldEntityTrait
         return parent::__call($name, $arguments);
     }
 
+    /**
+     * @param mixed[] $fields
+     */
     public function setFields($fields): void
     {
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
@@ -145,7 +148,7 @@ trait CustomFieldEntityTrait
             $value = CustomFieldHelper::fixValueType($field['type'], $value);
         }
 
-        if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
+        if ($oldValue !== $value && (('' !== $oldValue || null !== $value) && (null !== $oldValue || '' !== $value))) {
             $this->addChange('fields', [$alias => [$oldValue, $value]]);
             $this->updatedFields[$alias] = $value;
         }

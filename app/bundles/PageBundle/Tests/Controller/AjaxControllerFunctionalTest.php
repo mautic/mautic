@@ -12,7 +12,7 @@ use PHPUnit\Framework\Assert;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testGetBuilderTokensAction(): void
     {
@@ -31,7 +31,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent) {
+            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 

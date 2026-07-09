@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 
-class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
+final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -114,7 +114,7 @@ class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
     {
         // Add 1 segment
         $segmentRepo = $this->em->getRepository(LeadList::class);
-        \assert($segmentRepo instanceof LeadListRepository);
+        $this->assertInstanceOf(LeadListRepository::class, $segmentRepo);
 
         $segment = new LeadList();
         $filters = [

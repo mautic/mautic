@@ -60,12 +60,7 @@ class FormBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * Get submit actions.
-     *
-     * @return array
-     */
-    public function getSubmitActions()
+    public function getSubmitActions(): array
     {
         uasort(
             $this->actions,
@@ -143,11 +138,9 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * Get form fields.
-     *
-     * @return mixed
+     * @return array<string, mixed>
      */
-    public function getFormFields()
+    public function getFormFields(): array
     {
         return $this->fields;
     }

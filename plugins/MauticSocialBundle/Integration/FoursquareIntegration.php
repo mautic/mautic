@@ -52,7 +52,6 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
      *
      * @return mixed|string
      */
@@ -95,7 +94,6 @@ class FoursquareIntegration extends SocialIntegration
             //mayorships
             $url  = $this->getApiUrl("users/{$id}/mayorships");
             $data = $this->makeRequest($url);
-
             if (isset($data->response->mayorships) && count($data->response->mayorships->items)) {
                 $limit = 5;
                 foreach ($data->response->mayorships->items as $m) {
@@ -120,7 +118,7 @@ class FoursquareIntegration extends SocialIntegration
                     $limit--;
                 }
             }
-            */
+             */
 
             // tips
             $url  = $this->getApiUrl("users/{$id}/tips").'&limit=5&sort=recent';
@@ -153,13 +151,11 @@ class FoursquareIntegration extends SocialIntegration
             //lists
             $url  = $this->getApiUrl("users/{$id}/lists") . "&limit=5&group=created";
             $data = $this->makeRequest($url);
-
             if (isset($data->response->lists) && count($data->response->lists->items)) {
                 foreach ($data->response->lists->items as $l) {
                     if (!$l->listItems->count) {
                         continue;
                     }
-
                     $item = array(
                         'listName'        => $l->name,
                         'listDescription' => $l->description,
@@ -168,11 +164,9 @@ class FoursquareIntegration extends SocialIntegration
                         'listUpdatedAt'   => (isset($l->updatedAt)) ? $l->updatedAt : '',
                         'listItems'       => array()
                     );
-
                     //get a sample of the list items
                     $url      = "https://api.foursquare.com/v2/lists/{$l->id}?limit=5&sort=recent&v=20140719&oauth_token={$keys['access_token']}";
                     $listData = $this->makeRequest($url);
-
                     if (isset($listData->response->list->listItems) && count($listData->response->list->listItems->items)) {
                         foreach ($listData->response->list->listItems->items as $li) {
                             //find main category of venue
@@ -184,7 +178,6 @@ class FoursquareIntegration extends SocialIntegration
                                 }
                             }
                             $contact = (!empty($li->contact->formattedPhone)) ? $li->contact->formattedPhone : '';
-
                             $item['listItems'][] = array(
                                 'createdAt'     => $li->createdAt,
                                 'venueName'     => $li->venue->name,
@@ -194,11 +187,10 @@ class FoursquareIntegration extends SocialIntegration
                             );
                         }
                     }
-
                     $activity['lists'][] = $item;
                 }
             }
-            */
+             */
 
             $socialCache['activity'] = $activity;
         }

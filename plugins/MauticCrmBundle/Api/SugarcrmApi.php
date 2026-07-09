@@ -296,8 +296,7 @@ class SugarcrmApi extends CrmApi
     }
 
     /**
-     * @param $object
-     *                TODO 7.x
+     *                TODO 7.x.
      *
      * @return array|mixed|string
      */
@@ -468,7 +467,7 @@ class SugarcrmApi extends CrmApi
                     foreach ($record['name_value_list'] as $item) {
                         $fields[$item['name']] = $item['value'];
                     }
-                    if ('BYID' == $type) {
+                    if ('BYID' === $type) {
                         $res[$fields['id']] = $fields['email1'];
                     } elseif (isset($fields['email1'])) {
                         $res[$fields['email1']] = $fields['id'];
@@ -521,7 +520,7 @@ class SugarcrmApi extends CrmApi
                             }
                         }
                     }
-                    if ('BYID' == $type) {
+                    if ('BYID' === $type) {
                         $res[$record['id']] = $found_email;
                     } else {
                         $res[$found_email] = $record['id'];
@@ -614,7 +613,7 @@ class SugarcrmApi extends CrmApi
                 $fields[] = 'date_entered';
                 $fields[] = 'assigned_user_id';
                 $fields[] = 'email1';
-                if ('Accounts' != $object) {
+                if ('Accounts' !== $object) {
                     $fields[] = 'account_id';
                 }
                 $parameters = [
@@ -675,7 +674,7 @@ class SugarcrmApi extends CrmApi
                 $fields[] = 'date_entered';
                 $fields[] = 'assigned_user_id';
                 $fields[] = 'email1';
-                if ('Accounts' != $object) {
+                if ('Accounts' !== $object) {
                     $fields[] = 'account_id';
                 }
                 // $filter_args = ['filter' => [['$and' => $filter]]];

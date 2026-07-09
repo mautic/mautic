@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Exception\FilePathException;
@@ -11,7 +13,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FileUploader::class)]
-class FileUploaderTest extends \PHPUnit\Framework\TestCase
+final class FileUploaderTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUpload(): void
@@ -21,7 +23,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $translatorMock = $this->createMock(Translator::class);
+        $translatorMock = $this->createStub(Translator::class);
 
         $fileMock = $this->createMock(UploadedFile::class);
 
@@ -51,7 +53,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $translatorMock = $this->createMock(Translator::class);
+        $translatorMock = $this->createStub(Translator::class);
 
         $fileMock = $this->createMock(UploadedFile::class);
 
@@ -120,7 +122,7 @@ class FileUploaderTest extends \PHPUnit\Framework\TestCase
 
         $filePathResolverMock = $this->createMock(FilePathResolver::class);
 
-        $translatorMock = $this->createMock(Translator::class);
+        $translatorMock = $this->createStub(Translator::class);
 
         $filePathResolverMock->expects($this->once())
             ->method('delete')

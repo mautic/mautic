@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Field\SchemaDefinition;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class SchemaDefinitionTest extends TestCase
+final class SchemaDefinitionTest extends TestCase
 {
     /**
      * @param mixed[] $expected
@@ -56,7 +56,7 @@ class SchemaDefinitionTest extends TestCase
 
         foreach (['timezone', 'locale', 'country', 'email', 'lookup', 'select', 'region', 'tel', 'text'] as $type) {
             foreach ([75, null] as $length) {
-                $maxLength = ('text' == $type || !is_null($length)) ? $length : SchemaDefinition::MAX_VARCHAR_LENGTH;
+                $maxLength = ('text' === $type || !is_null($length)) ? $length : SchemaDefinition::MAX_VARCHAR_LENGTH;
                 yield [
                     'some',
                     $type,

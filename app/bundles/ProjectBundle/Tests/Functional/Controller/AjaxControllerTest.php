@@ -23,7 +23,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $projectModel = self::getContainer()->get(ProjectModel::class);
 
         $projects = array_map(
-            static function (string $projectName) use ($projectModel) {
+            static function (string $projectName) use ($projectModel): Project {
                 $project = new Project();
                 $project->setName($projectName);
                 $projectModel->saveEntity($project);
@@ -63,8 +63,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     public function testCreatingDuplicateProject(): void
     {
+        /** @var ProjectModel $projectModel */
         $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         $this->assertCount(
             0,
@@ -123,8 +124,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('xssPayloadsProvider')]
     public function testProjectNamesAreEscapedInAjaxResponse(string $xssPayload, string $dangerousSubstring): void
     {
+        /** @var ProjectModel $projectModel */
         $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with an XSS payload in the name
         $project = new Project();
@@ -225,8 +227,9 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('specialCharacterProjectNamesProvider')]
     public function testProjectNamesWithSpecialCharactersAreEscapedAndFunctional(string $projectName): void
     {
+        /** @var ProjectModel $projectModel */
         $projectModel = self::getContainer()->get('mautic.project.model.project');
-        \assert($projectModel instanceof ProjectModel);
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
 
         // Create a project with special characters
         $project = new Project();

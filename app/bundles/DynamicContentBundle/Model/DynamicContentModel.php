@@ -40,10 +40,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return 'dynamiccontent:dynamiccontents';
     }
 
-    /**
-     * @return DynamicContentRepository
-     */
-    public function getRepository()
+    public function getRepository(): DynamicContentRepository
     {
         /** @var DynamicContentRepository $repo */
         $repo = $this->em->getRepository(DynamicContent::class);
@@ -54,10 +51,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return $repo;
     }
 
-    /**
-     * @return \Mautic\DynamicContentBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \Mautic\DynamicContentBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }
@@ -177,10 +171,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * @param Lead|array $lead
      * @param string     $source
-     *
-     * @return Stat|null
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null): ?Stat
     {
         if (empty($lead)) {
             return null;
@@ -236,7 +228,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new DynamicContentEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

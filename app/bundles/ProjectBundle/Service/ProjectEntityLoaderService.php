@@ -19,15 +19,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ProjectEntityLoaderService
 {
-    /** @var array<string, EntityTypeConfig> */
+    /**
+     * @var array<string, EntityTypeConfig>
+     */
     private array $entityTypesCache = [];
 
     public function __construct(
-        private EntityManagerInterface $em,
-        private TranslatorInterface $translator,
-        private ModelFactory $modelFactory,
-        private CorePermissions $security,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly EntityManagerInterface $em,
+        private readonly TranslatorInterface $translator,
+        private readonly ModelFactory $modelFactory,
+        private readonly CorePermissions $security,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -212,7 +214,7 @@ final class ProjectEntityLoaderService
         }
 
         // Sort entity types alphabetically by label
-        uasort($this->entityTypesCache, fn (EntityTypeConfig $a, EntityTypeConfig $b) => strcasecmp($a->label, $b->label));
+        uasort($this->entityTypesCache, fn (EntityTypeConfig $a, EntityTypeConfig $b): int => strcasecmp($a->label, $b->label));
 
         return $this->entityTypesCache;
     }

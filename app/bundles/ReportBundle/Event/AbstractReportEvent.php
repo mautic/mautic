@@ -39,7 +39,7 @@ class AbstractReportEvent extends Event
         }
 
         if (is_array($context)) {
-            $res = array_filter($context, fn ($elem) => 0 === stripos($this->context, (string) $elem));
+            $res = array_filter($context, fn ($elem): bool => 0 === stripos($this->context, (string) $elem));
 
             return count($res) > 0;
         } elseif ($this->context == $context) {

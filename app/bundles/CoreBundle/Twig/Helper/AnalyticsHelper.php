@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class AnalyticsHelper
+final readonly class AnalyticsHelper
 {
     private string $code;
 

@@ -40,7 +40,7 @@ class IntegrationHelper
     private array $byPlugin = [];
 
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
         protected EntityManager $em,
         protected PathsHelper $pathsHelper,
         protected BundleHelper $bundleHelper,
@@ -235,7 +235,7 @@ class IntegrationHelper
             $integrationsWithFeatures = [];
             foreach ($withFeatures as $feature) {
                 if (isset($this->byFeatureList[$feature])) {
-                    $integrationsWithFeatures = $integrationsWithFeatures + $this->byFeatureList[$feature];
+                    $integrationsWithFeatures += $this->byFeatureList[$feature];
                 }
             }
 
@@ -413,7 +413,7 @@ class IntegrationHelper
             // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
-            /* @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
+            /** @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();

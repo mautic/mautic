@@ -30,11 +30,11 @@ class ExportHelper
     public const EXPORT_TYPE_CSV   = 'csv';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private FilePathResolver $filePathResolver,
-        private ProcessSignalService $processSignalService,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 

@@ -53,10 +53,7 @@ class Copy
         $builder->addNullableField('subject', 'text');
     }
 
-    /**
-     * @return $this
-     */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -81,10 +78,8 @@ class Copy
 
     /**
      * @param \DateTime $dateCreated
-     *
-     * @return Copy
      */
-    public function setDateCreated($dateCreated)
+    public function setDateCreated($dateCreated): static
     {
         $this->dateCreated = $dateCreated;
 
@@ -101,10 +96,8 @@ class Copy
 
     /**
      * @param string $body
-     *
-     * @return Copy
      */
-    public function setBody($body)
+    public function setBody($body): static
     {
         $this->body = $body;
 
@@ -121,10 +114,8 @@ class Copy
 
     /**
      * @param mixed $subject
-     *
-     * @return Copy
      */
-    public function setSubject($subject)
+    public function setSubject($subject): static
     {
         $this->subject = $subject;
 

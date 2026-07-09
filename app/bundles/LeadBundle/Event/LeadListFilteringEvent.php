@@ -16,7 +16,7 @@ class LeadListFilteringEvent extends CommonEvent
 
     protected string $subQuery;
 
-    private string $leadsTableAlias;
+    private readonly string $leadsTableAlias;
 
     /**
      * @param array        $details
@@ -87,18 +87,12 @@ class LeadListFilteringEvent extends CommonEvent
         return $this->queryBuilder;
     }
 
-    /**
-     * @param bool $status
-     */
-    public function setFilteringStatus($status): void
+    public function setFilteringStatus(bool $status): void
     {
         $this->isFilteringDone = $status;
     }
 
-    /**
-     * @param string $query
-     */
-    public function setSubQuery($query): void
+    public function setSubQuery(string $query): void
     {
         $this->subQuery = $query;
 

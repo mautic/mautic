@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Symfony\Component\DomCrawler\Crawler;
@@ -88,6 +89,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->assertTrue($responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
         // 2.c Save campaign through CampaignModel to trigger audit log creation
+        /** @var CampaignModel $campaignModel */
         $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
         $campaign      = $campaignModel->getEntity($campaignId);
         $event         = $this->em->find(Event::class, $eventId);
@@ -102,7 +104,7 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated'),

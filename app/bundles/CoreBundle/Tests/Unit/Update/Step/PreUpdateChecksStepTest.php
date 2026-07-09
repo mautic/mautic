@@ -12,15 +12,15 @@ use Mautic\CoreBundle\Update\Step\PreUpdateChecksStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PreUpdateChecksStepTest extends AbstractStepTestCase
+final class PreUpdateChecksStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|UpdateHelper
+     * @var MockObject&UpdateHelper
      */
     private MockObject $updateHelper;
 

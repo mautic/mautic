@@ -30,12 +30,12 @@ class TwitterCommandHelper
     private $twitterHandleField;
 
     public function __construct(
-        private LeadModel $leadModel,
-        private FieldModel $fieldModel,
-        private MonitoringModel $monitoringModel,
-        private PostCountModel $postCountModel,
-        private Translator $translator,
-        private EntityManagerInterface $em,
+        private readonly LeadModel $leadModel,
+        private readonly FieldModel $fieldModel,
+        private readonly MonitoringModel $monitoringModel,
+        private readonly PostCountModel $postCountModel,
+        private readonly Translator $translator,
+        private readonly EntityManagerInterface $em,
         CoreParametersHelper $coreParametersHelper,
     ) {
         $this->translator->setLocale($coreParametersHelper->get('locale', 'en_US'));
@@ -52,10 +52,7 @@ class TwitterCommandHelper
         return $this->updatedLeads;
     }
 
-    /**
-     * @return array
-     */
-    public function getManipulatedLeads()
+    public function getManipulatedLeads(): array
     {
         return $this->manipulatedLeads;
     }
@@ -66,10 +63,9 @@ class TwitterCommandHelper
     }
 
     /**
-     * @param string $message
-     * @param bool   $newLine
+     * @param bool $newLine
      */
-    private function output($message, $newLine = true): void
+    private function output(string $message, $newLine = true): void
     {
         if ($newLine) {
             $this->output->writeln($message);
@@ -202,7 +198,7 @@ class TwitterCommandHelper
         foreach ($statusList as $status) {
             $handle = strtolower($status['user']['screen_name']);
 
-            /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
+            /** @var Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
                 $lastActive              = new \DateTime($status['created_at']);
@@ -346,7 +342,7 @@ class TwitterCommandHelper
         $monitorLead->setLead($lead);
         $monitorLead->setDateAdded(new \DateTime());
 
-        /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
+        /** @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
         $monitorRepository = $this->em->getRepository(\MauticPlugin\MauticSocialBundle\Entity\Lead::class);
 
         $monitorRepository->saveEntity($monitorLead);

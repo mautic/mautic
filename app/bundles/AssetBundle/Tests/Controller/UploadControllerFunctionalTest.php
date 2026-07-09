@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class UploadControllerFunctionalTest extends MauticMysqlTestCase
 {
     private string $assetPath;
+
     private string $tempId;
 
     /**

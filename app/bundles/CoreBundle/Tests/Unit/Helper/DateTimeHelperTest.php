@@ -1,25 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateTimeHelper::class)]
-class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void
     {
         $helper   = new DateTimeHelper();
         $timezone = $helper->guessTimezoneFromOffset();
-        $this->assertEquals($timezone, 'Europe/London');
+        $this->assertEquals('Europe/London', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(3600);
-        $this->assertEquals($timezone, 'Europe/Paris');
+        $this->assertEquals('Europe/Paris', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(-2 * 3600);
-        $this->assertEquals($timezone, 'America/Goose_Bay'); // Is it really in timezone -2
+        $this->assertEquals('America/Goose_Bay', $timezone); // Is it really in timezone -2
         $timezone = $helper->guessTimezoneFromOffset(-5 * 3600);
-        $this->assertEquals($timezone, 'America/New_York');
+        $this->assertEquals('America/New_York', $timezone);
     }
 
     public function testBuildIntervalWithBadUnit(): void
@@ -66,7 +68,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $helper   = new DateTimeHelper('now', DateTimeHelper::FORMAT_DB, $timezone);
         $date     = new \DateTime();
         $date->setTimezone(new \DateTimeZone($timezone));
-        $this->assertEquals($date->format('P'), $helper->getLocalTimezoneOffset());
+        $this->assertSame($date->format('P'), $helper->getLocalTimezoneOffset());
     }
 
     public function testGetDiff(): void
@@ -114,13 +116,13 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $expectedDays     = (int) $expectedInterval->format('%R%a');
 
         // Assert that the interval days match the expected difference
-        $this->assertEquals($expectedDays, (int) $interval->format('%R%a'));
+        $this->assertSame($expectedDays, (int) $interval->format('%R%a'));
 
         // Assert that the interval hours are zero since times were reset
         $this->assertEquals(0, $interval->h);
 
         // Assert that the interval has the correct timezone
-        $this->assertEquals($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
+        $this->assertSame($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
     }
 
     public function testAddMethodModifiesOriginalDateTime(): void
@@ -138,7 +140,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $modifiedDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the date has been modified correctly
-        $this->assertEquals('2023-01-02 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-02 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testAddMethodReturnsClonedDateTime(): void
@@ -156,10 +158,10 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $originalDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the clone has been modified correctly
-        $this->assertEquals('2023-01-02 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-02 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
 
         // Assert that the original DateTime object remains unchanged
-        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testSubMethodModifiesOriginalDateTime(): void
@@ -177,7 +179,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $modifiedDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the date has been modified correctly
-        $this->assertEquals('2023-01-01 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-01 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testSubMethodReturnsClonedDateTime(): void
@@ -195,10 +197,10 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $originalDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the clone has been modified correctly
-        $this->assertEquals('2023-01-01 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-01 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
 
         // Assert that the original DateTime object remains unchanged
-        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testModifyMethodModifiesOriginalDateTime(): void
@@ -216,7 +218,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $modifiedDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the date has been modified correctly
-        $this->assertEquals('2023-01-03 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-03 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testModifyMethodReturnsClonedDateTime(): void
@@ -234,10 +236,10 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $originalDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the clone has been modified correctly
-        $this->assertEquals('2023-01-03 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-03 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
 
         // Assert that the original DateTime object remains unchanged
-        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('setTimeIfMissingDataProvider')]
@@ -246,8 +248,8 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $result = DateTimeHelper::setTimeIfMissing($input, $defaultTime, $timezone);
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $result);
-        $this->assertEquals($expectedOutput, $result->format('Y-m-d H:i:s'));
-        $this->assertEquals($expectedTimezone, $result->getTimezone()->getName());
+        $this->assertSame($expectedOutput, $result->format('Y-m-d H:i:s'));
+        $this->assertSame($expectedTimezone, $result->getTimezone()->getName());
     }
 
     /**

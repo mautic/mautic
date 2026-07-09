@@ -189,8 +189,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * Add company left join.
-     *
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      */
     private function addCompanyLeftJoin($q): void
@@ -339,7 +337,7 @@ class LeadFieldRepository extends CommonRepository
                 switch ($operatorExpr) {
                     case 'startsWith':
                         $operatorExpr    = 'like';
-                        $value           = $value.'%';
+                        $value .= '%';
                         break;
                     case 'endsWith':
                         $operatorExpr   = 'like';

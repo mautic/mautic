@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -18,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MauticSocialMonitoringCommand extends Command
 {
     public function __construct(
-        private MonitoringModel $monitoringModel,
+        private readonly MonitoringModel $monitoringModel,
     ) {
         parent::__construct();
     }
@@ -80,7 +79,6 @@ class MauticSocialMonitoringCommand extends Command
             'limit' => 100,
         ];
 
-        /** @var MonitoringRepository $repository */
         $repository = $this->monitoringModel->getRepository();
 
         if (null !== $id) {
@@ -99,11 +97,9 @@ class MauticSocialMonitoringCommand extends Command
     }
 
     /**
-     * @return bool|int
-     *
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output)
+    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();
@@ -120,7 +116,7 @@ class MauticSocialMonitoringCommand extends Command
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ('' == $commandName) {
+        if ('' === $commandName) {
             $output->writeln('Matching command not found.');
 
             return 1;

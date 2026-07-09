@@ -124,7 +124,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
+     */
     #[Groups(['notification:read', 'notification:write'])]
     private $category;
 
@@ -174,9 +174,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $this->translationChildren = new ArrayCollection();
     }
 
-    /**
-     * Clear stats.
-     */
     public function clearStats(): void
     {
         $this->stats = new ArrayCollection();
@@ -342,7 +339,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
             ->build();
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
@@ -368,10 +365,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * @param string $name
-     *
-     * @return $this
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -397,8 +392,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -414,10 +407,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -484,7 +474,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @param array $utmTags
      */
-    public function setUtmTags($utmTags)
+    public function setUtmTags($utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -517,10 +507,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->readCount;
     }
 
-    /**
-     * @return $this
-     */
-    public function setReadCount($readCount)
+    public function setReadCount($readCount): static
     {
         $this->readCount = $readCount;
 
@@ -535,10 +522,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->publishDown;
     }
 
-    /**
-     * @return $this
-     */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -554,10 +538,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->publishUp;
     }
 
-    /**
-     * @return $this
-     */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -570,10 +551,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return ($includeVariants) ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
 
@@ -588,21 +566,13 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->lists;
     }
 
-    /**
-     * Add list.
-     *
-     * @return Notification
-     */
-    public function addList(LeadList $list)
+    public function addList(LeadList $list): static
     {
         $this->lists[] = $list;
 
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->lists->removeElement($list);
@@ -643,10 +613,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     /**
      * @param bool $mobile
-     *
-     * @return $this
      */
-    public function setMobile($mobile)
+    public function setMobile($mobile): static
     {
         $this->mobile = $mobile;
 
@@ -661,10 +629,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->mobileSettings ?? [];
     }
 
-    /**
-     * @return $this
-     */
-    public function setMobileSettings(array $mobileSettings)
+    public function setMobileSettings(array $mobileSettings): static
     {
         $this->mobileSettings = $mobileSettings;
 

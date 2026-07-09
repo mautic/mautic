@@ -55,13 +55,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         protected ActionModel $formActionModel,
         protected FieldModel $formFieldModel,
         protected FormFieldHelper $fieldHelper,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
         protected LeadFieldModel $leadFieldModel,
-        private FormUploader $formUploader,
-        private ContactTracker $contactTracker,
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private TableSchemaHelper $tableSchemaHelper,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly FormUploader $formUploader,
+        private readonly ContactTracker $contactTracker,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly TableSchemaHelper $tableSchemaHelper,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -74,10 +74,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return FormRepository
-     */
-    public function getRepository()
+    public function getRepository(): FormRepository
     {
         return $this->em->getRepository(Form::class);
     }
@@ -152,7 +149,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -319,7 +316,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
@@ -555,9 +552,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param object $entity
+     */
     public function deleteEntity($entity): void
     {
-        /* @var Form $entity */
+        /** @var Form $entity */
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
@@ -577,7 +577,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
-            /* @var Form $entity */
+            /** @var Form $entity */
             // delete the associated results table
             $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
@@ -881,7 +881,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html): void
+    private function loadHTML(\DOMDocument &$dom, $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -895,7 +895,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    private function saveHTML($dom, $html)
+    private function saveHTML(\DOMDocument $dom, ?\DOMNode $html): string|false|null
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
@@ -954,7 +954,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Generate dom manipulation javascript to include all script.
      */
-    private function generateJsScript($html): string
+    private function generateJsScript(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();

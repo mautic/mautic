@@ -92,10 +92,7 @@ class Event
         return $this->webhook;
     }
 
-    /**
-     * @return $this
-     */
-    public function setWebhook(Webhook $webhook)
+    public function setWebhook(Webhook $webhook): static
     {
         $this->webhook = $webhook;
 
@@ -113,7 +110,7 @@ class Event
     /**
      * @param mixed $eventType
      */
-    public function setEventType($eventType)
+    public function setEventType($eventType): static
     {
         $this->eventType = $eventType;
 
@@ -122,10 +119,8 @@ class Event
 
     /**
      * @param ArrayCollection $queues
-     *
-     * @return self
      */
-    public function setQueues($queues)
+    public function setQueues($queues): static
     {
         $this->queues = $queues;
 

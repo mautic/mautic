@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -11,9 +13,11 @@ use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 
-class EventAccessorTest extends \PHPUnit\Framework\TestCase
+final class EventAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, array<string, mixed>>> */
+    /**
+     * @var array<string, array<string, array<string, mixed>>>
+     */
     private array $events = [
         Event::TYPE_ACTION    => [
             'lead.scorecontactscompanies' => [

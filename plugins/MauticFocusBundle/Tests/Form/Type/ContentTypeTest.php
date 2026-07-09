@@ -8,10 +8,10 @@ use MauticPlugin\MauticFocusBundle\Form\Type\ContentType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class ContentTypeTest extends TestCase
+final class ContentTypeTest extends TestCase
 {
     /**
-     * @var mixed|\PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&FormBuilderInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
 

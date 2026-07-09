@@ -22,7 +22,7 @@ class NoteController extends FormController
     public function indexAction(Request $request, $leadId = 0, $page = 1)
     {
         if (empty($leadId)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $lead = $this->checkLeadAccess($leadId, 'view');
@@ -126,10 +126,8 @@ class NoteController extends FormController
 
     /**
      * Generate's new note and processes post data.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $leadId)
+    public function newAction(Request $request, $leadId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -214,10 +212,8 @@ class NoteController extends FormController
 
     /**
      * Generate's edit form and processes post data.
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $leadId, $objectId)
+    public function editAction(Request $request, $leadId, $objectId): Response|JsonResponse
     {
         $lead = $this->checkLeadAccess($leadId, 'view');
         if ($lead instanceof Response) {
@@ -231,7 +227,7 @@ class NoteController extends FormController
         $valid      = false;
 
         if (null === $note || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $action = $this->generateUrl(
@@ -319,7 +315,7 @@ class NoteController extends FormController
             !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())
             || $model->isLocked($note)
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $model->deleteEntity($note);
@@ -347,6 +343,6 @@ class NoteController extends FormController
             return $this->{"{$objectAction}Action"}($request, $leadId, $objectId);
         }
 
-        return $this->accessDenied();
+        return $this->notFound();
     }
 }

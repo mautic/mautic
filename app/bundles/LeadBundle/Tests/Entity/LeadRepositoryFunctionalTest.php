@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
+final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private Lead $lead;
 
@@ -20,6 +23,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreAdded(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100);
@@ -34,6 +38,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreSubtracted(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
@@ -48,6 +53,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreMultiplied(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
@@ -62,6 +68,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testPointsAreDivided(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(2, Lead::POINTS_DIVIDE);
@@ -76,6 +83,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testMixedOperatorPointsAreCalculated(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
 
         $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
@@ -93,6 +101,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testMixedModelAndRepositorySavesDoNotDoublePoints(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
         $this->lead->adjustPoints(120, Lead::POINTS_ADD);
         $model->saveEntity($this->lead);
@@ -110,10 +119,51 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @param mixed[] $contactIds
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetContacts')]
+    public function testGetContacts(array $contactIds, bool $includeLead, int $expectedCount): void
+    {
+        if ($includeLead) {
+            $contactIds[] = $this->lead->getId();
+        }
+
+        /** @var LeadRepository $repo */
+        $repo     = $this->em->getRepository(Lead::class);
+        $contacts = $repo->getContacts($contactIds);
+
+        $this->assertCount($expectedCount, $contacts);
+    }
+
+    /**
+     * @return iterable<string, mixed>
+     */
+    public static function dataForGetContacts(): iterable
+    {
+        yield 'No ids' => [
+            [],
+            false,
+            0,
+        ];
+
+        yield 'Random ids only' => [
+            [99999, 0],
+            false,
+            0,
+        ];
+
+        yield 'Random ids with lead' => [
+            [99999],
+            true,
+            1,
+        ];
+    }
+
+    /**
      * @param string[]|string $emails
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('dataForTestAjaxGetLeadsByFieldValue')]
-    public function testAjaxGetLeadsByFieldValue($emails, bool $createFlag, int $expectedCount): void
+    public function testAjaxGetLeadsByFieldValue(string|array $emails, bool $createFlag, int $expectedCount): void
     {
         $this->createLeads($emails, $createFlag);
 
@@ -163,7 +213,7 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @param string[]|string $emails
      */
-    private function createLeads($emails, bool $flag): void
+    private function createLeads(string|array $emails, bool $flag): void
     {
         if (!$flag) {
             return;

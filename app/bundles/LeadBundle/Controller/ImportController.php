@@ -52,12 +52,12 @@ class ImportController extends FormController
 
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    private ImportModel $importModel;
+    private readonly ImportModel $importModel;
 
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -65,7 +65,7 @@ class ImportController extends FormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         CorePermissions $security,
     ) {
         /** @var ImportModel $model */
@@ -201,7 +201,7 @@ class ImportController extends FormController
         try {
             $initEvent = $this->dispatchImportOnInit();
         } catch (AccessDeniedException $e) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         if (!$initEvent->objectSupported) {
@@ -724,7 +724,7 @@ class ImportController extends FormController
         return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }
 
-    protected function getPermissionBase()
+    protected function getPermissionBase(): ?string
     {
         return $this->getModel($this->getModelName())->getPermissionBase();
     }

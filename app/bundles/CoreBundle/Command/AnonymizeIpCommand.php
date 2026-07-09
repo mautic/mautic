@@ -24,8 +24,11 @@ class AnonymizeIpCommand extends Command
      */
     public const COMMAND_NAME = 'mautic:anonymize:ip';
 
-    public function __construct(private IpAddressRepository $ipAddressRepository, private CoreParametersHelper $coreParametersHelper, private AuditLogRepository $auditLogRepository)
-    {
+    public function __construct(
+        private readonly IpAddressRepository $ipAddressRepository,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly AuditLogRepository $auditLogRepository,
+    ) {
         parent::__construct();
     }
 

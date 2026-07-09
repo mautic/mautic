@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,58 +20,41 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class InactiveHelperTest extends TestCase
+final class InactiveHelperTest extends TestCase
 {
     /**
-     * @var EventScheduler|MockObject
+     * @var MockObject&EventScheduler
      */
     private MockObject $scheduler;
 
     /**
-     * @var InactiveContactFinder|MockObject
-     */
-    private MockObject $inactiveContactFinder;
-
-    /**
-     * @var LeadEventLogRepository|MockObject
+     * @var MockObject&LeadEventLogRepository
      */
     private MockObject $eventLogRepository;
 
     /**
-     * @var EventRepository|MockObject
-     */
-    private MockObject $eventRepository;
-
-    /**
-     * @var LeadRepository|MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
 
-    /**
-     * @var LoggerInterface|MockObject
-     */
-    private MockObject $logger;
-
     private InactiveHelper $inactiveHelper;
-
-    private DecisionHelper $decisionHelper;
 
     protected function setUp(): void
     {
         $this->scheduler             = $this->createMock(EventScheduler::class);
-        $this->inactiveContactFinder = $this->createMock(InactiveContactFinder::class);
+        $inactiveContactFinder       = $this->createMock(InactiveContactFinder::class);
         $this->eventLogRepository    = $this->createMock(LeadEventLogRepository::class);
-        $this->eventRepository       = $this->createMock(EventRepository::class);
+        $eventRepository             = $this->createMock(EventRepository::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
-        $this->decisionHelper        = new DecisionHelper($this->leadRepository);
+        $logger                      = $this->createMock(LoggerInterface::class);
+        $decisionHelper              = new DecisionHelper($this->leadRepository);
         $this->inactiveHelper        = new InactiveHelper(
             $this->scheduler,
-            $this->inactiveContactFinder,
+            $inactiveContactFinder,
             $this->eventLogRepository,
-            $this->eventRepository,
-            $this->logger,
-            $this->decisionHelper
+            $eventRepository,
+            $logger,
+            $decisionHelper
         );
     }
 
@@ -102,19 +87,19 @@ class InactiveHelperTest extends TestCase
                 $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
             ]);
 
-        /** @var LeadEventLog&MockObject */
+        /** @var LeadEventLog&MockObject $log */
         $log = $this->createMock(LeadEventLog::class);
         $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
             ->willReturnOnConsecutiveCalls(1, 0, 1);
 
-        /** @var Campaign&MockObject */
+        /** @var Campaign&MockObject $campaign */
         $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->any())
             ->method('getId')
             ->willReturn(2);
 
-        /** @var Event&MockObject */
+        /** @var Event&MockObject $parentEvent */
         $parentEvent = $this->createMock(Event::class);
         $parentEvent->expects($this->exactly(4))
             ->method('getLogByContactAndRotation')
@@ -158,6 +143,6 @@ class InactiveHelperTest extends TestCase
             $event
         );
 
-        $this->assertEquals(1, $contacts->count());
+        $this->assertCount(1, $contacts);
     }
 }

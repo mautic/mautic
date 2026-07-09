@@ -55,10 +55,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     public function __construct(
         protected ListModel $leadListModel,
         protected FormModel $formModel,
-        private EventCollector $eventCollector,
-        private MembershipBuilder $membershipBuilder,
-        private ContactTracker $contactTracker,
-        private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        private readonly EventCollector $eventCollector,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly ContactTracker $contactTracker,
+        private readonly GeneratedColumnsProviderInterface $generatedColumnsProvider,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -71,10 +71,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return CampaignRepository
-     */
-    public function getRepository()
+    public function getRepository(): CampaignRepository
     {
         $repo = $this->em->getRepository(Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -82,26 +79,17 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    /**
-     * @return EventRepository
-     */
-    public function getEventRepository()
+    public function getEventRepository(): EventRepository
     {
         return $this->em->getRepository(Event::class);
     }
 
-    /**
-     * @return LeadRepository
-     */
-    public function getCampaignLeadRepository()
+    public function getCampaignLeadRepository(): LeadRepository
     {
         return $this->em->getRepository(CampaignLead::class);
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getCampaignLeadEventLogRepository()
+    public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }
@@ -210,7 +198,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof \Symfony\Contracts\EventDispatcher\Event) {
                 $event = new Events\CampaignEvent($entity, $isNew);
             }
 
@@ -222,7 +210,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return null;
     }
 
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
+    /**
+     * @param mixed[] $deletedEvents
+     */
+    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -366,11 +357,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $persist
+     * @param array<string, mixed> $settings
      *
-     * @return array
+     * @return mixed[]
      */
-    public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
+    public function setCanvasSettings(Campaign $entity, array $settings, bool $persist = true, $events = null): array
     {
         if (null === $events) {
             $events = $entity->getEvents();

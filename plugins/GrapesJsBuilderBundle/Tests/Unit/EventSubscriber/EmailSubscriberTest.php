@@ -19,29 +19,31 @@ use PHPUnit\Framework\TestCase;
 
 final class EmailSubscriberTest extends TestCase
 {
-    /** @var MockObject&Config */
+    /**
+     * @var MockObject&Config
+     */
     private MockObject $config;
-    /** @var MockObject&GrapesJsBuilderModel */
-    private MockObject $grapesJsBuilderModel;
-    /** @var MockObject&GrapesJsBuilderRepository */
+
+    /**
+     * @var MockObject&GrapesJsBuilderRepository
+     */
     private MockObject $grapesJsBuilderRepo;
-    private EmailModel|MockObject $emailModel;
-    private EmailConfigInterface|MockObject $emailConfig;
+
     private EmailSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->config               = $this->createMock(Config::class);
-        $this->grapesJsBuilderModel = $this->createMock(GrapesJsBuilderModel::class);
-        $this->emailModel           = $this->createMock(EmailModel::class);
-        $this->emailConfig          = $this->createMock(EmailConfigInterface::class);
+        $grapesJsBuilderModel       = $this->createMock(GrapesJsBuilderModel::class);
+        $emailModel                 = $this->createMock(EmailModel::class);
+        $emailConfig                = $this->createMock(EmailConfigInterface::class);
         $this->grapesJsBuilderRepo  = $this->createMock(GrapesJsBuilderRepository::class);
-        $this->subscriber           = new EmailSubscriber($this->config, $this->grapesJsBuilderModel, $this->emailModel, $this->emailConfig);
+        $this->subscriber           = new EmailSubscriber($this->config, $grapesJsBuilderModel, $emailModel, $emailConfig);
 
-        $this->emailModel->method('getRepository')
-            ->willReturn($this->createMock(EmailRepository::class));
+        $emailModel->method('getRepository')
+            ->willReturn($this->createStub(EmailRepository::class));
 
-        $this->grapesJsBuilderModel->method('getRepository')
+        $grapesJsBuilderModel->method('getRepository')
             ->willReturn($this->grapesJsBuilderRepo);
     }
 
@@ -65,7 +67,7 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createMock(Email::class));
+            ->willReturn($this->createStub(Email::class));
 
         $event->expects($this->once())
             ->method('isSaveAsDraft')
@@ -90,7 +92,7 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createMock(Email::class));
+            ->willReturn($this->createStub(Email::class));
 
         $event->expects($this->once())
             ->method('isApplyDraft')
