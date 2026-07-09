@@ -492,7 +492,7 @@ class SalesforceApi extends CrmApi
      */
     public function getCompaniesByName(array $names, $requiredFieldString)
     {
-        $names     = array_map([$this, 'escapeQueryValue'], $names);
+        $names     = array_map($this->escapeQueryValue(...), $names);
         $queryUrl  = $this->integration->getQueryUrl();
         $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
 

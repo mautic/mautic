@@ -41,7 +41,7 @@ class Interval implements ScheduleModeInterface
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
 
-            throw new NotSchedulableException($exception->getMessage());
+            throw new NotSchedulableException($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         if ($comparedToDateTime > $compareFromDateTime) {

@@ -9,7 +9,7 @@ use GuzzleHttp\Client;
 class ClientFactory
 {
     public function __construct(
-        private Client $httpClient,
+        private readonly Client $httpClient,
     ) {
     }
 
