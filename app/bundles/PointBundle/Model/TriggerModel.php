@@ -305,7 +305,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, ?Lead $lead = null, $force = false)
+    public function triggerEvent(array $event, ?Lead $lead = null, $force = false)
     {
         // only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -349,7 +349,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         return $triggerExecutedEvent->getResult();
     }
 
-    private function invokeCallback($event, Lead $lead, array $settings): mixed
+    private function invokeCallback(array $event, Lead $lead, array $settings): mixed
     {
         $args = [
             'event'  => $event,

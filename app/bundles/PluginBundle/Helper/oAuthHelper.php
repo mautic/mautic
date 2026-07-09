@@ -16,16 +16,16 @@ class oAuthHelper
 
     private $accessToken;
 
-    private string $accessTokenSecret;
+    private readonly string $accessTokenSecret;
 
     private $callback;
 
-    private $settings;
+    private array $settings;
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private readonly ?Request $request = null,
-        $settings = [],
+        array $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();

@@ -162,7 +162,7 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
-                    new Callback([$this, 'validateImagePath']),
+                    new Callback($this->validateImagePath(...)),
                 ],
             ]
         );

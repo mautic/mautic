@@ -117,6 +117,12 @@ parameters:
 		-
 			identifier: argument.type
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
+		# handle after native type declarations are covered
+		-
+			identifier: missingType.iterableValue
+			paths:
+				- app
+				- plugins
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
