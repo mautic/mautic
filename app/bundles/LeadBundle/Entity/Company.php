@@ -328,6 +328,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         } elseif (!empty($this->fields['core']['companyemail']['value'])) {
             return $this->fields['core']['companyemail']['value'];
         }
+
+        return null;
     }
 
     public function setOwner(?User $owner = null): static

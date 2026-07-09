@@ -455,7 +455,7 @@ class CommonRepository extends ServiceEntityRepository
         $parameter = [];
 
         if (isset($filter['group'])) {
-            $expr = $q->expr()->orX();
+            $expr = $q->expr()->or();
             foreach ($filter['group'] as $orGroup) {
                 $groupExpr = $q->expr()->andX();
                 foreach ($orGroup as $subFilter) {
@@ -472,7 +472,7 @@ class CommonRepository extends ServiceEntityRepository
             }
         } elseif (str_contains($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
-            $expr         = $q->expr()->orX();
+            $expr         = $q->expr()->or();
             $setParameter = false;
             foreach ($columns as $c) {
                 $subFilter           = $filter;
@@ -573,7 +573,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $expr = $q->expr()->andX(
             $q->expr()->eq("$alias.$pub", ':true'),
-            $q->expr()->orX(
+            $q->expr()->or(
                 $q->expr()->isNull("$alias.$pubDown"),
                 $q->expr()->gte("$alias.$pubDown", ':now')
             )
@@ -581,7 +581,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if ($allowNullForPublishedUp) {
             $expr->add(
-                $q->expr()->orX(
+                $q->expr()->or(
                     $q->expr()->isNull("$alias.$pubUp"),
                     $q->expr()->lte("$alias.$pubUp", ':now')
                 )
@@ -1186,7 +1186,7 @@ class CommonRepository extends ServiceEntityRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->isNull("$prefix.category"),
                     $q->expr()->eq("$prefix.category", $q->expr()->literal(''))
                 );
@@ -1623,7 +1623,7 @@ class CommonRepository extends ServiceEntityRepository
                         case 'isEmpty':
                         case 'isNotEmpty':
                             if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->orX(
+                                $whereClause = $query->expr()->or(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
                                 );
