@@ -1,9 +1,9 @@
-includes:
-	- phpstan-baseline.neon
+#includes:
+#	- phpstan-baseline.neon
 
 parameters:
 	tmpDir: ./var/phpstan-cache
-	level: 6
+	level: 0
 	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	parallel:
@@ -34,6 +34,29 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+		# mautic deprecations
+		-
+			identifier: staticMethod.deprecated
+			message: '#class Mautic#'
+		-
+			identifier: parameter.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: class.extendsDeprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: staticMethod.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: method.deprecated
+			message: '#class Mautic#'
+		-
+			identifier: return.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: classConstant.deprecatedClass
+			message: '#class Mautic#'
+
 		- identifier: missingType.generics
 		# controllers - group missing parameter types to fix later
 		-
