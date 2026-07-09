@@ -206,7 +206,7 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
     private function createUser(int $id, Role $role, array $activePermissions = []): User
     {
         $user = new class($id) extends User {
-            public function __construct(private int $testId)
+            public function __construct(private readonly int $testId)
             {
                 parent::__construct();
             }
@@ -225,7 +225,7 @@ final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
     private function createRole(int $id): Role
     {
         return new class($id) extends Role {
-            public function __construct(private int $testId)
+            public function __construct(private readonly int $testId)
             {
                 parent::__construct();
             }
