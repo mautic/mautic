@@ -20,7 +20,7 @@ return RectorConfig::configure()
         __DIR__.'/plugins',
     ])
     ->withPreparedSets(deadCode: true, typeDeclarations: true)
-    ->withPhpSets(php80: true)
+    ->withPhpSets(php81: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
@@ -39,6 +39,8 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
+
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -81,7 +83,11 @@ return RectorConfig::configure()
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
+            __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
         ],
+
+        // from upcoming PHP 8.1
+        Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector::class,
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,

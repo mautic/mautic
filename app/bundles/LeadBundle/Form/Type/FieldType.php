@@ -226,7 +226,7 @@ class FieldType extends AbstractType
                 'required'    => false,
                 'disabled'    => $disableDefaultValue,
                 'constraints' => [
-                    new Assert\Callback([$this, 'validateDefaultValue']),
+                    new Assert\Callback($this->validateDefaultValue(...)),
                 ],
             ]
         );
@@ -245,7 +245,7 @@ class FieldType extends AbstractType
             switch ($type) {
                 case 'select':
                 case 'lookup':
-                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    $constraints = new Assert\Callback($this->validateDefaultValue(...));
                     // no break
                 case 'multiselect':
                     $cleaningRules['defaultValue'] = 'raw';
@@ -406,7 +406,7 @@ class FieldType extends AbstractType
                 case 'tel':
                 case 'url':
                 case 'email':
-                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    $constraints = new Assert\Callback($this->validateDefaultValue(...));
                     // no break
                 case 'number':
                     $form->add(

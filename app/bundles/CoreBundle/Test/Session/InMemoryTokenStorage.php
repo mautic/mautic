@@ -22,7 +22,7 @@ class InMemoryTokenStorage implements ClearableTokenStorageInterface
     private array $store = [];
 
     public function __construct(
-        private string $namespace = SessionTokenStorage::SESSION_NAMESPACE,
+        private readonly string $namespace = SessionTokenStorage::SESSION_NAMESPACE,
     ) {
         $this->store[$this->namespace] = [];
     }

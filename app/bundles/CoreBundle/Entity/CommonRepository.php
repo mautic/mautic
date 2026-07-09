@@ -1435,7 +1435,7 @@ class CommonRepository extends ServiceEntityRepository
             foreach ($selects as $alias => $columns) {
                 if ($isOrm) {
                     if ($columns = array_intersect($columns, $ormColumns)) {
-                        $columns    = array_map([$this, 'sanitize'], $columns);
+                        $columns    = array_map($this->sanitize(...), $columns);
                         $partials[] = 'partial '.$alias.'.{'.implode(',', $columns).'}';
                     }
                 } else {
