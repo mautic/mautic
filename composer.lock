@@ -17809,8 +17809,8 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/0f317ec42c21adacad58d58400397636d5033ae6",
-                "reference": "0f317ec42c21adacad58d58400397636d5033ae6",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/3a8493148fc75ef80f0ffac860206790fd9bcaf5",
+                "reference": "3a8493148fc75ef80f0ffac860206790fd9bcaf5",
                 "shasum": ""
             },
             "require": {

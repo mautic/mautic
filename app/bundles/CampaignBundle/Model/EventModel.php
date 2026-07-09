@@ -52,7 +52,7 @@ class EventModel extends FormModel
     /**
      * Deletes campaign events and sets their redirect targets.
      */
-    public function deleteEvents($currentEvents, $deletedEvents): void
+    public function deleteEvents(array $currentEvents, array $deletedEvents): void
     {
         $deletedKeys = [];
         $deletedData = [];

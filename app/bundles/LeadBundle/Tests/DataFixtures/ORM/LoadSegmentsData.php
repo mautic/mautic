@@ -1062,7 +1062,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         }
     }
 
-    protected function createSegment($listConfig, ObjectManager $manager)
+    protected function createSegment(array $listConfig, ObjectManager $manager)
     {
         $adminUser = $this->getReference('admin-user');
 
