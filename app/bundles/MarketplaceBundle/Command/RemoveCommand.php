@@ -52,7 +52,7 @@ class RemoveCommand extends Command
 
                 return Command::FAILURE;
             }
-            throw new \Exception('Error while trying to get package details: '.$e->getMessage());
+            throw new \Exception('Error while trying to get package details: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         $type = $package->packageBase->type ?? '';

@@ -23,13 +23,13 @@ final class ResourceInstaller implements ResourceInstallerInterface
     private const INSTALLED_FILE = 'marketplace_installed_resources.json';
 
     public function __construct(
-        private Connection $connection,
+        private readonly Connection $connection,
         #[Autowire(service: 'mautic.http.client')]
-        private ClientInterface $httpClient,
-        private PathsHelper $pathsHelper,
-        private EventDispatcherInterface $dispatcher,
-        private LoggerInterface $logger,
-        private ImportHelper $importHelper,
+        private readonly ClientInterface $httpClient,
+        private readonly PathsHelper $pathsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly LoggerInterface $logger,
+        private readonly ImportHelper $importHelper,
     ) {
     }
 
@@ -149,7 +149,7 @@ final class ResourceInstaller implements ResourceInstallerInterface
                 ],
             ]);
         } catch (GuzzleException $e) {
-            throw new \RuntimeException('Download failed: '.$e->getMessage());
+            throw new \RuntimeException('Download failed: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         if ($response->getStatusCode() >= 300) {

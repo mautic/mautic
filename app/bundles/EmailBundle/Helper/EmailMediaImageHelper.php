@@ -28,8 +28,8 @@ final class EmailMediaImageHelper
     private const IMAGE_EXTENSIONS = 'png|jpe?g|gif|webp|svg';
 
     public function __construct(
-        private PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

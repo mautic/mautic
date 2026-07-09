@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class EmailExportListEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailMediaImageHelper $mediaImageHelper,
+        private readonly EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
 

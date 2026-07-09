@@ -22,10 +22,10 @@ final class CampaignShareService
     public const SHARE_DIR = 'campaign_share';
 
     public function __construct(
-        private ExportHelper $exportHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private UrlGeneratorInterface $urlGenerator,
-        private Filesystem $filesystem,
+        private readonly ExportHelper $exportHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly Filesystem $filesystem,
     ) {
     }
 

@@ -37,7 +37,7 @@ class AjaxController extends CommonAjaxController
         private readonly PackageModel $packageModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
-        private UserHelper $userHelper,
+        private readonly UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
         EventDispatcherInterface $dispatcher,
         Translator $translator,

@@ -33,8 +33,8 @@ final class ReviewCollection implements \Iterator, \Countable
 
         return new self(
             array_map(
-                fn (array $record): Review => Review::fromArray($record),
-                array_filter($array, fn ($record): bool => is_array($record))
+                Review::fromArray(...),
+                array_filter($array, is_array(...))
             )
         );
     }
