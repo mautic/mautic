@@ -242,6 +242,8 @@ class FocusController extends AbstractStandardFormController
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
         }
+
+        return [];
     }
 
     /**

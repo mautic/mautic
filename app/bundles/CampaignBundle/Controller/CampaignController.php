@@ -643,6 +643,8 @@ class CampaignController extends AbstractStandardFormController
 
         $campaignSources = $this->getCampaignModel()->getLeadSources($objectId);
         $this->prepareCampaignSourcesForEdit($tempId, $campaignSources);
+
+        return [];
     }
 
     /**
