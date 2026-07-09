@@ -276,7 +276,7 @@ final class OrphanEventsValidationFunctionalTest extends MauticMysqlTestCase
         // Verify the campaign version was not incremented (save was prevented)
         $this->em->clear();
         $campaign = $this->em->find(Campaign::class, $campaign->getId());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
+        $this->assertInstanceOf(Campaign::class, $campaign);
         Assert::assertSame($originalVersion, $campaign->getVersion());
     }
 

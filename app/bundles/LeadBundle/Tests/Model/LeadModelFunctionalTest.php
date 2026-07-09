@@ -47,7 +47,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         // Clear from doctrine memory so we get a fresh entity to ensure the points are definitely saved
         $em->detach($lead);
         $lead = $model->getEntity($lead->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertEquals(10, $lead->getPoints());
     }
@@ -249,7 +249,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $lead = $leadModel->getEntity($lead->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertSame($expectedValue, $lead->getFieldValue($selectField->getAlias()));
     }

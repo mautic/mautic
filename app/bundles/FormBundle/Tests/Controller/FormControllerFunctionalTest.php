@@ -691,7 +691,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedForm = $this->em->find(Form::class, $form->getId());
-        $this->assertInstanceOf(\Mautic\FormBundle\Entity\Form::class, $savedForm);
+        $this->assertInstanceOf(Form::class, $savedForm);
         Assert::assertSame($project->getId(), $savedForm->getProjects()->first()->getId());
     }
 

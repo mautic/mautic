@@ -33,7 +33,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear(Lead::class);
         $lead = $model->getEntity($lead->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
+        $this->assertInstanceOf(Lead::class, $lead);
         $this->assertFalse($lead->getTags()->isEmpty());
         $this->assertTrue($this->leadHasTag($lead, 'tag5'));
         $this->assertFalse($this->leadHasTag($lead, 'tag6'));
@@ -64,7 +64,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear(Lead::class);
         $lead = $model->getEntity($lead->getId());
         $pointGroupModel->adjustPoints($lead, $groupA, 5);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
+        $this->assertInstanceOf(Lead::class, $lead);
         $lead = $model->getEntity($lead->getId());
 
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
@@ -137,7 +137,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $triggerEventB = $this->createAddTagEvent('tagC', $triggerC);
         $triggerC->addTriggerEvent(0, $triggerEventB);
         $triggerModel->saveEntity($triggerC);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
+        $this->assertInstanceOf(Lead::class, $lead);
         $lead = $leadModel->getEntity($lead->getId());
 
         $this->assertFalse($this->leadHasTag($lead, 'tagC'));

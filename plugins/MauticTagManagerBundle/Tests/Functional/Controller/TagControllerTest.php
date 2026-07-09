@@ -102,7 +102,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tagId = $this->tagRepository->findOneBy([])->getId();
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
+        $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
 
     public function testTagDeletionRemovesContactAssociations(): void
@@ -122,7 +122,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
+        $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
         Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
 
@@ -132,7 +132,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testViewAction(): void
     {
         $tag = $this->tagRepository->findOneBy([]);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Tag::class, $tag);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $this->client->request('GET', '/s/tags/view/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
@@ -167,7 +167,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         $TagName = 'Test tag';
         $tag     = $this->tagRepository->findOneBy([]);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Tag::class, $tag);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
@@ -262,7 +262,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         $tag     = $this->tagRepository->findOneBy([]);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Tag::class, $tag);
+        $this->assertInstanceOf(Tag::class, $tag);
         $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }

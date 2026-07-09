@@ -492,20 +492,20 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead1 = $this->contactRepository->getEntity($contactId1);
         $lead2 = $this->contactRepository->getEntity($contactId2);
         $lead3 = $this->contactRepository->getEntity($contactId3);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead1);
+        $this->assertInstanceOf(Lead::class, $lead1);
 
         $result1 = [
             $lead1->getFieldValue('bool1'),
             $lead1->getFieldValue('bool2'),
             $lead1->getFieldValue('bool3'),
         ];
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead2);
+        $this->assertInstanceOf(Lead::class, $lead2);
         $result2 = [
             $lead2->getFieldValue('bool1'),
             $lead2->getFieldValue('bool2'),
             $lead2->getFieldValue('bool3'),
         ];
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead3);
+        $this->assertInstanceOf(Lead::class, $lead3);
         $result3 = [
             $lead3->getFieldValue('bool1'),
             $lead3->getFieldValue('bool2'),

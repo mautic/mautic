@@ -34,7 +34,7 @@ final class PointControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(Point::class, $point->getId());
-        $this->assertInstanceOf(\Mautic\PointBundle\Entity\Point::class, $savedAsset);
+        $this->assertInstanceOf(Point::class, $savedAsset);
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

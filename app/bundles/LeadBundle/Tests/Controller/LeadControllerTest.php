@@ -430,7 +430,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
             $clientResponse->getContent()
         );
         $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\ContactExportScheduler::class, $contactExportScheduler);
+        $this->assertInstanceOf(ContactExportScheduler::class, $contactExportScheduler);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');

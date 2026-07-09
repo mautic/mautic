@@ -115,7 +115,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedSegment = $this->listRepo->find($segment->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $savedSegment);
+        $this->assertInstanceOf(LeadList::class, $savedSegment);
         Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
@@ -169,9 +169,9 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Verify last built date is set.
         $this->em->detach($segment);
         $segment = $this->listRepo->find($segmentId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
+        $this->assertInstanceOf(LeadList::class, $segment);
         self::assertNotNull($segment->getLastBuiltDate());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
+        $this->assertInstanceOf(LeadList::class, $segment);
 
         // Set last built date in the future to allow testing without waiting.
         // (Same second built date as the modified date is shown as "Building" still in the UI).
@@ -248,7 +248,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Save filtered segment again to trigger rebuild label, setting last built date in the past.
         $this->em->detach($segment);
         $segment = $this->listRepo->find($segmentId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
+        $this->assertInstanceOf(LeadList::class, $segment);
         $segment->setLastBuiltDate(new \DateTime('-1 year'));
         // Date modified only updates on specific changes, so change name.
         $segment->setName('Lead List 1 Updated');
@@ -691,8 +691,8 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        $this->assertNotNull($rowWithFilters, 'Could not find Lead List 1 row');
-        $this->assertNotNull($rowWithoutFilters, 'Could not find Lead List 2 row');
+        $this->assertInstanceOf(Crawler::class, $rowWithFilters, 'Could not find Lead List 1 row');
+        $this->assertInstanceOf(Crawler::class, $rowWithoutFilters, 'Could not find Lead List 2 row');
 
         // Lead List 1 (with filters) should have the filter icon
         $filterIconCount = $rowWithFilters->filterXPath('.//td[2]//div//i[@class="ri-fw ri-filter-2-fill fs-14"]')->count();

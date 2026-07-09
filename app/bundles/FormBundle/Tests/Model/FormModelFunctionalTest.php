@@ -211,7 +211,7 @@ final class FormModelFunctionalTest extends MauticMysqlTestCase
         /** @var FieldModel $fieldModel */
         $fieldModel       = $this->getContainer()->get('mautic.lead.model.field');
         $multiselectField = $fieldModel->getEntity($multiselectFieldId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $multiselectField);
+        $this->assertInstanceOf(LeadField::class, $multiselectField);
         $fieldAlias       = $multiselectField->getAlias();
 
         $form   = $this->createFormWithMultiselect($fieldAlias);

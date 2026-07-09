@@ -42,7 +42,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         self::assertNull($listModel->getEntity($segmentId));
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $deletedEntity);
+        $this->assertInstanceOf(LeadList::class, $deletedEntity);
         self::assertSame($segmentId, $deletedEntity->getId());
 
         $this->testSymfonyCommand(DeleteLeadListsCommand::COMMAND_NAME, ['list-id' => $segmentId]);
@@ -79,7 +79,7 @@ final class DeleteLeadListsCommandFunctionalTest extends MauticMysqlTestCase
         self::assertNull($listModel->getEntity($segmentBId));
 
         $deletedEntity = $listModel->getSoftDeletedEntity($segmentBId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $deletedEntity);
+        $this->assertInstanceOf(LeadList::class, $deletedEntity);
         self::assertSame($segmentBId, $deletedEntity->getId());
         // command without  args --list-id
         $this->testSymfonyCommand(DeleteLeadListsCommand::COMMAND_NAME);

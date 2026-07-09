@@ -191,9 +191,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         $webhook = $this->webhhokRepository->find($webhook->getId());
-        $this->assertInstanceOf(\Mautic\WebhookBundle\Entity\Webhook::class, $webhook);
+        $this->assertInstanceOf(Webhook::class, $webhook);
         Assert::assertNull($webhook->getMarkedUnhealthyAt());
-        $this->assertInstanceOf(\Mautic\WebhookBundle\Entity\Webhook::class, $webhook);
+        $this->assertInstanceOf(Webhook::class, $webhook);
         Assert::assertNull($webhook->getUnHealthySince());
         Assert::assertNull($webhook->getLastNotificationSentAt());
 

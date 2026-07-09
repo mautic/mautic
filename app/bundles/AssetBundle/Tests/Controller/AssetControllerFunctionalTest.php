@@ -499,7 +499,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(Asset::class, $asset->getId());
-        $this->assertInstanceOf(\Mautic\AssetBundle\Entity\Asset::class, $savedAsset);
+        $this->assertInstanceOf(Asset::class, $savedAsset);
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 

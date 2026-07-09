@@ -97,12 +97,12 @@ final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $reloadedEventA = $this->em->find(Event::class, $eventA->getId());
         $reloadedEventB = $this->em->find(Event::class, $eventB->getId());
         $reloadedEventC = $this->em->find(Event::class, $eventCId);
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $reloadedEventC);
+        $this->assertInstanceOf(Event::class, $reloadedEventC);
 
         Assert::assertNotNull($reloadedEventC->getDeleted());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $reloadedEventA);
+        $this->assertInstanceOf(Event::class, $reloadedEventA);
         Assert::assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $reloadedEventB);
+        $this->assertInstanceOf(Event::class, $reloadedEventB);
         Assert::assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
         Assert::assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
     }

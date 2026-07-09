@@ -281,7 +281,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $company = $this->getCompanyRepository()->find($company->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+        $this->assertInstanceOf(Company::class, $company);
         $this->asserttrue($company->isDeleted());
     }
 
@@ -294,7 +294,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company = $this->getCompanyRepository()->find($companyId);
-        $this->assertNull($company);
+        $this->assertNotInstanceOf(Company::class, $company);
     }
 
     public function testDeleteCompaniesInBatchInHttpRequest(): void
@@ -315,9 +315,9 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company1 = $this->getCompanyRepository()->find($companyId1);
-        $this->assertNull($company1);
+        $this->assertNotInstanceOf(Company::class, $company1);
         $company2 = $this->getCompanyRepository()->find($companyId2);
-        $this->assertNull($company2);
+        $this->assertNotInstanceOf(Company::class, $company2);
     }
 
     public function testDeleteCompaniesInBatch(): void
@@ -335,10 +335,10 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company1 = $this->getCompanyRepository()->find($company1->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company1);
+        $this->assertInstanceOf(Company::class, $company1);
         $this->asserttrue($company1->isDeleted());
         $company2 = $this->getCompanyRepository()->find($company2->getId());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company2);
+        $this->assertInstanceOf(Company::class, $company2);
         $this->asserttrue($company2->isDeleted());
     }
 

@@ -102,7 +102,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedPage = $this->em->find(Page::class, $page->getId());
-        $this->assertInstanceOf(\Mautic\PageBundle\Entity\Page::class, $savedPage);
+        $this->assertInstanceOf(Page::class, $savedPage);
         $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
     }
 
@@ -160,7 +160,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->clear();
         $page = $this->em->find(Page::class, $id);
-        $this->assertInstanceOf(\Mautic\PageBundle\Entity\Page::class, $page);
+        $this->assertInstanceOf(Page::class, $page);
         Assert::assertSame($expectedVersion, $page->getVersion(), $message);
     }
 }

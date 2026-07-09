@@ -77,7 +77,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $leadThree  = $this->createLead($campaign);
         $eventThree = $this->createEvent($campaign);
         $this->em->flush();
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $eventOne);
+        $this->assertInstanceOf(Event::class, $eventOne);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
@@ -106,14 +106,14 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $eventThree = $logThree->getEvent();
         $campaignLeadTwo->setRotation($logTwo->getRotation() + 1);
         $this->em->flush();
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $eventOne);
+        $this->assertInstanceOf(Event::class, $eventOne);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
             [$eventOne->getId(), $eventTwo->getId(), $eventThree->getId()],
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $leadTwo);
+        $this->assertInstanceOf(Lead::class, $leadTwo);
 
         Assert::assertEquals(
             new CountResult(1, $leadTwo->getId(), $leadTwo->getId()),

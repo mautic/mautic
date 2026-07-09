@@ -114,7 +114,7 @@ final class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(DynamicContent::class, $dynamicContent->getId());
-        $this->assertInstanceOf(\Mautic\DynamicContentBundle\Entity\DynamicContent::class, $savedAsset);
+        $this->assertInstanceOf(DynamicContent::class, $savedAsset);
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 

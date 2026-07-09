@@ -192,7 +192,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $firstSegmentId = array_key_first($segments);
         $segment        = $this->em->getRepository(LeadList::class)->find($firstSegmentId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
+        $this->assertInstanceOf(LeadList::class, $segment);
         $segment->setIsPublished(false);
         $this->em->persist($segment);
         $this->em->flush();

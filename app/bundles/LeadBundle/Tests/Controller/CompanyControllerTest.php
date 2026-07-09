@@ -79,7 +79,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+        $this->assertInstanceOf(Company::class, $company);
         $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
         $this->assertSame('', trim($crawler->filter('#company_contact_engagement')->text()));
         $this->assertSame('', trim($crawler->filter('#contacts-table')->text()));
@@ -117,7 +117,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+        $this->assertInstanceOf(Company::class, $company);
         $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
 
         $buttonCrawler = $crawler->selectButton('Save & Close');
@@ -153,7 +153,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
         // Create a lead linked to the first company
         $lead1 = new Lead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company1);
+        $this->assertInstanceOf(Company::class, $company1);
         $lead1->setFirstname('lead')
             ->setEmail('test1@test.com')
             ->setLastname('for '.$company1->getName());
@@ -360,7 +360,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedCompany = $this->em->find(Company::class, $this->company1Id);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $savedCompany);
+        $this->assertInstanceOf(Company::class, $savedCompany);
         $this->assertSame($project->getId(), $savedCompany->getProjects()->first()->getId());
     }
 
@@ -380,7 +380,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company     = $companyModel->getEntity($this->company1Id);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
+        $this->assertInstanceOf(Company::class, $company);
         $updatedName = $company->getName().' - Updated';
         $form->setValues(
             [
@@ -415,10 +415,10 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $company1 = $companyModel->getEntity($this->company1Id);
         $company2 = $companyModel->getEntity($this->company2Id);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company1);
+        $this->assertInstanceOf(Company::class, $company1);
 
         $this->assertStringContainsString($company1->getName(), $content);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company2);
+        $this->assertInstanceOf(Company::class, $company2);
         $this->assertStringContainsString($company2->getName(), $content);
 
         $translator  = self::getContainer()->get('translator');

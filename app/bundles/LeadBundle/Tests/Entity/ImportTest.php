@@ -116,7 +116,7 @@ final class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity();
 
         $this->assertSame(Import::QUEUED, $import->getStatus());
-        $this->assertNull($import->getDateStarted());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $import->getDateStarted());
 
         // Date started will be set when the start is called for the first time.
         $import->start();
@@ -137,7 +137,7 @@ final class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity();
 
         $this->assertSame(Import::QUEUED, $import->getStatus());
-        $this->assertNull($import->getDateEnded());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $import->getDateEnded());
 
         $import->start()->end(false);
 
@@ -149,7 +149,7 @@ final class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertNull($import->getRunTime());
+        $this->assertNotInstanceOf(\DateInterval::class, $import->getRunTime());
 
         $import->end(false);
 

@@ -175,7 +175,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Verify the event is properly set up for redirection
         $this->assertTrue($deletedEvent->isDeleted(), 'Event should be marked as deleted');
-        $this->assertNotNull($deletedEvent->getRedirectEvent(), 'Event should have a redirect event');
+        $this->assertInstanceOf(Event::class, $deletedEvent->getRedirectEvent(), 'Event should have a redirect event');
         $this->assertTrue($deletedEvent->shouldBeRedirected(), 'Event should be redirected');
         $this->assertEquals(
             $redirectTargetEvent->getId(),
@@ -195,7 +195,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         // After execution, reload the logs from database to see the updated state
         $log1 = $this->em->find(LeadEventLog::class, $log1->getId());
         $log2 = $this->em->find(LeadEventLog::class, $log2->getId());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\LeadEventLog::class, $log1);
+        $this->assertInstanceOf(LeadEventLog::class, $log1);
 
         // Verify the logs now point to the redirect target event
         $this->assertEquals(
@@ -203,18 +203,18 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             $log1->getEvent()->getId(),
             'Log1 should now point to redirect target event'
         );
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\LeadEventLog::class, $log2);
+        $this->assertInstanceOf(LeadEventLog::class, $log2);
         $this->assertEquals(
             $redirectTargetEvent->getId(),
             $log2->getEvent()->getId(),
             'Log2 should now point to redirect target event'
         );
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\LeadEventLog::class, $log1);
+        $this->assertInstanceOf(LeadEventLog::class, $log1);
 
         // Verify rotation values are correctly calculated
         // (should be 3 and 4 since we had an existing log with rotation 2)
         $this->assertContains($log1->getRotation(), [3, 4], 'Log1 should have rotation 3 or 4');
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\LeadEventLog::class, $log2);
+        $this->assertInstanceOf(LeadEventLog::class, $log2);
         $this->assertContains($log2->getRotation(), [3, 4], 'Log2 should have rotation 3 or 4');
         $this->assertNotEquals(
             $log1->getRotation(),
@@ -320,7 +320,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Verify the log still points to the original event (no redirection occurred)
         $updatedLog = $this->em->find(LeadEventLog::class, $log->getId());
-        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\LeadEventLog::class, $updatedLog);
+        $this->assertInstanceOf(LeadEventLog::class, $updatedLog);
         $this->assertEquals($event->getId(), $updatedLog->getEvent()->getId());
         $this->assertEquals('Normal Event', $updatedLog->getEvent()->getName());
     }
@@ -448,7 +448,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             'campaign' => $campaign,
         ]);
 
-        $this->assertNotNull($updatedLog, 'Log should exist after redirection');
+        $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Log should exist after redirection');
         $this->assertEquals($redirectEvent->getId(), $updatedLog->getEvent()->getId(),
             'Log should be updated to reference the redirect event');
     }
