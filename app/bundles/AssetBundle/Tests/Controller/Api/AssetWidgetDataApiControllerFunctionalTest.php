@@ -19,9 +19,7 @@ final class AssetWidgetDataApiControllerFunctionalTest extends MauticMysqlTestCa
         yield 'created-assets' => ['created.assets'];
     }
 
-    /**
-     * @dataProvider assetWidgetTypesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('assetWidgetTypesProvider')]
     public function testAssetWidgetDataEndpointReturnsNonEmptyDataForApiLibraryShape(string $type): void
     {
         $this->client->request('GET', '/api/data/'.$type);
