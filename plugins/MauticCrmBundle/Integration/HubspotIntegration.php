@@ -425,10 +425,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     * @param bool  $id
+     * @param bool $id
      */
-    public function getCompanies($params = [], $id = false, &$executed = null)
+    public function getCompanies(array $params = [], $id = false, &$executed = null)
     {
         $results = [];
         try {

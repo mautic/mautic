@@ -80,12 +80,11 @@ class CampaignEventHelper
      * PreParse the twitter message and replace placeholders with values.
      *
      * @param string $text
-     * @param array  $lead
      * @param int    $channelId
      *
      * @return string|string[]
      */
-    protected function parseTweetText($text, $lead, $channelId = -1): array|string
+    protected function parseTweetText($text, array $lead, $channelId = -1): array|string
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [

@@ -216,7 +216,7 @@ class ImportModel extends FormModel
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            throw new ImportFailedException('Database had been overloaded');
+            throw new ImportFailedException('Database had been overloaded', $e->getCode(), $e);
         }
 
         $import->end();
@@ -504,9 +504,8 @@ class ImportModel extends FormModel
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = []): array
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, array $filter = []): array
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
