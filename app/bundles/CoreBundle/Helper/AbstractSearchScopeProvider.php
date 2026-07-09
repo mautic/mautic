@@ -53,36 +53,9 @@ abstract class AbstractSearchScopeProvider
 
                 return 0 !== $indentComparison ? $indentComparison : strcasecmp($this->displayLabel($a), $this->displayLabel($b));
             });
-
-            $additional = $this->insertCustomFieldsHeader($additional);
         }
 
         return array_merge($scopes, $additional);
-    }
-
-    /**
-     * Inserts a disabled "Custom fields" header option right before the first indented (custom field) entry.
-     *
-     * @param list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool, indent?: bool, disabled?: bool}> $additional
-     *
-     * @return list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool, indent?: bool, disabled?: bool}>
-     */
-    private function insertCustomFieldsHeader(array $additional): array
-    {
-        foreach ($additional as $index => $scope) {
-            if ($scope['indent'] ?? false) {
-                array_splice($additional, $index, 0, [[
-                    'command'   => '__custom_fields__',
-                    'label'     => 'mautic.core.search.scope.custom_fields',
-                    'translate' => true,
-                    'disabled'  => true,
-                ]]);
-
-                break;
-            }
-        }
-
-        return $additional;
     }
 
     /**

@@ -1357,6 +1357,7 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
         scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
         searchInput.val(initialSearch);
         searchInput.typeahead('val', initialSearch);
+        Mautic.refreshSearchScopeChosen(scopeSelect);
 
         return;
     }
@@ -1364,6 +1365,49 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
     const visibleValue = parsed.command ? parsed.value : initialSearch;
     searchInput.val(visibleValue);
     searchInput.typeahead('val', visibleValue);
+    Mautic.refreshSearchScopeChosen(scopeSelect);
+};
+
+/**
+ * Initialize the Chosen-enhanced search scope dropdown (same UX as segment filter picker).
+ */
+Mautic.activateSearchScopeChosen = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    if (!$select.length) {
+        return;
+    }
+
+    if ($select.next('.chosen-container').length) {
+        return;
+    }
+
+    $select.chosen({
+        placeholder_text_single: mauticLang['chosenChooseOne'],
+        no_results_text: mauticLang['chosenNoResults'],
+        width: '100%',
+        allow_single_deselect: false,
+        include_group_label_in_selected: false,
+        search_contains: true,
+    });
+
+    const searchPlaceholder = $select.attr('data-scope-search-placeholder');
+    if (searchPlaceholder) {
+        $select.on('chosen:showing_dropdown.searchScope', function () {
+            $select.next('.chosen-container').find('.chosen-search input').attr('placeholder', searchPlaceholder);
+        });
+    }
+};
+
+/**
+ * Refresh Chosen after programmatic scope selection changes.
+ */
+Mautic.refreshSearchScopeChosen = function (scopeSelect) {
+    const $select = mQuery(scopeSelect);
+    if (!$select.length || !$select.next('.chosen-container').length) {
+        return;
+    }
+
+    $select.trigger('chosen:updated');
 };
 
 /**
@@ -1444,6 +1488,8 @@ Mautic.activateSearchScope = function (searchEl) {
     const initialSearch = (scopeSelect.attr('data-initial-search') || searchInput.val() || '').trim();
     Mautic.applySearchScopeState(searchInput, initialSearch);
     MauticVars.lastSearchStr = initialSearch;
+
+    Mautic.activateSearchScopeChosen(scopeSelect);
 
     scopeSelect.off('change.searchScope').on('change.searchScope', function () {
         const command = scopeSelect.val();
@@ -2178,6 +2224,9 @@ Mautic.resetFilters = function () {
         const standardOption = scopeSelect.querySelector('option[value=""]:not(:disabled)');
         if (standardOption) {
             standardOption.selected = true;
+        }
+        if (typeof mQuery !== 'undefined') {
+            Mautic.refreshSearchScopeChosen(scopeSelect);
         }
     }
 

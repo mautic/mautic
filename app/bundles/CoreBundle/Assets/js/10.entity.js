@@ -138,6 +138,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
 
             if (scopeSelect.length) {
                 scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+                Mautic.refreshSearchScopeChosen(scopeSelect);
             }
         }
 
@@ -170,6 +171,7 @@ Mautic.filterList = function (e, elId, route, target, liveCacheVar, action, over
         if (scopeSelect.length) {
             if (action === 'clear' && !scopeChange) {
                 scopeSelect.find('option[value=""]:not(:disabled)').first().prop('selected', true);
+                Mautic.refreshSearchScopeChosen(scopeSelect);
                 value = '';
             } else {
                 if (!Mautic.filterCommands || Mautic.filterCommands.length === 0) {

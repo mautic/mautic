@@ -23,26 +23,75 @@
     }
 
     .search-scope-select {
-      flex: 0 0 auto;
-      inline-size: auto;
-      max-inline-size: 220px;
+      flex: 0 0 280px;
+      inline-size: 280px;
+      max-inline-size: 280px;
       border-inline-end: none;
       padding-inline: var(--spacing-04);
       background-color: var(--field);
       color: var(--text-primary);
     }
 
-    .search-scope-select option.search-scope-hint {
-      color: var(--text-secondary);
-      font-style: italic;
-      white-space: normal;
-    }
+    .search-scope-chosen {
+      flex: 0 0 280px;
+      inline-size: 280px;
+      max-inline-size: 280px;
+      min-inline-size: 280px;
+      position: relative;
+      z-index: 2;
 
-    // Custom fields are prefixed with non-breaking spaces (see SearchScopeHelper::formatLabel)
-    // for indentation support in browsers that ignore padding on <option>; this padding is a
-    // progressive enhancement for browsers that do honor it (e.g. Firefox).
-    .search-scope-select option.search-scope-option--indent {
-      padding-inline-start: var(--spacing-05);
+      .chosen-container {
+        width: 100% !important;
+      }
+
+      .chosen-container-single .chosen-single {
+        height: 48px;
+        line-height: 48px;
+        border-inline-end: none;
+        border-radius: unset;
+        background-color: var(--field);
+        color: var(--text-primary);
+        border: var(--border-no-width);
+
+        &:hover {
+          background-color: var(--field-hover);
+        }
+      }
+
+      .chosen-container-active.chosen-with-drop {
+        z-index: 1061;
+
+        .chosen-single {
+          border-inline-end: none;
+        }
+
+        .chosen-drop {
+          background-color: var(--layer);
+          border: var(--border-no-width);
+          border-color: var(--border-strong);
+          box-shadow: 0 8px 8px rgba(0, 0, 0, 0.25);
+          inline-size: 280px;
+          min-inline-size: 280px;
+        }
+
+        .chosen-search input[type="text"] {
+          background-color: var(--field);
+        }
+
+        .chosen-results {
+          background-color: var(--layer);
+          color: var(--text-secondary);
+
+          li.highlighted {
+            background-color: var(--layer-hover);
+            color: var(--text-primary);
+          }
+
+          li.group-result {
+            color: var(--text-primary);
+          }
+        }
+      }
     }
 
     > .btn {

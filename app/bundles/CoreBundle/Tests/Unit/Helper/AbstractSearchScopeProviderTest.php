@@ -76,10 +76,10 @@ final class AbstractSearchScopeProviderTest extends TestCase
 
         $commands = array_column($provider->getScopes(), 'command');
 
-        self::assertSame(['', 'aaa_regular', '__custom_fields__', 'aaa_custom', 'zzz_custom'], $commands);
+        self::assertSame(['', 'aaa_regular', 'aaa_custom', 'zzz_custom'], $commands);
     }
 
-    public function testGetScopesInsertsDisabledCustomFieldsHeaderBeforeIndentedCommands(): void
+    public function testGetScopesDoesNotInsertCustomFieldsHeaderWhenIndentedCommandsExist(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')
@@ -107,13 +107,10 @@ final class AbstractSearchScopeProviderTest extends TestCase
             }
         };
 
-        $scopes = $provider->getScopes();
-        $header = $scopes[array_search('__custom_fields__', array_column($scopes, 'command'), true)];
+        $commands = array_column($provider->getScopes(), 'command');
 
-        self::assertSame('mautic.core.search.scope.custom_fields', $header['label']);
-        self::assertTrue($header['translate']);
-        self::assertTrue($header['disabled'] ?? false);
-        self::assertArrayNotHasKey('indent', $header);
+        self::assertNotContains('__custom_fields__', $commands);
+        self::assertContains('aaa_custom', $commands);
     }
 
     public function testGetScopesDoesNotInsertCustomFieldsHeaderWhenNoIndentedCommands(): void
