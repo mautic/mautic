@@ -30,6 +30,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     private const UNSUBSCRIBE_TESTS = [
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
+        'testHeadRequestWithNoShowContactPreferences',
     ];
 
     protected function setUp(): void
@@ -202,6 +203,17 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $dncCollection = $stat->getLead()->getDoNotContact();
         $this->assertCount(1, $dncCollection);
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
+    }
+
+    public function testHeadRequestWithNoShowContactPreferences(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('HEAD', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertResponseIsSuccessful();
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertEquals(0, $dncCollection->count());
     }
 
     public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void
