@@ -437,11 +437,9 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @param array $parameters
-     *
      * @return mixed
      */
-    protected function getFormIdFromRequest($parameters = [])
+    protected function getFormIdFromRequest(array $parameters = [])
     {
         $request = $this->getCurrentRequest();
         if ($request->attributes->has('formId')) {

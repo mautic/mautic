@@ -166,7 +166,7 @@ class PrivateAddressChecker
 
             return false;
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage());
+            throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 

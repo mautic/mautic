@@ -87,7 +87,6 @@ class Ck5ForGrapesJs {
       latestClickEvent: null,
       badgableInfo: null,
       toolbarVisibilityInfo: null,
-      editableClassObserver: null,
       parseContent: !!parse_content,
       contentPolicy: typeof content_policy === 'object' && content_policy !== null ? content_policy : {},
       reuseEditor: reuse_editor !== undefined ? !!reuse_editor : false,

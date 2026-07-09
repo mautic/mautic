@@ -223,7 +223,7 @@ class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper): array {
+        $resultsCallback = function (array $event) use ($dateHelper): array {
             $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];

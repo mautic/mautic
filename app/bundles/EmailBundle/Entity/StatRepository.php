@@ -503,7 +503,7 @@ class StatRepository extends CommonRepository
             )->setParameter('fromDate', $dt->toUtcString());
         }
 
-        $timeToReadParser = function (&$stat): void {
+        $timeToReadParser = function (array &$stat): void {
             $dateSent = new DateTimeHelper($stat['dateSent']);
             if (!empty($stat['dateSent']) && !empty($stat['dateRead'])) {
                 $stat['timeToRead'] = $dateSent->getDiff($stat['dateRead']);
