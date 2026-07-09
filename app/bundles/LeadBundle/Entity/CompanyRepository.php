@@ -22,7 +22,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     private array $availableSearchFields = [];
 
-    private ?\Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher = null;
+    private ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * Used by search functions to search using aliases as commands.

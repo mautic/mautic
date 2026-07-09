@@ -67,7 +67,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $lastUsedParameterId = 0;
 
-    private ?\Doctrine\Common\Collections\ExpressionBuilder $expressionBuilder = null;
+    private ?ExpressionBuilder $expressionBuilder = null;
 
     /**
      * @param string $alias
