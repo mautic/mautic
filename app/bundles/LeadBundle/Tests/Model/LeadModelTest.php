@@ -400,8 +400,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $stageRepositoryMock = new class(1, $stageMock) {
             public function __construct(
-                private int|string $expectedValue,
-                private ?Stage $returnValue,
+                private readonly int|string $expectedValue,
+                private readonly ?Stage $returnValue,
             ) {
             }
 
@@ -449,8 +449,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $stageRepositoryMock = new class($data['stage'], null) {
             public function __construct(
-                private int|string $expectedValue,
-                private ?Stage $returnValue,
+                private readonly int|string $expectedValue,
+                private readonly ?Stage $returnValue,
             ) {
             }
 

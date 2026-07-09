@@ -19,7 +19,7 @@ class LeadStageLogRepository extends CommonRepository
     public function __construct(
         ManagerRegistry $registry,
         #[Autowire(service: 'doctrine.dbal.unbuffered_connection')]
-        private Connection $unbufferedConnection,
+        private readonly Connection $unbufferedConnection,
     ) {
         parent::__construct($registry);
     }
