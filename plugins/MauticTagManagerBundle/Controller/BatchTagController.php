@@ -49,6 +49,8 @@ class BatchTagController extends AbstractFormController
     public function execAction(Request $request): JsonResponse
     {
         $params   = $request->get('batch_tag');
+
+        /** @var TagModel $tagModel */
         $tagModel = $this->getModel('tagmanager.tag');
         assert($tagModel instanceof TagModel);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
