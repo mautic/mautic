@@ -383,8 +383,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->addNullableField('template', Types::STRING);
-        $builder->addNullableField('content', Types::ARRAY);
-        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
+        $builder->addNullableField('content', Types::JSON);
+        $builder->addNullableField('utmTags', Types::JSON, 'utm_tags');
         $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
         $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
         $builder->addNullableField('emailType', Types::TEXT, 'email_type');

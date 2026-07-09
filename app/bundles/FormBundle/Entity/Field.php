@@ -251,13 +251,13 @@ class Field implements UuidInterface
         $builder->addField('alias', Types::STRING);
         $builder->addField('type', Types::STRING);
         $builder->addNamedField('isCustom', Types::BOOLEAN, 'is_custom');
-        $builder->addNullableField('customParameters', Types::ARRAY, 'custom_parameters');
+        $builder->addNullableField('customParameters', Types::JSON, 'custom_parameters');
         $builder->addNullableField('defaultValue', Types::TEXT, 'default_value');
         $builder->addNamedField('isRequired', Types::BOOLEAN, 'is_required');
         $builder->addNullableField('validationMessage', Types::TEXT, 'validation_message');
         $builder->addNullableField('helpMessage', Types::TEXT, 'help_message');
         $builder->addNullableField('order', Types::INTEGER, 'field_order');
-        $builder->addNullableField('properties', Types::ARRAY);
+        $builder->addNullableField('properties', Types::JSON);
         $builder->addNullableField('validation', Types::JSON);
 
         $builder->addNullableField('parent', 'string', 'parent_id');
