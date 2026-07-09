@@ -993,7 +993,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param bool $canViewOthers
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, array $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1024,10 +1024,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1085,10 +1084,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];

@@ -225,7 +225,7 @@ class SchemaHelper
     /**
      * @throws DBALException
      */
-    protected function backupExistingSchema($tables, $mauticTables, $backupPrefix): array
+    protected function backupExistingSchema($tables, array $mauticTables, $backupPrefix): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();
@@ -359,7 +359,7 @@ class SchemaHelper
         return $sql;
     }
 
-    protected function dropExistingSchema($tables, $mauticTables): array
+    protected function dropExistingSchema($tables, array $mauticTables): array
     {
         $sql = [];
         $sm  = $this->getSchemaManager();

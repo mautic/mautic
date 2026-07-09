@@ -1017,10 +1017,8 @@ class LeadModel extends FormModel
      *
      * @param array<string, mixed> $data
      * @param array<LeadList>      $leadLists
-     *
-     * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, array $data, $leadLists, $persist = true): bool
+    public function setFrequencyRules(Lead $lead, array $data, array $leadLists, $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1608,10 +1606,8 @@ class LeadModel extends FormModel
 
     /**
      * Add leads UTM tags via API.
-     *
-     * @param array $params
      */
-    public function addUTMTags(Lead $lead, $params): void
+    public function addUTMTags(Lead $lead, array $params): void
     {
         // known "synonym" fields expected
         $synonyms = ['useragent'  => 'user_agent',
@@ -1840,10 +1836,9 @@ class LeadModel extends FormModel
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
-     * @param array     $filter
      * @param bool      $canViewOthers
      */
-    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getLeadsLineChartData($unit, $dateFrom, $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag        = null;
         $topLists    = null;
@@ -2065,9 +2060,8 @@ class LeadModel extends FormModel
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getLeadList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getLeadList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
             $filter['owner_id'] = $this->userHelper->getUser()->getId();

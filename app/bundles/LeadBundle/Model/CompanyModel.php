@@ -800,12 +800,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
+    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -930,9 +927,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * @param array $fields
-     * @param array $data
      */
-    protected function getFieldData($fields, $data): array
+    protected function getFieldData($fields, array $data): array
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];

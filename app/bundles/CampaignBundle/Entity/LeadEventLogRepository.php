@@ -385,7 +385,7 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    public function getChartQuery($options): array
+    public function getChartQuery(array $options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 

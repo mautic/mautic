@@ -257,7 +257,7 @@ class ChartQuery extends AbstractChart
     /**
      * Go through the raw data and add the missing times.
      */
-    public function completeTimeData($rawData, $countAverage = false): array
+    public function completeTimeData(array $rawData, $countAverage = false): array
     {
         $data          = [];
         $averageCounts = [];
@@ -401,7 +401,7 @@ class ChartQuery extends AbstractChart
      * @param array  $options      for special behavior
      * @param string $tablePrefix
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = [], $tablePrefix = 't')
+    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 

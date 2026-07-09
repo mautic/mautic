@@ -290,10 +290,8 @@ trait CustomFieldRepositoryTrait
 
     /**
      * Function to remove non custom field columns from an arrayed lead row.
-     *
-     * @param array $fixedFields
      */
-    protected function removeNonFieldColumns(&$r, $fixedFields = [])
+    protected function removeNonFieldColumns(array &$r, array $fixedFields = [])
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {
@@ -400,7 +398,7 @@ trait CustomFieldRepositoryTrait
         return $this->customFieldList;
     }
 
-    protected function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(array &$fields)
     {
         // Ensure booleans are integers
         foreach ($fields as $field => &$value) {

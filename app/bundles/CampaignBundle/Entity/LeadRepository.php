@@ -130,10 +130,9 @@ class LeadRepository extends CommonRepository
     /**
      * Check Lead in campaign.
      *
-     * @param Lead  $lead
-     * @param array $options
+     * @param Lead $lead
      */
-    public function checkLeadInCampaigns($lead, $options = []): bool
+    public function checkLeadInCampaigns($lead, array $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;

@@ -256,11 +256,9 @@ class EventRepository extends CommonRepository
     /**
      * Get array of events with stats.
      *
-     * @param array $args
-     *
      * @return array
      */
-    public function getEvents($args = [])
+    public function getEvents(array $args = [])
     {
         $q = $this->createQueryBuilder('e')
             ->select('e, ec, ep')
