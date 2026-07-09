@@ -423,10 +423,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
-    /**
-     * @param array $params
-     */
-    public function getCompanies($params = []): int
+    public function getCompanies(array $params = []): int
     {
         $executed    = 0;
         $MAX_RECORDS = 200; // Default max records is 5000
@@ -683,11 +680,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {

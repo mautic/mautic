@@ -37,12 +37,9 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
-     *
      * @return string
      */
-    public function getDynamicContentForLead($slot, $lead)
+    public function getDynamicContentForLead(string $slot, Lead|array|null $lead)
     {
         // Attempt campaign slots first
         $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
@@ -160,7 +157,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getRealDynamicContent($slot, $lead, DynamicContent $dwc)
+    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc)
     {
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale

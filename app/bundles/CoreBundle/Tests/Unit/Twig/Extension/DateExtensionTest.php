@@ -19,7 +19,7 @@ final class DateExtensionTest extends TestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')
-            ->willReturnCallback(function ($id, $parameters = []) {
+            ->willReturnCallback(function ($id, array $parameters = []) {
                 if (str_starts_with($id, 'mautic.core.date.')) {
                     $unit = str_replace('mautic.core.date.', '', $id);
 

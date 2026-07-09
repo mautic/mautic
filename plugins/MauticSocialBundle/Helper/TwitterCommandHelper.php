@@ -77,10 +77,9 @@ class TwitterCommandHelper
     /**
      * Processes a list of tweets and creates / updates leads in Mautic.
      *
-     * @param array      $statusList
      * @param Monitoring $monitor
      */
-    public function createLeadsFromStatuses($statusList, $monitor): int
+    public function createLeadsFromStatuses(array $statusList, $monitor): int
     {
         $leadField = $this->fieldModel->getRepository()->findOneBy(['alias' => $this->twitterHandleField]);
 
@@ -353,7 +352,7 @@ class TwitterCommandHelper
      *
      * @param Monitoring $monitor
      */
-    private function incrementPostCount($monitor, $tweet): void
+    private function incrementPostCount($monitor, array $tweet): void
     {
         $date = new \DateTime($tweet['created_at']);
 
