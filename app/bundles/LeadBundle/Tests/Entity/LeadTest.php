@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LeadTest extends TestCase
+final class LeadTest extends TestCase
 {
     use RequestTrait;
 
@@ -80,7 +82,7 @@ class LeadTest extends TestCase
         $lead->addDoNotContactEntry($dnc);
 
         $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
-        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
+        $this->assertSame(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
 
     public function testAdjustPoints(): void

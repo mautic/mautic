@@ -112,8 +112,6 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * eventAwareRenderView.
-     *
      * @param array<string, string> $parameters
      */
     public function eventAwareRenderView(string &$contentTemplate, array &$parameters, ?Request $request = null): string
@@ -202,10 +200,8 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Determines if a redirect response should be returned or a Json response directing the ajax call to force a page
      * refresh.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function delegateRedirect($url)
+    public function delegateRedirect($url): JsonResponse|RedirectResponse
     {
         $request = $this->getCurrentRequest();
 
@@ -497,7 +493,7 @@ class CommonController extends AbstractController implements MauticController
             $pageModel = $this->getModel('page');
             \assert($pageModel instanceof PageModel);
             $page = $pageModel->getEntity($page404);
-            if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+            if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug     = $pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',
@@ -557,7 +553,7 @@ class CommonController extends AbstractController implements MauticController
         if ($request->query->has('orderby')) {
             $orderBy = InputHelper::clean($request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = $orderBy === $session->get("$name.orderby") || false == $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
+            $dir     = $orderBy === $session->get("$name.orderby") || false === $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }

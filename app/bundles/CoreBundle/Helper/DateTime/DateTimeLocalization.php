@@ -7,7 +7,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DateTimeLocalization
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -53,7 +53,7 @@ class DateTimeLocalization
         ];
         $values = array_merge($months, $days);
         $keys   = $values;
-        array_walk($keys, function (&$key): void {
+        array_walk($keys, function (string &$key): void {
             $key = $this->translator->trans('mautic.core.date.'.strtolower($key));
         });
 

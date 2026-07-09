@@ -16,7 +16,7 @@ class oAuthHelper
 
     private $accessToken;
 
-    private $accessTokenSecret;
+    private readonly string $accessTokenSecret;
 
     private $callback;
 
@@ -24,7 +24,7 @@ class oAuthHelper
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
-        private ?Request $request = null,
+        private readonly ?Request $request = null,
         $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
@@ -74,7 +74,7 @@ class oAuthHelper
      */
     private function getCompositeKey(): string
     {
-        if (strlen($this->accessTokenSecret) > 0) {
+        if ('' !== $this->accessTokenSecret) {
             $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         } else {
             $composite_key = $this->encode($this->clientSecret).'&';
@@ -112,8 +112,10 @@ class oAuthHelper
 
     /**
      * Build base string for OAuth 1 signature signing.
+     *
+     * @param array<string, mixed> $params
      */
-    private function buildBaseString($baseURI, $method, $params): string
+    private function buildBaseString($baseURI, $method, array $params): string
     {
         $r = $this->normalizeParameters($params);
 
@@ -122,8 +124,10 @@ class oAuthHelper
 
     /**
      * Build header for OAuth 1 authorization.
+     *
+     * @param array<string, mixed> $oauth
      */
-    private function buildAuthorizationHeader($oauth): string
+    private function buildAuthorizationHeader(array $oauth): string
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
@@ -132,14 +136,12 @@ class oAuthHelper
     }
 
     /**
-     * Normalize parameters.
-     *
-     * @param bool $encode
-     * @param bool $returnarray
+     * @param array<string, mixed> $parameters
+     * @param bool                 $encode
      *
      * @return string|array<string,string>
      */
-    private function normalizeParameters($parameters, $encode = false, $returnarray = false, $normalized = [], $key = '')
+    private function normalizeParameters(array $parameters, $encode = false, bool $returnarray = false, $normalized = [], int|string $key = '')
     {
         // Sort by key
         ksort($parameters);
@@ -182,14 +184,14 @@ class oAuthHelper
         $result          = '';
         $accumulatedBits = 0;
         $random          = mt_getrandmax();
-        for ($totalBits = 0; 0 != $random; $random >>= 1) {
+        for ($totalBits = 0; 0 !== $random; $random >>= 1) {
             ++$totalBits;
         }
         $usableBits = intval($totalBits / 8) * 8;
 
         while ($accumulatedBits < $bits) {
             $bitsToAdd = min($totalBits - $usableBits, $bits - $accumulatedBits);
-            if (0 != $bitsToAdd % 4) {
+            if (0 !== $bitsToAdd % 4) {
                 // add bits in whole increments of 4
                 $bitsToAdd += 4 - $bitsToAdd % 4;
             }

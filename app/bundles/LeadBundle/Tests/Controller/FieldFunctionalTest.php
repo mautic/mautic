@@ -8,17 +8,19 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\HttpFoundation\Request;
 
-class FieldFunctionalTest extends MauticMysqlTestCase
+final class FieldFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideFieldLength')]
     public function testNewFieldVarcharFieldLength(int $expectedLength, ?int $inputLength = null): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $this->createField('a', 'text', [], $inputLength);
         $fieldModel->saveEntity($field);
@@ -30,6 +32,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
     public function testNewMultiSelectField(): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $this->createField('s', 'select', ['properties' => ['list' => ['choice_a' => 'Choice A']]]);
         $fieldModel->saveEntity($field);
@@ -62,6 +65,7 @@ class FieldFunctionalTest extends MauticMysqlTestCase
 
     public function testFieldDeleteValidationUsedInSegment(): void
     {
+        /** @var FieldModel $fieldModel */
         $fieldModel       = static::getContainer()->get('mautic.lead.model.field');
         $field_first      = $this->createField('First');
         $fieldModel->saveEntity($field_first);

@@ -13,8 +13,10 @@ use Symfony\Component\Mime\Email;
 #[AsMessageHandler(priority: -1000)]
 class RemoveReportAttachmentHandler
 {
-    public function __construct(private ExportHandler $exportHandler, private FilePathResolver $filePathResolver)
-    {
+    public function __construct(
+        private readonly ExportHandler $exportHandler,
+        private readonly FilePathResolver $filePathResolver,
+    ) {
     }
 
     public function __invoke(SendEmailMessage $message): void

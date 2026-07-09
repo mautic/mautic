@@ -11,7 +11,7 @@ class StageBuilderEvent extends Event
     private array $actions = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -60,12 +60,7 @@ class StageBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * Get actions.
-     *
-     * @return array
-     */
-    public function getActions()
+    public function getActions(): array
     {
         uasort($this->actions, fn ($a, $b): int => strnatcasecmp(
             $a['label'], $b['label']));

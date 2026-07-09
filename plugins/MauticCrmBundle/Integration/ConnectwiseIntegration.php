@@ -100,10 +100,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
-    /**
-     * @return bool
-     */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback($settings = [], $parameters = []): string|false
     {
         $url   = $this->getApiUrl();
         $error = false;
@@ -851,7 +848,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    fn ($contact): bool => 'lead' === $contact['internal_entity']
+                    fn (array $contact): bool => 'lead' === $contact['internal_entity']
                 ), 'integration_entity_id');
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));
@@ -885,7 +882,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId): void
+    public function saveCampaignMembers($allCampaignMembers, IntegrationObject $campaignMemberObject, $campaignId): void
     {
         if (empty($allCampaignMembers)) {
             return;

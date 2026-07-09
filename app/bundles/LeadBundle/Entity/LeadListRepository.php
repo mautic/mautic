@@ -209,9 +209,6 @@ class LeadListRepository extends CommonRepository
         return ($singleArrayHydration) ? $q->getQuery()->getArrayResult() : $q->getQuery()->getResult();
     }
 
-    /**
-     * Check Lead segments by ids.
-     */
     public function checkLeadSegmentsByIds(Lead $lead, $ids): bool
     {
         if (empty($ids)) {
@@ -277,11 +274,9 @@ class LeadListRepository extends CommonRepository
      *
      * @param int|int[] $listIds
      *
-     * @return array|int
-     *
      * @throws \Exception
      */
-    public function getLeadCount($listIds)
+    public function getLeadCount($listIds): int|array
     {
         if (!is_array($listIds)) {
             $listIds = [$listIds];
@@ -923,6 +918,6 @@ SQL;
             ->executeQuery()
             ->fetchAllNumeric();
 
-        return array_map(fn ($row): int => (int) $row[0], $result);
+        return array_map(fn (array $row): int => (int) $row[0], $result);
     }
 }

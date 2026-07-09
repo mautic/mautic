@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -107,7 +108,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             ],
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $model     = $this->getModel($this->getModelName());
             $ids       = json_decode($request->query->get('ids', ''));
             $deleteIds = [];
@@ -277,7 +278,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             'entity' => $entity,
         ];
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
@@ -381,7 +382,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $objectId]);
         $form    = $model->createForm($entity, $this->formFactory, $action, $options);
 
-        $isPost = !$ignorePost && 'POST' == $request->getMethod();
+        $isPost = !$ignorePost && 'POST' === $request->getMethod();
         $this->beforeFormProcessed($entity, $form, 'edit', $isPost, $objectId, $isClone);
         $this->setOptimisticLockVersion($entity, $form);
 
@@ -492,8 +493,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * Get action route.
-     *
      * @return string
      */
     protected function getActionRoute()
@@ -523,7 +522,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 $entity = $model->getEntity();
                 break;
             case 'edit':
-                /* @var $entity FormEntity */
+                /** @var FormEntity $entity */
                 if (is_object($objectId)) {
                     $entity   = $objectId;
                     $isClone  = true;
@@ -572,8 +571,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * Get index route.
-     *
      * @return string
      */
     protected function getIndexRoute()

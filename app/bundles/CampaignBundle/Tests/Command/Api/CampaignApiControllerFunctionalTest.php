@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command\Api;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -23,6 +24,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
+        /** @var CacheProvider $cacheProvider */
         $cacheProvider = self::getContainer()->get('mautic.cache.provider');
         if ($fromCache) {
             $contactCountDetail = [

@@ -13,8 +13,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailStatModel
 {
-    public function __construct(private EntityManagerInterface $entityManager, private EventDispatcherInterface $dispatcher)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {
     }
 
     public function saveEntity(Stat $stat): void

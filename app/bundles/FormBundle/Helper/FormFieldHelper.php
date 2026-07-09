@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ValidatorInterface $validator;
+    private readonly ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -236,14 +236,17 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 break;
             case 'select':
             case 'country':
-                $regex           = '/<select\s*id="mauticform_input_'.$escapedFormName.'_'.$escapedAlias.'"(.*?)<\/select>/is';
+                $regex = '/<select\b(?=[^>]*\bid="mauticform_input_'.$escapedFormName.'_'.$escapedAlias.'")[^>]*>(.*?)<\/select>/is';
                 if (preg_match($regex, $formHtml, $match)) {
-                    $origText = $match[0];
-                    $replace  = str_replace(
-                        '<option value="'.$this->sanitizeValue($value).'">',
-                        '<option value="'.$this->sanitizeValue($value).'" selected="selected">',
+                    $origText  = $match[0];
+                    $sanitized = $this->sanitizeValue($value);
+                    $replace   = preg_replace_callback(
+                        '/<option\s+value="([^"]*)"\s*>/i',
+                        static fn (array $optionMatch): string => $optionMatch[1] === $sanitized
+                            ? '<option value="'.$sanitized.'" selected="selected">'
+                            : $optionMatch[0],
                         $origText
-                    );
+                    ) ?? $origText;
                     $formHtml = str_replace($origText, $replace, $formHtml);
                 }
 
@@ -251,12 +254,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         }
     }
 
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public function sanitizeValue($value)
+    public function sanitizeValue(mixed $value): mixed
     {
         $valueType = gettype($value);
         $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));

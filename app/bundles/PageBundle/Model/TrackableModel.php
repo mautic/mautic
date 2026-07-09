@@ -62,7 +62,7 @@ class TrackableModel extends AbstractCommonModel
 
     public function __construct(
         protected RedirectModel $redirectModel,
-        private LeadFieldRepository $leadFieldRepository,
+        private readonly LeadFieldRepository $leadFieldRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -75,18 +75,12 @@ class TrackableModel extends AbstractCommonModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\TrackableRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PageBundle\Entity\TrackableRepository
     {
         return $this->em->getRepository(Trackable::class);
     }
 
-    /**
-     * @return RedirectModel
-     */
-    protected function getRedirectModel()
+    protected function getRedirectModel(): RedirectModel
     {
         return $this->redirectModel;
     }
@@ -305,10 +299,8 @@ class TrackableModel extends AbstractCommonModel
      *
      * @param string $content
      * @param string $type    html|text
-     *
-     * @return string
      */
-    protected function prepareContentWithTrackableTokens($content, $type)
+    protected function prepareContentWithTrackableTokens($content, $type): string
     {
         if (empty($content)) {
             return '';
@@ -428,9 +420,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Validate and parse link for tracking.
      *
-     * @return bool|non-empty-array<mixed, mixed>
+     * @return false|array{0: string, 1: string}
      */
-    protected function prepareUrlForTracking(string $url)
+    protected function prepareUrlForTracking(string $url): false|array
     {
         // Ensure it's clean
         $url = trim($url);
@@ -483,7 +475,11 @@ class TrackableModel extends AbstractCommonModel
             }
         } else {
             // Regular URL without a tokenized host
-            $trackableUrl = $this->httpBuildUrl($urlParts);
+            try {
+                $trackableUrl = $this->httpBuildUrl($urlParts);
+            } catch (\InvalidArgumentException) {
+                return false;
+            }
 
             if ($this->isInDoNotTrack($trackableUrl)) {
                 return false;
@@ -540,11 +536,7 @@ class TrackableModel extends AbstractCommonModel
             return $this->isValidUrl($url, false);
         }
 
-        if (!$this->isValidUrl($tokenValue)) {
-            return false;
-        }
-
-        return true;
+        return $this->isValidUrl($tokenValue);
     }
 
     /**
@@ -560,22 +552,16 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure a valid scheme
-        if (($forceScheme && !isset($urlParts['scheme']))
-            || (isset($urlParts['scheme'])
-                && !in_array(
-                    $urlParts['scheme'],
-                    ['http', 'https', 'ftp', 'ftps', 'mailto']
-                ))) {
-            return false;
-        }
-
-        return true;
+        return (!$forceScheme || isset($urlParts['scheme'])) && (!isset($urlParts['scheme']) || in_array(
+            $urlParts['scheme'],
+            ['http', 'https', 'ftp', 'ftps', 'mailto']
+        ));
     }
 
     /**
      * Find and extract tokens from the URL as this have to be processed outside of tracking tokens.
      *
-     * @param $urlParts Array from parse_url
+     * @param array<string, mixed> $urlParts from parse_url
      *
      * @return array|false
      */
@@ -665,10 +651,8 @@ class TrackableModel extends AbstractCommonModel
 
     /**
      * Build query string while accounting for tokens that include an equal sign.
-     *
-     * @return mixed|string
      */
-    protected function httpBuildQuery(array $queryParts)
+    protected function httpBuildQuery(array $queryParts): ?string
     {
         $query = http_build_query($queryParts);
 
@@ -738,10 +722,7 @@ class TrackableModel extends AbstractCommonModel
         return $content;
     }
 
-    /**
-     * @return array
-     */
-    protected function getContactFieldUrlTokens()
+    protected function getContactFieldUrlTokens(): array
     {
         if (null !== $this->contactFieldUrlTokens) {
             return $this->contactFieldUrlTokens;

@@ -11,8 +11,8 @@ use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 class UserNotificationHelper
 {
     public function __construct(
-        private Writer $writer,
-        private UserNotificationBuilder $userNotificationBuilder,
+        private readonly Writer $writer,
+        private readonly UserNotificationBuilder $userNotificationBuilder,
     ) {
     }
 

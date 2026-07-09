@@ -15,8 +15,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
     public function __construct(
-        private CompanyReportData $companyReportData,
-        private RouterInterface $router,
+        private readonly CompanyReportData $companyReportData,
+        private readonly RouterInterface $router,
     ) {
     }
 

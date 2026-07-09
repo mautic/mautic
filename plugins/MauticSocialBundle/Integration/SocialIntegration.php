@@ -162,7 +162,7 @@ abstract class SocialIntegration extends AbstractIntegration
                 }
             }
             if ($this->sortFieldsAlphabetically()) {
-                uasort($fields, 'strnatcmp');
+                uasort($fields, strnatcmp(...));
             }
         }
 

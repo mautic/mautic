@@ -30,7 +30,7 @@
     "codeception/module-asserts": "^3.0",
     "codeception/module-db": "^3.1",
     "codeception/module-webdriver": "^4.0",
-    "friendsofphp/php-cs-fixer": "^3.14",
+    "friendsofphp/php-cs-fixer": "^v3.95.11",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.3",
     "liip/test-fixtures-bundle": "^3.5",
@@ -42,14 +42,15 @@
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpunit": "^10.5.62",
-    "rector/rector": "^2.5.2",
+    "rector/rector": "dev-main",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
     "symfony/phpunit-bridge": "~7.4.0",
     "symfony/var-dumper": "~7.4.0",
     "symfony/web-profiler-bundle": "~7.4.0",
-    "symplify/easy-coding-standard": "^12.0.13"
+    "symplify/easy-coding-standard": "^13.2.5",
+    "tomasvotruba/type-coverage": "^2.2.1"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
@@ -222,6 +223,10 @@
     "incenteev-parameters": {
       "file": "app/config/parameters.yml"
     },
-    "patches": {}
+    "patches": {
+      "twig/twig": {
+        "Make IntegrationTestCase data providers static for PHPUnit 11": "patches/twig-integration-testcase-static-data-providers.patch"
+      }
+    }
   }
 }

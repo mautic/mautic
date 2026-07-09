@@ -37,9 +37,9 @@ class FormSubscriber implements EventSubscriberInterface
         protected ContactTracker $contactTracker,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadFieldRepository $leadFieldRepository,
-        private PointGroupModel $groupModel,
-        private DoNotContact $doNotContact,
-        private FieldModel $leadFieldModel,
+        private readonly PointGroupModel $groupModel,
+        private readonly DoNotContact $doNotContact,
+        private readonly FieldModel $leadFieldModel,
     ) {
     }
 
@@ -189,7 +189,7 @@ class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if (!empty($pointGroup)) {
+        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);

@@ -32,9 +32,9 @@ class PushTransifexCommand extends Command
     public const NAME = 'mautic:transifex:push';
 
     public function __construct(
-        private TransifexFactory $transifexFactory,
-        private TranslatorInterface $translator,
-        private LanguageHelper $languageHelper,
+        private readonly TransifexFactory $transifexFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $languageHelper,
     ) {
         parent::__construct();
     }

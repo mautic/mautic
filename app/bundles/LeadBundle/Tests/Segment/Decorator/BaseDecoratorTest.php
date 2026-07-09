@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -7,7 +9,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(BaseDecorator::class)]
-class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
+final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetField(): void
     {
@@ -355,10 +357,7 @@ class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $baseDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
-    /**
-     * @return BaseDecorator
-     */
-    private function getDecorator()
+    private function getDecorator(): BaseDecorator
     {
         $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
 

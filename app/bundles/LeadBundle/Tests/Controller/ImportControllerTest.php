@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -129,7 +130,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
-        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/'.$filename, 'contacts.csv', 'text/csv');
+        $file       = new UploadedFile(__DIR__.'/../Fixtures/'.$filename, 'contacts.csv', 'text/csv');
 
         $uploadForm['lead_import[file]']->setValue((string) $file);
 
@@ -141,7 +142,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('Import process was successfully created.', $crawler->html());
 
         $importRepository = $this->em->getRepository(Import::class);
-        \assert($importRepository instanceof ImportRepository);
+        $this->assertInstanceOf(ImportRepository::class, $importRepository);
         $importEntity = $importRepository->findOneBy(['originalFile' => $filename]);
 
         Assert::assertInstanceOf(Import::class, $importEntity);
@@ -162,7 +163,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertSame(Import::IMPORTED, $importEntity->getStatus());
 
         $leadRepository = $this->em->getRepository(Lead::class);
-        \assert($leadRepository instanceof LeadRepository);
+        $this->assertInstanceOf(LeadRepository::class, $leadRepository);
 
         /** @var Lead[] $contacts */
         $contacts = $leadRepository->findBy([], ['id' => 'asc']);
@@ -171,7 +172,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         Assert::assertSame('Existing-owned-after', $contacts[1]->getFirstname(), 'This contact should be updated as the user has permission to edit own.');
 
         $eventLogRepository = $this->em->getRepository(LeadEventLog::class);
-        \assert($eventLogRepository instanceof LeadEventLogRepository);
+        $this->assertInstanceOf(LeadEventLogRepository::class, $eventLogRepository);
 
         /** @var LeadEventLog[] $logs */
         $logs = $eventLogRepository->findBy(['bundle' => 'lead', 'object' => 'import'], ['id' => 'asc']);
@@ -200,7 +201,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
-        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
+        $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts.csv', 'contacs.csv', 'itext/csv');
 
         $uploadForm['lead_import[file]']->setValue((string) $file);
 
@@ -229,7 +230,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
         $file       = new UploadedFile(
-            dirname(__FILE__).'/../Fixtures/contacts.csv',
+            __DIR__.'/../Fixtures/contacts.csv',
             'contacs.csv',
             'itext/csv'
         );
@@ -321,7 +322,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/import/new');
         $uploadForm = $crawler->selectButton('Upload')->form();
-        $file       = new UploadedFile(dirname(__FILE__).'/../Fixtures/contacts-with-custom-field.csv', 'contacs.csv', 'itext/csv');
+        $file       = new UploadedFile(__DIR__.'/../Fixtures/contacts-with-custom-field.csv', 'contacs.csv', 'itext/csv');
 
         $uploadForm['lead_import[file]']->setValue((string) $file);
 
@@ -449,6 +450,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function addCancellationNotification(?Import $import = null): void
     {
+        /** @var NotificationModel $notificationModel */
         $notificationModel = static::getContainer()->get('mautic.core.model.notification');
         $translator        = static::getContainer()->get('translator');
 
@@ -545,7 +547,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $user->setUsername($username);
         $user->setEmail($email);
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash('Maut1cR0cks!'));
         $user->setRole($role);
         $this->em->persist($user);

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class ReportApiDateHandlingTest extends MauticMysqlTestCase
 {
     private Report $report;
+
     private Form $form;
 
     protected function setUp(): void

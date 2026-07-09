@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 
-class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private EmailRepository $emailRepository;
 
@@ -197,7 +197,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];
-        $expectedLeadIds = array_map(fn (int $id) => (string) $id, $expectedLeadIds);
+        $expectedLeadIds = array_map(fn (int $id): string => (string) $id, $expectedLeadIds);
         sort($expectedLeadIds);
 
         Assert::assertSame($expectedLeadIds, $actualLeadIds);
@@ -217,11 +217,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lead ...$leads
-     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, ...$leads): LeadList
+    private function createLeadList(string $name, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);
@@ -256,10 +254,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         return $category;
     }
 
-    /**
-     * @param Category ...$categories
-     */
-    private function subscribeCategory(Lead $lead, bool $subscribed, ...$categories): void
+    private function subscribeCategory(Lead $lead, bool $subscribed, Category ...$categories): void
     {
         foreach ($categories as $category) {
             $leadCategory = new LeadCategory();

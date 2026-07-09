@@ -9,7 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class AssetModelFunctionalTest extends MauticMysqlTestCase
+final class AssetModelFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -46,8 +46,9 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
 
         $expectedUrl = 'https://localhost/asset/'.$slug.$expectedQuery;
 
+        /** @var AssetModel $assetModel */
         $assetModel = static::getContainer()->get('mautic.asset.model.asset');
-        assert($assetModel instanceof AssetModel);
+        $this->assertInstanceOf(AssetModel::class, $assetModel);
         $generatedUrl = $assetModel->generateUrl($asset, $absolute, $clickthrough, $stream);
 
         $this->assertSame($expectedUrl, $generatedUrl);
@@ -116,9 +117,10 @@ class AssetModelFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($asset->getUuid());
         $this->assertSame('1:the-alias', $asset->getSlug());
 
+        /** @var AssetModel $assetModel */
         $assetModel = static::getContainer()->get('mautic.asset.model.asset');
-        assert($assetModel instanceof AssetModel);
-        $generatedUrl = $assetModel->generateUrl($asset, true, [], null);
+        $this->assertInstanceOf(AssetModel::class, $assetModel);
+        $generatedUrl = $assetModel->generateUrl($asset, true, []);
         $this->assertSame('https://localhost/asset/1:the-alias', $generatedUrl);
     }
 }

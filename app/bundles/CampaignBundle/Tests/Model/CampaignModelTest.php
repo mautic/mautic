@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -7,7 +9,7 @@ use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 
-class CampaignModelTest extends CampaignTestAbstract
+final class CampaignModelTest extends CampaignTestAbstract
 {
     public function testGetSourceListsWithNull(): void
     {
@@ -44,7 +46,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $leadList = $this->createMock(LeadList::class);
+        $leadList = $this->createStub(LeadList::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -76,7 +78,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $form     = $this->createMock(Form::class);
+        $form     = $this->createStub(Form::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -94,7 +96,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $leadList = $this->createMock(LeadList::class);
+        $leadList = $this->createStub(LeadList::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -112,7 +114,7 @@ class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = $this->createMock(Campaign::class);
-        $form     = $this->createMock(Form::class);
+        $form     = $this->createStub(Form::class);
 
         $this->entityManager->expects($this->once())
             ->method('find')

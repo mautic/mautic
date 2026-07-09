@@ -56,7 +56,7 @@
         {{ form_row(form.isPublished) }}
         {% if integrationObject is instanceof('\\Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormAuthInterface') %}
         <hr />
-        {{ form_row(form.apiKeys) }}
+        {{ form_widget(form.apiKeys) }}
             {% if useAuthorizationUrl %}
             <div class="alert alert-warning">
                 {{ integrationObject.getCallbackHelpMessageTranslationKey()|trans }}
@@ -111,7 +111,7 @@
             {# // @todo echo $view['form']->row($form['featureSettings']['sync']['updateBlanks']); #}
 
             {% if form.featureSettings.sync.integration is defined %}
-                {{ form_row(form.featureSettings.sync.integration) }}
+                {{ form_widget(form.featureSettings.sync.integration) }}
             {% endif %}
 
             {% if useFeatureSettings %}
@@ -120,7 +120,7 @@
         {% endif %}
 
         {% if useFeatureSettings %}
-            {{ form_row(form.featureSettings.integration) }}
+            {{ form_widget(form.featureSettings.integration) }}
         {% endif %}
     </div>
     {% endif %}

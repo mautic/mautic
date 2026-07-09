@@ -14,17 +14,15 @@ class TriggerEventController extends CommonFormController
 {
     /**
      * Generates new form and processes post data.
-     *
-     * @return Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
         $method  = $request->getMethod();
         $session = $request->getSession();
 
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $triggerEvent = $request->request->all()['pointtriggerevent'] ?? [];
             $eventType    = $triggerEvent['type'];
             $triggerId    = $triggerEvent['triggerId'];
@@ -62,7 +60,7 @@ class TriggerEventController extends CommonFormController
         $triggerEvent['settings'] = $events[$eventType];
 
         // Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -140,10 +138,8 @@ class TriggerEventController extends CommonFormController
      * Generates edit form and processes post data.
      *
      * @param int $objectId
-     *
-     * @return Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, $objectId): JsonResponse|Response
     {
         $session      = $request->getSession();
         $method       = $request->getMethod();
@@ -178,7 +174,7 @@ class TriggerEventController extends CommonFormController
             ]);
             $form->get('triggerId')->setData($triggerId);
             // Check for a submitted form and process it
-            if ('POST' == $method) {
+            if ('POST' === $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -285,7 +281,7 @@ class TriggerEventController extends CommonFormController
 
         $triggerEvent = (array_key_exists($objectId, $events)) ? $events[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $triggerEvent) {
+        if ('POST' === $request->getMethod() && null !== $triggerEvent) {
             // add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;

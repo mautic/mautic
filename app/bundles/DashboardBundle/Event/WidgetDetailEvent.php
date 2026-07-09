@@ -38,8 +38,12 @@ class WidgetDetailEvent extends CommonEvent
 
     private bool $isPreview = false;
 
-    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, protected Widget $widget, private ?CacheProviderTagAwareInterface $cacheProvider = null)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        protected Widget $widget,
+        private readonly ?CacheProviderTagAwareInterface $cacheProvider = null,
+    ) {
         $this->startTime = microtime(true);
         $this->setWidget($widget);
     }
@@ -83,7 +87,7 @@ class WidgetDetailEvent extends CommonEvent
 
         // If there are no additional parameters we return uniqueWidgetId as a cache key
         // Otherwise we return hashed $cacheKey value
-        $cacheKey = (1 == count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
+        $cacheKey = (1 === count($cacheKey)) ? $this->getUniqueWidgetId() : substr(md5(implode('', $cacheKey)), 0, 16);
 
         return $this->cacheKeyPath.$cacheKey;
     }
@@ -123,7 +127,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget type.
      *
-     * @return string $type
+     * @return string
      */
     public function getType()
     {
@@ -164,10 +168,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Returns the widget entity.
-     *
-     * @return Widget $widget
      */
-    public function getWidget()
+    public function getWidget(): Widget
     {
         return $this->widget;
     }
@@ -186,7 +188,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get the widget template.
      *
-     * @return string $template
+     * @return string
      */
     public function getTemplate()
     {
@@ -251,7 +253,7 @@ class WidgetDetailEvent extends CommonEvent
     /**
      * Get an error message.
      *
-     * @return string $errorMessage
+     * @return string
      */
     public function getErrorMessage()
     {
@@ -320,10 +322,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Get the Translator object.
-     *
-     * @return TranslatorInterface
      */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
@@ -340,12 +340,8 @@ class WidgetDetailEvent extends CommonEvent
 
     /**
      * Check if the user has defined permission to see the widgets.
-     *
-     * @param string $permission
-     *
-     * @return bool
      */
-    public function hasPermission($permission)
+    public function hasPermission(string $permission): bool
     {
         return $this->security->isGranted($permission);
     }

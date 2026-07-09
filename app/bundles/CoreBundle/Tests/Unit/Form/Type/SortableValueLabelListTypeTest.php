@@ -23,17 +23,15 @@ final class SortableValueLabelListTypeTest extends TestCase
         $call = 0;
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->with($this->callback(function ($name) {
+            ->with($this->callback(function ($name): bool {
                 $expected = [
                     ['label', 'value'],
                 ];
 
                 return in_array($name, $expected[0], true);
             }),
-                $this->callback(function ($type) {
-                    return TextType::class === $type;
-                }),
-                $this->callback(function ($options) use (&$call) {
+                $this->callback(fn ($type): bool => TextType::class === $type),
+                $this->callback(function ($options) use (&$call): bool {
                     $expectedOptions = [
                         [
                             'label'          => 'mautic.core.label',
@@ -64,8 +62,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testBuildViewSetsViewVariables(): void
     {
         $type = new SortableValueLabelListType();
-        $form = $this->createMock(FormInterface::class);
-        $view = $this->createMock(FormView::class);
+        $form = $this->createStub(FormInterface::class);
+        $view = $this->createStub(FormView::class);
 
         $options = [
             'attr' => [
@@ -89,8 +87,8 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testBuildViewWithEmptyOptions(): void
     {
         $type = new SortableValueLabelListType();
-        $form = $this->createMock(FormInterface::class);
-        $view = $this->createMock(FormView::class);
+        $form = $this->createStub(FormInterface::class);
+        $view = $this->createStub(FormView::class);
 
         $options    = ['attr' => []];
         $view->vars = [];
@@ -112,7 +110,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         // @phpstan-ignore-next-line
         $builder->expects($this->once())
             ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, $this->callback(function ($callback) use (&$eventListener) {
+            ->with(FormEvents::PRE_SUBMIT, $this->callback(function ($callback) use (&$eventListener): true {
                 $eventListener = $callback;
 
                 return true;
@@ -127,7 +125,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerVariants(mixed $data, bool $shouldSetData, ?string $expectedValue = null): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createMock(FormBuilderInterface::class);
+        $builder       = $this->createStub(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
         $event         = $this->createMock(FormEvent::class);
         $event->expects($this->once())
@@ -136,9 +134,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expectedValue) {
-                    return $newData['label'] === $data['label'] && $newData['value'] === $expectedValue;
-                }));
+                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expectedValue));
         } else {
             $event->expects($this->never())
                 ->method('setData');
@@ -179,7 +175,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     public function testFormEventListenerGeneratesSlug(string $input, string $expected): void
     {
         $type          = new SortableValueLabelListType();
-        $builder       = $this->createMock(FormBuilderInterface::class);
+        $builder       = $this->createStub(FormBuilderInterface::class);
         $eventListener = $this->getEventListenerFromBuildForm($type, $builder);
         $event         = $this->createMock(FormEvent::class);
 
@@ -191,9 +187,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expected) {
-                    return $newData['label'] === $data['label'] && $newData['value'] === $expected;
-                }));
+                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expected));
         } else {
             $event->expects($this->never())
                 ->method('setData');

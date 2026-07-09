@@ -36,7 +36,7 @@ class AjaxController extends CommonAjaxController
             $request,
             $emailModel,
             fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn ($form): string                                                  => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
+            fn (\Symfony\Component\Form\FormInterface $form): string => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
             'emailform'
         ));
@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
                 $stats['failed'] += $batchFailedCount;
 
                 foreach ($batchFailedRecipients as $emails) {
-                    $stats['failedRecipients'] = $stats['failedRecipients'] + $emails;
+                    $stats['failedRecipients'] += $emails;
                 }
 
                 $session->set('mautic.email.send.progress', $progress);

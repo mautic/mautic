@@ -9,13 +9,14 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ListApiControllerFunctionalTest extends MauticMysqlTestCase
+final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected ListModel $listModel;
 
@@ -635,6 +636,7 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
         $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
         $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
 
@@ -811,7 +813,9 @@ class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString($expectedDetailMessage2, $allDetails);
     }
 
-    /** @param array<int, array<string, mixed>> $filters */
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     */
     private function saveSegment(string $name, string $alias, array $filters = [], ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();

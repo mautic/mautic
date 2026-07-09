@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -11,18 +13,8 @@ use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Mautic\WebhookBundle\WebhookEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&IpLookupHelper
-     */
-    private MockObject $ipLookupHelper;
-
-    /**
-     * @var MockObject&AuditLogModel
-     */
-    private MockObject $auditLogModel;
-
     /**
      * @var MockObject&WebhookKillNotificator
      */
@@ -30,8 +22,6 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel          = $this->createMock(AuditLogModel::class);
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
     }
 
@@ -49,7 +39,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnWebhookKill(): void
     {
-        $webhookMock = $this->createMock(Webhook::class);
+        $webhookMock = $this->createStub(Webhook::class);
         $reason      = 'reason';
 
         $eventMock = $this->createMock(WebhookEvent::class);
@@ -67,7 +57,7 @@ class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with($webhookMock, $reason);
 
-        $subscriber = new WebhookSubscriber($this->ipLookupHelper, $this->auditLogModel, $this->webhookKillNotificator);
+        $subscriber = new WebhookSubscriber($this->createStub(IpLookupHelper::class), $this->createStub(AuditLogModel::class), $this->webhookKillNotificator);
         $subscriber->onWebhookKill($eventMock);
     }
 }

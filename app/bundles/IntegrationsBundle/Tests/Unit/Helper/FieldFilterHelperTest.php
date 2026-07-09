@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use PHPUnit\Framework\TestCase;
 
-class FieldFilterHelperTest extends TestCase
+final class FieldFilterHelperTest extends TestCase
 {
     public function testFieldsFilteredByPage(): void
     {
@@ -17,7 +17,7 @@ class FieldFilterHelperTest extends TestCase
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         $fieldFilterHelper->filterFieldsByPage('test', 2, 3);
-        $this->assertEquals(5, $fieldFilterHelper->getTotalFieldCount());
+        $this->assertSame(5, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
         $this->assertFalse(isset($filteredFields['field1']));
@@ -33,7 +33,7 @@ class FieldFilterHelperTest extends TestCase
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         $fieldFilterHelper->filterFieldsByKeyword('test', 'three', 1);
-        $this->assertEquals(1, $fieldFilterHelper->getTotalFieldCount());
+        $this->assertSame(1, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
         $this->assertFalse(isset($filteredFields['field1']));
@@ -49,7 +49,7 @@ class FieldFilterHelperTest extends TestCase
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
         $fieldFilterHelper->filterFieldsByKeyword('test', 'field', 2, 3);
-        $this->assertEquals(5, $fieldFilterHelper->getTotalFieldCount());
+        $this->assertSame(5, $fieldFilterHelper->getTotalFieldCount());
         $filteredFields = $fieldFilterHelper->getFilteredFields();
 
         $this->assertFalse(isset($filteredFields['field1']));
@@ -60,9 +60,9 @@ class FieldFilterHelperTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigFormSyncInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject&ConfigFormSyncInterface
      */
-    private function getIntegrationObject()
+    private function getIntegrationObject(): \PHPUnit\Framework\MockObject\MockObject
     {
         $field1 = $this->createMock(MappedFieldInfoInterface::class);
         $field1->method('getLabel')

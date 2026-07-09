@@ -28,15 +28,15 @@ class CommonEntity implements \Stringable
     /**
      * Wrapper function for isProperty methods.
      *
-     * @param string $name
+     * @param mixed[] $arguments
      *
      * @throws \InvalidArgumentException
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
         if (str_starts_with($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
             return $this->{'get'.ucfirst($name)}();
-        } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
+        } elseif ('getName' === $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 

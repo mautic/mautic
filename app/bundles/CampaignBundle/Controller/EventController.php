@@ -38,8 +38,8 @@ class EventController extends CommonFormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private EventCollector $eventCollector,
-        private DateHelper $dateHelper,
+        private readonly EventCollector $eventCollector,
+        private readonly DateHelper $dateHelper,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -49,7 +49,7 @@ class EventController extends CommonFormController
         FlashBag $flashBag,
         RequestStack $requestStack,
         CorePermissions $security,
-        private CampaignModel $campaignModel,
+        private readonly CampaignModel $campaignModel,
     ) {
         // @phpstan-ignore-next-line Ignore as AbstractStandardFormController is deprecated
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
@@ -67,10 +67,8 @@ class EventController extends CommonFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request)
+    public function newAction(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $success = 0;
         $valid   = $cancelled   = false;
@@ -206,10 +204,8 @@ class EventController extends CommonFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, $objectId)
+    public function editAction(Request $request, string $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
@@ -381,7 +377,7 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
             if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
                 $event['settings'] = $events[$event['eventType']][$event['type']];
@@ -448,7 +444,7 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
             if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
                 $event['settings'] = $events[$event['eventType']][$event['type']];
@@ -515,7 +511,7 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
             $event['id']    = $event['tempId']    = $keyId;
             $session->set('mautic.campaign.events.clone.storage', $event);

@@ -51,7 +51,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param array $settings
      * @param array $parameters
      *
      * @return bool|string
@@ -71,11 +70,9 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (isset($settings['list'])) {
             // Ajax update

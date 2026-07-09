@@ -13,10 +13,10 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
     /**
      * @var \SplPriorityQueue|\ReflectionClass[]
      */
-    private \SplPriorityQueue $specs;
+    private readonly \SplPriorityQueue $specs;
 
     public function __construct(
-        private string $env,
+        private readonly string $env,
     ) {
         $this->specs     = new \SplPriorityQueue();
     }
@@ -37,7 +37,7 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         return false;
     }
 
-    private function createCacheFile($cacheDirectory): void
+    private function createCacheFile(string $cacheDirectory): void
     {
         $middlewarsDir = __DIR__.'/../../../middlewares';
 

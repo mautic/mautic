@@ -317,7 +317,7 @@ class ListController extends FormController
         $form = $segmentModel->createForm($segment, $this->formFactory, $action);
 
         // Check for a submitted form and process it
-        if (!$ignorePost && Request::METHOD_POST == $request->getMethod()) {
+        if (!$ignorePost && Request::METHOD_POST === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -366,12 +366,11 @@ class ListController extends FormController
     /**
      * Create modifying response for segments - edit.
      *
-     * @param string $action
-     * @param bool   $ignorePost
+     * @param bool $ignorePost
      *
      * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, $action, $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, $ignorePost)
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');
@@ -828,9 +827,6 @@ class ListController extends FormController
         return $this->getModel('lead.list')->getPermissionBase();
     }
 
-    /**
-     * Get List Model.
-     */
     protected function getListModel(): ListModel
     {
         /** @var ListModel $model */
@@ -955,13 +951,13 @@ class ListController extends FormController
         }
 
         if (!empty($filters)) {
-            if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
+            if (in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('manually_removed', $filters['includeEvents'])) {
+            if (in_array('manually_removed', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
             }
-            if (isset($filters['includeEvents']) && in_array('filter_added', $filters['includeEvents'])) {
+            if (in_array('filter_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 0]);
             }
         }

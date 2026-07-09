@@ -17,6 +17,10 @@ class SubmissionRepository extends CommonRepository
 {
     use TimelineTrait;
 
+    /**
+     * @param Submission $entity
+     * @param bool       $flush
+     */
     public function saveEntity($entity, $flush = true): void
     {
         parent::saveEntity($entity, $flush);
@@ -95,7 +99,7 @@ class SubmissionRepository extends CommonRepository
 
         $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
         // Quote reserved keywords in field aliases
-        $fieldAliases = array_map(fn ($alias) => $databasePlatform->quoteIdentifier($alias), $fieldAliases);
+        $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
 
         $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
@@ -360,7 +364,7 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($pageId)) {
             $q->where($q->expr()->in('s.page_id', ':pageIds'))
-                ->setParameter('pageIds', array_map('intval', $pageId), ArrayParameterType::INTEGER)
+                ->setParameter('pageIds', array_map(intval(...), $pageId), ArrayParameterType::INTEGER)
                 ->groupBy('s.page_id, p.title, p.variant_hits');
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
@@ -393,7 +397,7 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($emailId)) {
             $q->where($q->expr()->in('e.id', ':ids'))
-                ->setParameter('ids', array_map('intval', $emailId), ArrayParameterType::INTEGER)
+                ->setParameter('ids', array_map(intval(...), $emailId), ArrayParameterType::INTEGER)
                 ->groupBy('e.id, e.subject, e.variant_sent_count');
         } else {
             $q->where($q->expr()->eq('e.id', ':id'))
@@ -468,7 +472,7 @@ class SubmissionRepository extends CommonRepository
                 break;
             case 'startsWith':
                 $operatorExpr    = 'like';
-                $value           = $value.'%';
+                $value .= '%';
                 break;
             case 'endsWith':
                 $operatorExpr   = 'like';

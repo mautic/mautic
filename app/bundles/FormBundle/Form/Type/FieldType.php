@@ -499,7 +499,7 @@ class FieldType extends AbstractType
                     ChoiceType::class,
                     [
                         'choices'     => $fields->toChoices(),
-                        'choice_attr' => function ($val) use ($fields): array {
+                        'choice_attr' => function (string $val) use ($fields): array {
                             try {
                                 $field = $fields->getFieldByKey($val);
                                 if ($field->isListType()) {
@@ -538,7 +538,7 @@ class FieldType extends AbstractType
 
         $builder->add('type', HiddenType::class);
 
-        $update = (!empty($options['data']['id'])) ? true : false;
+        $update = !empty($options['data']['id']);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
             $btnIcon  = 'ri-edit-line';

@@ -46,7 +46,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($response->getContent(), true);
         Assert::assertSame(1, $responseData['success'], print_r(json_decode($response->getContent(), true), true));
 
-        $actualEventData = array_filter($responseData['event'], fn ($value) => in_array($value, [
+        $actualEventData = array_filter($responseData['event'], fn ($value): bool => in_array($value, [
             'name',
             'type',
             'eventType',
@@ -266,7 +266,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $form         = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
 
         // Assert the field email_type === "marketing"
-        Assert::assertEquals('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
+        Assert::assertSame('marketing', $form['campaignevent[properties][email_type]']->getValue(), 'The default email type should be "marketing"');
     }
 
     public function testEventsAreNotAccessibleWithXhr(): void

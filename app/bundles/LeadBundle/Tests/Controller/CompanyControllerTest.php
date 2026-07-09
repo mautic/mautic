@@ -16,7 +16,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CompanyControllerTest extends MauticMysqlTestCase
+final class CompanyControllerTest extends MauticMysqlTestCase
 {
     private const COUNTRY_UNITED_STATES = 'United States';
 
@@ -59,7 +59,11 @@ class CompanyControllerTest extends MauticMysqlTestCase
               ->setIndustry($companyData['industry']);
             $model->saveEntity($company);
 
-            $this->{'company'.$i.'Id'} = $company->getId();
+            if (1 === $i) {
+                $this->company1Id = $company->getId();
+            } elseif (2 === $i) {
+                $this->company2Id = $company->getId();
+            }
         }
     }
 
@@ -71,6 +75,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $crawler                = $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
+        /** @var CompanyModel $model */
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -107,6 +112,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $crawler                = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
+        /** @var CompanyModel $model */
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
@@ -133,11 +139,13 @@ class CompanyControllerTest extends MauticMysqlTestCase
     /* Get company contacts list */
     public function testListCompanyContacts(): void
     {
+        /** @var CompanyModel $companyModel */
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        \assert($companyModel instanceof CompanyModel);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
+        /** @var LeadModel $leadModel */
         $leadModel = self::getContainer()->get('mautic.lead.model.lead');
-        \assert($leadModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
 
         $company1 = $companyModel->getEntity($this->company1Id);
 
@@ -167,7 +175,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertResponseIsSuccessful();
-        $this->assertEquals(1, $leadsTableRows->count(), $crawler->html());
+        $this->assertCount(1, $leadsTableRows, $crawler->html());
 
         $clientResponse = $this->client->getResponse();
         $this->assertStringContainsString('test1@test.com', $clientResponse->getContent());
@@ -178,7 +186,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
         $this->assertResponseIsSuccessful();
-        $this->assertEquals(0, $leadsTableRows->count(), $crawler->html());
+        $this->assertCount(0, $leadsTableRows, $crawler->html());
     }
 
     public function testCompanyFieldsAreUpdatedWithBatchFindAndReplace(): void
@@ -239,7 +247,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         );
 
         $companyTableRows = $crawler->filterXPath("//table[@id='companyTable']//tbody//tr");
-        $this->assertEquals(5, $companyTableRows->count(), $crawler->html());
+        $this->assertCount(5, $companyTableRows, $crawler->html());
 
         $payload = [
             'lead_batch_find_replace' => [
@@ -363,8 +371,9 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $buttonCrawler = $crawler->selectButton('Save & Close');
         $form          = $buttonCrawler->form();
 
+        /** @var CompanyModel $companyModel */
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        \assert($companyModel instanceof CompanyModel);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company     = $companyModel->getEntity($this->company1Id);
         $updatedName = $company->getName().' - Updated';
@@ -396,8 +405,9 @@ class CompanyControllerTest extends MauticMysqlTestCase
 
         $content = $clientResponse->getContent();
 
+        /** @var CompanyModel $companyModel */
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        \assert($companyModel instanceof CompanyModel);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $company1 = $companyModel->getEntity($this->company1Id);
         $company2 = $companyModel->getEntity($this->company2Id);
 
@@ -422,8 +432,9 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->em->persist($lead);
         $this->em->flush();
 
+        /** @var CompanyModel $companyModel */
         $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        \assert($companyModel instanceof CompanyModel);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company = $companyModel->getEntity($this->company1Id);
 
