@@ -457,7 +457,7 @@ class CommonRepository extends ServiceEntityRepository
         if (isset($filter['group'])) {
             $expr = $q->expr()->or();
             foreach ($filter['group'] as $orGroup) {
-                $groupExpr = $q->expr()->andX();
+                $groupExpr = $q->expr()->and();
                 foreach ($orGroup as $subFilter) {
                     [$subExpr, $subParameters] = $this->getFilterExpr($q, $subFilter);
 
@@ -472,7 +472,8 @@ class CommonRepository extends ServiceEntityRepository
             }
         } elseif (str_contains($filter['column'], ',')) {
             $columns      = explode(',', $filter['column']);
-            $expr         = $q->expr()->or();
+            $expressionBuilder = $q->expr();
+            $expr         = $expressionBuilder->or();
             $setParameter = false;
             foreach ($columns as $c) {
                 $subFilter           = $filter;
@@ -573,7 +574,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $expr = $q->expr()->andX(
             $q->expr()->eq("$alias.$pub", ':true'),
-            $q->expr()->or(
+            $q->expr()->orX(
                 $q->expr()->isNull("$alias.$pubDown"),
                 $q->expr()->gte("$alias.$pubDown", ':now')
             )
@@ -581,7 +582,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if ($allowNullForPublishedUp) {
             $expr->add(
-                $q->expr()->or(
+                $q->expr()->orX(
                     $q->expr()->isNull("$alias.$pubUp"),
                     $q->expr()->lte("$alias.$pubUp", ':now')
                 )
@@ -1628,7 +1629,7 @@ class CommonRepository extends ServiceEntityRepository
                                     $query->expr()->isNull($column)
                                 );
                             } else {
-                                $whereClause = $query->expr()->andX(
+                                $whereClause = $query->expr()->and(
                                     $query->expr()->neq($column, $query->expr()->literal('')),
                                     $query->expr()->isNotNull($column)
                                 );
