@@ -15,7 +15,7 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private readonly FieldsBuilder $fieldsBuilder,
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
     }
 

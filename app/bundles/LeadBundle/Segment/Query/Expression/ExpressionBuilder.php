@@ -14,7 +14,7 @@ class ExpressionBuilder extends BaseExpressionBuilder
 
     public const BETWEEN           = 'BETWEEN';
 
-    private AbstractPlatform $platform;
+    private readonly AbstractPlatform $platform;
 
     public function __construct(Connection $connection)
     {

@@ -21,7 +21,7 @@ class DncReportService
     public function __construct(
         private readonly DoNotContact $doNotContactModel,
         private readonly DncFormatterHelper $dncFormatterHelper,
-        private Connection $connection,
+        private readonly Connection $connection,
     ) {
     }
 

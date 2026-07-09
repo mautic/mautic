@@ -317,7 +317,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
                 $prefixedTables = array_filter($tables, fn (string $table): bool => str_starts_with($table, $prefix));
 
                 if (!empty($prefixedTables)) {
-                    $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
+                    $quotedTables = array_map($this->connection->quoteIdentifier(...), $prefixedTables);
                     $this->connection->executeStatement(
                         self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables).' RESTART IDENTITY CASCADE'
                     );
@@ -403,7 +403,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
 
         // Quote identifiers properly for PostgreSQL
-        $quotedTables = array_map([$this->connection, 'quoteIdentifier'], $prefixedTables);
+        $quotedTables = array_map($this->connection->quoteIdentifier(...), $prefixedTables);
 
         $content = "-- PostgreSQL reset script for prefixed tables\n";
         $content .= self::TRUNCATE_TABLE_SQL.' '.implode(', ', $quotedTables)." RESTART IDENTITY CASCADE;\n";
