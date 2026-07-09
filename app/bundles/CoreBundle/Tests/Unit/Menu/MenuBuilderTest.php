@@ -17,7 +17,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class MenuBuilderTest extends TestCase
+final class MenuBuilderTest extends TestCase
 {
     private FactoryInterface $factory;
 
