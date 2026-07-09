@@ -357,9 +357,10 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
+     * @param mixed[]              $data
      * @param bool                 $includePublish
      */
-    protected function addStandardFormFields($bundle, $level, &$builder, array $data, $includePublish = true)
+    protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.view'   => 'view',
