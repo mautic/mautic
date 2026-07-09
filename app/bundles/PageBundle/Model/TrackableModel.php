@@ -86,15 +86,14 @@ class TrackableModel extends AbstractCommonModel
     }
 
     /**
-     * @param array      $clickthrough
-     * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param bool|false $shortenUrl If true, use the configured shortener service to shorten the URLs
      * @param array      $utmTags
      *
      * @return string
      */
     public function generateTrackableUrl(
         Trackable $trackable,
-        $clickthrough = [],
+        array $clickthrough = [],
         $shortenUrl = false,
         $utmTags = [],
     ) {
@@ -565,7 +564,7 @@ class TrackableModel extends AbstractCommonModel
      *
      * @return array|false
      */
-    protected function extractTokensFromQuery(&$urlParts)
+    protected function extractTokensFromQuery(array &$urlParts)
     {
         $tokenizedParams = false;
 

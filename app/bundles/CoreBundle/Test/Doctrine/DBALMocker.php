@@ -238,7 +238,7 @@ class DBALMocker
 
             $mock->expects(new AnyInvokedCount())
                 ->method('executeQuery')
-                ->willReturnCallback([$this, 'getMockResultStatement']);
+                ->willReturnCallback($this->getMockResultStatement(...));
 
             $this->mockQueryBuilder = $mock;
         }
