@@ -288,18 +288,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\AssetRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
     {
         return $this->em->getRepository(Asset::class);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\DownloadRepository
-     */
-    public function getDownloadRepository()
+    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
     {
         return $this->em->getRepository(Download::class);
     }
@@ -611,7 +605,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Asset-specific override for legacy public asset URLs.
      *

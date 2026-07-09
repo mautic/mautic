@@ -16,7 +16,7 @@ class oAuthHelper
 
     private $accessToken;
 
-    private $accessTokenSecret;
+    private readonly string $accessTokenSecret;
 
     private $callback;
 
@@ -74,7 +74,7 @@ class oAuthHelper
      */
     private function getCompositeKey(): string
     {
-        if (strlen($this->accessTokenSecret) > 0) {
+        if ('' !== $this->accessTokenSecret) {
             $composite_key = $this->encode($this->clientSecret).'&'.$this->encode($this->accessTokenSecret);
         } else {
             $composite_key = $this->encode($this->clientSecret).'&';

@@ -216,7 +216,7 @@ class ImportModel extends FormModel
 
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
 
-            throw new ImportFailedException('Database had been overloaded');
+            throw new ImportFailedException('Database had been overloaded', $e->getCode(), $e);
         }
 
         $import->end();
@@ -545,18 +545,12 @@ class ImportModel extends FormModel
         return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
-    /**
-     * @return ImportRepository
-     */
-    public function getRepository()
+    public function getRepository(): ImportRepository
     {
         return $this->em->getRepository(Import::class);
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getEventLogRepository()
+    public function getEventLogRepository(): LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }

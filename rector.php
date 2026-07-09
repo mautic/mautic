@@ -9,6 +9,7 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
@@ -18,8 +19,8 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
     ])
-    ->withPreparedSets(deadCode: true)
-    ->withPhpSets(php80: true)
+    ->withPreparedSets(deadCode: true, typeDeclarations: true)
+    ->withPhpSets(php81: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
@@ -27,6 +28,7 @@ return RectorConfig::configure()
         Mautic\CoreBundle\Controller\AbstractFormController::class,
         CommonRepository::class,
         Mautic\ApiBundle\Controller\FetchCommonApiController::class,
+        Mautic\PluginBundle\Integration\AbstractIntegration::class,
     ])
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
@@ -37,15 +39,39 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
+
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
     ])
     ->reportUnusedSkips()
-    ->withTypeCoverageLevel(50)
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(27)
+    ->withCodeQualityLevel(38)
     ->withSkip([
+        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class,
+
+        Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
+        ],
+
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+        ],
+        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
+        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
+
+        // checking child classes
+        Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
+        ],
+
+        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+
+        ReturnTypeFromGetRepositoryDocblockRector::class => [
+            // double getRepository() override
+            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
+            // list lead vs lead list diff
+            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
         ],
 
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
@@ -57,7 +83,11 @@ return RectorConfig::configure()
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
+            __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
         ],
+
+        // from upcoming PHP 8.1
+        Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector::class,
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,

@@ -20,10 +20,7 @@ final class PageControllerTest extends MauticMysqlTestCase
 
     private string $prefix;
 
-    /**
-     * @var int
-     */
-    private $id;
+    private int $id;
 
     /**
      * @throws \Exception
@@ -38,6 +35,7 @@ final class PageControllerTest extends MauticMysqlTestCase
             'template' => 'blank',
         ];
 
+        /** @var PageModel $model */
         $model = static::getContainer()->get('mautic.page.model.page');
         $page  = new Page();
         $page->setTitle($pageData['title'])
@@ -196,7 +194,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         return $page;
     }
 
-    /*
+    /**
      * Get page's view.
      */
     public function testViewActionPage(): void
@@ -204,6 +202,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/pages/view/'.$this->id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
+        /** @var PageModel $model */
         $model                  = static::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());

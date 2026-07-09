@@ -20,7 +20,7 @@ class Submission
 
     /**
      * @var Form
-     **/
+     */
     private $form;
 
     /**
@@ -209,9 +209,6 @@ class Submission
         return $this->results;
     }
 
-    /**
-     * Get results.
-     */
     public function setResults($results): static
     {
         $this->results = $results;

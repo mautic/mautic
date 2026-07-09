@@ -98,7 +98,7 @@ class Trigger extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['trigger:read', 'trigger:write'])]
     private $category;
 

@@ -52,9 +52,9 @@ class InstallCommand extends Command
             $package = $this->packageModel->getPackageDetail($packageName);
         } catch (ApiException $e) {
             if (404 === $e->getCode()) {
-                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.');
+                throw new \InvalidArgumentException('Given package '.$packageName.' does not exist in Packagist. Please check the name for typos.', $e->getCode(), $e);
             }
-            throw new \Exception('Error while trying to get package details: '.$e->getMessage());
+            throw new \Exception('Error while trying to get package details: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         $type = $package->packageBase->type ?? '';

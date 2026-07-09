@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CampaignListType extends AbstractType
 {
-    private bool $canViewOther;
+    private readonly bool $canViewOther;
 
     public function __construct(
         private readonly CampaignModel $model,

@@ -23,8 +23,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 )]
 class UpdateCustomFieldCommand extends Command
 {
-    public function __construct(private readonly BackgroundService $backgroundService, private readonly TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly BackgroundService $backgroundService,
+        private readonly TranslatorInterface $translator,
+    ) {
         parent::__construct();
     }
 
