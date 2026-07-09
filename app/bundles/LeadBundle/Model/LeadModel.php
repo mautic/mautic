@@ -138,10 +138,7 @@ class LeadModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return LeadRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadRepository
     {
         /** @var LeadRepository $repo */
         $repo = $this->em->getRepository(Lead::class);
@@ -168,94 +165,71 @@ class LeadModel extends FormModel
 
     /**
      * Get the tags repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\TagRepository
      */
-    public function getTagRepository()
+    public function getTagRepository(): \Mautic\LeadBundle\Entity\TagRepository
     {
         return $this->em->getRepository(Tag::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\PointsChangeLogRepository
-     */
-    public function getPointLogRepository()
+    public function getPointLogRepository(): \Mautic\LeadBundle\Entity\PointsChangeLogRepository
     {
         return $this->em->getRepository(PointsChangeLog::class);
     }
 
     /**
      * Get the tags repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\UtmTagRepository
      */
-    public function getUtmTagRepository()
+    public function getUtmTagRepository(): \Mautic\LeadBundle\Entity\UtmTagRepository
     {
         return $this->em->getRepository(UtmTag::class);
     }
 
     /**
      * Get the tags repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadDeviceRepository
      */
-    public function getDeviceRepository()
+    public function getDeviceRepository(): \Mautic\LeadBundle\Entity\LeadDeviceRepository
     {
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadDevice::class);
     }
 
     /**
      * Get the lead event log repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadEventLogRepository
      */
-    public function getEventLogRepository()
+    public function getEventLogRepository(): \Mautic\LeadBundle\Entity\LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**
      * Get the frequency rules repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\FrequencyRuleRepository
      */
-    public function getFrequencyRuleRepository()
+    public function getFrequencyRuleRepository(): \Mautic\LeadBundle\Entity\FrequencyRuleRepository
     {
         return $this->em->getRepository(FrequencyRule::class);
     }
 
     /**
      * Get the Stages change log repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\StagesChangeLogRepository
      */
-    public function getStagesChangeLogRepository()
+    public function getStagesChangeLogRepository(): \Mautic\LeadBundle\Entity\StagesChangeLogRepository
     {
         return $this->em->getRepository(StagesChangeLog::class);
     }
 
     /**
      * Get the lead categories repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadCategoryRepository
      */
-    public function getLeadCategoryRepository()
+    public function getLeadCategoryRepository(): \Mautic\LeadBundle\Entity\LeadCategoryRepository
     {
         return $this->em->getRepository(LeadCategory::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\MergeRecordRepository
-     */
-    public function getMergeRecordRepository()
+    public function getMergeRecordRepository(): \Mautic\LeadBundle\Entity\MergeRecordRepository
     {
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\MergeRecord::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\LeadListRepository
-     */
-    public function getLeadListRepository()
+    public function getLeadListRepository(): \Mautic\LeadBundle\Entity\LeadListRepository
     {
         return $this->em->getRepository(LeadList::class);
     }
@@ -353,8 +327,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, ?Event $event = null): ?Event
@@ -393,9 +365,6 @@ class LeadModel extends FormModel
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$event instanceof Event) {
@@ -407,9 +376,6 @@ class LeadModel extends FormModel
         return $this->dispatchEvent($action, $entity, $isNew, $event);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
     {
         if (count($entitiesBatchParams) < 1) {
@@ -530,7 +496,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param object $entity
+     * @param Lead $entity
      */
     public function deleteEntity($entity): void
     {
@@ -877,7 +843,7 @@ class LeadModel extends FormModel
     /**
      * @param bool $returnWithQueryFields
      *
-     * @return array|Lead
+     * @return array{Lead, mixed[]}|Lead
      */
     public function checkForDuplicateContact(array $queryFields, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
@@ -1048,12 +1014,12 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param array<mixed>    $data
-     * @param array<LeadList> $leadLists
+     * @param array<string, mixed> $data
+     * @param array<LeadList>      $leadLists
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true): bool
+    public function setFrequencyRules(Lead $lead, array $data, $leadLists, $persist = true): bool
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1755,12 +1721,12 @@ class LeadModel extends FormModel
 
         $this->logger->debug('CONTACT: Adding '.implode(', ', $tags).' to contact ID# '.$lead->getId());
 
-        array_walk($tags, function (&$val): void {
+        array_walk($tags, function (string &$val): void {
             $val = html_entity_decode(trim($val), ENT_QUOTES);
             $val = InputHelper::_($val, 'string');
         });
         // Remove any tags that became empty after filtering
-        $tags = array_filter($tags, fn ($tag): bool => strlen($tag) > 0);
+        $tags = array_filter($tags, fn (string $tag): bool => '' !== $tag);
 
         // See which tags already exist
         $foundTags = $this->getTagRepository()->getTagsByName($tags);
@@ -1800,7 +1766,7 @@ class LeadModel extends FormModel
                 $val = InputHelper::_($val, 'string');
             });
             // Remove any tags that became empty after filtering
-            $removeTags = array_filter($removeTags, fn ($tag): bool => strlen($tag) > 0);
+            $removeTags = array_filter($removeTags, fn (string $tag): bool => '' !== $tag);
 
             // See which tags really exist
             $foundRemoveTags = $this->getTagRepository()->getTagsByName($removeTags);
@@ -2205,9 +2171,6 @@ class LeadModel extends FormModel
         return false;
     }
 
-    /**
-     * Get contact channels.
-     */
     public function getContactChannels(Lead $lead): array
     {
         $allChannels = $this->getPreferenceChannels();

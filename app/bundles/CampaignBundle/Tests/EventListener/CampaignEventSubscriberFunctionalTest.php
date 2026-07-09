@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception

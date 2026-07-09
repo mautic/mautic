@@ -106,7 +106,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
-    public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event): false|CampaignExecutionEvent
     {
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();
@@ -152,7 +152,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult($result);
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): bool|CampaignExecutionEvent
     {
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();

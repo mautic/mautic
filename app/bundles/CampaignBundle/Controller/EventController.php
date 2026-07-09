@@ -205,7 +205,7 @@ class EventController extends CommonFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function editAction(Request $request, string $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
@@ -377,7 +377,7 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
             if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
                 $event['settings'] = $events[$event['eventType']][$event['type']];
@@ -444,7 +444,7 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $events = $this->eventCollector->getEventsArray();
             if (isset($event['eventType'], $event['type']) && isset($events[$event['eventType']][$event['type']])) {
                 $event['settings'] = $events[$event['eventType']][$event['type']];
@@ -511,7 +511,7 @@ class EventController extends CommonFormController
 
         $event = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
-        if ('POST' == $request->getMethod() && null !== $event) {
+        if ('POST' === $request->getMethod() && null !== $event) {
             $keyId          = 'new'.hash('sha1', uniqid((string) mt_rand()));
             $event['id']    = $event['tempId']    = $keyId;
             $session->set('mautic.campaign.events.clone.storage', $event);

@@ -39,7 +39,7 @@ final readonly class MenuHelper
         foreach ($attributes as $name => $value) {
             $name  = trim($name);
             $value = trim($value);
-            if ($name == $value) {
+            if ($name === $value) {
                 $string .= " $name";
             } else {
                 $string .= " $name=\"$value\"";

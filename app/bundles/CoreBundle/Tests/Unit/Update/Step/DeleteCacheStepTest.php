@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\CacheHelper;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Update\Step\DeleteCacheStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DeleteCacheStepTest extends AbstractStepTestCase
+final class DeleteCacheStepTest extends AbstractStepTestCase
 {
     /**
      * @var MockObject&CacheHelper

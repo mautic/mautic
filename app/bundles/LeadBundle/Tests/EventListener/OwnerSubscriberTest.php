@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,9 +37,11 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class OwnerSubscriberTest extends TestCase
+final class OwnerSubscriberTest extends TestCase
 {
-    /** @var array<int, array<string, int|string|null>> */
+    /**
+     * @var array<int, array<string, int|string|null>>
+     */
     protected array $contacts = [
         [
             'id'        => 1,

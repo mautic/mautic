@@ -720,12 +720,11 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param array  $vars
      * @param bool   $returnContent
      *
      * @return void|string
      */
-    public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
     {
         $content = $this->twig->render($template, $vars);
 
@@ -877,7 +876,7 @@ class MailHelper
             $addresses = [$addresses => $name];
         } elseif (0 === array_keys($addresses)[0]) {
             // We need an array of $email => $name pairs
-            $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
+            $addresses = array_reduce($addresses, function (array $address, $item) use ($name): array {
                 $address[$item] = $name;
 
                 return $address;
@@ -1105,9 +1104,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
@@ -1283,8 +1281,6 @@ class MailHelper
     }
 
     /**
-     * Set custom headers.
-     *
      * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true): void
@@ -1350,10 +1346,7 @@ class MailHelper
         return true;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
             $lead    = $this->getLead();
@@ -1774,14 +1767,16 @@ class MailHelper
 
     /**
      * Generate bounce email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
@@ -1796,14 +1791,16 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
@@ -1818,13 +1815,11 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @return string|null
      */
-    protected function cleanName($name)
+    protected function cleanName(?string $name): ?string
     {
         if (null === $name) {
-            return $name;
+            return null;
         }
 
         $name = trim(html_entity_decode($name, ENT_QUOTES));

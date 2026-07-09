@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\IntegrationsBundle\Tests\Unit;
 
 use Doctrine\ORM\EntityManager;
@@ -21,7 +23,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTest extends TestCase
+final class AbstractIntegrationTest extends TestCase
 {
     public function testParseCallbackResponseWithUTF8StringThatContainsControlChars(): void
     {
@@ -41,7 +43,9 @@ JSON;
         self::assertArrayHasKey('webinars', $json);
     }
 
-    /** @phpstan-ignore return.deprecatedClass */
+    /**
+     * @phpstan-ignore return.deprecatedClass
+     */
     private function buildAbstractIntegrationDouble(): AbstractIntegration
     {
         // creating a double since we can't instantiate

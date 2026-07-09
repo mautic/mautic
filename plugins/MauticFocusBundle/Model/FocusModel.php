@@ -91,18 +91,12 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         return $formFactory->create(FocusType::class, $entity, $options);
     }
 
-    /**
-     * @return \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
-     */
-    public function getRepository()
+    public function getRepository(): \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
     {
         return $this->em->getRepository(Focus::class);
     }
 
-    /**
-     * @return \MauticPlugin\MauticFocusBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \MauticPlugin\MauticFocusBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }
@@ -120,8 +114,8 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Focus      $entity
-     * @param bool|false $unlock
+     * @param Focus $entity
+     * @param bool  $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {

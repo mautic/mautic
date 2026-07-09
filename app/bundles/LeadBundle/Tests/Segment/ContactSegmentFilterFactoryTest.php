@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Entity\LeadList;
@@ -13,7 +15,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterFactory::class)]
-class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testLeadFilter(): void
     {

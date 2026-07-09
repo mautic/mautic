@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\DAO;
 
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
@@ -9,7 +11,7 @@ use Mautic\StatsBundle\Aggregate\Collection\Stats\WeekStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\YearStat;
 use PHPUnit\Framework\TestCase;
 
-class StatsDAOTest extends TestCase
+final class StatsDAOTest extends TestCase
 {
     public function testGetYearsReturnsYears(): void
     {
@@ -21,7 +23,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getYears();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat): void {
+        array_walk($stats, function (YearStat $stat): void {
             $this->assertInstanceOf(YearStat::class, $stat);
         });
     }
@@ -37,7 +39,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getMonths();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat): void {
+        array_walk($stats, function (MonthStat $stat): void {
             $this->assertInstanceOf(MonthStat::class, $stat);
         });
     }
@@ -53,7 +55,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getWeeks();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat): void {
+        array_walk($stats, function (WeekStat $stat): void {
             $this->assertInstanceOf(WeekStat::class, $stat);
         });
     }
@@ -70,7 +72,7 @@ class StatsDAOTest extends TestCase
         $stats = $this->getStats()->getDays();
         $this->assertSame($expected, array_keys($stats));
 
-        array_walk($stats, function ($stat): void {
+        array_walk($stats, function (DayStat $stat): void {
             $this->assertInstanceOf(DayStat::class, $stat);
         });
     }

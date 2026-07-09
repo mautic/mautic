@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -141,13 +143,13 @@ abstract class StandardImportTestHelper extends CommonMocks
         $this->entityManager  = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
-        /** @var MockObject&UserHelper */
+        /** @var MockObject&UserHelper $userHelper */
         $userHelper = $this->createMock(UserHelper::class);
 
-        /** @var MockObject&LeadEventLogRepository */
+        /** @var MockObject&LeadEventLogRepository $logRepository */
         $logRepository = $this->createMock(LeadEventLogRepository::class);
 
-        /** @var MockObject&ImportRepository */
+        /** @var MockObject&ImportRepository $importRepository */
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->method('getValue')

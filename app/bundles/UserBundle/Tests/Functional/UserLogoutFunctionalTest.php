@@ -11,7 +11,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class UserLogoutFunctionalTest extends MauticMysqlTestCase
+final class UserLogoutFunctionalTest extends MauticMysqlTestCase
 {
     public function testLogout(): void
     {

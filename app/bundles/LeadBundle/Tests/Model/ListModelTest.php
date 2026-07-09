@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ListModelTest extends TestCase
+final class ListModelTest extends TestCase
 {
     protected ?MockObject $fixture = null;
 
@@ -98,7 +98,9 @@ class ListModelTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /** @param array<int, mixed> $getLookupResultsReturn */
+    /**
+     * @param array<int, mixed> $getLookupResultsReturn
+     */
     private function prepareMockForTestGetSourcesLists(array $getLookupResultsReturn): void
     {
         $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
@@ -132,7 +134,9 @@ class ListModelTest extends TestCase
         $this->fixture = $mockListModel;
     }
 
-    /** @return array<int, array{0: array<int, mixed>, 1: string|null, 2: array<string|int, mixed>}> */
+    /**
+     * @return array<int, array{0: array<int, mixed>, 1: string|null, 2: array<string|int, mixed>}>
+     */
     public static function sourceTypeTestDataProvider(): array
     {
         return [

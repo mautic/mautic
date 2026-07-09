@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
+final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {
@@ -44,6 +44,10 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             {
             }
 
+            /**
+             * @param object $entity
+             * @param bool   $flush
+             */
             public function saveEntity($entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;
@@ -64,6 +68,10 @@ class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
                 return null;
             }
 
+            /**
+             * @param object $entity
+             * @param bool   $flush
+             */
             public function saveEntity($entity, $flush = true): void
             {
                 ++$this->saveEntityCallCount;

@@ -128,6 +128,7 @@ class PublicController extends CommonFormController
         $isOneClickUnsubscribe  = $request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe');
         $isUnsubscribeAll       = $request->get('unsubscribe_all');
         $showContactPreferences = $this->coreParametersHelper->get('show_contact_preferences');
+        $isHeadRequest          = $request->isMethod(Request::METHOD_HEAD);
 
         if ($request->isMethod(Request::METHOD_POST) && 'One-Click' === $request->get('List-Unsubscribe')) {
             return $this->oneClickUnsubscribe($model, $stat);
@@ -188,7 +189,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            if (!$showContactPreferences || $isUnsubscribeAll) {
+            if (!$isHeadRequest && (!$showContactPreferences || $isUnsubscribeAll)) {
                 if (!empty($stat)) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
                 } elseif ($lead && $lead instanceof Lead) {
@@ -686,7 +687,7 @@ class PublicController extends CommonFormController
         return $repo->getLeadByEmail($email);
     }
 
-    public function getUnsubscribeMessage($idHash, $model, $stat, $translator): string
+    public function getUnsubscribeMessage(string $idHash, $model, $stat, TranslatorInterface $translator): string
     {
         $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 

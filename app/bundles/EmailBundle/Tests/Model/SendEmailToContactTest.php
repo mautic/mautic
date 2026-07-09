@@ -40,7 +40,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<array<string,int|string>>

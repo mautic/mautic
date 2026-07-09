@@ -1883,7 +1883,7 @@ class LeadController extends FormController
             $this->throwAccessDenied();
         }
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             /** @var LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $request->request->all()['lead_batch_owner'] ?? [];
@@ -2252,7 +2252,7 @@ class LeadController extends FormController
         $iterator = new IteratorExportDataModel(
             $model,
             $args,
-            fn ($contact): array => $exportHelper->parseLeadToExport($contact)
+            fn (Lead $contact): array => $exportHelper->parseLeadToExport($contact)
         );
         $response = $this->exportResultsAs($iterator, $fileType, 'contacts', $exportHelper);
 

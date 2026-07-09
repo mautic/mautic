@@ -45,6 +45,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(ListModel::class, $this->listModel);
         $this->listRepo = $this->listModel->getRepository();
         $this->assertInstanceOf(LeadListRepository::class, $this->listRepo);
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $leadModel);
         $this->segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
@@ -564,7 +565,9 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
     }
 
-    /** @param array<int, array<string, mixed>>|null $filters */
+    /**
+     * @param array<int, array<string, mixed>>|null $filters
+     */
     private function saveSegment(string $name, string $alias, ?array $filters = null, ?LeadList $segment = null): LeadList
     {
         $segment ??= new LeadList();

@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportHelperTest extends TestCase
+final class ExportHelperTest extends TestCase
 {
     private MockObject&TranslatorInterface $translatorInterfaceMock;
 
@@ -367,7 +367,7 @@ class ExportHelperTest extends TestCase
      */
     private function removeBomUtf8(string $s): string
     {
-        if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
+        if (substr($s, 0, 3) === chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
             return substr($s, 3);
         }
 

@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use PHPUnit\Framework\TestCase;
 
-class ValueHelperTest extends TestCase
+final class ValueHelperTest extends TestCase
 {
     public function testExceptionForMissingRequiredIntegrationValue(): void
     {

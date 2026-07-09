@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
-class SsoAuthenticatorTest extends TestCase
+final class SsoAuthenticatorTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\DataProvider('provideIsPost')]
     public function testIsPost(string $method, bool $isPost, bool $expected): void
@@ -56,7 +56,7 @@ class SsoAuthenticatorTest extends TestCase
         $request = new Request();
         $request->server->set('REQUEST_METHOD', $method);
 
-        if (true === $expected) {
+        if ($expected) {
             $httpUtils->method('checkRequestPath')
                 ->with($request, $path)
                 ->willReturn(true);

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
 use Symfony\Component\HttpFoundation\Request;
 
-class ProfileControllerTest extends MauticMysqlTestCase
+final class ProfileControllerTest extends MauticMysqlTestCase
 {
     use CreateEntityTrait;
     use LoginUserWithSamlTrait;

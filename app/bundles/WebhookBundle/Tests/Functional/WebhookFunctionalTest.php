@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityRepository;
@@ -21,26 +23,20 @@ use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WebhookFunctionalTest extends MauticMysqlTestCase
+final class WebhookFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
     protected $useCleanupRollback = false;
 
-    /**
-     * @var WebhookQueueRepository
-     */
-    private $webhookQueueRepository;
+    private WebhookQueueRepository $webhookQueueRepository;
 
-    /**
-     * @var NotificationRepository
-     */
-    private $notificationRepository;
+    private NotificationRepository $notificationRepository;
 
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private $webhhokRepository;
+    private \Mautic\WebhookBundle\Entity\WebhookRepository|EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {

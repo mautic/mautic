@@ -175,7 +175,7 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * @param Campaign             &$entity
+     * @param Campaign             $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
@@ -267,7 +267,7 @@ class CampaignApiController extends CommonApiController
                 fn (Event $event): ConstraintViolationListInterface => $this->validator->validate($event),
                 $entity->getEvents()->toArray()
             ),
-            fn ($error): bool => $error->count() > 0
+            fn (ConstraintViolationListInterface $error): bool => $error->count() > 0
         );
 
         if (count($eventViolations) > 0) {

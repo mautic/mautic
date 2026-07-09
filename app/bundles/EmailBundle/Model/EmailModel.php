@@ -141,18 +141,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $this->emailStatModel->getRepository();
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\CopyRepository
-     */
-    public function getCopyRepository()
+    public function getCopyRepository(): \Mautic\EmailBundle\Entity\CopyRepository
     {
         return $this->em->getRepository(\Mautic\EmailBundle\Entity\Copy::class);
     }
 
-    /**
-     * @return \Mautic\EmailBundle\Entity\StatDeviceRepository
-     */
-    public function getStatDeviceRepository()
+    public function getStatDeviceRepository(): \Mautic\EmailBundle\Entity\StatDeviceRepository
     {
         return $this->em->getRepository(StatDevice::class);
     }
@@ -799,7 +793,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param Email|int $email
      * @param bool      $includeVariants
      */
-    public function getEmailDeviceStats($email, $includeVariants = false, $dateFrom = null, $dateTo = null): array
+    public function getEmailDeviceStats($email, $includeVariants = false, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null): array
     {
         if (!$email instanceof Email) {
             $email = $this->getEntity($email);
@@ -1350,17 +1344,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param $options = array()
-     *                 array source array('model', 'id')
-     *                 array emailSettings
-     *                 int   listId
-     *                 bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                 bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                 array assetAttachments Array of optional Asset IDs to attach
+     * @param mixed[] $options = array()
+     *                         array source array('model', 'id')
+     *                         array emailSettings
+     *                         int   listId
+     *                         bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
+     *                         bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                         array assetAttachments Array of optional Asset IDs to attach
      *
      * @return string[]|bool|string|null
      */
-    public function sendEmail(Email $email, $leads, $options = [])
+    public function sendEmail(Email $email, $leads, array $options = [])
     {
         $listId              = ArrayHelper::getValue('listId', $options);
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
@@ -1580,10 +1574,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array|int $users
-     * @param bool      $saveStat
+     * @param mixed[]|int $users
+     * @param bool        $saveStat
      *
-     * @return bool|string[]
+     * @return false|string[]
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -1597,7 +1591,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         array $to = [],
         array $cc = [],
         array $bcc = [],
-    ) {
+    ): false|array {
         if (!$emailId = $email->getId()) {
             return false;
         }
@@ -1648,7 +1642,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
-            if (true === $firstMail) {
+            if ($firstMail) {
                 try {
                     $this->flushQueue($mailer);
                 } catch (EmailCouldNotBeSentException $e) {
@@ -1697,7 +1691,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // If this is the first message, flush the queue. This process clears the cc and bcc.
-            if (true === $firstMail) {
+            if ($firstMail) {
                 try {
                     $this->flushQueue($mailer);
                 } catch (EmailCouldNotBeSentException $e) {
@@ -1766,7 +1760,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return bool|DoNotContact
      */
-    public function setDoNotContact(Stat $stat, $comments, $reason = DoNotContact::BOUNCED, $flush = true)
+    public function setDoNotContact(Stat $stat, ?string $comments, $reason = DoNotContact::BOUNCED, $flush = true)
     {
         $lead = $stat->getLead();
 
@@ -1809,11 +1803,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param int    $reason
-     * @param string $comments
-     * @param bool   $flush
+     * @param int  $reason
+     * @param bool $flush
      */
-    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, $comments = '', $flush = true, $leadId = null): array
+    public function setEmailDoNotContact($email, $reason = DoNotContact::BOUNCED, ?string $comments = '', $flush = true, $leadId = null): array
     {
         /** @var \Mautic\LeadBundle\Entity\LeadRepository $leadRepo */
         $leadRepo = $this->em->getRepository(Lead::class);
@@ -1920,9 +1913,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get line chart data of emails sent and read.
      *
-     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string|null $dateFormat
-     * @param bool        $canViewOthers
      *
      * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
      */
@@ -1932,7 +1924,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         \DateTime $dateTo,
         $dateFormat = null,
         array $filter = [],
-        $canViewOthers = true,
+        bool $canViewOthers = true,
     ): array {
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setCanViewOthers($canViewOthers);
@@ -2047,7 +2039,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Get pie chart data of ignored vs opened emails.
      */
-    public function getDeviceGranularityPieChartData($dateFrom, $dateTo): array
+    public function getDeviceGranularityPieChartData(?\DateTime $dateFrom, ?\DateTime $dateTo): array
     {
         $chart = new PieChart();
 
@@ -2232,12 +2224,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array                   $tokens
      * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
      * @param bool                    $saveStat
      *
-     * @return bool|string[]
+     * @return false|mixed[]
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -2245,10 +2236,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $email,
         $users,
         $leadFields = null,
-        $tokens = [],
+        array $tokens = [],
         $assetAttachments = [],
         $saveStat = true,
-    ) {
+    ): false|array {
         if (!$emailId = $email->getId()) {
             return false;
         }
@@ -2387,14 +2378,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param string                                   $route
      * @param array<string, string>|array<string, int> $routeParams
      * @param bool                                     $absolute
      * @param array<array<string>>                     $clickthrough
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 
@@ -2420,13 +2410,38 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws \Psr\Cache\InvalidArgumentException
      */
+    public function invalidatePendingCountCache(int $emailId): void
+    {
+        $this->cacheStorageHelper->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function invalidatePendingCountCacheForList(int $listId): void
+    {
+        foreach ($this->getRepository()->getSegmentEmailIdsByListId($listId) as $emailId) {
+            $this->invalidatePendingCountCache($emailId);
+        }
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     protected function setCachedCount(mixed $entity): void
     {
-        $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
-        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+        $queued = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
         if (false !== $queued) {
             $entity->setQueuedCount($queued);
+        }
+
+        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+
+        if (false === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
+            $entity->setPendingCount($this->getPendingLeads($entity, null, true));
+
+            return;
         }
 
         if (false !== $pending) {

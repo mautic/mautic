@@ -341,7 +341,7 @@ class CategoryController extends AbstractFormController
         $form['inForm']->setData($inForm);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -594,7 +594,7 @@ class CategoryController extends AbstractFormController
     private function getInFormValue(Request $request, string $method): int
     {
         $inForm = $request->get('inForm', 0);
-        if (Request::METHOD_POST == $method) {
+        if (Request::METHOD_POST === $method) {
             $category_form = $request->request->all()['category_form'] ?? [];
             $inForm        = $category_form['inForm'] ?? 0;
         }

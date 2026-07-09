@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
@@ -29,7 +30,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
+final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     use LeadFieldTestTrait;
 
@@ -435,6 +436,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $lead3      = $this->createContact('test_true_'.uniqid().'@example.com');
         $contactId3 = $lead3->getId();
 
+        /** @var LeadModel $leadModel */
         $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
 
         $leadModel->setFieldValues($lead1, [
@@ -1087,6 +1089,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         // Create a contact and set the custom field value
         $contact   = $this->createContact('john.doe@example.com');
+        /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $leadModel->setFieldValues($contact, ['test_date' => $fieldValue]);
         $leadModel->saveEntity($contact);
@@ -1123,6 +1126,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectedResult, $event->getResult(), 'Regex operator should not cause exception and should match as expected.');
 
         // Clean up
+        /** @var FieldModel $fieldModel */
         $fieldModel = static::getContainer()->get('mautic.lead.model.field');
         $field      = $fieldModel->getEntityByAlias('test_date');
         if ($field) {

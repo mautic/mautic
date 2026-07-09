@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\DependencyInjection\Compiler;
 
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -8,7 +10,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SmsTransportPassTest extends TestCase
+final class SmsTransportPassTest extends TestCase
 {
     public function testProcess(): void
     {

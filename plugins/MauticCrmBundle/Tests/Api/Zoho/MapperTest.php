@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho;
 
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Mapper::class)]
-class MapperTest extends \PHPUnit\Framework\TestCase
+final class MapperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>
@@ -40,7 +42,9 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var array<string, string> */
+    /**
+     * @var array<string, string>
+     */
     protected array $mappedFields = [
         'Company'   => 'company',
         'Email'     => 'email',
@@ -49,7 +53,9 @@ class MapperTest extends \PHPUnit\Framework\TestCase
         'LastName'  => 'lastname',
     ];
 
-    /** @var array<int, array<string, int|string|null>> */
+    /**
+     * @var array<int, array<string, int|string|null>>
+     */
     protected array $contacts = [
         [
             'firstname'             => 'FirstName1',

@@ -297,7 +297,7 @@ class QueryBuilder extends BaseQueryBuilder
     public function getTableAliases()
     {
         $queryParts = $this->getQueryParts();
-        $tables     = array_reduce($queryParts['from'], function ($result, $item) {
+        $tables     = array_reduce($queryParts['from'], function (array $result, array $item): array {
             $result[$item['table']] = $item['alias'];
 
             return $result;
@@ -389,7 +389,7 @@ class QueryBuilder extends BaseQueryBuilder
         $glue = strtolower($glue);
 
         //  Different handling
-        if ('or' == $glue) {
+        if ('or' === $glue) {
             //  Is this the first condition in query builder?
             if (!is_null($this->getQueryPart('where'))) {
                 // Are the any queued conditions?

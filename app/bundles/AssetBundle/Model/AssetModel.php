@@ -89,7 +89,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      * @throws \Doctrine\ORM\ORMException
      * @throws \Exception
      */
-    public function trackDownload($asset, $request = null, int $code = 200, $systemEntry = []): void
+    public function trackDownload(Asset $asset, $request = null, int $code = 200, $systemEntry = []): void
     {
         // Don't skew results with in-house downloads
         if (empty($systemEntry) && !$this->security->isAnonymous()) {
@@ -280,18 +280,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\AssetRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
     {
         return $this->em->getRepository(Asset::class);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\DownloadRepository
-     */
-    public function getDownloadRepository()
+    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
     {
         return $this->em->getRepository(Download::class);
     }
@@ -454,10 +448,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         return $number;
     }
 
-    /**
-     * @return int|string
-     */
-    public function getTotalFilesize($assets)
+    public function getTotalFilesize($assets): int|string
     {
         $firstAsset = is_array($assets) ? reset($assets) : false;
         if ($assets instanceof PersistentCollection || is_object($firstAsset)) {
@@ -606,7 +597,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * Asset-specific override for legacy public asset URLs.
      *

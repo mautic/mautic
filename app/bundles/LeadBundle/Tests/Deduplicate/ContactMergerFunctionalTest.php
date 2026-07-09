@@ -17,9 +17,11 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
     public function testMergedContactFound(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $model);
 
+        /** @var ContactMerger $merger */
         $merger = static::getContainer()->get('mautic.lead.merger');
         $this->assertInstanceOf(ContactMerger::class, $merger);
 
@@ -71,12 +73,14 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
     public function testMergedContactsPointsAreAccurate(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $model);
 
         $em = static::getContainer()->get('doctrine.orm.entity_manager');
         $this->assertInstanceOf(EntityManager::class, $em);
 
+        /** @var ContactMerger $merger */
         $merger = static::getContainer()->get('mautic.lead.merger');
         $this->assertInstanceOf(ContactMerger::class, $merger);
 
@@ -138,15 +142,19 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
     public function testMergedContactKeepsCompanyAssociations(): void
     {
+        /** @var LeadModel $model */
         $model = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $model);
 
+        /** @var CompanyModel $companyModel */
         $companyModel = static::getContainer()->get('mautic.lead.model.company');
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
+        /** @var ContactMerger $merger */
         $merger = static::getContainer()->get('mautic.lead.merger');
         $this->assertInstanceOf(ContactMerger::class, $merger);
 
+        /** @var CompanyLeadRepository $companyLeadRepository */
         $companyLeadRepository = static::getContainer()->get('mautic.lead.repository.company_lead');
         $this->assertInstanceOf(CompanyLeadRepository::class, $companyLeadRepository);
 

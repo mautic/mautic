@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Event\JobExtendTimeEvent;
@@ -21,7 +23,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporterTest extends \PHPUnit\Framework\TestCase
+final class ReportExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcessExport(): void
     {

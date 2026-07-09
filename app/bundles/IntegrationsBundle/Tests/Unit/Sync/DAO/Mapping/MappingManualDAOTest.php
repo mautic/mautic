@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use PHPUnit\Framework\TestCase;
 
-class MappingManualDAOTest extends TestCase
+final class MappingManualDAOTest extends TestCase
 {
     private string $integrationName       = 'Test';
 

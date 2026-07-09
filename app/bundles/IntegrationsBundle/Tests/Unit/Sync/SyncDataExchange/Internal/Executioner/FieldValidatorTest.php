@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldValidatorTest extends TestCase
+final class FieldValidatorTest extends TestCase
 {
     /**
      * @var MockObject&LeadFieldRepository

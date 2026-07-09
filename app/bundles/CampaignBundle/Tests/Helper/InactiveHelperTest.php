@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class InactiveHelperTest extends TestCase
+final class InactiveHelperTest extends TestCase
 {
     /**
      * @var MockObject&EventScheduler
@@ -85,19 +87,19 @@ class InactiveHelperTest extends TestCase
                 $leadNegative3->getId() => \DateTime::createFromFormat('Y-m-d H:i:s', '2022-05-28 21:37:00'),
             ]);
 
-        /** @var LeadEventLog&MockObject */
+        /** @var LeadEventLog&MockObject $log */
         $log = $this->createMock(LeadEventLog::class);
         $log->expects($this->exactly(3))
             ->method('getNonActionPathTaken')
             ->willReturnOnConsecutiveCalls(1, 0, 1);
 
-        /** @var Campaign&MockObject */
+        /** @var Campaign&MockObject $campaign */
         $campaign = $this->createMock(Campaign::class);
         $campaign->expects($this->any())
             ->method('getId')
             ->willReturn(2);
 
-        /** @var Event&MockObject */
+        /** @var Event&MockObject $parentEvent */
         $parentEvent = $this->createMock(Event::class);
         $parentEvent->expects($this->exactly(4))
             ->method('getLogByContactAndRotation')

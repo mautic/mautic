@@ -14,18 +14,14 @@ import grapesjsckeditor from './plugins/grapesjs-ckeditor';
 import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
 import grapesjsImageLink from './plugins/grapesjs-image-link';
 import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
-import contentService from 'grapesjs-preset-mautic/dist/content.service';
-import grapesjsmautic from 'grapesjs-preset-mautic';
-import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
+import contentService from './preset-mautic/content.service';
+import grapesjsmautic from './preset-mautic';
+import editorFontsService from './preset-mautic/editorFonts/editorFonts.service';
 import StorageService from './storage.service';
-
-// for local dev
-// import contentService from '../../../../../../grapesjs-preset-mautic/src/content.service';
-// import grapesjsmautic from '../../../../../../grapesjs-preset-mautic/src';
 
 import CodeModeButton from './codeMode/codeMode.button';
 import CompCopyPaste from './commands/compCopyPaste';
-import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import MjmlService from './preset-mautic/mjml/mjml.service';
 import MjmlStylesService from './mjmlStyles.service';
 import EditorStateService from './editorState.service';
 
@@ -685,10 +681,13 @@ export default class BuilderService {
     this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
     this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
 
-    this.editor.on('load', () => this.normalizeTextComponentContainers());
-    this.editor.on('component:add', (component) =>
-      this.normalizeTextComponentContainers(component)
-    );
+    this.editor.on('load', () => {
+      if (this.isPageContext()) {
+        this.addMobileCssFix();
+      }
+      this.normalizeTextComponentContainers();
+    });
+    this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('mautic:code-editor-update', () => this.normalizeTextComponentContainers());
 
@@ -1544,6 +1543,21 @@ export default class BuilderService {
           order: -1,
         });
       }
+    });
+  }
+
+  addMobileCssFix() {
+    const cssc = this.editor.CssComposer;
+    if (!cssc || typeof cssc.setRule !== 'function') {
+      return;
+    }
+
+    cssc.setRule('.gjs-cell, .gjs-cell30, .gjs-cell70', {
+      height: 'auto',
+    }, {
+      atRuleType: 'media',
+      atRuleParams: '(max-width: 768px)',
+      addStyles: true,
     });
   }
 

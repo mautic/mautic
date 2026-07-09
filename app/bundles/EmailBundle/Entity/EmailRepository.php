@@ -70,7 +70,7 @@ class EmailRepository extends CommonRepository
      *
      * @return false|array{id: numeric-string, unsubscribed: bool, bounced: bool, manual: bool, comments: string}
      */
-    public function checkDoNotEmail($email)
+    public function checkDoNotEmail($email): false|array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('dnc.*')
@@ -166,8 +166,6 @@ class EmailRepository extends CommonRepository
      * @param int|null       $maxContactId
      * @param bool           $countWithMaxMin
      * @param \DateTime|null $maxDate
-     *
-     * @return QueryBuilder|int|array
      */
     public function getEmailPendingQuery(
         $emailId,
@@ -182,7 +180,7 @@ class EmailRepository extends CommonRepository
         ?int $maxThreads = null,
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
-    ) {
+    ): array|int|QueryBuilder {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')
@@ -877,6 +875,34 @@ class EmailRepository extends CommonRepository
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getSegmentEmailIdsByListId(int $listId): array
+    {
+        $connection = $this->getEntityManager()->getConnection();
+
+        $includedIds = $connection->createQueryBuilder()
+            ->select('DISTINCT xref.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'xref')
+            ->innerJoin('xref', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = xref.email_id')
+            ->where('xref.leadlist_id = :listId')
+            ->andWhere("e.email_type = 'list'")
+            ->setParameter('listId', $listId)
+            ->fetchFirstColumn();
+
+        $excludedIds = $connection->createQueryBuilder()
+            ->select('DISTINCT excl.email_id')
+            ->from(MAUTIC_TABLE_PREFIX.'email_list_excluded', 'excl')
+            ->innerJoin('excl', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = excl.email_id')
+            ->where('excl.leadlist_id = :listId')
+            ->andWhere("e.email_type = 'list'")
+            ->setParameter('listId', $listId)
+            ->fetchFirstColumn();
+
+        return array_values(array_unique(array_map('intval', [...$includedIds, ...$excludedIds])));
     }
 
     private function getExcludedListQuery(int $emailId): ?QueryBuilder

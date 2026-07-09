@@ -467,10 +467,8 @@ class ImportModel extends FormModel
 
     /**
      * Save log about errored line.
-     *
-     * @param string $errorMessage
      */
-    public function logImportRowError(LeadEventLog $eventLog, $errorMessage): void
+    public function logImportRowError(LeadEventLog $eventLog, string $errorMessage): void
     {
         $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');
@@ -547,18 +545,12 @@ class ImportModel extends FormModel
         return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
-    /**
-     * @return ImportRepository
-     */
-    public function getRepository()
+    public function getRepository(): ImportRepository
     {
         return $this->em->getRepository(Import::class);
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getEventLogRepository()
+    public function getEventLogRepository(): LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }

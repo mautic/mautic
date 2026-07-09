@@ -167,7 +167,7 @@ class AssetGenerationHelper
                         "$assetsFullPath/css",
                         "$assetsFullPath/js",
                     ];
-                    array_walk($checkPaths, function ($path): void {
+                    array_walk($checkPaths, function (string $path): void {
                         if (!file_exists($path)) {
                             mkdir($path);
                         }
@@ -239,12 +239,11 @@ class AssetGenerationHelper
     /**
      * Finds directory assets.
      *
-     * @param string $dir
-     * @param string $ext
-     * @param string $env
-     * @param array  $assets
+     * @param mixed[] $assets
+     *
+     * @return array<string, false|int>
      */
-    protected function findAssets($dir, $ext, $env, &$assets): array
+    protected function findAssets(string $dir, string $ext, string $env, array &$assets): array
     {
         $rootPath    = str_replace('\\', '/', $this->pathsHelper->getSystemPath('assets_root').'/');
         $directories = new Finder();
@@ -280,7 +279,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ('prod' == $env) {
+                    if ('prod' === $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
                             $modifiedLast[$group] = $lastModified;
@@ -310,7 +309,7 @@ class AssetGenerationHelper
                 'relPath'  => $relPath,
             ];
 
-            if ('prod' == $env) {
+            if ('prod' === $env) {
                 $lastModified = filemtime($fullPath);
                 if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
                     $modifiedLast['app'] = $lastModified;

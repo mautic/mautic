@@ -17,7 +17,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class DashboardControllerFunctionalTest extends MauticMysqlTestCase
+final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -159,6 +159,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $contact = new Lead();
         $contact->setFirstName('John');
+        /** @var LeadModel $contactModel */
         $contactModel = self::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);

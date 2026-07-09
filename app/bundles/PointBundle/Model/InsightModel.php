@@ -41,10 +41,7 @@ class InsightModel extends CommonFormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return PointInsightRepository
-     */
-    public function getRepository()
+    public function getRepository(): PointInsightRepository
     {
         return $this->em->getRepository(PointInsight::class);
     }

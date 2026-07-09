@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormatterHelperTest extends \PHPUnit\Framework\TestCase
+final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface

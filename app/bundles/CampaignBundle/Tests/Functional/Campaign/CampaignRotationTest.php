@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class CampaignRotationTest extends MauticMysqlTestCase
+final class CampaignRotationTest extends MauticMysqlTestCase
 {
     private Campaign $campaignWithoutJump;
 
@@ -44,6 +45,7 @@ class CampaignRotationTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+        /** @var ContactTracker $contactTracker */
         $contactTracker               = static::getContainer()->get('mautic.tracker.contact');
         $this->campaignLeadRepository = static::getContainer()->get('mautic.campaign.repository.lead');
         $this->leadEventLogRepository = static::getContainer()->get('mautic.campaign.repository.lead_event_log');

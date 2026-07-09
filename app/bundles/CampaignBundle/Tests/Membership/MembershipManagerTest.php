@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Membership;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,7 +15,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\NullLogger;
 
-class MembershipManagerTest extends \PHPUnit\Framework\TestCase
+final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&Adder
@@ -109,8 +111,9 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
     public function testContactsAreAddedOrUpdated(): void
     {
         $contact = new class extends Lead {
-            public function __construct(private readonly int $id = 1)
-            {
+            public function __construct(
+                private readonly int $id = 1,
+            ) {
             }
 
             public function getId(): int
@@ -119,8 +122,9 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
             }
         };
         $contact2 = new class extends Lead {
-            public function __construct(private readonly int $id = 2)
-            {
+            public function __construct(
+                private readonly int $id = 2,
+            ) {
             }
 
             public function getId(): int
@@ -160,8 +164,9 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
     public function testContactsAreRemoved(): void
     {
         $contact = new class extends Lead {
-            public function __construct(private readonly int $id = 1)
-            {
+            public function __construct(
+                private readonly int $id = 1,
+            ) {
             }
 
             public function getId(): int
@@ -170,8 +175,9 @@ class MembershipManagerTest extends \PHPUnit\Framework\TestCase
             }
         };
         $contact2 = new class extends Lead {
-            public function __construct(private readonly int $id = 2)
-            {
+            public function __construct(
+                private readonly int $id = 2,
+            ) {
             }
 
             public function getId(): int

@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AssetControllerFunctionalTest extends AbstractAssetTestCase
+final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 {
     use ControllerTrait;
 
@@ -408,6 +408,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
+        /** @var RoleModel $roleModel */
         $roleModel = static::getContainer()->get('mautic.user.model.role');
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);

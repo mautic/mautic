@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Entity;
 
 use Doctrine\ORM\AbstractQuery;
@@ -9,7 +11,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
+final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -28,7 +30,7 @@ class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|MockObject
+     * @return QueryBuilder&MockObject
      */
     private function getQueryBuilderMock(): MockObject
     {

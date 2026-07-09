@@ -9,10 +9,9 @@ use Mautic\LeadBundle\Model\CompanyModel;
 class IdentifyCompanyHelper
 {
     /**
-     * @param array $data
      * @param mixed $lead
      */
-    public static function identifyLeadsCompany($data, $lead, CompanyModel $companyModel): array
+    public static function identifyLeadsCompany(array $data, $lead, CompanyModel $companyModel): array
     {
         $addContactToCompany = true;
 
@@ -116,10 +115,8 @@ class IdentifyCompanyHelper
      * Checks if email address' domain has a DNS MX record. Returns the domain if found.
      *
      * @param string $email
-     *
-     * @return string|false
      */
-    protected static function domainExists($email)
+    protected static function domainExists($email): false|string
     {
         if (!strstr($email, '@')) { // not a valid email adress
             return false;

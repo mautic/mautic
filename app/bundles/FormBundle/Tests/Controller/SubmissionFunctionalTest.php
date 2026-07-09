@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\PageBundle\Entity\Page;
@@ -1389,6 +1390,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
+        /** @var SubmissionModel $submissionModel */
         $submissionModel = static::getContainer()->get('mautic.form.model.submission');
         $submission      = $submissionModel->getEntity($submissionId);
         $submissionModel->deleteEntity($submission);

@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends MauticMysqlTestCase
+final class SegmentSubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -36,7 +36,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
 
-        $expectedTranslationString = implode(' ', array_map(fn ($trans) => $translator->trans($trans), $expectedTranslations));
+        $expectedTranslationString = implode(' ', array_map(fn (string $trans) => $translator->trans($trans), $expectedTranslations));
 
         $crawlerText = $crawler->filter('#leadlist_filters_0_properties')->filter('.alert')->text();
         $this->assertStringContainsString($expectedTranslationString, $crawlerText);
@@ -103,6 +103,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
+        /** @var ListModel $listModel */
         $listModel = $this->getContainer()->get('mautic.lead.model.list');
         $this->assertInstanceOf(ListModel::class, $listModel);
 

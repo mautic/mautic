@@ -20,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class SentHelperTest extends TestCase
+final class SentHelperTest extends TestCase
 {
     private DateTimeHelper $dateTimeHelper;
 

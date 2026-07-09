@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -18,7 +20,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ConfigTypeTest extends TypeTestCase
+final class ConfigTypeTest extends TypeTestCase
 {
     public function testSubmitEmptyTrustedHosts(): void
     {
@@ -129,7 +131,9 @@ class ConfigTypeTest extends TypeTestCase
         return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
     }
 
-    /** @return array<int, PreloadedExtension|ValidatorExtension> */
+    /**
+     * @return array<int, PreloadedExtension|ValidatorExtension>
+     */
     protected function getExtensions(): array
     {
         $validator = Validation::createValidator();

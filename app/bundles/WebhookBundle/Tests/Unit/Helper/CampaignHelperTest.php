@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -161,7 +163,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-        if ('application/json' == $type) {
+        if ('application/json' === $type) {
             array_push($sample['headers']['list'],
                 [
                     'label' => 'content-type',

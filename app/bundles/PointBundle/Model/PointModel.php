@@ -60,10 +60,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return PointRepository
-     */
-    public function getRepository()
+    public function getRepository(): PointRepository
     {
         return $this->em->getRepository(Point::class);
     }
@@ -190,7 +187,6 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         // find all the actions for published points
-        /** @var PointRepository $repo */
         $repo            = $this->getRepository();
         $availablePoints = $repo->getPublishedByType($type);
         if (empty($availablePoints)) {
