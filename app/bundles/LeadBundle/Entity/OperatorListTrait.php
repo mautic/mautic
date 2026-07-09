@@ -178,7 +178,7 @@ trait OperatorListTrait
      *
      * @return mixed[]
      */
-    public function getOperatorChoiceList($definition, $overrideHiddenOperators = []): array
+    public function getOperatorChoiceList(array $definition, $overrideHiddenOperators = []): array
     {
         static $operatorChoices = [];
         if (empty($operatorChoices)) {

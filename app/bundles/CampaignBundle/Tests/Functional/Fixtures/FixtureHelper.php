@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 final class FixtureHelper
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 

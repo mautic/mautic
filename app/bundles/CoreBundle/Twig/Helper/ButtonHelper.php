@@ -244,7 +244,7 @@ final class ButtonHelper
      * @param array<string,mixed> $button
      * @param int                 $buttonCount
      */
-    private function buildButton($button, $buttonCount = 0): string
+    private function buildButton(array $button, $buttonCount = 0): string
     {
         $buttons = '';
 
@@ -338,7 +338,7 @@ final class ButtonHelper
 
         uasort(
             $this->buttons,
-            function ($a, $b): int {
+            function (array $a, array $b): int {
                 $ap = (isset($a['priority']) ? (int) $a['priority'] : 0);
                 $bp = (isset($b['priority']) ? (int) $b['priority'] : 0);
 
@@ -388,7 +388,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function validatePriority(&$button): void
+    private function validatePriority(array &$button): void
     {
         if (!empty($button['primary'])) {
             if (!isset($button['priority']) || $button['priority'] < 200) {
@@ -402,7 +402,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function generateTextAttributes(&$button): string
+    private function generateTextAttributes(array &$button): string
     {
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
@@ -445,7 +445,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function addMobileResponsiveClasses(&$button): void
+    private function addMobileResponsiveClasses(array &$button): void
     {
         if (isset($button['confirm'])) {
             $change = &$button['confirm'];
@@ -464,7 +464,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function addButtonClasses(&$button): void
+    private function addButtonClasses(array &$button): void
     {
         if (isset($button['confirm'])) {
             $addTo = &$button['confirm'];
@@ -494,7 +494,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function removeButtonClasses(&$button): void
+    private function removeButtonClasses(array &$button): void
     {
         if (isset($button['confirm'])) {
             $removeFrom = &$button['confirm'];
