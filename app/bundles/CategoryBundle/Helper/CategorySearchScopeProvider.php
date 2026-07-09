@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CategorySearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private CategoryModel $categoryModel,
+        private readonly CategoryModel $categoryModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

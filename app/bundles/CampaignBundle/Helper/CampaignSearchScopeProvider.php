@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CampaignSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private CampaignModel $campaignModel,
+        private readonly CampaignModel $campaignModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

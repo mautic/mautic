@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class UserSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private UserModel $userModel,
+        private readonly UserModel $userModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

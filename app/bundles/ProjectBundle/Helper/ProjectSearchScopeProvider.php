@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ProjectSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private ProjectRepository $projectRepository,
+        private readonly ProjectRepository $projectRepository,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

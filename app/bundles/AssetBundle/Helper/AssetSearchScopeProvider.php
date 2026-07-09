@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class AssetSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private AssetModel $assetModel,
+        private readonly AssetModel $assetModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

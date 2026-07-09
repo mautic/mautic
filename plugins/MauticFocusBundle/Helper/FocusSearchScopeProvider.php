@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FocusSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private FocusModel $focusModel,
+        private readonly FocusModel $focusModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

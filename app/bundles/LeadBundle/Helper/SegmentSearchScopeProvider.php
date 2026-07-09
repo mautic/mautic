@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SegmentSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private ListModel $listModel,
+        private readonly ListModel $listModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

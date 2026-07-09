@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FieldSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private FieldModel $fieldModel,
+        private readonly FieldModel $fieldModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

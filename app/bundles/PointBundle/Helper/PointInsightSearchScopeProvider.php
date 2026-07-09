@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class PointInsightSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private InsightModel $insightModel,
+        private readonly InsightModel $insightModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

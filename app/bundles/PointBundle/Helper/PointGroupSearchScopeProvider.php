@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class PointGroupSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private PointGroupModel $pointGroupModel,
+        private readonly PointGroupModel $pointGroupModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

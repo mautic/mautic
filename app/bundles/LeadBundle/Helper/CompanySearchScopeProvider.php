@@ -13,8 +13,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CompanySearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private CompanyModel $companyModel,
-        private FieldList $fieldList,
+        private readonly CompanyModel $companyModel,
+        private readonly FieldList $fieldList,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

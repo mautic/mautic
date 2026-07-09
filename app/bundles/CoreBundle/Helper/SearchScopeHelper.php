@@ -99,7 +99,7 @@ final class SearchScopeHelper
         } else {
             $parts     = explode(':', $label);
             $formatted = implode(':', array_map(
-                static fn (string $part): string => ucfirst($part),
+                ucfirst(...),
                 $parts
             ));
         }

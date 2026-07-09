@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class DynamicContentSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private DynamicContentModel $dynamicContentModel,
+        private readonly DynamicContentModel $dynamicContentModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

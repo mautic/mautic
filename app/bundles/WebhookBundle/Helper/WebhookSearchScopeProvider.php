@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class WebhookSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private WebhookModel $webhookModel,
+        private readonly WebhookModel $webhookModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

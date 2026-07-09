@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TagSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private TagRepository $tagRepository,
+        private readonly TagRepository $tagRepository,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class StageSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private StageModel $stageModel,
+        private readonly StageModel $stageModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

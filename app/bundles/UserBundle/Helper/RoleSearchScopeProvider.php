@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class RoleSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private RoleModel $roleModel,
+        private readonly RoleModel $roleModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

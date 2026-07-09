@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TriggerSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private TriggerModel $triggerModel,
+        private readonly TriggerModel $triggerModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);

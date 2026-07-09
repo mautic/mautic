@@ -12,7 +12,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class EmailSearchScopeProvider extends AbstractSearchScopeProvider
 {
     public function __construct(
-        private EmailModel $emailModel,
+        private readonly EmailModel $emailModel,
         TranslatorInterface $translator,
     ) {
         parent::__construct($translator);
