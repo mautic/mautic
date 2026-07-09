@@ -138,10 +138,7 @@ class LeadModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return LeadRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadRepository
     {
         /** @var LeadRepository $repo */
         $repo = $this->em->getRepository(Lead::class);
@@ -168,94 +165,71 @@ class LeadModel extends FormModel
 
     /**
      * Get the tags repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\TagRepository
      */
-    public function getTagRepository()
+    public function getTagRepository(): \Mautic\LeadBundle\Entity\TagRepository
     {
         return $this->em->getRepository(Tag::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\PointsChangeLogRepository
-     */
-    public function getPointLogRepository()
+    public function getPointLogRepository(): \Mautic\LeadBundle\Entity\PointsChangeLogRepository
     {
         return $this->em->getRepository(PointsChangeLog::class);
     }
 
     /**
      * Get the tags repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\UtmTagRepository
      */
-    public function getUtmTagRepository()
+    public function getUtmTagRepository(): \Mautic\LeadBundle\Entity\UtmTagRepository
     {
         return $this->em->getRepository(UtmTag::class);
     }
 
     /**
      * Get the tags repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadDeviceRepository
      */
-    public function getDeviceRepository()
+    public function getDeviceRepository(): \Mautic\LeadBundle\Entity\LeadDeviceRepository
     {
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadDevice::class);
     }
 
     /**
      * Get the lead event log repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadEventLogRepository
      */
-    public function getEventLogRepository()
+    public function getEventLogRepository(): \Mautic\LeadBundle\Entity\LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }
 
     /**
      * Get the frequency rules repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\FrequencyRuleRepository
      */
-    public function getFrequencyRuleRepository()
+    public function getFrequencyRuleRepository(): \Mautic\LeadBundle\Entity\FrequencyRuleRepository
     {
         return $this->em->getRepository(FrequencyRule::class);
     }
 
     /**
      * Get the Stages change log repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\StagesChangeLogRepository
      */
-    public function getStagesChangeLogRepository()
+    public function getStagesChangeLogRepository(): \Mautic\LeadBundle\Entity\StagesChangeLogRepository
     {
         return $this->em->getRepository(StagesChangeLog::class);
     }
 
     /**
      * Get the lead categories repository.
-     *
-     * @return \Mautic\LeadBundle\Entity\LeadCategoryRepository
      */
-    public function getLeadCategoryRepository()
+    public function getLeadCategoryRepository(): \Mautic\LeadBundle\Entity\LeadCategoryRepository
     {
         return $this->em->getRepository(LeadCategory::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\MergeRecordRepository
-     */
-    public function getMergeRecordRepository()
+    public function getMergeRecordRepository(): \Mautic\LeadBundle\Entity\MergeRecordRepository
     {
         return $this->em->getRepository(\Mautic\LeadBundle\Entity\MergeRecord::class);
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\LeadListRepository
-     */
-    public function getLeadListRepository()
+    public function getLeadListRepository(): \Mautic\LeadBundle\Entity\LeadListRepository
     {
         return $this->em->getRepository(LeadList::class);
     }

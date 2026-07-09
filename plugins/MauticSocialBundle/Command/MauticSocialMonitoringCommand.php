@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -80,7 +79,6 @@ class MauticSocialMonitoringCommand extends Command
             'limit' => 100,
         ];
 
-        /** @var MonitoringRepository $repository */
         $repository = $this->monitoringModel->getRepository();
 
         if (null !== $id) {

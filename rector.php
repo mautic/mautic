@@ -9,6 +9,7 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
+use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
@@ -19,7 +20,7 @@ return RectorConfig::configure()
         __DIR__.'/plugins',
     ])
     ->withPreparedSets(deadCode: true, typeDeclarations: true)
-    ->withPhpSets(php80: true)
+    ->withPhpSets(php81: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
@@ -38,6 +39,8 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
+
+        Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -66,6 +69,13 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
+        ReturnTypeFromGetRepositoryDocblockRector::class => [
+            // double getRepository() override
+            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
+            // list lead vs lead list diff
+            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
+        ],
+
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
             __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
         ],
@@ -75,7 +85,11 @@ return RectorConfig::configure()
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
+            __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
         ],
+
+        // from upcoming PHP 8.1
+        Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector::class,
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,

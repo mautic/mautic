@@ -286,7 +286,7 @@ class PlainTextHelper
         $this->convertBlockquotes($text);
         $this->convertPre($text);
         $text = preg_replace($this->search, $this->replace, $text);
-        $text = preg_replace_callback($this->callbackSearch, [$this, 'pregCallback'], $text);
+        $text = preg_replace_callback($this->callbackSearch, $this->pregCallback(...), $text);
         $text = strip_tags($text);
         $text = preg_replace($this->entSearch, $this->entReplace, $text);
         $text = html_entity_decode($text, ENT_QUOTES, self::ENCODING);
@@ -368,7 +368,7 @@ class PlainTextHelper
             // Run our defined tags search-and-replace with callback
             $this->preContent = preg_replace_callback(
                 $this->callbackSearch,
-                [$this, 'pregCallback'],
+                $this->pregCallback(...),
                 $this->preContent
             );
 
@@ -381,7 +381,7 @@ class PlainTextHelper
             // replace the content (use callback because content can contain $0 variable)
             $text = preg_replace_callback(
                 '/<pre[^>]*>.*<\/pre>/ismU',
-                [$this, 'pregPreCallback'],
+                $this->pregPreCallback(...),
                 $text,
                 1
             );

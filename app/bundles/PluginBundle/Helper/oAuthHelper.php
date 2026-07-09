@@ -16,7 +16,7 @@ class oAuthHelper
 
     private $accessToken;
 
-    private string $accessTokenSecret;
+    private readonly string $accessTokenSecret;
 
     private $callback;
 

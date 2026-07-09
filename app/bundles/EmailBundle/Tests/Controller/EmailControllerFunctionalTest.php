@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
@@ -1499,6 +1500,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function setPermission(Role $role, array $permissions): void
     {
+        /** @var RoleModel $roleModel */
         $roleModel = $this->getContainer()->get('mautic.user.model.role');
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
