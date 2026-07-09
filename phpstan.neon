@@ -56,6 +56,9 @@ parameters:
 		-
 			identifier: classConstant.deprecatedClass
 			message: '#class Mautic#'
+		-
+			identifier: new.deprecated
+			message: '#class Mautic#'
 
 		- identifier: missingType.generics
 		# controllers - group missing parameter types to fix later
