@@ -76,7 +76,7 @@ class PrimaryCompanyTagRelationValueFilterQueryBuilder extends BaseFilterQueryBu
             return $this->generateRandomParameterName();
         }
 
-        return array_map(fn (): string => $this->generateRandomParameterName(), $filterParameters);
+        return array_map($this->generateRandomParameterName(...), $filterParameters);
     }
 
     private function createTagFilterQuery(

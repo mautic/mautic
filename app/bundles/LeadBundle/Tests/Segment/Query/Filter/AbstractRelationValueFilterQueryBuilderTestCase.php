@@ -53,9 +53,9 @@ abstract class AbstractRelationValueFilterQueryBuilderTestCase extends TestCase
              * @param array<string, mixed> $batch
              */
             public function __construct(
-                private string $operator,
-                private mixed $value,
-                private array $batch,
+                private readonly string $operator,
+                private readonly mixed $value,
+                private readonly array $batch,
             ) {
             }
 
