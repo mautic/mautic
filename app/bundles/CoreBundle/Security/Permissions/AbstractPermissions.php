@@ -183,9 +183,9 @@ abstract class AbstractPermissions
     /**
      * Determines if the user has access to the specified permission.
      *
-     * @param array<string, mixed> $userPermissions
-     * @param string               $name
-     * @param string               $level
+     * @param array  $userPermissions
+     * @param string $name
+     * @param string $level
      */
     public function isGranted($userPermissions, $name, $level): bool
     {
@@ -357,7 +357,7 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
-     * @param mixed[]              $data
+     * @param array                $data
      * @param bool                 $includePublish
      */
     protected function addStandardFormFields($bundle, $level, &$builder, $data, $includePublish = true)
@@ -424,8 +424,9 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
+     * @param array                $data
      */
-    protected function addManageFormFields($bundle, $level, &$builder, array $data)
+    protected function addManageFormFields($bundle, $level, &$builder, $data)
     {
         $choices = [
             'mautic.core.permissions.manage' => 'manage',
@@ -482,9 +483,10 @@ abstract class AbstractPermissions
      * @param string               $bundle
      * @param string               $level
      * @param FormBuilderInterface $builder
+     * @param array                $data
      * @param bool                 $includePublish
      */
-    protected function addExtendedFormFields($bundle, $level, &$builder, array $data, $includePublish = true)
+    protected function addExtendedFormFields($bundle, $level, &$builder, $data, $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.viewown'     => 'viewown',
