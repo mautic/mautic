@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 final class BatchDownloadResponder
 {
     public function __construct(
-        private Translator $translator,
+        private readonly Translator $translator,
     ) {
     }
 

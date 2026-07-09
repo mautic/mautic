@@ -13,9 +13,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 final class BatchFileCollector
 {
     public function __construct(
-        private AssetModel $assetModel,
-        private CorePermissions $security,
-        private CoreParametersHelper $parametersHelper,
+        private readonly AssetModel $assetModel,
+        private readonly CorePermissions $security,
+        private readonly CoreParametersHelper $parametersHelper,
     ) {
     }
 

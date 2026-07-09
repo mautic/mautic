@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class BatchDownloadRequestValidator
 {
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 
