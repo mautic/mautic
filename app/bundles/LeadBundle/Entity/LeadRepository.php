@@ -607,7 +607,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
     public function getEntityContacts(
-        $args,
+        array $args,
         $joinTable,
         $entityId,
         $filters = [],
@@ -1425,7 +1425,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    protected function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(array &$fields)
     {
         // Do not save points as they are handled by postSaveEntity
         unset($fields['points']);

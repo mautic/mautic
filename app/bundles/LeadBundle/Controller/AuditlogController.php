@@ -100,7 +100,7 @@ class AuditlogController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper): array {
+        $resultsCallback = function (array $event) use ($dateHelper): array {
             $userName = $event['userName'] ?? $event['eventType'];
             if (is_array($userName)) {
                 $userName = $userName['label'];
