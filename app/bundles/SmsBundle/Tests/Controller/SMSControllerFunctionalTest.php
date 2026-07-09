@@ -44,6 +44,7 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedSms = $this->em->find(Sms::class, $sms->getId());
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $savedSms);
         Assert::assertSame($project->getId(), $savedSms->getProjects()->first()->getId());
     }
 

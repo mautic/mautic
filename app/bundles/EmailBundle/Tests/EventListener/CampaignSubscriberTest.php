@@ -139,6 +139,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         /** @var LeadEventLog $failure */
         $failure    = $failures->first();
         $failedLead = $failure->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $failedLead);
 
         $this->assertSame('tester@mautic.org', $failedLead->getEmail());
     }

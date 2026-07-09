@@ -56,6 +56,7 @@ final class TweetControllerTest extends MauticMysqlTestCase
     public function testEditAction(): void
     {
         $tweet = $this->tweetsRepo->findOneBy([]);
+        $this->assertInstanceOf(\MauticPlugin\MauticSocialBundle\Entity\Tweet::class, $tweet);
 
         $crawler               = $this->client->request('GET', '/s/tweets/edit/'.$tweet->getId());
         $clientResponse        = $this->client->getResponse();

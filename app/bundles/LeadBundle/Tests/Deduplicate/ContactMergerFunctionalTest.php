@@ -43,10 +43,12 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Bob should have been merged into Jane
         $jane = $model->getEntity($janeId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
         $this->assertSame($janeId, $jane->getId());
 
         // If Bob is queried, Jane should be returned
         $jane = $model->getEntity($bobId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
         $this->assertSame($janeId, $jane->getId());
 
         // Merge Jane into a third contact
@@ -61,6 +63,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Query for Bob which should now return Joey
         $joey = $model->getEntity($bobId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $joey);
         $this->assertSame($joeyId, $joey->getId());
 
         // If Joey is deleted, querying for Bob or Jane should result in null
@@ -95,7 +98,9 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         $em->detach($jane);
         $jane = $model->getEntity($jane->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
         $this->assertEquals(50, $jane->getPoints());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
         $janeId = $jane->getId();
 
         // Jane is currently a visitor on a different device with 3 points
@@ -104,10 +109,12 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($visitor);
         $em->detach($visitor);
         $visitor = $model->getEntity($visitor->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $visitor);
         $this->assertEquals(3, $visitor->getPoints());
 
         // Jane submits a form or something that identifies her so the visitor should be merged into Jane giving her 53 points
         $jane = $model->getEntity($janeId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
         // Jane should start out with 50 points
         $this->assertEquals(50, $jane->getPoints());
         // Jane should come out of the merge as Jane
@@ -119,6 +126,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $em->detach($visitor);
         // Jane should still have 53 points
         $jane = $model->getEntity($janeId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
         $this->assertEquals(53, $jane->getPoints());
 
         // Jane is on another device again and gets 3 points
@@ -127,6 +135,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($visitor2);
         $em->detach($visitor2);
         $visitor2 = $model->getEntity($visitor2->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $visitor2);
         $this->assertEquals(3, $visitor2->getPoints());
 
         // Jane again identifies herself, gets merged into the new visitor and so should now have a total of 56 points
@@ -136,6 +145,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $em->detach($jane);
         $em->detach($visitor2);
         $jane = $model->getEntity($jane->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
 
         $this->assertEquals(56, $jane->getPoints());
     }

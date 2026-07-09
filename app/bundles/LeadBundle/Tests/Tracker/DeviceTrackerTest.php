@@ -85,11 +85,13 @@ final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $tracker = new DeviceTracker($this->deviceCreatorService, $this->deviceDetectorFactory, $this->deviceTrackingService, $this->createStub(Logger::class));
 
         $device = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadDevice::class, $device);
         $this->assertEquals('3dfc9e6dff07948058df37455718cb98', $device->getSignature());
 
         // Subsequent calls should not create a new tracking ID
         $device2 = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
         $this->assertEquals($device->getTrackingId(), $device2->getTrackingId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadDevice::class, $device2);
         $this->assertEquals('apple', $device2->getDeviceBrand());
         $this->assertEquals($device->getSignature(), $device2->getSignature());
     }

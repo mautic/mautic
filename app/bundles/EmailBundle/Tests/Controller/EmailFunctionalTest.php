@@ -89,12 +89,14 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $email = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(\Mautic\EmailBundle\Entity\Email::class, $email);
 
         // assert lists/excludedLists changed accordingly
         $this->assertEmailLists([
             $listOne->getId(),
             $listFour->getId(),
         ], $email->getLists());
+        $this->assertInstanceOf(\Mautic\EmailBundle\Entity\Email::class, $email);
         $this->assertEmailLists([
             $listTwo->getId(),
             $listThree->getId(),
@@ -152,6 +154,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $email = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(\Mautic\EmailBundle\Entity\Email::class, $email);
 
         Assert::assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
 

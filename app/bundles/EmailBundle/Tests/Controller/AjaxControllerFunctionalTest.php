@@ -99,6 +99,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($parameters->get('mailer_from_name'), $email->getFrom()[0]->getName());
         Assert::assertSame($parameters->get('mailer_from_email'), $email->getFrom()[0]->getAddress());
         Assert::assertCount(1, $email->getTo());
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         Assert::assertSame($user->getFirstName().' '.$user->getLastName(), $email->getTo()[0]->getName());
         Assert::assertSame($user->getEmail(), $email->getTo()[0]->getAddress());
     }
@@ -323,8 +324,10 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $this->assertInstanceOf(\Mautic\EmailBundle\Entity\Email::class, $email);
         Assert::assertFalse($email->isPublished(), 'The email should not be published.');
         Assert::assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
+        $this->assertInstanceOf(\Mautic\EmailBundle\Entity\Email::class, $email);
         Assert::assertSame($email->getId(), $dispatchedEvent->getEmail()->getId(), 'The email entity should match the one in the request.');
     }
 

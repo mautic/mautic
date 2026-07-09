@@ -132,6 +132,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testViewAction(): void
     {
         $tag = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Tag::class, $tag);
 
         $this->client->request('GET', '/s/tags/view/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
@@ -166,6 +167,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         $TagName = 'Test tag';
         $tag     = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Tag::class, $tag);
 
         $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
@@ -260,6 +262,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         $tag     = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Tag::class, $tag);
         $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }

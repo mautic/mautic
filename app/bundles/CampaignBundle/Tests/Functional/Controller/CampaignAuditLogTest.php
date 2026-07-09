@@ -93,7 +93,9 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
         $campaign      = $campaignModel->getEntity($campaignId);
         $event         = $this->em->find(Event::class, $eventId);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $event);
         $event->setName('2 contact points after 1 day');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
         $campaign->addEvent($eventId, $event);
         $campaignModel->saveEntity($campaign);
         $this->em->clear();

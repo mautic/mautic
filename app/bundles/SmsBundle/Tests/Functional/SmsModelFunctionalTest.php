@@ -36,6 +36,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $contact = $this->em->find(Lead::class, $contactId);
         $sms     = $this->em->find(Sms::class, $sms->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         // Set locale
         $contact->addUpdatedField('preferred_locale', $contactLocale);
@@ -98,9 +99,11 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $contact1 = $this->em->find(Lead::class, $englishLead->getId());
         $contact2 = $this->em->find(Lead::class, $frenchLead->getId());
         $contact3 = $this->em->find(Lead::class, $frenchLead2->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact2);
 
         // 4. Update locale for the second contact
         $contact2->addUpdatedField('preferred_locale', 'fr_FR');
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact3);
         $contact3->addUpdatedField('preferred_locale', 'fr_FR');
         $this->em->flush();
 
@@ -166,20 +169,27 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         // 7. Validate SMS stats per contact
         $statRepo = $smsModel->getStatRepository();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact1);
 
         $stat1 = $statRepo->getLeadStats($contact1->getId());
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $sms);
         $this->assertSame((string) $sms->getId(), $stat1[0]['sms_id'], 'English contact should map to base SMS.');
 
         $stat2 = $statRepo->getLeadStats($contact2->getId());
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $smsFr);
         $this->assertSame((string) $smsFr->getId(), $stat2[0]['sms_id'], 'French contact should map to translated SMS.');
 
         // 8. Validate SMS stats for translation and parent
         $this->em->clear();
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $sms);
         $sms      = $this->em->find(Sms::class, $sms->getId());
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $smsFr);
         $smsFr    = $this->em->find(Sms::class, $smsFr->getId());
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $sms);
 
         $this->assertSame(3, $sms->getSentCount(true), 'Total sent count for base SMS including translations should be 3.');
         $this->assertSame(1, $sms->getSentCount(), 'Sent count for base SMS (excluding translations) should be 1.');
+        $this->assertInstanceOf(\Mautic\SmsBundle\Entity\Sms::class, $smsFr);
         $this->assertSame(2, $smsFr->getSentCount(), 'Sent count for French translated SMS should be 2.');
     }
 

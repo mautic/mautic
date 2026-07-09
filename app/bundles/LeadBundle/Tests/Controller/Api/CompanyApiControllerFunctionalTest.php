@@ -281,6 +281,7 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $company = $this->getCompanyRepository()->find($company->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
         $this->asserttrue($company->isDeleted());
     }
 
@@ -334,8 +335,10 @@ final class CompanyApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $company1 = $this->getCompanyRepository()->find($company1->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company1);
         $this->asserttrue($company1->isDeleted());
         $company2 = $this->getCompanyRepository()->find($company2->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company2);
         $this->asserttrue($company2->isDeleted());
     }
 

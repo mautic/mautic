@@ -118,6 +118,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
+        $this->assertInstanceOf(\Mautic\EmailBundle\Entity\EmailDraft::class, $emailDraft);
         Assert::assertEquals('Test html Draft', $emailDraft->getHtml());
         Assert::assertSame('Test html', $email->getCustomHtml());
     }

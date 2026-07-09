@@ -38,6 +38,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         // Force the campaign failure events manually
         // Reload campaign to get the event
         $campaign    = $this->em->find(Campaign::class, $campaign->getId());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
         $events      = $campaign->getEvents();
         $failedEvent = $events->first();
 
@@ -45,6 +46,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::getContainer()->get('event_dispatcher');
         $dispatcher->dispatch($unpublishEvent, CampaignEvents::ON_CAMPAIGN_UNPUBLISH_NOTIFY);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
 
         // Check for notifications - use a more general query
         $notifications = $this->em->getRepository(Notification::class)

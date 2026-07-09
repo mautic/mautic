@@ -33,6 +33,7 @@ final class TriggerControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(Trigger::class, $trigger->getId());
+        $this->assertInstanceOf(\Mautic\PointBundle\Entity\Trigger::class, $savedAsset);
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 }

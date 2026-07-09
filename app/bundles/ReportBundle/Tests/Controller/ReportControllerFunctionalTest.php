@@ -116,6 +116,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+        $this->assertInstanceOf(\Mautic\ReportBundle\Entity\Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
         self::assertResponseIsSuccessful();

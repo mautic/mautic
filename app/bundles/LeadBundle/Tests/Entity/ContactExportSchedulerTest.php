@@ -47,6 +47,7 @@ final class ContactExportSchedulerTest extends MauticMysqlTestCase
 
         $exportScheduler = $this->em->find(ContactExportScheduler::class, $id);
         $localDate       = $this->convertDateTimezone($this->fetchScheduledDate($id), 'UTC', $timezone);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\ContactExportScheduler::class, $exportScheduler);
         Assert::assertSame($timezone, $exportScheduler->getScheduledDateTime()->getTimezone()->getName(), sprintf('Timezone should be %s.', $timezone));
         Assert::assertSame($localDate, $exportScheduler->getScheduledDateTime()->format(DateTimeHelper::FORMAT_DB), sprintf('PHP value should be converted to %s.', $timezone));
     }

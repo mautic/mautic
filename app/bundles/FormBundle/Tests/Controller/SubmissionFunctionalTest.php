@@ -191,6 +191,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('Australia', $contact->getCountry());
         Assert::assertSame('Victoria', $contact->getState());
@@ -282,6 +283,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertNull($contact->getCountry());
         Assert::assertNull($contact->getState());
@@ -663,6 +665,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('Acquia', $contact->getCompany());
         Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
@@ -727,6 +730,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('test', $contact->getFirstname());
 

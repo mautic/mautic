@@ -207,6 +207,7 @@ final class ImportTest extends StandardImportTestHelper
     protected function fakeImportStartDate(Import $import, int $runtime = 600): void
     {
         $dateEnded   = $import->getDateEnded();
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateEnded);
         $dateStarted = new \DateTime($dateEnded->format('Y-m-d H:i:s.u'), $dateEnded->getTimezone());
         $dateStarted->modify('-'.$runtime.' seconds');
         $import->setDateStarted($dateStarted);

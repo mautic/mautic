@@ -115,6 +115,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedSegment = $this->listRepo->find($segment->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $savedSegment);
         Assert::assertSame($project->getId(), $savedSegment->getProjects()->first()->getId());
     }
 
@@ -168,7 +169,9 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Verify last built date is set.
         $this->em->detach($segment);
         $segment = $this->listRepo->find($segmentId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
         self::assertNotNull($segment->getLastBuiltDate());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
 
         // Set last built date in the future to allow testing without waiting.
         // (Same second built date as the modified date is shown as "Building" still in the UI).
@@ -245,6 +248,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         // Save filtered segment again to trigger rebuild label, setting last built date in the past.
         $this->em->detach($segment);
         $segment = $this->listRepo->find($segmentId);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadList::class, $segment);
         $segment->setLastBuiltDate(new \DateTime('-1 year'));
         // Date modified only updates on specific changes, so change name.
         $segment->setName('Lead List 1 Updated');

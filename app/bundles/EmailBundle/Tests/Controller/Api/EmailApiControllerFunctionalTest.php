@@ -376,12 +376,14 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $owner = $this->getUser($creatorUsername);
         $email = $this->createEmail('Email C', 'Email C Subject', 'template', 'empty', 'Test html');
         $email->setIsPublished(false);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $owner);
         $email->setCreatedBy($owner->getId());
         $this->em->flush();
 
         $emailId = $email->getId();
 
         $user = $this->getUser('sales');
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
