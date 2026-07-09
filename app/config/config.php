@@ -166,7 +166,6 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'options'        => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
@@ -195,7 +194,6 @@ $container->loadFromExtension('doctrine', [
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
                     $unbufferedQueryConstant    => false,
-                    PDO::ATTR_STRINGIFY_FETCHES => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
