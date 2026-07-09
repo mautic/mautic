@@ -112,7 +112,7 @@ return [
                 'priority'  => 40,
             ],
             'mautic.contribute.menu.index' => [
-                'uri'            => 'https://mautic.org',
+                'uri'            => 'https://mau.tc/support',
                 'iconClass'      => 'ri-hand-coin-fill',
                 'priority'       => 0,
                 'linkAttributes' => [
