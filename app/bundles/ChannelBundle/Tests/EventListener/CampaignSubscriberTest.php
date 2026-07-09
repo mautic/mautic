@@ -153,8 +153,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
-        $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, [$this, 'sendMarketingMessageEmail']);
-        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, [$this, 'sendMarketingMessageSms']);
+        $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
+        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, $this->sendMarketingMessageSms(...));
     }
 
     public function testCorrectChannelIsUsed(): void
