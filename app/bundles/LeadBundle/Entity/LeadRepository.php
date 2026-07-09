@@ -237,7 +237,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         /** @var Lead $lead */
         foreach ($entities as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
-            if (!empty($this->triggerModel)) {
+            if ($this->triggerModel instanceof \Mautic\PointBundle\Model\TriggerModel) {
                 $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
             }
 
@@ -397,7 +397,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $entity;
         }
 
-        if (!empty($this->triggerModel)) {
+        if ($this->triggerModel instanceof \Mautic\PointBundle\Model\TriggerModel) {
             $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getPoints()));
         }
 
@@ -460,7 +460,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'lead',
             $args,
             function ($r): void {
-                if (!empty($this->triggerModel)) {
+                if ($this->triggerModel instanceof \Mautic\PointBundle\Model\TriggerModel) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
                 $r->setAvailableSocialFields($this->availableSocialFields);
