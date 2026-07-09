@@ -403,12 +403,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array      $params
      * @param array|null $query
      *
      * @return int|null
      */
-    public function getCompanies($params = [], $query = null, $executed = null): int|float|null
+    public function getCompanies(array $params = [], $query = null, $executed = null): int|float|null
     {
         $executed = null;
 
@@ -1143,11 +1142,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array  $fields
      * @param array  $keys
      * @param string $object
      */
-    public function cleanSugarData($fields, $keys, $object): array
+    public function cleanSugarData(array $fields, $keys, $object): array
     {
         $leadFields = [];
 
@@ -1163,11 +1161,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         [$fromDate, $toDate]     = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
@@ -1469,10 +1465,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return $result;
     }
 
-    /**
-     * @param array $lead
-     */
-    protected function getOwnerEmail($lead)
+    protected function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
             /** @var \Mautic\UserBundle\Entity\User $user */
@@ -1484,7 +1477,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         return null;
     }
 
-    protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSugarUpdate, $object, $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
+    protected function buildCompositeBody(array &$mauticData, array $availableFields, $fieldsToUpdateInSugarUpdate, $object, array $lead, $onwerAssignedUserIdByEmail = null, $objectId = null)
     {
         $body = [];
         if (isset($lead['email']) && !empty($lead['email'])) {
