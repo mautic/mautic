@@ -234,7 +234,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
+            $callback = $settings['callback'] ?? \Mautic\PointBundle\Helper\EventHelper::engagePointAction(...);
 
             if (is_callable($callback)) {
                 $object = null;
