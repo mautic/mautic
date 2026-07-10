@@ -63,8 +63,7 @@ final class PublicController extends CommonFormController
             $this->throwAccessDenied();
         }
 
-        $context          = $this->createSubmitContext($request);
-        $submissionResult = $this->processSubmittedForm($request, $context, $dateTemplateHelper, $notificationModel, $userRepository);
+        $submissionResult = $this->processSubmittedForm($request, $dateTemplateHelper, $notificationModel, $userRepository);
 
         if ($submissionResult['response'] instanceof Response) {
             return $submissionResult['response'];
@@ -75,55 +74,46 @@ final class PublicController extends CommonFormController
             $submissionResult['postActionProperty'] = $this->replacePostSubmitTokens($submissionResult['postActionProperty'], $submissionResult['submissionEvent'], $pageTokenHelper);
         }
 
-        return ($context['messengerMode'] || $context['isAjax'])
-            ? $this->buildMessengerResponse($context, $submissionResult)
-            : $this->buildStandardResponse($request, $context, $submissionResult);
+        return ($this->isMessengerMode($request) || $this->isAjax($request))
+            ? $this->buildMessengerResponse($request, $submissionResult)
+            : $this->buildStandardResponse($request, $submissionResult);
     }
 
     /**
      * @return array<string, mixed>
      */
-    private function createSubmitContext(Request $request): array
+    private function getSubmittedPost(Request $request): array
     {
-        $server = $request->server->all();
-        $post   = $request->request->all()['mauticform'] ?? [];
-        $post   = is_array($post) ? $post : [];
-        $return = $post['return'] ?? false;
-        $query  = '?';
+        $post = $request->request->all()['mauticform'] ?? [];
 
-        if (empty($return)) {
-            // try to get it from the HTTP_REFERER
-            $return = $server['HTTP_REFERER'] ?? false;
-        }
+        return is_array($post) ? $post : [];
+    }
 
-        if (!empty($return)) {
-            // remove mauticError and mauticMessage from the referer so it doesn't get sent back
-            $return = InputHelper::url((string) $return, false, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (!str_contains($return, '?')) ? '?' : '&';
-        }
+    private function isAjax(Request $request): bool
+    {
+        return (bool) $request->query->get('ajax');
+    }
 
-        return [
-            'isAjax'        => (bool) $request->query->get('ajax'),
-            'messengerMode' => !empty($post['messenger']),
-            'post'          => $post,
-            'query'         => $query,
-            'return'        => $return,
-            'server'        => $server,
-        ];
+    private function isMessengerMode(Request $request): bool
+    {
+        $post = $this->getSubmittedPost($request);
+        $messenger = $post['messenger'] ?? null;
+
+        // This is a transport hint set by mautic-form JS to request messenger-style responses.
+        // It must not be used for business/security decisions.
+        return in_array($messenger, [1, '1', true, 'true'], true);
     }
 
     /**
-     * @param array<string, mixed> $context
-     *
      * @return array<string, mixed>
      */
     private function processSubmittedForm(
         Request $request,
-        array $context,
         DateHelper $dateTemplateHelper,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
     ): array {
+        $post = $this->getSubmittedPost($request);
         $result = [
             'callbackResponses'  => [],
             'error'              => null,
@@ -133,8 +123,6 @@ final class PublicController extends CommonFormController
             'response'           => null,
             'submissionEvent'    => null,
         ];
-        $post = $context['post'];
-        \assert(is_array($post));
 
         if (!isset($post['formId'])) {
             $result['error'] = $this->translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
@@ -154,7 +142,7 @@ final class PublicController extends CommonFormController
                 if (null === $result['error']) {
                     $result = array_merge(
                         $result,
-                        $this->handlePublishedForm($request, $context, $form, $notificationModel, $userRepository)
+                        $this->handlePublishedForm($request, $form, $notificationModel, $userRepository)
                     );
                 }
             }
@@ -193,13 +181,10 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * @param array<string, mixed> $context
-     *
      * @return array<string, mixed>
      */
     private function handlePublishedForm(
         Request $request,
-        array $context,
         Form $form,
         NotificationModel $notificationModel,
         UserRepository $userRepository,
@@ -214,14 +199,12 @@ final class PublicController extends CommonFormController
             ];
         }
 
-        $post   = $context['post'];
-        $server = $context['server'];
-        \assert(is_array($post));
-        \assert(is_array($server));
+        $post   = $this->getSubmittedPost($request);
+        $server = $request->server->all();
 
         $result = $this->submissionModel->saveSubmission($post, $server, $form, $request, true);
 
-        return $this->handleSubmissionResult($result, $context);
+        return $this->handleSubmissionResult($request, $result);
     }
 
     private function notifySubmissionLimitReached(Form $form, NotificationModel $notificationModel, UserRepository $userRepository): void
@@ -249,18 +232,20 @@ final class PublicController extends CommonFormController
 
     /**
      * @param array<string, mixed> $result
-     * @param array<string, mixed> $context
      *
      * @return array<string, mixed>
      */
-    private function handleSubmissionResult(array $result, array $context): array
+    private function handleSubmissionResult(Request $request, array $result): array
     {
+        $messengerMode = $this->isMessengerMode($request);
+        $isAjax        = $this->isAjax($request);
+
         if (!empty($result['errors'])) {
             return [
                 'error' => $this->formatSubmissionErrors(
                     $result['errors'],
-                    (bool) $context['messengerMode'],
-                    (bool) $context['isAjax']
+                    $messengerMode,
+                    $isAjax
                 ),
             ];
         }
@@ -270,8 +255,8 @@ final class PublicController extends CommonFormController
             $submissionEvent = $result['callback'];
             $callbackResult  = $this->dispatchPostSubmitCallbacks(
                 $submissionEvent,
-                (bool) $context['messengerMode'],
-                (bool) $context['isAjax']
+                $messengerMode,
+                $isAjax
             );
 
             return array_merge(['submissionEvent' => $submissionEvent], $callbackResult);
@@ -331,11 +316,11 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * @param array<string, mixed> $context
      * @param array<string, mixed> $submissionResult
      */
-    private function buildMessengerResponse(array $context, array $submissionResult): Response
+    private function buildMessengerResponse(Request $request, array $submissionResult): Response
     {
+        $post = $this->getSubmittedPost($request);
         $data  = ['success' => 1];
         $error = $submissionResult['error'];
 
@@ -350,14 +335,11 @@ final class PublicController extends CommonFormController
             $data = $this->addMessengerSuccessData($data, $submissionResult);
         }
 
-        $post = $context['post'];
-        \assert(is_array($post));
-
         if (isset($post['formName'])) {
             $data['formName'] = $post['formName'];
         }
 
-        if ((bool) $context['isAjax']) {
+        if ($this->isAjax($request)) {
             // Post via ajax so return a json response
             return new JsonResponse($data);
         }
@@ -429,12 +411,11 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * @param array<string, mixed> $context
      * @param array<string, mixed> $submissionResult
      */
-    private function buildStandardResponse(Request $request, array $context, array $submissionResult): Response
+    private function buildStandardResponse(Request $request, array $submissionResult): Response
     {
-        $response = $this->getStandardRedirectResponse($context, $submissionResult);
+        $response = $this->getStandardRedirectResponse($submissionResult);
 
         if (null === $response) {
             $msg     = $submissionResult['postActionProperty'];
@@ -463,31 +444,15 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * @param array<string, mixed> $context
      * @param array<string, mixed> $submissionResult
      */
-    private function getStandardRedirectResponse(array $context, array $submissionResult): ?Response
+    private function getStandardRedirectResponse(array $submissionResult): ?Response
     {
-        $error    = $submissionResult['error'];
-        $response = null;
-
-        if (!empty($error) && $context['return']) {
-            $form = $submissionResult['form'];
-            $hash = ($form instanceof Form) ? '#'.strtolower($form->getAlias()) : '';
-
-            $response = $this->redirect($context['return'].$context['query'].'mauticError='.rawurlencode((string) $error).$hash); // NOSONAR return URL is sanitized in createSubmitContext().
-        } elseif ('redirect' === $submissionResult['postAction']) {
-            $response = $this->redirect((string) $submissionResult['postActionProperty']);
-        } elseif ('return' === $submissionResult['postAction'] && !empty($context['return'])) {
-            $return = (string) $context['return'];
-            if (!empty($submissionResult['postActionProperty'])) {
-                $return .= $context['query'].'mauticMessage='.rawurlencode((string) $submissionResult['postActionProperty']);
-            }
-
-            $response = $this->redirect($return); // NOSONAR return URL is sanitized in createSubmitContext().
+        if ('redirect' === $submissionResult['postAction']) {
+            return $this->redirect((string) $submissionResult['postActionProperty']);
         }
 
-        return $response;
+        return null;
     }
 
     /**
@@ -588,14 +553,14 @@ final class PublicController extends CommonFormController
     /**
      * Generates JS file for automatic form generation.
      */
-    public function generateAction(Request $request): Response
+    public function generateAction(Request $request, FormModel $model): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
         $formId = (int) $request->get('id');
-        $form  = $this->formModel->getEntity($formId);
-        $js    = '';
+        $form   = $this->formModel->getEntity($formId);
+        $js     = '';
 
         if (null !== $form) {
             $status = $form->getPublishStatus();

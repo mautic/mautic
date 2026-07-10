@@ -103,6 +103,63 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('bar', $queryParams['foo']);
     }
 
+    public function testMaliciousReturnUrlIsIgnoredOnValidationError(): void
+    {
+        $payload = [
+            'name'        => 'Return URL security test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'postAction'  => 'return',
+            'fields'      => [
+                [
+                    'label'      => 'Email',
+                    'type'       => 'email',
+                    'alias'      => 'email',
+                    'isRequired' => true,
+                    'leadField'  => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        $this->client->followRedirects(false);
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'formId' => $formId,
+                    'return' => 'https://attacker.com/phishing',
+                ],
+            ]
+        );
+
+        $submitResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode());
+
+        $redirectUrl = $submitResponse->headers->get('Location');
+        $this->assertNotNull($redirectUrl);
+        $this->assertStringNotContainsString('attacker.com', $redirectUrl);
+
+        $urlParts = parse_url($redirectUrl);
+        $this->assertSame('/form/message', $urlParts['path'] ?? null);
+
+        $this->client->followRedirects(true);
+    }
+
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
         // Create the test form via API.
@@ -1367,12 +1424,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $redirectUrl = $secondResponse->headers->get('Location');
         $this->assertNotNull($redirectUrl);
         $urlParts = parse_url($redirectUrl);
-        $query    = [];
-        if (isset($urlParts['query'])) {
-            parse_str($urlParts['query'], $query);
-        }
+        $this->assertSame('/form/message', $urlParts['path'] ?? null);
 
-        $this->assertSame('Stop here', urldecode($query['mauticError'] ?? ''));
+        $this->client->followRedirect();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Stop here', $this->client->getResponse()->getContent());
         $this->client->followRedirects(true);
 
         // Ensure no additional submissions were created after hitting the limit.
