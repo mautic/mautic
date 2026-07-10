@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
  * therefore cannot be served to the browser; the builder serves images from the media images directory, so
  * on import the files are relocated there.
  */
-final class EmailMediaImageHelper
+final readonly class EmailMediaImageHelper
 {
     // The builder emits URLs under "media/images" regardless of a remote instance's configured image_path,
     // so this segment is what we detect in incoming content to stay compatible across installations.
@@ -28,8 +28,8 @@ final class EmailMediaImageHelper
     private const IMAGE_EXTENSIONS = 'png|jpe?g|gif|webp|svg';
 
     public function __construct(
-        private readonly PathsHelper $pathsHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
+        private PathsHelper $pathsHelper,
+        private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

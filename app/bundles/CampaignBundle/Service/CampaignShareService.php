@@ -12,7 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class CampaignShareService
+final readonly class CampaignShareService
 {
     // The marketplace copies the ZIP into its own storage on submit, so the file only
     // needs to be reachable for the short window between user clicking Publish on Mautic
@@ -26,10 +26,10 @@ final class CampaignShareService
     public const PENDING_DIR = 'campaign_share/pending';
 
     public function __construct(
-        private readonly ExportHelper $exportHelper,
-        private readonly CoreParametersHelper $coreParametersHelper,
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly Filesystem $filesystem,
+        private ExportHelper $exportHelper,
+        private CoreParametersHelper $coreParametersHelper,
+        private UrlGeneratorInterface $urlGenerator,
+        private Filesystem $filesystem,
     ) {
     }
 

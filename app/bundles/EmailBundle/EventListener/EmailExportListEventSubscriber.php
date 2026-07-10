@@ -16,10 +16,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * listener scans the exported email content for such media images and adds the local files to the
  * export asset list so they are packed alongside the entity data.
  */
-final class EmailExportListEventSubscriber implements EventSubscriberInterface
+final readonly class EmailExportListEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailMediaImageHelper $mediaImageHelper,
+        private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
 

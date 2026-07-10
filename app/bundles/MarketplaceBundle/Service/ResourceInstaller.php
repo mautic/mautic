@@ -18,18 +18,18 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class ResourceInstaller implements ResourceInstallerInterface
+final readonly class ResourceInstaller implements ResourceInstallerInterface
 {
     private const INSTALLED_FILE = 'marketplace_installed_resources.json';
 
     public function __construct(
-        private readonly Connection $connection,
+        private Connection $connection,
         #[Autowire(service: 'mautic.http.client')]
-        private readonly ClientInterface $httpClient,
-        private readonly PathsHelper $pathsHelper,
-        private readonly EventDispatcherInterface $dispatcher,
-        private readonly LoggerInterface $logger,
-        private readonly ImportHelper $importHelper,
+        private ClientInterface $httpClient,
+        private PathsHelper $pathsHelper,
+        private EventDispatcherInterface $dispatcher,
+        private LoggerInterface $logger,
+        private ImportHelper $importHelper,
     ) {
     }
 
