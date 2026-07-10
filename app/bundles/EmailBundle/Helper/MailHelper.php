@@ -1370,7 +1370,7 @@ class MailHelper
                 );
             }
 
-            return "<$url>";
+            return "<{$url}>";
         }
 
         if (!empty($this->queuedRecipients) || !empty($this->lead)) {
@@ -1504,7 +1504,7 @@ class MailHelper
         }
 
         if ($context) {
-            $error .= " ($context)";
+            $error .= " ({$context})";
 
             if ('send' === $context) {
                 $error .= '; '.implode(', ', $this->errors['failures']);

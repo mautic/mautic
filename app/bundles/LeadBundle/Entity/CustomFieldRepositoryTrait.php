@@ -218,7 +218,7 @@ trait CustomFieldRepositoryTrait
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $col   = $this->getTableAlias().'.'.$field;
         $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select("DISTINCT $col")
+            ->select("DISTINCT {$col}")
             ->from($table, 'l');
 
         $q->where(
@@ -229,7 +229,7 @@ trait CustomFieldRepositoryTrait
         );
 
         if (!empty($search)) {
-            $q->andWhere("$col LIKE :search")
+            $q->andWhere("{$col} LIKE :search")
                 ->setParameter('search', "{$search}%");
         }
 
