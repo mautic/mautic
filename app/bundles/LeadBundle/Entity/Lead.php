@@ -747,13 +747,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif ($this->getCompany()) {
+        }
+        if ($this->getCompany()) {
             return $this->getCompany();
-        } elseif ($this->getEmail()) {
+        }
+        if ($this->getEmail()) {
             return $this->getEmail();
-        } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
+        }
+        if ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
-        } elseif (count($ips = $this->getIpAddresses())) {
+        }
+        if (count($ips = $this->getIpAddresses())) {
             return $ips->first()->getIpAddress();
         }
 
@@ -878,7 +882,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     {
         if (null !== $this->actualPoints) {
             return $this->actualPoints;
-        } elseif (null !== $this->updatedPoints) {
+        }
+        if (null !== $this->updatedPoints) {
             return $this->updatedPoints;
         }
 

@@ -76,7 +76,8 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $this->addFlash(FlashBag::LEVEL_ERROR, $translator->trans('mautic.user.auth.error.weakpassword', [], 'flashes'));
 
                 return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
-            } elseif ($error instanceof Exception\BadCredentialsException) {
+            }
+            if ($error instanceof Exception\BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';

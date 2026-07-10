@@ -982,23 +982,27 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
                         case str_contains($args[0], '/query'):
                             if (isset($args[1]['q']) && str_contains($args[0], 'from CampaignMember')) {
                                 return [];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Campaign')) {
                                 return [
                                     'totalSize' => 0,
                                     'records'   => [],
                                 ];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from Account')) {
                                 return [
                                     'totalSize' => 0,
                                     'records'   => [],
                                 ];
-                            } elseif (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
+                            }
+                            if (isset($args[1]['q']) && 'SELECT CreatedDate from Organization' === $args[1]['q']) {
                                 return [
                                     'records' => [
                                         ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
                                     ],
                                 ];
-                            } elseif (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
+                            }
+                            if (isset($args[1]['q']) && str_contains($args[1]['q'], 'from '.$updateObject.'History')) {
                                 return $this->getSalesforceDNCHistory($updateObject, 'Mautic');
                             }
                             // Extract emails

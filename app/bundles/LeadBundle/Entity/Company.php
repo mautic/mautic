@@ -325,7 +325,8 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         if ($name = $this->getName()) {
             return $name;
-        } elseif (!empty($this->fields['core']['companyemail']['value'])) {
+        }
+        if (!empty($this->fields['core']['companyemail']['value'])) {
             return $this->fields['core']['companyemail']['value'];
         }
     }

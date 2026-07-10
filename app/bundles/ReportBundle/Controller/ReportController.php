@@ -403,7 +403,8 @@ class ReportController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form for updated columns
                 $form = $model->createForm($entity, $this->formFactory, $action);
             }
@@ -558,7 +559,8 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        }
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 
@@ -748,7 +750,8 @@ class ReportController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
+        }
+        if (!$this->security->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -794,7 +797,8 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        }
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();

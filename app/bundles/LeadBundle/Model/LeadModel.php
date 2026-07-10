@@ -1494,7 +1494,8 @@ class LeadModel extends FormModel
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($lead->isNew() && !empty($leadField['defaultValue'])) {
+            }
+            if ($lead->isNew() && !empty($leadField['defaultValue'])) {
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
@@ -2444,7 +2445,8 @@ class LeadModel extends FormModel
             foreach ($groupFields as $field) {
                 if (!is_array($field)) {
                     return;
-                } elseif ('select' !== $field['type']) {
+                }
+                if ('select' !== $field['type']) {
                     continue;
                 }
                 $allowedValues = is_array($field['properties'])

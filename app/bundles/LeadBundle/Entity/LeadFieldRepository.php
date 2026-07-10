@@ -251,7 +251,8 @@ class LeadFieldRepository extends CommonRepository
 
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
-            } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
+            }
+            if (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
                 return empty($result['id']);
             }
 
