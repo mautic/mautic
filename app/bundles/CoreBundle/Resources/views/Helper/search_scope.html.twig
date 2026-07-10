@@ -16,7 +16,7 @@
         data-initial-search="{{ searchValue|default('')|e('html_attr') }}"
         aria-label="{{ 'mautic.core.search.scope.label'|trans }}"
         data-scope-search-placeholder="{{ 'mautic.core.search.scope.placeholder'|trans }}"
-        {% if searchScopeHint is defined and searchScopeHint is not empty %}title="{{ searchScopeHint|trans }}"{% endif %}
+        {% if searchScopeHint is defined and searchScopeHint is not empty %}data-scope-hint="{{ searchScopeHint|trans }}"{% endif %}
     >
         {% for scope in searchScopes %}
             {% set scopeCommand = scope.command|default('') %}

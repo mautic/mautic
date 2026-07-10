@@ -1390,12 +1390,21 @@ Mautic.activateSearchScopeChosen = function (scopeSelect) {
         search_contains: true,
     });
 
-    const searchPlaceholder = $select.attr('data-scope-search-placeholder');
-    if (searchPlaceholder) {
-        $select.on('chosen:showing_dropdown.searchScope', function () {
-            $select.next('.chosen-container').find('.chosen-search input').attr('placeholder', searchPlaceholder);
-        });
-    }
+    $select.on('chosen:showing_dropdown.searchScope', function () {
+        const $container = $select.next('.chosen-container');
+        const $drop = $container.find('.chosen-drop');
+        const searchPlaceholder = $select.attr('data-scope-search-placeholder');
+        const scopeHint = $select.attr('data-scope-hint');
+
+        if (searchPlaceholder) {
+            $container.find('.chosen-search input').attr('placeholder', searchPlaceholder);
+        }
+
+        $drop.find('.search-scope-tip').remove();
+        if (scopeHint) {
+            $drop.prepend(mQuery('<div class="search-scope-tip" role="note"></div>').text(scopeHint));
+        }
+    });
 };
 
 /**
