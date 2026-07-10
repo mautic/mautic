@@ -212,9 +212,11 @@ class RoleController extends FormController
         $source         = $model->getEntity($objectId);
         $postActionVars = $this->getRoleClonePostActionVars($request);
 
-        return null === $source
-            ? $this->getRoleNotFoundResponse($postActionVars, $objectId)
-            : $this->handleRoleClone($request, $objectId, $source, $model, $postActionVars);
+        if (null === $source) {
+            return $this->getRoleNotFoundResponse($postActionVars, $objectId);
+        }
+
+        return $this->handleRoleClone($request, $objectId, $source, $model, $postActionVars);
     }
 
     /**
@@ -263,11 +265,11 @@ class RoleController extends FormController
         $permissionsConfig = $this->getPermissionsConfig($source);
         $action            = $this->generateUrl('mautic_role_action', ['objectAction' => 'clone', 'objectId' => $objectId]);
         $form              = $model->createForm($entity, $this->formFactory, $action, ['permissionsConfig' => $permissionsConfig['config']]);
-        $response          = null;
-
-        if ($request->isMethod('POST')) {
-            $response = $this->handleRoleClonePost($request, $entity, $model, $form, $postActionVars);
+        if (!$request->isMethod('POST')) {
+            return $this->renderRoleCloneForm($form, $permissionsConfig, $action);
         }
+
+        $response = $this->handleRoleClonePost($request, $entity, $model, $form, $postActionVars);
 
         return $response ?? $this->renderRoleCloneForm($form, $permissionsConfig, $action);
     }
@@ -277,7 +279,6 @@ class RoleController extends FormController
      */
     private function handleRoleClonePost(Request $request, Entity\Role $entity, RoleModel $model, FormInterface $form, array $postActionVars): ?Response
     {
-        $response  = null;
         $cancelled = $this->isFormCancelled($form);
         $valid     = !$cancelled && $this->isFormValid($form);
 
@@ -302,12 +303,14 @@ class RoleController extends FormController
         }
 
         if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
-            $response = $this->postActionRedirect($postActionVars);
-        } elseif ($valid) {
-            $response = $this->editAction($request, $entity->getId(), true);
+            return $this->postActionRedirect($postActionVars);
         }
 
-        return $response;
+        if ($valid) {
+            return $this->editAction($request, $entity->getId(), true);
+        }
+
+        return null;
     }
 
     /**

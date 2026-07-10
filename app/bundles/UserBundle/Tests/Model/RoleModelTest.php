@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class RoleModelTest extends TestCase
+final class RoleModelTest extends TestCase
 {
     public function testCloneEntityWithPermissions(): void
     {
@@ -38,10 +38,10 @@ class RoleModelTest extends TestCase
 
         $clonedRole = $roleModel->cloneEntity($sourceRole);
 
-        $this->assertEquals('Clone of Test Role', $clonedRole->getName());
-        $this->assertEquals('Test Description', $clonedRole->getDescription());
+        $this->assertSame('Clone of Test Role', $clonedRole->getName());
+        $this->assertSame('Test Description', $clonedRole->getDescription());
         $this->assertFalse($clonedRole->isAdmin());
-        $this->assertEquals($sourceRole->getRawPermissions(), $clonedRole->getRawPermissions());
+        $this->assertSame($sourceRole->getRawPermissions(), $clonedRole->getRawPermissions());
         $this->assertCount(0, $clonedRole->getPermissions());
     }
 
@@ -62,8 +62,8 @@ class RoleModelTest extends TestCase
 
         $clonedRole = $roleModel->cloneEntity($sourceRole);
 
-        $this->assertEquals('Clone of Admin Role', $clonedRole->getName());
-        $this->assertEquals('Admin Description', $clonedRole->getDescription());
+        $this->assertSame('Clone of Admin Role', $clonedRole->getName());
+        $this->assertSame('Admin Description', $clonedRole->getDescription());
         $this->assertTrue($clonedRole->isAdmin());
         $this->assertCount(0, $clonedRole->getPermissions());
     }
