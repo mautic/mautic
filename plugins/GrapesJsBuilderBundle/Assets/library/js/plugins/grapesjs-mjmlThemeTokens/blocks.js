@@ -8,8 +8,8 @@ export const createBlockPatcher = ({ editor, options, classNames }) => {
       .join('');
   const getMjTextAttributes = (mjClass, fallbackAttributes) =>
     `${getMjClassAttribute(mjClass)}${
-      mjClass ? '' : getAttributes(fallbackAttributes)
-    } padding="10px 25px"`;
+      mjClass ? '' : `${getAttributes(fallbackAttributes)} padding="10px 25px"`
+    }`;
   const getTypographyCategory = () => ({
     label: Mautic.translate('grapesjsbuilder.categoryTypographyLabel'),
     order: -0.5,
