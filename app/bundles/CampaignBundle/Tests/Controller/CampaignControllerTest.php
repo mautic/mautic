@@ -78,6 +78,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedCampaign = $this->em->find(Campaign::class, $campaign->getId());
+        $this->assertInstanceOf(Campaign::class, $savedCampaign);
         Assert::assertSame($project->getId(), $savedCampaign->getProjects()->first()->getId());
     }
 

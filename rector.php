@@ -51,6 +51,8 @@ return RectorConfig::configure()
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(38)
     ->withSkip([
+        __DIR__.'/plugins/*/node_modules/*',
+
         Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],

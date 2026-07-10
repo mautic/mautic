@@ -44,10 +44,10 @@ class UrlHelper
         $scheme = strtolower($_SERVER['SERVER_PROTOCOL']);
         $scheme = substr($scheme, 0, strpos($scheme, '/')).($ssl ? 's' : '');
         $port   = $_SERVER['SERVER_PORT'];
-        $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":$port";
+        $port   = ((!$ssl && '80' == $port) || ($ssl && '443' == $port)) ? '' : ":{$port}";
         $host   = $_SERVER['HTTP_HOST'] ?? null;
         $host ??= $_SERVER['SERVER_NAME'].$port;
-        $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
+        $base   = "{$scheme}://{$host}".$_SERVER['REQUEST_URI'];
 
         $base = str_replace('/index.php', '', $base);
 
@@ -82,9 +82,9 @@ class UrlHelper
 
         /* dirty absolute URL // with port number if exists */
         if ('' != parse_url($base, PHP_URL_PORT)) {
-            $abs = "$host:".parse_url($base, PHP_URL_PORT)."$path/$rel";
+            $abs = "{$host}:".parse_url($base, PHP_URL_PORT)."{$path}/{$rel}";
         } else {
-            $abs = "$host$path/$rel";
+            $abs = "{$host}{$path}/{$rel}";
         }
         /* replace '//' or '/./' or '/foo/../' with '/' */
         $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
@@ -107,8 +107,8 @@ class UrlHelper
         $urls = [];
         // Check if there are any tokens that URL based fields
         foreach ($contactUrlFields as $field) {
-            if (str_contains($text, "{contactfield=$field}")) {
-                $urls[] = "{contactfield=$field}";
+            if (str_contains($text, "{contactfield={$field}}")) {
+                $urls[] = "{contactfield={$field}}";
             }
         }
 
