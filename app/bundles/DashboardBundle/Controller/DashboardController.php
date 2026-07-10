@@ -366,7 +366,7 @@ class DashboardController extends AbstractFormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $pathsHelper->getSystemPath("dashboard.$type");
+        $dir  = $pathsHelper->getSystemPath("dashboard.{$type}");
         $path = $dir.'/'.$name.'.json';
 
         if (file_exists($path) && is_writable($path)) {
@@ -391,7 +391,7 @@ class DashboardController extends AbstractFormController
         $type  = array_shift($parts);
         $name  = implode('.', $parts);
 
-        $dir  = $pathsHelper->getSystemPath("dashboard.$type");
+        $dir  = $pathsHelper->getSystemPath("dashboard.{$type}");
         $path = $dir.'/'.$name.'.json';
 
         if (!file_exists($path) || !is_readable($path)) {

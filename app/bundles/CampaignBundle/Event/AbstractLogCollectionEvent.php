@@ -97,11 +97,11 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
     public function findLogByContactId($id)
     {
         if (!isset($this->logContactXref[$id])) {
-            throw new NoContactsFoundException("$id not found");
+            throw new NoContactsFoundException("{$id} not found");
         }
 
         if (!$this->logs->offsetExists($this->logContactXref[$id])) {
-            throw new NoContactsFoundException("$id was found in the xref table but no log was found");
+            throw new NoContactsFoundException("{$id} was found in the xref table but no log was found");
         }
 
         return $this->logs->get($this->logContactXref[$id]);
