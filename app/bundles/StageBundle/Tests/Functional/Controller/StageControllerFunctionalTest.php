@@ -51,6 +51,7 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedStage = $this->em->find(Stage::class, $stage->getId());
+        $this->assertInstanceOf(Stage::class, $savedStage);
         Assert::assertSame($project->getId(), $savedStage->getProjects()->first()->getId());
     }
 

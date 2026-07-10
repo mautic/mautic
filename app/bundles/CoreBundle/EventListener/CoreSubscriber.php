@@ -176,7 +176,7 @@ class CoreSubscriber implements EventSubscriberInterface
 
                         foreach (['name', 'path', 'controller'] as $required) {
                             if (empty($details[$required])) {
-                                throw new \InvalidArgumentException("$bundle.$name must have $required defined");
+                                throw new \InvalidArgumentException("{$bundle}.{$name} must have {$required} defined");
                             }
                         }
 

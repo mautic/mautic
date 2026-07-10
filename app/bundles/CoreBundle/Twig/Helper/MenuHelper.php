@@ -40,9 +40,9 @@ final readonly class MenuHelper
             $name  = trim($name);
             $value = trim($value);
             if ($name === $value) {
-                $string .= " $name";
+                $string .= " {$name}";
             } else {
-                $string .= " $name=\"$value\"";
+                $string .= " {$name}=\"{$value}\"";
             }
         }
 

@@ -158,7 +158,7 @@ class CorePermissions implements ResetInterface
                 foreach ($perms as $perm) {
                     // get the bit for the perm
                     if (!$object->isSupported($name, $perm)) {
-                        throw new \InvalidArgumentException("$perm does not exist for $bundle:$name");
+                        throw new \InvalidArgumentException("{$perm} does not exist for {$bundle}:{$name}");
                     }
 
                     $bit += $object->getValue($name, $perm);

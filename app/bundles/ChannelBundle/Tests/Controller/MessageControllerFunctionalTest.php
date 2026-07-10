@@ -33,6 +33,7 @@ final class MessageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedMessage = $this->em->find(Message::class, $message->getId());
+        $this->assertInstanceOf(Message::class, $savedMessage);
         Assert::assertSame($project->getId(), $savedMessage->getProjects()->first()->getId());
     }
 }

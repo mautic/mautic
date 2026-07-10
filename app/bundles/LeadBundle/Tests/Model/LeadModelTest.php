@@ -323,7 +323,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
         } catch (\Exception) {
-            $this->assertNull($leadEventLog->getLead());
+            $this->assertNotInstanceOf(Lead::class, $leadEventLog->getLead());
         }
     }
 
