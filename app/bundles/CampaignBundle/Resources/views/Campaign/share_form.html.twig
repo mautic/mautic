@@ -3,6 +3,7 @@
 {% block headerTitle %}{{ 'mautic.campaign.share.header'|trans({'%name%': campaignName}) }}{% endblock %}
 
 {% block content %}
+{% set stashedImages = stashedImages ?? {} %}
 <div class="box-layout">
     <div class="col-md-8 col-md-offset-2 height-auto">
         <div class="pa-lg">
@@ -72,6 +73,10 @@
                         {{ form_label(form.bannerImage) }}
                         {{ form_widget(form.bannerImage) }}
                         {{ form_errors(form.bannerImage) }}
+                        {{ form_widget(form.bannerImageStash, stashedImages.bannerImageStash is defined ? {'value': stashedImages.bannerImageStash.token} : {}) }}
+                        {% if stashedImages.bannerImageStash is defined %}
+                            <span class="help-block"><i class="ri-attachment-2"></i> {{ stashedImages.bannerImageStash.name }}</span>
+                        {% endif %}
                         <span class="help-block">
                             <i class="ri-information-line"></i>
                             {{ 'mautic.campaign.share.banner_image.help'|trans }}
@@ -84,12 +89,19 @@
 
                     <div id="gallery-slots">
                         {% for i in 1..8 %}
-                        <div class="row gallery-row" data-gallery-slot="{{ i }}" {% if i > 1 %}style="display: none; margin-top: 10px;"{% endif %}>
+                        {% set slotStash = stashedImages['galleryImageStash' ~ i] ?? null %}
+                        {# Keep slots visible after a failed-validation re-render when they carry a stashed image or an alt text. #}
+                        {% set slotHasContent = slotStash is not null or attribute(form, 'galleryAlt' ~ i).vars.value is not empty %}
+                        <div class="row gallery-row" data-gallery-slot="{{ i }}" {% if i > 1 and not slotHasContent %}style="display: none; margin-top: 10px;"{% endif %}>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="campaign_share_galleryImage{{ i }}">{{ 'mautic.campaign.share.gallery_image'|trans }} {{ i }}</label>
                                     {{ form_widget(attribute(form, 'galleryImage' ~ i), {id: 'campaign_share_galleryImage' ~ i}) }}
                                     {{ form_errors(attribute(form, 'galleryImage' ~ i)) }}
+                                    {{ form_widget(attribute(form, 'galleryImageStash' ~ i), slotStash ? {'value': slotStash.token} : {}) }}
+                                    {% if slotStash %}
+                                        <span class="help-block"><i class="ri-attachment-2"></i> {{ slotStash.name }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="col-md-6">

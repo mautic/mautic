@@ -21,6 +21,10 @@ final class CampaignShareService
 
     public const SHARE_DIR = 'campaign_share';
 
+    // Uploaded banner/gallery images are parked here when the share form fails
+    // validation, so a corrected re-submit doesn't force the user to pick them again.
+    public const PENDING_DIR = 'campaign_share/pending';
+
     public function __construct(
         private readonly ExportHelper $exportHelper,
         private readonly CoreParametersHelper $coreParametersHelper,
@@ -41,31 +45,7 @@ final class CampaignShareService
      */
     public function share(Campaign $campaign, array $exportData, array $assetList, array $metadata = []): string
     {
-        $composerJson = $this->buildComposerJson($campaign, $metadata);
-
-        $jsonOutput = json_encode([$exportData], JSON_PRETTY_PRINT);
-
-        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
-        $this->addComposerJsonToZip($zipFilePath, $composerJson);
-
-        // Add banner image
-        $bannerImage = $metadata['bannerImage'] ?? null;
-        if ($bannerImage instanceof UploadedFile) {
-            $this->addImageToZip($zipFilePath, $bannerImage, 'banner');
-        }
-
-        // Add gallery images
-        $gallery = $metadata['gallery'] ?? [];
-        foreach ($gallery as $index => $item) {
-            $image = $item['image'] ?? null;
-            if ($image instanceof UploadedFile) {
-                $alt = $item['alt'] ?? '';
-                $this->addImageToZip($zipFilePath, $image, 'gallery/image_'.($index + 1));
-                if ('' !== $alt) {
-                    $this->addTextToZip($zipFilePath, 'gallery/image_'.($index + 1).'.alt.txt', $alt);
-                }
-            }
-        }
+        $zipFilePath = $this->buildShareZip($campaign, $exportData, $assetList, $metadata);
 
         $token = $this->storeTransientZip($zipFilePath);
 
@@ -74,6 +54,49 @@ final class CampaignShareService
             ['token' => $token],
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
+    }
+
+    /**
+     * Builds the shareable ZIP (entity data, assets, composer.json, banner and gallery
+     * images) and returns its path. Used by both the publish flow and the share form's
+     * Download button so they produce identical archives.
+     *
+     * @param array<int|string, mixed> $exportData
+     * @param array<int, string>       $assetList
+     * @param array<string, mixed>     $metadata
+     *
+     * @throws InvalidPackageNameException
+     */
+    public function buildShareZip(Campaign $campaign, array $exportData, array $assetList, array $metadata = []): string
+    {
+        $composerJson = $this->buildComposerJson($campaign, $metadata);
+
+        $jsonOutput = json_encode([$exportData], JSON_PRETTY_PRINT);
+
+        $zipFilePath = $this->exportHelper->writeToZipFile($jsonOutput, $assetList, '');
+        $this->addComposerJsonToZip($zipFilePath, $composerJson);
+
+        // Banner and gallery live under assets/ so the shared archive keeps the same
+        // layout as a plain campaign export and the import flow restores the images
+        // into the media directory.
+        $bannerImage = $metadata['bannerImage'] ?? null;
+        if ($bannerImage instanceof UploadedFile) {
+            $this->addImageToZip($zipFilePath, $bannerImage, 'assets/banner');
+        }
+
+        $gallery = $metadata['gallery'] ?? [];
+        foreach ($gallery as $index => $item) {
+            $image = $item['image'] ?? null;
+            if ($image instanceof UploadedFile) {
+                $alt = $item['alt'] ?? '';
+                $this->addImageToZip($zipFilePath, $image, 'assets/gallery/image_'.($index + 1));
+                if ('' !== $alt) {
+                    $this->addTextToZip($zipFilePath, 'assets/gallery/image_'.($index + 1).'.alt.txt', $alt);
+                }
+            }
+        }
+
+        return $zipFilePath;
     }
 
     /**
@@ -227,6 +250,103 @@ final class CampaignShareService
         $uploadDir = (string) $this->coreParametersHelper->get('upload_dir', 'media/files');
 
         return rtrim($uploadDir, '/').'/'.self::SHARE_DIR;
+    }
+
+    /**
+     * Parks an uploaded image under an unguessable token so it survives a failed
+     * validation round-trip (browsers never repopulate file inputs). Returns the
+     * token and the original client filename for display in the re-rendered form.
+     *
+     * @return array{token: string, name: string}
+     */
+    public function stashImage(UploadedFile $file): array
+    {
+        $pendingDir = $this->getPendingDir();
+        $this->filesystem->mkdir($pendingDir, 0775);
+
+        $token = bin2hex(random_bytes(16));
+        $name  = $file->getClientOriginalName();
+
+        $file->move($pendingDir, $token.'.img');
+        $this->filesystem->dumpFile($pendingDir.'/'.$token.'.json', (string) json_encode([
+            'originalName' => $name,
+            'mimeType'     => $file->getClientMimeType(),
+        ]));
+
+        $this->purgeExpiredPendingImages($pendingDir);
+
+        return ['token' => $token, 'name' => $name];
+    }
+
+    /**
+     * Rebuilds an UploadedFile from a stashed image; null when the token is invalid,
+     * expired, or was never set — callers then simply treat the image as absent.
+     */
+    public function restoreStashedImage(?string $token): ?UploadedFile
+    {
+        $meta = $this->readStashMetadata($token);
+        if (null === $meta) {
+            return null;
+        }
+
+        return new UploadedFile(
+            $this->getPendingDir().'/'.$token.'.img',
+            $meta['originalName'],
+            $meta['mimeType'],
+            null,
+            true,
+        );
+    }
+
+    /**
+     * Original filename of a stashed image, for showing "kept: <name>" next to the
+     * file input when the form re-renders after failed validation.
+     */
+    public function stashedImageName(?string $token): ?string
+    {
+        return $this->readStashMetadata($token)['originalName'] ?? null;
+    }
+
+    /**
+     * @return array{originalName: string, mimeType: string}|null
+     */
+    private function readStashMetadata(?string $token): ?array
+    {
+        // The token is user-supplied on re-submit; the strict format check keeps it
+        // from being abused as a path traversal into the upload directory.
+        if (null === $token || 1 !== preg_match('/^[a-f0-9]{32}$/', $token)) {
+            return null;
+        }
+
+        $pendingDir = $this->getPendingDir();
+        if (!is_file($pendingDir.'/'.$token.'.img') || !is_file($pendingDir.'/'.$token.'.json')) {
+            return null;
+        }
+
+        $meta = json_decode((string) file_get_contents($pendingDir.'/'.$token.'.json'), true);
+        if (!\is_array($meta) || !\is_string($meta['originalName'] ?? null) || !\is_string($meta['mimeType'] ?? null)) {
+            return null;
+        }
+
+        return ['originalName' => $meta['originalName'], 'mimeType' => $meta['mimeType']];
+    }
+
+    private function getPendingDir(): string
+    {
+        $uploadDir = (string) $this->coreParametersHelper->get('upload_dir', 'media/files');
+
+        return rtrim($uploadDir, '/').'/'.self::PENDING_DIR;
+    }
+
+    private function purgeExpiredPendingImages(string $pendingDir): void
+    {
+        $cutoff = time() - self::SHARE_TTL_SECONDS;
+        foreach (glob($pendingDir.'/*.{img,json}', GLOB_BRACE) ?: [] as $file) {
+            $mtime = @filemtime($file);
+            if (false !== $mtime && $mtime < $cutoff) {
+                @unlink($file);
+            }
+        }
     }
 
     private function purgeExpiredShares(string $shareDir): void

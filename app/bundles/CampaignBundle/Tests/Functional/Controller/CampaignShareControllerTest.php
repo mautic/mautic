@@ -218,6 +218,76 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $this->assertFileDoesNotExist($zipPath);
     }
 
+    public function testFailedValidationKeepsUploadedBannerAndPacksItOnResubmit(): void
+    {
+        $nonAdminUser = $this->setupShareTestData(1024);
+        $this->loginOtherUser($nonAdminUser);
+
+        $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
+
+        // Submit with a banner but a blank vendor name, so validation fails.
+        $form = $crawler->selectButton('campaign_share[download]')->form();
+        $form->setValues([
+            'campaign_share[title]'             => self::CAMPAIGN_NAME,
+            'campaign_share[vendorName]'        => '',
+            'campaign_share[version]'           => '1.0.0',
+            'campaign_share[headline]'          => 'Test Headline For Campaign',
+            'campaign_share[description]'       => self::TEST_DESCRIPTION,
+            'campaign_share[worksWithVersions]' => ['5.0'],
+        ]);
+        $pngPath = $this->createTempPng();
+        $form['campaign_share[bannerImage]']->upload($pngPath);
+
+        $crawler  = $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertNotSame('application/zip', $response->headers->get('Content-Type'));
+
+        // The re-rendered form must carry the stash token and show the kept filename.
+        $stashToken = (string) $crawler->filter('input[name="campaign_share[bannerImageStash]"]')->attr('value');
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $stashToken);
+        $this->assertStringContainsString(basename($pngPath), (string) $response->getContent());
+
+        // Fix the vendor name and re-submit WITHOUT selecting the file again.
+        $form = $crawler->selectButton('campaign_share[download]')->form();
+        $form->setValues([
+            'campaign_share[title]'             => self::CAMPAIGN_NAME,
+            'campaign_share[vendorName]'        => 'acme',
+            'campaign_share[version]'           => '1.0.0',
+            'campaign_share[headline]'          => 'Test Headline For Campaign',
+            'campaign_share[description]'       => self::TEST_DESCRIPTION,
+            'campaign_share[worksWithVersions]' => ['5.0'],
+        ]);
+
+        $this->client->submit($form);
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+
+        ob_start();
+        $response->sendContent();
+        $zipContents = (string) ob_get_clean();
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'share_zip_');
+        file_put_contents($zipPath, $zipContents);
+
+        $zip = new \ZipArchive();
+        $this->assertTrue($zip->open($zipPath));
+        $this->assertNotFalse($zip->locateName('assets/banner.png'), 'The stashed banner must be packed into the downloaded ZIP.');
+        $zip->close();
+        @unlink($zipPath);
+    }
+
+    private function createTempPng(): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'share_banner_');
+        rename($path, $path .= '.png');
+        // 1x1 transparent PNG so the File constraint's mime sniffing sees a real image.
+        file_put_contents($path, (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true));
+
+        return $path;
+    }
+
     public function testShareFormValidationRejectsInvalidVersion(): void
     {
         $nonAdminUser = $this->setupShareTestData(1024);

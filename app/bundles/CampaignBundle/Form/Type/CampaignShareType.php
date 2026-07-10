@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -117,6 +118,10 @@ final class CampaignShareType extends AbstractType
             ]
         );
 
+        // Carries the stash token of a banner uploaded in a submit that failed
+        // validation, so the image survives the round-trip (file inputs don't).
+        $builder->add('bannerImageStash', HiddenType::class, ['required' => false]);
+
         $builder->add(
             'headline',
             TextType::class,
@@ -214,6 +219,9 @@ final class CampaignShareType extends AbstractType
                     'label' => 'mautic.campaign.share.gallery_image',
                 ]
             );
+
+            // Same failed-validation stash mechanism as bannerImageStash.
+            $builder->add('galleryImageStash'.$i, HiddenType::class, ['required' => false]);
 
             $builder->add(
                 'galleryAlt'.$i,

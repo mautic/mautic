@@ -169,7 +169,7 @@ final class ResourceInstaller implements ResourceInstallerInterface
      * Prepares import data: adds UUIDs, defaults, and normalizes dependencies
      * to match the format expected by CampaignImportExportSubscriber.
      *
-     * @param array<int, array<string, mixed>> &$fileData
+     * @param array<int, array<string, mixed>> $fileData
      */
     private function prepareImportData(array &$fileData): void
     {
