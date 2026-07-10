@@ -24,7 +24,7 @@ final class DynamicContentExportListEventSubscriberTest extends TestCase
         $this->filesystem = new Filesystem();
         // realpath: macOS's temp dir is a symlink (/var -> /private/var) and the helper
         // resolves collected paths, so the expectation must use the resolved prefix too.
-        $this->imageDir = (string) realpath(sys_get_temp_dir()).'/dwc_export_images_test/media/images';
+        $this->imageDir = realpath(sys_get_temp_dir()).'/dwc_export_images_test/media/images';
         $this->filesystem->mkdir($this->imageDir);
     }
 

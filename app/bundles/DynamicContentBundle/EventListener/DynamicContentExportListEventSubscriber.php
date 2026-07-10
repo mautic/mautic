@@ -14,10 +14,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * landing pages do. Those images are not Asset entities, so without this listener they
  * would be missing from the export ZIP and show up broken after import.
  */
-final class DynamicContentExportListEventSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentExportListEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly EmailMediaImageHelper $mediaImageHelper,
+        private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
 
