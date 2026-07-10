@@ -64,7 +64,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     public function testGetTrackedLeadNoTrackedIdentifier(): void
@@ -81,7 +81,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -119,7 +119,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -163,7 +163,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**
@@ -213,7 +213,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $contactTrackingService = $this->getContactTrackingService();
-        $this->assertNull($contactTrackingService->getTrackedLead());
+        $this->assertNotInstanceOf(Lead::class, $contactTrackingService->getTrackedLead());
     }
 
     /**

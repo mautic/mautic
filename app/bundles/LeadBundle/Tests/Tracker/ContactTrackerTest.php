@@ -133,6 +133,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($device);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getFieldValue('email'));
     }
@@ -152,6 +153,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($lead);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
@@ -183,6 +185,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$lead]);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
@@ -212,6 +215,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldModelMock->expects($this->any())->method('getFieldListWithProperties')->willReturn([]);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
         $this->assertEquals(true, $contact->isNewlyCreated());
     }
 

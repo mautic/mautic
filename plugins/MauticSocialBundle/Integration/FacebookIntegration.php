@@ -67,7 +67,7 @@ class FacebookIntegration extends SocialIntegration
 
     public function getApiUrl($endpoint): string
     {
-        return "https://graph.facebook.com/$endpoint";
+        return "https://graph.facebook.com/{$endpoint}";
     }
 
     /**

@@ -2341,7 +2341,7 @@ class LeadModel extends FormModel
         }
 
         if ($leadId = $lead->getId()) {
-            $this->logger->debug("LEAD: New lead created with ID# $leadId.");
+            $this->logger->debug("LEAD: New lead created with ID# {$leadId}.");
         }
 
         return $lead;

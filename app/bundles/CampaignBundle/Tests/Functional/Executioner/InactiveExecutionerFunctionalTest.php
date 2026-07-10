@@ -213,6 +213,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, count($redirectConditionLogs), 'Expected redirect condition to be executed');
         $this->assertCount(0, $originalNegativeActionLogs,
             'Original decision negative action should NOT be executed');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         // Verify execution counters
         $this->assertGreaterThan(0, $counter->getTotalEvaluated(), 'Expected contacts to be evaluated');

@@ -119,6 +119,7 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($data);
 
         $company = $integration->getMauticCompany($data);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
 
         $this->assertEquals('Some Business', $company->getName());
         $this->assertEquals('Some Business', $company->getFieldValue('custom_company_name'));

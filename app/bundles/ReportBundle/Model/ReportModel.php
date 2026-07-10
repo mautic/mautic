@@ -297,7 +297,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 continue;
             }
             if (isset($data['label'])) {
-                $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"{$column}\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];
                 $return->definitions[$column] = $data;
             }
@@ -327,13 +327,13 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             if (isset($data['label'])) {
                 $return->definitions[$filter] = $data;
                 $return->choices[$filter]     = $data['label'];
-                $return->choiceHtml .= "<option value=\"$filter\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"{$filter}\">{$data['label']}</option>\n";
 
                 $return->operatorChoices[$filter] = $this->getOperatorOptions($data);
                 $return->operatorHtml[$filter]    = '';
 
                 foreach ($return->operatorChoices[$filter] as $value => $label) {
-                    $return->operatorHtml[$filter] .= "<option value=\"$value\">$label</option>\n";
+                    $return->operatorHtml[$filter] .= "<option value=\"{$value}\">{$label}</option>\n";
                 }
             }
         }
@@ -634,7 +634,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 if (is_array($param)) {
                     $param = implode("','", $param);
                 }
-                $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
+                $debugData['query'] = str_replace(":{$name}", "'{$param}'", $debugData['query']);
             }
 
             $debugData['query_time'] = $queryTime ?? 'N/A';
