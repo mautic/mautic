@@ -35,6 +35,11 @@ parameters:
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	ignoreErrors:
+        # optional child method access
+		-
+			identifier: '#Call to an undefined method Mautic\\CoreBundle\\Controller\\AbstractFormController::getPermissionBase\(\)#'
+			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
+
 		- identifier: missingType.generics
 		# not all IDEs are as smart as PHPSTAN and need the type hint
 		- identifier: function.alreadyNarrowedType
@@ -123,6 +128,35 @@ parameters:
 			paths:
 				- app
 				- plugins
+
+		# mautic deprecations
+		-
+			identifier: staticMethod.deprecated
+			message: '#class Mautic#'
+		-
+			identifier: parameter.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: class.extendsDeprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: staticMethod.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: method.deprecated
+			message: '#class Mautic#'
+		-
+			identifier: return.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: classConstant.deprecatedClass
+			message: '#class Mautic#'
+		-
+			identifier: new.deprecated
+			message: '#class Mautic#'
+		-
+			identifier: classConstant.deprecated
+			message: '#class Mautic#'
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
