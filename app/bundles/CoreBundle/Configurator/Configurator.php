@@ -207,7 +207,7 @@ class Configurator
                     $value = $this->renderArray($value);
                 }
 
-                $string .= "\t'$key' => $value,\n";
+                $string .= "\t'{$key}' => {$value},\n";
             }
         }
 

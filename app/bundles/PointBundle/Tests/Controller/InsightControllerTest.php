@@ -55,7 +55,7 @@ final class InsightControllerTest extends MauticMysqlTestCase
 
         $insightId = $insight->getId();
 
-        $this->assertNotNull($insightModel->getEntity($insightId));
+        $this->assertInstanceOf(PointInsight::class, $insightModel->getEntity($insightId));
 
         $this->client->request(Request::METHOD_POST, '/s/points/insights/delete/'.$insightId);
 

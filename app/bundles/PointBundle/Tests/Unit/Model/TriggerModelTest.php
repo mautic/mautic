@@ -119,7 +119,7 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
                     return $event;
                 }
-                $this->fail("Unexpected event name: $eventName");
+                $this->fail("Unexpected event name: {$eventName}");
             });
 
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);

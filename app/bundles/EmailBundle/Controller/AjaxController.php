@@ -148,7 +148,7 @@ class AjaxController extends CommonAjaxController
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
-                        $dataArray['folders'] .= "<option value=\"$folder\">$folder</option>\n";
+                        $dataArray['folders'] .= "<option value=\"{$folder}\">{$folder}</option>\n";
                     }
                 }
                 $dataArray['success'] = 1;

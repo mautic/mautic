@@ -108,7 +108,7 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
 
         // Assert
         $this->em->refresh($childNotification);
-        $this->assertNull($childNotification->getTranslationParent());
+        $this->assertNotInstanceOf(\Mautic\CoreBundle\Entity\TranslationEntityInterface::class, $childNotification->getTranslationParent());
     }
 
     public function testTranslationsAreDisplayedOnViewPage(): void

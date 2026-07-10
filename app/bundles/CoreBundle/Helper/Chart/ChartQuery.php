@@ -583,7 +583,7 @@ class ChartQuery extends AbstractChart
         $dbUnit                = $this->translateTimeUnit($this->unit);
         $columnName            = $tablePrefix.'.'.$column;
         $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
+        $columnName            = "CONVERT_TZ({$columnName}, '+00:00', '{$defaultTimezoneOffset}')";
 
         return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
     }

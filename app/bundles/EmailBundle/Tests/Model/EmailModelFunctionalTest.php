@@ -337,6 +337,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $emailStat->setDateRead(new \DateTime());
         $emailStat->setOpenCount(1);
         $email = $emailStat->getEmail();
+        $this->assertInstanceOf(Email::class, $email);
         $email->setReadCount($email->getReadCount() + 1);
         $this->em->persist($emailStat);
         $this->em->persist($email);

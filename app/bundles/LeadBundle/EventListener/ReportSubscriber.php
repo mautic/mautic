@@ -286,7 +286,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             $qb->expr()->eq('log.is_scheduled', 0),
                             $qb->expr()->isNotNull('l.attribution'),
                             $qb->expr()->neq('l.attribution', 0),
-                            $qb->expr()->lte("DATE($localDateTriggered)", 'DATE(l.attribution_date)')
+                            $qb->expr()->lte("DATE({$localDateTriggered})", 'DATE(l.attribution_date)')
                         )
                     );
 
@@ -330,7 +330,7 @@ class ReportSubscriber implements EventSubscriberInterface
                             }
 
                             $expr = $expr->with(
-                                $expr->{$filter['operator']}($x, ":$filterParam")
+                                $expr->{$filter['operator']}($x, ":{$filterParam}")
                             );
                             $qb->setParameter($filterParam, $filter['value']);
                         }
@@ -345,7 +345,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 if ('multi' != $alias) {
                     // Get the min/max row and group by lead for first touch or last touch events
                     $func = ('first' == $alias) ? 'min' : 'max';
-                    $subQ->select("$func({$alias}log.date_triggered)")
+                    $subQ->select("{$func}({$alias}log.date_triggered)")
                         ->setMaxResults(1);
                     $qb->andWhere(
                         $qb->expr()->eq('log.date_triggered', sprintf('(%s)', $subQ->getSQL()))
@@ -888,7 +888,7 @@ class ReportSubscriber implements EventSubscriberInterface
         ];
         unset($stages);
 
-        $context = "contact.attribution.$type";
+        $context = "contact.attribution.{$type}";
         $event
             ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_stages')
             ->addGraph($context, 'pie', 'mautic.lead.graph.pie.attribution_campaigns')
