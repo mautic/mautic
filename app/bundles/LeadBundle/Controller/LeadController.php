@@ -698,7 +698,8 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
@@ -809,7 +810,8 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
                 $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
@@ -976,7 +978,8 @@ class LeadController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
+                    }
+                    if (
                         !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
                         || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
                     ) {

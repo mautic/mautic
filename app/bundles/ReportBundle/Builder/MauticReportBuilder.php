@@ -502,7 +502,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
             return $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL());
-        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
+        }
+        if (in_array($filter['condition'], ['notIn', 'empty'])) {
             return $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL());
         }
 

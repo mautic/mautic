@@ -187,7 +187,8 @@ abstract class AbstractFormController extends CommonController
                     $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+            }
+            if ($this->security->checkPermissionExists($permissionBase.':edit')) {
                 return $this->security->isGranted(
                     $permissionBase.':edit'
                 );

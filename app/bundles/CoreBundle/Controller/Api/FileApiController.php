@@ -128,7 +128,8 @@ class FileApiController extends CommonApiController
 
         if (!file_exists($filePath)) {
             return $this->returnError('File does not exist', Response::HTTP_NOT_FOUND);
-        } elseif (!is_writable($filePath)) {
+        }
+        if (!is_writable($filePath)) {
             return $this->returnError('File is not writable');
         }
         unlink($filePath);

@@ -240,7 +240,8 @@ class InstallCommand extends Command
                         $output->writeln('Install canceled');
 
                         return (int) -$step;
-                    } elseif (isset($messages['optional']) && !empty($messages['optional'])) {
+                    }
+                    if (isset($messages['optional']) && !empty($messages['optional'])) {
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
 

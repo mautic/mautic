@@ -19,7 +19,7 @@ return RectorConfig::configure()
         __DIR__.'/plugins',
     ])
     ->withPreparedSets(deadCode: true, typeDeclarations: true)
-    ->withPhpSets(php81: true)
+    ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
         // common controllers
@@ -45,7 +45,6 @@ return RectorConfig::configure()
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
-        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -56,6 +55,9 @@ return RectorConfig::configure()
         Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
+
+        // offer next
+        Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,
 
         UnserializeToSerializerDecodeRector::class => [
             // tests
@@ -72,18 +74,15 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
-        Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
-            __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
-        ],
-
-        // rector bug to be fixed
-        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.php',
-            __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
-            __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
+            // a getRepository() override
+            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
+            // list lead vs lead list diff
+            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
         ],
 
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
+
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
@@ -117,19 +116,8 @@ return RectorConfig::configure()
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnNullableTypeRector::class => [
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
-        ],
 
-        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictTypedPropertyRector::class => [
-            // date times
-            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
-            __DIR__.'/app/bundles/IntegrationsBundle/Sync/DAO/DateRange.php',
-        ],
-
-        TypedPropertyFromAssignsRector::class => [
-            '*/Entity/*',
-        ],
+        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

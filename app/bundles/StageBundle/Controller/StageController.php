@@ -271,7 +271,8 @@ class StageController extends AbstractFormController
                     ]
                 )
             );
-        } elseif (!$this->security->isGranted('stage:stages:edit')) {
+        }
+        if (!$this->security->isGranted('stage:stages:edit')) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked

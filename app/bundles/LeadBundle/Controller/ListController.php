@@ -345,7 +345,8 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist',
                     ],
                 ]));
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
             }
         }
@@ -758,7 +759,8 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             $list->getCreatedBy()
