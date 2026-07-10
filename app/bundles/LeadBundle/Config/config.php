@@ -248,6 +248,11 @@ return [
                 'path'            => '/companies',
                 'controller'      => Mautic\LeadBundle\Controller\Api\CompanyApiController::class,
             ],
+            'mautic_api_companybatchaddcontacts' => [
+                'path'       => '/companies/batch/addcontacts',
+                'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::batchAddContactsAction',
+                'method'     => 'POST',
+            ],
             'mautic_api_companyaddcontact' => [
                 'path'       => '/companies/{companyId}/contact/{contactId}/add',
                 'controller' => 'Mautic\LeadBundle\Controller\Api\CompanyApiController::addContactAction',

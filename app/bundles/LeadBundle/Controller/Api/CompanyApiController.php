@@ -14,11 +14,13 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Model\BatchCompanyContactAssignmentModel;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -50,6 +52,7 @@ final class CompanyApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private CompanyModel $companyModel,
         private LeadModel $leadModel,
+        private BatchCompanyContactAssignmentModel $batchCompanyContactAssignmentModel,
     ) {
         $this->model              = $companyModel;
         $this->entityClass        = Company::class;
@@ -103,9 +106,70 @@ final class CompanyApiController extends CommonApiController
             return $contact;
         }
 
-        $this->model->addLeadToCompany($company, $contact);
+        $addedCompanyIds = $this->model->addLeadToCompany($company, $contact);
+
+        try {
+            $this->batchCompanyContactAssignmentModel->logContactCompanyAssignments(
+                $contact,
+                $addedCompanyIds,
+                [$company->getId() => $company],
+            );
+        } catch (\Throwable) {
+            // Assignment succeeded; logging failure must not change the API outcome.
+        }
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Assigns multiple contacts to multiple companies in one request.
+     */
+    public function batchAddContactsAction(Request $request): Response
+    {
+        if (!$this->security->isGranted('lead:leads:editown') && !$this->security->isGranted('lead:leads:editother')) {
+            return $this->accessDenied();
+        }
+
+        $parameters   = $this->getBatchAddContactsParameters($request);
+        $assignments = $parameters['assignments'] ?? null;
+
+        if (!is_array($assignments) || [] === $assignments) {
+            return $this->returnError('"assignments" parameter is required and must be a non-empty array', Response::HTTP_BAD_REQUEST);
+        }
+
+        foreach ($assignments as $entry) {
+            if (!is_array($entry)) {
+                return $this->returnError('Assignments entries must be a non-empty array', Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $valid = $this->validateBatchPayload($assignments);
+        if ($valid instanceof Response) {
+            return $valid;
+        }
+
+        $payload = $this->batchCompanyContactAssignmentModel->process($assignments);
+
+        return $this->handleView($this->view($payload, Response::HTTP_OK));
+    }
+
+    /**
+     * Prefer the raw JSON body so Content-Type: application/json works without relying on
+     * request bag population; fall back to the request parameter bag for form posts.
+     *
+     * @return array<string, mixed>
+     */
+    private function getBatchAddContactsParameters(Request $request): array
+    {
+        $content = $request->getContent();
+        if ('' !== $content) {
+            $decoded = json_decode($content, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return $request->request->all();
     }
 
     /**
