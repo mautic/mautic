@@ -77,7 +77,7 @@ class AnalyseCustomFieldCommand extends Command
 
             $label  = $analysisDetail['label'];
             $rows[] = [
-                "\"$label\"",
+                "\"{$label}\"",
                 $analysisDetail['alias'],
                 $columnLength,
                 $maxLength,

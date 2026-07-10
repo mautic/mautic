@@ -46,7 +46,7 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function getApiUrl($endpoint, $m = 'foursquare'): string
     {
-        return "https://api.foursquare.com/v2/$endpoint?v=20140806&m={$m}";
+        return "https://api.foursquare.com/v2/{$endpoint}?v=20140806&m={$m}";
     }
 
     /**
