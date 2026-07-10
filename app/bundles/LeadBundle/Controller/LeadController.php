@@ -756,8 +756,8 @@ class LeadController extends FormController
                     $image = $form['preferred_profile_image']->getData();
                     if ('custom' == $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        $file = $form['custom_avatar']->getData();
+                        if ($file instanceof UploadedFile) {
                             $this->uploadAvatar($request, $avatarHelper, $lead);
 
                             // Note the avatar update so that it can be forced to update

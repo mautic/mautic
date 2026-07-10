@@ -44,8 +44,8 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Person $fullcontact */
-        if ($fullcontact = $this->getFullContact()) {
+        $fullcontact = $this->getFullContact();
+        if ($fullcontact instanceof FullContact_Person) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     [$cacheId, $webhookId, $cache] = $this->getCache($lead, $notify);
@@ -90,8 +90,8 @@ class LookupHelper
             return;
         }
 
-        /** @var FullContact_Company $fullcontact */
-        if ($fullcontact = $this->getFullContact(false)) {
+        $fullcontact = $this->getFullContact(false);
+        if ($fullcontact instanceof FullContact_Company) {
             if (!$checkAuto || $this->integration->shouldAutoUpdate()) {
                 try {
                     $parse                             = parse_url($website);
