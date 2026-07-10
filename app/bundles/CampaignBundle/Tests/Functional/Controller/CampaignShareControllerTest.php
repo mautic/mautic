@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Service\CampaignShareService;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
@@ -217,6 +218,68 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_GONE, $this->client->getResponse()->getStatusCode());
         // Expired files are unlinked on access.
         $this->assertFileDoesNotExist($zipPath);
+    }
+
+    public function testShareDownloadPacksEmailBuilderImages(): void
+    {
+        $nonAdminUser = $this->setupShareTestData(1024);
+        $this->loginOtherUser($nonAdminUser);
+
+        // A builder image on disk, referenced from the campaign's email the same way
+        // the email builder stores it (absolute URL under media/images).
+        $pathsHelper = self::getContainer()->get(PathsHelper::class);
+        $imageDir    = rtrim($pathsHelper->getImagePath(), '/');
+        if (!is_dir($imageDir)) {
+            mkdir($imageDir, 0775, true);
+        }
+        $fileName  = 'share_asset_'.bin2hex(random_bytes(6)).'.png';
+        $imagePath = $imageDir.'/'.$fileName;
+        file_put_contents($imagePath, 'fake-png-bytes');
+
+        $email = $this->createEmail('Share Asset Email');
+        $email->setCustomHtml('<img src="https://origin.example.com/media/images/'.$fileName.'">');
+
+        $event = $this->createEvent('Send share email', $this->campaign, 'email.send', 'action', ['email' => $email->getId()]);
+        $event->setChannel('email');
+        $this->em->flush();
+        $event->setChannelId($email->getId());
+        $this->em->flush();
+
+        try {
+            $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
+            $form    = $crawler->selectButton('campaign_share[download]')->form();
+            $form->setValues([
+                'campaign_share[title]'             => self::CAMPAIGN_NAME,
+                'campaign_share[vendorName]'        => 'acme',
+                'campaign_share[version]'           => '1.0.0',
+                'campaign_share[headline]'          => 'Test Headline For Campaign',
+                'campaign_share[description]'       => self::TEST_DESCRIPTION,
+                'campaign_share[worksWithVersions]' => ['5.0'],
+            ]);
+
+            $this->client->submit($form);
+            $response = $this->client->getResponse();
+            $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+            $this->assertSame('application/zip', $response->headers->get('Content-Type'));
+
+            ob_start();
+            $response->sendContent();
+            $zipContents = (string) ob_get_clean();
+
+            $zipPath = tempnam(sys_get_temp_dir(), 'share_zip_');
+            file_put_contents($zipPath, $zipContents);
+
+            $zip = new \ZipArchive();
+            $this->assertTrue($zip->open($zipPath));
+            $this->assertNotFalse(
+                $zip->locateName('assets/'.$fileName),
+                'The share archive must contain the email builder image under assets/.'
+            );
+            $zip->close();
+            @unlink($zipPath);
+        } finally {
+            @unlink($imagePath);
+        }
     }
 
     public function testFailedValidationKeepsUploadedBannerAndPacksItOnResubmit(): void
