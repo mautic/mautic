@@ -177,7 +177,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $q;
         }
 
-        $q->andWhere("$col = :search")->setParameter('search', $value);
+        $q->andWhere("{$col} = :search")->setParameter('search', $value);
 
         return $q;
     }
@@ -290,7 +290,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -660,7 +660,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $this->buildWhereClauseFromArray($qb, [$value]);
                 } else {
                     if (!str_contains($column, '.')) {
-                        $column = "entity.$column";
+                        $column = "entity.{$column}";
                     }
                     if (null === $expr) {
                         $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
@@ -781,14 +781,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr = $q->expr()->or(
-                    $q->expr()->$likeExpr('l.firstname', ":$unique"),
-                    $q->expr()->$likeExpr('l.lastname', ":$unique")
+                    $q->expr()->$likeExpr('l.firstname', ":{$unique}"),
+                    $q->expr()->$likeExpr('l.lastname', ":{$unique}")
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
             case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
-                $expr            = $q->expr()->$likeExpr('l.email', ":$unique");
+                $expr            = $q->expr()->$likeExpr('l.email', ":{$unique}");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
@@ -800,7 +800,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         $q->expr()->and(
                             $q->expr()->eq('l.id', 'lla.lead_id'),
                             $q->expr()->eq('lla.manually_removed', 0),
-                            $q->expr()->in('lla.leadlist_id', ":$unique")
+                            $q->expr()->in('lla.leadlist_id', ":{$unique}")
                         )
                     );
                 $from = $q->getQueryPart('from')[0];
@@ -878,7 +878,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         )
                     )
                     ->groupBy('duplicate.lead_id')
-                    ->having("COUNT(duplicate.lead_id) = $pluck");
+                    ->having("COUNT(duplicate.lead_id) = {$pluck}");
 
                 $expr            = $q->expr()->$inExpr('l.id', sprintf('(%s)', $sq->getSQL()));
                 $returnParameter = true;
@@ -959,7 +959,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 if ($string === $anyKeyword || $string === $anyKeywordEn) {
                     $returnParameter = false;
                 } else {
-                    $sq->andWhere($q->expr()->eq('dnc.channel', ":$unique"));
+                    $sq->andWhere($q->expr()->eq('dnc.channel', ":{$unique}"));
                     $returnParameter = true;
                 }
                 $expr           = $this->getExistsExpression($filter->not).' ('.$sq->getSQL().')';
@@ -986,7 +986,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
-                    $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
+                    $expr = $q->expr()->$likeExpr("l.{$command}", ":{$unique}");
                 }
                 $returnParameter = true;
                 break;
@@ -1291,16 +1291,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select("$alias.id")
+            ->select("{$alias}.id")
             ->from($this->getTableName(), $this->getTableAlias());
 
         $qb->where(
             $qb->expr()->and(
-                $qb->expr()->gt("$alias.id", (int) $lastId),
-                $qb->expr()->isNotNull("$alias.date_identified")
+                $qb->expr()->gt("{$alias}.id", (int) $lastId),
+                $qb->expr()->isNotNull("{$alias}.date_identified")
             )
         )
-            ->orderBy("$alias.id")
+            ->orderBy("{$alias}.id")
             ->setMaxResults(1);
 
         $next = $qb->executeQuery()->fetchOne();

@@ -206,7 +206,7 @@ class PathsHelper
                     // Assume system root if one is not set specifically
                     $path = $this->paths['root'];
                 } else {
-                    throw new \InvalidArgumentException("$name does not exist.");
+                    throw new \InvalidArgumentException("{$name} does not exist.");
                 }
         }
 

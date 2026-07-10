@@ -806,7 +806,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['doNotContact'][0]['reason'], $response['contact']['doNotContact'][0]['reason']);
 
         // Remove contact
-        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/{$contactId}/delete");
         $this->assertResponseIsSuccessful();
     }
 
@@ -1089,7 +1089,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEmpty($response['contacts'][0]['doNotContact']);
 
         // Remove contact
-        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/{$contactId}/delete");
         $this->assertResponseIsSuccessful();
     }
 
@@ -1151,7 +1151,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $dncPayload = ['reason' => 0];
         $dncChannel = 'email';
 
-        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $this->client->request(Request::METHOD_POST, "/api/contacts/{$contactId}/dnc/{$dncChannel}/add", $dncPayload);
         $clientResponse = $this->client->getResponse();
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
@@ -1159,7 +1159,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $dncPayload = [];
 
         // Add DNC to the contact.
-        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/add", $dncPayload);
+        $this->client->request(Request::METHOD_POST, "/api/contacts/{$contactId}/dnc/{$dncChannel}/add", $dncPayload);
         $clientResponse = $this->client->getResponse();
         $dncResponse    = json_decode($clientResponse->getContent(), true);
 
@@ -1179,7 +1179,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame('Contact was manually set as do not contact for this channel.', $dncEvents[0]['details']['dnc']['reason']);
 
         // Remove DNC from the contact.
-        $this->client->request(Request::METHOD_POST, "/api/contacts/$contactId/dnc/$dncChannel/remove");
+        $this->client->request(Request::METHOD_POST, "/api/contacts/{$contactId}/dnc/{$dncChannel}/remove");
         $clientResponse    = $this->client->getResponse();
         self::assertResponseIsSuccessful();
         $dncRemoveResponse = json_decode($clientResponse->getContent(), true);
@@ -1188,7 +1188,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $dncRemoveResponse['contact']['doNotContact']);
 
         // Remove the contact.
-        $this->client->request(Request::METHOD_DELETE, "/api/contacts/$contactId/delete");
+        $this->client->request(Request::METHOD_DELETE, "/api/contacts/{$contactId}/delete");
         $this->assertResponseIsSuccessful();
     }
 
