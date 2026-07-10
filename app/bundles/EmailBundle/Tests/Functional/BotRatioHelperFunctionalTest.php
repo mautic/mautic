@@ -61,9 +61,9 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
         $updatedStat = $this->em->getRepository(Stat::class)->findOneBy(['id'=>$statId]);
         $this->assertSame($isRead, $updatedStat->getIsRead());
         if ($isRead) {
-            $this->assertNotNull($updatedStat->getLastOpened());
+            $this->assertInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());
         } else {
-            $this->assertNull($updatedStat->getLastOpened());
+            $this->assertNotInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());
         }
     }
 

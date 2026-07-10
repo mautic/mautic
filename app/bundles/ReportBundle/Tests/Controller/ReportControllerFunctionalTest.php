@@ -9,8 +9,10 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
@@ -37,6 +39,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
+        /** @var PageModel $pageModel */
         $pageModel = self::getContainer()->get('mautic.page.model.page');
         $res       = $pageModel->getHitRepository()->getMostVisited($query);   // $this->em->getRepository(Hit::class);
 
@@ -113,6 +116,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+        $this->assertInstanceOf(Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
         self::assertResponseIsSuccessful();
@@ -181,6 +185,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailReportWithAggregatedColumnsAndTotals(): void
     {
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts
@@ -286,6 +291,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testContactReportNotLikeExpression(): void
     {
+        /** @var LeadModel $contactModel */
         $contactModel = self::getContainer()->get('mautic.lead.model.lead');
 
         // Create and save contacts

@@ -9,14 +9,13 @@ class MailchimpApi extends EmailMarketingApi
     private string $version = '3.0';
 
     /**
-     * @param array  $parameters
      * @param string $method
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    protected function request($endpoint, $parameters = [], $method = 'GET')
+    protected function request($endpoint, array $parameters = [], $method = 'GET')
     {
         if (isset($this->keys['password'])) {
             // Extract the dc from the key

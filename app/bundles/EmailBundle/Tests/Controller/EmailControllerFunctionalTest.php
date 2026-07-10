@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
@@ -480,8 +481,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         /** @var MauticMessage[] $messages */
         $messages   = self::getMailerMessages();
-        $messageOne = array_values(array_filter($messages, fn ($message): bool => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
-        $messageTwo = array_values(array_filter($messages, fn ($message): bool => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
+        $messageOne = array_values(array_filter($messages, fn (MauticMessage $message): bool => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
+        $messageTwo = array_values(array_filter($messages, fn (MauticMessage $message): bool => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
 
         Assert::assertSame('Subject A', $messageOne->getSubject());
         Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageOne->getHtmlBody());
@@ -746,6 +747,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedEmail = $this->em->find(Email::class, $email->getId());
+        $this->assertInstanceOf(Email::class, $savedEmail);
         Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
     }
 
@@ -840,6 +842,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        $this->assertInstanceOf(Email::class, $email);
         Assert::assertTrue($email->getIsPublished());
     }
 
@@ -851,6 +854,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Set user to be able to create emails, but not publish them.
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', 'sales');
@@ -883,6 +887,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        $this->assertInstanceOf(Email::class, $email);
         Assert::assertSame($publishAfterSave, $email->getIsPublished());
     }
 
@@ -942,6 +947,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // Set user to be able to create emails, but not publish them.
         $loggedInUser = $this->em->getRepository(User::class)->findOneBy(['username' => $user]);
+        $this->assertInstanceOf(User::class, $loggedInUser);
         $this->setPermission($loggedInUser->getRole(), ['email:emails' => $permissions]);
 
         $this->loginUser($loggedInUser);
@@ -978,6 +984,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        $this->assertInstanceOf(Email::class, $email);
         Assert::assertSame($publishAfterSave, $email->getIsPublished());
     }
 
@@ -1180,7 +1187,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $email = $this->em->getRepository(Email::class)->find($email->getId());
-        $this->assertNull($email->getPublishUp());
+        $this->assertInstanceOf(Email::class, $email);
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $email->getPublishUp());
     }
 
     private function createDynamicContent(string $type): DynamicContent
@@ -1245,7 +1253,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $translationParent = $updatedChild->getTranslationParent();
         \assert($translationParent instanceof Email || null === $translationParent);
 
-        $this->assertNotNull($translationParent, 'Translation parent should be set.');
+        $this->assertInstanceOf(Email::class, $translationParent, 'Translation parent should be set.');
         $this->assertSame(
             $parentEmail->getId(),
             $translationParent->getId(),
@@ -1323,7 +1331,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             return;
         }
 
-        $this->assertNull($email);
+        $this->assertNotInstanceOf(Email::class, $email);
         $this->assertStringContainsString($fromAddress, $this->client->getResponse()->getContent());
     }
 
@@ -1399,7 +1407,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
 
-        $this->assertNull($email);
+        $this->assertNotInstanceOf(Email::class, $email);
         $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());
     }
 
@@ -1499,6 +1507,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function setPermission(Role $role, array $permissions): void
     {
+        /** @var RoleModel $roleModel */
         $roleModel = $this->getContainer()->get('mautic.user.model.role');
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
@@ -1509,6 +1518,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->clear();
         $email = $this->em->find(Email::class, $id);
+        $this->assertInstanceOf(Email::class, $email);
         Assert::assertSame($expectedVersion, $email->getVersion(), $message);
     }
 }

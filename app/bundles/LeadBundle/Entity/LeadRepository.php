@@ -603,7 +603,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
     public function getEntityContacts(
-        $args,
+        array $args,
         $joinTable,
         $entityId,
         $filters = [],
@@ -691,7 +691,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     protected function addCatchAllWhereClause($q, $filter): array
     {
         $customFields       = $this->getSearchableFieldAliases($this->getEntityManager()->getRepository(LeadField::class), 'lead');
-        $availableForSearch = array_map(fn ($alias): string => 'l.'.$alias, $customFields);
+        $availableForSearch = array_map(fn (string $alias): string => 'l.'.$alias, $customFields);
 
         $columns = array_merge(
             [
@@ -1395,7 +1395,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
     }
 
-    protected function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(array &$fields)
     {
         // Do not save points as they are handled by postSaveEntity
         unset($fields['points']);
@@ -1408,14 +1408,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     private function buildDuplicateValuesQuery(array $uniqueFields): string
     {
-        $fieldsAliases = array_map(fn ($uniqueField): string => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
+        $fieldsAliases = array_map(fn (string $uniqueField): string => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
 
         if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return $this->getDuplicateValuesQuery($fieldsAliases)->getSQL();
         }
 
         $queries = array_map(
-            fn ($fieldAlias) => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
+            fn (string $fieldAlias) => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
             $fieldsAliases
         );
 

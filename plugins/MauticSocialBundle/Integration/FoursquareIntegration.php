@@ -52,7 +52,6 @@ class FoursquareIntegration extends SocialIntegration
     /**
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
      *
      * @return mixed|string
      */
@@ -82,6 +81,9 @@ class FoursquareIntegration extends SocialIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $socialCache
+     */
     public function getPublicActivity($identifier, &$socialCache): void
     {
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
@@ -244,9 +246,11 @@ class FoursquareIntegration extends SocialIntegration
     }
 
     /**
+     * @param array<string, mixed> $socialCache
+     *
      * @return bool
      */
-    private function getContactUserId(&$identifier, &$socialCache)
+    private function getContactUserId(&$identifier, array &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];

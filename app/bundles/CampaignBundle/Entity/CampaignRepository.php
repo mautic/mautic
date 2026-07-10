@@ -610,10 +610,9 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param int[] $campaignIds
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');

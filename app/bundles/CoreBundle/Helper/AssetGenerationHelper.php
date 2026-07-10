@@ -167,7 +167,7 @@ class AssetGenerationHelper
                         "$assetsFullPath/css",
                         "$assetsFullPath/js",
                     ];
-                    array_walk($checkPaths, function ($path): void {
+                    array_walk($checkPaths, function (string $path): void {
                         if (!file_exists($path)) {
                             mkdir($path);
                         }
@@ -279,7 +279,7 @@ class AssetGenerationHelper
                         'relPath'  => $relPath,
                     ];
 
-                    if ('prod' == $env) {
+                    if ('prod' === $env) {
                         $lastModified = filemtime($fullPath);
                         if (!isset($modifiedLast[$group]) || $lastModified > $modifiedLast[$group]) {
                             $modifiedLast[$group] = $lastModified;
@@ -309,7 +309,7 @@ class AssetGenerationHelper
                 'relPath'  => $relPath,
             ];
 
-            if ('prod' == $env) {
+            if ('prod' === $env) {
                 $lastModified = filemtime($fullPath);
                 if (!isset($modifiedLast['app']) || $lastModified > $modifiedLast['app']) {
                     $modifiedLast['app'] = $lastModified;
@@ -327,7 +327,7 @@ class AssetGenerationHelper
     /**
      * Find asset overrides in the template.
      */
-    protected function findOverrides($env, &$assets): array
+    protected function findOverrides($env, array &$assets): array
     {
         $rootPath      = $this->pathsHelper->getSystemPath('assets_root');
         $currentTheme  = $this->pathsHelper->getSystemPath('current_theme');

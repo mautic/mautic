@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PageListType extends AbstractType
 {
-    private bool $canViewOther;
+    private readonly bool $canViewOther;
 
     public function __construct(
         private readonly PageModel $model,

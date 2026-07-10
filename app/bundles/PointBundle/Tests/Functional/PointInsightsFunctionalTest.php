@@ -47,6 +47,7 @@ final class PointInsightsFunctionalTest extends MauticMysqlTestCase
         $contact = $leadModel->getEntity($contact->getId());
 
         $expectedValue = $groupA->getId().self::GROUP_A_SUFFIX;
+        $this->assertInstanceOf(Lead::class, $contact);
         $this->assertEquals($expectedValue, $contact->getFieldValue($customField->getAlias()));
     }
 

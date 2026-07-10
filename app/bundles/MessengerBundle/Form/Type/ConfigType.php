@@ -9,6 +9,7 @@ use Mautic\MessengerBundle\Validator\Dsn;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
@@ -63,6 +64,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
 
@@ -76,6 +78,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
 
@@ -90,6 +93,10 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                // Symfony's MultiplierRetryStrategy throws
+                // InvalidArgumentException for any multiplier < 1, which would
+                // otherwise crash the queue worker after the form is saved.
+                'constraints' => $this->greaterThanOrEqualConstraint(1),
             ]
         );
 
@@ -103,8 +110,17 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'constraints' => $this->greaterThanOrEqualConstraint(0),
             ]
         );
+    }
+
+    /**
+     * @return list<GreaterThanOrEqual>
+     */
+    private function greaterThanOrEqualConstraint(int|float $value): array
+    {
+        return [new GreaterThanOrEqual(['value' => $value])];
     }
 
     public function getBlockPrefix(): string

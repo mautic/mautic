@@ -205,7 +205,7 @@ class EventController extends CommonFormController
     /**
      * Generates edit form and processes post data.
      */
-    public function editAction(Request $request, $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
+    public function editAction(Request $request, string $objectId): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $valid         = $cancelled = false;
         $method        = $request->getMethod();

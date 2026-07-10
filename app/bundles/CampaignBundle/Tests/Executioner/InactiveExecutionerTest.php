@@ -68,6 +68,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getEvaluated());
     }
@@ -85,6 +86,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -147,6 +149,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 

@@ -280,18 +280,12 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $this->getRepository()->upDownloadCount($id, $increaseBy, $unique);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\AssetRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\AssetBundle\Entity\AssetRepository
     {
         return $this->em->getRepository(Asset::class);
     }
 
-    /**
-     * @return \Mautic\AssetBundle\Entity\DownloadRepository
-     */
-    public function getDownloadRepository()
+    public function getDownloadRepository(): \Mautic\AssetBundle\Entity\DownloadRepository
     {
         return $this->em->getRepository(Download::class);
     }
@@ -581,9 +575,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getAssetList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')
