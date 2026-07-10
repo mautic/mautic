@@ -238,15 +238,26 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
 
         $email = $this->createEmail('Share Asset Email');
         $email->setCustomHtml('<img src="https://origin.example.com/media/images/'.$fileName.'">');
+        // Flush before building the event so the email has an ID; entities use deferred
+        // explicit change tracking, so channel data must be set before the initial insert
+        // (a later set + flush without re-persisting would be silently dropped).
+        $this->em->flush();
 
         $event = $this->createEvent('Send share email', $this->campaign, 'email.send', 'action', ['email' => $email->getId()]);
         $event->setChannel('email');
-        $this->em->flush();
         $event->setChannelId($email->getId());
         $this->em->flush();
 
+        // The test client shares this EntityManager, so without clearing it the export
+        // would see the in-memory Campaign whose events collection was never populated
+        // (the event only set the owning side). Clearing forces a fresh DB load, which
+        // is what a real request would do.
+        $campaignId = $this->campaign->getId();
+        $this->em->clear();
+
         try {
-            $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$this->campaign->getId());
+            $crawler = $this->client->request(Request::METHOD_GET, self::SHARE_ROUTE.$campaignId);
+
             $form    = $crawler->selectButton('campaign_share[download]')->form();
             $form->setValues([
                 'campaign_share[title]'             => self::CAMPAIGN_NAME,
