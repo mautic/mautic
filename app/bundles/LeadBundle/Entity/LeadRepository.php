@@ -37,27 +37,16 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected $dispatcher;
 
-    /**
-     * @var array
-     */
-    private $availableSocialFields = [];
+    private array $availableSocialFields = [];
 
-    /**
-     * @var array
-     */
-    private $availableSearchFields = [];
+    private array $availableSearchFields = [];
 
     /**
      * Required to get the color based on a lead's points.
-     *
-     * @var TriggerModel
      */
-    private $triggerModel;
+    private ?TriggerModel $triggerModel = null;
 
-    /**
-     * @var ListLeadRepository
-     */
-    private $listLeadRepository;
+    private ?ListLeadRepository $listLeadRepository = null;
 
     /**
      * Used by search functions to search social profiles.
@@ -248,7 +237,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         /** @var Lead $lead */
         foreach ($entities as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
-            if (!empty($this->triggerModel)) {
+            if ($this->triggerModel instanceof TriggerModel) {
                 $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
             }
 
@@ -408,7 +397,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             return $entity;
         }
 
-        if (!empty($this->triggerModel)) {
+        if ($this->triggerModel instanceof TriggerModel) {
             $entity->setColor($this->triggerModel->getColorForLeadPoints($entity->getPoints()));
         }
 
@@ -471,7 +460,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'lead',
             $args,
             function ($r): void {
-                if (!empty($this->triggerModel)) {
+                if ($this->triggerModel instanceof TriggerModel) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }
                 $r->setAvailableSocialFields($this->availableSocialFields);
