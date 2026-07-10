@@ -95,7 +95,7 @@ class Widget extends FormEntity
         $builder->addField('height', Types::INTEGER);
         $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
         $builder->addNullableField('ordering', Types::INTEGER);
-        $builder->addNullableField('params', Types::ARRAY);
+        $builder->addNullableField('params', Types::JSON);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

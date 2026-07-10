@@ -80,7 +80,7 @@ class UtmTag
         $builder->addId();
         $builder->addDateAdded();
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
-        $builder->addNullableField('query', Types::ARRAY);
+        $builder->addNullableField('query', Types::JSON);
         $builder->addNullableField('referer', Types::TEXT);
         $builder->addNullableField('remoteHost', Types::STRING, 'remote_host');
         $builder->addNullableField('url', Types::TEXT);

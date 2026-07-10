@@ -173,29 +173,29 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
 
         $builder->addField('source', Types::STRING);
 
-        $builder->createField('columns', Types::ARRAY)
+        $builder->createField('columns', Types::JSON)
             ->nullable()
             ->build();
 
-        $builder->createField('filters', Types::ARRAY)
+        $builder->createField('filters', Types::JSON)
             ->nullable()
             ->build();
 
-        $builder->createField('tableOrder', Types::ARRAY)
+        $builder->createField('tableOrder', Types::JSON)
             ->columnName('table_order')
             ->nullable()
             ->build();
 
-        $builder->createField('graphs', Types::ARRAY)
+        $builder->createField('graphs', Types::JSON)
             ->nullable()
             ->build();
 
-        $builder->createField('groupBy', Types::ARRAY)
+        $builder->createField('groupBy', Types::JSON)
             ->columnName('group_by')
             ->nullable()
             ->build();
 
-        $builder->createField('aggregators', Types::ARRAY)
+        $builder->createField('aggregators', Types::JSON)
             ->columnName('aggregators')
             ->nullable()
             ->build();

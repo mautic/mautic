@@ -46,7 +46,7 @@ class ContactExportScheduler
         $builder->createField('scheduledDateTime', Types::DATETIME_IMMUTABLE)
             ->columnName('scheduled_datetime')
             ->build();
-        $builder->addNullableField('data', Types::ARRAY);
+        $builder->addNullableField('data', Types::JSON);
     }
 
     public static function loadValidatorMetadata(ValidatorClassMetadata $metadata): void
