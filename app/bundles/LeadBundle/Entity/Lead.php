@@ -880,14 +880,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getPoints()
     {
-        if (null !== $this->actualPoints) {
-            return $this->actualPoints;
-        }
-        if (null !== $this->updatedPoints) {
-            return $this->updatedPoints;
-        }
-
-        return $this->points;
+        return ($this->actualPoints ?? $this->updatedPoints) ?? $this->points;
     }
 
     /**

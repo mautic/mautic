@@ -208,13 +208,11 @@ class FieldController extends FormController
             if ($valid) {
                 return $this->editAction($request, $field->getId(), true);
             }
-            if (!$valid) {
-                // some bug in Symfony prevents repopulating list options on errors
-                $field   = $form->getData();
-                $newForm = $model->createForm($field, $this->formFactory, $action);
-                $this->copyErrorsRecursively($form, $newForm);
-                $form = $newForm;
-            }
+            // some bug in Symfony prevents repopulating list options on errors
+            $field   = $form->getData();
+            $newForm = $model->createForm($field, $this->formFactory, $action);
+            $this->copyErrorsRecursively($form, $newForm);
+            $form = $newForm;
         }
 
         return $this->delegateView(

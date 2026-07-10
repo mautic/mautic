@@ -46,10 +46,7 @@ class AbstractReportEvent extends Event
         if ($this->context == $context) {
             return true;
         }
-        if (0 === stripos($this->context, (string) $context)) {
-            return true;
-        }
 
-        return false;
+        return 0 === stripos($this->context, (string) $context);
     }
 }

@@ -174,11 +174,8 @@ class SubmissionEvent extends CommonEvent
         if (null === $key) {
             return $this->feedback;
         }
-        if (isset($this->feedback[$key])) {
-            return $this->feedback[$key];
-        }
 
-        return false;
+        return $this->feedback[$key] ?? false;
     }
 
     public function checkContext(string $context): bool

@@ -546,11 +546,8 @@ class ImportController extends FormController
         if ($browserImportLimit && $this->getLineCount($object) < $browserImportLimit) {
             return true;
         }
-        if (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-            return true;
-        }
 
-        return false;
+        return !$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked();
     }
 
     protected function getLineCountLimit()
@@ -571,11 +568,8 @@ class ImportController extends FormController
         if ($browserImportLimit && $this->getLineCount($object) >= $browserImportLimit) {
             return true;
         }
-        if (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
-            return true;
-        }
 
-        return false;
+        return !$browserImportLimit && $this->getFormButton($form, ['buttons', 'apply'])->isClicked();
     }
 
     /**
