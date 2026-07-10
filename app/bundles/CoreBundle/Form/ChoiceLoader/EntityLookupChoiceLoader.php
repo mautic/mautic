@@ -176,7 +176,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if (count($duplicates)) {
                 foreach ($duplicates as $value => $label) {
-                    $prepped[$value] = "$label ($value)";
+                    $prepped[$value] = "{$label} ({$value})";
                 }
             }
 
@@ -195,7 +195,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $idColumn    = $this->options['entity_id_column'];
 
         if (!$this->modelFactory->hasModel($modelName)) {
-            throw new \InvalidArgumentException("$modelName not found as a registered model service.");
+            throw new \InvalidArgumentException("{$modelName} not found as a registered model service.");
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {

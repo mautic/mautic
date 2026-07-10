@@ -15,7 +15,7 @@ trait ComponentValidationTrait
                     throw new BadConfigurationException("At least one of the following keys are required: '".implode(', ', $k));
                 }
             } elseif (!array_key_exists($k, $component)) {
-                throw new BadConfigurationException("The key, '$k' is missing.");
+                throw new BadConfigurationException("The key, '{$k}' is missing.");
             }
         }
 

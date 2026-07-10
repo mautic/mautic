@@ -1199,7 +1199,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             $records[] = [
                 'attributes' => [
                     'type' => $object,
-                    'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
+                    'url'  => "/services/data/v34.0/sobjects/{$object}/SF{$id}",
                 ],
                 'Id'        => 'SF'.$id,
                 'FirstName' => $object.$id,

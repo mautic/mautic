@@ -16,7 +16,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
                 'name'      => 'test',
@@ -38,7 +38,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => $invalidReturnUrl,
                 'name'      => 'test',
@@ -60,7 +60,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
                 'name'      => 'test',
