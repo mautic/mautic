@@ -590,21 +590,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
 
                 return implode('; ', $errors);
-            } elseif (!empty($response->error->message)) {
+            }
+            if (!empty($response->error->message)) {
                 return $response->error->message;
             }
 
             return (string) $response;
-        } elseif (is_array($response)) {
+        }
+        if (is_array($response)) {
             if (isset($response['error_description'])) {
                 return $response['error_description'];
-            } elseif (isset($response['error'])) {
+            }
+            if (isset($response['error'])) {
                 if (is_array($response['error'])) {
                     return $response['error']['message'] ?? implode(', ', $response['error']);
                 }
 
                 return $response['error'];
-            } elseif (isset($response['errors'])) {
+            }
+            if (isset($response['errors'])) {
                 $errors = [];
                 foreach ($response['errors'] as $err) {
                     if (is_array($err)) {
@@ -954,7 +958,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         }
 
                         $headers = [
-                            "oauth-token: $authTokenKey",
+                            "oauth-token: {$authTokenKey}",
                             "Authorization: OAuth {$authToken}",
                         ];
                     }

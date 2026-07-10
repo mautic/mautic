@@ -370,7 +370,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'edit'
                 )
             );
-        } elseif ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
+        }
+        if ((!$isClone && !$this->checkActionPermission('edit', $entity)) || ($isClone && !$this->checkActionPermission('create'))) {
             // deny access if the entity is not a clone and don't have permission to edit or is a clone and don't have permission to create
             $this->throwAccessDenied();
         } elseif (!$isClone && $model->isLocked($entity)) {
@@ -447,7 +448,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'edit'
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
                 $form   = $model->createForm($entity, $this->formFactory, $action);
@@ -986,7 +988,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'new'
                     )
                 );
-            } elseif ($valid && $this->isFormApplied($form)) {
+            }
+            if ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
@@ -1069,7 +1072,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     'view'
                 )
             );
-        } elseif (!$this->checkActionPermission('view', $entity)) {
+        }
+        if (!$this->checkActionPermission('view', $entity)) {
             $this->throwAccessDenied();
         }
 

@@ -67,10 +67,7 @@ class CommonRepository extends ServiceEntityRepository
      */
     protected $lastUsedParameterId = 0;
 
-    /**
-     * @var ExpressionBuilder|null
-     */
-    private $expressionBuilder;
+    private ?ExpressionBuilder $expressionBuilder = null;
 
     /**
      * @param string $alias
@@ -572,25 +569,25 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         $expr = $q->expr()->andX(
-            $q->expr()->eq("$alias.$pub", ':true'),
+            $q->expr()->eq("{$alias}.{$pub}", ':true'),
             $q->expr()->orX(
-                $q->expr()->isNull("$alias.$pubDown"),
-                $q->expr()->gte("$alias.$pubDown", ':now')
+                $q->expr()->isNull("{$alias}.{$pubDown}"),
+                $q->expr()->gte("{$alias}.{$pubDown}", ':now')
             )
         );
 
         if ($allowNullForPublishedUp) {
             $expr->add(
                 $q->expr()->orX(
-                    $q->expr()->isNull("$alias.$pubUp"),
-                    $q->expr()->lte("$alias.$pubUp", ':now')
+                    $q->expr()->isNull("{$alias}.{$pubUp}"),
+                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
                 )
             );
         } else {
             $expr->add(
                 $q->expr()->andX(
-                    $q->expr()->isNotNull("$alias.$pubUp"),
-                    $q->expr()->lte("$alias.$pubUp", ':now')
+                    $q->expr()->isNotNull("{$alias}.{$pubUp}"),
+                    $q->expr()->lte("{$alias}.{$pubUp}", ':now')
                 )
             );
         }
@@ -708,7 +705,7 @@ class CommonRepository extends ServiceEntityRepository
             $labelColumn = $reflection->hasMethod('getTitle') ? 'title' : 'name';
         }
 
-        $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", $extraColumns" : ''))
+        $q->select($prefix.$valueColumn.' as value, '.$prefix.$labelColumn.' as label'.($extraColumns ? ", {$extraColumns}" : ''))
             ->from($tableName, $alias)
             ->orderBy($prefix.$labelColumn);
 
@@ -1078,13 +1075,13 @@ class CommonRepository extends ServiceEntityRepository
 
         foreach ($columns as $column) {
             $expr->add(
-                $q->expr()->$exprFunc($column, ":$unique")
+                $q->expr()->$exprFunc($column, ":{$unique}")
             );
         }
 
         return [
             $expr,
-            ["$unique" => $string],
+            ["{$unique}" => $string],
         ];
     }
 
@@ -1121,7 +1118,7 @@ class CommonRepository extends ServiceEntityRepository
 
         if (!$filter->strict) {
             if (!str_contains($string, '%')) {
-                $string = "%$string%";
+                $string = "%{$string}%";
             }
         }
 
@@ -1144,7 +1141,7 @@ class CommonRepository extends ServiceEntityRepository
         $expr = $q->expr()->$xFunc();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->$exprFunc($col, ":$unique")
+                $q->expr()->$exprFunc($col, ":{$unique}")
             );
         }
 
@@ -1154,7 +1151,7 @@ class CommonRepository extends ServiceEntityRepository
 
         return [
             $expr,
-            ["$unique" => $string],
+            ["{$unique}" => $string],
         ];
     }
 
@@ -1187,8 +1184,8 @@ class CommonRepository extends ServiceEntityRepository
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
             case $this->translator->trans('mautic.core.searchcommand.isuncategorized', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
-                    $q->expr()->isNull("$prefix.category"),
-                    $q->expr()->eq("$prefix.category", $q->expr()->literal(''))
+                    $q->expr()->isNull("{$prefix}.category"),
+                    $q->expr()->eq("{$prefix}.category", $q->expr()->literal(''))
                 );
                 $returnParameter = false;
                 break;
@@ -1240,11 +1237,11 @@ class CommonRepository extends ServiceEntityRepository
             $string = $filter->string;
             if (!$filter->strict) {
                 if (!str_contains($string, '%')) {
-                    $string = "$string%";
+                    $string = "{$string}%";
                 }
             }
 
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -1419,7 +1416,7 @@ class CommonRepository extends ServiceEntityRepository
             foreach ($selects as $alias => $columns) {
                 if ($isOrm) {
                     if ($columns = array_intersect($columns, $ormColumns)) {
-                        $columns    = array_map([$this, 'sanitize'], $columns);
+                        $columns    = array_map($this->sanitize(...), $columns);
                         $partials[] = 'partial '.$alias.'.{'.implode(',', $columns).'}';
                     }
                 } else {
@@ -1623,12 +1620,12 @@ class CommonRepository extends ServiceEntityRepository
                         case 'isEmpty':
                         case 'isNotEmpty':
                             if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->orX(
+                                $whereClause = $query->expr()->or(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
                                 );
                             } else {
-                                $whereClause = $query->expr()->andX(
+                                $whereClause = $query->expr()->and(
                                     $query->expr()->neq($column, $query->expr()->literal('')),
                                     $query->expr()->isNotNull($column)
                                 );

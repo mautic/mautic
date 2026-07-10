@@ -113,13 +113,14 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     );
 
                     return $event;
-                } elseif (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
+                }
+                if (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
                     Assert::assertSame($contact, $event->getLead());
                     Assert::assertSame($triggerEvent, $event->getTriggerEvent());
 
                     return $event;
                 }
-                $this->fail("Unexpected event name: $eventName");
+                $this->fail("Unexpected event name: {$eventName}");
             });
 
         $this->triggerModel->triggerEvent($triggerEvent->convertToArray(), $contact, true);

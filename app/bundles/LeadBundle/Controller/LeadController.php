@@ -128,13 +128,13 @@ class LeadController extends FormController
         $anonymousShowing = false;
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
         $results = $model->getEntities([
@@ -183,7 +183,7 @@ class LeadController extends FormController
 
         $listArgs = [];
         if (!$this->security->isGranted('lead:lists:viewother')) {
-            $listArgs['filter']['force'] = " $mine";
+            $listArgs['filter']['force'] = " {$mine}";
         }
 
         $leadListModel = $this->getModel('lead.list');
@@ -191,10 +191,10 @@ class LeadController extends FormController
         $lists = $leadListModel->getUserLists();
 
         // check to see if in a single list
-        $inSingleList = 1 === substr_count($search, "$listCommand:");
+        $inSingleList = 1 === substr_count($search, "{$listCommand}:");
         $list         = [];
         if ($inSingleList) {
-            preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
+            preg_match("/{$listCommand}:(.*?)(?=\s|$)/", $search, $matches);
 
             if (!empty($matches[1])) {
                 $alias = $matches[1];
@@ -698,7 +698,8 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
@@ -809,7 +810,8 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
                 $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
@@ -976,7 +978,8 @@ class LeadController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
+                    }
+                    if (
                         !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
                         || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
                     ) {
@@ -2145,11 +2148,11 @@ class LeadController extends FormController
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
         return $filter;
@@ -2212,11 +2215,11 @@ class LeadController extends FormController
         } else {
             if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
-                $filter['force'] .= " !$anonymous";
+                $filter['force'] .= " !{$anonymous}";
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
+                $filter['force'] .= " {$mine}";
             }
         }
 

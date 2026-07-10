@@ -1198,6 +1198,18 @@ export default class BuilderService {
     const inlineElements = BuilderService.getInlineElements();
     const emailCkEditorOptions = BuilderService.getCkeConf('email:getBuilderTokens');
     const emailInlineOptions = BuilderService.buildInlineCkeConf(emailCkEditorOptions);
+    const allowedTextInnerChildTags = [
+      'a',
+      'b',
+      'em',
+      'i',
+      'small',
+      'span',
+      'strong',
+      'sub',
+      'sup',
+      'u',
+    ];
 
     this.editor = grapesjs.init({
       selectorManager: {
@@ -1212,8 +1224,18 @@ export default class BuilderService {
         styles,
       },
       domComponents: {
-        // disable all except link components
-        disableTextInnerChilds: (child) => !child.is('link'), // https://github.com/GrapesJS/grapesjs/releases/tag/v0.21.2
+        // Keep inline phrasing content inside paragraph text components. If
+        // spans are disallowed here, GrapesJS reparses them as siblings of the
+        // paragraph and MJML renders extra line breaks.
+        disableTextInnerChilds: (child) => {
+          if (child.is('link')) {
+            return false;
+          }
+
+          const tagName = `${child.get('tagName') || ''}`.toLowerCase();
+
+          return !allowedTextInnerChildTags.includes(tagName);
+        },
       },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),

@@ -89,7 +89,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
 
         if (!empty($type)) {
             if (!in_array($typeCondition, ['=', '<>', '!='], true)) {
-                throw new \InvalidArgumentException("Invalid operator '$typeCondition'");
+                throw new \InvalidArgumentException("Invalid operator '{$typeCondition}'");
             }
 
             $qb->andWhere("type {$typeCondition} :type");
@@ -139,12 +139,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param string     $slot
-     * @param Lead|array $lead
+     * @param Lead|mixed[]|null $lead
      *
      * @return array<string, mixed>|false
      */
-    public function getSlotContentForLead($slot, $lead)
+    public function getSlotContentForLead(string $slot, array|Lead|null $lead)
     {
         if (!$lead) {
             return [];
@@ -256,10 +255,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 

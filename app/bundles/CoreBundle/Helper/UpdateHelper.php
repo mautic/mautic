@@ -321,7 +321,8 @@ class UpdateHelper
     {
         if (function_exists('php_uname')) {
             return php_uname('s').' '.php_uname('r');
-        } elseif (defined('PHP_OS')) {
+        }
+        if (defined('PHP_OS')) {
             return PHP_OS;
         }
 

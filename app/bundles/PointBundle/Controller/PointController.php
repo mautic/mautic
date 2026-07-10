@@ -240,7 +240,8 @@ class PointController extends AbstractFormController
                     ],
                 ])
             );
-        } elseif (!$this->security->isGranted('point:points:edit')) {
+        }
+        if (!$this->security->isGranted('point:points:edit')) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked

@@ -54,7 +54,7 @@ final class TokenHelperTest extends TestCase
     public function testFindFocusTokensFoundAddScriptByFocusPublishedStatus(): void
     {
         $focusItemId = 1;
-        $content     = "content {focus=$focusItemId}";
+        $content     = "content {focus={$focusItemId}}";
 
         $focusItem = new Focus();
         $focusItem->setIsPublished(true);
@@ -74,7 +74,7 @@ final class TokenHelperTest extends TestCase
     {
         $focusItemId = 1;
         $createdById = 2;
-        $content     = "content {focus=$focusItemId}";
+        $content     = "content {focus={$focusItemId}}";
 
         $focusItem = new Focus();
         $focusItem->setIsPublished(false);

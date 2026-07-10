@@ -97,8 +97,8 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         // Verify the event was processed
         $updatedLog = $this->em->getRepository(LeadEventLog::class)->find($logId);
 
-        $this->assertNotNull($updatedLog, 'Event log should exist');
-        $this->assertNotNull($updatedLog->getTriggerDate(), 'Trigger date should be set');
+        $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Event log should exist');
+        $this->assertInstanceOf(\DateTimeInterface::class, $updatedLog->getTriggerDate(), 'Trigger date should be set');
     }
 
     public function testCampaignTriggerCommandWithPositiveSecondsSchedulesCorrectly(): void
@@ -158,8 +158,8 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         // The event should be rescheduled to approximately 7 days from now (10 day interval - 3 days elapsed)
         $updatedLog = $this->em->getRepository(LeadEventLog::class)->find($logId);
 
-        $this->assertNotNull($updatedLog, 'Event log should exist');
-        $this->assertNotNull($updatedLog->getTriggerDate(), 'Trigger date should be set');
+        $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Event log should exist');
+        $this->assertInstanceOf(\DateTimeInterface::class, $updatedLog->getTriggerDate(), 'Trigger date should be set');
 
         $expectedTriggerDate = new \DateTime('+7 days');
         $lowerBound          = (clone $expectedTriggerDate)->modify('-10 seconds');

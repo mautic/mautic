@@ -748,24 +748,6 @@ parameters:
 			path: app/bundles/AssetBundle/EventListener/CampaignSubscriber.php
 
 		-
-			message: '#^Parameter \#3 \$filters of method Mautic\\AssetBundle\\Model\\AssetModel\:\:getUniqueVsRepetitivePieChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\AssetBundle\\Model\\AssetModel\:\:getPopularAssets\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Parameter \#5 \$filter of method Mautic\\AssetBundle\\Model\\AssetModel\:\:getDownloadsLineChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/AssetBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Property Mautic\\AssetBundle\\EventListener\\DashboardSubscriber\:\:\$permissions type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -7703,12 +7685,6 @@ parameters:
 
 		-
 			message: '#^Parameter \#2 \$week of method DateTime\:\:setISODate\(\) expects int, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CoreBundle/Helper/Chart/ChartQuery.php
-
-		-
-			message: '#^Parameter \#3 \$options of method Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery\:\:modifyCountQuery\(\) expects array, string\|null given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CoreBundle/Helper/Chart/ChartQuery.php
