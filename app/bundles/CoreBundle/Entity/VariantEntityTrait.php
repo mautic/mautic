@@ -318,7 +318,7 @@ trait VariantEntityTrait
         }
 
         $endDate = clone $startDate;
-        $endDate->modify("+$delayHours hours");
+        $endDate->modify("+{$delayHours} hours");
 
         return $endDate;
     }

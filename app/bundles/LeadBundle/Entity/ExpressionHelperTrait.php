@@ -17,7 +17,7 @@ trait ExpressionHelperTrait
     {
         // in/notIn for dbal will use a raw array
         if (!is_array($parameter) && !str_starts_with($parameter, ':')) {
-            $parameter = ":$parameter";
+            $parameter = ":{$parameter}";
         }
 
         if (null === $includeIsNull) {

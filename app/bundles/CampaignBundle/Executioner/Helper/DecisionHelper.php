@@ -33,11 +33,11 @@ class DecisionHelper
 
         // If channels do not match up at all (not even fuzzy logic i.e. page vs page.redirect), there's no need to go further
         if ($channel && $event->getChannel() && !str_contains($channel, $event->getChannel())) {
-            throw new DecisionNotApplicableException("Channels, $channel and {$event->getChannel()}, do not match.");
+            throw new DecisionNotApplicableException("Channels, {$channel} and {$event->getChannel()}, do not match.");
         }
 
         if ($channel && $channelId && $event->getChannelId() && (string) $channelId !== (string) $event->getChannelId()) {
-            throw new DecisionNotApplicableException("Channel IDs, $channelId and {$event->getChannelId()}, do not match for $channel.");
+            throw new DecisionNotApplicableException("Channel IDs, {$channelId} and {$event->getChannelId()}, do not match for {$channel}.");
         }
 
         // Check if parent taken path is the path of this event, otherwise exit

@@ -366,7 +366,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
                     $tokens = [];
                     foreach ($lead as $field => $value) {
-                        $tokens["{contactfield=$field}"] = $value;
+                        $tokens["{contactfield={$field}}"] = $value;
                     }
                     $tokens['{hash}'] = $event->getIdHash();
 
