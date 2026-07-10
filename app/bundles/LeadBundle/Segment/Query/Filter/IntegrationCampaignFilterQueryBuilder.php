@@ -36,8 +36,8 @@ class IntegrationCampaignFilterQueryBuilder extends BaseFilterQueryBuilder
         );
 
         $expression = $queryBuilder->expr()->and(
-            $queryBuilder->expr()->eq($tableAlias.'.integration', ":$integrationNameParameter"),
-            $queryBuilder->expr()->eq($tableAlias.'.integration_entity_id', ":$campaignIdParameter")
+            $queryBuilder->expr()->eq($tableAlias.'.integration', ":{$integrationNameParameter}"),
+            $queryBuilder->expr()->eq($tableAlias.'.integration_entity_id', ":{$campaignIdParameter}")
         );
 
         $queryBuilder->addJoinCondition($tableAlias, $expression);

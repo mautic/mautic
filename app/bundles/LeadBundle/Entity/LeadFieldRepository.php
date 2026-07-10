@@ -305,8 +305,8 @@ class LeadFieldRepository extends CommonRepository
                 // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
                 $paramName   = 'value'.$paramCount++;
                 $v           = trim((string) $v, "'");
-                $innerExpr[] = $property." $operator :".$paramName;
-                $q->setParameter($paramName, "\\|?$v\\|?");
+                $innerExpr[] = $property." {$operator} :".$paramName;
+                $q->setParameter($paramName, "\\|?{$v}\\|?");
             }
 
             if (str_starts_with($operatorExpr, 'not')) {
@@ -435,8 +435,8 @@ class LeadFieldRepository extends CommonRepository
             ->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->eq("MONTH(l. $field)", ':month'),
-                    $q->expr()->eq("DAY(l. $field)", ':day')
+                    $q->expr()->eq("MONTH(l. {$field})", ':month'),
+                    $q->expr()->eq("DAY(l. {$field})", ':day')
                 )
             )
             ->setParameter('lead', (int) $lead)
@@ -518,12 +518,12 @@ class LeadFieldRepository extends CommonRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.field.searchcommand.isindexed'):
-                $expr            = $q->expr()->eq($prefix.'.isIndex', ":$unique");
+                $expr            = $q->expr()->eq($prefix.'.isIndex', ":{$unique}");
                 $forceParameters = [$unique => true];
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.field.searchcommand.isunique'):
-                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":$unique");
+                $expr            = $q->expr()->eq($prefix.'.isUniqueIdentifer', ":{$unique}");
                 $forceParameters = [$unique => true];
                 $returnParameter = true;
                 break;
@@ -531,14 +531,14 @@ class LeadFieldRepository extends CommonRepository
                 $forceParameters = [
                     $unique     => $filter->string,
                 ];
-                $expr            = $q->expr()->like($prefix.'.type', ":$unique");
+                $expr            = $q->expr()->like($prefix.'.type', ":{$unique}");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.field.searchcommand.group'):
                 $forceParameters = [
                     $unique     => $filter->string,
                 ];
-                $expr            = $q->expr()->like($prefix.'.group', ":$unique");
+                $expr            = $q->expr()->like($prefix.'.group', ":{$unique}");
                 $returnParameter = true;
                 break;
         }
@@ -551,7 +551,7 @@ class LeadFieldRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];

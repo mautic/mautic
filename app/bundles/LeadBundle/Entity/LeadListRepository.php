@@ -365,7 +365,7 @@ class LeadListRepository extends CommonRepository
         $subExpr = [];
 
         foreach ($subQueryFilters as $subColumn => $subParameter) {
-            $subExpr[] = $subQb->expr()->eq($subColumn, ":$subParameter");
+            $subExpr[] = $subQb->expr()->eq($subColumn, ":{$subParameter}");
         }
 
         if ('leads' !== $table) {
@@ -383,13 +383,13 @@ class LeadListRepository extends CommonRepository
             $subFunc           = 'eq';
             if (is_array($value)) {
                 $subFunc                        = 'in';
-                $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
+                $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":{$subFilterParamter}");
                 $parameters[$subFilterParamter] = ['value' => $value, 'type' => ArrayParameterType::STRING];
             } else {
                 $parameters[$subFilterParamter] = $value;
             }
 
-            $subExpr = $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
+            $subExpr = $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":{$subFilterParamter}");
         }
 
         $subQb->expr()->and(...$subExpr);
@@ -433,7 +433,7 @@ class LeadListRepository extends CommonRepository
         switch ($command) {
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal'):
             case $this->translator->trans('mautic.lead.list.searchcommand.isglobal', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
+                $expr            = $q->expr()->eq('l.isGlobal', ":{$unique}");
                 $forceParameters = [$unique => true];
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
@@ -463,7 +463,7 @@ class LeadListRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [
@@ -579,7 +579,7 @@ class LeadListRepository extends CommonRepository
 
         $sql = <<<SQL
             SELECT leadlist_id 
-            FROM $tableName
+            FROM {$tableName}
             WHERE lead_id = ?
                 AND manually_removed = 0
             LIMIT 1
@@ -662,7 +662,7 @@ SQL;
 
         $sql = <<<SQL
             SELECT leadlist_id 
-            FROM $tableName
+            FROM {$tableName}
             WHERE lead_id = ?
                 AND leadlist_id IN (?)
                 AND manually_removed = 0

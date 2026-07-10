@@ -101,7 +101,7 @@ class OrderDAO
             return $this->changedObjects[$objectType];
         }
 
-        throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
+        throw new UnexpectedValueException("There are no change objects for object type '{$objectType}'");
     }
 
     /**

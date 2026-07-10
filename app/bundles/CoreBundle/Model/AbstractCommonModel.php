@@ -286,8 +286,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
-        if ($this->security->checkPermissionExists("$permissionBase:viewown")) {
-            $isGranted = $this->security->isGranted("$permissionBase:viewown");
+        if ($this->security->checkPermissionExists("{$permissionBase}:viewown")) {
+            $isGranted = $this->security->isGranted("{$permissionBase}:viewown");
         }
 
         return $isGranted;
@@ -301,8 +301,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
-        if ($this->security->checkPermissionExists("$permissionBase:viewother")) {
-            $isGranted = $this->security->isGranted(["$permissionBase:viewother"]);
+        if ($this->security->checkPermissionExists("{$permissionBase}:viewother")) {
+            $isGranted = $this->security->isGranted(["{$permissionBase}:viewother"]);
         }
 
         return $isGranted;

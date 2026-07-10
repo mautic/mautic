@@ -1050,7 +1050,7 @@ class PageController extends FormController
         if ($request->query->has('result')) {
             // Force ID
             $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $request->query->get('result'), 'strict' => false];
-            $session->set("mautic.pageresult.$objectId.filters", $filters);
+            $session->set("mautic.pageresult.{$objectId}.filters", $filters);
         }
         // get the results
         $entities = $submissionModel->getEntitiesByPage(
