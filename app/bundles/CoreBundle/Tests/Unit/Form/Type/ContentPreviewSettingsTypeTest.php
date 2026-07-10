@@ -430,7 +430,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
     private function createEmail(): Email
     {
-        return new class extends Email {
+        return new class() extends Email {
             private int $id = 0;
 
             public function getId(): int

@@ -337,7 +337,7 @@ final class OwnerSubscriberTest extends TestCase
 
     protected function getUser(): User
     {
-        $user = new class extends User {
+        $user = new class() extends User {
             public function setId(int $id): void
             {
                 $this->id = $id;

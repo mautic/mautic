@@ -676,7 +676,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $email = new class extends Email {
+        $email = new class() extends Email {
             public function getId(): int
             {
                 return 1;
