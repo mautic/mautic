@@ -26,9 +26,17 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer::class,
         PhpCsFixer\Fixer\Whitespace\MethodChainingIndentationFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\MethodChainingNewlineFixer::class,
+        PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
     ])
     ->withRules([
         PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
+        PhpCsFixer\Fixer\StringNotation\ExplicitStringVariableFixer::class,
     ])
-    ->withPreparedSets(comments: true, docblocks: true);
+    ->withPreparedSets(
+        comments: true,
+        docblocks: true,
+        namespaces: true,
+        cleanup: true,
+        // controlStructures: true
+    );

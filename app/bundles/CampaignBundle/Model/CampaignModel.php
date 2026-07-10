@@ -213,7 +213,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param mixed[] $deletedEvents
      */
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, array $deletedEvents): array
+    public function setEvents(Campaign $entity, $sessionEvents, array $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -705,9 +705,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -769,7 +768,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string   $root
      * @param int      $order
      */
-    protected function buildOrder($hierarchy, &$events, $entity, $root = 'null', $order = 1)
+    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1)
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {

@@ -117,7 +117,7 @@ trait LeadDetailsTrait
         return $filters;
     }
 
-    private function cmp($a, $b): int
+    private function cmp(array $a, array $b): int
     {
         return $b['timestamp'] <=> $a['timestamp'];
     }

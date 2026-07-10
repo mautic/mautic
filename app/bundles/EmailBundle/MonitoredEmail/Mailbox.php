@@ -258,7 +258,7 @@ class Mailbox
         $this->imapFullPath = $paths['full'];
     }
 
-    public function getImapPath($settings): array
+    public function getImapPath(array $settings): array
     {
         if (!isset($settings['encryption'])) {
             $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
@@ -790,7 +790,7 @@ class Mailbox
                 if (!empty($to->mailbox) && !empty($to->host)) {
                     $toEmail            = strtolower($to->mailbox.'@'.$to->host);
                     $toName             = isset($to->personal) ? $this->decodeMimeStr($to->personal, $this->serverEncoding) : null;
-                    $toStrings[]        = $toName ? "$toName <$toEmail>" : $toEmail;
+                    $toStrings[]        = $toName ? "{$toName} <{$toEmail}>" : $toEmail;
                     $mail->to[$toEmail] = $toName;
                 }
             }

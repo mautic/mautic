@@ -9,7 +9,6 @@ use Rector\CodeQuality\Rector\FunctionLike\SimplifyUselessVariableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StringReturnTypeFromStrictStringReturnsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
@@ -23,32 +22,36 @@ return RectorConfig::configure()
     ->withPhpSets(php81: true)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
+        // common controllers
         Mautic\CoreBundle\Controller\AbstractStandardFormController::class,
         Mautic\CoreBundle\Controller\CommonController::class,
         Mautic\CoreBundle\Controller\AbstractFormController::class,
-        CommonRepository::class,
+        Mautic\ApiBundle\Controller\CommonApiController::class,
         Mautic\ApiBundle\Controller\FetchCommonApiController::class,
         Mautic\PluginBundle\Integration\AbstractIntegration::class,
+        Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait::class,
+        // other objects
+        CommonRepository::class,
+        Mautic\CoreBundle\Security\Permissions\AbstractPermissions::class,
+        Mautic\PluginBundle\Integration\AbstractIntegration::class,
+        MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
     ])
     ->withRules([
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ChangeMockObjectReturnUnionToIntersectionRector::class,
-
         TypedPropertyFromAssignsRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
-
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
+        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
     ->withCodeQualityLevel(38)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
-
-        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class,
 
         Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
@@ -69,15 +72,15 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
-        ReturnTypeFromGetRepositoryDocblockRector::class => [
-            // double getRepository() override
-            __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
-            // list lead vs lead list diff
-            __DIR__.'/app/bundles/LeadBundle/Model/ListModel.php',
-        ],
-
         Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector::class => [
             __DIR__.'/app/bundles/SmsBundle/Controller/AjaxController.php',
+        ],
+
+        // rector bug to be fixed
+        Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Controller/Api/CustomFieldsApiControllerTrait.php',
+            __DIR__.'/app/bundles/ApiBundle/Controller/FetchCommonApiController.php',
+            __DIR__.'/app/bundles/ApiBundle/Controller/CommonApiController.php',
         ],
 
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,

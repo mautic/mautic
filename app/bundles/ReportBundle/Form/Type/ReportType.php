@@ -434,7 +434,7 @@ class ReportType extends AbstractType
      *
      * @param array $tables Array with the table list and columns
      */
-    private function buildTableSourceList($tables): array
+    private function buildTableSourceList(array $tables): array
     {
         $temp = array_keys($tables);
 

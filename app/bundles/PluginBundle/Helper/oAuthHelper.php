@@ -20,12 +20,12 @@ class oAuthHelper
 
     private $callback;
 
-    private $settings;
+    private array $settings;
 
     public function __construct(
         UnifiedIntegrationInterface $integration,
         private readonly ?Request $request = null,
-        $settings = [],
+        array $settings = [],
     ) {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();

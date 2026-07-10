@@ -297,7 +297,7 @@ class ChartQuery extends AbstractChart
     /**
      * Go through the raw data and add the missing times.
      */
-    public function completeTimeData($rawData, $countAverage = false): array
+    public function completeTimeData(array $rawData, $countAverage = false): array
     {
         $data          = [];
         $averageCounts = [];
@@ -441,7 +441,7 @@ class ChartQuery extends AbstractChart
      * @param array  $options      for special behavior
      * @param string $tablePrefix
      */
-    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, $options = [], $tablePrefix = 't')
+    public function modifyCountQuery(QueryBuilder &$query, $uniqueColumn, array $options = [], $tablePrefix = 't')
     {
         $query->select('COUNT('.$tablePrefix.'.'.$uniqueColumn.') AS count');
 
@@ -583,7 +583,7 @@ class ChartQuery extends AbstractChart
         $dbUnit                = $this->translateTimeUnit($this->unit);
         $columnName            = $tablePrefix.'.'.$column;
         $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ($columnName, '+00:00', '{$defaultTimezoneOffset}')";
+        $columnName            = "CONVERT_TZ({$columnName}, '+00:00', '{$defaultTimezoneOffset}')";
 
         return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
     }

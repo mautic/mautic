@@ -109,6 +109,7 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $pageDraft = $this->em->getRepository(PageDraft::class)->findOneBy(['page' => $page]);
+        $this->assertInstanceOf(PageDraft::class, $pageDraft);
         Assert::assertEquals('Test html Draft', $pageDraft->getHtml());
         Assert::assertSame('Test html', $page->getCustomHtml());
     }
