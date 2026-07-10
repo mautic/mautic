@@ -257,8 +257,8 @@ class SubmissionRepository extends CommonRepository
             $date2      = $this->generateRandomParameterName();
             $parameters = [$date1 => $date.' 00:00:00', $date2 => $date.' 23:59:59'];
             $expr       = $q->expr()->and(
-                $q->expr()->gte('s.date_submitted', ":$date1"),
-                $q->expr()->lte('s.date_submitted', ":$date2")
+                $q->expr()->gte('s.date_submitted', ":{$date1}"),
+                $q->expr()->lte('s.date_submitted', ":{$date2}")
             );
 
             return [$expr, $parameters];

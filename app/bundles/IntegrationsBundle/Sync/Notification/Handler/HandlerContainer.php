@@ -27,11 +27,11 @@ class HandlerContainer
     public function getHandler(string $integration, string $object)
     {
         if (!isset($this->handlers[$integration])) {
-            throw new HandlerNotSupportedException("$integration does not have any registered handlers");
+            throw new HandlerNotSupportedException("{$integration} does not have any registered handlers");
         }
 
         if (!isset($this->handlers[$integration][$object])) {
-            throw new HandlerNotSupportedException("$integration does not have any registered handlers for the object $object");
+            throw new HandlerNotSupportedException("{$integration} does not have any registered handlers for the object {$object}");
         }
 
         return $this->handlers[$integration][$object];

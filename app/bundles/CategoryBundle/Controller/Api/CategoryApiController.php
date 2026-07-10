@@ -56,13 +56,13 @@ class CategoryApiController extends CommonApiController
         }
 
         if ('create' != $action) {
-            $ownPerm   = "$permissionBase:{$action}own";
-            $otherPerm = "$permissionBase:{$action}other";
+            $ownPerm   = "{$permissionBase}:{$action}own";
+            $otherPerm = "{$permissionBase}:{$action}other";
 
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $entity->getCreatedBy());
         }
 
-        return $this->security->isGranted("$permissionBase:create");
+        return $this->security->isGranted("{$permissionBase}:create");
     }
 
     /**

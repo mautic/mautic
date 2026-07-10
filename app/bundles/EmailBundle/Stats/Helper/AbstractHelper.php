@@ -89,13 +89,13 @@ abstract class AbstractHelper implements StatHelperInterface
         }
 
         if (1 === count($ids)) {
-            $q->andWhere("$prefix.$column = :email_id");
+            $q->andWhere("{$prefix}.{$column} = :email_id");
             $q->setParameter('email_id', $ids[0]);
 
             return;
         }
 
-        $q->andWhere("$prefix.$column IN (:email_ids)");
+        $q->andWhere("{$prefix}.{$column} IN (:email_ids)");
         $q->setParameter('email_ids', $ids, ArrayParameterType::INTEGER);
     }
 

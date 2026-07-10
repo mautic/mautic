@@ -75,7 +75,7 @@ class IndexHelper
 
         $tableName = $this->entityManager->getClassMetadata(Lead::class)->getTableName();
 
-        $sql = "SHOW INDEXES FROM `$tableName`";
+        $sql = "SHOW INDEXES FROM `{$tableName}`";
 
         $stmt    = $this->entityManager->getConnection()->prepare($sql);
         $indexes = $stmt->executeQuery()->fetchAllAssociative();
