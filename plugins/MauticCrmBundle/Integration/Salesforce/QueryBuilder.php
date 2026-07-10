@@ -18,7 +18,7 @@ class QueryBuilder
         $fieldString = self::getFieldString($fields);
         $idString    = implode("','", $ids);
 
-        return ($idString) ? "SELECT $fieldString from Lead where Id in ('$idString') and ConvertedContactId = NULL" : '';
+        return ($idString) ? "SELECT {$fieldString} from Lead where Id in ('{$idString}') and ConvertedContactId = NULL" : '';
     }
 
     /**
@@ -33,7 +33,7 @@ class QueryBuilder
         $fieldString = self::getFieldString($fields);
         $idString    = implode("','", $ids);
 
-        return ($idString) ? "SELECT $fieldString from Contact where Id in ('$idString')" : '';
+        return ($idString) ? "SELECT {$fieldString} from Contact where Id in ('{$idString}')" : '';
     }
 
     private static function getFieldString(array $fields): string

@@ -79,9 +79,9 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
                     if ('lead:leads' === $permBase) {
                         // Acknowledge owner then created_by
-                        $where['value'] = "IF ($tableAlias.owner_id IS NOT NULL, $tableAlias.owner_id, $tableAlias.created_by) = $userId";
+                        $where['value'] = "IF ({$tableAlias}.owner_id IS NOT NULL, {$tableAlias}.owner_id, {$tableAlias}.created_by) = {$userId}";
                     } else {
-                        $where['value'] = "$tableAlias.created_by = $userId";
+                        $where['value'] = "{$tableAlias}.created_by = {$userId}";
                     }
                     $event->addWhere($where);
 

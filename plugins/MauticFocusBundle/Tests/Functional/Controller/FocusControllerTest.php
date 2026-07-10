@@ -35,6 +35,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedFocus = $this->em->find(Focus::class, $focus->getId());
+        $this->assertInstanceOf(Focus::class, $savedFocus);
         Assert::assertSame($project->getId(), $savedFocus->getProjects()->first()->getId());
     }
 }

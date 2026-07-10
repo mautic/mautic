@@ -341,10 +341,10 @@ class QueryBuilder extends BaseQueryBuilder
         $sql    = $this->getSQL();
         foreach ($params as $key=>$val) {
             if (!is_int($val) && !is_float($val) && !is_array($val)) {
-                $val = "'$val'";
+                $val = "'{$val}'";
             } elseif (is_array($val)) {
                 if (ArrayParameterType::STRING === $this->getParameterType($key)) {
-                    $val = array_map(static fn ($value): string => "'$value'", $val);
+                    $val = array_map(static fn ($value): string => "'{$value}'", $val);
                 }
                 $val = implode(', ', $val);
             }

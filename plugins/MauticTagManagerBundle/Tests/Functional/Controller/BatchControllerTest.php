@@ -67,6 +67,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
         $lead1     = $leadModel->getEntity($this->leads[0]->getId());
+        $this->assertInstanceOf(Lead::class, $lead1);
         $this->assertContains($this->tags[0], $lead1->getTags()->toArray());
         $this->assertContains($this->tags[1], $lead1->getTags()->toArray());
         $this->assertNotContains($this->tags[2], $lead1->getTags()->toArray());
@@ -91,6 +92,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('1 contact affected', $this->client->getResponse()->getContent());
         $lead1 = $leadModel->getEntity($this->leads[0]->getId());
+        $this->assertInstanceOf(Lead::class, $lead1);
         $this->assertNotContains($this->tags[1], $lead1->getTags()->toArray());
         $this->assertContains($this->tags[2], $lead1->getTags()->toArray());
     }
