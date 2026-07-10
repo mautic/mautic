@@ -47,7 +47,6 @@ class TagController extends FormController
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
-        /** @var TagManagerModel $model */
         $model = $this->getModel('tagmanager.tag');
         \assert($model instanceof TagManagerModel);
         $session = $request->getSession();
