@@ -21,6 +21,9 @@ setup_mautic() {
     printf "Enabling plugins...\n"
     php bin/console mautic:plugins:reload
 
+    printf "Building GrapesJs builder assets...\n"
+    ( cd plugins/GrapesJsBuilderBundle && npm ci && npm run build-dev )
+
     tput setaf 2
     printf "All done! Here's some useful information:\n"
     printf "🔒 The default login is admin / Maut1cR0cks!\n"
