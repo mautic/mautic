@@ -362,7 +362,7 @@ class DateTimeHelper
 
         if (!in_array($unit, $possibleUnits, true)) {
             $possibleUnitsString = implode(', ', $possibleUnits);
-            throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
+            throw new \InvalidArgumentException("Unit '{$unit}' is not supported. Use one of these: {$possibleUnitsString}");
         }
     }
 

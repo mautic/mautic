@@ -54,15 +54,18 @@ final class OverrideIncludeExtension extends AbstractExtension
                 $templates[] = $event->getTemplate();
             }
 
-            // Use Twig's original include for array handling
-            return CoreExtension::include($env, $context, $templates, $event->getVars(), $withContext, $ignoreMissing, $sandboxed);
+            // Use Twig's original include for array handling. Twig >= 3.28 returns
+            // Twig\Markup here; cast to keep the string return type. Escaping is
+            // unaffected as the function is registered with 'is_safe' => ['html'].
+            return (string) CoreExtension::include($env, $context, $templates, $event->getVars(), $withContext, $ignoreMissing, $sandboxed);
         }
 
         // Handle single template
         $event = $this->dispatchCustomTemplateEvent((string) $template, $variables);
 
-        // Use Twig's original include functionality
-        return CoreExtension::include($env, $context, $event->getTemplate(), $event->getVars(), $withContext, $ignoreMissing, $sandboxed);
+        // Use Twig's original include functionality. Twig >= 3.28 returns Twig\Markup;
+        // cast to keep the string return type (escaping handled via 'is_safe' above).
+        return (string) CoreExtension::include($env, $context, $event->getTemplate(), $event->getVars(), $withContext, $ignoreMissing, $sandboxed);
     }
 
     public function getName(): string

@@ -96,9 +96,9 @@ final class ListControllerTest extends MauticMysqlTestCase
     private function createList(string $suffix = 'A'): LeadList
     {
         $list = new LeadList();
-        $list->setName("Segment $suffix");
-        $list->setPublicName("Segment $suffix");
-        $list->setAlias("segment-$suffix");
+        $list->setName("Segment {$suffix}");
+        $list->setPublicName("Segment {$suffix}");
+        $list->setAlias("segment-{$suffix}");
         $list->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
         $list->setDateModified(new \DateTime('2020-03-21 20:29:02'));
         $list->setCreatedByUser('Test User');
