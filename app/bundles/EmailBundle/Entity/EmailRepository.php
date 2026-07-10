@@ -377,7 +377,8 @@ class EmailRepository extends CommonRepository
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
             return $results[0];
-        } elseif ($countOnly) {
+        }
+        if ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
         }
         $leads = [];

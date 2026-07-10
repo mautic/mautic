@@ -518,7 +518,8 @@ class CampaignController extends AbstractStandardFormController
                         'new'
                     )
                 );
-            } elseif ($valid && $this->isFormApplied($form)) {
+            }
+            if ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($request, $campaign->getId(), true);
             }
         }

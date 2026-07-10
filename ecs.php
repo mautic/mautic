@@ -32,11 +32,12 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
         PhpCsFixer\Fixer\StringNotation\ExplicitStringVariableFixer::class,
+        PhpCsFixer\Fixer\ControlStructure\NoSuperfluousElseifFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
         docblocks: true,
         namespaces: true,
         cleanup: true,
-        // controlStructures: true
+        // controlStructures: true,
     );
