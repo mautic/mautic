@@ -12,18 +12,25 @@ use Symfony\Component\HttpFoundation\Response;
 class BatchCompanyContactAssignmentModel
 {
     private const MESSAGE_ADDED             = 'Contact added to company';
+
     private const MESSAGE_CONTACT_NOT_FOUND = 'Contact not found';
+
     private const MESSAGE_COMPANY_NOT_FOUND = 'Company not found';
+
     private const MESSAGE_ACCESS_DENIED     = 'Access denied';
+
     private const MESSAGE_UNEXPECTED        = 'An unexpected error occurred';
+
     private const LOG_TYPE                  = 'api';
+
     private const LOG_EVENT_NAME            = 'API batch assignment';
+
     private const LOG_ACTION_PREFIX         = 'Lead added to the company, ';
 
     public function __construct(
-        private CompanyModel $companyModel,
-        private LeadModel $leadModel,
-        private CorePermissions $security,
+        private readonly CompanyModel $companyModel,
+        private readonly LeadModel $leadModel,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -114,7 +121,7 @@ class BatchCompanyContactAssignmentModel
 
             if (Response::HTTP_OK === $status) {
                 try {
-                    $this->logBatchAssignments($contact, $addedCompanyIds ?? [], $companiesById);
+                    $this->logBatchAssignments($contact, $addedCompanyIds, $companiesById);
                 } catch (\Throwable) {
                     // Assignment succeeded; logging failure must not change the API outcome.
                 }

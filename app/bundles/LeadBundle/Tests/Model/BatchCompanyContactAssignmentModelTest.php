@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\BatchCompanyContactAssignmentModel;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -19,13 +20,13 @@ use Symfony\Component\HttpFoundation\Response;
 class BatchCompanyContactAssignmentModelTest extends TestCase
 {
     /** @var CompanyModel&MockObject */
-    private CompanyModel $companyModel;
+    private MockObject $companyModel;
 
     /** @var LeadModel&MockObject */
-    private LeadModel $leadModel;
+    private MockObject $leadModel;
 
     /** @var CorePermissions&MockObject */
-    private CorePermissions $security;
+    private MockObject $security;
 
     private BatchCompanyContactAssignmentModel $model;
 
@@ -250,7 +251,7 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
 
     private function createContact(int $id, int $ownerId): Lead
     {
-        $owner = $this->createMock(\Mautic\UserBundle\Entity\User::class);
+        $owner = $this->createMock(User::class);
         $owner->method('getId')->willReturn($ownerId);
 
         $contact = new Lead();
