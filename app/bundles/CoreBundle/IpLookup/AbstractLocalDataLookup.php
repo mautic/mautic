@@ -27,10 +27,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Return the URL to manually download.
-     *
-     * @return string
      */
-    abstract public function getRemoteDateStoreDownloadUrl();
+    abstract public function getRemoteDateStoreDownloadUrl(): string;
 
     /**
      * @return string

@@ -200,7 +200,9 @@ final class AssetsSubscriberTest extends TestCase
         );
     }
 
-    /** @param array<string, mixed>|string $content */
+    /**
+     * @param array<string, mixed>|string $content
+     */
     private function writeManifest(array|string $content): void
     {
         $data = is_array($content) ? json_encode($content) : $content;

@@ -643,6 +643,8 @@ class CampaignController extends AbstractStandardFormController
 
         $campaignSources = $this->getCampaignModel()->getLeadSources($objectId);
         $this->prepareCampaignSourcesForEdit($tempId, $campaignSources);
+
+        return [];
     }
 
     /**
@@ -1121,6 +1123,8 @@ class CampaignController extends AbstractStandardFormController
         $this->modifiedEvents                     = $this->campaignEvents                     = $campaignEvents;
         $this->campaignElements['modifiedEvents'] = $campaignEvents;
         $this->campaignElements['campaignEvents'] = $campaignEvents;
+
+        return [];
     }
 
     protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)
