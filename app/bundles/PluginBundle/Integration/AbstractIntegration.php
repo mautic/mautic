@@ -1840,11 +1840,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
                 $values = $data[$field];
             } else {
-                if (!isset($data->$field)) {
+                if (!isset($data->{$field})) {
                     $info[$field] = '';
                     continue;
                 }
-                $values = $data->$field;
+                $values = $data->{$field};
             }
 
             switch ($fieldDetails['type']) {
@@ -1854,10 +1854,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     break;
                 case 'object':
                     foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values->$f)) {
+                        if (isset($values->{$f})) {
                             $fn = $this->matchFieldName($field, $f);
 
-                            $info[$fn] = $values->$f;
+                            $info[$fn] = $values->{$f};
                         }
                     }
                     break;

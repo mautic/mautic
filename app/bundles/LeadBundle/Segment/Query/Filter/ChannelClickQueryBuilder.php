@@ -45,7 +45,7 @@ class ChannelClickQueryBuilder extends BaseFilterQueryBuilder
 
         if ($this->isDateBased($filter->getField())) {
             $expr = $expr->with(
-                $subQb->expr()->$filterOperator($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
+                $subQb->expr()->{$filterOperator}($tableAlias.'.date_hit', $filter->getParameterHolder($parameters))
             );
         }
 

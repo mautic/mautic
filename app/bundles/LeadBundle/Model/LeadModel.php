@@ -1652,7 +1652,7 @@ class LeadModel extends FormModel
         // cycle through calling appropriate setter
         foreach ($fields as $q => $setter) {
             if (isset($params[$q])) {
-                $utmTags->$setter($params[$q]);
+                $utmTags->{$setter}($params[$q]);
             }
         }
 

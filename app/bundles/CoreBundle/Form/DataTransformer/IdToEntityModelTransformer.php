@@ -37,7 +37,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
                 return '';
             }
 
-            return $entity->$func();
+            return $entity->{$func}();
         }
 
         if (!is_array($entity) && !$entity instanceof PersistentCollection) {
@@ -46,7 +46,7 @@ class IdToEntityModelTransformer implements DataTransformerInterface
 
         $return = [];
         foreach ($entity as $e) {
-            $return[] = $e->$func();
+            $return[] = $e->{$func}();
         }
 
         return $return;
