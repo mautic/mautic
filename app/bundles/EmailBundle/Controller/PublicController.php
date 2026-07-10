@@ -80,9 +80,9 @@ class PublicController extends CommonFormController
             // Add subject as title
             if (!empty($subject)) {
                 if (str_contains($content, '<title></title>')) {
-                    $content = str_replace('<title></title>', "<title>$subject</title>", $content);
+                    $content = str_replace('<title></title>', "<title>{$subject}</title>", $content);
                 } elseif (!str_contains($content, '<title>')) {
-                    $content = str_replace('<head>', "<head>\n<title>$subject</title>", $content);
+                    $content = str_replace('<head>', "<head>\n<title>{$subject}</title>", $content);
                 }
             }
 

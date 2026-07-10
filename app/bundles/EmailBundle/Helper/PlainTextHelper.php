@@ -454,7 +454,7 @@ class PlainTextHelper
      *
      * @return string
      */
-    protected function pregCallback($matches)
+    protected function pregCallback(array $matches)
     {
         switch (strtolower($matches[1])) {
             case 'b':

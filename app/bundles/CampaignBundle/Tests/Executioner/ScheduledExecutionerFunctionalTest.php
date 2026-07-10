@@ -50,6 +50,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $limiter = new ContactLimiter(100, 0, 0, 0);
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
@@ -77,7 +78,8 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $limiter = new ContactLimiter(100, 0, 0, 0);
-        $counter = $this->scheduledExecutioner->execute($campaign, $limiter); // Quiet mode - no output
+        $counter = $this->scheduledExecutioner->execute($campaign, $limiter);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter); // Quiet mode - no output
 
         $this->assertEquals(4, $counter->getTotalEvaluated());
     }
@@ -99,6 +101,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(2, $counter->getTotalEvaluated());
     }
@@ -122,6 +125,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $limiter = new ContactLimiter(100, 0, 0, 0);
         $counter = $this->scheduledExecutioner->execute($campaign, $limiter);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         // Both events should be evaluated since they are due for execution
         $this->assertEquals(2, $counter->getTotalEvaluated());
@@ -171,7 +175,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         // Verify the event is properly set up for redirection
         $this->assertTrue($deletedEvent->isDeleted(), 'Event should be marked as deleted');
-        $this->assertNotNull($deletedEvent->getRedirectEvent(), 'Event should have a redirect event');
+        $this->assertInstanceOf(Event::class, $deletedEvent->getRedirectEvent(), 'Event should have a redirect event');
         $this->assertTrue($deletedEvent->shouldBeRedirected(), 'Event should be redirected');
         $this->assertEquals(
             $redirectTargetEvent->getId(),
@@ -182,6 +186,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         // Process logs one by one to avoid race condition in rotation calculation
         $counter1 = $this->scheduledExecutioner->executeByIds([$log1->getId()]);
         $counter2 = $this->scheduledExecutioner->executeByIds([$log2->getId()]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter1);
 
         $totalEvaluated = $counter1->getTotalEvaluated() + $counter2->getTotalEvaluated();
 
@@ -190,6 +195,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         // After execution, reload the logs from database to see the updated state
         $log1 = $this->em->find(LeadEventLog::class, $log1->getId());
         $log2 = $this->em->find(LeadEventLog::class, $log2->getId());
+        $this->assertInstanceOf(LeadEventLog::class, $log1);
 
         // Verify the logs now point to the redirect target event
         $this->assertEquals(
@@ -197,15 +203,18 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             $log1->getEvent()->getId(),
             'Log1 should now point to redirect target event'
         );
+        $this->assertInstanceOf(LeadEventLog::class, $log2);
         $this->assertEquals(
             $redirectTargetEvent->getId(),
             $log2->getEvent()->getId(),
             'Log2 should now point to redirect target event'
         );
+        $this->assertInstanceOf(LeadEventLog::class, $log1);
 
         // Verify rotation values are correctly calculated
         // (should be 3 and 4 since we had an existing log with rotation 2)
         $this->assertContains($log1->getRotation(), [3, 4], 'Log1 should have rotation 3 or 4');
+        $this->assertInstanceOf(LeadEventLog::class, $log2);
         $this->assertContains($log2->getRotation(), [3, 4], 'Log2 should have rotation 3 or 4');
         $this->assertNotEquals(
             $log1->getRotation(),
@@ -262,6 +271,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(2, $counter->getTotalEvaluated());
     }
@@ -283,6 +293,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log1->getId(), $log2->getId()]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -302,12 +313,14 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $counter = $this->scheduledExecutioner->executeByIds([$log->getId()]);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         // Event should be evaluated since it's not deleted and campaign is published
         $this->assertEquals(1, $counter->getTotalEvaluated());
 
         // Verify the log still points to the original event (no redirection occurred)
         $updatedLog = $this->em->find(LeadEventLog::class, $log->getId());
+        $this->assertInstanceOf(LeadEventLog::class, $updatedLog);
         $this->assertEquals($event->getId(), $updatedLog->getEvent()->getId());
         $this->assertEquals('Normal Event', $updatedLog->getEvent()->getName());
     }
@@ -435,7 +448,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
             'campaign' => $campaign,
         ]);
 
-        $this->assertNotNull($updatedLog, 'Log should exist after redirection');
+        $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Log should exist after redirection');
         $this->assertEquals($redirectEvent->getId(), $updatedLog->getEvent()->getId(),
             'Log should be updated to reference the redirect event');
     }

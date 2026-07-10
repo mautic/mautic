@@ -242,8 +242,8 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
     private function createField(string $suffix, string $type = 'text', array $parameters = [], ?int $charLength = null): LeadField
     {
         $field = new LeadField();
-        $field->setName("Field $suffix");
-        $field->setAlias("field_$suffix");
+        $field->setName("Field {$suffix}");
+        $field->setAlias("field_{$suffix}");
         $field->setDateAdded(new \DateTime());
         $field->setDateAdded(new \DateTime());
         $field->setDateModified(new \DateTime());

@@ -40,7 +40,7 @@ final class YearStatTest extends TestCase
     public function testGetStats(): void
     {
         $result = $this->yearStat->getStats();
-        $this->assertSame(["$this->year-$this->month" => $this->monthStat], $result);
+        $this->assertSame(["{$this->year}-{$this->month}" => $this->monthStat], $result);
     }
 
     public function testGetSum(): void
