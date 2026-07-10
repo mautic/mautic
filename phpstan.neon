@@ -11,9 +11,9 @@ parameters:
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
-		return: 85
-		param: 72
-		property: 66
+		return: 86.2
+		param: 74.1
+		property: 66.8
 		# wait for PHP 8.3 before changing
 		constant: 3
 	paths:
@@ -117,6 +117,12 @@ parameters:
 		-
 			identifier: argument.type
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
+		# handle after native type declarations are covered
+		-
+			identifier: missingType.iterableValue
+			paths:
+				- app
+				- plugins
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php

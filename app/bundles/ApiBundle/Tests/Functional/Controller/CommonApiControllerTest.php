@@ -24,7 +24,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->createAndAuthenticateApiUser('api_user', 'api@example.com');
 
-        $this->assertNotNull($email->getCheckedOut());
+        $this->assertInstanceOf(\DateTimeInterface::class, $email->getCheckedOut());
         $this->assertEquals('Admin User', $email->getCheckedOutByUser());
 
         $this->client->request('PATCH', '/api/emails/'.$email->getId().'/edit', [
@@ -42,6 +42,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $translator = static::getContainer()->get('translator');
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');
@@ -114,6 +115,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
         $translator = static::getContainer()->get('translator');
         $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
         $this->assertInstanceOf(CoreParametersHelper::class, $coreParametersHelper);
         $dateFormat = $coreParametersHelper->get('date_format_dateonly');

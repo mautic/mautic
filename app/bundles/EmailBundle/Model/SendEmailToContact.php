@@ -238,7 +238,7 @@ class SendEmailToContact
         throw new FailedToSendToContactException($errorMessages);
     }
 
-    protected function processSendFailures($sendFailures)
+    protected function processSendFailures(array $sendFailures)
     {
         $failedEmailAddresses = $sendFailures['failures'];
         unset($sendFailures['failures']);

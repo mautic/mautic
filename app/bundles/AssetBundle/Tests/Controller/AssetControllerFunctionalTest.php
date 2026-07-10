@@ -396,6 +396,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()
@@ -408,6 +409,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
+        /** @var RoleModel $roleModel */
         $roleModel = static::getContainer()->get('mautic.user.model.role');
         $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
@@ -497,6 +499,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(Asset::class, $asset->getId());
+        $this->assertInstanceOf(Asset::class, $savedAsset);
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 

@@ -124,10 +124,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         return $repo;
     }
 
-    /**
-     * @return CompanyLeadRepository
-     */
-    public function getCompanyLeadRepository()
+    public function getCompanyLeadRepository(): CompanyLeadRepository
     {
         return $this->em->getRepository(CompanyLead::class);
     }
@@ -259,7 +256,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                         $newValue = implode('|', $newValue);
                     }
 
-                    if ($curValue !== $newValue && (strlen((string) $newValue) > 0 || $overwriteWithBlank)) {
+                    if ($curValue !== $newValue && ('' !== (string) $newValue || $overwriteWithBlank)) {
                         $field['value'] = $newValue;
                         $company->addUpdatedField($alias, $newValue, $curValue);
                     }
@@ -798,12 +795,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array $fields
-     * @param array $data
-     *
      * @throws \Exception
      */
-    public function importCompany($fields, $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
+    public function importCompany(array $fields, array $data, $owner = null, $persist = true, $skipIfExists = false): ?Company
     {
         try {
             $duplicateCompanies = $this->companyDeduper->checkForDuplicateCompanies($this->getFieldData($fields, $data));
@@ -928,9 +922,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * @param array $fields
-     * @param array $data
      */
-    protected function getFieldData($fields, $data): array
+    protected function getFieldData($fields, array $data): array
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];

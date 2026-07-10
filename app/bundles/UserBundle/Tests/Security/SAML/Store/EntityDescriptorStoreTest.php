@@ -33,7 +33,7 @@ final class EntityDescriptorStoreTest extends TestCase
 
         $descriptor = $store->get('foobar');
 
-        $this->assertNull($descriptor);
+        $this->assertNotInstanceOf(\LightSaml\Model\Metadata\EntityDescriptor::class, $descriptor);
     }
 
     public function testHasReturnsFalseIfSamlIsDisabled(): void

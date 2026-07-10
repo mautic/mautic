@@ -16,8 +16,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SendSmsSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private DoNotContactRepository $dncRepo, private MessageQueueModel $messageQueueModel)
-    {
+    public function __construct(
+        private DoNotContactRepository $dncRepo,
+        private MessageQueueModel $messageQueueModel,
+    ) {
     }
 
     /**

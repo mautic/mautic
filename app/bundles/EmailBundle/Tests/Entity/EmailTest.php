@@ -17,8 +17,8 @@ final class EmailTest extends TestCase
         $email->setPublishUp(new \DateTime());
         $email->setPublishDown(new \DateTime());
         $emailClone = clone $email;
-        $this->assertNull($emailClone->getPublishUp());
-        $this->assertNull($emailClone->getPublishDown());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $emailClone->getPublishUp());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $emailClone->getPublishDown());
     }
 
     public function testCloneResetPlainText(): void

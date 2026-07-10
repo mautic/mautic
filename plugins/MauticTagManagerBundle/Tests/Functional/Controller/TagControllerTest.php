@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\TagModel;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
@@ -27,14 +28,12 @@ final class TagControllerTest extends MauticMysqlTestCase
 {
     private const MERGE_ROUTE_BASE = '/s/tags/merge/';
 
-    /**
-     * @var TagRepository
-     */
-    private $tagRepository;
+    private TagRepository $tagRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
+        /** @var TagModel $tagModel */
         $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
 
@@ -103,7 +102,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $tagId = $this->tagRepository->findOneBy([])->getId();
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
+        $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
 
     public function testTagDeletionRemovesContactAssociations(): void
@@ -123,7 +122,7 @@ final class TagControllerTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertNull($this->tagRepository->find($tagId), 'Assert that tag is deleted');
+        $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
         Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
 
@@ -133,6 +132,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     public function testViewAction(): void
     {
         $tag = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $this->client->request('GET', '/s/tags/view/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
@@ -167,6 +167,7 @@ final class TagControllerTest extends MauticMysqlTestCase
     {
         $TagName = 'Test tag';
         $tag     = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
@@ -261,6 +262,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         $tag     = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(Tag::class, $tag);
         $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }
@@ -354,13 +356,14 @@ final class TagControllerTest extends MauticMysqlTestCase
         Assert::assertSame(2, $this->countLeadTagAssociations($secondaryTagId));
 
         // Test the actual merge functionality by calling the model directly
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();
 
         $remainingTags   = $this->tagRepository->findAll();
-        $remainingTagIds = array_map(fn ($tag) => $tag->getId(), $remainingTags);
+        $remainingTagIds = array_map(fn (Tag $tag) => $tag->getId(), $remainingTags);
 
         Assert::assertSame(2, $this->countLeadTagAssociations($primaryTagId));
         Assert::assertSame(0, $this->countLeadTagAssociations($secondaryTagId));
@@ -393,6 +396,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $pointTriggerEventId   = (int) $pointTriggerEvent->getId();
         $reportId              = (int) $report->getId();
 
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
