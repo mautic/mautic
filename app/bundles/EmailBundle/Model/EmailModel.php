@@ -1930,19 +1930,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $flag    = ArrayHelper::pickValue('flag', $filter, false);
         $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
-        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter))) {
+        if (null !== ($companyId = ArrayHelper::pickValue('companyId', $filter))) {
             $fetchOptions->setCompanyId((int) $companyId);
         }
 
-        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter))) {
+        if (null !== ($campaignId = ArrayHelper::pickValue('campaignId', $filter))) {
             $fetchOptions->setCampaignId((int) $campaignId);
         }
 
-        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter))) {
+        if (null !== ($segmentId = ArrayHelper::pickValue('segmentId', $filter))) {
             $fetchOptions->setSegmentId((int) $segmentId);
         }
 
-        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter))) {
+        if (null !== ($emailId = ArrayHelper::pickValue('email_id', $filter))) {
             $fetchOptions->setEmailIds([(int) $emailId]);
         }
 

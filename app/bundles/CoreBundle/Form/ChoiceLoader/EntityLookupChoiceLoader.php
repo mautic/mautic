@@ -288,7 +288,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      */
     private function sanitizeIds(int|string|array|object|null $data): array
     {
-        if (is_null($data)) {
+        if (null === $data) {
             return [];
         }
 

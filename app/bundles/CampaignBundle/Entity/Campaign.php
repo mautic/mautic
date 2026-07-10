@@ -691,7 +691,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getContactMembership(Contact $contact): Collection
