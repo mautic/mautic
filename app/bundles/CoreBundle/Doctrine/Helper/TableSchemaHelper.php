@@ -192,7 +192,7 @@ class TableSchemaHelper
     {
         if ($this->sm->tablesExist([$this->prefix.$table])) {
             if ($throwException) {
-                throw new SchemaException($this->prefix."$table already exists");
+                throw new SchemaException($this->prefix."{$table} already exists");
             }
 
             return true;

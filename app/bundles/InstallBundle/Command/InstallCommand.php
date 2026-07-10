@@ -436,7 +436,7 @@ class InstallCommand extends Command
     private function handleInstallerErrors(OutputInterface $output, array $messages): void
     {
         foreach ($messages as $type => $message) {
-            $output->writeln("  - [$type] $message");
+            $output->writeln("  - [{$type}] {$message}");
         }
     }
 }

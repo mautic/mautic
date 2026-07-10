@@ -671,18 +671,18 @@ TEXT;
                 if ($useMap) {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <map><area href="$url"$dnc alt="alt" /></map> 321ABC
+    ABC123 <map><area href="{$url}"{$dnc} alt="alt" /></map> 321ABC
 CONTENT;
                 } else {
                     $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 <a href="$url"$dnc>$url</a> 321ABC
+    ABC123 <a href="{$url}"{$dnc}>{$url}</a> 321ABC
 CONTENT;
                 }
             } else {
                 $content .= <<<CONTENT
     ABC123 321ABC
-    ABC123 $url 321ABC
+    ABC123 {$url} 321ABC
 CONTENT;
             }
         }

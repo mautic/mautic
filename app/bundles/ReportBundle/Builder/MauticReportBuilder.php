@@ -397,7 +397,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $andGroup[] = $expression;
                         break;
                     case 'neq':
-                        $columnValue = ":$paramName";
+                        $columnValue = ":{$paramName}";
                         $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
                             $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
@@ -406,7 +406,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $andGroup[] = $expression;
                         break;
                     default:
-                        $columnValue = ":$paramName";
+                        $columnValue = ":{$paramName}";
                         $type        = $filterDefinitions[$filter['column']]['type'];
                         if (isset($filterDefinitions[$filter['column']]['formula'])) {
                             $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
