@@ -51,7 +51,7 @@ class ConstantContactApi extends EmailMarketingApi
     {
         $parameters = array_merge($fields, [
             'lists' => [
-                ['id' => "$listId"],
+                ['id' => "{$listId}"],
             ],
             'email_addresses' => [
                 ['email_address' => $email],

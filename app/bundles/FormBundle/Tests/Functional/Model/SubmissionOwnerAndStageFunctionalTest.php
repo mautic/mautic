@@ -100,21 +100,21 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         $submission = $submissions[0];
         $contact    = $submission->getLead();
 
-        $this->assertNotNull($contact, "Contact was not created for test: {$testName}");
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact, "Contact was not created for test: {$testName}");
         $this->assertSame($contactEmail, $contact->getEmail());
 
         if ($expectedOwnerId) {
-            $this->assertNotNull($contact->getOwner(), "Owner not set for test: {$testName}");
+            $this->assertInstanceOf(User::class, $contact->getOwner(), "Owner not set for test: {$testName}");
             $this->assertSame($expectedOwnerId, $contact->getOwner()->getId(), "Incorrect owner set for test: {$testName}");
         } else {
-            $this->assertNull($contact->getOwner(), "Owner was set unexpectedly for test: {$testName}");
+            $this->assertNotInstanceOf(User::class, $contact->getOwner(), "Owner was set unexpectedly for test: {$testName}");
         }
 
         if ($expectedStageId) {
-            $this->assertNotNull($contact->getStage(), "Stage not set for test: {$testName}");
+            $this->assertInstanceOf(Stage::class, $contact->getStage(), "Stage not set for test: {$testName}");
             $this->assertSame($expectedStageId, $contact->getStage()->getId(), "Incorrect stage set for test: {$testName}");
         } else {
-            $this->assertNull($contact->getStage(), "Stage was set unexpectedly for test: {$testName}");
+            $this->assertNotInstanceOf(Stage::class, $contact->getStage(), "Stage was set unexpectedly for test: {$testName}");
         }
     }
 
