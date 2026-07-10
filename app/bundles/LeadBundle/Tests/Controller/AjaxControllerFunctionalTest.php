@@ -508,7 +508,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
 
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($owner);
             $leads[] = $lead;
         }
@@ -546,7 +546,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by admin user.
         for ($i = 1; $i <= 2; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($adminUser);
             $leads[] = $lead;
         }
@@ -588,7 +588,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by non-admin user.
         for ($i = 3; $i <= 4; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($nonAdminUser);
             $nonAdminLeads[] = $lead;
         }
@@ -656,7 +656,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {
-            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '$expectedValue' for object: $object, group: $group");
+            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '{$expectedValue}' for object: {$object}, group: {$group}");
         }
     }
 

@@ -237,7 +237,7 @@ class ContactObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->{$this->repository->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 

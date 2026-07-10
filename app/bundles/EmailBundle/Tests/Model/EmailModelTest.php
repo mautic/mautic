@@ -424,7 +424,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $counts = [];
         foreach ($emailSettings as $id => $details) {
-            $counts[] = "$id:{$details['variantCount']}";
+            $counts[] = "{$id}:{$details['variantCount']}";
         }
         $counts = implode('; ', $counts);
 
@@ -568,7 +568,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         $counts = [];
         foreach ($emailSettings as $id => $details) {
-            $counts[] = "$id:{$details['variantCount']}";
+            $counts[] = "{$id}:{$details['variantCount']}";
         }
         $counts = implode('; ', $counts);
 
