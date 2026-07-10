@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -235,8 +236,10 @@ final class CampaignShareControllerTest extends MauticMysqlTestCase
             'campaign_share[description]'       => self::TEST_DESCRIPTION,
             'campaign_share[worksWithVersions]' => ['5.0'],
         ]);
-        $pngPath = $this->createTempPng();
-        $form['campaign_share[bannerImage]']->upload($pngPath);
+        $pngPath     = $this->createTempPng();
+        $bannerField = $form['campaign_share[bannerImage]'];
+        \assert($bannerField instanceof FileFormField);
+        $bannerField->upload($pngPath);
 
         $crawler  = $this->client->submit($form);
         $response = $this->client->getResponse();
