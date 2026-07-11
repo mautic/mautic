@@ -145,7 +145,7 @@ class ButtonExtension extends AbstractExtension
                             'confirm' => [
                                 'message' => $this->translator->trans(
                                     'mautic.'.$langVar.'.form.confirmdelete',
-                                    ['%name%' => $item->$nameGetter().' ('.$item->getId().')']
+                                    ['%name%' => $item->{$nameGetter}().' ('.$item->getId().')']
                                 ),
                                 'confirmAction' => $this->router->generate(
                                     $actionRoute,

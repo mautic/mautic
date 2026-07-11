@@ -304,7 +304,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             $id = null;
 
             if (is_object($value) && method_exists($value, $getter)) {
-                $id = $value->$getter();
+                $id = $value->{$getter}();
             } elseif (is_scalar($value)) {
                 $id = $value;
             }

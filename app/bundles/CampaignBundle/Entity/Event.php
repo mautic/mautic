@@ -528,7 +528,7 @@ class Event implements ChannelInterface, UuidInterface
     private function isChanged(string $prop, $val): bool
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' === $prop || 'parent' === $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -537,8 +537,8 @@ class Event implements ChannelInterface, UuidInterface
 
                 return true;
             }
-        } elseif ($this->$prop != $val) {
-            $this->changes[$prop] = [$this->$prop, $val];
+        } elseif ($this->{$prop} != $val) {
+            $this->changes[$prop] = [$this->{$prop}, $val];
 
             return true;
         }

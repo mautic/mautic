@@ -70,7 +70,7 @@ class EntityResultHelper
                 continue;
             }
 
-            $object[0]->$key = $value;
+            $object[0]->{$key} = $value;
         }
 
         return $object[0];

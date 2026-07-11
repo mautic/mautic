@@ -287,7 +287,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
         if (str_starts_with($prop, $prefix)) {
             $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
-            $current = $this->$getter();
+            $current = $this->{$getter}();
             if ($current !== $val) {
                 $this->addChange($prop, [$current, $val]);
             }

@@ -745,11 +745,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $options = [
             'updateSelect' => $updateSelect,
             'id'           => $entity->getId(),
-            'name'         => $entity->$nameMethod(),
+            'name'         => $entity->{$nameMethod}(),
         ];
 
         if ($groupMethod) {
-            $options['group'] = $entity->$groupMethod();
+            $options['group'] = $entity->{$groupMethod}();
         }
 
         return $options;
@@ -764,7 +764,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
-        $dateRangeValues = $request->$method->all()['daterange'] ?? $request->getSession()->get($name, []);
+        $dateRangeValues = $request->{$method}->all()['daterange'] ?? $request->getSession()->get($name, []);
         $request->getSession()->set($name, $dateRangeValues);
 
         $dateRangeForm = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);

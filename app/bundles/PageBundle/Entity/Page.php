@@ -741,7 +741,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';

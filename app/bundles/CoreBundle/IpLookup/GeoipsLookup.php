@@ -45,7 +45,7 @@ class GeoipsLookup extends AbstractRemoteDataLookup
                         break;
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }
