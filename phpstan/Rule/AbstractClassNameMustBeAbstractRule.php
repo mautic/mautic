@@ -32,6 +32,11 @@ final class AbstractClassNameMustBeAbstractRule implements Rule
             return [];
         }
 
+        // a final class cannot be abstract; skip it (e.g. a "final" test named AbstractFooTest)
+        if ($node->isFinal()) {
+            return [];
+        }
+
         $shortClassName = $node->name->toString();
 
         if (!str_contains($shortClassName, 'Abstract')) {

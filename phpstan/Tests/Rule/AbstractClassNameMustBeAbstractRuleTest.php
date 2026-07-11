@@ -37,4 +37,9 @@ final class AbstractClassNameMustBeAbstractRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/PlainParser.php'], []);
     }
+
+    public function testSkipFinalClass(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/FinalParserNamedAbstract.php'], []);
+    }
 }
