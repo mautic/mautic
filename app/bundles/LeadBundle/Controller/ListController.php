@@ -693,7 +693,7 @@ class ListController extends FormController
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->$function($lead, $list, true);
+                $model->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [

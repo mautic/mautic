@@ -331,7 +331,7 @@ trait VariantEntityTrait
     protected function getAccumulativeVariantCount(string $getter): mixed
     {
         [$parent, $children]     = $this->getVariants();
-        $count                   = $parent->$getter();
+        $count                   = $parent->{$getter}();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
             // Append translations for this variant if applicable
@@ -339,7 +339,7 @@ trait VariantEntityTrait
         }
 
         foreach ($children as $variant) {
-            $count += $variant->$getter();
+            $count += $variant->{$getter}();
 
             if ($checkTranslations) {
                 // Append translations for this variant if applicable
