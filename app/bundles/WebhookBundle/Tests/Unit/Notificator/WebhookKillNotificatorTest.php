@@ -224,7 +224,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
         $matcher = $this->exactly(2);
         $this->translatorMock->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher, $htmlUrl): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.webhook.stopped', $parameters[0]);
 
@@ -242,7 +242,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                     return $this->details;
                 }
 
-                return '';
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->webhook->expects($this->once())

@@ -66,7 +66,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->ownerProvider->expects($matcher)
-            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
@@ -80,7 +80,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
                     return [['owner_id' => 2, 'id' => 2]];
                 }
 
-                return [];
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->never())
@@ -121,7 +121,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->ownerProvider->expects($matcher)
-            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
@@ -135,7 +135,7 @@ final class UserSummaryNotificationHelperTest extends TestCase
                     return [];
                 }
 
-                return [];
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->exactly(2))

@@ -101,7 +101,7 @@ final class ListCommandTest extends AbstractMauticTestCase
         $connection = $this->createMock(Connection::class);
         $matcher    = $this->exactly(2);
 
-        $connection->expects($matcher)->method('getPlugins')->willReturnCallback(function (...$parameters) use ($matcher, $plugin1, $plugin2) {
+        $connection->expects($matcher)->method('getPlugins')->willReturnCallback(function (...$parameters) use ($matcher, $plugin1, $plugin2): array {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame(1, $parameters[0]);
                 $this->assertSame(1, $parameters[1]);
@@ -117,7 +117,7 @@ final class ListCommandTest extends AbstractMauticTestCase
                 return json_decode($plugin2, true);
             }
 
-            return [];
+            throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
         });
 
         $allowlistPayload = DTOAllowlist::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true));

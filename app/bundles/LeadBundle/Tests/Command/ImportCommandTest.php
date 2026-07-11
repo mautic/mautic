@@ -100,7 +100,7 @@ final class ImportCommandTest extends TestCase
         // InputInterface
         $inputInterfaceMock = $this->createMock(InputInterface::class);
         $matcher            = $this->exactly(2);
-        $inputInterfaceMock->expects($matcher)->method('getOption')->willReturnCallback(function (...$parameters) use ($matcher) {
+        $inputInterfaceMock->expects($matcher)->method('getOption')->willReturnCallback(function (...$parameters) use ($matcher): int {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('id', $parameters[0]);
 
@@ -112,7 +112,7 @@ final class ImportCommandTest extends TestCase
                 return 10;
             }
 
-            return 0;
+            throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
         });
 
         // OutputInterface
