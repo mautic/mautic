@@ -241,6 +241,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
                     return $this->details;
                 }
+
+                return '';
             });
 
         $this->webhook->expects($this->once())

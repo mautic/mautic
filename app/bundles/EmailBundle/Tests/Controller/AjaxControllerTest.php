@@ -132,6 +132,8 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                return false;
             });
 
         $this->emailMock->expects($this->once())
@@ -180,6 +182,8 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                return false;
             });
 
         $this->emailMock->expects($this->once())

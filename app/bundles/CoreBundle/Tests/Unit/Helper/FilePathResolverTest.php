@@ -60,6 +60,8 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                return false;
             });
 
         $this->fileMock->expects($this->once())

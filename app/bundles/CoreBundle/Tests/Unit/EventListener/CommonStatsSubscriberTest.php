@@ -95,6 +95,8 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                return false;
             });
 
         $this->repository->expects($this->once())

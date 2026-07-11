@@ -79,6 +79,8 @@ final class UserSummaryNotificationHelperTest extends TestCase
 
                     return [['owner_id' => 2, 'id' => 2]];
                 }
+
+                return [];
             });
 
         $this->userHelper->expects($this->never())
@@ -132,6 +134,8 @@ final class UserSummaryNotificationHelperTest extends TestCase
 
                     return [];
                 }
+
+                return [];
             });
 
         $this->userHelper->expects($this->exactly(2))

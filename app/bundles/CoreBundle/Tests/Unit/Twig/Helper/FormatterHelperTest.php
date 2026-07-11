@@ -66,6 +66,8 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
                     return 'no';
                 }
+
+                return '';
             });
 
         $result = $this->formatterHelper->_(1, 'bool');

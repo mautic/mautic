@@ -58,6 +58,8 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                return false;
             });
 
         $this->contactModelMock->expects($this->once())
@@ -94,6 +96,8 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                return false;
             });
 
         $this->contactModelMock->expects($this->once())
