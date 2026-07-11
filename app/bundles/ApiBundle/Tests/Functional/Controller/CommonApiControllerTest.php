@@ -143,6 +143,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
     private function createAndAuthenticateApiUser(string $username, string $email): void
     {
         $role = $this->em->getRepository(Role::class)->find(1);
+        $this->assertInstanceOf(Role::class, $role);
 
         $user = (new User())
             ->setFirstName('API')

@@ -264,6 +264,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
 
         // Create campaign_lead_event_log entries (required for campaign filter)
         $leadEventLog1 = new LeadEventLog();
+        $this->assertInstanceOf(Event::class, $event);
         $leadEventLog1->setEvent($event);
         $leadEventLog1->setLead($this->lead1);
         $leadEventLog1->setCampaign($this->campaign);
