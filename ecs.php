@@ -33,11 +33,8 @@ return ECSConfig::configure()
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
         PhpCsFixer\Fixer\StringNotation\ExplicitStringVariableFixer::class,
         PhpCsFixer\Fixer\ControlStructure\NoSuperfluousElseifFixer::class,
-<<<<<<< HEAD
         PhpCsFixer\Fixer\LanguageConstruct\IsNullFixer::class,
-=======
         PhpCsFixer\Fixer\LanguageConstruct\ExplicitIndirectVariableFixer::class,
->>>>>>> 4b639de4d9 ([cs] make indirect variable explicit)
     ])
     ->withPreparedSets(
         comments: true,
