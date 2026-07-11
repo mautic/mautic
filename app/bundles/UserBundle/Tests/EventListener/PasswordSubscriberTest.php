@@ -31,7 +31,7 @@ final class PasswordSubscriberTest extends TestCase
         $authenticationEvent                  = $this->createMock(AuthenticationEvent::class);
         $pluginToken                          = $this->createMock(PluginToken::class);
 
-        $authenticationEvent->expects($this->any())
+        $authenticationEvent
             ->method('getToken')
             ->willReturn($pluginToken);
     }

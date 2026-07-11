@@ -136,7 +136,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void
     {
-        $this->companyModel->expects($this->any())
+        $this->companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_LEADS;
@@ -154,7 +154,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated(): void
     {
-        $this->companyModel->expects($this->any())
+        $this->companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $this->specialSfCase = self::SC_MULTIPLE_SF_CONTACTS;
@@ -418,7 +418,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $lead->setEmail('Lead1@sftest.com');
         $lead->setId(1);
 
-        $sf->expects($this->any())
+        $sf
             ->method('makeRequest')
             ->willReturnCallback(
                 function () {
@@ -454,7 +454,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $company->setName('MyCompanyName');
 
-        $sf->expects($this->any())
+        $sf
             ->method('makeRequest')
             ->willReturnCallback(
                 function () {
@@ -641,8 +641,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ];
 
             $sf = $this->getSalesforceIntegration(2, 2);
-            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())
+            $sf->method('updateDncByDate')->willReturn(true);
+            $sf
                 ->method('getDncHistory')
                 ->willReturn(
                     $this->getSalesforceDNCHistory($object, 'SF')
@@ -677,8 +677,8 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ];
 
             $sf = $this->getSalesforceIntegration(2, 2);
-            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
-            $sf->expects($this->any())->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
+            $sf->method('updateDncByDate')->willReturn(true);
+            $sf->method('getDoNotContactHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
 
             $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-15T10:00:00.000000']);
             foreach ($mappedData as $assertion) {
@@ -748,7 +748,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $auditLogRepo = $this->createMock(AuditLogRepository::class);
 
         $auditLogRepo
-            ->expects($this->any())
             ->method('getAuditLogsForLeads')
             ->willReturn(
                 [
@@ -874,7 +873,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        $this->cache->expects($this->any())
+        $this->cache
             ->method('get')
             ->willReturnMap(
                 [

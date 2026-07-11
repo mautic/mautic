@@ -124,7 +124,7 @@ final class ConfigTypeTest extends TypeTestCase
         $shortener                  = $this->createMock(Shortener::class);
         $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
 
-        $languageHelper->expects($this->any())
+        $languageHelper
                        ->method('fetchLanguages')
                        ->willReturn(['en' => ['name'=>'English']]);
 
@@ -145,12 +145,12 @@ final class ConfigTypeTest extends TypeTestCase
         $configType = $this->getConfigFormType();
 
         $repoMock = $this->createMock(PageRepository::class);
-        $repoMock->expects($this->any())
+        $repoMock
                  ->method('getPageList')
                  ->willReturn([]);
 
         $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock->expects($this->any())
+        $pageModelMock
                       ->method('getRepository')
                       ->willReturn($repoMock);
         $permsMock    = $this->createMock(CorePermissions::class);

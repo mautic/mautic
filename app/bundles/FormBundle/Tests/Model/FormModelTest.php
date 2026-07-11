@@ -88,8 +88,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $tableSchemaHelper           = $this->createMock(TableSchemaHelper::class);
         $mappedObjectCollector       = $this->createMock(MappedObjectCollectorInterface::class);
 
-        $entityManager->expects($this
-            ->any())
+        $entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [

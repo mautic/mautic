@@ -60,7 +60,7 @@ final class ClientTypeTest extends TestCase
             'data' => $this->client,
         ];
 
-        $this->builder->expects($this->any())
+        $this->builder
             ->method('create')
             ->willReturnSelf();
 

@@ -204,7 +204,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([$companyEntityTo]);
 
-        $this->mockCompanyModel->expects($this->any())
+        $this->mockCompanyModel
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
