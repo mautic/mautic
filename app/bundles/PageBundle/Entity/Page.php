@@ -326,7 +326,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $metadata->addConstraint(new Callback(
             function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
-                if (!is_null($type)) {
+                if (null !== $type) {
                     $validator  = $context->getValidator();
                     $violations = $validator->validate(
                         $page->getRedirectUrl(),
@@ -808,7 +808,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public function hasDraft(): bool
     {
-        return !is_null($this->getDraft());
+        return null !== $this->getDraft();
     }
 
     public function getDraftContent(): ?string

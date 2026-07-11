@@ -607,7 +607,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getDeleted(): ?\DateTimeInterface
