@@ -37,6 +37,7 @@ final class ImportControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->generateSmallCSV();
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
         $tagName = 'tag1';
         $tag     = $this->createTag($tagName);

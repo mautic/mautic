@@ -506,6 +506,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignNoFileUploaded(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
 
         // Attempt to import with no files
@@ -520,6 +521,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
 
         $campaign = new Campaign();
@@ -555,6 +557,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignInvalidFile(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
 
         // Create a temporary file
@@ -577,6 +580,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignUnsupportedFileType(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
 
         // Create a temporary file with a non-ZIP extension

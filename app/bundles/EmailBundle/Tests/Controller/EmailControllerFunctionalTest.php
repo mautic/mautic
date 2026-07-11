@@ -942,6 +942,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
         $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $ownerUser);
         $email->setCreatedBy($ownerUser);
         $this->em->flush();
 

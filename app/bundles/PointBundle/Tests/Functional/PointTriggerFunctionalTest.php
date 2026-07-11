@@ -63,9 +63,11 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear(Lead::class);
         $lead = $model->getEntity($lead->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
         $pointGroupModel->adjustPoints($lead, $groupA, 5);
         $this->assertInstanceOf(Lead::class, $lead);
         $lead = $model->getEntity($lead->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
 
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
@@ -97,6 +99,7 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $triggerModel->saveEntity($triggerB);
 
         $lead = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
 
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
@@ -139,8 +142,10 @@ final class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $triggerModel->saveEntity($triggerC);
         $this->assertInstanceOf(Lead::class, $lead);
         $lead = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
 
         $this->assertFalse($this->leadHasTag($lead, 'tagC'));
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $lead);
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
     }

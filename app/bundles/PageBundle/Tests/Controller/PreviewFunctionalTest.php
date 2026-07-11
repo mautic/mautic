@@ -33,6 +33,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
         $this->logoutUser();
         $this->client->request(Request::METHOD_GET, $url);
         self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
 
         $this->loginUser($user);
 
@@ -201,6 +202,7 @@ final class PreviewFunctionalTest extends MauticMysqlTestCase
 
         // Check public preview with login.
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
         $crawler = $this->client->request(Request::METHOD_GET, '/page/preview/'.$pageId);
         self::assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());

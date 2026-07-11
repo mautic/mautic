@@ -121,6 +121,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
         // Reboot kernel to reload all themes
         self::bootKernel();
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
 
         // Email theme list has hidden 'Aurora' theme

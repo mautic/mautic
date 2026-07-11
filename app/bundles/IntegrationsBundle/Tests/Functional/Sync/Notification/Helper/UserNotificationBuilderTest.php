@@ -32,6 +32,7 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
     {
         $user = $this->em->find(User::class, 2);
         $lead = new Lead();
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $lead->setOwner($user);
         $this->em->persist($lead);
         $this->em->flush();

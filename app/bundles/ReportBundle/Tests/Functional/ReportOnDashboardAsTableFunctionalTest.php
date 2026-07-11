@@ -23,6 +23,7 @@ final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 
         // Create email
         $email  = $this->createEmail();
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $widget = $this->createWidget($user, $report);
 
         $this->em->persist($email);

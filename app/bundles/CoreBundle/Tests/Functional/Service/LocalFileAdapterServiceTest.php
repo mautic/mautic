@@ -55,6 +55,7 @@ final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
         $this->folderName = (string) time();
         $user             = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
         $this->loginUser($user);
         $_SERVER['REQUEST_METHOD'] = Request::METHOD_POST;
         $this->client->request(
