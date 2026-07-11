@@ -30,7 +30,11 @@ final class SortableValueLabelListTypeTest extends TestCase
 
                 return in_array($name, $expected[0], true);
             }),
-                $this->callback(fn ($type): bool => TextType::class === $type),
+                $this->callback(function ($type): bool {
+                    $this->assertSame($type, TextType::class);
+
+                    return true;
+                }),
                 $this->callback(function ($options) use (&$call): bool {
                     $expectedOptions = [
                         [
@@ -134,7 +138,12 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expectedValue));
+                ->with($this->callback(function ($newData) use ($data, $expectedValue): bool {
+                    $this->assertSame($data['label'], $newData['label']);
+                    $this->assertSame($expectedValue, $newData['value']);
+
+                    return true;
+                }));
         } else {
             $event->expects($this->never())
                 ->method('setData');
@@ -187,7 +196,12 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(fn ($newData): bool => $newData['label'] === $data['label'] && $newData['value'] === $expected));
+                ->with($this->callback(function ($newData) use ($data, $expected): bool {
+                    $this->assertSame($data['label'], $newData['label']);
+                    $this->assertSame($expected, $newData['value']);
+
+                    return true;
+                }));
         } else {
             $event->expects($this->never())
                 ->method('setData');
