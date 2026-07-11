@@ -42,18 +42,15 @@ final class InactiveHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->scheduler             = $this->createMock(EventScheduler::class);
-        $inactiveContactFinder       = $this->createMock(InactiveContactFinder::class);
         $this->eventLogRepository    = $this->createMock(LeadEventLogRepository::class);
-        $eventRepository             = $this->createMock(EventRepository::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
-        $logger                      = $this->createMock(LoggerInterface::class);
         $decisionHelper              = new DecisionHelper($this->leadRepository);
         $this->inactiveHelper        = new InactiveHelper(
             $this->scheduler,
-            $inactiveContactFinder,
+            $this->createStub(InactiveContactFinder::class),
             $this->eventLogRepository,
-            $eventRepository,
-            $logger,
+            $this->createStub(EventRepository::class),
+            $this->createStub(LoggerInterface::class),
             $decisionHelper
         );
     }

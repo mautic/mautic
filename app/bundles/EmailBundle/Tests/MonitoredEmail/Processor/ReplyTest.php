@@ -69,7 +69,6 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
         $this->contactFinder      = $this->createMock(ContactFinder::class);
         $leadModel                = $this->createMock(LeadModel::class);
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
-        $logger                   = $this->createMock(Logger::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
         $emailAddressHelper       = new EmailAddressHelper();
         $this->leadRepository     = $this->createMock(LeadRepository::class);
@@ -79,7 +78,7 @@ final class ReplyTest extends \PHPUnit\Framework\TestCase
             $this->contactFinder,
             $leadModel,
             $this->dispatcher,
-            $logger,
+            $this->createStub(Logger::class),
             $this->contactTracker,
             $emailAddressHelper
         );

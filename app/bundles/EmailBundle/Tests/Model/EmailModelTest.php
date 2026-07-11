@@ -1039,9 +1039,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->emailEntity->method('getLists')->willReturn($lists);
-
-        $connection   = $this->createMock(Connection::class);
-        $this->entityManager->method('getConnection')->willReturn($connection);
+        $this->entityManager->method('getConnection')->willReturn($this->createStub(Connection::class));
 
         $dateFromObject = new \DateTime('now');
         $dateToObject   = new \DateTime('-1 month');

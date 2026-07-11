@@ -39,12 +39,11 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->mockModel           = $this->createMock(DynamicContentModel::class);
-        $realTimeExecutioner       = $this->createMock(RealTimeExecutioner::class);
         $this->mockDispatcher      = $this->createMock(EventDispatcher::class);
         $this->leadModel           = $this->createMock(LeadModel::class);
         $this->helper              = new DynamicContentHelper(
             $this->mockModel,
-            $realTimeExecutioner,
+            $this->createStub(RealTimeExecutioner::class),
             $this->mockDispatcher,
             $this->leadModel,
         );

@@ -54,27 +54,19 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $containerMock          = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-
-        $managerRegistry        = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock = $this->createMock(ModelFactory::class);
-        $userHelper             = $this->createMock(UserHelper::class);
-        $coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
-        $dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $translator             = $this->createMock(Translator::class);
-        $flashBag               = $this->createMock(FlashBag::class);
         $requestStack           = new RequestStack();
-        $security               = $this->createMock(CorePermissions::class);
 
         $this->controller = new AjaxController(
-            $managerRegistry,
+            $this->createStub(ManagerRegistry::class),
             $this->modelFactoryMock,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
-            $translator,
-            $flashBag,
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $security
+            $this->createStub(CorePermissions::class)
         );
 
         $this->controller->setContainer($containerMock);
