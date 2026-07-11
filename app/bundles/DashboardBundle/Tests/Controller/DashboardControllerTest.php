@@ -67,28 +67,21 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->containerMock      = $this->createMock(Container::class);
-
-        $doctrine                 = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
-        $userHelper               = $this->createMock(UserHelper::class);
-        $coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
-        $dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $flashBagMock             = $this->createMock(FlashBag::class);
         $requestStack             = new RequestStack();
-        $securityMock             = $this->createMock(CorePermissions::class);
 
         $requestStack->push($this->requestMock);
         $this->controller = new DashboardController(
-            $doctrine,
+            $this->createStub(ManagerRegistry::class),
             $this->modelFactoryMock,
-            $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
             $this->translatorMock,
-            $flashBagMock,
+            $this->createStub(FlashBag::class),
             $requestStack,
-            $securityMock
+            $this->createStub(CorePermissions::class)
         );
         $this->controller->setContainer($this->containerMock);
     }

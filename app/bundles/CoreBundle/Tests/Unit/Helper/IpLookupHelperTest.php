@@ -201,7 +201,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($mockRepository);
 
-        if (is_null($mockCoreParametersHelper)) {
+        if (null === $mockCoreParametersHelper) {
             $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
             $mockCoreParametersHelper
                 ->method('get')

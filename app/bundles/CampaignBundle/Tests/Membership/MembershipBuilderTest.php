@@ -39,12 +39,11 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $this->manager                  = $this->createMock(MembershipManager::class);
         $this->campaignMemberRepository = $this->createMock(CampaignMemberRepository::class);
         $this->leadRepository           = $this->createMock(LeadRepository::class);
-        $translator                     = $this->createMock(TranslatorInterface::class);
         $this->membershipBuilder        = new MembershipBuilder(
             $this->manager,
             $this->campaignMemberRepository,
             $this->leadRepository,
-            $translator
+            $this->createStub(TranslatorInterface::class)
         );
     }
 

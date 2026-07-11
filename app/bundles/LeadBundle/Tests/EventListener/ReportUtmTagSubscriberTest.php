@@ -210,10 +210,7 @@ final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportUtmTagSubscriber(): ReportUtmTagSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-
-        return new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
+        return new ReportUtmTagSubscriber($this->createStub(FieldsBuilder::class), $this->createStub(CompanyReportData::class));
     }
 
     /**

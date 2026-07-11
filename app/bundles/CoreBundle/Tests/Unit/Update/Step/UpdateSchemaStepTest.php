@@ -44,7 +44,6 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
         $kernel               = $this->createMock(KernelInterface::class);
-        $helperSet            = $this->createMock(HelperSet::class);
         $kernel
             ->method('getBundles')
             ->willReturn([]);
@@ -57,7 +56,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn($helperSet);
+            ->willReturn($this->createStub(HelperSet::class));
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')

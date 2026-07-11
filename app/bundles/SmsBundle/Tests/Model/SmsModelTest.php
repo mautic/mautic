@@ -138,9 +138,6 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
     private function sendMessage(bool $isMMS = false): void
     {
-        $repositoryMock     = $this->createMock(SmsRepository::class);
-        $statRepositoryMock = $this->createMock(StatRepository::class);
-
         $sms = new Sms();
         ReflectionHelper::setValue($sms, 'id', 1);
         $sms->setMessage('test');
@@ -185,10 +182,10 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
             ->with($sms->getId(), 'sent', 2);
 
         $smsModel->method('getRepository')
-            ->willReturn($repositoryMock);
+            ->willReturn($this->createStub(SmsRepository::class));
 
         $smsModel->method('getStatRepository')
-            ->willReturn($statRepositoryMock);
+            ->willReturn($this->createStub(StatRepository::class));
 
         if ($isMMS) {
             $this->transport->expects($this->once())

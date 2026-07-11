@@ -225,7 +225,7 @@ class EmailRepository extends CommonRepository
         }
 
         // Only include those who belong to the associated lead lists
-        if (is_null($listIds)) {
+        if (null === $listIds) {
             // Get a list of lists associated with this email
             $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')

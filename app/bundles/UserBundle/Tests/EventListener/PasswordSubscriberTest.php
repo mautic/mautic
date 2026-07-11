@@ -25,15 +25,13 @@ final class PasswordSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $dispatcher                           = $this->createMock(EventDispatcherInterface::class);
-        $passwordStrengthEstimatorModel       = new PasswordStrengthEstimatorModel($dispatcher);
+        $passwordStrengthEstimatorModel       = new PasswordStrengthEstimatorModel($this->createStub(EventDispatcherInterface::class));
         $this->passwordSubscriber             = new PasswordSubscriber($passwordStrengthEstimatorModel);
         $authenticationEvent                  = $this->createMock(AuthenticationEvent::class);
-        $pluginToken                          = $this->createMock(PluginToken::class);
 
         $authenticationEvent
             ->method('getToken')
-            ->willReturn($pluginToken);
+            ->willReturn($this->createStub(PluginToken::class));
     }
 
     public function testThatItIsSubscribedToEvents(): void

@@ -81,7 +81,6 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock        = $this->createMock(MailHelper::class);
         $this->coreParamHelperMock   = $this->createMock(CoreParametersHelper::class);
         $this->webhook               = $this->createMock(Webhook::class);
-        $userRepositoryMock          = $this->createMock(UserRepository::class);
         $twig                        = $this->createMock(Environment::class);
         $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
@@ -102,7 +101,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             $this->entityManagerMock,
             $this->mailHelperMock,
             $this->coreParamHelperMock,
-            $userRepositoryMock,
+            $this->createStub(UserRepository::class),
             $eventDispatcher
         );
     }

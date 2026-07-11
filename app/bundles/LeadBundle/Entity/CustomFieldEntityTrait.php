@@ -126,7 +126,7 @@ trait CustomFieldEntityTrait
             if ('' === $value) {
                 $value = null;
             }
-            $this->$setter($value);
+            $this->{$setter}($value);
         }
 
         if (is_string($value)) {
