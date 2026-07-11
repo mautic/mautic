@@ -54,7 +54,7 @@ final class ContactFinderTest extends \PHPUnit\Framework\TestCase
             ->method('findOneBy')
             ->willReturnCallback(
                 function (array $hash) use ($stat): Stat {
-                    $stat->setTrackingHash($hash);
+                    $stat->setTrackingHash($hash['trackingHash']);
 
                     $email = new Email();
                     $stat->setEmail($email);

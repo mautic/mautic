@@ -125,6 +125,8 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                return '';
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -220,6 +222,8 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                return '';
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -284,6 +288,8 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                return '';
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -388,6 +394,8 @@ final class ContentPreviewSettingsTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                return '';
             });
 
         $formBuilder = $this->createMock(FormBuilderInterface::class);

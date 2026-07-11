@@ -69,6 +69,8 @@ final class LeadSubscriberTest extends CommonMocks
 
                     return self::EVENT_TYPE_CLICK_NAME;
                 }
+
+                return '';
             });
     }
 

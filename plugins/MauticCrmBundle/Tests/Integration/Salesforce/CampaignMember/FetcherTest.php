@@ -170,6 +170,8 @@ final class FetcherTest extends \PHPUnit\Framework\TestCase
                         ],
                     ];
                 }
+
+                return [];
             });
 
         $fetcher = new Fetcher($repo, $organizer, '701f10000021UnkAAE');

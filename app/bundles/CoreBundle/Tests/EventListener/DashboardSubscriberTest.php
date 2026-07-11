@@ -248,6 +248,8 @@ final class DashboardSubscriberTest extends TestCase
 
                     return null;
                 }
+
+                return null;
             });
 
         $this->router->expects(self::exactly(5))

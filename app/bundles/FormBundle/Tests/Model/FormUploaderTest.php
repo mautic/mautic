@@ -105,6 +105,8 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
                     return 'upload2.txt';
                 }
+
+                return '';
             });
 
         $formUploader->uploadFiles($filesToUpload, $submission);

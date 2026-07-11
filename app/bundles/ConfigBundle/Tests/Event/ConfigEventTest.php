@@ -101,7 +101,7 @@ final class ConfigEventTest extends \PHPUnit\Framework\TestCase
             ->willReturn($realPath);
 
         $this->assertSame($fileContent, $event->getFileContent($uploadedFile));
-        $this->assertFileNotExists($realPath);
+        $this->assertFileDoesNotExist($realPath);
     }
 
     public function testEncodeFileContents(): void

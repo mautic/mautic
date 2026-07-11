@@ -111,6 +111,8 @@ final class ImportCommandTest extends TestCase
 
                 return 10;
             }
+
+            return 0;
         });
 
         // OutputInterface

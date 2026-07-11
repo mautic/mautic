@@ -200,6 +200,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                return false;
             });
 
         $this->requestStack->expects($this->once())

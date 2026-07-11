@@ -53,6 +53,8 @@ final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                return false;
             });
 
         $this->contactModelMock->expects($this->once())
@@ -85,6 +87,8 @@ final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                return false;
             });
 
         $this->contactModelMock->expects($this->once())
@@ -176,6 +180,8 @@ final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
 
                     return [2, 3];
                 }
+
+                return [];
             });
         $matcher = $this->exactly(2);
 

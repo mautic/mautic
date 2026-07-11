@@ -114,6 +114,8 @@ final class ExampleSendTypeTest extends TestCase
 
                     return 'nomatches';
                 }
+
+                return '';
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);

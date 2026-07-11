@@ -78,6 +78,8 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
 
                     return $updateSuccessfulKey;
                 }
+
+                return '';
             });
 
         $this->pathsHelper->expects($this->once())

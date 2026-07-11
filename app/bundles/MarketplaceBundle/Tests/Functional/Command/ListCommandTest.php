@@ -116,6 +116,8 @@ final class ListCommandTest extends AbstractMauticTestCase
 
                 return json_decode($plugin2, true);
             }
+
+            return [];
         });
 
         $allowlistPayload = DTOAllowlist::fromArray(json_decode(file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json'), true));

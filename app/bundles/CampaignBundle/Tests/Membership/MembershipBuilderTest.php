@@ -130,6 +130,8 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
                     return [];
                 }
+
+                return [];
             });
 
         $this->manager->expects($this->exactly(3))
@@ -193,6 +195,8 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
                     return [];
                 }
+
+                return [];
             });
 
         $this->manager->expects($this->exactly(3))
