@@ -138,7 +138,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expectedValue): bool {
+                ->with($this->callback(function (array $newData) use ($data, $expectedValue): bool {
                     $this->assertSame($data['label'], $newData['label']);
                     $this->assertSame($expectedValue, $newData['value']);
 
@@ -196,7 +196,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expected): bool {
+                ->with($this->callback(function (array $newData) use ($data, $expected): bool {
                     $this->assertSame($data['label'], $newData['label']);
                     $this->assertSame($expected, $newData['value']);
 
