@@ -87,7 +87,10 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
             ->with(
                 $this->callback(
                     /** @var AddColumnBackgroundEvent $event */
-                    fn ($event): bool => $event instanceof UpdateColumnEvent),
+                    function ($event): bool {
+                        $this->assertInstanceOf(\Mautic\LeadBundle\Field\Event\UpdateColumnEvent::class, $event);
+                        return true;
+                    }),
                 'mautic.lead_field_pre_update_column'
             );
 
@@ -116,7 +119,10 @@ final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(fn ($event): bool => $event instanceof DeleteColumnEvent),
+                $this->callback(function ($event): bool {
+                    $this->assertInstanceOf(\Mautic\LeadBundle\Field\Event\DeleteColumnEvent::class, $event);
+                    return true;
+                }),
                 'mautic.lead_field_pre_delete_column',
             );
 

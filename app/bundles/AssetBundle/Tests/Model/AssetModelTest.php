@@ -253,8 +253,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('persist')
             ->with($this->callback(function ($downloadPersist) use (&$download): bool {
                 $download = $downloadPersist;
-
-                return $download instanceof Download;
+                $this->assertInstanceOf(\Mautic\AssetBundle\Entity\Download::class, $download);
+                return true;
             }));
 
         $this->entityManager->expects($this->once())
