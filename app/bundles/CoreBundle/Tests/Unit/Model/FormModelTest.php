@@ -140,4 +140,44 @@ final class FormModelTest extends TestCase
             ++$countDispatch;
         }
     }
+
+    public function testSaveEntityToCheckDateAddedAndDateModified(): void
+    {
+        $formModel = new FormModel(
+            $this->entityManagerMock,
+            $this->corePermissionsMock,
+            $this->dispatcherMock,
+            $this->routerMock,
+            $this->translatorMock,
+            $this->userHelperMock,
+            $this->loggerMock,
+            $this->coreParametersHelperMock,
+        );
+
+        // Step 1: Create a new entity and save it
+        $lead = new Lead();
+        $formModel->saveEntity($lead);
+
+        $dateModified1 = $lead->getDateModified();
+        $dateAdded1 = $lead->getDateAdded();
+
+        // Step 2: Update the existing entity and save it
+        $lead->setTitle('Lorem ipsum');
+        $formModel->saveEntity($lead);
+
+        $dateModified2 = $lead->getDateModified();
+        $dateAdded2 = $lead->getDateAdded();
+
+        self::assertSame(
+            $dateAdded1,
+            $dateAdded2,
+            'Date added should not be updated after saving the entity again',
+        );
+
+        self::assertGreaterThan(
+            $dateModified1,
+            $dateModified2,
+            'Date modified should be updated after saving the entity again',
+        );
+    }
 }
