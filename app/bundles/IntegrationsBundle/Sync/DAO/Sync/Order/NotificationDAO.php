@@ -12,9 +12,6 @@ class NotificationDAO
     ) {
     }
 
-    /**
-     * @return ObjectChangeDAO
-     */
     public function getMauticObject(): string
     {
         return $this->objectChangeDAO->getMappedObject();
