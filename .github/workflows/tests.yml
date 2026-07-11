@@ -58,7 +58,7 @@ jobs:
           - 8086:8080
 
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - uses: actions/checkout@v7
       # Codecov needs access to previous commits, so we add fetch-depth: 0
       with:
         fetch-depth: 0
@@ -74,7 +74,7 @@ jobs:
           ${{ runner.os }}-phpunit-
 
     - name: Setup PHP, with composer and extensions
-      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
@@ -147,7 +147,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -182,7 +182,7 @@ jobs:
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -230,7 +230,7 @@ jobs:
       uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
 
     - name: Setup PHP, with composer and extensions
-      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
