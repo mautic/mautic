@@ -141,12 +141,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
         $this->channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $this->reportHelperMock                 = new ReportHelper($this->createStub(EventDispatcherInterface::class));
-        $campaignRepositoryMock                 = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
-        $expressionBuilderMock                  = $this->createMock(ExpressionBuilder::class);
         $this->reportGraphEventMock             = $this->createMock(ReportGraphEvent::class);
-        $dncReportService                       = $this->createMock(DncReportService::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
             $this->leadFieldModelMock,
@@ -157,12 +154,12 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->companyReportDataMock,
             $this->fieldsBuilderMock,
             $this->translatorMock,
-            $dncReportService
+            $this->createStub(DncReportService::class)
         );
 
         $this->queryBuilderMock->expects($this->any())
                 ->method('expr')
-                ->willReturn($expressionBuilderMock);
+                ->willReturn($this->createStub(ExpressionBuilder::class));
 
         $this->queryBuilderMock->expects($this->any())
             ->method('resetQueryParts')
@@ -234,7 +231,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('orderBy')
             ->willReturn($this->queryBuilderMock);
 
-        $campaignModelMock->method('getRepository')->willReturn($campaignRepositoryMock);
+        $campaignModelMock->method('getRepository')->willReturn($this->createStub(CampaignRepository::class));
 
         $eventCollectorMock->expects($this->any())
             ->method('getEventsArray')

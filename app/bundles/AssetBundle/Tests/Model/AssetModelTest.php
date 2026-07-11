@@ -78,9 +78,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelper->method('get')
             ->with($this->equalTo('max_size'))
             ->willReturn('2MB');
-
-        $container                   = $this->createMock(ContainerInterface::class);
-        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $container);
+        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
         $this->leadModel             = $this->createStub(LeadModel::class);
         $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
