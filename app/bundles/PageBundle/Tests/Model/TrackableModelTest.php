@@ -618,7 +618,7 @@ TEXT;
             ->method('getDoNotTrackList')
             ->willReturn($doNotTrack);
 
-        $mockModel->expects($this->any())
+        $mockModel
             ->method('getEntitiesFromUrls')
             ->willReturnCallback(
                 function ($trackableUrls, $channel, $channelId): array {
@@ -631,7 +631,7 @@ TEXT;
                 }
             );
 
-        $mockModel->expects($this->any())
+        $mockModel
             ->method('getContactFieldUrlTokens')
             ->willReturn($urlFieldsForPlaintext);
 

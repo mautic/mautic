@@ -331,7 +331,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
         $mockQueryBuilder = $this->createStub(QueryBuilder::class);
         $mockChartQuery   = $this->createMock(ChartQuery::class);
 
-        $mockTrans->expects($this->any())
+        $mockTrans
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -339,15 +339,15 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('getQueryBuilder')
             ->willReturn($mockQueryBuilder);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('loadAndBuildTimeData')
             ->willReturn(['a', 'b', 'c']);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCount')
             ->willReturn(2);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCountDateDiff')
             ->willReturn(2);
 
@@ -362,7 +362,7 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('checkContext')
             ->willReturn(true);
 
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getOptions')
             ->willReturn($graphOptions);
 

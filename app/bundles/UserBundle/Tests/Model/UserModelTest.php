@@ -119,7 +119,6 @@ final class UserModelTest extends TestCase
             ->with('mautic_user_passwordresetconfirm', ['token' => null], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
 

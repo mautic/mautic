@@ -168,7 +168,7 @@ BODY;
             ->method('setDateRead')
             ->with($this->isInstanceOf(\DateTime::class));
 
-        $stat->expects($this->any())
+        $stat
             ->method('getReplies')
             ->willReturn(new ArrayCollection());
 

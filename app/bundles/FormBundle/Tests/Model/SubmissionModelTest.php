@@ -239,11 +239,11 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveSubmission(): void
     {
-        $this->contactTracker->expects($this->any())
+        $this->contactTracker
             ->method('getContact')
             ->willReturn(new Lead());
 
-        $this->userHelper->expects($this->any())
+        $this->userHelper
             ->method('getUser')
             ->willReturn(new User());
 
@@ -257,11 +257,11 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             'properties'   => [],
         ];
 
-        $this->fieldsWithUniqueIdentifier->expects($this->any())
+        $this->fieldsWithUniqueIdentifier
             ->method('getFieldsWithUniqueIdentifier')
             ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
 
-        $this->leadFieldModel->expects($this->any())
+        $this->leadFieldModel
             ->method('getFieldListWithProperties')
             ->willReturn($mockLeadField);
 
@@ -271,7 +271,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $userMock = $this->createStub(UserRepository::class);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -281,23 +281,23 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->leadRepository->expects($this->any())
+        $this->leadRepository
             ->method('getLeadsByUniqueFields')
             ->willReturn(null);
 
-        $this->file1Mock->expects($this->any())
+        $this->file1Mock
             ->method('getClientOriginalName')
             ->willReturn('test.jpg');
 
-        $this->router->expects($this->any())
+        $this->router
             ->method('generate')
             ->willReturn('test.jpg');
 
-        $this->uploadFieldValidatorMock->expects($this->any())
+        $this->uploadFieldValidatorMock
             ->method('processFileValidation')
             ->willReturn($this->file1Mock);
 
-        $this->ipLookupHelper->expects($this->any())
+        $this->ipLookupHelper
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
@@ -413,15 +413,15 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
     private function setUpExport(): void
     {
-        $this->formModel->expects($this->any())
+        $this->formModel
             ->method('getCustomComponents')
             ->willReturn(['viewOnlyFields' => ['button', 'captcha', 'freetext']]);
 
-        $this->submissioRepository->expects($this->any())
+        $this->submissioRepository
             ->method('getEntities')
             ->willReturn([]);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturn($this->submissioRepository);
     }
@@ -450,7 +450,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     {
         $values = ['Submission ID', 'Contact ID', 'Date Submitted', 'IP address', 'Referrer', 'Form ID'];
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->with($this->anything())
             ->willReturnCallback(fn ($text): ?string => match ($text) {

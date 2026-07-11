@@ -212,7 +212,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private function mockCommonMethods(int $sentToAuthor, ?string $emailToSend = null): void
     {
-        $this->coreParamHelperMock->expects($this->any())
+        $this->coreParamHelperMock
             ->method('get')
             ->willReturnOnConsecutiveCalls('from_name', $sentToAuthor, $emailToSend);
 

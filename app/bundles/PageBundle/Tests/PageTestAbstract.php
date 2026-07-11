@@ -106,13 +106,11 @@ abstract class PageTestAbstract extends TestCase
         $lead->setId(self::$mockId);
         $lead->setFirstname(self::$mockName);
 
-        $contactTracker->expects($this
-            ->any())
+        $contactTracker
             ->method('getContact')
             ->willReturn($lead);
 
-        $entityManager->expects($this
-            ->any())
+        $entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -121,7 +119,7 @@ abstract class PageTestAbstract extends TestCase
                 ]
             );
 
-        $coreParametersHelper->expects($this->any())
+        $coreParametersHelper
             ->method('get')
             ->with($this->anything())
             ->willReturnCallback(function ($parameter) use ($transliterationEnabled, $validatePageHitRequiredData) {
@@ -193,11 +191,11 @@ abstract class PageTestAbstract extends TestCase
 
         $mockRedirect = $this->createMock(\Mautic\PageBundle\Entity\Redirect::class);
 
-        $mockRedirectModel->expects($this->any())
+        $mockRedirectModel
             ->method('createRedirectEntity')
             ->willReturn($mockRedirect);
 
-        $mockRedirectModel->expects($this->any())
+        $mockRedirectModel
             ->method('generateRedirectUrl')
             ->willReturn('http://some-url.com');
 

@@ -155,7 +155,7 @@ abstract class StandardImportTestHelper extends CommonMocks
         $importRepository->method('getValue')
             ->willReturn(true);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -164,7 +164,7 @@ abstract class StandardImportTestHelper extends CommonMocks
                 ]
             );
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('isOpen')
             ->willReturn($entityManagerOpen);
 
@@ -174,7 +174,7 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->setConstructorArgs([16 => $this->entityManager])
             ->getMock();
 
-        $leadModel->expects($this->any())
+        $leadModel
             ->method('getEventLogRepository')
             ->willReturn($logRepository);
 

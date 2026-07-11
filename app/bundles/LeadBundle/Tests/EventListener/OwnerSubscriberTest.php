@@ -327,7 +327,7 @@ final class OwnerSubscriberTest extends TestCase
     {
         /** @var Translator&MockObject $translator */
         $translator = $this->createMock(Translator::class);
-        $translator->expects($this->any())
+        $translator
             ->method('hasId')
             ->willReturn(false);
 
@@ -373,17 +373,17 @@ final class OwnerSubscriberTest extends TestCase
     private function onSmsTokenReplacementProvider(): array
     {
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getId')
             ->willReturn(1);
-        $lead->expects($this->any())
+        $lead
             ->method('getProfileFields')
             ->willReturn(
                 [
                     'id'     => 1,
                 ]
             );
-        $lead->expects($this->any())
+        $lead
             ->method('getowner')
             ->willReturn(
                 $this->getUser()
