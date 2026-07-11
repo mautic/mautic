@@ -1620,12 +1620,12 @@ class CommonRepository extends ServiceEntityRepository
                         case 'isEmpty':
                         case 'isNotEmpty':
                             if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->or(
+                                $whereClause = $query->expr()->orX(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
                                 );
                             } else {
-                                $whereClause = $query->expr()->and(
+                                $whereClause = $query->expr()->andX(
                                     $query->expr()->neq($column, $query->expr()->literal('')),
                                     $query->expr()->isNotNull($column)
                                 );
