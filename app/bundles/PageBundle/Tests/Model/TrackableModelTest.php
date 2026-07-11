@@ -424,7 +424,7 @@ final class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables);
-        $this->assertStringContainsString($url, $content);
+        $this->assertStringContainsString($url, (string) $content);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('trackMapProvider')]
@@ -451,7 +451,7 @@ final class TrackableModelTest extends TestCase
         );
         $token = array_key_first($trackables);
         Assert::assertNotEmpty($trackables, $content);
-        Assert::assertStringContainsString($token, $content);
+        Assert::assertStringContainsString($token, (string) $content);
 
         // Assert that exactly one trackable found
         Assert::assertCount(1, $trackables);

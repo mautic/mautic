@@ -58,15 +58,15 @@ final class ThemeControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testBatchDeleteActionValidation(): void
     {
         $this->client->request(Request::METHOD_POST, 's/themes/batchDelete?ids=[%22aurora%22,%22brienz%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('brienz is the default theme and therefore cannot be removed.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('aurora is the default theme and therefore cannot be removed.', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('brienz is the default theme and therefore cannot be removed.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testBatchDeleteActionWithNonCoreTheme(): void
@@ -83,7 +83,7 @@ final class ThemeControllerTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/s/themes/batchDelete?ids=[%22blanktest%22,%22auroratest%22]');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('2 themes have been deleted!', $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('2 themes have been deleted!', (string) $this->client->getResponse()->getContent(), $this->client->getResponse()->getContent());
     }
 
     public function testThemeVisibility(): void

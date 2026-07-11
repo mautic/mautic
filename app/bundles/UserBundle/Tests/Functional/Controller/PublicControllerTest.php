@@ -32,9 +32,9 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $responseData = $clientResponse->getContent();
         // Tests that actual string is not present.
-        $this->assertStringNotContainsString('-alert("xss test mautic")-', $responseData, 'XSS injection attempt is filtered.');
+        $this->assertStringNotContainsString('-alert("xss test mautic")-', (string) $responseData, 'XSS injection attempt is filtered.');
         // Tests that sanitized string is passed.
-        $this->assertStringContainsString('alertxsstestmautic', $responseData, 'XSS sanitized string is present.');
+        $this->assertStringContainsString('alertxsstestmautic', (string) $responseData, 'XSS sanitized string is present.');
     }
 
     public function testPasswordResetPage(): void
@@ -43,7 +43,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $responseData = $clientResponse->getContent();
-        $this->assertStringContainsString('Enter either your username or email to reset your password. Instructions to reset your password will be sent to the email in your profile.', $responseData);
+        $this->assertStringContainsString('Enter either your username or email to reset your password. Instructions to reset your password will be sent to the email in your profile.', (string) $responseData);
     }
 
     public function testPasswordResetAction(): void
@@ -58,7 +58,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $responseData = $clientResponse->getContent();
-        $this->assertStringContainsString('A new password has been generated and will be emailed to you, if this user exists. If you do not receive it within a few minutes, check your spam box and/or contact the system administrator.', $responseData);
+        $this->assertStringContainsString('A new password has been generated and will be emailed to you, if this user exists. If you do not receive it within a few minutes, check your spam box and/or contact the system administrator.', (string) $responseData);
     }
 
     public function testPasswordResetActionWithoutUserWithSaml(): void
@@ -75,7 +75,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
 
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('A new password has been generated and will be emailed to you, if this user exists. If you do not receive it within a few minutes, check your spam box and/or contact the system administrator.', $clientResponse->getContent());
+        $this->assertStringContainsString('A new password has been generated and will be emailed to you, if this user exists. If you do not receive it within a few minutes, check your spam box and/or contact the system administrator.', (string) $clientResponse->getContent());
     }
 
     public function testInviteRedirectsToLoginWhenTokenIsInvalid(): void
@@ -85,7 +85,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Dashboard', $clientResponse->getContent());
+        $this->assertStringContainsString('Dashboard', (string) $clientResponse->getContent());
     }
 
     public function testInviteShowsRegistrationFormForValidToken(): void
@@ -97,7 +97,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Create Account', $clientResponse->getContent());
+        $this->assertStringContainsString('Create Account', (string) $clientResponse->getContent());
     }
 
     public function testInviteShowsErrorWhenInvitedEmailAlreadyExists(): void
@@ -112,7 +112,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Email is already in use. Please contact your system administrator.', $clientResponse->getContent());
+        $this->assertStringContainsString('Email is already in use. Please contact your system administrator.', (string) $clientResponse->getContent());
     }
 
     /**

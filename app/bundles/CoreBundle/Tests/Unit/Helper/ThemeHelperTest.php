@@ -101,7 +101,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('config.json', $parameters['%files%']);
+                    $this->assertStringContainsString('config.json', (string) $parameters['%files%']);
                 }
             );
 
@@ -121,7 +121,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('message.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('message.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -141,7 +141,7 @@ final class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('page.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('page.html.twig', (string) $parameters['%files%']);
                 }
             );
 

@@ -45,7 +45,7 @@ final class SystemThemeTemplatePathPassTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/account');
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Override test', $this->client->getResponse()->getContent(), 'Page has not override.');
+        Assert::assertStringContainsString('Override test', (string) $this->client->getResponse()->getContent(), 'Page has not override.');
     }
 
     protected function beforeTearDown(): void

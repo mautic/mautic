@@ -493,7 +493,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $notifications    = $notificationRepo->getNotifications($userId);
 
         foreach ($notifications as $notification) {
-            Assert::assertStringNotContainsString($expectedSubstring, $notification['message']);
+            Assert::assertStringNotContainsString($expectedSubstring, (string) $notification['message']);
         }
     }
 

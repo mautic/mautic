@@ -43,7 +43,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('has been updated!', $response->getContent());
+        $this->assertStringContainsString('has been updated!', (string) $response->getContent());
     }
 
     public function testEditActionFormSubmissionInvalid(): void
@@ -60,7 +60,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexIncludesInviteForm(): void
@@ -84,7 +84,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/users/invite');
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('name="user_invite"', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('name="user_invite"', (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -106,7 +106,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -159,7 +159,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**

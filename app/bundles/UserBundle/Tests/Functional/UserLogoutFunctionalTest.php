@@ -44,7 +44,7 @@ final class UserLogoutFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(
             'login',
-            $clientResponse->getContent()
+            (string) $clientResponse->getContent()
         );
     }
 }

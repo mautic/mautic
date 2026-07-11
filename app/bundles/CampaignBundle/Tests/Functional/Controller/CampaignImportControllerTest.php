@@ -30,7 +30,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('campaignImport', $response->getContent());
+        $this->assertStringContainsString('campaignImport', (string) $response->getContent());
     }
 
     public function testCancelAction(): void
@@ -59,7 +59,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('campaignImport', $response->getContent());
+        $this->assertStringContainsString('campaignImport', (string) $response->getContent());
     }
 
     public function testUndoAction(): void
@@ -87,7 +87,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('The last import has been undone successfully.', $response->getContent());
+        $this->assertStringContainsString('The last import has been undone successfully.', (string) $response->getContent());
     }
 
     public function testUndoActionWithoutUndoData(): void
@@ -115,7 +115,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('No data found for import undo.', $response->getContent());
+        $this->assertStringContainsString('No data found for import undo.', (string) $response->getContent());
     }
 
     public function testProgressActionAnalyzeDataErrors(): void
