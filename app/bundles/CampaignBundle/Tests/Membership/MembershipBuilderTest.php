@@ -39,12 +39,11 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $this->manager                  = $this->createMock(MembershipManager::class);
         $this->campaignMemberRepository = $this->createMock(CampaignMemberRepository::class);
         $this->leadRepository           = $this->createMock(LeadRepository::class);
-        $translator                     = $this->createMock(TranslatorInterface::class);
         $this->membershipBuilder        = new MembershipBuilder(
             $this->manager,
             $this->campaignMemberRepository,
             $this->leadRepository,
-            $translator
+            $this->createStub(TranslatorInterface::class)
         );
     }
 
@@ -102,7 +101,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $matcher        = $this->exactly(4);
 
         $this->campaignMemberRepository->expects($matcher)
-            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
+            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
@@ -165,7 +164,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $matcher        = $this->exactly(4);
 
         $this->campaignMemberRepository->expects($matcher)
-            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
+            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);

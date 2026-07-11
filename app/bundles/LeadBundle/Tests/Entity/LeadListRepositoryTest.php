@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -34,8 +33,6 @@ final class LeadListRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->connection       = $this->createMock(Connection::class);
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->expressionMock   = $this->createMock(Expr::class);
         $this->repository       = $this->configureRepository(LeadList::class);
@@ -44,28 +41,28 @@ final class LeadListRepositoryTest extends TestCase
     public function testIsContactInAnySegmentFalse(): void
     {
         $contactId = 1;
-        $this->mockIsContactInAnySegment($contactId, []);
+        $this->mockIsContactInAnySegment([]);
         self::assertFalse($this->repository->isContactInAnySegment($contactId));
     }
 
     public function testIsContactInAnySegmentTrue(): void
     {
         $contactId = 1;
-        $this->mockIsContactInAnySegment($contactId, [1]);
+        $this->mockIsContactInAnySegment([1]);
         self::assertTrue($this->repository->isContactInAnySegment($contactId));
     }
 
     public function testIsNotContactInAnySegmentTrue(): void
     {
         $contactId = 1;
-        $this->mockIsContactInAnySegment($contactId, []);
+        $this->mockIsContactInAnySegment([]);
         self::assertTrue($this->repository->isNotContactInAnySegment($contactId));
     }
 
     public function testIsNotContactInAnySegmentFalse(): void
     {
         $contactId = 1;
-        $this->mockIsContactInAnySegment($contactId, [1]);
+        $this->mockIsContactInAnySegment([1]);
         self::assertFalse($this->repository->isNotContactInAnySegment($contactId));
     }
 
@@ -74,7 +71,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1];
         $queryResult        = [];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertFalse($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -83,7 +80,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -92,7 +89,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1, 2];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -101,7 +98,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1];
         $queryResult        = [0];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertTrue($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -110,7 +107,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -119,7 +116,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1, 2];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertFalse($this->repository->isNotContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -128,7 +125,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1];
         $queryResult        = [];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertFalse($this->repository->isContactInAllSegments($contactId, $expectedSegmentIds));
     }
 
@@ -137,7 +134,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertFalse($this->repository->isContactInAllSegments($contactId, $expectedSegmentIds));
     }
 
@@ -146,7 +143,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1, 2];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertTrue($this->repository->isContactInSegments($contactId, $expectedSegmentIds));
     }
 
@@ -155,7 +152,7 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1];
         $queryResult        = [];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertTrue($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
     }
 
@@ -164,54 +161,27 @@ final class LeadListRepositoryTest extends TestCase
         $contactId          = 1;
         $expectedSegmentIds = [1, 2];
         $queryResult        = [1, 2];
-        $this->mockIsContactInSegments($contactId, $expectedSegmentIds, $queryResult);
+        $this->mockIsContactInSegments($queryResult);
         self::assertFalse($this->repository->isNotContactInAllSegments($contactId, $expectedSegmentIds));
     }
 
     /**
      * @param array<int> $queryResult
      */
-    private function mockIsContactInAnySegment(int $contactId, array $queryResult): void
+    private function mockIsContactInAnySegment(array $queryResult): void
     {
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql    = <<<SQL
-            SELECT leadlist_id 
-            FROM {$prefix}lead_lists_leads
-            WHERE lead_id = ?
-                AND manually_removed = 0
-            LIMIT 1
-SQL;
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with($sql, [$contactId], [\PDO::PARAM_INT])
-            ->willReturn($this->result);
         $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
 
     /**
-     * @param array<int> $expectedSegmentIds
      * @param array<int> $queryResult
      */
-    private function mockIsContactInSegments(int $contactId, array $expectedSegmentIds, array $queryResult): void
+    private function mockIsContactInSegments(array $queryResult): void
     {
         $prefix = MAUTIC_TABLE_PREFIX;
-        $sql    = <<<SQL
-            SELECT leadlist_id 
-            FROM {$prefix}lead_lists_leads
-            WHERE lead_id = ?
-                AND leadlist_id IN (?)
-                AND manually_removed = 0
-SQL;
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                $sql,
-                [$contactId, $expectedSegmentIds],
-                [\PDO::PARAM_INT, ArrayParameterType::INTEGER]
-            )
-            ->willReturn($this->result);
 
         $this->result->expects($this->once())
             ->method('fetchFirstColumn')
@@ -333,9 +303,6 @@ SQL;
      */
     private function mockGetLeadCount(array $queryResult, bool $addParam = true): void
     {
-        $this->connection->method('createQueryBuilder')
-            ->willReturn($this->queryBuilderMock);
-
         $this->queryBuilderMock->expects($this->once())
             ->method('select')
             ->with('count(l.lead_id) as thecount, l.leadlist_id')

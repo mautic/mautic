@@ -23,7 +23,7 @@ final class SortableValueLabelListTypeTest extends TestCase
         $call = 0;
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->with($this->callback(function ($name): bool {
+            ->with($this->callback(function (string|FormBuilderInterface $name): bool {
                 $expected = [
                     ['label', 'value'],
                 ];
@@ -31,7 +31,8 @@ final class SortableValueLabelListTypeTest extends TestCase
                 return in_array($name, $expected[0], true);
             }),
                 $this->callback(function ($type): bool {
-                    $this->assertSame($type, TextType::class);
+                    $this->assertSame(TextType::class, $type);
+
                     return true;
                 }),
                 $this->callback(function ($options) use (&$call): bool {
@@ -137,9 +138,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         if ($shouldSetData) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expectedValue): bool {
+                ->with($this->callback(function (array $newData) use ($data, $expectedValue): bool {
                     $this->assertSame($data['label'], $newData['label']);
                     $this->assertSame($expectedValue, $newData['value']);
+
                     return true;
                 }));
         } else {
@@ -194,9 +196,10 @@ final class SortableValueLabelListTypeTest extends TestCase
         if (!empty($input)) {
             $event->expects($this->once())
                 ->method('setData')
-                ->with($this->callback(function ($newData) use ($data, $expected): bool {
+                ->with($this->callback(function (array $newData) use ($data, $expected): bool {
                     $this->assertSame($data['label'], $newData['label']);
                     $this->assertSame($expected, $newData['value']);
+
                     return true;
                 }));
         } else {

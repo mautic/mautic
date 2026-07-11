@@ -942,7 +942,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
         $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $ownerUser);
+        $this->assertInstanceOf(User::class, $ownerUser);
         $email->setCreatedBy($ownerUser);
         $this->em->flush();
 
@@ -962,12 +962,12 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
         Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
         Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
-        Assert::assertTrue(is_null($isUnpublishedInput->attr('checked')));
+        Assert::assertNull($isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
         Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
         Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
-        Assert::assertTrue(!is_null($isPublishedInput->attr('checked')));
+        Assert::assertNotNull($isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');

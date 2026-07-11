@@ -103,7 +103,7 @@ final class ExampleSendTypeTest extends TestCase
         $userId  = 37;
         $matcher = self::exactly(2);
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.lead.list.form.startTyping', $parameters[0]);
 

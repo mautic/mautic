@@ -56,9 +56,10 @@ final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->once())
             ->method('persist')
             ->with($this->callback(function ($scheduler) use ($report, $dateOfNextSchedule): bool {
-                $this->assertInstanceOf(\Mautic\ReportBundle\Entity\Scheduler::class, $scheduler);
+                $this->assertInstanceOf(Scheduler::class, $scheduler);
                 $this->assertSame($report, $scheduler->getReport());
                 $this->assertSame($dateOfNextSchedule, $scheduler->getScheduleDate());
+
                 return true;
             }));
 

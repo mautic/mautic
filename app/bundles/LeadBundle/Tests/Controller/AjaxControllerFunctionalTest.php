@@ -58,7 +58,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $this->client->getResponse()->getContent()
         );
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
 
         // Let's remove the member now.
@@ -77,7 +77,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
 
         $this->assertResponseIsSuccessful($clientResponse->getContent());
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
     }
 
@@ -482,7 +482,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Assert the tag is removed from the lead
         $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $updatedLead);
-        $this->assertFalse(in_array($tag, $updatedLead->getTags()->toArray()));
+        $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
 
     public function testContactListActionSuggestionsByAdminUser(): void
@@ -692,9 +692,9 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
-        $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
+        $this->assertArrayHasKey('flashes', $response, 'The response should contain flashes');
         $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
 
         $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
@@ -724,9 +724,9 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = json_decode($this->client->getResponse()->getContent(), true);
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
-        $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
+        $this->assertArrayHasKey('flashes', $response, 'The response should contain flashes');
         $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
 
         $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');

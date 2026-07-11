@@ -87,14 +87,12 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $scheduler = $this->createMock(EventScheduler::class);
 
-        $contactTracker = $this->createMock(ContactTracker::class);
-
         /** @phpstan-ignore new.deprecated */
         $legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $scheduler,
             new NullLogger(),
-            $contactTracker
+            $this->createStub(ContactTracker::class)
         );
 
         $eventDispatcher = new ActionDispatcher(
@@ -142,14 +140,12 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
-
         $campaignSubscriber = new CampaignSubscriber(
             $messageModel,
             $eventDispatcher,
             $eventCollector,
             new NullLogger(),
-            $translator
+            $this->createStub(Translator::class)
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
@@ -196,10 +192,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $successful = $pendingEvent->getSuccessful();
 
         // SMS should be noted as DNC
-        $this->assertFalse(empty($successful->get(2)->getMetadata()['sms']['dnc']));
+        $this->assertNotEmpty($successful->get(2)->getMetadata()['sms']['dnc']);
 
         // Nothing recorded for success
-        $this->assertTrue(empty($successful->get(1)->getMetadata()));
+        $this->assertEmpty($successful->get(1)->getMetadata());
     }
 
     public function sendMarketingMessageEmail(PendingEvent $event): void

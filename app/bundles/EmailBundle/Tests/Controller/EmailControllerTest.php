@@ -105,14 +105,9 @@ final class EmailControllerTest extends TestCase
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
-        $formFieldHelper                  = $this->createMock(FormFieldHelper::class);
-        $doctrine                         = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock           = $this->createMock(ModelFactory::class);
         $helperUserMock                   = $this->createMock(UserHelper::class);
-        $coreParametersHelper             = $this->createMock(CoreParametersHelper::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $translatorMock                   = $this->createMock(Translator::class);
-        $flashBagMock                     = $this->createMock(FlashBag::class);
         $this->requestStack               = new RequestStack();
         $this->corePermissionsMock        = $this->createMock(CorePermissions::class);
 
@@ -121,14 +116,14 @@ final class EmailControllerTest extends TestCase
 
         $this->controller = new EmailController(
             $this->formFactoryMock,
-            $formFieldHelper,
-            $doctrine,
+            $this->createStub(FormFieldHelper::class),
+            $this->createStub(ManagerRegistry::class),
             $this->modelFactoryMock,
             $helperUserMock,
-            $coreParametersHelper,
+            $this->createStub(CoreParametersHelper::class),
             $this->dispatcher,
-            $translatorMock,
-            $flashBagMock,
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $this->requestStack,
             $this->corePermissionsMock
         );

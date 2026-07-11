@@ -58,7 +58,7 @@ final class LeadSubscriberTest extends CommonMocks
         $matcher              = $this->any();
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.focus.event.view', $parameters[0]);
 

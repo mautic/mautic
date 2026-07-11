@@ -44,7 +44,7 @@ final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
         $matcher       = $this->exactly(3);
 
         $this->filesystemMock->expects($matcher)
-            ->method('exists')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('exists')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('my/upload/dir/filename_x.jpg', $parameters[0]);
 

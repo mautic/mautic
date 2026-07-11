@@ -55,10 +55,9 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $coreParamtersHelper       = $this->createMock(CoreParametersHelper::class);
         $coreParamtersHelper->method('getDefaultTimezone')
             ->willReturn('America/New_York');
-        $peakInteractionTimer             = $this->createMock(PeakInteractionTimer::class);
         $this->intervalScheduler          = new Interval($this->logger, $coreParamtersHelper);
         $this->dateTimeScheduler          = new DateTime($this->logger);
-        $this->optimizedScheduler         = new Optimized($peakInteractionTimer);
+        $this->optimizedScheduler         = new Optimized($this->createStub(PeakInteractionTimer::class));
         $this->eventCollector             = $this->createMock(EventCollector::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
         $this->scheduler                  = new EventScheduler(
@@ -334,7 +333,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $now): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (ScheduledBatchEvent $event) use ($now): void {
                         // The first log was scheduled to 10 minutes.

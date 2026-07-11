@@ -90,7 +90,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -98,7 +98,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['firstname']));
+        $this->assertArrayHasKey('firstname', $changedFields);
 
         // First name should have changed to Robert because the sync judge returned the integration's information change request
         $this->assertEquals('Robert', $changedFields['firstname']->getValue()->getNormalizedValue());
@@ -157,7 +157,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -165,7 +165,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['firstname']));
+        $this->assertArrayHasKey('firstname', $changedFields);
 
         // First name should have changed to Robert because the sync judge returned the integration's information change request
         $this->assertEquals('Bob', $changedFields['firstname']->getValue()->getNormalizedValue());

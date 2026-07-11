@@ -56,13 +56,12 @@ final class ExportHelperTest extends TestCase
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
-        $processSignalService           = $this->createMock(ProcessSignalService::class);
 
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $processSignalService,
+            $this->createStub(ProcessSignalService::class),
             $this->createStub(EventDispatcherInterface::class),
         );
     }
@@ -117,9 +116,9 @@ final class ExportHelperTest extends TestCase
         $zip = new \ZipArchive();
         $zip->open($zipFilePath);
 
-        $this->assertTrue(false !== $zip->locateName('entity_data.json'));
-        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath1)));
-        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath2)));
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath2)));
 
         $zip->close();
 

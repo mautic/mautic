@@ -184,7 +184,7 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(4);
 
         $this->emailValidator->expects($matcher)
-            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('hello@there.com', $parameters[0]);
 
@@ -211,7 +211,7 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
         $this->emailModel
             ->expects($this->once())
             ->method('sendEmailToUser')
-            ->willReturnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc): array {
+            ->willReturnCallback(function ($email, $users, ?array $leadCredentials, array $tokens, array $assetAttachments, $saveStat, array $to, array $cc, array $bcc): array {
                 $expectedUsers = [
                     ['id' => 6],
                     ['id' => 7],
@@ -220,9 +220,9 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 $this->assertInstanceOf(Email::class, $email);
                 $this->assertEquals($expectedUsers, $users);
                 $this->assertFalse($saveStat);
-                $this->assertEquals(['hello@there.com', 'bob@bobek.cz', 'default@email.com'], $to);
-                $this->assertEquals([], $cc);
-                $this->assertEquals([0 => 'hidden@translation.in', 2 => 'replaced.token@email.address'], $bcc);
+                $this->assertSame(['hello@there.com', 'bob@bobek.cz', 'default@email.com'], $to);
+                $this->assertSame([], $cc);
+                $this->assertSame([0 => 'hidden@translation.in', 2 => 'replaced.token@email.address'], $bcc);
 
                 return [];
             });

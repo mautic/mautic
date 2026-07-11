@@ -76,7 +76,7 @@ final class ClientTest extends TestCase
 
         $this->httpClientMock->expects($this->once())
             ->method('sendRequest')
-            ->willReturnCallback(function (Request $request) use ($method, $url, $headers, $payload, $response): \GuzzleHttp\Psr7\Response {
+            ->willReturnCallback(function (Request $request) use ($method, $url, $headers, $payload, $response): Response {
                 $this->assertSame($method, $request->getMethod());
                 $this->assertSame($url, (string) $request->getUri());
 

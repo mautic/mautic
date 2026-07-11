@@ -140,7 +140,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 
         // Jane again identifies herself, gets merged into the new visitor and so should now have a total of 56 points
         $jane = $model->getEntity($janeId);
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $jane);
+        $this->assertInstanceOf(Lead::class, $jane);
         $jane = $merger->merge($jane, $visitor2);
         $this->assertSame($janeId, $jane->getId());
         $em->detach($jane);

@@ -51,7 +51,7 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->setUpSymfony(array_merge($this->configParams, ['email_default_preference_center_id' => $pageId]));
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');

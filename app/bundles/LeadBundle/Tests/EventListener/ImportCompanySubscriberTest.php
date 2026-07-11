@@ -226,7 +226,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($formMock);
         $formMock->expects($this->once())
             ->method('getData')
-            ->willReturnOnConsecutiveCalls($matchedFields);
+            ->willReturn($matchedFields);
         $translatorInterfaceMock->expects($this->once())
             ->method('trans')
             ->with(

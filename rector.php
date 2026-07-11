@@ -18,7 +18,7 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
     ])
-    ->withPreparedSets(deadCode: true, typeDeclarations: true)
+    ->withPreparedSets(deadCode: true, typeDeclarations: true, phpunitCodeQuality: true)
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
@@ -82,6 +82,9 @@ return RectorConfig::configure()
         ],
 
         Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsOrAssertSameFloatParameterToSpecificMethodsTypeRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertInstanceOfComparisonRector::class,
 
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
@@ -92,6 +95,9 @@ return RectorConfig::configure()
 
         // from upcoming PHP 8.1
         Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector::class,
+
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\StringCastAssertStringContainsStringRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,

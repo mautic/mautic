@@ -49,33 +49,26 @@ final class PointModelTest extends TestCase
 
     protected function setUp(): void
     {
-        $requestStack               = $this->createMock(RequestStack::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
         $this->leadModel            = $this->createMock(LeadModel::class);
-        $contactTracker             = $this->createMock(ContactTracker::class);
         $this->em                   = $this->createMock(EntityManager::class);
         $this->security             = $this->createMock(CorePermissions::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $router                     = $this->createMock(RouterInterface::class);
         $this->translator           = $this->createStub(Translator::class);
-        $userHelper                 = $this->createMock(UserHelper::class);
-        $mauticLogger               = $this->createMock(LoggerInterface::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $pointGroupModel            = $this->createMock(PointGroupModel::class);
         $this->pointModel           = new PointModel(
-            $requestStack,
+            new RequestStack(),
             $this->ipLookupHelper,
             $this->leadModel,
-            $contactTracker,
+            $this->createStub(ContactTracker::class),
             $this->em,
             $this->security,
             $this->dispatcher,
-            $router,
+            $this->createStub(RouterInterface::class),
             $this->translator,
-            $userHelper,
-            $mauticLogger,
-            $coreParametersHelper,
-            $pointGroupModel,
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(PointGroupModel::class),
         );
     }
 

@@ -662,7 +662,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
-        $this->assertInstanceOf(\Mautic\UserBundle\Entity\User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $name);

@@ -8,7 +8,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class AbstractStepTestCase extends TestCase
@@ -17,11 +16,6 @@ abstract class AbstractStepTestCase extends TestCase
      * @var ProgressBar
      */
     protected $progressBar;
-
-    /**
-     * @var MockObject&InputInterface
-     */
-    protected MockObject $input;
 
     /**
      * @var MockObject&OutputInterface
@@ -33,8 +27,6 @@ abstract class AbstractStepTestCase extends TestCase
         $formatter = $this->createMock(OutputFormatterInterface::class);
         $formatter->method('isDecorated')
           ->willReturn(false);
-
-        $this->input      = $this->createMock(InputInterface::class);
         $this->output     = $this->createMock(OutputInterface::class);
 
         $this->output->method('getFormatter')

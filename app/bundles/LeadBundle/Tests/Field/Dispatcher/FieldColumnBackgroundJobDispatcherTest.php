@@ -111,7 +111,8 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
             $this->callback(function (AddColumnBackgroundEvent $event): true {
                 $event->stopPropagation();
-                $this->assertInstanceOf(\Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent::class, $event);
+                $this->assertInstanceOf(AddColumnBackgroundEvent::class, $event);
+
                 return true;
             }),
             LeadEvents::LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB,
@@ -151,7 +152,8 @@ final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\Te
         $this->dispatcher->expects($this->once())->method('dispatch')->with(
             $this->callback(function (DeleteColumnBackgroundEvent $event): true {
                 $event->stopPropagation();
-                $this->assertInstanceOf(\Mautic\LeadBundle\Field\Event\DeleteColumnBackgroundEvent::class, $event);
+                $this->assertInstanceOf(DeleteColumnBackgroundEvent::class, $event);
+
                 return true;
             }),
             LeadEvents::LEAD_FIELD_PRE_DELETE_COLUMN_BACKGROUND_JOB,

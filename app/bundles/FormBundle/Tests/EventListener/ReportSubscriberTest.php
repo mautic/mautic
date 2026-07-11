@@ -64,16 +64,14 @@ final class ReportSubscriberTest extends AbstractMauticTestCase
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
         $this->reportHelper         = new ReportHelper($this->createStub(EventDispatcher::class));
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
-        $dncReportService           = $this->createMock(DncReportService::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
             $this->reportHelper,
-            $coreParametersHelper,
+            $this->createStub(CoreParametersHelper::class),
             $this->createStub(TranslatorInterface::class),
-            $dncReportService
+            $this->createStub(DncReportService::class)
         );
     }
 

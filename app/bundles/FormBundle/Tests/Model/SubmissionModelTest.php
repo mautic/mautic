@@ -140,12 +140,8 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $twigMock                       = $this->createMock(Environment::class);
         $this->formModel                = $this->createMock(FormModel::class);
-        $pageModel                      = $this->createMock(PageModel::class);
-        $leadModel                      = $this->createMock(LeadModel::class);
         $this->campaignModel            = $this->createMock(CampaignModel::class);
-        $membershipManager              = $this->createMock(MembershipManager::class);
         $this->leadFieldModel           = $this->createMock(LeadFieldModel::class);
         $this->companyModel             = $this->createMock(CompanyModel::class);
         $fieldHelper                    = $this->createMock(FormFieldHelper::class);
@@ -176,14 +172,11 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->method('getClassMetadata')->willReturn($classMetadata);
         $this->submissioRepository        = $this->createMock(SubmissionRepository::class);
         $this->leadRepository             = $this->createMock(LeadRepository::class);
-        $mockLogger                       = $this->createMock(Logger::class);
         $this->uploadFieldValidatorMock   = $this->createMock(UploadFieldValidator::class);
-        $formUploaderMock                 = $this->createMock(FormUploader::class);
         $deviceTrackingService            = $this->createMock(DeviceTrackingServiceInterface::class);
         $this->file1Mock                  = $this->createMock(UploadedFile::class);
         $this->router                     = $this->createMock(RouterInterface::class);
         $this->contactTracker             = $this->createMock(ContactTracker::class);
-        $contactMerger                    = $this->createMock(ContactMerger::class);
         $userRepository                   = $this->createMock(UserRepository::class);
 
         $this->entityManager->method('getRepository')->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
@@ -207,22 +200,22 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
-            $twigMock,
+            $this->createStub(Environment::class),
             $this->formModel,
-            $pageModel,
-            $leadModel,
+            $this->createStub(PageModel::class),
+            $this->createStub(LeadModel::class),
             $this->campaignModel,
-            $membershipManager,
+            $this->createStub(MembershipManager::class),
             $this->leadFieldModel,
             $this->companyModel,
             $fieldHelper,
             $this->uploadFieldValidatorMock,
-            $formUploaderMock,
+            $this->createStub(FormUploader::class),
             $deviceTrackingService,
             new FieldValueTransformer($this->router),
             $this->dateHelper,
             $this->contactTracker,
-            $contactMerger,
+            $this->createStub(ContactMerger::class),
             $this->fieldsWithUniqueIdentifier,
             $this->entityManager,
             $this->createStub(CorePermissions::class),
@@ -230,7 +223,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(UrlGeneratorInterface::class),
             $this->translator,
             $this->userHelper,
-            $mockLogger,
+            $this->createStub(Logger::class),
             $this->createStub(CoreParametersHelper::class)
         );
 
@@ -271,7 +264,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $userMock = $this->createStub(UserRepository::class);
 
-        $this->entityManager
+        $this->entityManager->expects($this->exactly(3))
             ->method('getRepository')
             ->willReturnMap(
                 [

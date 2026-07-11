@@ -67,7 +67,7 @@ final class HttpFactoryTest extends TestCase
 
         $client1 = $factory->getClient($credentials);
         $client2 = $factory->getClient($credentials);
-        $this->assertTrue($client1 === $client2);
+        $this->assertSame($client2, $client1);
 
         $credential2 = new class implements HeaderCredentialsInterface {
             public function getApiKey(): string
@@ -82,7 +82,7 @@ final class HttpFactoryTest extends TestCase
         };
 
         $client3 = $factory->getClient($credential2);
-        $this->assertFalse($client1 === $client3);
+        $this->assertNotSame($client3, $client1);
     }
 
     public function testHeaderCredentialsSetsHeader(): void

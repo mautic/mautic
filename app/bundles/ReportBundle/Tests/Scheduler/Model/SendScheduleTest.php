@@ -46,7 +46,6 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock  = $this->createMock(MailHelper::class);
         $this->messageSchedule = $this->createMock(MessageSchedule::class);
         $this->fileHandler     = $this->createMock(FileHandler::class);
-        $eventDispatcher       = $this->createMock(EventDispatcher::class);
 
         $this->mailHelperMock->expects($this->once())
             ->method('getMailer')
@@ -56,7 +55,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
             $this->mailHelperMock,
             $this->messageSchedule,
             $this->fileHandler,
-            $eventDispatcher
+            $this->createStub(EventDispatcher::class)
         );
     }
 
@@ -122,7 +121,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
         $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->with($this->callback(function ($arg) use ($matcher): true {
+            ->with($this->callback(function (string $arg) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('/path/to/report.csv', $arg);
 
@@ -189,7 +188,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
         $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->with($this->callback(function ($arg) use ($matcher): true {
+            ->with($this->callback(function (string $arg) use ($matcher): true {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('path-to-a-file', $arg);
                 }
@@ -199,7 +198,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
 
                 return true;
             }))
-            ->will($this->throwException(new FileTooBigException()));
+            ->willThrowException(new FileTooBigException());
 
         $this->mailHelperMock->expects($this->once())
             ->method('setTo')

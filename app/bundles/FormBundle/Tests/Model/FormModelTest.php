@@ -69,24 +69,12 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         if (!isset($_ENV['MAUTIC_UPLOAD_DIR'])) {
             $_ENV['MAUTIC_UPLOAD_DIR'] = sys_get_temp_dir();
         }
-
-        $requestStack                = $this->createMock(RequestStack::class);
-        $twigMock                    = $this->createMock(Environment::class);
-        $themeHelper                 = $this->createMock(ThemeHelper::class);
-        $formActionModel             = $this->createMock(ActionModel::class);
-        $formFieldModel              = $this->createMock(FieldModel::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->fieldHelper           = $this->createMock(FormFieldHelper::class);
         $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
-        $dispatcher                  = $this->createMock(EventDispatcher::class);
-        $translator                  = $this->createMock(Translator::class);
         $entityManager               = $this->createMock(EntityManager::class);
-        $formUploaderMock            = $this->createMock(FormUploader::class);
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
-        $columnSchemaHelper          = $this->createMock(ColumnSchemaHelper::class);
-        $tableSchemaHelper           = $this->createMock(TableSchemaHelper::class);
-        $mappedObjectCollector       = $this->createMock(MappedObjectCollectorInterface::class);
 
         $entityManager
             ->method('getRepository')
@@ -97,24 +85,24 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->formModel = new FormModel(
-            $requestStack,
-            $twigMock,
-            $themeHelper,
-            $formActionModel,
-            $formFieldModel,
+            new RequestStack(),
+            $this->createStub(Environment::class),
+            $this->createStub(ThemeHelper::class),
+            $this->createStub(ActionModel::class),
+            $this->createStub(FieldModel::class),
             $this->fieldHelper,
             $this->primaryCompanyHelper,
             $this->leadFieldModel,
-            $formUploaderMock,
+            $this->createStub(FormUploader::class),
             $this->contactTracker,
-            $columnSchemaHelper,
-            $tableSchemaHelper,
-            $mappedObjectCollector,
+            $this->createStub(ColumnSchemaHelper::class),
+            $this->createStub(TableSchemaHelper::class),
+            $this->createStub(MappedObjectCollectorInterface::class),
             $entityManager,
             $this->createStub(CorePermissions::class),
-            $dispatcher,
+            $this->createStub(EventDispatcher::class),
             $this->createStub(UrlGeneratorInterface::class),
-            $translator,
+            $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class)

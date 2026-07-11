@@ -27,9 +27,8 @@ final class CookieHelperTest extends TestCase
     protected function setUp(): void
     {
         $this->requestStackMock = $this->createMock(RequestStack::class);
-        $requestMock            = $this->createMock(Request::class);
         $this->requestStackMock->method('getMainRequest')
-            ->willReturn($requestMock);
+            ->willReturn(new Request());
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The helper is instantiated correctly when secure and contains samesite=lax')]

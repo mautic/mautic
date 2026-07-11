@@ -229,7 +229,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         self::assertSame('Services', $companyC->getIndustry());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 companies affected', $response['flashes']);
     }
@@ -295,7 +295,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         self::assertSame('Retail', $companyG->getIndustry());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('5 companies affected', $response['flashes']);
     }

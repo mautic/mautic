@@ -10,8 +10,14 @@ use Mautic\LeadBundle\Model\SegmentActionModel;
 
 final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
     private \PHPUnit\Framework\MockObject\Stub $contactMock5;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
     private \PHPUnit\Framework\MockObject\Stub $contactMock6;
 
     /**
@@ -41,7 +47,7 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 
@@ -77,7 +83,7 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->contactModelMock->expects($matcher)
-            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('canEditContact')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->contactMock5, $parameters[0]);
 

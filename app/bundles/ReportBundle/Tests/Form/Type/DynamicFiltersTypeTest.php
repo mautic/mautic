@@ -164,6 +164,7 @@ final class DynamicFiltersTypeTest extends TestCase
                         'required' => false,
                     ];
                     $this->assertSame($args, $expectedOptions);
+
                     return true;
                 })
             );
@@ -203,6 +204,7 @@ final class DynamicFiltersTypeTest extends TestCase
                         'data' => 1,
                     ];
                     $this->assertSame($args, $expectedOptions);
+
                     return true;
                 })
             );
@@ -223,7 +225,8 @@ final class DynamicFiltersTypeTest extends TestCase
                 'test_alias',
                 ButtonGroupType::class,
                 $this->callback(function (array $args): bool {
-                    $this->assertSame($args['data'], 0);
+                    $this->assertSame(0, $args['data']);
+
                     return true;
                 })
             );
@@ -259,6 +262,7 @@ final class DynamicFiltersTypeTest extends TestCase
                         'format'   => 'y-MM-dd',
                     ];
                     $this->assertSame($args, $expectedOptions);
+
                     return true;
                 })
             );
@@ -294,6 +298,7 @@ final class DynamicFiltersTypeTest extends TestCase
                         'format'   => 'y-MM-dd HH:mm:ss',
                     ];
                     $this->assertSame($args, $expectedOptions);
+
                     return true;
                 })
             );
@@ -319,6 +324,7 @@ final class DynamicFiltersTypeTest extends TestCase
                 ChoiceType::class,
                 $this->callback(function (array $args): bool {
                     $this->assertSame(['Option 1' => 'option1', 'Option 2' => 'option2'], $args['choices']);
+
                     return true;
                 })
             );
@@ -344,8 +350,9 @@ final class DynamicFiltersTypeTest extends TestCase
                 'test_alias',
                 ChoiceType::class,
                 $this->callback(function (array $args): bool {
-                    $this->assertSame($args['multiple'], true);
+                    $this->assertTrue($args['multiple']);
                     $this->assertSame(['Option 1' => 'option1', 'Option 2' => 'option2'], $args['choices']);
+
                     return true;
                 })
             );
@@ -366,7 +373,8 @@ final class DynamicFiltersTypeTest extends TestCase
                 'test_alias',
                 ButtonGroupType::class,
                 $this->callback(function (array $args): bool {
-                    $this->assertSame($args['data'], true);
+                    $this->assertTrue($args['data']);
+
                     return true;
                 })
             );
@@ -387,7 +395,8 @@ final class DynamicFiltersTypeTest extends TestCase
                 'test_alias',
                 TextType::class,
                 $this->callback(function (array $args): bool {
-                    $this->assertSame($args['label'], 'Test Label (Equals)');
+                    $this->assertSame('Test Label (Equals)', $args['label']);
+
                     return true;
                 })
             );
@@ -408,7 +417,8 @@ final class DynamicFiltersTypeTest extends TestCase
                 'test_alias',
                 TextType::class,
                 $this->callback(function (array $args): bool {
-                    $this->assertSame($args['label'], 'Test Label (Equals)');
+                    $this->assertSame('Test Label (Equals)', $args['label']);
+
                     return true;
                 })
             );
@@ -429,7 +439,8 @@ final class DynamicFiltersTypeTest extends TestCase
                 'test_alias',
                 TextType::class,
                 $this->callback(function (array $args): bool {
-                    $this->assertSame($args['label'], 'Test Label');
+                    $this->assertSame('Test Label', $args['label']);
+
                     return true;
                 })
             );

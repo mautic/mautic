@@ -143,9 +143,6 @@ abstract class StandardImportTestHelper extends CommonMocks
         $this->entityManager  = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
 
-        /** @var MockObject&UserHelper $userHelper */
-        $userHelper = $this->createMock(UserHelper::class);
-
         /** @var MockObject&LeadEventLogRepository $logRepository */
         $logRepository = $this->createMock(LeadEventLogRepository::class);
 
@@ -203,7 +200,7 @@ abstract class StandardImportTestHelper extends CommonMocks
             $this->dispatcher,
             $this->createStub(UrlGeneratorInterface::class),
             $translator,
-            $userHelper,
+            $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             new ProcessSignalService()
         );

@@ -385,7 +385,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
 
-        $this->entityManager
+        $this->entityManager->expects($this->exactly(3))
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -529,7 +529,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
 
-        $this->entityManager
+        $this->entityManager->expects($this->exactly(3))
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -589,7 +589,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([1 => 'someone@domain.com']);
 
-        $this->entityManager
+        $this->entityManager->expects($this->exactly(3))
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -606,7 +606,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailEntity->method('getId')
             ->willReturn(1);
 
-        $this->assertTrue(0 === count($this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']])));
+        $this->assertCount(0, $this->emailModel->sendEmail($this->emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']]));
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dataStatRecordExistance')]
@@ -666,7 +666,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->companyModel->method('getRepository')
             ->willReturn($this->companyRepository);
 
-        $this->entityManager
+        $this->entityManager->expects($this->exactly(3))
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -729,7 +729,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
-        $this->entityManager
+        $this->entityManager->expects($this->exactly(4))
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -809,7 +809,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ],
             ['email_type' => MailHelper::EMAIL_TYPE_MARKETING]
         );
-        $this->assertTrue(0 === count($result), print_r($result, true));
+        $this->assertCount(0, $result, print_r($result, true));
     }
 
     public function testHitEmailSavesEmailStatAndDeviceStatInTwoTransactions(): void
@@ -1039,9 +1039,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->emailEntity->method('getLists')->willReturn($lists);
-
-        $connection   = $this->createMock(Connection::class);
-        $this->entityManager->method('getConnection')->willReturn($connection);
+        $this->entityManager->method('getConnection')->willReturn($this->createStub(Connection::class));
 
         $dateFromObject = new \DateTime('now');
         $dateToObject   = new \DateTime('-1 month');
