@@ -193,12 +193,12 @@ trait TranslationEntityTrait
 
         [$parent, $children] = $this->getTranslations();
         if ($variantParent != $parent) {
-            $count = $parent->$getter();
+            $count = $parent->{$getter}();
         }
 
         foreach ($children as $translation) {
             if ($variantParent != $translation) {
-                $count += $translation->$getter();
+                $count += $translation->{$getter}();
             }
         }
 

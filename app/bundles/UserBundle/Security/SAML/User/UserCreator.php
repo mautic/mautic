@@ -62,7 +62,7 @@ class UserCreator implements UserCreatorInterface
         foreach ($this->requiredFields as $field) {
             $getter = 'get'.ucfirst($field);
 
-            if (!$user->$getter()) {
+            if (!$user->{$getter}()) {
                 throw new BadCredentialsException('User does not include required fields.');
             }
         }

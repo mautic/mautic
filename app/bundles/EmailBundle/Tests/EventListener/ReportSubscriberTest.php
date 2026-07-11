@@ -69,19 +69,16 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->connectionMock            = $this->getMockedConnection();
         $this->companyReportDataMock     = $this->createMock(CompanyReportData::class);
-        $statRepository                  = $this->createMock(StatRepository::class);
         $this->emailRepository           = $this->createMock(EmailRepository::class);
-        $generatedColumnsProvider        = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
-        $dncReportService                = $this->createMock(DncReportService::class);
         $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
-            $statRepository,
+            $this->createStub(StatRepository::class),
             $this->emailRepository,
-            $generatedColumnsProvider,
+            $this->createStub(GeneratedColumnsProviderInterface::class),
             $this->fieldsBuilderMock,
-            $dncReportService,
+            $this->createStub(DncReportService::class),
         );
 
         $this->report             = $this->createMock(Report::class);

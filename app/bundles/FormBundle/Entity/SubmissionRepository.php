@@ -499,8 +499,8 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('form', (int) $form);
 
         match ($type) {
-            'boolean', 'number' => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, $value)),
-            default => $q->andWhere($q->expr()->$operatorExpr('r.'.$field, ':value'))
+            'boolean', 'number' => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, $value)),
+            default => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, ':value'))
                 ->setParameter('value', $value),
         };
 

@@ -24,14 +24,13 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
         $dateHelper                 = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $this->translator,
-            $coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->formatterHelper               = new FormatterHelper($dateHelper, $this->translator);
     }

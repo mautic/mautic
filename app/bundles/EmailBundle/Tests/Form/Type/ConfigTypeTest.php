@@ -60,9 +60,7 @@ final class ConfigTypeTest extends TypeTestCase
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
         $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
         $dsnValidator                   = new DsnValidator($this->createStub(TransportFactory::class));
-        $emailValidator                 = $this->createMock(EmailValidator::class);
-        $customFieldValidator           = $this->createMock(CustomFieldValidator::class);
-        $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($emailValidator, $customFieldValidator);
+        $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($this->createStub(EmailValidator::class), $this->createStub(CustomFieldValidator::class));
         $validator                      = Validation::createValidatorBuilder()
             ->setConstraintValidatorFactory(new ConstraintValidatorFactory([
                 DsnValidator::class                   => $dsnValidator,
