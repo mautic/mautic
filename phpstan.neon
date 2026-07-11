@@ -167,3 +167,9 @@ parameters:
 	symfony:
 		containerXmlPath: var/cache/test/AppKernelTestDebugContainer.xml
 		consoleApplicationLoader: app/console-application.php
+
+services:
+	-
+		class: MauticPhpStan\Rule\AbstractClassNameMustBeAbstractRule
+		tags:
+			- phpstan.rules.rule
