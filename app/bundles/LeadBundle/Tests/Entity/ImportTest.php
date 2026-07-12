@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
-class ImportTest extends StandardImportTestHelper
+final class ImportTest extends StandardImportTestHelper
 {
     public function testSetPath(): void
     {
@@ -114,7 +116,7 @@ class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity();
 
         $this->assertSame(Import::QUEUED, $import->getStatus());
-        $this->assertNull($import->getDateStarted());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $import->getDateStarted());
 
         // Date started will be set when the start is called for the first time.
         $import->start();
@@ -135,7 +137,7 @@ class ImportTest extends StandardImportTestHelper
         $import = $this->initImportEntity();
 
         $this->assertSame(Import::QUEUED, $import->getStatus());
-        $this->assertNull($import->getDateEnded());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $import->getDateEnded());
 
         $import->start()->end(false);
 
@@ -147,7 +149,7 @@ class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertNull($import->getRunTime());
+        $this->assertNotInstanceOf(\DateInterval::class, $import->getRunTime());
 
         $import->end(false);
 
@@ -205,6 +207,7 @@ class ImportTest extends StandardImportTestHelper
     protected function fakeImportStartDate(Import $import, int $runtime = 600): void
     {
         $dateEnded   = $import->getDateEnded();
+        $this->assertInstanceOf(\DateTimeInterface::class, $dateEnded);
         $dateStarted = new \DateTime($dateEnded->format('Y-m-d H:i:s.u'), $dateEnded->getTimezone());
         $dateStarted->modify('-'.$runtime.' seconds');
         $import->setDateStarted($dateStarted);

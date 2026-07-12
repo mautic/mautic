@@ -1,25 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class ContentHelperTest extends \PHPUnit\Framework\TestCase
+final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContentHelper
-     */
-    private $contentHelper;
+    private ContentHelper $contentHelper;
 
     protected function setUp(): void
     {
-        $dispatcherMock = $this->createMock(EventDispatcherInterface::class);
-
-        $delegationMock = $this->createMock(Environment::class);
-
-        $this->contentHelper = new ContentHelper($delegationMock, $dispatcherMock);
+        $this->contentHelper = new ContentHelper($this->createStub(Environment::class), $this->createStub(EventDispatcherInterface::class));
     }
 
     public function testShowScriptTagsContext(): void

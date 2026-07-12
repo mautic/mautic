@@ -20,9 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ExportSchedulerCommand extends Command
 {
     public function __construct(
-        private ReportExporter $reportExporter,
-        private ReportCleanup $reportCleanup,
-        private TranslatorInterface $translator,
+        private readonly ReportExporter $reportExporter,
+        private readonly ReportCleanup $reportCleanup,
+        private readonly TranslatorInterface $translator,
     ) {
         parent::__construct();
     }
@@ -38,7 +38,7 @@ class ExportSchedulerCommand extends Command
         $report      = $input->getOption('report');
         $cleanupOnly = $input->getOption('cleanup-only') ?? false;
 
-        if (!is_null($report) && !is_numeric($report)) {
+        if (null !== $report && !is_numeric($report)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
             return Command::INVALID;

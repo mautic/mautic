@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\Role;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailPermissionsTest extends MauticMysqlTestCase
+final class EmailPermissionsTest extends MauticMysqlTestCase
 {
     public function testEmailSendToDncPermissionIsAvailable(): void
     {
@@ -40,6 +40,7 @@ class EmailPermissionsTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $role               = $this->em->getRepository(Role::class)->findOneBy(['name' => 'Send To DNC Permission']);
+        $this->assertInstanceOf(Role::class, $role);
         $readablePermission = $role->getRawPermissions();
         Assert::assertSame(['email:emails' => [8 => 'sendtodnc']], $readablePermission);
     }

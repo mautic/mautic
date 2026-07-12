@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -11,16 +13,16 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\TestCase;
 
-class SegmentLogReportSubscriberTest extends TestCase
+final class SegmentLogReportSubscriberTest extends TestCase
 {
     /**
-     * @var FieldsBuilder
+     * @var \PHPUnit\Framework\MockObject\MockObject&FieldsBuilder
      */
     private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
 
     private SegmentLogReportSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -58,10 +60,12 @@ class SegmentLogReportSubscriberTest extends TestCase
         $setTables = [];
         $mockEvent->expects($this->exactly(1))
             ->method('addTable')
-            ->willReturnCallback(function () use (&$setTables): void {
+            ->willReturnCallback(function () use ($mockEvent, &$setTables): ReportBuilderEvent {
                 $args = func_get_args();
 
                 $setTables[] = $args;
+
+                return $mockEvent;
             });
 
         $this->subscriber->onReportBuilder($mockEvent);
@@ -79,7 +83,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $expressionBuilder = $this->createMock(ExpressionBuilder::class);
         $expressionBuilder->expects($this->exactly(1))
             ->method('or')
-            ->willReturn($this->createMock(CompositeExpression::class));
+            ->willReturn($this->createStub(CompositeExpression::class));
         $expressionBuilder->expects($this->exactly(2))
             ->method('isNotNull')
             ->willReturn('');

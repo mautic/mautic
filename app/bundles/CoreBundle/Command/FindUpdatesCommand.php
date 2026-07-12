@@ -19,8 +19,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FindUpdatesCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private UpdateHelper $updateHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly UpdateHelper $updateHelper,
     ) {
         parent::__construct();
     }

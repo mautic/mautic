@@ -12,7 +12,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ObjectChangeDAOTest extends TestCase
+final class ObjectChangeDAOTest extends TestCase
 {
     public function testGetUnchangedFields(): void
     {

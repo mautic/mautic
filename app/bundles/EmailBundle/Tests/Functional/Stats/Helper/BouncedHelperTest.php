@@ -24,11 +24,17 @@ use Mautic\UserBundle\Entity\User;
 final class BouncedHelperTest extends MauticMysqlTestCase
 {
     private BouncedHelper $bouncedHelper;
+
     private User $adminUser;
+
     private User $regularUser;
+
     private Email $email;
+
     private Campaign $campaign;
+
     private Lead $lead1;
+
     private Lead $lead2;
 
     protected function setUp(): void
@@ -280,6 +286,7 @@ final class BouncedHelperTest extends MauticMysqlTestCase
         $stat1->setEmailAddress($this->lead1->getEmail());
         $stat1->setDateSent(new \DateTime());
         $stat1->setSource('campaign.event');
+        $this->assertInstanceOf(Event::class, $event);
         $stat1->setSourceId($event->getId());
         $this->em->persist($stat1);
 

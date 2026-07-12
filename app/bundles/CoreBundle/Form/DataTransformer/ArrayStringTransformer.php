@@ -33,10 +33,10 @@ class ArrayStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform(mixed $string): mixed
     {
-        if (!$string) {
+        if (null === $string || '' === $string) {
             return [];
         }
 
-        return array_map('trim', explode(',', $string));
+        return array_map(trim(...), explode(',', $string));
     }
 }

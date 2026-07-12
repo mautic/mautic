@@ -16,15 +16,9 @@ use PHPUnit\Framework\Assert;
 
 final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 {
-    /**
-     * @var WebhookModel
-     */
-    private $webhookModel;
+    private WebhookModel $webhookModel;
 
-    /**
-     * @var MockHandler
-     */
-    private $clientMockHandler;
+    private MockHandler $clientMockHandler;
 
     protected function setUp(): void
     {

@@ -10,7 +10,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData;
 use PHPUnit\Framework\Assert;
 
-class GrapeJsDataTest extends MauticMysqlTestCase
+final class GrapeJsDataTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 

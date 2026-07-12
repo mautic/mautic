@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
+final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private CampaignRepository $repository;
 
@@ -77,6 +77,7 @@ class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $leadThree  = $this->createLead($campaign);
         $eventThree = $this->createEvent($campaign);
         $this->em->flush();
+        $this->assertInstanceOf(Event::class, $eventOne);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
@@ -105,12 +106,14 @@ class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $eventThree = $logThree->getEvent();
         $campaignLeadTwo->setRotation($logTwo->getRotation() + 1);
         $this->em->flush();
+        $this->assertInstanceOf(Event::class, $eventOne);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
             [$eventOne->getId(), $eventTwo->getId(), $eventThree->getId()],
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
+        $this->assertInstanceOf(Lead::class, $leadTwo);
 
         Assert::assertEquals(
             new CountResult(1, $leadTwo->getId(), $leadTwo->getId()),
@@ -141,7 +144,7 @@ class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $result = $this->repository->getCampaignPublishAndVersionData($nonExistentId);
 
-        Assert::assertEquals([], $result);
+        Assert::assertSame([], $result);
     }
 
     private function createLead(Campaign $campaign, ?CampaignLead &$campaignLead = null): Lead // @phpstan-ignore parameterByRef.unusedType

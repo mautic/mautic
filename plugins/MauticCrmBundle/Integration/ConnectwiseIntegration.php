@@ -100,10 +100,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
-    /**
-     * @return bool
-     */
-    public function authCallback($settings = [], $parameters = [])
+    public function authCallback($settings = [], $parameters = []): string|false
     {
         $url   = $this->getApiUrl();
         $error = false;
@@ -630,7 +627,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $leadPushed;
     }
 
-    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = []): array
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function getMappedFields(string $object, $lead, bool $personFound, array $config, array $cwContactData = []): array
     {
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
@@ -851,7 +851,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
-                    fn ($contact): bool => 'lead' === $contact['internal_entity']
+                    fn (array $contact): bool => 'lead' === $contact['internal_entity']
                 ), 'integration_entity_id');
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));
@@ -885,7 +885,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId): void
+    public function saveCampaignMembers($allCampaignMembers, IntegrationObject $campaignMemberObject, $campaignId): void
     {
         if (empty($allCampaignMembers)) {
             return;
@@ -970,7 +970,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @throws ApiErrorException
      */
-    public function createActivity($config, $cwContactId, $leadId): ?IntegrationEntity
+    public function createActivity(array $config, $cwContactId, $leadId): ?IntegrationEntity
     {
         if ($cwContactId and !empty($config['activity_name'])) {
             $activity = [

@@ -30,10 +30,10 @@ class CompanyObjectHelper implements ObjectHelperInterface
     private array $companiesCreated = [];
 
     public function __construct(
-        private CompanyModel $model,
-        private CompanyRepository $repository,
-        private Connection $connection,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly CompanyModel $model,
+        private readonly CompanyRepository $repository,
+        private readonly Connection $connection,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
     }
 
@@ -199,7 +199,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 

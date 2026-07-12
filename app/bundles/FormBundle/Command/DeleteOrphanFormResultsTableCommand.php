@@ -23,13 +23,13 @@ class DeleteOrphanFormResultsTableCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:forms:delete-results-table';
 
-    private Connection $conn;
+    private readonly Connection $conn;
 
     public function __construct(
-        private EntityManager $entityManager,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private FormRepository $formRepository,
+        private readonly EntityManager $entityManager,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct();
 

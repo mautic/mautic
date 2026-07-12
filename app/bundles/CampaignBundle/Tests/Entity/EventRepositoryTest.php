@@ -23,7 +23,7 @@ final class EventRepositoryTest extends TestCase
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
         $expressionMock   = $this->createMock(Expr::class);
 
-        $queryBuilderMock->expects($this->any())
+        $queryBuilderMock
             ->method('expr')
             ->willReturn($expressionMock);
 
@@ -32,7 +32,7 @@ final class EventRepositoryTest extends TestCase
             ->with('id', ':id')
             ->willReturn('id = :id');
 
-        $queryBuilderMock->expects($this->any())
+        $queryBuilderMock
             ->method('expr')
             ->willReturn($expressionMock);
 
@@ -76,7 +76,7 @@ final class EventRepositoryTest extends TestCase
 
         $eventRepository = $this->configureRepository(Event::class, $emMock);
         $this->connection->method('createQueryBuilder')
-            ->willReturnCallback(fn () => $queryBuilderMock);
+            ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
 
         $eventMock       = $this->createMock(Event::class);
         $eventMock->method('getId')

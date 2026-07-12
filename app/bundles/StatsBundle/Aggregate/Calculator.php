@@ -9,9 +9,9 @@ use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 class Calculator
 {
     public function __construct(
-        private StatsDAO $statsDAO,
-        private ?\DateTimeInterface $fromDateTime = null,
-        private ?\DateTimeInterface $toDateTime = null,
+        private readonly StatsDAO $statsDAO,
+        private readonly ?\DateTimeInterface $fromDateTime = null,
+        private readonly ?\DateTimeInterface $toDateTime = null,
     ) {
     }
 

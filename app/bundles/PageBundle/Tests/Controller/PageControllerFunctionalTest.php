@@ -12,7 +12,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageControllerFunctionalTest extends MauticMysqlTestCase
+final class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPagePreview(): void
     {
@@ -102,6 +102,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedPage = $this->em->find(Page::class, $page->getId());
+        $this->assertInstanceOf(Page::class, $savedPage);
         $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
     }
 
@@ -159,6 +160,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->clear();
         $page = $this->em->find(Page::class, $id);
+        $this->assertInstanceOf(Page::class, $page);
         Assert::assertSame($expectedVersion, $page->getVersion(), $message);
     }
 }

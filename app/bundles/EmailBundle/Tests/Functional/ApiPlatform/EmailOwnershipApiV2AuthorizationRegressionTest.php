@@ -47,7 +47,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->em->clear();
 
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -108,7 +108,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->em->clear();
 
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');

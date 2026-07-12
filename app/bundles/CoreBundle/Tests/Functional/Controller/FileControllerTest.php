@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileControllerTest extends MauticMysqlTestCase
+final class FileControllerTest extends MauticMysqlTestCase
 {
     private ?string $uploadedFilePath = null;
 
@@ -44,13 +44,12 @@ class FileControllerTest extends MauticMysqlTestCase
         $filePath = $this->getFixurePath();
         copy($filePath.$fileName, $filePath.$tmpFile);
         $this->uploadedFilePath = $filePath.$tmpFile;
-        $image                  = new UploadedFile(
+
+        return new UploadedFile(
             $filePath.$tmpFile,
             $tmpFile,
             'image/png'
         );
-
-        return $image;
     }
 
     private function getFixurePath(): string

@@ -19,12 +19,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class CacheInvalidateSubscriber
 {
     private const ACTION_PERSIST = 'persist';
+
     private const ACTION_UPDATE  = 'update';
+
     private const ACTION_REMOVE  = 'remove';
 
     public function __construct(
         #[Autowire(service: 'doctrine.orm.default_configuration')]
-        private Configuration $ormConfiguration,
+        private readonly Configuration $ormConfiguration,
     ) {
     }
 

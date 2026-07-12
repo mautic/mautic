@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StageController extends AbstractFormController
 {
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -274,7 +271,8 @@ class StageController extends AbstractFormController
                     ]
                 )
             );
-        } elseif (!$this->security->isGranted('stage:stages:edit')) {
+        }
+        if (!$this->security->isGranted('stage:stages:edit')) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -296,7 +294,7 @@ class StageController extends AbstractFormController
         );
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $request->getMethod()) {
+        if (!$ignorePost && 'POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {

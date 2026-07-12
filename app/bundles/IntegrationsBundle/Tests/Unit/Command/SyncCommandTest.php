@@ -14,20 +14,20 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class SyncCommandTest extends TestCase
+final class SyncCommandTest extends TestCase
 {
     use IsolatedTestTrait;
 
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var SyncServiceInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&SyncServiceInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $syncService;
 
     private CommandTester $commandTester;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -63,10 +63,10 @@ class SyncCommandTest extends TestCase
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
                 $this->assertSame(['123', '345'], $inputOptionsDAO->getMauticObjectIds()->getObjectIdsFor(Contact::NAME));
-                $this->assertNull($inputOptionsDAO->getIntegrationObjectIds());
+                $this->assertNotInstanceOf(\Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO::class, $inputOptionsDAO->getIntegrationObjectIds());
                 $this->assertTrue($inputOptionsDAO->pullIsEnabled());
                 $this->assertFalse($inputOptionsDAO->pushIsEnabled());
 
@@ -88,7 +88,7 @@ class SyncCommandTest extends TestCase
     {
         $this->syncService->expects($this->once())
             ->method('processIntegrationSync')
-            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO) {
+            ->with($this->callback(function (InputOptionsDAO $inputOptionsDAO): true {
                 $this->assertSame(self::INTEGRATION_NAME, $inputOptionsDAO->getIntegration());
 
                 return true;

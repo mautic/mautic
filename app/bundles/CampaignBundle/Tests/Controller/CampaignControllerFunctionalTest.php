@@ -15,21 +15,15 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
+final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
     private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private CampaignModel $campaignModel;
 
-    /**
-     * @var string
-     */
-    private $campaignLeadsLabel;
+    private string $campaignLeadsLabel;
 
     protected function setUp(): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class RedirectModelTest extends PageTestAbstract
+final class RedirectModelTest extends PageTestAbstract
 {
     public function testCreateRedirectEntityWhenCalledReturnsRedirect(): void
     {
@@ -36,12 +38,12 @@ class RedirectModelTest extends PageTestAbstract
         $redirectModel = $this->getRedirectModel();
         $url           = $redirectModel->generateRedirectUrl($redirect);
 
-        $this->assertStringContainsString($url, 'http://some-url.com');
+        $this->assertStringContainsString('http://some-url.com', $url);
     }
 
     public function testRedirectGenerationEvent(): void
     {
-        $shortener = $this->createMock(Shortener::class);
+        $shortener = $this->createStub(Shortener::class);
 
         $dispatcher = new EventDispatcher();
 
@@ -54,14 +56,14 @@ class RedirectModelTest extends PageTestAbstract
             ->willReturn($url);
 
         $model = new RedirectModel(
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
             $router,
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
             $shortener
         );
 

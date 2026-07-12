@@ -12,6 +12,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\PageBundle\Entity\Page;
@@ -29,6 +30,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     use FormTestHelperTrait;
 
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     public function testRedirectPostAction(): void
@@ -93,11 +95,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $urlParts   = parse_url($currentUrl);
         parse_str($urlParts['query'], $queryParams);
 
-        $this->assertEquals('/test-form-redirect-target-page', $urlParts['path']);
+        $this->assertSame('/test-form-redirect-target-page', $urlParts['path']);
         // Test that the redirect didn't remove any additional URL parts
-        $this->assertEquals('john@doe.com', $queryParams['email']);
+        $this->assertSame('john@doe.com', $queryParams['email']);
         $this->assertGreaterThan(0, (int) $queryParams['lead']);
-        $this->assertEquals('bar', $queryParams['foo']);
+        $this->assertSame('bar', $queryParams['foo']);
     }
 
     public function testRequiredConditionalFieldIfNotEmpty(): void
@@ -189,6 +191,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('Australia', $contact->getCountry());
         Assert::assertSame('Victoria', $contact->getState());
@@ -280,6 +283,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertNull($contact->getCountry());
         Assert::assertNull($contact->getState());
@@ -592,7 +596,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
@@ -661,6 +665,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('Acquia', $contact->getCompany());
         Assert::assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
@@ -725,6 +730,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('test', $contact->getFirstname());
 
@@ -866,7 +872,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -890,7 +896,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $contactCompanies = json_decode($clientResponse->getContent(), true);
         $this->assertArrayHasKey('total', $contactCompanies);
         $this->assertArrayHasKey('companies', $contactCompanies);
-        $this->assertEquals(1, count($contactCompanies['companies']));
+        $this->assertCount(1, $contactCompanies['companies']);
 
         // Check company details
         $this->assertEquals($expectedData['company_name'], $contactCompanies['companies'][0]['companyname']);
@@ -1099,7 +1105,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('results', $latestSubmission);
         foreach ($expectedData as $key => $value) {
             $this->assertArrayHasKey($key, $latestSubmission['results']);
-            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '$value' for field '$key'");
+            $this->assertEquals($value, $latestSubmission['results'][$key], "Failed asserting that '{$latestSubmission['results'][$key]}' matches expected '{$value}' for field '{$key}'");
         }
 
         // Check contact details
@@ -1388,6 +1394,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // Deleting the submission decrements the counter symmetrically (via the postRemove listener).
         $submissionId    = $finalSubmissionsData['submissions'][0]['id'];
+        /** @var SubmissionModel $submissionModel */
         $submissionModel = static::getContainer()->get('mautic.form.model.submission');
         $submission      = $submissionModel->getEntity($submissionId);
         $submissionModel->deleteEntity($submission);

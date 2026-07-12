@@ -45,7 +45,7 @@ abstract class ModeratedCommand extends Command
 
     public function __construct(
         protected PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
@@ -211,10 +211,7 @@ abstract class ModeratedCommand extends Command
         }
 
         $disabled = explode(',', ini_get('disable_functions'));
-        if (in_array('getmypid', $disabled) || in_array('posix_getpgid', $disabled)) {
-            return false;
-        }
 
-        return true;
+        return !in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled);
     }
 }

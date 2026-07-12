@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -7,13 +9,12 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CompanyReportData::class)]
-class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
+final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var TranslatorInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&Translator
      */
     private \PHPUnit\Framework\MockObject\MockObject $translator;
 
@@ -124,7 +125,7 @@ class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
             ->method('getEntities')
             ->willReturn([$field]);
 
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('hasColumn')
             ->willReturn(false);
 

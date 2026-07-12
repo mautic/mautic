@@ -24,10 +24,7 @@ class CompanyController extends FormController
 {
     use LeadDetailsTrait;
 
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, CompanyColumnsDictionary $companyColumnsDictionary, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -366,7 +363,8 @@ class CompanyController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $entity->getPermissionUser())) {
@@ -467,7 +465,8 @@ class CompanyController extends FormController
                         'passthroughVars' => $passthrough,
                     ]
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $company = $model->getEntity($objectId);
                 $form    = $model->createForm($company, $this->formFactory, $action, ['fields' => $fields, 'update_select' => $updateSelect]);
@@ -1085,7 +1084,8 @@ class CompanyController extends FormController
                                 ]
                             )
                         );
-                    } elseif (!$permissions['lead:leads:editother']) {
+                    }
+                    if (!$permissions['lead:leads:editother']) {
                         $this->throwAccessDenied();
                     } elseif ($model->isLocked($secondaryCompany)) {
                         // deny access if the entity is locked

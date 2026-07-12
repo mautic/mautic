@@ -12,9 +12,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class PageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EmailModel $emailModel,
-        private RealTimeExecutioner $realTimeExecutioner,
-        private RequestStack $requestStack,
+        private readonly EmailModel $emailModel,
+        private readonly RealTimeExecutioner $realTimeExecutioner,
+        private readonly RequestStack $requestStack,
     ) {
     }
 

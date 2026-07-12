@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Psr7\Query;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -14,6 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
@@ -97,6 +99,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
         private ContactRequestHelper $contactRequestHelper,
+        private VariantConverterService $variantConverterService,
         EntityManager $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -118,10 +121,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $this->catInUrl = $catInUrl;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\PageRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\PageBundle\Entity\PageRepository
     {
         $repo = $this->em->getRepository(Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -129,10 +129,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\HitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): \Mautic\PageBundle\Entity\HitRepository
     {
         return $this->em->getRepository(Hit::class);
     }
@@ -173,7 +170,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 $count     = $repo->checkPageUniqueAlias($testAlias, $pageIds);
                 ++$aliasTag;
             }
-            if ($testAlias != $alias) {
+            if ($testAlias !== $alias) {
                 $alias = $testAlias;
             }
             $entity->setAlias($alias);
@@ -274,7 +271,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new PageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -791,10 +788,9 @@ class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 
@@ -1091,7 +1087,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         }
     }
 
-    private function setLeadManipulator($page, Hit $hit, Lead $lead): void
+    private function setLeadManipulator(Page|Redirect|null $page, Hit $hit, Lead $lead): void
     {
         // Only save the lead and dispatch events if needed
         $source   = 'hit';
@@ -1205,12 +1201,24 @@ class PageModel extends FormModel implements GlobalSearchInterface
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
     }
 
-    /*
+    /**
+     * Converts a variant to the main item and the original main item a variant.
+     */
+    public function convertWinnerVariant(VariantEntityInterface $entity): void
+    {
+        // let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        $this->variantConverterService->convertWinnerVariant($entity);
+        /** @var iterable<Page> $save */
+        $save = $this->variantConverterService->getUpdatedVariants();
+
+        // save the entities
+        $this->saveEntities($save, false);
+    }
+
+    /**
      * Cleans query params saving url values.
-     *
-     * @param $query array
-     *
-     * @return array
      */
     private function cleanQuery(array $query): array
     {

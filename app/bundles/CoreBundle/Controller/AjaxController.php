@@ -25,13 +25,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class AjaxController extends CommonController
 {
     /**
-     * @param array $dataArray
-     * @param int   $statusCode
-     * @param bool  $addIgnoreWdt
+     * @param int  $statusCode
+     * @param bool $addIgnoreWdt
      *
      * @throws \Exception
      */
-    protected function sendJsonResponse($dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
+    protected function sendJsonResponse(array $dataArray, $statusCode = null, $addIgnoreWdt = true): JsonResponse
     {
         $response = new JsonResponse();
 
@@ -71,12 +70,12 @@ class AjaxController extends CommonController
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
 
-                if (3 == count($parts) && 'plugin' == $parts['0']) {
+                if (3 === count($parts) && 'plugin' == $parts['0']) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
                 }
 
-                if (2 == count($parts)) {
+                if (2 === count($parts)) {
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
@@ -373,7 +372,7 @@ class AjaxController extends CommonController
                         $dataArray['error'] = $this->translator->trans(
                             'mautic.core.ip_lookup.remote_fetch_error',
                             [
-                                '%remoteUrl%' => $remoteUrl,
+                                '%remoteUrl%' => AbstractLocalDataLookup::cleanUrl($remoteUrl),
                                 '%localPath%' => $localPath,
                             ]
                         );
@@ -396,8 +395,8 @@ class AjaxController extends CommonController
     {
         $dataArray = ['html' => '', 'attribution' => ''];
 
-        if ($request->request->has('service')) {
-            $serviceName = $request->request->get('service');
+        if ($request->query->has('service')) {
+            $serviceName = $request->query->get('service');
 
             $ipService = $ipServiceFactory->getService($serviceName);
 
@@ -408,9 +407,20 @@ class AjaxController extends CommonController
                         $themes   = $ipService->getConfigFormThemes();
                         $themes[] = '@MauticCore/FormTheme/Config/config_layout.html.twig';
 
-                        $form = $formFactory->create($formType, [], ['ip_lookup_service' => $ipService]);
+                        $form = $formFactory->createBuilder()
+                            ->add(
+                                'ip_lookup_config',
+                                $formType,
+                                [
+                                    'label'             => false,
+                                    'ip_lookup_service' => $ipService,
+                                    'csrf_protection'   => false,
+                                ]
+                            )
+                            ->getForm();
+
                         $html = $this->renderView(
-                            '@MauticCore/FormTheme/Config/ip_lookup_config_row.html.twig',
+                            '@MauticCore/Default/ajax_form.html.twig',
                             [
                                 'form'       => $form->createView(),
                                 'formThemes' => $themes,

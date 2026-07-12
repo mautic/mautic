@@ -21,7 +21,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -87,14 +87,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $contact  = $this->createContact('blabla@contact.email');
 
         $userRepository = $this->em->getRepository(User::class);
-        \assert($userRepository instanceof UserRepository);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
         $roleRepository = $this->em->getRepository(Role::class);
-        \assert($roleRepository instanceof RoleRepository);
+        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -481,6 +481,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert the tag is removed from the lead
         $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        $this->assertInstanceOf(Lead::class, $updatedLead);
         $this->assertFalse(in_array($tag, $updatedLead->getTags()->toArray()));
     }
 
@@ -507,7 +508,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
 
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($owner);
             $leads[] = $lead;
         }
@@ -545,7 +546,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by admin user.
         for ($i = 1; $i <= 2; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($adminUser);
             $leads[] = $lead;
         }
@@ -587,7 +588,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by non-admin user.
         for ($i = 3; $i <= 4; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($nonAdminUser);
             $nonAdminLeads[] = $lead;
         }
@@ -655,7 +656,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {
-            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '$expectedValue' for object: $object, group: $group");
+            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '{$expectedValue}' for object: {$object}, group: {$group}");
         }
     }
 
@@ -848,7 +849,9 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
     }
 
-    /** @return array<int, array<string, mixed>> */
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()

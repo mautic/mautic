@@ -10,7 +10,7 @@ use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class TweetControllerTest extends MauticMysqlTestCase
+final class TweetControllerTest extends MauticMysqlTestCase
 {
     private TweetRepository $tweetsRepo;
 
@@ -56,6 +56,7 @@ class TweetControllerTest extends MauticMysqlTestCase
     public function testEditAction(): void
     {
         $tweet = $this->tweetsRepo->findOneBy([]);
+        $this->assertInstanceOf(Tweet::class, $tweet);
 
         $crawler               = $this->client->request('GET', '/s/tweets/edit/'.$tweet->getId());
         $clientResponse        = $this->client->getResponse();

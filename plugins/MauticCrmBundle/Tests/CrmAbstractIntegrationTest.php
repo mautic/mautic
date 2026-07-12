@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -7,9 +9,8 @@ use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\PluginBundle\Tests\Integration\AbstractIntegrationTestCase;
 use MauticPlugin\MauticCrmBundle\Tests\Fixtures\Model\CompanyModelStub;
 use MauticPlugin\MauticCrmBundle\Tests\Stubs\StubIntegration;
-use PHPUnit\Framework\MockObject\MockBuilder;
 
-class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
+final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testFieldMatchingPriority(): void
     {
@@ -23,7 +24,6 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ],
         ];
 
-        /** @var MockBuilder $mockBuilder */
         $mockBuilder = $this->getMockBuilder(StubIntegration::class);
         $mockBuilder->disableOriginalConstructor();
 
@@ -58,9 +58,9 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             'some_custom_field'   => 'some value',
         ];
 
-        $emailValidator = $this->createMock(EmailValidator::class);
+        $emailValidator = $this->createStub(EmailValidator::class);
 
-        $companyDeduper = $this->createMock(CompanyDeduper::class);
+        $companyDeduper = $this->createStub(CompanyDeduper::class);
 
         $companyModel = $this->getMockBuilder(CompanyModelStub::class)
             ->onlyMethods(['fetchCompanyFields', 'organizeFieldsByGroup', 'saveEntity'])
@@ -70,7 +70,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $companyModel->setEmailValidator($emailValidator);
         $companyModel->setCompanyDeduper($companyDeduper);
 
-        $companyModel->expects($this->any())
+        $companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $companyModel->expects($this->once())
@@ -119,6 +119,7 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($data);
 
         $company = $integration->getMauticCompany($data);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Company::class, $company);
 
         $this->assertEquals('Some Business', $company->getName());
         $this->assertEquals('Some Business', $company->getFieldValue('custom_company_name'));
@@ -127,24 +128,24 @@ class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
 
     public function testLimitString(): void
     {
-        $integration = $this->createMock(StubIntegration::class);
+        $integration = $this->createStub(StubIntegration::class);
 
         $methodLimitString = new \ReflectionMethod(StubIntegration::class, 'limitString');
 
         $string = 'SomeRandomString';
 
         $result = $methodLimitString->invokeArgs($integration, [str_repeat($string, 100), 'text']);
-        $this->assertSame(strlen($result), 255);
+        $this->assertSame(255, strlen($result));
 
         $result = $methodLimitString->invokeArgs($integration, [$string, 'text']);
         $this->assertSame(strlen($result), strlen($string));
         $this->assertSame($result, $string);
 
         $result = $methodLimitString->invokeArgs($integration, [true, 'text']);
-        $this->assertSame($result, true);
+        $this->assertTrue($result);
 
         $result = $methodLimitString->invokeArgs($integration, [false, 'text']);
-        $this->assertSame($result, false);
+        $this->assertFalse($result);
 
         $result = $methodLimitString->invokeArgs($integration, [[1, 2, 3]]);
         $this->assertSame($result, [1, 2, 3]);

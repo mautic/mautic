@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class AbstractFormControllerTest extends MauticMysqlTestCase
+final class AbstractFormControllerTest extends MauticMysqlTestCase
 {
     public function testUnlockActionWithValidReturnUrl(): void
     {
@@ -16,7 +16,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
                 'name'      => 'test',
@@ -38,7 +38,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => $invalidReturnUrl,
                 'name'      => 'test',
@@ -60,7 +60,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
                 'name'      => 'test',

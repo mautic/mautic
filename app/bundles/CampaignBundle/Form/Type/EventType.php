@@ -68,8 +68,8 @@ class EventType extends AbstractType
                 $label .= '_inaction';
 
                 unset($choices['immediate']);
-                $choices['interval'] = $choices['interval'].'_inaction';
-                $choices['date']     = $choices['date'].'_inaction';
+                $choices['interval'] .= '_inaction';
+                $choices['date'] .= '_inaction';
             }
             $default = array_key_first($choices);
 
@@ -327,7 +327,8 @@ class EventType extends AbstractType
 
         if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
             return $this->parseTimeValue($data[$name]['date']);
-        } elseif (is_string($data[$name])) {
+        }
+        if (is_string($data[$name])) {
             return $this->parseTimeValue($data[$name]);
         }
 

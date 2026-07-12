@@ -46,10 +46,7 @@ class MessageQueueModel extends FormModel
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ChannelBundle\Entity\MessageQueueRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\ChannelBundle\Entity\MessageQueueRepository
     {
         return $this->em->getRepository(MessageQueue::class);
     }
@@ -312,10 +309,7 @@ class MessageQueueModel extends FormModel
         $message->setProcessed();
     }
 
-    /**
-     * @param array $channelIds
-     */
-    public function getQueuedChannelCount($channel, $channelIds = []): int
+    public function getQueuedChannelCount($channel, ?array $channelIds = []): int
     {
         return $this->getRepository()->getQueuedChannelCount($channel, $channelIds);
     }
@@ -342,7 +336,7 @@ class MessageQueueModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

@@ -177,7 +177,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param mixed[]|Lead         $lead
+     * @param array<string, mixed> $config
+     *
+     * @return mixed[]
      */
     public function populateLeadData($lead, $config = [], $object = 'Contacts')
     {
@@ -212,11 +215,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
-     *
      * @throws ApiErrorException
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $dynamicsFields    = [];
         $silenceExceptions = $settings['silence_exceptions'] ?? true;
@@ -253,7 +254,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                 'UniqueidentifierType',
                             ], true)) {
                                 continue;
-                            } elseif (in_array($fieldType, [
+                            }
+                            if (in_array($fieldType, [
                                 'DoubleType',
                                 'IntegerType',
                                 'MoneyType',
@@ -422,10 +424,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
-    /**
-     * @param array $params
-     */
-    public function getCompanies($params = []): int
+    public function getCompanies(array $params = []): int
     {
         $executed    = 0;
         $MAX_RECORDS = 200; // Default max records is 5000
@@ -682,11 +681,9 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     *
      * @return mixed[]
      */
-    public function pushLeads($params = []): array
+    public function pushLeads(array $params = []): array
     {
         $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
         if (isset($params['fetchAll']) && $params['fetchAll']) {
@@ -728,7 +725,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             // start with update
             if ($totalToUpdate + $totalToCreate) {
                 $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
                 $output->writeln('<info>This could take some time. Please wait until the process is completed</info>');
                 $progress = new ProgressBar($output, $totalCount);
             }
@@ -864,7 +861,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      * @param array                       $ids
      * @param IntegrationEntityRepository $integrationEntityRepo
      */
-    private function createIntegrationEntities($ids, $object, $integrationEntityRepo): void
+    private function createIntegrationEntities($ids, string $object, $integrationEntityRepo): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
@@ -879,7 +876,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function getExistingRecord($seachColumn, $searchValue, $object = 'contacts')
+    private function getExistingRecord(string $seachColumn, $searchValue, string $object = 'contacts')
     {
         $availableFields    = $this->getAvailableLeadFields();
         $oparams['$select'] = implode(',', array_keys($availableFields[$object]));

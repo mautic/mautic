@@ -208,7 +208,7 @@ class ListApiController extends CommonApiController
             } else {
                 $leadModel = $this->getModel('lead');
                 \assert($leadModel instanceof LeadModel);
-                /* @var \Mautic\LeadBundle\Entity\Lead $contact */
+                /** @var \Mautic\LeadBundle\Entity\Lead $contact */
                 $leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
             }
@@ -269,7 +269,8 @@ class ListApiController extends CommonApiController
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
-        } elseif ('delete' == $action) {
+        }
+        if ('delete' == $action) {
             return $this->security->hasEntityAccess(
                 true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );

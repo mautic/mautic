@@ -348,10 +348,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
     }
 
-    /**
-     * @return array
-     */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object): array
     {
         if (!isset($data['properties'])) {
             return [];
@@ -400,9 +397,9 @@ class HubspotIntegration extends CrmAbstractIntegration
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
                             if ($contact && !$contact->isNewlyCreated()) { // updated
-                                $executed[0] = $executed[0] + 1;
+                                ++$executed[0];
                             } elseif ($contact && $contact->isNewlyCreated()) { // newly created
-                                $executed[1] = $executed[1] + 1;
+                                ++$executed[1];
                             }
 
                             if ($contact) {
@@ -428,10 +425,9 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     * @param bool  $id
+     * @param bool $id
      */
-    public function getCompanies($params = [], $id = false, &$executed = null)
+    public function getCompanies(array $params = [], $id = false, &$executed = null)
     {
         $results = [];
         try {
@@ -562,10 +558,8 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @param Lead  $lead
      * @param array $config
-     *
-     * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -643,17 +637,13 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @throws \Exception
      */
-    private function getReadOnlyFields($object): array
+    private function getReadOnlyFields(string $object): array
     {
         $fields = ArrayHelper::getValue($object, $this->getAvailableLeadFields(), []);
 
         return array_filter(
             $fields,
-            function ($field) {
-                if (!empty($field['readOnly'])) {
-                    return $field;
-                }
-            }
+            fn (array $field): bool => !empty($field['readOnly'])
         );
     }
 }

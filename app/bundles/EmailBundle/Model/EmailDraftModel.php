@@ -15,7 +15,7 @@ class EmailDraftModel extends AbstractCommonModel
     public function createDraft(Email $email, string $html, string $template, bool $publicPreview = true): EmailDraft
     {
         $emailDraft = $this->getRepository()->findOneBy(['email' => $email]);
-        if (!is_null($emailDraft)) {
+        if (null !== $emailDraft) {
             throw new \Exception(sprintf('Draft already exists for email %d', $email->getId()));
         }
         $emailDraft = new EmailDraft($email, $html, $template, $publicPreview);
@@ -28,7 +28,7 @@ class EmailDraftModel extends AbstractCommonModel
 
     public function deleteDraft(Email $email): void
     {
-        if (is_null($emailDraft = $email->getDraft())) {
+        if (null === ($emailDraft = $email->getDraft())) {
             throw new NotFoundHttpException(sprintf('Draft not found for email %d', $email->getId()));
         }
         $this->em->remove($emailDraft);

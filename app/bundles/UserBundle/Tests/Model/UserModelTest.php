@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -23,10 +25,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class UserModelTest extends TestCase
+final class UserModelTest extends TestCase
 {
     private UserModel $userModel;
 
@@ -46,7 +47,7 @@ class UserModelTest extends TestCase
     private MockObject $router;
 
     /**
-     * @var MockObject&TranslatorInterface
+     * @var MockObject&Translator
      */
     private MockObject $translator;
 
@@ -54,11 +55,6 @@ class UserModelTest extends TestCase
      * @var MockObject&User
      */
     private MockObject $user;
-
-    /**
-     * @var MockObject&UserToken
-     */
-    private MockObject $userToken;
 
     /**
      * @var MockObject&UserTokenServiceInterface
@@ -75,7 +71,7 @@ class UserModelTest extends TestCase
      */
     private MockObject $twig;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->mailHelper       = $this->createMock(MailHelper::class);
         $this->userTokenService = $this->createMock(UserTokenServiceInterface::class);
@@ -83,7 +79,6 @@ class UserModelTest extends TestCase
         $this->user             = $this->createMock(User::class);
         $this->router           = $this->createMock(Router::class);
         $this->translator       = $this->createMock(Translator::class);
-        $this->userToken        = $this->createMock(UserToken::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
 
@@ -91,13 +86,13 @@ class UserModelTest extends TestCase
             $this->mailHelper,
             $this->userTokenService,
             $this->entityManager,
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
             $this->router,
             $this->translator,
-            $this->createMock(UserHelper::class),
+            $this->createStub(UserHelper::class),
             $this->logger,
-            $this->createMock(CoreParametersHelper::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->twig
         );
     }
@@ -106,7 +101,7 @@ class UserModelTest extends TestCase
     {
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->userToken);
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->mailHelper
             ->method('getMailer')
@@ -117,14 +112,13 @@ class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->userToken);
+            ->willReturn($this->createStub(UserToken::class));
 
         $this->router->expects($this->once())
             ->method('generate')
             ->with('mautic_user_passwordresetconfirm', ['token' => null], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
 
@@ -227,13 +221,11 @@ class UserModelTest extends TestCase
 
         $this->entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function (UserInvite $invite) use ($email, $role): bool {
-                return $email === $invite->getEmail()
-                    && 32 === strlen((string) $invite->getTokenSelector())
-                    && str_starts_with((string) $invite->getTokenVerifierHash(), '$')
-                    && $role === $invite->getRole()
-                    && $invite->getExpiration() > new \DateTime();
-            }));
+            ->with($this->callback(fn (UserInvite $invite): bool => $email === $invite->getEmail()
+                && 32 === strlen((string) $invite->getTokenSelector())
+                && str_starts_with((string) $invite->getTokenVerifierHash(), '$')
+                && $role === $invite->getRole()
+                && $invite->getExpiration() > new \DateTime()));
 
         $this->entityManager->expects($this->once())
             ->method('flush');
@@ -319,7 +311,7 @@ class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: token selector was not found', ['selector' => 'missing-selector']);
 
-        $this->assertNull($this->userModel->getInvite('missing-selector.verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('missing-selector.verifier'));
     }
 
     public function testGetInviteReturnsNullWhenInviteExpired(): void
@@ -342,7 +334,7 @@ class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: invite has expired', ['invite_id' => null, 'email' => null]);
 
-        $this->assertNull($this->userModel->getInvite('expired-selector.verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('expired-selector.verifier'));
     }
 
     public function testGetInviteReturnsNullWhenTokenVerifierDoesNotMatch(): void
@@ -366,7 +358,7 @@ class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: token verifier did not match', ['invite_id' => null, 'email' => null]);
 
-        $this->assertNull($this->userModel->getInvite('active-selector.wrong-verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('active-selector.wrong-verifier'));
     }
 
     public function testGetInviteReturnsNullWhenInviteAlreadyUsed(): void
@@ -391,7 +383,7 @@ class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: invite has already been used', ['invite_id' => null, 'email' => null]);
 
-        $this->assertNull($this->userModel->getInvite('used-selector.verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('used-selector.verifier'));
     }
 
     public function testGetInviteReturnsNullWhenTokenFormatIsInvalid(): void
@@ -403,7 +395,7 @@ class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: token format is invalid', []);
 
-        $this->assertNull($this->userModel->getInvite('invalid-token'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('invalid-token'));
     }
 
     public function testGetInviteReturnsActiveInvite(): void

@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 class ModelFactory
 {
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
     }
 
@@ -27,7 +27,7 @@ class ModelFactory
 
         // Shortcut for models with the same name as the bundle
         if (!str_contains($modelNameKey, '.')) {
-            $modelNameKey = "$modelNameKey.$modelNameKey";
+            $modelNameKey = "{$modelNameKey}.{$modelNameKey}";
         }
 
         $parts = explode('.', $modelNameKey);
@@ -51,7 +51,7 @@ class ModelFactory
     /**
      * Check if a model exists.
      */
-    public function hasModel($modelNameKey): bool
+    public function hasModel(string $modelNameKey): bool
     {
         try {
             $this->getModel($modelNameKey);

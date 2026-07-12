@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
+final class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @var array<int, array<string, mixed>>

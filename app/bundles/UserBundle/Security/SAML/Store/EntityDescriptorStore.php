@@ -14,7 +14,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
     private $entityDescriptor;
 
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -43,11 +43,7 @@ class EntityDescriptorStore implements EntityDescriptorStoreInterface
         $entityDescriptor = $this->get($entityId);
 
         // EntityIds do not match
-        if (!$entityDescriptor) {
-            return false;
-        }
-
-        return true;
+        return null !== $entityDescriptor;
     }
 
     /**

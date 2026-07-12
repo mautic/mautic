@@ -64,7 +64,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         $campaignData = $this->fetchCampaignData($campaignId);
 
         if (!$campaignData) {
-            $this->logger->warning("Campaign data not found for ID: $campaignId");
+            $this->logger->warning("Campaign data not found for ID: {$campaignId}");
 
             return;
         }
@@ -109,7 +109,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         $campaign = $this->campaignModel->getEntity($campaignId);
         if (!$campaign) {
-            $this->logger->warning("Campaign not found for ID: $campaignId");
+            $this->logger->warning("Campaign not found for ID: {$campaignId}");
 
             return [];
         }
@@ -336,7 +336,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
         $user = $this->userModel->getEntity($userId);
         if (!$user) {
-            $this->logger->warning("User ID $userId not found. Campaigns will not have a created_by_user field set.");
+            $this->logger->warning("User ID {$userId} not found. Campaigns will not have a created_by_user field set.");
 
             return '';
         }
@@ -631,16 +631,16 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     {
         // Define the possible locations where the channel ID may be stored
         $propertyPaths = [
-            "properties.$channelKey",
+            "properties.{$channelKey}",
             "properties.{$channelKey}s",
-            "properties.properties.$channelKey",
+            "properties.properties.{$channelKey}",
             "properties.properties.{$channelKey}s",
         ];
 
         foreach ($propertyPaths as $path) {
             $existingValue = $this->getNestedValue($event, $path);
 
-            if (!is_null($existingValue)) {
+            if (null !== $existingValue) {
                 if (is_array($existingValue)) {
                     // If the existing value is an array, replace it with a single-element array
                     $this->setNestedValue($event, $path, [$channelId]);
@@ -745,7 +745,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     /**
      * Set a nested array value using dot notation.
      *
-     * @param array<string, mixed> &$array
+     * @param array<string, mixed> $array
      */
     private function setNestedValue(array &$array, string $path, mixed $value): void
     {
@@ -764,11 +764,10 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
     /**
      * @param array<int, array<string, mixed>> $dependencies
-     * @param string                           $entity
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSubDependencies(array $dependencies, $entity): array
+    private function getSubDependencies(array $dependencies, string $entity): array
     {
         foreach ($dependencies as $dependencyGroup) {
             if (isset($dependencyGroup[$entity])) {

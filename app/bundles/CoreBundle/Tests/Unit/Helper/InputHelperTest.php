@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -7,7 +9,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(InputHelper::class)]
-class InputHelperTest extends TestCase
+final class InputHelperTest extends TestCase
 {
     #[\PHPUnit\Framework\Attributes\TestDox('The html returns correct values')]
     public function testHtmlFilter(): void
@@ -59,7 +61,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john..doe@email.com', $clean);
+        $this->assertSame('john..doe@email.com', $clean);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The email returns value without surrounding white spaces')]
@@ -67,7 +69,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('    john.doe@email.com  ');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertSame('john.doe@email.com', $clean);
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The array is cleaned')]
@@ -138,7 +140,9 @@ class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
-    /** @return iterable<array{0: string, 1: string, 2: string, 3?: bool}> */
+    /**
+     * @return iterable<array{0: string, 1: string, 2: string, 3?: bool}>
+     */
     public static function urlProvider(): iterable
     {
         yield [
@@ -255,7 +259,7 @@ class InputHelperTest extends TestCase
     {
         $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
 
-        Assert::assertEquals($cleanedUrl, $outputFilename);
+        Assert::assertSame($cleanedUrl, $outputFilename);
     }
 
     /**
@@ -297,7 +301,7 @@ class InputHelperTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('minifyHTMLProvider')]
     public function testMinifyHTML(string $html, string $expected): void
     {
-        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+        $this->assertSame($expected, InputHelper::minifyHTML($html));
     }
 
     /**

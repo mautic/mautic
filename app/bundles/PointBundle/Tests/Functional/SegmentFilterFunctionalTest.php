@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -10,7 +12,7 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class SegmentFilterFunctionalTest extends MauticMysqlTestCase
+final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -69,7 +71,7 @@ class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertEquals(1, (int) $response['total']);
+        $this->assertSame(1, (int) $response['total']);
         $contactIds = array_column($response['contacts'], 'id');
         $this->assertContains((int) $contactA->getId(), $contactIds);
         $this->assertNotContains((int) $contactB->getId(), $contactIds);

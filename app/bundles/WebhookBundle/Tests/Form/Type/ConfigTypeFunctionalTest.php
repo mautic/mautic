@@ -7,7 +7,7 @@ namespace Mautic\WebhookBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class ConfigTypeFunctionalTest extends MauticMysqlTestCase
+final class ConfigTypeFunctionalTest extends MauticMysqlTestCase
 {
     public function testSendEmailDetailsToggleIsOnByDefault(): void
     {

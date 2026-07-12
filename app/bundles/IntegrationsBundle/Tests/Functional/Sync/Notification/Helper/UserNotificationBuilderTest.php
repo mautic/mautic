@@ -10,14 +10,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 
-class UserNotificationBuilderTest extends MauticMysqlTestCase
+final class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
-    /**
-     * @var UserNotificationBuilder
-     */
-    private $notificationBuilder;
+    private UserNotificationBuilder $notificationBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -40,6 +37,7 @@ class UserNotificationBuilderTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $userIds = $this->notificationBuilder->getUserIds('lead', (int) $lead->getId());
+        $this->assertInstanceOf(User::class, $user);
 
         Assert::assertSame([$user->getId()], $userIds);
     }

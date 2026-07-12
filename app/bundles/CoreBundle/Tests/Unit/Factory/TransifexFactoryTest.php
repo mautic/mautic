@@ -12,15 +12,10 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
-class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
+final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ClientInterface&MockObject
-     */
-    private MockObject $client;
-
-    /**
-     * @var CoreParametersHelper&MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
@@ -28,9 +23,8 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->client               = $this->createMock(ClientInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->transifexFactory     = new TransifexFactory($this->client, $this->coreParametersHelper);
+        $this->transifexFactory     = new TransifexFactory($this->createStub(ClientInterface::class), $this->coreParametersHelper);
     }
 
     public function testCreatingTransifexWithoutCredentials(): void

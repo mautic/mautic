@@ -21,8 +21,8 @@ use Symfony\Component\Routing\RouterInterface;
 class ContactObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private ContactObjectHelper $contactObjectHelper,
-        private RouterInterface $router,
+        private readonly ContactObjectHelper $contactObjectHelper,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -85,7 +85,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
 
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Contact::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
             return;
         }
 

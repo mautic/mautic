@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 
-class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
+final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -51,6 +51,7 @@ class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         // Modify custom field (add trailing spaces)
         $updatedField = $this->em->getRepository(LeadField::class)
           ->findOneBy(['alias' => 'industry_type']);
+        $this->assertInstanceOf(LeadField::class, $updatedField);
 
         $updatedField->setProperties([
             'list' => [
@@ -78,6 +79,7 @@ class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         // Validate result
         $reloadedEvent = $this->em->getRepository(CampaignEvent::class)
           ->findOneBy(['name' => 'Update Industry']);
+        $this->assertInstanceOf(CampaignEvent::class, $reloadedEvent);
 
         $props = $reloadedEvent->getProperties();
 
