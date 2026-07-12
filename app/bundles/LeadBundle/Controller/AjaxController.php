@@ -598,7 +598,7 @@ class AjaxController extends CommonAjaxController
                 if (!is_numeric($utmTag)) {
                     // New tag
                     $utmTagEntity = new UtmTag();
-                    $utmTagEntity->setUtmTag(InputHelper::clean($utmTag));
+                    $utmTagEntity->setUtmContent(InputHelper::clean($utmTag));
                     $newUtmTags[] = $utmTagEntity;
                 }
             }
