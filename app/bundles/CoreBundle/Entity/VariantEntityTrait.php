@@ -20,9 +20,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var VariantEntityInterface|null
-     *
-     * @phpstan-var T|null
+     * @var T|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
