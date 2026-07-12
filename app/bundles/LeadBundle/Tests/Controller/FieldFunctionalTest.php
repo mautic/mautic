@@ -232,8 +232,8 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $urlEncodedSearch = urlencode('ids:2,3');
         $this->client->request(Request::METHOD_GET, "/s/contacts/fields?search={$urlEncodedSearch}");
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('First Name', $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('Last Name', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('First Name', (string) $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('Last Name', (string) $this->client->getResponse()->getContent());
     }
 
     /**

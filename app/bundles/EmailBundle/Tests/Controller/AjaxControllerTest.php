@@ -116,7 +116,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->sessionMock->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): array|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.progress', $parameters[0]);
 
@@ -132,6 +132,8 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->emailMock->expects($this->once())
@@ -164,7 +166,7 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(3);
 
         $this->sessionMock->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): array|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.email.send.progress', $parameters[0]);
 
@@ -180,6 +182,8 @@ final class AjaxControllerTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->emailMock->expects($this->once())

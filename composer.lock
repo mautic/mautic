@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3cd360ce1cfc5d693ce7a7439aaad9e6",
+    "content-hash": "531da3df238394fc4db84155cff98a4a",
     "packages": [
         {
             "name": "api-platform/core",
@@ -16535,11 +16535,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.2.2",
+            "version": "2.2.5",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e5cc34d491a90e79c216d824f60fe21fd4d93bd6",
-                "reference": "e5cc34d491a90e79c216d824f60fe21fd4d93bd6",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/909c1e5fef7989ac0d0c1c5c42e32a5c4f6198a0",
+                "reference": "909c1e5fef7989ac0d0c1c5c42e32a5c4f6198a0",
                 "shasum": ""
             },
             "require": {
@@ -16595,7 +16595,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-05T09:00:01+00:00"
+            "time": "2026-07-05T06:31:06+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -17801,16 +17801,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.5.5",
+            "version": "2.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "9718a72e7f1aacacbdcb6eeed07a47147bce802e"
+                "reference": "c329e210d17f86d70424f2688e1294495f44c670"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/9718a72e7f1aacacbdcb6eeed07a47147bce802e",
-                "reference": "9718a72e7f1aacacbdcb6eeed07a47147bce802e",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/c329e210d17f86d70424f2688e1294495f44c670",
+                "reference": "c329e210d17f86d70424f2688e1294495f44c670",
                 "shasum": ""
             },
             "require": {
@@ -17849,7 +17849,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.5.5"
+                "source": "https://github.com/rectorphp/rector/tree/2.5.6"
             },
             "funding": [
                 {
@@ -17857,7 +17857,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-09T09:48:44+00:00"
+            "time": "2026-07-12T10:21:06+00:00"
         },
         {
             "name": "sebastian/cli-parser",

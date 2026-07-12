@@ -1608,7 +1608,7 @@ final class MailHelperTest extends TestCase
 
         $body = $transport->getMessage()->getHtmlBody();
 
-        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', (string) $body);
         $this->assertSame(2, substr_count($body, 'cid:'));
 
         $metadata = $transport->getMessage()->getMetadata();

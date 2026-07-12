@@ -169,7 +169,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $matcher         = $this->exactly(6);
 
         $request->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): string|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals('utm_campaign', $parameters[0]);
 
@@ -200,6 +200,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->requestStack->expects($this->once())
@@ -251,8 +253,9 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('persist')
             ->with($this->callback(function ($downloadPersist) use (&$download): bool {
                 $download = $downloadPersist;
+                $this->assertInstanceOf(Download::class, $download);
 
-                return $download instanceof Download;
+                return true;
             }));
 
         $this->entityManager->expects($this->once())

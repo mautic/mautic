@@ -34,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class CommonRepository extends ServiceEntityRepository
 {
     /**
-     * @phpstan-param class-string<T>|null $entityFQCN
+     * @param class-string<T>|null $entityFQCN
      */
     public function __construct(ManagerRegistry $registry, ?string $entityFQCN = null)
     {

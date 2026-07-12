@@ -64,7 +64,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $content      = \json_decode($response->getContent(), true);
         $expectedLink = rtrim($expectedLink, '/').'/'.$entity->getId();
 
-        $this->assertStringContainsString($expectedLink, $content['newContent']);
+        $this->assertStringContainsString($expectedLink, (string) $content['newContent']);
     }
 
     /**
@@ -296,7 +296,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $content = \json_decode($response->getContent(), true);
-        $this->assertStringContainsString('s/users/edit/'.$user->getId(), $content['newContent']);
+        $this->assertStringContainsString('s/users/edit/'.$user->getId(), (string) $content['newContent']);
     }
 
     /**
@@ -333,7 +333,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
         $this->assertGlobalSearchNotResult($content['newContent']);
 
-        $this->assertStringNotContainsString($notExpectedLink, $content['newContent']);
+        $this->assertStringNotContainsString($notExpectedLink, (string) $content['newContent']);
     }
 
     /**
@@ -448,8 +448,8 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $content = \json_decode($response->getContent(), true);
 
         $translator = self::getContainer()->get('translator');
-        $this->assertStringContainsString('s/contacts?search='.$searchString, $content['newContent']);
-        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), $content['newContent']);
+        $this->assertStringContainsString('s/contacts?search='.$searchString, (string) $content['newContent']);
+        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), (string) $content['newContent']);
 
         $crawler = new Crawler($content['newContent']);
         $this->assertCount(4, $crawler->filterXPath("//li[contains(@class, 'gsearch--results-item')]"));
@@ -462,8 +462,8 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $content = \json_decode($response->getContent(), true);
 
         $translator = self::getContainer()->get('translator');
-        $this->assertStringContainsString('s/credentials?search='.$searchString, $content['newContent']);
-        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), $content['newContent']);
+        $this->assertStringContainsString('s/credentials?search='.$searchString, (string) $content['newContent']);
+        $this->assertStringContainsString($translator->trans('mautic.core.search.more', ['%count%' => 1]), (string) $content['newContent']);
 
         $crawler = new Crawler($content['newContent']);
         $this->assertCount(4, $crawler->filterXPath("//li[contains(@class, 'gsearch--results-item')]"));
