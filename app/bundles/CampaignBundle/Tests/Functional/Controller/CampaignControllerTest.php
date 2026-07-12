@@ -53,9 +53,9 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($this->contactOne->getName(), $content);
-        $this->assertStringContainsString($this->contactTwo->getName(), $content);
-        $this->assertStringContainsString($this->contactThree->getName(), $content);
+        $this->assertStringContainsString($this->contactOne->getName(), (string) $content);
+        $this->assertStringContainsString($this->contactTwo->getName(), (string) $content);
+        $this->assertStringContainsString($this->contactThree->getName(), (string) $content);
     }
 
     /**
@@ -74,7 +74,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('No Contacts Found', $content, $content);
+        $this->assertStringContainsString('No Contacts Found', (string) $content, $content);
     }
 
     /**
@@ -253,7 +253,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
-        $this->assertStringContainsString('.zip', $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('.zip', (string) $response->headers->get('Content-Disposition'));
     }
 
     public function testBatchExportAction(): void
@@ -328,7 +328,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $responseData = json_decode($responseContent, true);
 
         $this->assertArrayHasKey('error', $responseData);
-        $this->assertStringContainsString('Export file could not be created', $responseData['error']);
+        $this->assertStringContainsString('Export file could not be created', (string) $responseData['error']);
 
         $this->assertArrayHasKey('flashes', $responseData);
     }
@@ -387,6 +387,6 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $responseData = json_decode($responseContent, true);
 
         $this->assertArrayHasKey('error', $responseData);
-        $this->assertStringContainsString('Export file could not be created', $responseData['error']);
+        $this->assertStringContainsString('Export file could not be created', (string) $responseData['error']);
     }
 }

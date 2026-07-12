@@ -42,7 +42,7 @@ final class TimelineControllerTest extends MauticMysqlTestCase
             'leadId' => $contact->getId(),
         ]);
 
-        $this->assertStringContainsString('Contact added to segment, TEST', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Contact added to segment, TEST', (string) $this->client->getResponse()->getContent());
     }
 
     /**
