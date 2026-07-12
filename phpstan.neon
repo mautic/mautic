@@ -158,10 +158,23 @@ parameters:
 		-
 			identifier: classConstant.deprecated
 			message: '#class Mautic#'
+<<<<<<< HEAD
 		# child class generic
 		-
 			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
+=======
+<<<<<<< HEAD
+=======
+        # false positive
+		-
+			message: '#Call to private method getRepository\(\) of class Mautic\\AssetBundle\\Model\\AssetModel#'
+			paths:
+				- app/bundles/CoreBundle/Helper/BuilderTokenHelper.php
+				- app/bundles/CoreBundle/Controller/AjaxController.php
+
+>>>>>>> ce8554495c (improve direct ModelFactory with generics)
+>>>>>>> a0648866d5 ([phpstan] add conditional return type to getModel() to improve PHPStan support)
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
