@@ -10,6 +10,9 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
+/**
+ * @template TApiHelper of CrmApi
+ */
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
@@ -148,7 +151,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return CrmApi
+     * @return TApiHelper
      */
     public function getApiHelper()
     {
