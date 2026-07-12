@@ -112,10 +112,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerBatchAction(): void
     {
         $sms = $this->createMock(Sms::class);
-        $sms->expects($this->any())
+        $sms
             ->method('getId')
             ->willReturn(1);
-        $sms->expects($this->any())
+        $sms
             ->method('isPublished')
             ->willReturn(true);
 

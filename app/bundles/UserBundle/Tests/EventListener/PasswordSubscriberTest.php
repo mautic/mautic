@@ -29,7 +29,7 @@ final class PasswordSubscriberTest extends TestCase
         $this->passwordSubscriber             = new PasswordSubscriber($passwordStrengthEstimatorModel);
         $authenticationEvent                  = $this->createMock(AuthenticationEvent::class);
 
-        $authenticationEvent->expects($this->any())
+        $authenticationEvent
             ->method('getToken')
             ->willReturn($this->createStub(PluginToken::class));
     }

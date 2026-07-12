@@ -148,7 +148,7 @@ final class EmailControllerTest extends TestCase
             ->with(5)
             ->willReturn(null);
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
@@ -181,7 +181,7 @@ final class EmailControllerTest extends TestCase
             ->with(5)
             ->willReturn($this->emailMock);
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 

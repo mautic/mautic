@@ -76,8 +76,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->leadFieldModel        = $this->createMock(LeadFieldModel::class);
         $this->formRepository        = $this->createMock(FormRepository::class);
 
-        $entityManager->expects($this
-            ->any())
+        $entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [

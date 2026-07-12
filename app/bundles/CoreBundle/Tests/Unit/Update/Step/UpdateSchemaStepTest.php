@@ -119,7 +119,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -145,7 +145,7 @@ final class UpdateSchemaStepTest extends AbstractStepTestCase
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 

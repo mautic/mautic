@@ -88,7 +88,7 @@ final class SearchSubscriberTest extends TestCase
         $leadModel->method('getRepository')
             ->willReturn($contactRepository);
 
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
             ->willReturnCallback(function ($key): string|array|null {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
