@@ -354,7 +354,7 @@ final class ObjectChangeGeneratorTest extends TestCase
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class implements SyncJudgeInterface {
+            new class() implements SyncJudgeInterface {
                 public function adjudicate(
                     $mode,
                     InformationChangeRequestDAO $leftChangeRequest,
@@ -363,9 +363,9 @@ final class ObjectChangeGeneratorTest extends TestCase
                     return $leftChangeRequest;
                 }
             },
-            new class extends ValueHelper {
+            new class() extends ValueHelper {
             },
-            new class extends FieldHelper {
+            new class() extends FieldHelper {
                 public function __construct()
                 {
                 }
@@ -377,7 +377,7 @@ final class ObjectChangeGeneratorTest extends TestCase
                     return ['email' => []];
                 }
             },
-            new class extends BulkNotification {
+            new class() extends BulkNotification {
                 public function __construct()
                 {
                 }

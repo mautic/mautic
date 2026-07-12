@@ -617,7 +617,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     private function getFieldPaginatorFake(): Paginator
     {
-        return new class extends Paginator {
+        return new class() extends Paginator {
             public function __construct()
             {
             }
