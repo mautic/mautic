@@ -508,7 +508,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param array $objects
+     * @param string[]|string|null $objects
      *
      * @return array
      */

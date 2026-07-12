@@ -157,6 +157,10 @@ parameters:
 		-
 			identifier: classConstant.deprecated
 			message: '#class Mautic#'
+		# child class generic
+		-
+			message: '#Call to an undefined method TApiHelper of MauticPlugin\\MauticCrmBundle\\Api\\CrmApi::getLeads\(\)#'
+			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 	scanFiles:
 		# This is here because a few functions in the global namespace are defined in this file
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
