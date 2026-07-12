@@ -17,9 +17,7 @@ final class FormFieldSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        $fieldModel = $this->createMock(FieldModel::class);
-
-        $this->subscriber = new FormFieldSubscriber($fieldModel);
+        $this->subscriber = new FormFieldSubscriber($this->createStub(FieldModel::class));
     }
 
     public function testGetSubscribedEvents(): void

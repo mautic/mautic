@@ -366,7 +366,7 @@ final class InputHelperTest extends TestCase
         $rawResult           = InputHelper::raw($valueWithApostrophe);
 
         $this->assertNotEquals($valueWithApostrophe, $cleanResult);
-        $this->assertStringContainsString('&#', $cleanResult);
+        $this->assertStringContainsString('&#', (string) $cleanResult);
 
         $this->assertEquals($valueWithApostrophe, $rawResult);
     }

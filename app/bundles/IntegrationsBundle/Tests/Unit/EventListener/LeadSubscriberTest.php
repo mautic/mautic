@@ -419,7 +419,7 @@ final class LeadSubscriberTest extends TestCase
         $integrationName     = 'testIntegration';
         $enabledIntegrations = [$integrationName];
 
-        $this->syncIntegrationsHelper->expects($this->any())
+        $this->syncIntegrationsHelper
             ->method('getEnabledIntegrations')
             ->willReturn($enabledIntegrations);
 

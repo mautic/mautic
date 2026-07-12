@@ -26,8 +26,8 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString($name, $this->client->getResponse()->getContent());
-        $this->assertStringContainsString($desc, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($name, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($desc, (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditRoleAction(): void
@@ -50,7 +50,7 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString($updatedName, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($updatedName, (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexActionCanSortByUserCount(): void

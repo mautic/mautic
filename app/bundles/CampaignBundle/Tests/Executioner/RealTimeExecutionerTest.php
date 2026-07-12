@@ -59,9 +59,7 @@ final class RealTimeExecutionerTest extends TestCase
 
         $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-
-        $this->decisionHelper    = new DecisionHelper($leadRepository);
+        $this->decisionHelper    = new DecisionHelper($this->createStub(LeadRepository::class));
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
         // Configure the redirection helper mock to return the event it receives

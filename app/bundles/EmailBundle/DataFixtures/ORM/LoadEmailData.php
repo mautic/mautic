@@ -31,7 +31,7 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface
                     if (in_array($col, ['content', 'variantSettings'])) {
                         $val = Serializer::decode(stripslashes($val));
                     }
-                    $email->$setter($val);
+                    $email->{$setter}($val);
                 }
             }
             $email->addList($this->getReference('lead-list'));

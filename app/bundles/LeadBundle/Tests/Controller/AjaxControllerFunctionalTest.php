@@ -157,7 +157,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
         $response = $this->client->getResponse();
         self::assertResponseStatusCodeSame(400);
-        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
+        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', (string) $response->getContent());
     }
 
     public function testCompanyLookupWithLimit(): void
@@ -635,8 +635,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert the response is successful
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('<form', $htmlContent, 'Response contains a form instead of just field order.');
-        $this->assertStringContainsString('<select', $htmlContent, 'Response contains select tag.');
+        $this->assertStringNotContainsString('<form', (string) $htmlContent, 'Response contains a form instead of just field order.');
+        $this->assertStringContainsString('<select', (string) $htmlContent, 'Response contains select tag.');
 
         // Parse the HTML content using DOMDocument
         $dom = new \DOMDocument();
@@ -697,7 +697,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
         $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
 
-        $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
+        $this->assertStringContainsString('Contact is now contactable on the email channel', (string) $response['flashes'], 'Flash message about channel being contactable should be present');
     }
 
     public function testRemoveBounceStatusActionWithFlashMessage(): void
@@ -729,7 +729,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue(isset($response['flashes']), 'The response should contain flashes');
         $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
 
-        $this->assertStringContainsString('Contact is now contactable on the email channel', $response['flashes'], 'Flash message about channel being contactable should be present');
+        $this->assertStringContainsString('Contact is now contactable on the email channel', (string) $response['flashes'], 'Flash message about channel being contactable should be present');
     }
 
     public function testFieldListAction(): void
@@ -846,7 +846,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
         Assert::assertArrayHasKey('viewParameters', $response);
-        Assert::assertStringContainsString('data-model="category.category"', $response['viewParameters']['form']);
+        Assert::assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
     }
 
     /**

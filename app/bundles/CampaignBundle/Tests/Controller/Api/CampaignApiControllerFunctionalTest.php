@@ -506,6 +506,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignNoFileUploaded(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Attempt to import with no files
@@ -514,12 +515,13 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', $response->getContent());
+        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', (string) $response->getContent());
     }
 
     public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $campaign = new Campaign();
@@ -555,6 +557,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignInvalidFile(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Create a temporary file
@@ -568,7 +571,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', (string) $response->getContent());
 
         // Clean up
         unlink($filePath);
@@ -577,6 +580,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testImportCampaignUnsupportedFileType(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         // Create a temporary file with a non-ZIP extension
@@ -588,7 +592,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', (string) $response->getContent());
 
         // Clean up
         unlink($filePath);
@@ -618,7 +622,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             $response = $this->client->getResponse();
 
             $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-            $this->assertStringContainsString('Invalid JSON', $response->getContent());
+            $this->assertStringContainsString('Invalid JSON', (string) $response->getContent());
         } finally {
             // Clean up - check if file exists before trying to delete
             if (file_exists($zipPath)) {

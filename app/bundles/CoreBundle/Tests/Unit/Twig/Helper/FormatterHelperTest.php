@@ -24,14 +24,13 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
         $dateHelper                 = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $this->translator,
-            $coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->formatterHelper               = new FormatterHelper($dateHelper, $this->translator);
     }
@@ -56,7 +55,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $matcher = $this->exactly(2);
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.yes', $parameters[0]);
 
@@ -67,6 +66,8 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
                     return 'no';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $result = $this->formatterHelper->_(1, 'bool');

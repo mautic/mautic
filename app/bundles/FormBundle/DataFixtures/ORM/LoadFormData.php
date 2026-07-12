@@ -128,7 +128,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
                         $val = stripslashes($val);
                         $form->setCachedHtml($val);
                     } else {
-                        $form->$setter($val);
+                        $form->{$setter}($val);
                     }
                 }
             }
@@ -158,9 +158,9 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
                         $form->addField($count, $field);
                     } elseif (in_array($col, ['customParameters', 'properties'], true)) {
                         $val = Serializer::decode(stripslashes($val));
-                        $field->$setter($val);
+                        $field->{$setter}($val);
                     } else {
-                        $field->$setter($val);
+                        $field->{$setter}($val);
                     }
                 }
             }
@@ -188,7 +188,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
                         $val = Serializer::decode(stripslashes($val));
                         $action->setProperties($val);
                     } else {
-                        $action->$setter($val);
+                        $action->{$setter}($val);
                     }
                 }
             }

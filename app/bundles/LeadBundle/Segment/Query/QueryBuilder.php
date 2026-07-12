@@ -28,7 +28,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function expr()
     {
-        if (!is_null($this->_expr)) {
+        if (null !== $this->_expr) {
             return $this->_expr;
         }
 
@@ -225,7 +225,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     public function getTableAlias(string $table, $joinType = null)
     {
-        if (is_null($joinType)) {
+        if (null === $joinType) {
             $tables = $this->getTableAliases();
 
             return $tables[$table] ?? false;
@@ -391,7 +391,7 @@ class QueryBuilder extends BaseQueryBuilder
         //  Different handling
         if ('or' === $glue) {
             //  Is this the first condition in query builder?
-            if (!is_null($this->getQueryPart('where'))) {
+            if (null !== $this->getQueryPart('where')) {
                 // Are the any queued conditions?
                 if ($this->hasLogicStack()) {
                     // We need to apply current stack to the query builder
@@ -437,7 +437,7 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function &parentProperty(string $property)
     {
-        return \Closure::bind(fn &() => $this->$property, $this, parent::class)();
+        return \Closure::bind(fn &() => $this->{$property}, $this, parent::class)();
     }
 
     /**
@@ -447,6 +447,6 @@ class QueryBuilder extends BaseQueryBuilder
      */
     private function parentMethod(string $method, ...$arguments)
     {
-        return \Closure::bind(fn () => $this->$method(...$arguments), $this, parent::class)();
+        return \Closure::bind(fn () => $this->{$method}(...$arguments), $this, parent::class)();
     }
 }

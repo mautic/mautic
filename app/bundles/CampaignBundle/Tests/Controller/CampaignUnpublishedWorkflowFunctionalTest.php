@@ -117,8 +117,8 @@ final class CampaignUnpublishedWorkflowFunctionalTest extends AbstractCampaignTe
         $content = $response->getContent();
 
         foreach ($attributes as $key => $val) {
-            $this->assertStringContainsString($key, $content);
-            $this->assertStringContainsString($val, $content);
+            $this->assertStringContainsString($key, (string) $content);
+            $this->assertStringContainsString($val, (string) $content);
         }
     }
 }

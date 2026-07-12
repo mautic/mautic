@@ -330,7 +330,7 @@ class LeadFieldRepository extends CommonRepository
                 // include null
                 $expr = $expr->with(
                     $q->expr()->or(
-                        $q->expr()->$operatorExpr($property, ':value'),
+                        $q->expr()->{$operatorExpr}($property, ':value'),
                         $q->expr()->isNull($property)
                     )
                 );
@@ -351,7 +351,7 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $expr = $expr->with(
-                    $q->expr()->$operatorExpr($property, ':value')
+                    $q->expr()->{$operatorExpr}($property, ':value')
                 );
             }
 
