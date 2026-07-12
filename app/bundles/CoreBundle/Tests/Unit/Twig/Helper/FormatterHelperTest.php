@@ -97,7 +97,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     public function testNormalizeStringValue(string|int|bool|\DateTime $input, string|int|bool|\DateTime $expected): void
     {
         date_default_timezone_set('Europe/Paris');
-        $this->assertEquals($this->formatterHelper->normalizeStringValue($input), $expected);
+        $this->assertSame($this->formatterHelper->normalizeStringValue($input), $expected);
     }
 
     /**

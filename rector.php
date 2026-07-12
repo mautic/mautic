@@ -18,7 +18,11 @@ return RectorConfig::configure()
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
     ])
-    ->withPreparedSets(deadCode: true, typeDeclarations: true)
+    ->withPreparedSets(
+        deadCode: true,
+        typeDeclarations: true,
+        // phpunitCodeQuality: true,
+    )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
     ->withTypeGuardedClasses([
@@ -47,6 +51,11 @@ return RectorConfig::configure()
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
+
+        // phpunit specific asserts
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertIssetToSpecificMethodRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWithMethodRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -58,10 +67,16 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
 
+<<<<<<< HEAD
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
         ],
+=======
+        // waits for descission
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
+>>>>>>> 5ce67e265f ([tests] use more precise asserts)
 
         // offer next
         Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,

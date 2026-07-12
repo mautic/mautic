@@ -34,7 +34,7 @@ final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->contentHelper->showScriptTags($sample);
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     private function doShowTagsContext(string $tag): void
@@ -61,6 +61,6 @@ final class ContentHelperTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->contentHelper->showScriptTags($sample);
 
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 }

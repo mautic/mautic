@@ -114,7 +114,7 @@ final class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertFalse($result['error']);
 
         $updatePackage = __DIR__.'/resource/update/tmp/update.zip';
@@ -136,7 +136,7 @@ final class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertTrue($result['error']);
         $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
