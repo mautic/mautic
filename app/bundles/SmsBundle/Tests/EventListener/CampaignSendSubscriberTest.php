@@ -42,14 +42,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')->willReturn('mautic.sms.campaign.failed.missing_entity');
 
         $event    = new Event();
-        $campaign = new class extends Campaign {
+        $campaign = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
             }
         };
         $contact = new Lead();
-        $leadLog = new class extends LeadEventLog {
+        $leadLog = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
@@ -76,14 +76,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $sms      = new Sms();
         $event    = new Event();
         $contact  = new Lead();
-        $leadLog  = new class extends LeadEventLog {
+        $leadLog  = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;
             }
         };
 
-        $campaign  = new class extends Campaign {
+        $campaign  = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
@@ -129,14 +129,14 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $smsModel->method('getEntity')->willReturn($sms);
 
         $event     = new Event();
-        $campaign  = new class extends Campaign {
+        $campaign  = new class() extends Campaign {
             public function getId(): int
             {
                 return 111;
             }
         };
         $contact  = new Lead();
-        $leadLog  = new class extends LeadEventLog {
+        $leadLog  = new class() extends LeadEventLog {
             public function getId(): int
             {
                 return 456;

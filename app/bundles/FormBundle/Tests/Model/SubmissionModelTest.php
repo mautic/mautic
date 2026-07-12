@@ -311,7 +311,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $server    = $request->server->all();
         $form      = new Form();
         $fields    = $this->getTestFormFields();
-        $formModel = new class extends FormModel {
+        $formModel = new class() extends FormModel {
             public function __construct()
             {
             }

@@ -99,7 +99,7 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
     public function testSendEmailWithNoError(): void
     {
         $lead  = new Lead();
-        $owner = new class extends User {
+        $owner = new class() extends User {
             public function getId(): int
             {
                 return 10;
@@ -116,7 +116,7 @@ final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ->with(33)
             ->willReturn($email);
 
-        $emailSendEvent                           = new class extends EmailSendEvent {
+        $emailSendEvent                           = new class() extends EmailSendEvent {
             public int $getTokenMethodCallCounter = 0;
 
             public function __construct()
