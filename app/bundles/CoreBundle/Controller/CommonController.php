@@ -84,8 +84,9 @@ class CommonController extends AbstractController implements MauticController
     /**
      * Get a model instance from the service container.
      *
+     * For long return map @see https://phpstan.org/blog/phpstan-1-6-0-with-conditional-return-types
+     *
      * @param string $modelNameKey
-<<<<<<< HEAD
      *
      * @return ($modelNameKey is 'asset' ? \Mautic\AssetBundle\Model\AssetModel
      * : ($modelNameKey is 'campaign' ? \Mautic\CampaignBundle\Model\CampaignModel
@@ -115,7 +116,7 @@ class CommonController extends AbstractController implements MauticController
      * : ($modelNameKey is 'lead.list' ? \Mautic\LeadBundle\Model\ListModel
      * : ($modelNameKey is 'lead.note' ? \Mautic\LeadBundle\Model\NoteModel
      * : ($modelNameKey is 'lead.tag' ? \Mautic\LeadBundle\Model\TagModel
-     * : ($modelNameKey is 'notification' ? \Mautic\NotificationBundle\Model\NotificationModel
+     * : ($modelNameKey is 'notification' ? \Mautic\CoreBundle\Model\NotificationModel
      * : ($modelNameKey is 'page' ? \Mautic\PageBundle\Model\PageModel
      * : ($modelNameKey is 'page.page' ? \Mautic\PageBundle\Model\PageModel
      * : ($modelNameKey is 'page.trackable' ? \Mautic\PageBundle\Model\TrackableModel
@@ -137,8 +138,6 @@ class CommonController extends AbstractController implements MauticController
      * : ($modelNameKey is 'user.user' ? \Mautic\UserBundle\Model\UserModel
      * : ($modelNameKey is 'webhook' ? \Mautic\WebhookBundle\Model\WebhookModel
      *     : \Mautic\CoreBundle\Model\AbstractCommonModel<object>)))))))))))))))))))))))))))))))))))))))))))))))))
-=======
->>>>>>> ce8554495c (improve direct ModelFactory with generics)
      */
     protected function getModel($modelNameKey): \Mautic\CoreBundle\Model\MauticModelInterface
     {
