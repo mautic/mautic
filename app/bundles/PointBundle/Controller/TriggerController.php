@@ -7,6 +7,8 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -398,7 +400,10 @@ class TriggerController extends FormController
                     ])
                 );
             }
-            if ($form->get('buttons')->get('apply')->isClicked()) {
+
+            /** @var Button&ClickableInterface $applyButton */
+            $applyButton = $form->get('buttons')->get('apply');
+            if ($applyButton->isClicked()) {
                 // do not clear session, just reload view with updated session
                 $cleanSlate = false;
             }

@@ -18,6 +18,8 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -395,7 +397,9 @@ class ListController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('apply')->isClicked()) {
+                    /** @var Button&ClickableInterface $applyButton */
+                    $applyButton = $form->get('buttons')->get('apply');
+                    if ($applyButton->isClicked()) {
                         $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;

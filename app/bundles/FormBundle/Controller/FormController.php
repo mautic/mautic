@@ -25,6 +25,8 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -685,7 +687,10 @@ class FormController extends CommonFormController
                     )
                 );
             }
-            if ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+
+            /** @var Button&ClickableInterface $applyButton */
+            $applyButton = $form->get('buttons')->get('apply');
+            if ($valid && $applyButton->isClicked()) {
                 // Rebuild everything to include new ids
                 $reorder    = true;
 
