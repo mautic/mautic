@@ -37,6 +37,9 @@ return RectorConfig::configure()
         MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
     ])
     ->withRules([
+
+        \Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
+
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
         Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ChangeMockObjectReturnUnionToIntersectionRector::class,
@@ -54,6 +57,11 @@ return RectorConfig::configure()
 
         Rector\TypeDeclaration\Rector\ClassMethod\ArrayParamTypeByMethodCallTypeRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
+        ],
+
+        // fix in rector-dev
+        \Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
+            __DIR__ . '/app/bundles/CoreBundle/Entity/CommonRepository.php',
         ],
 
         // offer next
