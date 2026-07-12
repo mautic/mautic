@@ -68,11 +68,22 @@ return RectorConfig::configure()
         ],
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
         ],
 =======
+=======
+        // fixed on dev
+        //        RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
+        //            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
+        //        ],
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
+        ],
+
+>>>>>>> c4d66bdfcb (skips)
         // waits for descission
         Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
         Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
