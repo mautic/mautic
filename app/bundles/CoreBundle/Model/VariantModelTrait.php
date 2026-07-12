@@ -92,6 +92,7 @@ trait VariantModelTrait
         if ($isVariant) {
             // Reset the variant hit and start date if there are any changes and if this is an A/B test
             // Do it here in addition to postVariantSave() so that it's available to the event listeners
+            /** @var TranslationEntityInterface $entity */
             $changes = $entity->getChanges();
 
             // If unpublished and wasn't changed from published - don't reset
