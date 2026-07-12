@@ -386,7 +386,7 @@ class InstallCommand extends Command
                     // Set all step fields based on parameters
                     foreach ($step as $key => $value) {
                         if (isset($params[$key])) {
-                            $step->$key = $params[$key];
+                            $step->{$key} = $params[$key];
                         }
                     }
                 }

@@ -478,6 +478,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->setUpSymfony($configParams);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $mockHandler = $this->getClientMockHandler();
@@ -531,6 +532,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $this->setUpSymfony($configParams);
 
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $this->setCsrfHeader();
@@ -553,6 +555,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $name]);
+        $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $name);

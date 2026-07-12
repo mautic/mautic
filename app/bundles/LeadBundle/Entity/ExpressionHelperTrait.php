@@ -27,11 +27,11 @@ trait ExpressionHelperTrait
 
         if ($includeIsNull) {
             $expr = $q->expr()->or(
-                $q->expr()->$operator($column, $parameter),
+                $q->expr()->{$operator}($column, $parameter),
                 $q->expr()->isNull($column)
             );
         } else {
-            $expr = $q->expr()->$operator($column, $parameter);
+            $expr = $q->expr()->{$operator}($column, $parameter);
         }
 
         if ($appendTo) {

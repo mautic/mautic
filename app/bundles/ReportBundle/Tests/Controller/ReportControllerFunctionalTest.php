@@ -402,10 +402,10 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $buttonCrawler  =  $crawler->selectButton('Save & Close');
         $form           = $buttonCrawler->form();
         $form['report[scheduleUnit]']->setValue($newScheduleUnit);
-        if (!is_null($newScheduleDay)) {
+        if (null !== $newScheduleDay) {
             $form['report[scheduleDay]']->setValue($newScheduleDay);
         }
-        if (!is_null($newScheduleMonthFrequency)) {
+        if (null !== $newScheduleMonthFrequency) {
             $form['report[scheduleMonthFrequency]']->setValue($newScheduleMonthFrequency);
         }
 

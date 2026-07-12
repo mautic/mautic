@@ -287,7 +287,7 @@ class MenuHelper
                 }
 
                 foreach ($checkConfig as $name => $value) {
-                    if (false === $this->$checkMethod($name, $value)) {
+                    if (false === $this->{$checkMethod}($name, $value)) {
                         return false;
                     }
                 }

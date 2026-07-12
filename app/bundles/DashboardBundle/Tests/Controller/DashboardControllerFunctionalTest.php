@@ -37,6 +37,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setParams(['graph' => sprintf('%s:mautic.lead.graph.line.leads', $report->getId())]);
         $widget->setWidth(100);
         $widget->setHeight(200);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
 
@@ -76,6 +77,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setParams(['timeFormat' => 24, 'segmentId' => $segment->getId()]);
         $widget->setWidth(100);
         $widget->setHeight(200);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
 
@@ -105,6 +107,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
     public function testWidgetWithSegmentBuildTime(): void
     {
         $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $this->assertInstanceOf(User::class, $user);
         $this->createSegment('A', 'a', 3, $user);
         $this->createSegment('B', 'b', 60, $user);
         $this->createSegment('C', 'c', 66, $user);
@@ -154,6 +157,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setType('recent.activity');
         $widget->setWidth(100);
         $widget->setHeight(300);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
         $this->em->persist($widget);
         $this->em->flush();
@@ -212,6 +216,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $widget->setType('upcoming.emails');
         $widget->setWidth(50);
         $widget->setHeight(330);
+        $this->assertInstanceOf(User::class, $user);
         $widget->setCreatedBy($user);
 
         $this->em->persist($widget);

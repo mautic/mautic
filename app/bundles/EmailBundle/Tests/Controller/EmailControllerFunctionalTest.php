@@ -864,18 +864,18 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
         Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
-        Assert::assertSame($publishedByDefault, is_null($isUnpublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
+        Assert::assertSame($publishedByDefault, null === $isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
         Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
-        Assert::assertSame($publishedByDefault, !is_null($isPublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
+        Assert::assertSame($publishedByDefault, null !== $isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
-        Assert::assertSame($expectDisabled, !is_null($publishUpInput->attr('disabled')));
-        Assert::assertSame($expectDisabled, !is_null($publishDownInput->attr('disabled')));
+        Assert::assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
+        Assert::assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');
@@ -942,6 +942,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
         $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
+        $this->assertInstanceOf(User::class, $ownerUser);
         $email->setCreatedBy($ownerUser);
         $this->em->flush();
 
@@ -960,18 +961,18 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
         Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
-        Assert::assertTrue(is_null($isUnpublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
+        Assert::assertTrue(null === $isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
         Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
-        Assert::assertTrue(!is_null($isPublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
+        Assert::assertTrue(null !== $isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
-        Assert::assertSame($expectDisabled, !is_null($publishUpInput->attr('disabled')));
-        Assert::assertSame($expectDisabled, !is_null($publishDownInput->attr('disabled')));
+        Assert::assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
+        Assert::assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');

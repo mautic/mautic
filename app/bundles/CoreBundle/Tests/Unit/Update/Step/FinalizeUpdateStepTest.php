@@ -125,7 +125,7 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
             ->method('writeln')
             ->with("\n\n<info>This is an example message</info>");
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
