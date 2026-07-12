@@ -292,7 +292,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->mailHelper->method('addTo')->willReturn(true);
         $this->mailHelper->method('queue')->willReturn([true, []]);
         $this->mailHelper->method('setEmail')->willReturn(true);
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('hasId')
             ->willReturn(false);
 
@@ -308,7 +308,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         // Setup an email variant email
         $variantDate = new \DateTime();
-        $this->emailEntity->expects($this->any())
+        $this->emailEntity
             ->method('getId')
             ->willReturn(1);
         $this->emailEntity->method('getTemplate')
@@ -335,7 +335,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             });
 
         $variantA = $this->createMock(Email::class);
-        $variantA->expects($this->any())
+        $variantA
             ->method('getId')
             ->willReturn(2);
         $variantA->method('getTemplate')
@@ -356,7 +356,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['weight' => '25']);
 
         $variantB = $this->createMock(Email::class);
-        $variantB->expects($this->any())
+        $variantB
             ->method('getId')
             ->willReturn(3);
         $variantB->method('getTemplate')
@@ -385,7 +385,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -443,7 +443,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->mailHelper->method('addTo')->willReturn(true);
         $this->mailHelper->method('queue')->willReturn([true, []]);
         $this->mailHelper->method('setEmail')->willReturn(true);
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('hasId')
             ->willReturn(false);
 
@@ -459,7 +459,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
 
         // Setup an email variant email
         $variantDate = new \DateTime();
-        $this->emailEntity->expects($this->any())
+        $this->emailEntity
             ->method('getId')
             ->willReturn(1);
         $this->emailEntity->method('getTemplate')->willReturn('');
@@ -479,7 +479,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             });
 
         $variantA = $this->createMock(Email::class);
-        $variantA->expects($this->any())
+        $variantA
             ->method('getId')
             ->willReturn(2);
         $variantA->method('getTemplate')
@@ -500,7 +500,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['weight' => '25']);
 
         $variantB = $this->createMock(Email::class);
-        $variantB->expects($this->any())
+        $variantB
             ->method('getId')
             ->willReturn(3);
         $variantB->method('getTemplate')
@@ -529,7 +529,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([]);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -582,14 +582,14 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testDoNotContactIsHonored(): void
     {
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('hasId')
             ->willReturn(false);
 
         $this->emailRepository->method('getDoNotEmailList')
             ->willReturn([1 => 'someone@domain.com']);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -666,7 +666,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->companyModel->method('getRepository')
             ->willReturn($this->companyRepository);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -720,7 +720,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testFrequencyRulesAreAppliedAndMessageGetsQueued(): void
     {
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('hasId')
             ->willReturn(false);
 
@@ -729,7 +729,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->frequencyRepository->method('getAppliedFrequencyRules')
             ->willReturn([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -742,7 +742,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $leadEntity = (new Lead())
             ->setEmail('someone@domain.com');
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getReference')
             ->willReturn(
                 $leadEntity
@@ -1028,7 +1028,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $trackableRepo    = $this->createMock(TrackableRepository::class);
         $doNotContactRepo = $this->createMock(DoNotContactRepository::class);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -1039,9 +1039,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->emailEntity->method('getLists')->willReturn($lists);
-
-        $connection   = $this->createMock(Connection::class);
-        $this->entityManager->method('getConnection')->willReturn($connection);
+        $this->entityManager->method('getConnection')->willReturn($this->createStub(Connection::class));
 
         $dateFromObject = new \DateTime('now');
         $dateToObject   = new \DateTime('-1 month');

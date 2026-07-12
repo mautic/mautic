@@ -416,8 +416,6 @@ final class WebhookModelTest extends TestCase
 
     private function initModel(): WebhookModel
     {
-        $webhookServiceMock = $this->createMock(WebhookService::class);
-
         // create anew webhook model instance using mocks
         $model              = new WebhookModel(
             $this->parametersHelperMock,
@@ -430,7 +428,7 @@ final class WebhookModelTest extends TestCase
             $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(Logger::class),
-            $webhookServiceMock
+            $this->createStub(WebhookService::class)
         );
 
         return $model;

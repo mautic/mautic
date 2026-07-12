@@ -61,7 +61,7 @@ final class FieldModelTest extends TestCase
             $schemaHelper
         );
 
-        $entityManager->expects($this->any())
+        $entityManager
             ->method('getConnection')
             ->willReturn($connection);
 

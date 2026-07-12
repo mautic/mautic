@@ -10,8 +10,14 @@ use Mautic\LeadBundle\Model\SegmentActionModel;
 
 final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
     private \PHPUnit\Framework\MockObject\Stub $contactMock5;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&Lead
+     */
     private \PHPUnit\Framework\MockObject\Stub $contactMock6;
 
     /**

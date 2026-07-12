@@ -28,7 +28,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         foreach ($leadData as $field => $value) {
             $method = 'set'.ucfirst($field);
             if (method_exists($lead, $method)) {
-                $lead->$method($value);
+                $lead->{$method}($value);
             }
         }
 

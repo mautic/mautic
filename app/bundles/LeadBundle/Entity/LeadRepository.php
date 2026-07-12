@@ -735,39 +735,39 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
-                $expr = $q->expr()->$nullExpr('l.date_identified');
+                $expr = $q->expr()->{$nullExpr}('l.date_identified');
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr = $q->expr()->$eqExpr('l.owner_id', $this->currentUser->getId());
+                $expr = $q->expr()->{$eqExpr}('l.owner_id', $this->currentUser->getId());
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isunowned', [], null, 'en_US'):
                 $expr = $q->expr()->or(
-                    $q->expr()->$eqExpr('l.owner_id', 0),
-                    $q->expr()->$nullExpr('l.owner_id')
+                    $q->expr()->{$eqExpr}('l.owner_id', 0),
+                    $q->expr()->{$nullExpr}('l.owner_id')
                 );
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
                 $q->leftJoin($this->getTableAlias(), MAUTIC_TABLE_PREFIX.'users', 'u', "u.id = {$this->getTableAlias()}.owner_id");
                 $expr = $q->expr()->or(
-                    $q->expr()->$likeExpr('u.first_name', ':'.$unique),
-                    $q->expr()->$likeExpr('u.last_name', ':'.$unique)
+                    $q->expr()->{$likeExpr}('u.first_name', ':'.$unique),
+                    $q->expr()->{$likeExpr}('u.last_name', ':'.$unique)
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr = $q->expr()->or(
-                    $q->expr()->$likeExpr('l.firstname', ":{$unique}"),
-                    $q->expr()->$likeExpr('l.lastname', ":{$unique}")
+                    $q->expr()->{$likeExpr}('l.firstname', ":{$unique}"),
+                    $q->expr()->{$likeExpr}('l.lastname', ":{$unique}")
                 );
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.email'):
             case $this->translator->trans('mautic.core.searchcommand.email', [], null, 'en_US'):
-                $expr            = $q->expr()->$likeExpr('l.email', ":{$unique}");
+                $expr            = $q->expr()->{$likeExpr}('l.email', ":{$unique}");
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
@@ -859,7 +859,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ->groupBy('duplicate.lead_id')
                     ->having("COUNT(duplicate.lead_id) = {$pluck}");
 
-                $expr            = $q->expr()->$inExpr('l.id', sprintf('(%s)', $sq->getSQL()));
+                $expr            = $q->expr()->{$inExpr}('l.id', sprintf('(%s)', $sq->getSQL()));
                 $returnParameter = true;
 
                 break;
@@ -946,7 +946,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
-                    $expr = $q->expr()->$likeExpr("l.{$command}", ":{$unique}");
+                    $expr = $q->expr()->{$likeExpr}("l.{$command}", ":{$unique}");
                 }
                 $returnParameter = true;
                 break;
@@ -1282,7 +1282,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         $this->useDistinctCount = true;
         if (!preg_match('/"'.preg_quote($primaryTable['alias'], '/').'"/i', json_encode($q->getQueryPart('join')))) {
-            $q->$joinType(
+            $q->{$joinType}(
                 $primaryTable['from_alias'],
                 MAUTIC_TABLE_PREFIX.$primaryTable['table'],
                 $primaryTable['alias'],
@@ -1303,7 +1303,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
 
             if (!$exists) {
-                $q->$joinType(
+                $q->{$joinType}(
                     $table['from_alias'],
                     MAUTIC_TABLE_PREFIX.$table['table'],
                     $table['alias'],

@@ -158,7 +158,7 @@ class CommonRepository extends ServiceEntityRepository
 
                 $method = 'set'.ucfirst($property);
                 if (method_exists($entity, $method)) {
-                    $entity->$method($v);
+                    $entity->{$method}($v);
                 }
 
                 unset($data[$dbCol]);
@@ -889,7 +889,7 @@ class CommonRepository extends ServiceEntityRepository
             $idGetter  = "get{$idCol}";
             $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
             $columns[] = $column;
-            $values[]  = $assocEntity->$idGetter();
+            $values[]  = $assocEntity->{$idGetter}();
             $types[]   = Types::STRING;
             $set[]     = '?';
             $update[]  = $makeUpdate($column);
@@ -1071,11 +1071,11 @@ class CommonRepository extends ServiceEntityRepository
             $xFunc    = 'orX';
             $exprFunc = 'like';
         }
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
 
         foreach ($columns as $column) {
             $expr->add(
-                $q->expr()->$exprFunc($column, ":{$unique}")
+                $q->expr()->{$exprFunc}($column, ":{$unique}")
             );
         }
 
@@ -1138,10 +1138,10 @@ class CommonRepository extends ServiceEntityRepository
             }
         }
 
-        $expr = $q->expr()->$xFunc();
+        $expr = $q->expr()->{$xFunc}();
         foreach ($columns as $col) {
             $expr->add(
-                $q->expr()->$exprFunc($col, ":{$unique}")
+                $q->expr()->{$exprFunc}($col, ":{$unique}")
             );
         }
 
@@ -1301,7 +1301,7 @@ class CommonRepository extends ServiceEntityRepository
                 }
 
                 $joinType = ($hasNullable) ? 'leftJoin' : 'join';
-                $q->$joinType($alias, $targetTable, $property, implode(' AND ', $joinColumns));
+                $q->{$joinType}($alias, $targetTable, $property, implode(' AND ', $joinColumns));
                 $joinAdded = true;
             }
         }
@@ -1620,12 +1620,12 @@ class CommonRepository extends ServiceEntityRepository
                         case 'isEmpty':
                         case 'isNotEmpty':
                             if ('isEmpty' === $clause['expr']) {
-                                $whereClause = $query->expr()->or(
+                                $whereClause = $query->expr()->orX(
                                     $query->expr()->eq($column, $query->expr()->literal('')),
                                     $query->expr()->isNull($column)
                                 );
                             } else {
-                                $whereClause = $query->expr()->and(
+                                $whereClause = $query->expr()->andX(
                                     $query->expr()->neq($column, $query->expr()->literal('')),
                                     $query->expr()->isNotNull($column)
                                 );

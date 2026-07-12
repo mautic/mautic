@@ -552,7 +552,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     protected function isChanged($prop, $val, $oldValue = null)
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $oldValue ?? $this->$getter();
+        $current = $oldValue ?? $this->{$getter}();
         if ('owner' == $prop) {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];

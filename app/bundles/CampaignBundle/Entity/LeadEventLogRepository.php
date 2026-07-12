@@ -234,7 +234,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
-        $q->$join(
+        $q->{$join}(
             'o',
             MAUTIC_TABLE_PREFIX.'campaign_leads',
             'l',

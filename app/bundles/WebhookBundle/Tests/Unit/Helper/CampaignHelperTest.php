@@ -37,7 +37,6 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $this->contact           = $this->createMock(Lead::class);
         $this->client            = $this->createMock(Client::class);
         $companyModel            = $this->createMock(CompanyModel::class);
-        $dispatcher              = $this->createMock(EventDispatcherInterface::class);
         $ipCollection            = new ArrayCollection();
         $companyRepository       = $this->getMockBuilder(CompanyRepository::class)
             ->disableOriginalConstructor()
@@ -48,7 +47,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 
         $companyModel->method('getRepository')->willReturn($companyRepository);
 
-        $this->campaignHelper = new CampaignHelper($this->client, $companyModel, $dispatcher);
+        $this->campaignHelper = new CampaignHelper($this->client, $companyModel, $this->createStub(EventDispatcherInterface::class));
 
         $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.1'));
         $ipCollection->add((new IpAddress())->setIpAddress('127.0.0.2'));
