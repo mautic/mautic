@@ -113,10 +113,10 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         yield ['random string', 'random string'];
 
         // integer
-        yield [1, '1'];
+        yield [1, 1];
 
         // bool
-        yield [false, ''];
+        yield [false, false];
 
         // date
         yield ['2020-02-02', '2020-02-02'];

@@ -67,27 +67,18 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        // fix in rector-dev
-        Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
-        ],
-=======
-=======
-        // fixed on dev
-        //        RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
-        //            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
-        //        ],
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
         ],
 
->>>>>>> c4d66bdfcb (skips)
         // waits for descission
         Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
         Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
->>>>>>> 5ce67e265f ([tests] use more precise asserts)
+
+        // fix in rector-dev
+        Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
+        ],
 
         // offer next
         Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,
