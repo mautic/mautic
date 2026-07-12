@@ -37,8 +37,7 @@ return RectorConfig::configure()
         MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration::class,
     ])
     ->withRules([
-
-        \Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
+        Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector::class,
 
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
@@ -60,8 +59,8 @@ return RectorConfig::configure()
         ],
 
         // fix in rector-dev
-        \Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
-            __DIR__ . '/app/bundles/CoreBundle/Entity/CommonRepository.php',
+        Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
         ],
 
         // offer next
