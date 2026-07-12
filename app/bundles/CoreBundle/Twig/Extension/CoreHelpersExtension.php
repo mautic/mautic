@@ -20,7 +20,7 @@ class CoreHelpersExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             // Used by CoreBundle:Helper:list_filters.html.twig
