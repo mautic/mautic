@@ -101,7 +101,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $matcher        = $this->exactly(4);
 
         $this->campaignMemberRepository->expects($matcher)
-            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
+            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
@@ -130,6 +130,8 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
                     return [];
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->manager->expects($this->exactly(3))
@@ -164,7 +166,7 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
         $matcher        = $this->exactly(4);
 
         $this->campaignMemberRepository->expects($matcher)
-            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter) {
+            ->method('getCampaignContactsBySegments')->willReturnCallback(function (...$parameters) use ($matcher, $contactLimiter): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(111, $parameters[0]);
                     $this->assertSame($contactLimiter, $parameters[1]);
@@ -193,6 +195,8 @@ final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
 
                     return [];
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->manager->expects($this->exactly(3))
