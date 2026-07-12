@@ -32,7 +32,7 @@ use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * @method SalesforceApi getApiHelper()
+ * @extends CrmAbstractIntegration<SalesforceApi>
  */
 class SalesforceIntegration extends CrmAbstractIntegration
 {

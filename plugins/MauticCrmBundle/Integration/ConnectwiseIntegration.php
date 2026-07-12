@@ -8,13 +8,14 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Integration\IntegrationObject;
+use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
 /**
- * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper()
+ * @extends CrmAbstractIntegration<ConnectwiseApi>
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
