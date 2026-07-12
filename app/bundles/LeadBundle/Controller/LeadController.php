@@ -2018,7 +2018,7 @@ class LeadController extends FormController
             $entities = $this->getContactFindReplaceEntities($request, $model, $data, $ids, $permissions);
             $updated  = $this->replaceContactFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
 
-            if ($updated) {
+            if ([] !== $updated) {
                 $model->saveEntities($updated);
             }
         }
