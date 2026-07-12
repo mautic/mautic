@@ -550,6 +550,7 @@ class NotificationController extends AbstractFormController
      */
     public function cloneAction(Request $request, FormFactoryInterface $formFactory, $objectId)
     {
+        /** @var NotificationModel $model */
         $model  = $this->getModel('notification');
         $entity = $model->getEntity($objectId);
 
