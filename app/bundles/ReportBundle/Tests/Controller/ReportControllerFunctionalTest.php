@@ -457,13 +457,13 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/reports/'.$report->getId());
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
 
         // Check the list
         $this->client->request('GET', '/s/reports');
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', $clientResponseContent);
+        $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
     }
 
     public function testXssUrlFromQuery(): void
@@ -487,10 +487,10 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->client->request('GET', '/s/reports/view/'.$report->getId());
         $this->assertResponseStatusCodeSame(200);
-        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
 
         $this->client->request('GET', '/s/reports/view/'.$report->getId().'/export/html');
-        $this->assertStringNotContainsString($xssHeader, $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString($xssHeader, (string) $this->client->getResponse()->getContent());
     }
 
     public function testDelayedTransport(): void
@@ -642,7 +642,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', $url);
         $this->assertStringNotContainsString(
             'You have an error in your SQL syntax',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -672,7 +672,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content  = $this->client->getResponse()->getcontent();
-        Assert::assertStringContainsString(self::TEST_EMAIL, $content);
+        Assert::assertStringContainsString(self::TEST_EMAIL, (string) $content);
     }
 
     public function testDynamicFiltersWithDefaultValueAreApplied(): void
@@ -717,6 +717,6 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, $content);
+        Assert::assertStringContainsString(self::DEFAULT_TEST_EMAIL, (string) $content);
     }
 }

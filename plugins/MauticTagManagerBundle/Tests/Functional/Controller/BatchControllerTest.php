@@ -46,8 +46,8 @@ final class BatchControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/tags/batch/view');
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Add tags', $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('Remove tags', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Add tags', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Remove tags', (string) $this->client->getResponse()->getContent());
     }
 
     public function testAddTagBatchSetAction(): void
@@ -62,7 +62,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('3 contacts affected', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('3 contacts affected', (string) $this->client->getResponse()->getContent());
 
         /** @var LeadModel $leadModel */
         $leadModel = static::getContainer()->get('mautic.lead.model.lead');
@@ -90,7 +90,7 @@ final class BatchControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('1 contact affected', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('1 contact affected', (string) $this->client->getResponse()->getContent());
         $lead1 = $leadModel->getEntity($this->leads[0]->getId());
         $this->assertInstanceOf(Lead::class, $lead1);
         $this->assertNotContains($this->tags[1], $lead1->getTags()->toArray());

@@ -64,7 +64,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('widgetHeight', $data);
         Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
         Assert::assertArrayHasKey('widgetHtml', $data);
-        Assert::assertStringContainsString('View Full Report', $data['widgetHtml']);
+        Assert::assertStringContainsString('View Full Report', (string) $data['widgetHtml']);
     }
 
     public function testWidgetWithBestHours(): void
@@ -101,7 +101,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertArrayHasKey('widgetHeight', $data);
         Assert::assertSame($widget->getHeight(), $data['widgetHeight']);
         Assert::assertArrayHasKey('widgetHtml', $data);
-        Assert::assertStringContainsString('Best email read hours', $data['widgetHtml']);
+        Assert::assertStringContainsString('Best email read hours', (string) $data['widgetHtml']);
     }
 
     public function testWidgetWithSegmentBuildTime(): void
@@ -246,6 +246,6 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/dashboard/widget/{$widget->getId()}", [], [], $this->createAjaxHeaders());
 
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('TestFN TestLN', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('TestFN TestLN', (string) $this->client->getResponse()->getContent());
     }
 }

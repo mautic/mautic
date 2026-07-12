@@ -425,7 +425,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $response = $this->submissionModel->exportResults('csv', new Form(), []);
 
         $this->assertSame($response::class, \Symfony\Component\HttpFoundation\StreamedResponse::class);
-        $this->assertStringContainsString('.csv', $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('.csv', (string) $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
 
@@ -435,7 +435,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $response = $this->submissionModel->exportResults('xlsx', new Form(), []);
 
         $this->assertSame($response::class, \Symfony\Component\HttpFoundation\StreamedResponse::class);
-        $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('.xlsx', (string) $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
     }
 

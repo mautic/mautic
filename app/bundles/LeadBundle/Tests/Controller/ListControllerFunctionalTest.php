@@ -464,13 +464,13 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/s/ajax', ['action' => 'togglePublishStatus', 'model' => 'lead.list', 'id' => $list1->getId()]);
         $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedErrorMessage, (string) $this->client->getResponse()->getContent());
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$list1->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $form['leadlist[isPublished]']->setValue('0');
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($expectedErrorMessage, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedErrorMessage, (string) $this->client->getResponse()->getContent());
     }
 
     public function testUnpublishUnUsedSegment(): void
@@ -526,7 +526,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse     = $this->client->getResponse();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
 
     public function testBatchDeleteUsedInCampaignSegment(): void
@@ -566,7 +566,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $clientResponseBody = json_decode($clientResponse->getContent(), true);
 
-        $this->assertStringContainsString($expectedErrorMessage, $clientResponseBody['flashes']);
+        $this->assertStringContainsString($expectedErrorMessage, (string) $clientResponseBody['flashes']);
     }
 
     /**
@@ -799,7 +799,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('1 segments have been deleted!', $clientResponse->getContent());
+        $this->assertStringContainsString('1 segments have been deleted!', (string) $clientResponse->getContent());
 
         $this->em->clear();
 
@@ -830,16 +830,16 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
 
-        Assert::assertStringContainsString('leadlist_buttons_apply', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('leadlist_buttons_apply', (string) $this->client->getResponse()->getContent());
 
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
         if ($shouldContainError) {
-            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', $this->client->getResponse()->getContent());
+            $this->assertStringContainsString('Date field filter value &quot;'.$filter.'&quot; is invalid', (string) $this->client->getResponse()->getContent());
         } else {
-            $this->assertStringNotContainsString('Date field filter value', $this->client->getResponse()->getContent());
+            $this->assertStringNotContainsString('Date field filter value', (string) $this->client->getResponse()->getContent());
         }
     }
 
@@ -880,7 +880,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $translator = self::getContainer()->get('translator');
 
-        $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));
     }
 
@@ -920,10 +920,10 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
         $html = $response->getContent();
-        $this->assertStringContainsString('Total contacts', $html);
-        $this->assertStringContainsString('2', $html);
-        $this->assertStringContainsString('Active contacts', $html);
-        $this->assertStringContainsString('1', $html);
+        $this->assertStringContainsString('Total contacts', (string) $html);
+        $this->assertStringContainsString('2', (string) $html);
+        $this->assertStringContainsString('Active contacts', (string) $html);
+        $this->assertStringContainsString('1', (string) $html);
     }
 
     /**

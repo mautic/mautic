@@ -515,7 +515,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', $response->getContent());
+        $this->assertStringContainsString('No JSON content found, and exactly one ZIP file must be uploaded.', (string) $response->getContent());
     }
 
     public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
@@ -571,7 +571,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', (string) $response->getContent());
 
         // Clean up
         unlink($filePath);
@@ -592,7 +592,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', $response->getContent());
+        $this->assertStringContainsString('Unsupported file type. Only ZIP archives are supported.', (string) $response->getContent());
 
         // Clean up
         unlink($filePath);
@@ -622,7 +622,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
             $response = $this->client->getResponse();
 
             $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-            $this->assertStringContainsString('Invalid JSON', $response->getContent());
+            $this->assertStringContainsString('Invalid JSON', (string) $response->getContent());
         } finally {
             // Clean up - check if file exists before trying to delete
             if (file_exists($zipPath)) {
