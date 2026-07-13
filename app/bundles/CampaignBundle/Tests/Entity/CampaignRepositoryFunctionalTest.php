@@ -78,6 +78,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $eventThree = $this->createEvent($campaign);
         $this->em->flush();
         $this->assertInstanceOf(Event::class, $eventOne);
+        $this->assertInstanceOf(Event::class, $eventTwo);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
@@ -107,6 +108,7 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $campaignLeadTwo->setRotation($logTwo->getRotation() + 1);
         $this->em->flush();
         $this->assertInstanceOf(Event::class, $eventOne);
+        $this->assertInstanceOf(Event::class, $eventTwo);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),

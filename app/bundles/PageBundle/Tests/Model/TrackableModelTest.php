@@ -346,7 +346,7 @@ final class TrackableModelTest extends TestCase
         );
 
         $this->assertEmpty($trackables, $content);
-        $this->assertFalse(strpos($content, $url), 'https:// should have been stripped from the token URL');
+        $this->assertStringNotContainsString($url, (string) $content, 'https:// should have been stripped from the token URL');
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Test that tokens that are supposed to be ignored are')]
@@ -408,7 +408,7 @@ final class TrackableModelTest extends TestCase
             1
         );
 
-        $this->assertTrue(str_contains($content, $url), $content);
+        $this->assertStringContainsString($url, (string) $content, $content);
     }
 
     public function testMalformedUrlDoesNotCrashTrackingParsing(): void
@@ -488,7 +488,7 @@ final class TrackableModelTest extends TestCase
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
-            Assert::assertNotFalse(strpos($content, (string) $redirectId), $content);
+            Assert::assertStringContainsString((string) $redirectId, (string) $content, $content);
         }
     }
 

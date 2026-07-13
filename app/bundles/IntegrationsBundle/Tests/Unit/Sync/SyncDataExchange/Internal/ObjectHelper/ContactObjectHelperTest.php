@@ -86,15 +86,13 @@ final class ContactObjectHelperTest extends TestCase
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
             ->with(
-                $this->callback(function (Lead $lead) use ($idMap): bool {
+                $this->callback(function (Lead $lead) use ($idMap): void {
                     $this->assertManipulator($lead, 'create');
 
                     // Set contact ID
                     $reflection = new \ReflectionClass($lead);
                     $property   = $reflection->getProperty('id');
                     $property->setValue($lead, $idMap[$lead->getEmail()]);
-
-                    return true;
                 })
             );
         $this->repository->expects($this->exactly(2))
@@ -139,15 +137,13 @@ final class ContactObjectHelperTest extends TestCase
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
             ->with(
-                $this->callback(function (Lead $lead) use ($idMap): bool {
+                $this->callback(function (Lead $lead) use ($idMap): void {
                     $this->assertManipulator($lead, 'create');
 
                     // Set contact ID
                     $reflection = new \ReflectionClass($lead);
                     $property   = $reflection->getProperty('id');
                     $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
-
-                    return true;
                 })
             );
 

@@ -61,13 +61,11 @@ final class CompanyObjectHelperTest extends TestCase
         $this->model->expects($this->exactly(3))
             ->method('saveEntity')
             ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
+                $this->callback(function (Company $company) use ($idMap): void {
                     // Set ID
                     $reflection = new \ReflectionClass($company);
                     $property   = $reflection->getProperty('id');
                     $property->setValue($company, $idMap[$company->getEmail()]);
-
-                    return true;
                 })
             );
 
@@ -113,13 +111,11 @@ final class CompanyObjectHelperTest extends TestCase
         $this->model->expects($this->exactly(4))
             ->method('saveEntity')
             ->with(
-                $this->callback(function (Company $company) use ($idMap): bool {
+                $this->callback(function (Company $company) use ($idMap): void {
                     // Set ID
                     $reflection = new \ReflectionClass($company);
                     $property   = $reflection->getProperty('id');
                     $property->setValue($company, $idMap[$company->getEmail() ?? '']);
-
-                    return true;
                 })
             );
 

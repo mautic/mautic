@@ -731,7 +731,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->expects($spy = $this->any())
             ->method('getIntegrationsEntityId')
             ->willReturnCallback(
-                function () use ($spy) {
+                function () use ($spy): array {
                     // WARNING: this is using a PHPUnit undocumented workaround:
                     // https://github.com/sebastianbergmann/phpunit/issues/3888
                     $spyParentProperties = self::getParentPrivateProperties($spy);

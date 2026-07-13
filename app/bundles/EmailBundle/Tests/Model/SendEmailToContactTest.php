@@ -360,7 +360,7 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (EmailSendEvent $event, $eventName): EmailSendEvent {
+                function (EmailSendEvent $event, ?string $eventName): EmailSendEvent {
                     $lead = $event->getLead();
 
                     $tokens = [];

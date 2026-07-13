@@ -242,11 +242,11 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // 0 contacts are from the US and should be labeled with US:Action
         $this->assertCount(0, $byEvent[12]);
-        $this->assertTrue(empty($tags['US:Action']));
+        $this->assertEmpty($tags['US:Action']);
 
         // None tagged with US:Action, so none should be tagged with ChainedAction by a chained event.
         $this->assertCount(0, $byEvent[16]);
-        $this->assertTrue(empty($tags['ChainedAction']));
+        $this->assertEmpty($tags['ChainedAction']);
 
         // The rest (1) contacts are not from the US and should be labeled with NonUS:Action
         $this->assertCount(1, $byEvent[13]);
@@ -357,22 +357,22 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // Of those that did not open the email, 0 should be tagged US:NotOpen
         $this->assertCount(0, $byEvent[6]);
-        $this->assertTrue(empty($tags['US:NotOpen']));
+        $this->assertEmpty($tags['US:NotOpen']);
 
         // And 0 should be tagged NonUS:NotOpen
         $this->assertCount(0, $byEvent[7]);
-        $this->assertTrue(empty($tags['NonUS:NotOpen']));
+        $this->assertEmpty($tags['NonUS:NotOpen']);
 
         // And 0 should be tagged UK:NotOpen
         $this->assertCount(0, $byEvent[8]);
-        $this->assertTrue(empty($tags['UK:NotOpen']));
+        $this->assertEmpty($tags['UK:NotOpen']);
 
         // And 0 should be tagged NonUK:NotOpen
         $this->assertCount(0, $byEvent[9]);
-        $this->assertTrue(empty($tags['NonUK:NotOpen']));
+        $this->assertEmpty($tags['NonUK:NotOpen']);
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
-        $this->assertTrue(empty($tags['EmailNotOpen']));
+        $this->assertEmpty($tags['EmailNotOpen']);
     }
 
     public function testCampaignExecutionForSome(): void

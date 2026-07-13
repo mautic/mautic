@@ -137,15 +137,14 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
 
-
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         // phpunit
-        \Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
-        \Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
         // will be fixed
-        \Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
-        \Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

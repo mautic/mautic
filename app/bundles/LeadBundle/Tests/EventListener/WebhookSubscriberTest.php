@@ -40,10 +40,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type): bool {
+                    function ($type): void {
                         $this->assertSame($type, LeadEvents::LEAD_POST_SAVE.'_new');
-
-                        return true;
                     }
                 )
             );
@@ -67,10 +65,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    function ($type): bool {
+                    function ($type): void {
                         $this->assertSame($type, LeadEvents::LEAD_POST_SAVE.'_update');
-
-                        return true;
                     }
                 )
             );
