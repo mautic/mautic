@@ -607,12 +607,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
 
 		-
-			message: '#^Call to an undefined method Mautic\\CampaignBundle\\Entity\\Lead\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/LeadRepository.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\LeadRepository\:\:getCampaignSegments\(\) has parameter \$campaignId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -1346,12 +1340,6 @@ parameters:
 
 		-
 			message: '#^Call to an undefined method Mautic\\CoreBundle\\Model\\AbstractCommonModel\<object\>\:\:getNameGetter\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\CoreBundle\\Model\\AbstractCommonModel\<object\>\:\:unlockEntity\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
@@ -3325,12 +3313,6 @@ parameters:
 			path: app/bundles/CoreBundle/Validator/FileUploadValidator.php
 
 		-
-			message: '#^Call to an undefined method Mautic\\PageBundle\\Entity\\PageRepository\:\:countVisitors\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/DashboardBundle/Controller/AjaxController.php
-
-		-
 			message: '''
 				#^Fetching deprecated class constant ARRAY of class Doctrine\\DBAL\\Types\\Types\:
 				Use \{@link Types\:\:JSON\} instead\.$#
@@ -5005,12 +4987,6 @@ parameters:
 			path: app/bundles/FormBundle/Controller/FieldController.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormInterface\:\:isClicked\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/FormBundle/Controller/FormController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 6
@@ -5884,12 +5860,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/Sync/Helper/RelationsHelper.php
 
 		-
-			message: '#^Unsafe access to private property Mautic\\IntegrationsBundle\\Sync\\Logger\\DebugLogger\:\:\$logger through static\:\:\.$#'
-			identifier: staticClassAccess.privateProperty
-			count: 3
-			path: app/bundles/IntegrationsBundle/Sync/Logger/DebugLogger.php
-
-		-
 			message: '#^Method Mautic\\IntegrationsBundle\\Sync\\SyncDataExchange\\Internal\\ObjectHelper\\ContactObjectHelper\:\:getDoNotContactReason\(\) has parameter \$value with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5912,12 +5882,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/IntegrationsBundle/Sync/ValueNormalizer/ValueNormalizerInterface.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\UtmTag\:\:setUtmTag\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Controller/AjaxController.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Controller\\Api\\LeadApiController\:\:persistFrequencyRuleFormData\(\) has no return type specified\.$#'
@@ -5992,12 +5956,15 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
 		-
+<<<<<<< HEAD
 			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormInterface\:\:isClicked\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: app/bundles/LeadBundle/Controller/ListController.php
 
 		-
+=======
+>>>>>>> ef7f72d272 (rebuild baseline)
 			message: '#^Parameter \#1 \$unit of method Mautic\\LeadBundle\\Model\\ListModel\:\:getSegmentContactsLineChartData\(\) expects string, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -6140,12 +6107,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyLeadRepository.php
-
-		-
-			message: '#^Method Doctrine\\Persistence\\ObjectManager\:\:flush\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:getAjaxSimpleList\(\) has parameter \$labelColumn with no type specified\.$#'
@@ -6779,12 +6740,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadNoteRepository.php
-
-		-
-			message: '#^Method Doctrine\\Persistence\\ObjectManager\:\:flush\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadRepository\:\:defaultPrepareDbalFieldsForSave\(\) has no return type specified\.$#'
@@ -10028,12 +9983,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/PointBundle/Controller/Api/PointApiController.php
-
-		-
-			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormInterface\:\:isClicked\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/PointBundle/Controller/TriggerController.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
