@@ -704,7 +704,7 @@ class CommonController extends AbstractController implements MauticController
             $column
         );
 
-        if ($extraOrConditions) {
+        if ([] !== $extraOrConditions) {
             $orConditions = array_merge($orConditions, $extraOrConditions);
         }
 

@@ -126,7 +126,7 @@ class ReportRepository extends CommonRepository
             if (1 === count($ownerIds)) {
                 $qb->andWhere($qb->expr()->eq('r.created_by', ':ownerId'));
                 $qb->setParameter('ownerId', reset($ownerIds));
-            } elseif ($ownerIds) {
+            } elseif ([] !== $ownerIds) {
                 $qb->andWhere($qb->expr()->in('r.created_by', ':ownerIds'));
                 $qb->setParameter('ownerIds', $ownerIds, ArrayParameterType::INTEGER);
             }
