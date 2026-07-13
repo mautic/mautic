@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -60,8 +61,8 @@ class StagesChangeLogRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'lead_stages_change_log')
             ->set('stage_id', ':to')
             ->where('stage_id = :from')
-            ->setParameter('to', (string) $toStageId)
-            ->setParameter('from', (string) $fromStageId)
+            ->setParameter('to', $toStageId, ParameterType::INTEGER)
+            ->setParameter('from', $fromStageId, ParameterType::INTEGER)
             ->executeStatement();
     }
 

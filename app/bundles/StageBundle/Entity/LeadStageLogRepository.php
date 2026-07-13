@@ -27,7 +27,7 @@ class LeadStageLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead(int $fromLeadId, int $toLeadId): void
+    public function updateLead(string $fromLeadId, string $toLeadId): void
     {
         $connection = $this->_em->getConnection();
         $table      = MAUTIC_TABLE_PREFIX.LeadStageLog::TABLE_NAME;
@@ -37,7 +37,7 @@ class LeadStageLogRepository extends CommonRepository
             ->select('pl.stage_id')
             ->from($table, 'pl')
             ->where('pl.lead_id = :toLeadId')
-            ->setParameter('toLeadId', $toLeadId)
+            ->setParameter('toLeadId', $toLeadId, ParameterType::STRING)
             ->executeQuery()
             ->fetchFirstColumn();
 
@@ -45,8 +45,8 @@ class LeadStageLogRepository extends CommonRepository
         $q->update($table)
             ->set('lead_id', ':toLeadId')
             ->where('lead_id = :fromLeadId')
-            ->setParameter('fromLeadId', $fromLeadId)
-            ->setParameter('toLeadId', $toLeadId);
+            ->setParameter('fromLeadId', $fromLeadId, ParameterType::STRING)
+            ->setParameter('toLeadId', $toLeadId, ParameterType::STRING);
 
         if (!empty($stageIds)) {
             $q->andWhere(
@@ -61,7 +61,7 @@ class LeadStageLogRepository extends CommonRepository
             $connection->createQueryBuilder()
                 ->delete($table)
                 ->where('lead_id = :fromLeadId')
-                ->setParameter('fromLeadId', $fromLeadId)
+                ->setParameter('fromLeadId', $fromLeadId, ParameterType::STRING)
                 ->executeStatement();
         } else {
             $q->executeStatement();
@@ -80,7 +80,7 @@ class LeadStageLogRepository extends CommonRepository
     }
 
     /**
-     * @return iterable<array<int>>
+     * @return iterable<array<string>>
      */
     private function getLeadIdBatchesForStage(int $stageId, string $table): iterable
     {
@@ -103,7 +103,7 @@ class LeadStageLogRepository extends CommonRepository
     }
 
     /**
-     * @return iterable<array<int>>
+     * @return iterable<array<string>>
      */
     private function getLeadIdBatchesFromConnection(Connection $connection, int $stageId, string $table): iterable
     {
@@ -115,7 +115,7 @@ class LeadStageLogRepository extends CommonRepository
 
         $leadIds = [];
         while (false !== $row = $result->fetchAssociative()) {
-            $leadIds[] = (int) $row['lead_id'];
+            $leadIds[] = (string) $row['lead_id'];
 
             if (self::UPDATE_STAGE_BATCH_SIZE === count($leadIds)) {
                 yield $leadIds;
@@ -130,7 +130,7 @@ class LeadStageLogRepository extends CommonRepository
     }
 
     /**
-     * @param array<int> $leadIds
+     * @param array<string> $leadIds
      */
     private function deleteDuplicateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
     {
@@ -148,14 +148,14 @@ class LeadStageLogRepository extends CommonRepository
             ],
             [
                 'fromStageId' => ParameterType::INTEGER,
-                'leadIds'     => ArrayParameterType::INTEGER,
+                'leadIds'     => ArrayParameterType::STRING,
                 'toStageId'   => ParameterType::INTEGER,
             ]
         );
     }
 
     /**
-     * @param array<int> $leadIds
+     * @param array<string> $leadIds
      */
     private function updateStageLogs(Connection $connection, string $table, int $fromStageId, int $toStageId, array $leadIds): void
     {
@@ -165,7 +165,7 @@ class LeadStageLogRepository extends CommonRepository
             ->where('stage_id = :fromStageId')
             ->andWhere('lead_id IN (:leadIds)')
             ->setParameter('fromStageId', $fromStageId, ParameterType::INTEGER)
-            ->setParameter('leadIds', $leadIds, ArrayParameterType::INTEGER)
+            ->setParameter('leadIds', $leadIds, ArrayParameterType::STRING)
             ->setParameter('toStageId', $toStageId, ParameterType::INTEGER)
             ->executeStatement();
     }

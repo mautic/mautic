@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class StageController extends AbstractFormController
+class StageController extends AbstractFormController
 {
     public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
@@ -405,9 +405,6 @@ final class StageController extends AbstractFormController
         return $this->newAction($request, $formFactory, $entity);
     }
 
-    /**
-     * Stage merge function.
-     */
     public function mergeAction(Request $request, FormFactoryInterface $formFactory, StageModel $model, int $objectId): Response
     {
         $secondaryStage = $model->getEntity($objectId);
@@ -423,9 +420,8 @@ final class StageController extends AbstractFormController
                 'mauticContent' => 'stage',
             ],
         ];
-        $response = null;
         if (null === $secondaryStage) {
-            $response = $this->postActionRedirect(
+            return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [[
                         'type'    => 'error',
@@ -434,12 +430,10 @@ final class StageController extends AbstractFormController
                     ]],
                 ])
             );
-        } elseif (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
-            $this->throwAccessDenied();
         }
 
-        if (null !== $response) {
-            return $response;
+        if (!$this->security->isGranted(StagePermissions::PERMISSION_EDIT)) {
+            $this->throwAccessDenied();
         }
 
         $stages = $model->getRepository()->getStages(false, (string) $secondaryStage->getId());

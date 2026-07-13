@@ -51,7 +51,7 @@ final class StageMergeType extends AbstractType
             ]
         );
 
-        if (!empty($options['action'])) {
+        if (null !== $options['action'] && '' !== $options['action']) {
             $builder->setAction($options['action']);
         }
     }

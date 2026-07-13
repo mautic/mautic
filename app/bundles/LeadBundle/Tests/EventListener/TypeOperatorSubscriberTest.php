@@ -81,7 +81,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $stageModel            = $this->createMock(StageModel::class);
-        $this->stageRepository = new class extends StageRepository {
+        $this->stageRepository = new class() extends StageRepository {
             public function __construct()
             {
             }

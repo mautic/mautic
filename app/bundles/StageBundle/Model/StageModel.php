@@ -170,38 +170,38 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         return $chart->render();
     }
 
-    public function stageMerge(Stage $mainStage, Stage $secStage): Stage
+    public function stageMerge(Stage $primaryStage, Stage $secondaryStage): Stage
     {
         $this->logger->debug('STAGE: Merging stages');
 
-        $mainStageId = $mainStage->getId();
-        $secStageId  = $secStage->getId();
+        $primaryStageId   = $primaryStage->getId();
+        $secondaryStageId = $secondaryStage->getId();
 
-        if ($mainStageId === $secStageId) {
-            return $mainStage;
+        if ($primaryStageId === $secondaryStageId) {
+            return $primaryStage;
         }
 
-        $this->em->wrapInTransaction(function () use ($mainStageId, $secStage, $secStageId): void {
+        $this->em->wrapInTransaction(function () use ($primaryStageId, $secondaryStage, $secondaryStageId): void {
             $this->em->getConnection()->createQueryBuilder()
                 ->update(MAUTIC_TABLE_PREFIX.'leads')
-                ->set('stage_id', ':mainStageId')
-                ->where('stage_id = :secStageId')
-                ->setParameter('mainStageId', $mainStageId, ParameterType::INTEGER)
-                ->setParameter('secStageId', $secStageId, ParameterType::INTEGER)
+                ->set('stage_id', ':primaryStageId')
+                ->where('stage_id = :secondaryStageId')
+                ->setParameter('primaryStageId', $primaryStageId, ParameterType::INTEGER)
+                ->setParameter('secondaryStageId', $secondaryStageId, ParameterType::INTEGER)
                 ->executeStatement();
 
             /** @var StagesChangeLogRepository $changeLogRepo */
             $changeLogRepo = $this->em->getRepository(StagesChangeLog::class);
-            $changeLogRepo->updateStage($secStageId, $mainStageId);
+            $changeLogRepo->updateStage($secondaryStageId, $primaryStageId);
 
             /** @var LeadStageLogRepository $leadStageLogRepo */
             $leadStageLogRepo = $this->em->getRepository(LeadStageLog::class);
-            $leadStageLogRepo->updateStage($secStageId, $mainStageId);
+            $leadStageLogRepo->updateStage($secondaryStageId, $primaryStageId);
 
-            $this->deleteEntity($secStage);
+            $this->deleteEntity($secondaryStage);
         });
 
-        return $mainStage;
+        return $primaryStage;
     }
 
     public function getUserStages(): array
