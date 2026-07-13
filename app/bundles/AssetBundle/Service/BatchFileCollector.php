@@ -10,12 +10,12 @@ use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
-final class BatchFileCollector
+final readonly class BatchFileCollector
 {
     public function __construct(
-        private readonly AssetModel $assetModel,
-        private readonly CorePermissions $security,
-        private readonly CoreParametersHelper $parametersHelper,
+        private AssetModel $assetModel,
+        private CorePermissions $security,
+        private CoreParametersHelper $parametersHelper,
     ) {
     }
 

@@ -2,7 +2,6 @@
 
 namespace Mautic\AssetBundle\Controller;
 
-use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\AssetBundle\Service\ArchiveBuilder;
 use Mautic\AssetBundle\Service\BatchDownloadRequestValidator;

@@ -111,10 +111,18 @@ final class ArchiveBuilder
      */
     private function generateFilename(Asset $asset, array &$usedNames): string
     {
-        $originalFileName = $asset->getOriginalFileName();
-        $filename         = $originalFileName ?: ($asset->getTitle() ?: (string) $asset->getId());
+        $filename = $asset->getOriginalFileName();
+        if (null === $filename || '' === $filename) {
+            $filename = $asset->getTitle();
+        }
+        if (null === $filename || '' === $filename) {
+            $filename = (string) $asset->getId();
+        }
 
         $filename = InputHelper::transliterateFilename($filename);
+        if ('' === $filename) {
+            $filename = (string) $asset->getId();
+        }
 
         $finalName   = $this->ensureUniqueFilename($filename, $usedNames);
         $usedNames[] = mb_strtolower($finalName);

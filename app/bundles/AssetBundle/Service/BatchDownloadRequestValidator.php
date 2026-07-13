@@ -8,10 +8,10 @@ use Mautic\AssetBundle\Service\Exception\BatchDownloadException;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\Request;
 
-final class BatchDownloadRequestValidator
+final readonly class BatchDownloadRequestValidator
 {
     public function __construct(
-        private readonly CorePermissions $security,
+        private CorePermissions $security,
     ) {
     }
 
@@ -42,7 +42,7 @@ final class BatchDownloadRequestValidator
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
 
-        if (!is_array($ids) || empty($ids)) {
+        if (!is_array($ids) || !array_is_list($ids) || empty($ids)) {
             throw new BatchDownloadException('mautic.asset.asset.batch_download.error.no_selection');
         }
 

@@ -190,6 +190,13 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         Assert::assertArrayHasKey('flashes', $content);
     }
 
+    public function testBatchDownloadRejectsObjectShapedIds(): void
+    {
+        $this->client->request('GET', '/s/assets/batchDownload', ['ids' => '{"asset": 1}']);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+    }
+
     public function testBatchDownloadReturnsZipWithSanitizedTitles(): void
     {
         $this->asset->setOriginalFileName('Asset controller test. Preview action.png');
@@ -209,9 +216,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         Assert::assertStringContainsString('assets-batch-', $contentDisposition);
         Assert::assertStringEndsWith('.zip', $contentDisposition);
 
-        ob_start();
-        $response->sendContent();
-        $zipContent = ob_get_clean();
+        $zipContent = $this->client->getInternalResponse()->getContent();
 
         $zipPath = tempnam(sys_get_temp_dir(), 'mautic_asset_batch_test_');
         \assert(false !== $zipPath);
