@@ -89,7 +89,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
 
         $translator = self::getContainer()->get('translator');
 
-        $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($translator->trans('mautic.core.recent.activity'), (string) $this->client->getResponse()->getContent());
         $this->assertCount(2, $crawler->filterXPath('//ul[contains(@class, "media-list-feed")]/li'));
     }
 }

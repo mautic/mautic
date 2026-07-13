@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -90,7 +91,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         if ($expectedErrorMessage) {
             Assert::assertStringContainsString(
                 $expectedErrorMessage,
-                json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
+                (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
                 $this->client->getResponse()->getContent()
             );
         }
@@ -408,7 +409,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'validators'
         );
-        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
+        Assert::assertStringContainsString($errorMessage, (string) $response['errors'][0]['message']);
     }
 
     public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
@@ -635,6 +636,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
         $segmentCountCacheHelper = self::getContainer()->get('mautic.helper.segment.count.cache');
         $segmentCountCacheHelper->setSegmentContactCount($segment->getId(), 2);
 
@@ -721,7 +723,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['message']);
+        Assert::assertStringContainsString($expectedErrorMessage, (string) $response['errors'][0]['message']);
 
         $expectedErrorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.delete',
@@ -733,7 +735,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['details'][0]);
+        Assert::assertStringContainsString($expectedErrorMessage, (string) $response['errors'][0]['details'][0]);
     }
 
     public function testBatchDeleteUsedInCampaignSegment(): void

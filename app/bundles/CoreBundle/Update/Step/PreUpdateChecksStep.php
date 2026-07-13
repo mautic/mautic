@@ -59,7 +59,7 @@ final readonly class PreUpdateChecksStep implements StepInterface
             $errorString = '';
 
             foreach ($errors as $error) {
-                $errorString .= "- $error\n";
+                $errorString .= "- {$error}\n";
             }
 
             throw new UpdateFailedException($this->translator->trans('mautic.core.update.check.error')."\n".$errorString);

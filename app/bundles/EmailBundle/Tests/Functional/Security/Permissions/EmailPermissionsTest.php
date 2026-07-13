@@ -16,7 +16,7 @@ final class EmailPermissionsTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles/new');
         self::assertResponseIsSuccessful();
 
-        Assert::assertStringContainsString('Send to unsubscribed contacts', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('Send to unsubscribed contacts', (string) $this->client->getResponse()->getContent());
 
         $emailPermissionTab = $crawler->filter('#emailPermissionTab');
         Assert::assertCount(1, $emailPermissionTab);
@@ -40,6 +40,7 @@ final class EmailPermissionsTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $role               = $this->em->getRepository(Role::class)->findOneBy(['name' => 'Send To DNC Permission']);
+        $this->assertInstanceOf(Role::class, $role);
         $readablePermission = $role->getRawPermissions();
         Assert::assertSame(['email:emails' => [8 => 'sendtodnc']], $readablePermission);
     }

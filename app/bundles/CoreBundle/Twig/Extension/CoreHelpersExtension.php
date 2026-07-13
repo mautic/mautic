@@ -114,12 +114,12 @@ class CoreHelpersExtension extends AbstractExtension
                     }
                 }
 
-                return 'href="javascript:void(0);"'." onclick='".$jsCallback.'('.implode(',', $jsArguments).", $page, this);'";
+                return 'href="javascript:void(0);"'." onclick='".$jsCallback.'('.implode(',', $jsArguments).", {$page}, this);'";
             }
 
-            return 'href="javascript:void(0);"'." onclick='".$jsCallback."($page, this);'";
+            return 'href="javascript:void(0);"'." onclick='".$jsCallback."({$page}, this);'";
         }
 
-        return "href=\"$baseUrl/$page{$queryString}\"";
+        return "href=\"{$baseUrl}/{$page}{$queryString}\"";
     }
 }

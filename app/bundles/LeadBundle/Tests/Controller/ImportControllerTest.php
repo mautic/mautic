@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\ImportCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -449,6 +450,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function addCancellationNotification(?Import $import = null): void
     {
+        /** @var NotificationModel $notificationModel */
         $notificationModel = static::getContainer()->get('mautic.core.model.notification');
         $translator        = static::getContainer()->get('translator');
 
@@ -491,7 +493,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $notifications    = $notificationRepo->getNotifications($userId);
 
         foreach ($notifications as $notification) {
-            Assert::assertStringNotContainsString($expectedSubstring, $notification['message']);
+            Assert::assertStringNotContainsString($expectedSubstring, (string) $notification['message']);
         }
     }
 
@@ -557,6 +559,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     {
         $user = $this->em->getRepository(User::class)
             ->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $field = new LeadField();
         $field->setType('boolean');

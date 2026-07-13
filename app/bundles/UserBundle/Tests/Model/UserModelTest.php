@@ -119,7 +119,6 @@ final class UserModelTest extends TestCase
             ->with('mautic_user_passwordresetconfirm', ['token' => null], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
 
@@ -312,7 +311,7 @@ final class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: token selector was not found', ['selector' => 'missing-selector']);
 
-        $this->assertNull($this->userModel->getInvite('missing-selector.verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('missing-selector.verifier'));
     }
 
     public function testGetInviteReturnsNullWhenInviteExpired(): void
@@ -335,7 +334,7 @@ final class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: invite has expired', ['invite_id' => null, 'email' => null]);
 
-        $this->assertNull($this->userModel->getInvite('expired-selector.verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('expired-selector.verifier'));
     }
 
     public function testGetInviteReturnsNullWhenTokenVerifierDoesNotMatch(): void
@@ -359,7 +358,7 @@ final class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: token verifier did not match', ['invite_id' => null, 'email' => null]);
 
-        $this->assertNull($this->userModel->getInvite('active-selector.wrong-verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('active-selector.wrong-verifier'));
     }
 
     public function testGetInviteReturnsNullWhenInviteAlreadyUsed(): void
@@ -384,7 +383,7 @@ final class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: invite has already been used', ['invite_id' => null, 'email' => null]);
 
-        $this->assertNull($this->userModel->getInvite('used-selector.verifier'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('used-selector.verifier'));
     }
 
     public function testGetInviteReturnsNullWhenTokenFormatIsInvalid(): void
@@ -396,7 +395,7 @@ final class UserModelTest extends TestCase
             ->method('warning')
             ->with('User invite link rejected: token format is invalid', []);
 
-        $this->assertNull($this->userModel->getInvite('invalid-token'));
+        $this->assertNotInstanceOf(UserInvite::class, $this->userModel->getInvite('invalid-token'));
     }
 
     public function testGetInviteReturnsActiveInvite(): void

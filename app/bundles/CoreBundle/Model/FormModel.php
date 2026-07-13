@@ -422,7 +422,7 @@ class FormModel extends AbstractCommonModel
         $nameGetter = $this->getNameGetter();
 
         return $this->translator->trans($msg, [
-            '%entityName%' => $entity->$nameGetter(),
+            '%entityName%' => $entity->{$nameGetter}(),
             '%entityId%'   => $entity->getId(),
         ]);
     }

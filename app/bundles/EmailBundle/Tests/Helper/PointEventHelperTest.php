@@ -59,7 +59,7 @@ final class PointEventHelperTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getEntity', 'sendEmail'])
             ->getMock();
 
-        $mock->expects($this->any())
+        $mock
             ->method('getEntity')
             ->willReturnCallback(function ($id) use ($published): Email {
                 $email = new Email();
@@ -68,7 +68,7 @@ final class PointEventHelperTest extends \PHPUnit\Framework\TestCase
                 return $email;
             });
 
-        $mock->expects($this->any())
+        $mock
             ->method('sendEmail')
             ->willReturn($sendEmail);
 

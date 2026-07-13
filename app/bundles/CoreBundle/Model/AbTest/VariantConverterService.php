@@ -31,7 +31,7 @@ class VariantConverterService
         $this->switchParent    = $winner->isVariant(true);
 
         // set this email as the parent for the original parent and children
-        if (true === $this->switchParent) {
+        if ($this->switchParent) {
             $oldParent = $winner->getVariantParent();
 
             $this->switchParent($winner, $oldParent);
@@ -74,7 +74,7 @@ class VariantConverterService
     {
         foreach ($variantChildren as $child) {
             if ($child->getId() !== $winner->getId()) {
-                if (true === $this->switchParent) {
+                if ($this->switchParent) {
                     $this->transferChildToWinner($child, $winner);
                 }
                 $child->setIsPublished(false);

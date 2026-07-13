@@ -54,7 +54,8 @@ class ContactTracker
 
         if ($systemContact = $this->getSystemContact()) {
             return $systemContact;
-        } elseif ($this->isUserSession()) {
+        }
+        if ($this->isUserSession()) {
             return null;
         }
 
@@ -320,7 +321,7 @@ class ContactTracker
     {
         $newTrackingId = $this->getTrackingId();
         $this->logger->debug(
-            "CONTACT: Tracking code changed from $previouslyTrackedId for contact ID# {$previouslyTrackedContact->getId()} to $newTrackingId for contact ID# {$this->trackedContact->getId()}"
+            "CONTACT: Tracking code changed from {$previouslyTrackedId} for contact ID# {$previouslyTrackedContact->getId()} to {$newTrackingId} for contact ID# {$this->trackedContact->getId()}"
         );
 
         if (null !== $previouslyTrackedId) {

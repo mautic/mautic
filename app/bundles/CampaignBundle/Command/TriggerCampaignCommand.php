@@ -228,8 +228,8 @@ class TriggerCampaignCommand extends ModeratedCommand
             // Specific campaign;
             if ($id) {
                 $statusCode = ExitCode::SUCCESS;
-                /** @var Campaign $campaign */
-                if ($campaign = $this->campaignRepository->getEntity($id)) {
+                $campaign = $this->campaignRepository->getEntity($id);
+                if ($campaign instanceof Campaign) {
                     $this->triggerCampaign($campaign);
                 } else {
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');

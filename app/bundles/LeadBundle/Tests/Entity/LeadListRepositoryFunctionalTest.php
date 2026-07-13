@@ -49,9 +49,9 @@ final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
     private function createSegment(string $suffix = 'A'): LeadList
     {
         $segment = new LeadList();
-        $segment->setName("Segment $suffix");
-        $segment->setPublicName("Segment $suffix");
-        $segment->setAlias("segment-$suffix");
+        $segment->setName("Segment {$suffix}");
+        $segment->setPublicName("Segment {$suffix}");
+        $segment->setAlias("segment-{$suffix}");
 
         $this->em->persist($segment);
         $this->em->flush();
