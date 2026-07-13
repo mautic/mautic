@@ -82,12 +82,10 @@ final class WebhookModelTest extends TestCase
 
         $this->webhookRepository->expects($this->once())
             ->method('saveEntity')
-            ->with($this->callback(function (Webhook $entity): true {
+            ->willReturnCallback(function (Webhook $entity): void {
                 // The secret hash is not empty on save.
                 $this->assertNotEmpty($entity->getSecret());
-
-                return true;
-            }));
+            });
 
         $this->model->saveEntity($entity);
     }

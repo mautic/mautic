@@ -21,7 +21,7 @@ final class PageRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.page.searchcommand.isexpired' => 'is:expired',
             'mautic.page.searchcommand.ispending' => 'is:pending',
             default                               => $id,

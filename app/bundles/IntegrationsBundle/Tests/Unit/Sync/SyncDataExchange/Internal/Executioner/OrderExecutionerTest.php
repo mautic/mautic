@@ -81,7 +81,7 @@ final class OrderExecutionerTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectUpdateEvent $event): void {
                         Assert::assertSame(Contact::NAME, $event->getObject()->getName());
@@ -127,7 +127,7 @@ final class OrderExecutionerTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectUpdateEvent $event): void {
                         Assert::assertSame(Contact::NAME, $event->getObject()->getName());
@@ -196,7 +196,7 @@ final class OrderExecutionerTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectUpdateEvent $event): void {
                         Assert::assertSame(Company::NAME, $event->getObject()->getName());
@@ -263,7 +263,7 @@ final class OrderExecutionerTest extends TestCase
         $matcher = $this->exactly(4);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectUpdateEvent $event): void {
                         Assert::assertSame(Contact::NAME, $event->getObject()->getName());

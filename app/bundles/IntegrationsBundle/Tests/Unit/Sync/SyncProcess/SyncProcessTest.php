@@ -152,7 +152,7 @@ final class SyncProcessTest extends TestCase
         $matcher = $this->any();
 
         $this->eventDispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (CompletedSyncIterationEvent $event): void {
                         $orderResult = $event->getOrderResults();
@@ -201,7 +201,7 @@ final class SyncProcessTest extends TestCase
         $internalSyncOrder = $this->createMock(OrderDAO::class);
         $internalSyncOrder->expects($this->once())
             ->method('shouldSync')
-            ->willReturnOnConsecutiveCalls(true);
+            ->willReturn(true);
         $internalSyncOrder->expects($this->exactly(2))
             ->method('getObjectMappings')
             ->willReturn([(new ObjectMapping())->setIntegrationObjectName('bar')]);

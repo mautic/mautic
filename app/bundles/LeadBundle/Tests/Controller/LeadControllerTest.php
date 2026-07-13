@@ -468,7 +468,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content = $this->client->getInternalResponse()->getContent();
         $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
-        $this->assertTrue(strlen($content) > 10000, $content);
+        $this->assertGreaterThan(10000, strlen($content), $content);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void
@@ -1229,7 +1229,7 @@ EMAIL;
 
         $this->assertResponseIsSuccessful();
         $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
-        $this->assertTrue(strlen($content) > 10000, $content);
+        $this->assertGreaterThan(10000, strlen($content), $content);
 
         /** @var AuditLog $auditLog */
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([

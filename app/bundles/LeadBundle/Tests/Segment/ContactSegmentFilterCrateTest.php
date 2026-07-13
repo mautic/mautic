@@ -101,7 +101,7 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertSame(2.0, $contactSegmentFilterCrate->getFilter());
+        $this->assertEqualsWithDelta(2.0, $contactSegmentFilterCrate->getFilter(), PHP_FLOAT_EPSILON);
         $this->assertTrue($contactSegmentFilterCrate->isNumberType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
