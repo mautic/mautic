@@ -222,10 +222,7 @@ final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportDevicesSubscriber(): ReportDevicesSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-
-        return new ReportDevicesSubscriber($fieldsBuilderMock, $companyReportDataMock);
+        return new ReportDevicesSubscriber($this->createStub(FieldsBuilder::class), $this->createStub(CompanyReportData::class));
     }
 
     /**

@@ -208,7 +208,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(21, $tags['NonUK:NotOpen']);
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
-        $this->assertFalse(isset($tags['EmailNotOpen']));
+        $this->assertArrayNotHasKey('EmailNotOpen', $tags);
     }
 
     /**
@@ -535,7 +535,7 @@ final class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(1, $tags['NonUK:NotOpen']);
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
-        $this->assertFalse(isset($tags['EmailNotOpen']));
+        $this->assertArrayNotHasKey('EmailNotOpen', $tags);
     }
 
     /**

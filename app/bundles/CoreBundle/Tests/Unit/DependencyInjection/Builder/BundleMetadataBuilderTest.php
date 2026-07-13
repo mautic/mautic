@@ -36,7 +36,7 @@ final class BundleMetadataBuilderTest extends TestCase
         $metadata = $builder->getCoreBundleMetadata();
 
         $this->assertSame([], $builder->getPluginMetadata());
-        $this->assertTrue(isset($metadata['MauticCoreBundle']));
+        $this->assertArrayHasKey('MauticCoreBundle', $metadata);
 
         $bundleMetadata = $metadata['MauticCoreBundle'];
 
@@ -48,10 +48,10 @@ final class BundleMetadataBuilderTest extends TestCase
         $this->assertEquals(realpath($this->paths['root']).'/app/bundles/CoreBundle', $bundleMetadata['directory']);
         $this->assertEquals('Mautic\CoreBundle', $bundleMetadata['namespace']);
         $this->assertEquals(\Mautic\CoreBundle\MauticCoreBundle::class, $bundleMetadata['bundleClass']);
-        $this->assertTrue(isset($bundleMetadata['permissionClasses']));
-        $this->assertTrue(isset($bundleMetadata['permissionClasses'][SystemPermissions::class]));
-        $this->assertTrue(isset($bundleMetadata['config']));
-        $this->assertTrue(isset($bundleMetadata['config']['routes']));
+        $this->assertArrayHasKey('permissionClasses', $bundleMetadata);
+        $this->assertArrayHasKey(SystemPermissions::class, $bundleMetadata['permissionClasses']);
+        $this->assertArrayHasKey('config', $bundleMetadata);
+        $this->assertArrayHasKey('routes', $bundleMetadata['config']);
     }
 
     public function testPluginMetadataLoaded(): void
@@ -62,7 +62,7 @@ final class BundleMetadataBuilderTest extends TestCase
         $metadata = $builder->getPluginMetadata();
 
         $this->assertSame([], $builder->getCoreBundleMetadata());
-        $this->assertTrue(isset($metadata['MauticFocusBundle']));
+        $this->assertArrayHasKey('MauticFocusBundle', $metadata);
         $bundleMetadata = $metadata['MauticFocusBundle'];
 
         $this->assertTrue($bundleMetadata['isPlugin']);
@@ -73,10 +73,10 @@ final class BundleMetadataBuilderTest extends TestCase
         $this->assertEquals(realpath($this->paths['root']).'/plugins/MauticFocusBundle', $bundleMetadata['directory']);
         $this->assertEquals('MauticPlugin\MauticFocusBundle', $bundleMetadata['namespace']);
         $this->assertEquals(\MauticPlugin\MauticFocusBundle\MauticFocusBundle::class, $bundleMetadata['bundleClass']);
-        $this->assertTrue(isset($bundleMetadata['permissionClasses']));
-        $this->assertTrue(isset($bundleMetadata['permissionClasses'][FocusPermissions::class]));
-        $this->assertTrue(isset($bundleMetadata['config']));
-        $this->assertTrue(isset($bundleMetadata['config']['routes']));
+        $this->assertArrayHasKey('permissionClasses', $bundleMetadata);
+        $this->assertArrayHasKey(FocusPermissions::class, $bundleMetadata['permissionClasses']);
+        $this->assertArrayHasKey('config', $bundleMetadata);
+        $this->assertArrayHasKey('routes', $bundleMetadata['config']);
     }
 
     public function testSymfonyBundleIgnored(): void

@@ -194,7 +194,8 @@ class UserApiController extends CommonApiController
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
-        } elseif (!is_array($permissions)) {
+        }
+        if (!is_array($permissions)) {
             $permissions = [$permissions];
         }
 

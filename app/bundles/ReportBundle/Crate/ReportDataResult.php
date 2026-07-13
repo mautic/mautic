@@ -209,13 +209,13 @@ class ReportDataResult
 
                 return $sum;
             case 'MAX':
-                if (!is_null($previousVal)) {
+                if (null !== $previousVal) {
                     $aggregatorVal[] = $previousVal;
                 }
 
                 return max($aggregatorVal);
             case 'MIN':
-                if (!is_null($previousVal)) {
+                if (null !== $previousVal) {
                     $aggregatorVal[] = $previousVal;
                 }
 

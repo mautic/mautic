@@ -405,7 +405,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     public function generateUrl(Asset $entity, bool $absolute = true, array $clickthrough = [], ?string $stream = null): string
     {
         $routeParams = ['slug' => $entity->getSlug()];
-        if (!is_null($stream)) {
+        if (null !== $stream) {
             $routeParams['stream'] = $stream;
         }
 

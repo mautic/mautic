@@ -64,7 +64,7 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             $crawler->filterXPath("//div[@id='flashes']//span")->first()->text()
             :
             '';
-        Assert::assertStringNotContainsString('Could not save updated configuration:', $response, $message);
+        Assert::assertStringNotContainsString('Could not save updated configuration:', (string) $response, $message);
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();

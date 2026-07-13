@@ -225,11 +225,13 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $event->setResult(false);
 
                 return;
-            } elseif ($event->checkContext('email.open')) {
+            }
+            if ($event->checkContext('email.open')) {
                 $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
 
                 return;
-            } elseif ($event->checkContext('email.reply')) {
+            }
+            if ($event->checkContext('email.reply')) {
                 $event->setResult(in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds()));
 
                 return;

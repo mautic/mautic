@@ -21,8 +21,6 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $userHelper        = $this->createMock(UserHelper::class);
         $this->integration = new HubspotIntegration(
             $this->dispatcher,
             $this->cache,
@@ -40,7 +38,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             $this->integrationEntityModel,
             $this->doNotContact,
             $this->fieldsWithUniqueIdentifier,
-            $userHelper
+            $this->createStub(UserHelper::class)
         );
     }
 

@@ -501,7 +501,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Get the default properties of an entity and parents.
      *
-     * @phpstan-param E $entity
+     * @param E $entity
      *
      * @return array<mixed>
      */
@@ -564,7 +564,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @phpstan-param E $entity
+     * @param E $entity
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
@@ -661,10 +661,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param array<int, array<string|int>> $errors
-     * @param array<int, object|null>       $entities
-     *
-     * @phpstan-param E|null $entity
-     * @phpstan-param array<int, E|null> $entities
+     * @param E|null                        $entity
+     * @param array<int, E|null>            $entities
      */
     protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
     {

@@ -56,13 +56,9 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setup(): void
     {
         parent::setUp();
-
-        $ipLookupHelper         = $this->createMock(IpLookupHelper::class);
-        $auditLogModel          = $this->createMock(AuditLogModel::class);
         $this->emailModel       = $this->createMock(EmailModel::class);
-        $translator             = $this->createMock(TranslatorInterface::class);
         $this->mockMessage      = $this->createMock(MauticMessage::class);
-        $this->subscriber       = new EmailSubscriber($ipLookupHelper, $auditLogModel, $this->emailModel, $translator, $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class));
+        $this->subscriber       = new EmailSubscriber($this->createStub(IpLookupHelper::class), $this->createStub(AuditLogModel::class), $this->emailModel, $this->createStub(TranslatorInterface::class), $this->createStub(EntityManagerInterface::class), $this->createStub(EmailDraftModel::class));
     }
 
     public function testOnEmailResendWithNoLeadIdHash(): void
@@ -79,7 +75,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoStat(): void
     {
-        $message = new class extends MauticMessage {
+        $message = new class() extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -101,7 +97,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWithNoRetry(): void
     {
-        $message = new class extends MauticMessage {
+        $message = new class() extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -168,7 +164,7 @@ final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailResendWith4Retry(): void
     {
-        $message = new class extends MauticMessage {
+        $message = new class() extends MauticMessage {
             public ?string $leadIdHash = 'some-hash';
         };
 
@@ -270,20 +266,8 @@ CONTENT,
 
     private function runPreheaderEvent(string $html, callable $assert): void
     {
-        /** @var MockObject&FromEmailHelper $fromEmailHelper */
-        $fromEmailHelper = $this->createMock(FromEmailHelper::class);
-
         /** @var MockObject&CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        /** @var MockObject&Mailbox $mailbox */
-        $mailbox = $this->createMock(Mailbox::class);
-
-        /** @var MockObject&RouterInterface $router */
-        $router = $this->createMock(RouterInterface::class);
-
-        /** @var MockObject&Environment $twig */
-        $twig = $this->createMock(Environment::class);
 
         $themeHelper = $this->createMock(ThemeHelper::class);
         $themeHelper->expects(self::never())
@@ -304,13 +288,13 @@ CONTENT,
         $requestStack = new RequestStack();
         $mailHelper   = new MailHelper(
             $mailer,
-            $fromEmailHelper,
+            $this->createStub(FromEmailHelper::class),
             $coreParametersHelper,
-            $mailbox,
+            $this->createStub(Mailbox::class),
             new NullLogger(),
             new MailHashHelper($coreParametersHelper),
-            $router,
-            $twig,
+            $this->createStub(RouterInterface::class),
+            $this->createStub(Environment::class),
             $themeHelper,
             $this->createStub(PathsHelper::class),
             $this->createStub(EventDispatcherInterface::class),
