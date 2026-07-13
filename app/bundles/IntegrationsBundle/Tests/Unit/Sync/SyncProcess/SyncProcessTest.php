@@ -67,31 +67,25 @@ final class SyncProcessTest extends TestCase
     protected function setUp(): void
     {
         $this->syncDateHelper              = $this->createMock(SyncDateHelper::class);
-        $mappingHelper                     = $this->createMock(MappingHelper::class);
-        $relationsHelper                   = $this->createMock(RelationsHelper::class);
         $this->integrationSyncProcess      = $this->createMock(IntegrationSyncProcess::class);
         $this->mauticSyncProcess           = $this->createMock(MauticSyncProcess::class);
         $this->eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $notifier                          = $this->createMock(Notifier::class);
-        $mappingManualDAO                  = $this->createMock(MappingManualDAO::class);
-        $integrationSyncDataExchange       = $this->createMock(SyncDataExchangeInterface::class);
         $this->internalSyncDataExchange    = $this->createMock(MauticSyncDataExchange::class);
         $this->inputOptionsDAO             = $this->createMock(InputOptionsDAO::class);
-        $syncService                       = $this->createMock(SyncServiceInterface::class);
 
         $this->syncProcess = new SyncProcess(
             $this->syncDateHelper,
-            $mappingHelper,
-            $relationsHelper,
+            $this->createStub(MappingHelper::class),
+            $this->createStub(RelationsHelper::class),
             $this->integrationSyncProcess,
             $this->mauticSyncProcess,
             $this->eventDispatcher,
-            $notifier,
-            $mappingManualDAO,
+            $this->createStub(Notifier::class),
+            $this->createStub(MappingManualDAO::class),
             $this->internalSyncDataExchange,
-            $integrationSyncDataExchange,
+            $this->createStub(SyncDataExchangeInterface::class),
             $this->inputOptionsDAO,
-            $syncService
+            $this->createStub(SyncServiceInterface::class)
         );
     }
 

@@ -415,12 +415,12 @@ final class MailHelperTest extends TestCase
         $this->assertSame(['owner1@owner.com', 'nobody@nowhere.com', 'owner2@owner.com'], $fromAddresses);
 
         foreach ($metadatas as $key => $metadata) {
-            $this->assertTrue(isset($metadata[$this->contacts[$key]['email']]));
+            $this->assertArrayHasKey($this->contacts[$key]['email'], $metadata);
 
             if (0 === $key) {
                 // Should have two contacts
                 $this->assertCount(2, $metadata);
-                $this->assertTrue(isset($metadata['contact4@somewhere.com']));
+                $this->assertArrayHasKey('contact4@somewhere.com', $metadata);
             } else {
                 $this->assertCount(1, $metadata);
             }
@@ -1608,7 +1608,7 @@ final class MailHelperTest extends TestCase
 
         $body = $transport->getMessage()->getHtmlBody();
 
-        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', $body);
+        $this->assertStringContainsString('<img height="1" width="1" src="{tracking_pixel}" alt="" />', (string) $body);
         $this->assertSame(2, substr_count($body, 'cid:'));
 
         $metadata = $transport->getMessage()->getMetadata();

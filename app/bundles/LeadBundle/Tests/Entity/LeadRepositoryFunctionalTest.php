@@ -111,7 +111,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         // Points should now not be in changes
         $model->saveEntity($this->lead);
         $changes = $this->lead->getChanges(true);
-        $this->assertFalse(isset($changes['points']));
+        $this->assertArrayNotHasKey('points', $changes);
         // Points should remain the same
         $model->saveEntity($this->lead);
         $this->em->getRepository(Lead::class)->saveEntity($this->lead);

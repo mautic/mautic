@@ -35,7 +35,7 @@ final class TweetControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString('Tweet One', $response->getContent());
+        $this->assertStringContainsString('Tweet One', (string) $response->getContent());
     }
 
     public function testCreateTweet(): void
@@ -62,7 +62,7 @@ final class TweetControllerTest extends MauticMysqlTestCase
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit tweet '.$tweet->getName(), $clientResponseContent, 'The return must contain \'Edit tweet\' text');
+        $this->assertStringContainsString('Edit tweet '.$tweet->getName(), (string) $clientResponseContent, 'The return must contain \'Edit tweet\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['twitter_tweet[name]']->setValue('Updated tweet name');

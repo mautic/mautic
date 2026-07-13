@@ -59,8 +59,6 @@ final class MauticSyncDataExchangeTest extends TestCase
         $this->mappingHelper              = $this->createMock(MappingHelper::class);
         $this->fullObjectReportBuilder    = $this->createMock(FullObjectReportBuilder::class);
         $this->partialObjectReportBuilder = $this->createMock(PartialObjectReportBuilder::class);
-        $orderExecutioner                 = $this->createMock(OrderExecutioner::class);
-        $syncDateHelper                   = $this->createMock(SyncDateHelper::class);
 
         $this->mauticSyncDataExchange = new MauticSyncDataExchange(
             $this->fieldChangeRepository,
@@ -68,8 +66,8 @@ final class MauticSyncDataExchangeTest extends TestCase
             $this->mappingHelper,
             $this->fullObjectReportBuilder,
             $this->partialObjectReportBuilder,
-            $orderExecutioner,
-            $syncDateHelper
+            $this->createStub(OrderExecutioner::class),
+            $this->createStub(SyncDateHelper::class)
         );
     }
 

@@ -15,13 +15,13 @@ final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $helper   = new DateTimeHelper();
         $timezone = $helper->guessTimezoneFromOffset();
-        $this->assertEquals('Europe/London', $timezone);
+        $this->assertSame('Europe/London', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(3600);
-        $this->assertEquals('Europe/Paris', $timezone);
+        $this->assertSame('Europe/Paris', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(-2 * 3600);
-        $this->assertEquals('America/Goose_Bay', $timezone); // Is it really in timezone -2
+        $this->assertSame('America/Goose_Bay', $timezone); // Is it really in timezone -2
         $timezone = $helper->guessTimezoneFromOffset(-5 * 3600);
-        $this->assertEquals('America/New_York', $timezone);
+        $this->assertSame('America/New_York', $timezone);
     }
 
     public function testBuildIntervalWithBadUnit(): void
