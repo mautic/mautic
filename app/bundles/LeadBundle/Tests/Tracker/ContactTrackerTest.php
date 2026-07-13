@@ -92,7 +92,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->leadRepositoryMock->expects($this->any())
+        $this->leadRepositoryMock
             ->method('getFieldValues')
             ->willReturn([]);
 
@@ -176,7 +176,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedLead')
             ->willReturn(null);
 
-        $this->coreParametersHelperMock->expects($this->any())
+        $this->coreParametersHelperMock
             ->method('get')
             ->willReturn(true);
 
@@ -212,7 +212,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepositoryMock->expects($this->never())
             ->method('getLeadsByIp');
-        $this->leadFieldModelMock->expects($this->any())->method('getFieldListWithProperties')->willReturn([]);
+        $this->leadFieldModelMock->method('getFieldListWithProperties')->willReturn([]);
 
         $contact = $contactTracker->getContact();
         $this->assertInstanceOf(Lead::class, $contact);

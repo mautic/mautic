@@ -118,8 +118,8 @@ final class ResultControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/forms/results/{$formId}/add-to-segment");
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('form', $response->getContent());
-        $this->assertStringContainsString('batch', $response->getContent());
+        $this->assertStringContainsString('form', (string) $response->getContent());
+        $this->assertStringContainsString('batch', (string) $response->getContent());
     }
 
     public function testEditButtonIsDisplayedOnFormResultsPage(): void

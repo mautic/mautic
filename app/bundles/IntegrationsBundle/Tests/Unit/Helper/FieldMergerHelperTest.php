@@ -31,11 +31,11 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertFalse(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayNotHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testFieldUnsetIfMappingIsDeleted(): void
@@ -53,11 +53,11 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertFalse(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayNotHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentFieldMappingsAreMerged(): void
@@ -89,13 +89,13 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals($updatedFieldMappings['field1']['mappedField'], $mergedFieldMappings['Lead']['field1']['mappedField']);
         $this->assertEquals($updatedFieldMappings['field1']['syncDirection'], $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentFieldMappingsAreMergedWithJustMappedFieldUpdated(): void
@@ -126,13 +126,13 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
         $this->assertEquals($updatedFieldMappings['field4']['mappedField'], $mergedFieldMappings['Lead']['field4']['mappedField']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field4']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentFieldMappingsAreMergedWithJustSyncDirectionUpdated(): void
@@ -163,13 +163,13 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
         $this->assertEquals($fields['Lead']['field4']['mappedField'], $mergedFieldMappings['Lead']['field4']['mappedField']);
         $this->assertEquals($updatedFieldMappings['field4']['syncDirection'], $mergedFieldMappings['Lead']['field4']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testFieldUnsetIfDirectionIsUpdatedWithoutMappedField(): void
@@ -190,11 +190,11 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertFalse(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayNotHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithExisting(): void
@@ -225,12 +225,12 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field4']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithBidirectionalSupported(): void
@@ -262,12 +262,12 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_BIDIRECTIONALLY, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithIntegrationDirectionalSupported(): void
@@ -300,12 +300,12 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_INTEGRATION, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionSetWithMauticDirectionalSupported(): void
@@ -338,12 +338,12 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testCurrentSyncDirectionOverwrittenWithSupportedDirectionalSync(): void
@@ -375,12 +375,12 @@ final class FieldMergerHelperTest extends TestCase
         $fieldMergerHelper->mergeSyncFieldMapping('Lead', $updatedFieldMappings);
         $mergedFieldMappings = $fieldMergerHelper->getFieldMappings();
 
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field1']));
+        $this->assertArrayHasKey('field1', $mergedFieldMappings['Lead']);
         $this->assertEquals(ObjectMappingDAO::SYNC_TO_MAUTIC, $mergedFieldMappings['Lead']['field1']['syncDirection']);
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field2']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field3']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field4']));
-        $this->assertTrue(isset($mergedFieldMappings['Lead']['field5']));
+        $this->assertArrayHasKey('field2', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field3', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field4', $mergedFieldMappings['Lead']);
+        $this->assertArrayHasKey('field5', $mergedFieldMappings['Lead']);
     }
 
     public function testDefaultSyncDirectionThrowsExceptionIfFieldDoesNotHaveSyncDirectionSupportDefined(): void

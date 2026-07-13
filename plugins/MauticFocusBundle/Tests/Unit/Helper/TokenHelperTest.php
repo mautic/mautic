@@ -31,10 +31,9 @@ final class TokenHelperTest extends TestCase
         parent::setUp();
 
         $this->model    = $this->createMock(FocusModel::class);
-        $router         = $this->createMock(RouterInterface::class);
         $this->security = $this->createMock(CorePermissions::class);
 
-        $this->helper = new TokenHelper($this->model, $router, $this->security);
+        $this->helper = new TokenHelper($this->model, $this->createStub(RouterInterface::class), $this->security);
     }
 
     public function testFindFocusTokensNotFound(): void
