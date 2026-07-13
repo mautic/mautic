@@ -35,6 +35,6 @@ final class ProjectSearchScopeProviderTest extends SearchScopeProviderTestCase
 
     protected function expectedDynamicCommands(): array
     {
-        return ['is:mine'];
+        return ['ids'];
     }
 }

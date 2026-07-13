@@ -19,14 +19,13 @@ final class PointInsightSearchScopeProviderTest extends SearchScopeProviderTestC
         $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
-                'mautic.core.searchcommand.name' => 'name',
-                'mautic.core.searchcommand.ismine' => 'is:mine',
+                'mautic.core.searchcommand.ids' => 'ids',
                 default => $key,
             });
 
         $insightModel->method('getCommandList')
             ->willReturn([
-                'mautic.core.searchcommand.ismine',
+                'mautic.core.searchcommand.ids',
             ]);
 
         return new PointInsightSearchScopeProvider($insightModel, $translator);
@@ -34,6 +33,6 @@ final class PointInsightSearchScopeProviderTest extends SearchScopeProviderTestC
 
     protected function expectedDynamicCommands(): array
     {
-        return ['is:mine'];
+        return [];
     }
 }

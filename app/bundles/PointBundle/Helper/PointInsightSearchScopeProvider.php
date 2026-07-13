@@ -22,13 +22,7 @@ final class PointInsightSearchScopeProvider extends AbstractSearchScopeProvider
     {
         return [
             SearchScopePresets::standard(),
-            SearchScopePresets::name(),
-            SearchScopePresets::category(),
             SearchScopePresets::ids(),
-            SearchScopePresets::isPublished(),
-            SearchScopePresets::isUnpublished(),
-            SearchScopePresets::isUncategorized(),
-            SearchScopePresets::isMine(),
         ];
     }
 

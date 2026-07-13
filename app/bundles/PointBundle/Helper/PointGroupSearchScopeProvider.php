@@ -22,11 +22,7 @@ final class PointGroupSearchScopeProvider extends AbstractSearchScopeProvider
     {
         return [
             SearchScopePresets::standard(),
-            SearchScopePresets::name(),
             SearchScopePresets::ids(),
-            SearchScopePresets::isPublished(),
-            SearchScopePresets::isUnpublished(),
-            SearchScopePresets::isMine(),
         ];
     }
 

@@ -28,14 +28,20 @@ final class CampaignSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUnpublished(),
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::isMine(),
-            SearchScopePresets::command('mautic.campaign.campaign.searchcommand.isexpired'),
-            SearchScopePresets::command('mautic.campaign.campaign.searchcommand.ispending'),
             SearchScopePresets::project(),
         ];
     }
 
     protected function getAdditionalCommandKeys(): array
     {
-        return $this->campaignModel->getCommandList();
+        $excluded = [
+            'mautic.campaign.campaign.searchcommand.isexpired',
+            'mautic.campaign.campaign.searchcommand.ispending',
+        ];
+
+        return array_values(array_filter(
+            $this->campaignModel->getCommandList(),
+            static fn (string $key): bool => !in_array($key, $excluded, true)
+        ));
     }
 }

@@ -29,8 +29,6 @@ final class PageSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUnpublished(),
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::isMine(),
-            SearchScopePresets::command('mautic.page.searchcommand.isexpired'),
-            SearchScopePresets::command('mautic.page.searchcommand.ispending'),
             SearchScopePresets::command('mautic.page.searchcommand.isprefcenter'),
             SearchScopePresets::project(),
         ];
@@ -38,6 +36,14 @@ final class PageSearchScopeProvider extends AbstractSearchScopeProvider
 
     protected function getAdditionalCommandKeys(): array
     {
-        return $this->pageModel->getCommandList();
+        $excluded = [
+            'mautic.page.searchcommand.isexpired',
+            'mautic.page.searchcommand.ispending',
+        ];
+
+        return array_values(array_filter(
+            $this->pageModel->getCommandList(),
+            static fn (string $key): bool => !in_array($key, $excluded, true)
+        ));
     }
 }

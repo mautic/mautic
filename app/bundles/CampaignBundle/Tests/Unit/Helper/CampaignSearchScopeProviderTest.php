@@ -19,14 +19,12 @@ final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
         $translator->method('trans')
             ->willReturnCallback(static fn (string $key): string => match ($key) {
                 'mautic.core.search.scope.standard' => 'Standard',
-                'mautic.campaign.campaign.searchcommand.isexpired' => 'is:expired',
                 'mautic.core.searchcommand.ismine' => 'is:mine',
                 default => $key,
             });
 
         $campaignModel->method('getCommandList')
             ->willReturn([
-                'mautic.campaign.campaign.searchcommand.isexpired',
                 'mautic.core.searchcommand.ismine',
             ]);
 
@@ -35,6 +33,6 @@ final class CampaignSearchScopeProviderTest extends SearchScopeProviderTestCase
 
     protected function expectedDynamicCommands(): array
     {
-        return ['is:expired'];
+        return ['is:mine'];
     }
 }

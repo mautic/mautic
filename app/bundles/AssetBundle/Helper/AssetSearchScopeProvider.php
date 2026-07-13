@@ -29,14 +29,20 @@ final class AssetSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUnpublished(),
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::isMine(),
-            SearchScopePresets::command('mautic.asset.asset.searchcommand.isexpired'),
-            SearchScopePresets::command('mautic.asset.asset.searchcommand.ispending'),
             SearchScopePresets::project(),
         ];
     }
 
     protected function getAdditionalCommandKeys(): array
     {
-        return $this->assetModel->getCommandList();
+        $excluded = [
+            'mautic.asset.asset.searchcommand.isexpired',
+            'mautic.asset.asset.searchcommand.ispending',
+        ];
+
+        return array_values(array_filter(
+            $this->assetModel->getCommandList(),
+            static fn (string $key): bool => !in_array($key, $excluded, true)
+        ));
     }
 }

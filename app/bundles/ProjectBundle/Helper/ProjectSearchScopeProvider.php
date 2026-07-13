@@ -22,9 +22,7 @@ final class ProjectSearchScopeProvider extends AbstractSearchScopeProvider
     {
         return [
             SearchScopePresets::standard(),
-            SearchScopePresets::name(),
             SearchScopePresets::ids(),
-            SearchScopePresets::isMine(),
         ];
     }
 

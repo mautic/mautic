@@ -29,8 +29,6 @@ final class FormSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::isUnpublished(),
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::isMine(),
-            SearchScopePresets::command('mautic.form.form.searchcommand.isexpired'),
-            SearchScopePresets::command('mautic.form.form.searchcommand.ispending'),
             SearchScopePresets::command('mautic.form.form.searchcommand.hasresults'),
             SearchScopePresets::project(),
         ];
@@ -38,6 +36,14 @@ final class FormSearchScopeProvider extends AbstractSearchScopeProvider
 
     protected function getAdditionalCommandKeys(): array
     {
-        return $this->formModel->getCommandList();
+        $excluded = [
+            'mautic.form.form.searchcommand.isexpired',
+            'mautic.form.form.searchcommand.ispending',
+        ];
+
+        return array_values(array_filter(
+            $this->formModel->getCommandList(),
+            static fn (string $key): bool => !in_array($key, $excluded, true)
+        ));
     }
 }

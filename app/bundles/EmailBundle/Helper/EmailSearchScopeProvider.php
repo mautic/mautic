@@ -28,8 +28,6 @@ final class EmailSearchScopeProvider extends AbstractSearchScopeProvider
             SearchScopePresets::category(),
             SearchScopePresets::isPublished(),
             SearchScopePresets::isUnpublished(),
-            SearchScopePresets::command('mautic.email.email.searchcommand.isexpired'),
-            SearchScopePresets::command('mautic.email.email.searchcommand.ispending'),
             SearchScopePresets::isMine(),
             SearchScopePresets::isUncategorized(),
             SearchScopePresets::project(),
@@ -38,6 +36,14 @@ final class EmailSearchScopeProvider extends AbstractSearchScopeProvider
 
     protected function getAdditionalCommandKeys(): array
     {
-        return $this->emailModel->getCommandList();
+        $excluded = [
+            'mautic.email.email.searchcommand.isexpired',
+            'mautic.email.email.searchcommand.ispending',
+        ];
+
+        return array_values(array_filter(
+            $this->emailModel->getCommandList(),
+            static fn (string $key): bool => !in_array($key, $excluded, true)
+        ));
     }
 }
