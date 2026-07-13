@@ -209,7 +209,8 @@ class SearchStringHelper
                         $this->setFilter($filters, $baseName, $keyCount, $string, $command, $overrideCommand, !$neededParsing);
 
                         break;
-                    } elseif ($c === $char) {
+                    }
+                    if ($c === $char) {
                         // this is another opening char so keep track of it to properly handle nested strings
                         ++$openingCount;
                     } elseif ($c === $this->closingChars[$key]) {

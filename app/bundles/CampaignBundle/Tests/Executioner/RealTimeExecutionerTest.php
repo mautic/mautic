@@ -59,9 +59,7 @@ final class RealTimeExecutionerTest extends TestCase
 
         $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-
-        $this->decisionHelper    = new DecisionHelper($leadRepository);
+        $this->decisionHelper    = new DecisionHelper($this->createStub(LeadRepository::class));
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
         // Configure the redirection helper mock to return the event it receives
@@ -79,6 +77,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getContactPendingEvents');
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -102,6 +101,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -132,6 +132,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'page');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -210,6 +211,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 1);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -244,6 +246,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('evaluateForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -301,6 +304,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('executeEventsForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }
@@ -331,6 +335,7 @@ final class RealTimeExecutionerTest extends TestCase
             ->willReturn([$event]);
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Responses::class, $responses);
 
         $this->assertEquals(0, $responses->containsResponses());
     }

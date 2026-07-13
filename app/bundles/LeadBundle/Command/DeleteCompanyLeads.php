@@ -47,13 +47,13 @@ final readonly class DeleteCompanyLeads
 
     private function processDeleteCompany(int $companyId, OutputInterface $output): void
     {
-        $output->writeln("<info>Updating with new primary company for company id $companyId which has been deleted.</info>");
+        $output->writeln("<info>Updating with new primary company for company id {$companyId} which has been deleted.</info>");
         $this->companyModel->changePrimaryCompanyToLatest($companyId);
 
-        $output->writeln("<info>Deleting all the company lead mapping for company id $companyId which has been deleted.</info>");
+        $output->writeln("<info>Deleting all the company lead mapping for company id {$companyId} which has been deleted.</info>");
         $this->companyLeadRepository->deleteCompanyLeads($companyId);
 
-        $output->writeln("<info>Deleting company for company id $companyId permanently.</info>");
+        $output->writeln("<info>Deleting company for company id {$companyId} permanently.</info>");
         $this->companyModel->deleteCompanyPermanently($companyId);
     }
 }

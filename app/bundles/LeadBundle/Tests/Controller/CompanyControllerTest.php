@@ -79,7 +79,8 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
+        $this->assertInstanceOf(Company::class, $company);
+        $this->assertStringContainsString($company->getName(), (string) $clientResponseContent, 'The return must contain the name of company');
         $this->assertSame('', trim($crawler->filter('#company_contact_engagement')->text()));
         $this->assertSame('', trim($crawler->filter('#contacts-table')->text()));
     }
@@ -100,7 +101,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $engagementData = $datasets[0]['data'] ?? [];
         $totalContacts  = array_sum($engagementData);
 
-        self::assertStringContainsString('Engagements', $response->getContent());
+        self::assertStringContainsString('Engagements', (string) $response->getContent());
         self::assertSame(1, $totalContacts);
     }
 
@@ -116,7 +117,8 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $model                  = self::getContainer()->get('mautic.lead.model.company');
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
+        $this->assertInstanceOf(Company::class, $company);
+        $this->assertStringContainsString('Edit Company '.$company->getName(), (string) $clientResponseContent, 'The return must contain \'Edit Company\' text');
 
         $buttonCrawler = $crawler->selectButton('Save & Close');
         $form          = $buttonCrawler->form();
@@ -151,6 +153,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
 
         // Create a lead linked to the first company
         $lead1 = new Lead();
+        $this->assertInstanceOf(Company::class, $company1);
         $lead1->setFirstname('lead')
             ->setEmail('test1@test.com')
             ->setLastname('for '.$company1->getName());
@@ -178,9 +181,9 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertCount(1, $leadsTableRows, $crawler->html());
 
         $clientResponse = $this->client->getResponse();
-        $this->assertStringContainsString('test1@test.com', $clientResponse->getContent());
-        $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), $clientResponse->getContent());
-        $this->assertStringContainsString('1 item', $clientResponse->getContent());
+        $this->assertStringContainsString('test1@test.com', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), (string) $clientResponse->getContent());
+        $this->assertStringContainsString('1 item', (string) $clientResponse->getContent());
 
         $crawler        = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
@@ -228,7 +231,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('2 companies affected', $response['flashes']);
+        $this->assertStringContainsString('2 companies affected', (string) $response['flashes']);
     }
 
     public function testCompanyFieldsAreUpdatedWithBatchFindAndReplaceForCurrentSearch(): void
@@ -294,7 +297,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true);
         $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('5 companies affected', $response['flashes']);
+        $this->assertStringContainsString('5 companies affected', (string) $response['flashes']);
     }
 
     /**
@@ -357,6 +360,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedCompany = $this->em->find(Company::class, $this->company1Id);
+        $this->assertInstanceOf(Company::class, $savedCompany);
         $this->assertSame($project->getId(), $savedCompany->getProjects()->first()->getId());
     }
 
@@ -376,6 +380,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
 
         $company     = $companyModel->getEntity($this->company1Id);
+        $this->assertInstanceOf(Company::class, $company);
         $updatedName = $company->getName().' - Updated';
         $form->setValues(
             [
@@ -410,16 +415,18 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertInstanceOf(CompanyModel::class, $companyModel);
         $company1 = $companyModel->getEntity($this->company1Id);
         $company2 = $companyModel->getEntity($this->company2Id);
+        $this->assertInstanceOf(Company::class, $company1);
 
-        $this->assertStringContainsString($company1->getName(), $content);
-        $this->assertStringContainsString($company2->getName(), $content);
+        $this->assertStringContainsString($company1->getName(), (string) $content);
+        $this->assertInstanceOf(Company::class, $company2);
+        $this->assertStringContainsString($company2->getName(), (string) $content);
 
         $translator  = self::getContainer()->get('translator');
         $itemMessage = $translator->trans('mautic.core.pagination.items', ['%count%' => 2]);
-        $this->assertStringContainsString($itemMessage, $content);
+        $this->assertStringContainsString($itemMessage, (string) $content);
 
         $pageMessage = $translator->trans('mautic.core.pagination.pages', ['%count%' => 1]);
-        $this->assertStringContainsString($pageMessage, $content);
+        $this->assertStringContainsString($pageMessage, (string) $content);
     }
 
     protected function createLead(string $firstName = 'Firstname', string $lastName = 'Lastname', string $email = 'test@test.com', string $phoneNumber = '555-666-777'): Lead

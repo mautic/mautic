@@ -23,9 +23,8 @@ final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $client                     = $this->createMock(ClientInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->transifexFactory     = new TransifexFactory($client, $this->coreParametersHelper);
+        $this->transifexFactory     = new TransifexFactory($this->createStub(ClientInterface::class), $this->coreParametersHelper);
     }
 
     public function testCreatingTransifexWithoutCredentials(): void

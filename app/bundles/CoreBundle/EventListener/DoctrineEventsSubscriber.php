@@ -30,7 +30,8 @@ class DoctrineEventsSubscriber
         // in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
             return;
-        } elseif (empty($this->tablePrefix)) {
+        }
+        if (empty($this->tablePrefix)) {
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
         }
 

@@ -231,7 +231,8 @@ final class PageControllerTest extends MauticMysqlTestCase
         $model                  = static::getContainer()->get('mautic.page.model.page');
         $page                   = $model->getEntity($this->id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($page->getTitle(), $clientResponseContent, 'The return must contain the title of page');
+        $this->assertInstanceOf(Page::class, $page);
+        $this->assertStringContainsString($page->getTitle(), (string) $clientResponseContent, 'The return must contain the title of page');
     }
 
     /**

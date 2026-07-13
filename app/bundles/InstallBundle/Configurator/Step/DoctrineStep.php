@@ -89,7 +89,7 @@ class DoctrineStep implements StepInterface
             if (str_starts_with($key, 'db_')) {
                 $parameters[substr($key, 3)] = $value;
                 $key                         = substr($key, 3);
-                $this->$key                  = $value;
+                $this->{$key}                  = $value;
             }
         }
     }

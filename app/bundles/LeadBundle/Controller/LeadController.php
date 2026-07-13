@@ -128,13 +128,13 @@ class LeadController extends FormController
         $anonymousShowing = false;
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
             // remove anonymous leads unless requested to prevent clutter
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         } elseif (str_contains($search, $anonymous) && !str_contains($search, '!'.$anonymous)) {
             $anonymousShowing = true;
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
         $results = $model->getEntities([
@@ -183,7 +183,7 @@ class LeadController extends FormController
 
         $listArgs = [];
         if (!$this->security->isGranted('lead:lists:viewother')) {
-            $listArgs['filter']['force'] = " $mine";
+            $listArgs['filter']['force'] = " {$mine}";
         }
 
         $leadListModel = $this->getModel('lead.list');
@@ -191,10 +191,10 @@ class LeadController extends FormController
         $lists = $leadListModel->getUserLists();
 
         // check to see if in a single list
-        $inSingleList = 1 === substr_count($search, "$listCommand:");
+        $inSingleList = 1 === substr_count($search, "{$listCommand}:");
         $list         = [];
         if ($inSingleList) {
-            preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
+            preg_match("/{$listCommand}:(.*?)(?=\s|$)/", $search, $matches);
 
             if (!empty($matches[1])) {
                 $alias = $matches[1];
@@ -698,7 +698,8 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
@@ -755,8 +756,8 @@ class LeadController extends FormController
                     $image = $form['preferred_profile_image']->getData();
                     if ('custom' == $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        $file = $form['custom_avatar']->getData();
+                        if ($file instanceof UploadedFile) {
                             $this->uploadAvatar($request, $avatarHelper, $lead);
 
                             // Note the avatar update so that it can be forced to update
@@ -809,7 +810,8 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
                 $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
@@ -976,7 +978,8 @@ class LeadController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
+                    }
+                    if (
                         !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
                         || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
                     ) {
@@ -2145,11 +2148,11 @@ class LeadController extends FormController
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
 
         if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
-            $filter['force'] .= " !$anonymous";
+            $filter['force'] .= " !{$anonymous}";
         }
 
         if (!$permissions['lead:leads:viewother']) {
-            $filter['force'] .= " $mine";
+            $filter['force'] .= " {$mine}";
         }
 
         return $filter;
@@ -2212,11 +2215,11 @@ class LeadController extends FormController
         } else {
             if ('list' != $indexMode || ('list' == $indexMode && !str_contains($search, $anonymous))) {
                 // remove anonymous leads unless requested to prevent clutter
-                $filter['force'] .= " !$anonymous";
+                $filter['force'] .= " !{$anonymous}";
             }
 
             if (!$permissions['lead:leads:viewother']) {
-                $filter['force'] .= " $mine";
+                $filter['force'] .= " {$mine}";
             }
         }
 
@@ -2435,12 +2438,12 @@ class LeadController extends FormController
                         $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
                         $oldScore = $initData[$scoreKey] ?? null;
                         $newScore = $postData[$scoreKey];
-                        if (!is_null($oldScore) && is_null($newScore)) {
+                        if (null !== $oldScore && null === $newScore) {
                             // set 0 when the new score is not present, but the record exists
                             $newScore = 0;
                         }
 
-                        if (!is_null($newScore) && $newScore !== $oldScore) {
+                        if (null !== $newScore && $newScore !== $oldScore) {
                             $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
                             $delta = $newScore - ($oldScore ?? 0);
 

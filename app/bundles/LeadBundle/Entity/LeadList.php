@@ -520,6 +520,6 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 }

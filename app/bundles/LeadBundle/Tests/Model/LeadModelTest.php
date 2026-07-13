@@ -211,7 +211,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->setupFieldModelForIpLookupTest();
         $this->companyLeadRepositoryMock->method('getEntitiesByLead')->willReturn([]);
-        $this->companyModelMock->expects($this->any())
+        $this->companyModelMock
             ->method('fetchCompanyFields')
             ->willReturn([]);
 
@@ -324,7 +324,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         try {
             $mockLeadModel->import([], [], null, null, null, true, $leadEventLog);
         } catch (\Exception) {
-            $this->assertNull($leadEventLog->getLead());
+            $this->assertNotInstanceOf(Lead::class, $leadEventLog->getLead());
         }
     }
 
@@ -388,7 +388,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead->setId(1);
         $lead->setFields(['all' => 'sth']);
         $stageMock = $this->createMock(Stage::class);
-        $stageMock->expects($this->any())
+        $stageMock
             ->method('getId')
             ->willReturn(1);
         $data = ['stage' => $stageMock];
@@ -555,7 +555,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     private function mockGetLeadRepository(): void
     {
-        $this->entityManagerMock->expects($this->any())
+        $this->entityManagerMock
             ->method('getRepository')
             ->willReturnMap(
                 [
@@ -617,7 +617,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
      */
     private function getFieldPaginatorFake(): Paginator
     {
-        return new class extends Paginator {
+        return new class() extends Paginator {
             public function __construct()
             {
             }

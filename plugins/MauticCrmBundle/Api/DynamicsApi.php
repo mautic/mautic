@@ -214,7 +214,7 @@ class DynamicsApi extends CrmApi
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
         // split content by boundary and get rid of last -- element
-        $a_blocks = preg_split("/-+$boundary/", $input);
+        $a_blocks = preg_split("/-+{$boundary}/", $input);
         array_pop($a_blocks);
         // there is only one batchresponse
         $input                = array_pop($a_blocks);
@@ -228,7 +228,7 @@ class DynamicsApi extends CrmApi
         preg_match('/boundary=(.*)$/', $contentType, $matches);
         $boundary = $matches[1];
         // split content by boundary and get rid of last -- element
-        $a_blocks = preg_split("/-+$boundary/", $input);
+        $a_blocks = preg_split("/-+{$boundary}/", $input);
         array_pop($a_blocks);
         // loop data blocks
         foreach ($a_blocks as $block) {

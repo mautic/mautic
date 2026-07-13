@@ -254,7 +254,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                 'UniqueidentifierType',
                             ], true)) {
                                 continue;
-                            } elseif (in_array($fieldType, [
+                            }
+                            if (in_array($fieldType, [
                                 'DoubleType',
                                 'IntegerType',
                                 'MoneyType',
@@ -724,7 +725,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             // start with update
             if ($totalToUpdate + $totalToCreate) {
                 $output = new ConsoleOutput();
-                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $output->writeln("About {$totalToUpdate} to update and about {$totalToCreate} to create/update");
                 $output->writeln('<info>This could take some time. Please wait until the process is completed</info>');
                 $progress = new ProgressBar($output, $totalCount);
             }

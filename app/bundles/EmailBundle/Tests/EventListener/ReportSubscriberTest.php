@@ -69,19 +69,16 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->connectionMock            = $this->getMockedConnection();
         $this->companyReportDataMock     = $this->createMock(CompanyReportData::class);
-        $statRepository                  = $this->createMock(StatRepository::class);
         $this->emailRepository           = $this->createMock(EmailRepository::class);
-        $generatedColumnsProvider        = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->fieldsBuilderMock         = $this->createMock(FieldsBuilder::class);
-        $dncReportService                = $this->createMock(DncReportService::class);
         $this->subscriber                = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
-            $statRepository,
+            $this->createStub(StatRepository::class),
             $this->emailRepository,
-            $generatedColumnsProvider,
+            $this->createStub(GeneratedColumnsProviderInterface::class),
             $this->fieldsBuilderMock,
-            $dncReportService,
+            $this->createStub(DncReportService::class),
         );
 
         $this->report             = $this->createMock(Report::class);
@@ -95,7 +92,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn([
                 'es.email_address',
@@ -124,7 +121,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['vp.subject']);
 
@@ -149,11 +146,11 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['unique_hits']);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getFilters')
             ->willReturn([]);
 
@@ -185,11 +182,11 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getSource')
             ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
             ->willReturn(['cmp.name']);
 
-        $this->report->expects($this->any())
+        $this->report
             ->method('getFilters')
             ->willReturn([]);
 
@@ -392,7 +389,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $reportHelper       = new ReportHelper($this->createStub(EventDispatcherInterface::class));
 
         $this->companyReportDataMock
-            ->expects($this->any())
             ->method('getCompanyData')
             ->willReturn([
                 'comp.companyname' => [
@@ -402,7 +398,6 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->fieldsBuilderMock
-            ->expects($this->any())
             ->method('getLeadFilter')
             ->willReturn([
                 'tag' => [

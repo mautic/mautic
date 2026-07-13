@@ -169,12 +169,12 @@ class EmailPeriodMetrics
 
         return $this->connection->createQueryBuilder()
             ->select(
-                "$weekdayExpr AS $groupByAlias",
-                "COUNT(id) AS $countAlias"
+                "{$weekdayExpr} AS {$groupByAlias}",
+                "COUNT(id) AS {$countAlias}"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-            ->where("es.$dateColumn IS NOT NULL")
-            ->andWhere("es.$dateColumn BETWEEN :dateFrom AND :dateTo")
+            ->where("es.{$dateColumn} IS NOT NULL")
+            ->andWhere("es.{$dateColumn} BETWEEN :dateFrom AND :dateTo")
             ->andWhere('es.source = :campaign_event_source')
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy($groupByAlias)
@@ -189,12 +189,12 @@ class EmailPeriodMetrics
 
         $qb = $this->connection->createQueryBuilder()
             ->select(
-                "$hourExpr AS $groupByAlias",
-                "COUNT(id) AS $countAlias"
+                "{$hourExpr} AS {$groupByAlias}",
+                "COUNT(id) AS {$countAlias}"
             )
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-            ->where("es.$dateColumn IS NOT NULL")
-            ->andWhere("es.$dateColumn BETWEEN :dateFrom AND :dateTo")
+            ->where("es.{$dateColumn} IS NOT NULL")
+            ->andWhere("es.{$dateColumn} BETWEEN :dateFrom AND :dateTo")
             ->andWhere('es.source = :campaign_event_source')
             ->andWhere('es.source_id IN (:source_ids)')
             ->groupBy($groupByAlias)

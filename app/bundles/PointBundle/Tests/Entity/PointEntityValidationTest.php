@@ -45,11 +45,11 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
 
         if ($errorMessage) {
             self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
-            self::assertStringContainsString('error', $response->getContent());
-            self::assertStringContainsString($errorMessage, $response->getContent());
+            self::assertStringContainsString('error', (string) $response->getContent());
+            self::assertStringContainsString($errorMessage, (string) $response->getContent());
         } else {
             self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
-            self::assertStringNotContainsString('error', $response->getContent());
+            self::assertStringNotContainsString('error', (string) $response->getContent());
         }
     }
 

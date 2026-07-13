@@ -530,7 +530,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $expr      = new ExpressionBuilder($this->em->getConnection());
-        $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
+        $composite = $expr->and($expr->like("comp.{$column}", ':filterVar'));
 
         // Exclude company if $exclude is provided
         if ('' !== $exclude) {
@@ -589,7 +589,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $expr         = new ExpressionBuilder($this->em->getConnection());
                 $platform     = $this->em->getConnection()->getDatabasePlatform();
                 $composite    = $expr->and(
-                    DatabasePlatform::getCaseInsensitiveLike($platform, "comp.$column", ':'.$param)
+                    DatabasePlatform::getCaseInsensitiveLike($platform, "comp.{$column}", ':'.$param)
                 );
 
                 // Validate owner permissions
@@ -893,7 +893,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($company->isNew() && $entityField['defaultValue']) {
+            }
+            if ($company->isNew() && $entityField['defaultValue']) {
                 // Fill in the default value if any
                 $fieldData[$entityField['alias']] = ('multiselect' === $entityField['type']) ? [$entityField['defaultValue']] : $entityField['defaultValue'];
             }
@@ -934,7 +935,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $fieldData = [];
         foreach ($fields as $importField => $entityField) {
             // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
+            if (array_key_exists($importField, $data) && null !== $data[$importField] && '' != $data[$importField]) {
                 $fieldData[$entityField] = $data[$importField];
             }
         }

@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\ContactLimiterTrait;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -13,10 +14,7 @@ class BroadcastQuery
 {
     use ContactLimiterTrait;
 
-    /**
-     * @var \Doctrine\DBAL\Query\QueryBuilder
-     */
-    private $query;
+    private QueryBuilder $query;
 
     public function __construct(
         private EntityManager $entityManager,
@@ -47,10 +45,7 @@ class BroadcastQuery
         return $query->executeQuery()->fetchOne();
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    private function getBasicQuery(Sms $sms)
+    public function getBasicQuery(Sms $sms): QueryBuilder
     {
         $this->query = $this->smsModel->getRepository()->getSegmentsContactsQuery($sms->getId());
         $this->query->andWhere(

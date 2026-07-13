@@ -175,7 +175,7 @@ class ContactSegmentQueryBuilder
             );
 
         $existingQueryWherePart = $existsQueryBuilder->getQueryPart('where');
-        $existsQueryBuilder->where("$leadsTableAlias.id = $tableAlias.lead_id");
+        $existsQueryBuilder->where("{$leadsTableAlias}.id = {$tableAlias}.lead_id");
         $existsQueryBuilder->andWhere($existingQueryWherePart);
 
         $queryBuilder->orWhere(

@@ -375,19 +375,19 @@ class ChartQuery extends AbstractChart
     /**
      * Count occurences of a value in a column.
      *
-     * @param string $table        without prefix
-     * @param string $uniqueColumn name
-     * @param string $dateColumn   name
-     * @param array  $filters      will be added to where claues
-     * @param array  $options      for special behavior
+     * @param string  $table        without prefix
+     * @param string  $uniqueColumn name
+     * @param string  $dateColumn   name
+     * @param mixed[] $filters      will be added to where claues
+     * @param mixed[] $options      for special behavior
      *
      * @return QueryBuilder
      */
-    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], $options = [], $tablePrefix = 't')
+    public function getCountQuery($table, $uniqueColumn, $dateColumn = null, $filters = [], array $options = [], $tablePrefix = 't')
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
-        $this->modifyCountQuery($query, $uniqueColumn, $dateColumn, $tablePrefix);
+        $this->modifyCountQuery($query, $uniqueColumn, $options, $tablePrefix);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $dateColumn);
 

@@ -27,7 +27,7 @@ class ModelFactory
 
         // Shortcut for models with the same name as the bundle
         if (!str_contains($modelNameKey, '.')) {
-            $modelNameKey = "$modelNameKey.$modelNameKey";
+            $modelNameKey = "{$modelNameKey}.{$modelNameKey}";
         }
 
         $parts = explode('.', $modelNameKey);

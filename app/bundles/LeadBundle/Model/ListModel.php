@@ -1006,7 +1006,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             unset($filter['flag']);
         }
 
-        $allLists   = $query->getCountQuery('leads', 'id', 'date_added', null);
+        $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
         $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;

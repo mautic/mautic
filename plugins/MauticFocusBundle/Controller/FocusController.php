@@ -245,6 +245,8 @@ class FocusController extends AbstractStandardFormController
         if ($updateSelect) {
             return ['update_select' => $updateSelect];
         }
+
+        return [];
     }
 
     /**
@@ -260,7 +262,7 @@ class FocusController extends AbstractStandardFormController
         return [
             'updateSelect' => $updateSelect,
             'id'           => $entity->getId(),
-            'name'         => $entity->$nameMethod(),
+            'name'         => $entity->{$nameMethod}(),
         ];
     }
 }

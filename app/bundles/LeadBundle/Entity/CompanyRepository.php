@@ -20,15 +20,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     use CustomFieldRepositoryTrait;
     use ProjectRepositoryTrait;
 
-    /**
-     * @var array
-     */
-    private $availableSearchFields = [];
+    private array $availableSearchFields = [];
 
-    /**
-     * @var EventDispatcherInterface|null
-     */
-    private $dispatcher;
+    private ?EventDispatcherInterface $dispatcher = null;
 
     /**
      * Used by search functions to search using aliases as commands.
@@ -191,7 +185,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if (in_array($command, $this->availableSearchFields)) {
-            $expr = $q->expr()->like($this->getTableAlias().".$command", ":$unique");
+            $expr = $q->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
         }
 
         if ($this->dispatcher) {
@@ -519,7 +513,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
+            $q->{$this->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
                 ->setParameter($col, $val);
         }
 

@@ -226,7 +226,7 @@ class EmailRepository extends CommonRepository
         }
 
         // Only include those who belong to the associated lead lists
-        if (is_null($listIds)) {
+        if (null === $listIds) {
             // Get a list of lists associated with this email
             $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
@@ -378,7 +378,8 @@ class EmailRepository extends CommonRepository
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
             return $results[0];
-        } elseif ($countOnly) {
+        }
+        if ($countOnly) {
             return (isset($results[0])) ? $results[0]['count'] : 0;
         }
         $leads = [];
@@ -638,7 +639,7 @@ class EmailRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('e.language', ":$unique").' OR '.$q->expr()->like('e.language', ":$langUnique").')';
+                $expr            = '('.$q->expr()->eq('e.language', ":{$unique}").' OR '.$q->expr()->like('e.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -661,7 +662,7 @@ class EmailRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];

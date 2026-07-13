@@ -29,15 +29,13 @@ final class DateExtensionTest extends TestCase
                 return $id;
             });
 
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
         $dateHelper = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $translator,
-            $coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
 
         $this->dateExtension = new DateExtension($dateHelper);

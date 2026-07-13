@@ -20,7 +20,7 @@ final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     /**
      * @var array<string, bool>
      */
-    private $categoryFlags = [
+    private array $categoryFlags = [
         'one'   => true,
         'two'   => false,
         'three' => true,

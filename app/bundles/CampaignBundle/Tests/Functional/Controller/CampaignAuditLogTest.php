@@ -93,7 +93,9 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $campaignModel = static::getContainer()->get('mautic.campaign.model.campaign');
         $campaign      = $campaignModel->getEntity($campaignId);
         $event         = $this->em->find(Event::class, $eventId);
+        $this->assertInstanceOf(Event::class, $event);
         $event->setName('2 contact points after 1 day');
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Campaign::class, $campaign);
         $campaign->addEvent($eventId, $event);
         $campaignModel->saveEntity($campaign);
         $this->em->clear();
@@ -108,12 +110,12 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated'),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated_details', ['%event_id%' => $eventId]),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -150,10 +152,10 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         // Verify both project names appear
-        $this->assertStringContainsString('First Project', $responseContent);
-        $this->assertStringContainsString('Second Project', $responseContent);
+        $this->assertStringContainsString('First Project', (string) $responseContent);
+        $this->assertStringContainsString('Second Project', (string) $responseContent);
 
         // Should show the progression in audit log
-        $this->assertStringContainsString('First Project, Second Project', $responseContent);
+        $this->assertStringContainsString('First Project, Second Project', (string) $responseContent);
     }
 }

@@ -34,7 +34,7 @@ class InstagramIntegration extends SocialIntegration
 
     public function getApiUrl($endpoint): string
     {
-        return "https://api.instagram.com/v1/$endpoint";
+        return "https://api.instagram.com/v1/{$endpoint}";
     }
 
     public function getUserData($identifier, &$socialCache): void
@@ -61,7 +61,7 @@ class InstagramIntegration extends SocialIntegration
         $socialCache['has']['activity'] = false;
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             // get more than 10 so we can weed out videos
-            $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), ['count' => 20]);
+            $data = $this->makeRequest($this->getApiUrl("users/{$id}/media/recent"), ['count' => 20]);
 
             $socialCache['activity'] = [
                 'photos' => [],
@@ -117,7 +117,8 @@ class InstagramIntegration extends SocialIntegration
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
-        } elseif (empty($identifier)) {
+        }
+        if (empty($identifier)) {
             return false;
         }
 

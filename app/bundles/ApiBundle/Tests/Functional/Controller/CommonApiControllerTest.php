@@ -24,7 +24,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
         $this->createAndAuthenticateApiUser('api_user', 'api@example.com');
 
-        $this->assertNotNull($email->getCheckedOut());
+        $this->assertInstanceOf(\DateTimeInterface::class, $email->getCheckedOut());
         $this->assertEquals('Admin User', $email->getCheckedOutByUser());
 
         $this->client->request('PATCH', '/api/emails/'.$email->getId().'/edit', [
@@ -143,6 +143,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
     private function createAndAuthenticateApiUser(string $username, string $email): void
     {
         $role = $this->em->getRepository(Role::class)->find(1);
+        $this->assertInstanceOf(Role::class, $role);
 
         $user = (new User())
             ->setFirstName('API')
