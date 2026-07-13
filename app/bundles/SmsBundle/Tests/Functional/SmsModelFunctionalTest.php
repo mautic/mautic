@@ -49,11 +49,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
             ->method('sendBatchSms')
             ->with(
                 $this->anything(),
-                $this->callback(function (string $template) use ($expectedMessage): true {
-                    $this->assertSame($expectedMessage, $template);
-
-                    return true;
-                })
+                $expectedMessage
             )
             ->willReturn(new RecipientCollection($sms));
 

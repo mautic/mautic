@@ -162,7 +162,6 @@ return RectorConfig::configure()
 >>>>>>> fab4e2d24f (cleanup skipped never used rules)
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
