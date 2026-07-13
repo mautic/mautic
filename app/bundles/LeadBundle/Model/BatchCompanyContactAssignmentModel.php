@@ -23,7 +23,9 @@ class BatchCompanyContactAssignmentModel
 
     private const LOG_TYPE                  = 'api';
 
-    private const LOG_EVENT_NAME            = 'API batch assignment';
+    private const LOG_EVENT_NAME_BATCH      = 'API batch assignment';
+
+    private const LOG_EVENT_NAME_SINGLE     = 'API assignment';
 
     private const LOG_ACTION_PREFIX         = 'Lead added to the company, ';
 
@@ -121,7 +123,7 @@ class BatchCompanyContactAssignmentModel
 
             if (Response::HTTP_OK === $status) {
                 try {
-                    $this->logBatchAssignments($contact, $addedCompanyIds, $companiesById);
+                    $this->logContactCompanyAssignments($contact, $addedCompanyIds, $companiesById, self::LOG_EVENT_NAME_BATCH);
                 } catch (\Throwable) {
                     // Assignment succeeded; logging failure must not change the API outcome.
                 }
@@ -265,7 +267,7 @@ class BatchCompanyContactAssignmentModel
      * @param list<int>           $addedCompanyIds
      * @param array<int, Company> $companiesById
      */
-    private function logBatchAssignments(Lead $contact, array $addedCompanyIds, array $companiesById): void
+    public function logContactCompanyAssignments(Lead $contact, array $addedCompanyIds, array $companiesById, string $eventName = self::LOG_EVENT_NAME_SINGLE): void
     {
         if ([] === $addedCompanyIds) {
             return;
@@ -279,7 +281,7 @@ class BatchCompanyContactAssignmentModel
 
             $contact->addCompanyChangeLogEntry(
                 self::LOG_TYPE,
-                self::LOG_EVENT_NAME,
+                $eventName,
                 self::LOG_ACTION_PREFIX.$company->getName(),
                 $companyId
             );

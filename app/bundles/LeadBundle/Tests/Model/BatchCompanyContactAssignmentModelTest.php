@@ -175,6 +175,53 @@ class BatchCompanyContactAssignmentModelTest extends TestCase
         Assert::assertSame(2, $payload['summary']['succeeded']);
     }
 
+    public function testLogContactCompanyAssignmentsForAddedCompanies(): void
+    {
+        $contact = $this->createContact(1, 10);
+        $company = $this->createCompany(7, 'Acme Inc');
+        $this->expectLeadRepositorySave($contact);
+
+        $this->model->logContactCompanyAssignments($contact, [7], [7 => $company]);
+
+        $logs = $contact->getCompanyChangeLog();
+        Assert::assertCount(1, $logs);
+        Assert::assertSame('api', $logs[0]->getType());
+        Assert::assertSame('API assignment', $logs[0]->getEventName());
+        Assert::assertNotSame('API batch assignment', $logs[0]->getEventName());
+        Assert::assertSame('Lead added to the company, Acme Inc', $logs[0]->getActionName());
+        Assert::assertSame(7, $logs[0]->getCompany());
+    }
+
+    public function testLogContactCompanyAssignmentsDoesNotLogWhenNoCompaniesWereAdded(): void
+    {
+        $contact = $this->createContact(1, 10);
+        $company = $this->createCompany(7, 'Acme Inc');
+
+        $this->leadModel->expects($this->never())->method('getRepository');
+
+        $this->model->logContactCompanyAssignments($contact, [], [7 => $company]);
+
+        Assert::assertCount(0, $contact->getCompanyChangeLog());
+    }
+
+    public function testLogContactCompanyAssignmentsThrowsWhenSaveFails(): void
+    {
+        $contact = $this->createContact(1, 10);
+        $company = $this->createCompany(7, 'Acme Inc');
+
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->expects($this->once())
+            ->method('saveEntity')
+            ->with($contact)
+            ->willThrowException(new \RuntimeException('Logging failed'));
+        $this->leadModel->method('getRepository')->willReturn($leadRepository);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Logging failed');
+
+        $this->model->logContactCompanyAssignments($contact, [7], [7 => $company]);
+    }
+
     public function testProcessLogsBatchAssignmentsForAddedCompanies(): void
     {
         $contact = $this->createContact(1, 10);
