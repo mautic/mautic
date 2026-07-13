@@ -26,9 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FocusController extends AbstractStandardFormController
 {
-    /**
-     * @phpstan-ignore-next-line
-     */
     public function __construct(
         private readonly CacheProviderTagAwareInterface $cacheProvider,
         FormFactoryInterface $formFactory,
