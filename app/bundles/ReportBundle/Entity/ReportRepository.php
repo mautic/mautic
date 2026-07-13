@@ -121,7 +121,7 @@ class ReportRepository extends CommonRepository
         $qb->setParameter('true', true, 'boolean');
 
         if (is_array($ownedBy)) {
-            $ownerIds = array_values(array_filter(array_map('intval', $ownedBy)));
+            $ownerIds = array_values(array_filter($ownedBy));
 
             if (1 === count($ownerIds)) {
                 $qb->andWhere($qb->expr()->eq('r.created_by', ':ownerId'));

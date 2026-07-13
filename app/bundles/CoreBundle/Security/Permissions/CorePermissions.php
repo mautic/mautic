@@ -336,12 +336,9 @@ class CorePermissions implements ResetInterface
     /**
      * Checks if the user has access to the requested entity.
      *
-     * @param string|bool      $ownPermission
-     * @param string|bool      $otherPermission
-     * @param User|int         $ownerId
-     * @param string|bool|null $sameRolePermission
+     * @param User|int $ownerId
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId = 0, $sameRolePermission = null): bool
+    public function hasEntityAccess(string|bool $ownPermission, string|bool $otherPermission, $ownerId = 0, string|bool|null $sameRolePermission = null): bool
     {
         $user = $this->userHelper->getUser();
         if (!is_object($user)) {
@@ -357,12 +354,9 @@ class CorePermissions implements ResetInterface
     }
 
     /**
-     * @param string|bool $ownPermission
-     * @param string|bool $otherPermission
-     *
      * @return array{0: bool, 1: bool}
      */
-    private function getOwnerPermissions($ownPermission, $otherPermission): array
+    private function getOwnerPermissions(string|bool $ownPermission, string|bool $otherPermission): array
     {
         if (!is_bool($ownPermission) && !is_bool($otherPermission)) {
             $permissions = $this->isGranted(
@@ -379,13 +373,11 @@ class CorePermissions implements ResetInterface
         ];
     }
 
-    /**
-     * @param string|bool      $ownPermission
-     * @param string|bool      $otherPermission
-     * @param string|bool|null $sameRolePermission
-     */
-    private function isSameRoleGranted($ownPermission, $otherPermission, $sameRolePermission): bool
-    {
+    private function isSameRoleGranted(
+        string|bool $ownPermission,
+        string|bool $otherPermission,
+        string|bool|null $sameRolePermission,
+    ): bool {
         $sameRolePermission = $this->resolveSameRolePermission($ownPermission, $otherPermission, $sameRolePermission);
 
         if (is_bool($sameRolePermission)) {
@@ -397,15 +389,11 @@ class CorePermissions implements ResetInterface
             && $this->isGranted($sameRolePermission);
     }
 
-    /**
-     * @param string|bool      $ownPermission
-     * @param string|bool      $otherPermission
-     * @param string|bool|null $sameRolePermission
-     *
-     * @return string|bool|null
-     */
-    private function resolveSameRolePermission($ownPermission, $otherPermission, $sameRolePermission)
-    {
+    private function resolveSameRolePermission(
+        string|bool $ownPermission,
+        string|bool $otherPermission,
+        string|bool|null $sameRolePermission,
+    ): string|bool|null {
         if (null !== $sameRolePermission) {
             return $sameRolePermission;
         }

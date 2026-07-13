@@ -24,6 +24,8 @@ class SmsController extends FormController
 
     private const PERMISSION_VIEW_OTHER = 'sms:smses:viewother';
 
+    private const PERMISSION_VIEW_SAME_ROLE = 'sms:smses:viewsamerole';
+
     /**
      * @param int $page
      */
@@ -199,11 +201,14 @@ class SmsController extends FormController
                 'permissions' => $security->isGranted([
                     self::PERMISSION_VIEW_OWN,
                     self::PERMISSION_VIEW_OTHER,
+                    self::PERMISSION_VIEW_SAME_ROLE,
                     'sms:smses:create',
                     'sms:smses:editown',
                     'sms:smses:editother',
+                    'sms:smses:editsamerole',
                     'sms:smses:deleteown',
                     'sms:smses:deleteother',
+                    'sms:smses:deletesamerole',
                     'sms:smses:publishown',
                     'sms:smses:publishother',
                 ], 'RETURN_ARRAY'),
@@ -709,7 +714,12 @@ class SmsController extends FormController
         $sms      = $model->getEntity($objectId);
         $security = $this->security;
 
-        if (null !== $sms && $security->hasEntityAccess(self::PERMISSION_VIEW_OWN, self::PERMISSION_VIEW_OTHER)) {
+        if (null !== $sms && $security->hasEntityAccess(
+            self::PERMISSION_VIEW_OWN,
+            self::PERMISSION_VIEW_OTHER,
+            $sms->getCreatedBy(),
+            self::PERMISSION_VIEW_SAME_ROLE,
+        )) {
             return $this->delegateView([
                 'viewParameters' => [
                     'sms' => $sms,

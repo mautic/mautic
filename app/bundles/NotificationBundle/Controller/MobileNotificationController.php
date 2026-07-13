@@ -207,9 +207,11 @@ class MobileNotificationController extends FormController
                 'permissions'  => $security->isGranted([
                     self::PERMISSION_VIEW_OWN,
                     self::PERMISSION_VIEW_OTHER,
+                    'notification:mobile_notifications:viewsamerole',
                     'notification:mobile_notifications:create',
                     'notification:mobile_notifications:editown',
                     'notification:mobile_notifications:editother',
+                    'notification:mobile_notifications:editsamerole',
                     'notification:mobile_notifications:deleteown',
                     'notification:mobile_notifications:deleteother',
                     'notification:mobile_notifications:publishown',

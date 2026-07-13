@@ -258,8 +258,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
         $filter = $filterDTO->getFilters();
 
         if (!$this->canViewOthersEntity()) {
-            if ($this->canViewSameRoleEntity()) {
-                $roleId            = $this->userHelper->getUser()->getRole()->getId();
+            $user = $this->userHelper->getUser();
+            $role = $user->getRole();
+
+            if ($this->canViewSameRoleEntity() && null !== $role) {
+                $roleId            = $role->getId();
                 $userIds           = $this->em->getRepository(User::class)->findUserIdsByRole($roleId);
                 $filter['force'][] = [
                     'column' => $this->getRepository()->getTableAlias().'.createdBy',
@@ -270,7 +273,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
                 $filter['force'][] = [
                     'column' => $this->getRepository()->getTableAlias().'.createdBy',
                     'expr'   => 'eq',
-                    'value'  => $this->userHelper->getUser()->getId(),
+                    'value'  => $user->getId(),
                 ];
             }
         }

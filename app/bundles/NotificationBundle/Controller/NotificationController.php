@@ -204,9 +204,11 @@ class NotificationController extends AbstractFormController
                 'permissions'  => $security->isGranted([
                     self::PERMISSION_VIEW_OWN,
                     self::PERMISSION_VIEW_OTHER,
+                    'notification:notifications:viewsamerole',
                     'notification:notifications:create',
                     'notification:notifications:editown',
                     'notification:notifications:editother',
+                    'notification:notifications:editsamerole',
                     'notification:notifications:deleteown',
                     'notification:notifications:deleteother',
                     'notification:notifications:publishown',

@@ -29,14 +29,14 @@ final class ContactExportSchedulerModelTest extends TestCase
 {
     public function testPrepareDataAllowsSameRoleContactOwners(): void
     {
-        $role = new class extends Role {
+        $role = new class() extends Role {
             public function getId(): int
             {
                 return 5;
             }
         };
 
-        $user = new class extends User {
+        $user = new class() extends User {
             public function getId(): int
             {
                 return 10;
@@ -72,6 +72,35 @@ final class ContactExportSchedulerModelTest extends TestCase
                 'column' => 'l.owner_id',
                 'expr'   => 'in',
                 'value'  => [10, 20],
+            ],
+        ], $data['filter']['force']);
+    }
+
+    public function testPrepareDataRestrictsContactOwnersWithoutSameRolePermission(): void
+    {
+        $user = new class() extends User {
+            public function getId(): int
+            {
+                return 10;
+            }
+        };
+
+        $model = $this->createModel($this->createMock(EntityManager::class), $user);
+
+        $data = $model->prepareData([
+            'lead:leads:viewother'    => false,
+            'lead:leads:viewsamerole' => false,
+        ]);
+
+        self::assertSame([
+            [
+                'column' => 'l.dateIdentified',
+                'expr'   => 'isNotNull',
+            ],
+            [
+                'column' => 'l.owner_id',
+                'expr'   => 'eq',
+                'value'  => 10,
             ],
         ], $data['filter']['force']);
     }
