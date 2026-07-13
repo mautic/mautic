@@ -238,7 +238,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(User::class);
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->any())
+        $lead
             ->method('getOwner')
             ->willReturn(null);
 
@@ -251,7 +251,6 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($user);
 
         $this->translator
-            ->expects($this->any())
             ->method('trans')
             ->willReturn('test');
     }

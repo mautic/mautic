@@ -192,7 +192,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($field, $func)) {
-                    $field->$func($v);
+                    $field->{$func}($v);
                 }
             }
             $field->setForm($entity);
@@ -274,7 +274,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 }
 
                 if (method_exists($action, $func)) {
-                    $action->$func($v);
+                    $action->{$func}($v);
                 }
             }
             $action->setForm($entity);
@@ -857,9 +857,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
@@ -965,18 +964,18 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         foreach ($items as $key => $script) {
             if ($script->hasAttribute('src')) {
                 $javascript .= "
-                var script$key = document.createElement('script');
-                script$key.src = '".$script->getAttribute('src')."';
-                document.getElementsByTagName('head')[0].appendChild(script$key);";
+                var script{$key} = document.createElement('script');
+                script{$key}.src = '".$script->getAttribute('src')."';
+                document.getElementsByTagName('head')[0].appendChild(script{$key});";
             } else {
                 $scriptContent = $script->nodeValue;
                 $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
 
                 $javascript .= "
-                var inlineScript$key = document.createTextNode(\"$scriptContent\");
-                var script$key       = document.createElement('script');
-                script$key.appendChild(inlineScript$key);
-                document.getElementsByTagName('head')[0].appendChild(script$key);";
+                var inlineScript{$key} = document.createTextNode(\"{$scriptContent}\");
+                var script{$key}       = document.createElement('script');
+                script{$key}.appendChild(inlineScript{$key});
+                document.getElementsByTagName('head')[0].appendChild(script{$key});";
             }
         }
 

@@ -260,7 +260,7 @@ final class FieldModelTest extends MauticMysqlTestCase
     {
         // Log queries so we can detect if alter queries were executed
         /**  $stack */
-        $stack                    = new class implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
+        $stack                    = new class() implements SQLLogger { /** @phpstan-ignore-line SQLLogger is deprecated */
             /**
              * @var array<mixed>
              */
@@ -376,7 +376,7 @@ final class FieldModelTest extends MauticMysqlTestCase
         $stmt = $this->connection->executeQuery(
             "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '"
             .MAUTIC_TABLE_PREFIX
-            ."$table' AND COLUMN_NAME = '$column'"
+            ."{$table}' AND COLUMN_NAME = '{$column}'"
         );
 
         return $stmt->fetchAllAssociative();

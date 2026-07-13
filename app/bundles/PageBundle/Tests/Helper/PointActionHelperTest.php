@@ -33,10 +33,9 @@ final class PointActionHelperTest extends TestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->hitRepository = $this->createMock(HitRepository::class);
-        $lead                = $this->createMock(Lead::class);
         $this->eventDetails  = $this->createMock(Hit::class);
 
-        $this->eventDetails->method('getLead')->willReturn($lead);
+        $this->eventDetails->method('getLead')->willReturn($this->createStub(Lead::class));
         $this->entityManager->method('getRepository')->willReturn($this->hitRepository);
     }
 

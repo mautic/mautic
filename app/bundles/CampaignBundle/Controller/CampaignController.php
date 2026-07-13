@@ -518,7 +518,8 @@ class CampaignController extends AbstractStandardFormController
                         'new'
                     )
                 );
-            } elseif ($valid && $this->isFormApplied($form)) {
+            }
+            if ($valid && $this->isFormApplied($form)) {
                 return $this->editAction($request, $campaign->getId(), true);
             }
         }
@@ -643,6 +644,8 @@ class CampaignController extends AbstractStandardFormController
 
         $campaignSources = $this->getCampaignModel()->getLeadSources($objectId);
         $this->prepareCampaignSourcesForEdit($tempId, $campaignSources);
+
+        return [];
     }
 
     /**
@@ -948,7 +951,7 @@ class CampaignController extends AbstractStandardFormController
 
         // Extract IDs from deleted events and use as keys for filtering
         $deletedEventIds = array_column($this->deletedEvents, 'id');
-        $deletedEventIds = $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
+        $deletedEventIds = [] !== $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
 
         $this->campaignEvents = array_diff_key($this->modifiedEvents, $deletedEventIds);
     }
@@ -1121,6 +1124,8 @@ class CampaignController extends AbstractStandardFormController
         $this->modifiedEvents                     = $this->campaignEvents                     = $campaignEvents;
         $this->campaignElements['modifiedEvents'] = $campaignEvents;
         $this->campaignElements['campaignEvents'] = $campaignEvents;
+
+        return [];
     }
 
     protected function prepareCampaignSourcesForEdit($objectId, $campaignSources, $isPost = false)

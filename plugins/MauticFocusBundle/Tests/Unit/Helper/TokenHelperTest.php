@@ -31,10 +31,9 @@ final class TokenHelperTest extends TestCase
         parent::setUp();
 
         $this->model    = $this->createMock(FocusModel::class);
-        $router         = $this->createMock(RouterInterface::class);
         $this->security = $this->createMock(CorePermissions::class);
 
-        $this->helper = new TokenHelper($this->model, $router, $this->security);
+        $this->helper = new TokenHelper($this->model, $this->createStub(RouterInterface::class), $this->security);
     }
 
     public function testFindFocusTokensNotFound(): void
@@ -54,7 +53,7 @@ final class TokenHelperTest extends TestCase
     public function testFindFocusTokensFoundAddScriptByFocusPublishedStatus(): void
     {
         $focusItemId = 1;
-        $content     = "content {focus=$focusItemId}";
+        $content     = "content {focus={$focusItemId}}";
 
         $focusItem = new Focus();
         $focusItem->setIsPublished(true);
@@ -74,7 +73,7 @@ final class TokenHelperTest extends TestCase
     {
         $focusItemId = 1;
         $createdById = 2;
-        $content     = "content {focus=$focusItemId}";
+        $content     = "content {focus={$focusItemId}}";
 
         $focusItem = new Focus();
         $focusItem->setIsPublished(false);

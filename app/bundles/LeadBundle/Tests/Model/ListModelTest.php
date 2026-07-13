@@ -52,37 +52,29 @@ final class ListModelTest extends TestCase
     {
         $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherInterfaceMock->method('dispatch');
-        $loggerMock                   = $this->createMock(LoggerInterface::class);
-        $translatorMock               = $this->createMock(Translator::class);
         $this->leadListRepositoryMock = $this->createMock(LeadListRepository::class);
 
         $entityManagerMock = $this->createMock(EntityManager::class);
         $entityManagerMock->method('getRepository')
             ->willReturn($this->leadListRepositoryMock);
-
-        $coreParametersHelperMock              = $this->createMock(CoreParametersHelper::class);
         $this->contactSegmentServiceMock       = $this->createMock(ContactSegmentService::class);
-        $segmentChartQueryFactoryMock          = $this->createMock(SegmentChartQueryFactory::class);
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
-        $requestStackMock                      = $this->createMock(RequestStack::class);
-        $categoryModelMock                     = $this->createMock(CategoryModel::class);
-        $doNotContactRepositoryMock            = $this->createMock(DoNotContactRepository::class);
 
         $this->model = new ListModel(
-            $categoryModelMock,
-            $coreParametersHelperMock,
+            $this->createStub(CategoryModel::class),
+            $this->createStub(CoreParametersHelper::class),
             $this->contactSegmentServiceMock,
-            $segmentChartQueryFactoryMock,
-            $requestStackMock,
+            $this->createStub(SegmentChartQueryFactory::class),
+            $this->createStub(RequestStack::class),
             $this->segmentCountCacheHelper,
-            $doNotContactRepositoryMock,
+            $this->createStub(DoNotContactRepository::class),
             $entityManagerMock,
             $this->createStub(CorePermissions::class),
             $eventDispatcherInterfaceMock,
             $this->createStub(UrlGeneratorInterface::class),
-            $translatorMock,
+            $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
-            $loggerMock
+            $this->createStub(LoggerInterface::class)
         );
     }
 

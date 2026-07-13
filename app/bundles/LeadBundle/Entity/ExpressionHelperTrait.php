@@ -17,7 +17,7 @@ trait ExpressionHelperTrait
     {
         // in/notIn for dbal will use a raw array
         if (!is_array($parameter) && !str_starts_with($parameter, ':')) {
-            $parameter = ":$parameter";
+            $parameter = ":{$parameter}";
         }
 
         if (null === $includeIsNull) {
@@ -27,11 +27,11 @@ trait ExpressionHelperTrait
 
         if ($includeIsNull) {
             $expr = $q->expr()->or(
-                $q->expr()->$operator($column, $parameter),
+                $q->expr()->{$operator}($column, $parameter),
                 $q->expr()->isNull($column)
             );
         } else {
-            $expr = $q->expr()->$operator($column, $parameter);
+            $expr = $q->expr()->{$operator}($column, $parameter);
         }
 
         if ($appendTo) {

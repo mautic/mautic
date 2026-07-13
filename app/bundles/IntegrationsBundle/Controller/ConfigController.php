@@ -84,7 +84,7 @@ class ConfigController extends AbstractFormController
         // Clear the session of previously stored fields in case it got stuck
         /** @var Session $session */
         $session = $request->getSession();
-        $session->remove("$integration-fields");
+        $session->remove("{$integration}-fields");
 
         return $this->showForm($request, $form, $formExtension);
     }
@@ -120,7 +120,7 @@ class ConfigController extends AbstractFormController
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
             $session       = $request->getSession();
-            $updatedFields = $session->get("$integration-fields", []);
+            $updatedFields = $session->get("{$integration}-fields", []);
 
             $fieldMerger = new FieldMergerHelper($this->integrationObject, $fieldMappings);
 

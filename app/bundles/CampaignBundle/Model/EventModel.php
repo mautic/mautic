@@ -52,7 +52,7 @@ class EventModel extends FormModel
     /**
      * Deletes campaign events and sets their redirect targets.
      */
-    public function deleteEvents($currentEvents, $deletedEvents): void
+    public function deleteEvents(array $currentEvents, array $deletedEvents): void
     {
         $deletedKeys = [];
         $deletedData = [];
@@ -73,7 +73,7 @@ class EventModel extends FormModel
             ];
         }
 
-        if ($deletedKeys) {
+        if ([] !== $deletedKeys) {
             $this->getRepository()->nullEventRelationships($deletedKeys);
             $this->getRepository()->setEventsAsDeletedWithRedirect($deletedData);
             $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);

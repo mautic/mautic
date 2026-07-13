@@ -554,12 +554,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param array    $options
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
      */
-    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
+    public function getSentEmailToContactData($limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -615,12 +614,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
     /**
      * @param int      $limit
-     * @param array    $options
      * @param int|null $companyId
      * @param int|null $campaignId
      * @param int|null $segmentId
      */
-    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
+    public function getMostHitEmailRedirects($limit, \DateTime $dateFrom, \DateTime $dateTo, array $options = [], $companyId = null, $campaignId = null, $segmentId = null): array
     {
         $createdByUserId = null;
         $canViewOthers   = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
@@ -1323,7 +1321,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             }
 
             // Reorder according to send_weight so that campaigns which currently send one at a time alternate
-            uasort($this->emailSettings[$email->getId()], function ($a, $b): int {
+            uasort($this->emailSettings[$email->getId()], function (array $a, array $b): int {
                 if ($a['weight_deficit'] === $b['weight_deficit']) {
                     if ($a['variantCount'] === $b['variantCount']) {
                         return 0;
@@ -1354,7 +1352,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return string[]|bool|string|null
      */
-    public function sendEmail(Email $email, $leads, array $options = [])
+    public function sendEmail(Email $email, array $leads, array $options = [])
     {
         $listId              = ArrayHelper::getValue('listId', $options);
         $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
@@ -1881,7 +1879,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $q                     = $query->prepareTimeDataQuery('email_stats', $column, $filter);
         $columnWithTimezone    = 't.'.$column;
         $defaultTimezoneOffset = (new DateTimeHelper())->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ($columnWithTimezone, '+00:00', '{$defaultTimezoneOffset}')";
+        $columnName            = "CONVERT_TZ({$columnWithTimezone}, '+00:00', '{$defaultTimezoneOffset}')";
         $q->select('CONCAT(TIME_FORMAT('.$columnName.', \''.$format.'\'),\'-\',TIME_FORMAT('.$columnName.' + INTERVAL 1 HOUR, \''.$format.'\'),\'\') as hour, COUNT(t.id) AS count')
         ->groupBy('hour')
         ->orderBy('count', 'DESC')
@@ -1932,19 +1930,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $flag    = ArrayHelper::pickValue('flag', $filter, false);
         $dataset = ArrayHelper::pickValue('dataset', $filter, []);
 
-        if (!is_null($companyId = ArrayHelper::pickValue('companyId', $filter))) {
+        if (null !== ($companyId = ArrayHelper::pickValue('companyId', $filter))) {
             $fetchOptions->setCompanyId((int) $companyId);
         }
 
-        if (!is_null($campaignId = ArrayHelper::pickValue('campaignId', $filter))) {
+        if (null !== ($campaignId = ArrayHelper::pickValue('campaignId', $filter))) {
             $fetchOptions->setCampaignId((int) $campaignId);
         }
 
-        if (!is_null($segmentId = ArrayHelper::pickValue('segmentId', $filter))) {
+        if (null !== ($segmentId = ArrayHelper::pickValue('segmentId', $filter))) {
             $fetchOptions->setSegmentId((int) $segmentId);
         }
 
-        if (!is_null($emailId = ArrayHelper::pickValue('email_id', $filter))) {
+        if (null !== ($emailId = ArrayHelper::pickValue('email_id', $filter))) {
             $fetchOptions->setEmailIds([(int) $emailId]);
         }
 
@@ -2072,9 +2070,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getEmailStatList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getEmailStatList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2109,9 +2106,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getEmailList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getEmailList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $canViewOthers = empty($options['canViewOthers']) ? false : $options['canViewOthers'];
         $q             = $this->em->getConnection()->createQueryBuilder();
@@ -2410,13 +2406,38 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws \Psr\Cache\InvalidArgumentException
      */
+    public function invalidatePendingCountCache(int $emailId): void
+    {
+        $this->cacheStorageHelper->delete(sprintf('%s|%s|%s', 'email', $emailId, 'pending'));
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    public function invalidatePendingCountCacheForList(int $listId): void
+    {
+        foreach ($this->getRepository()->getSegmentEmailIdsByListId($listId) as $emailId) {
+            $this->invalidatePendingCountCache($emailId);
+        }
+    }
+
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     protected function setCachedCount(mixed $entity): void
     {
-        $queued  = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
-        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+        $queued = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
         if (false !== $queued) {
             $entity->setQueuedCount($queued);
+        }
+
+        $pending = $this->cacheStorageHelper->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'pending'));
+
+        if (false === $pending && $entity instanceof Email && $entity->isSegmentEmail() && null !== $entity->getId()) {
+            $entity->setPendingCount($this->getPendingLeads($entity, null, true));
+
+            return;
         }
 
         if (false !== $pending) {

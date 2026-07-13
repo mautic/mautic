@@ -127,7 +127,7 @@ class CommonController extends AbstractController implements MauticController
         }
 
         // It's not uncommon that the vars are array of mixed. Not just strings. I beliveve this is Symfony's issue.
-        return $this->renderView($contentTemplate, $parameters); // @phpstan-ignore parameterByRef.type
+        return $this->renderView($contentTemplate, $parameters);
     }
 
     /**
@@ -546,27 +546,27 @@ class CommonController extends AbstractController implements MauticController
         }
         $name = 'mautic.'.$name;
 
-        if (false === $request->query->has('orderby') && false === $session->has("$name.orderbydir")) {
-            $session->set("$name.orderbydir", $this->getDefaultOrderDirection());
+        if (false === $request->query->has('orderby') && false === $session->has("{$name}.orderbydir")) {
+            $session->set("{$name}.orderbydir", $this->getDefaultOrderDirection());
         }
 
         if ($request->query->has('orderby')) {
             $orderBy = InputHelper::clean($request->query->get('orderby'), true);
-            $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = $orderBy === $session->get("$name.orderby") || false === $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
-            $session->set("$name.orderby", $orderBy);
-            $session->set("$name.orderbydir", $dir);
+            $dir     = $session->get("{$name}.orderbydir", 'ASC');
+            $dir     = $orderBy === $session->get("{$name}.orderby") || false === $session->has("{$name}.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
+            $session->set("{$name}.orderby", $orderBy);
+            $session->set("{$name}.orderbydir", $dir);
         }
 
         if ($request->query->has('limit')) {
             $limit = (int) $request->query->get('limit');
-            $session->set("$name.limit", $limit);
+            $session->set("{$name}.limit", $limit);
         }
 
         if ($request->query->has('filterby')) {
             $filter  = InputHelper::clean($request->query->get('filterby'), true);
             $value   = InputHelper::clean($request->query->get('value'), true);
-            $filters = $session->get("$name.filters", []);
+            $filters = $session->get("{$name}.filters", []);
 
             if ('' == $value) {
                 if (isset($filters[$filter])) {
@@ -581,7 +581,7 @@ class CommonController extends AbstractController implements MauticController
                 ];
             }
 
-            $session->set("$name.filters", $filters);
+            $session->set("{$name}.filters", $filters);
         }
     }
 

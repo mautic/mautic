@@ -345,7 +345,8 @@ class ListController extends FormController
                         'mauticContent' => 'leadlist',
                     ],
                 ]));
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $segmentDependencies, $segmentCampaignShare, $segmentModel, $auditLogModel, $segment->getId(), true);
             }
         }
@@ -587,7 +588,7 @@ class ListController extends FormController
                 }
             }
 
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
                     $deletedEntities = $model->deleteEntities($deleteIds);
                 } catch (DeleteEntitiesDependencyException $e) {
@@ -604,7 +605,7 @@ class ListController extends FormController
                     }
                 }
 
-                if ($deletedEntities) {
+                if ([] !== $deletedEntities) {
                     $flashes[] = [
                         'type'    => 'notice',
                         'msg'     => 'mautic.lead.list.notice.batch_deleted',
@@ -692,7 +693,7 @@ class ListController extends FormController
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
-                $model->$function($lead, $list, true);
+                $model->{$function}($lead, $list, true);
 
                 $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
                 $flashes[]  = [
@@ -758,7 +759,8 @@ class ListController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             LeadPermissions::LISTS_VIEW_OWN,
             LeadPermissions::LISTS_VIEW_OTHER,
             $list->getCreatedBy()

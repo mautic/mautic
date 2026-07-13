@@ -243,7 +243,7 @@ final class ContactObjectHelperTest extends TestCase
         foreach ($objectMappings as $objectMapping) {
             $this->assertEquals('Test', $objectMapping->getIntegration());
             $this->assertEquals('MappedObject', $objectMapping->getIntegrationObjectName());
-            $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
+            $this->assertArrayHasKey($objectMapping->getIntegrationObjectId(), $objects);
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
 

@@ -376,12 +376,14 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $owner = $this->getUser($creatorUsername);
         $email = $this->createEmail('Email C', 'Email C Subject', 'template', 'empty', 'Test html');
         $email->setIsPublished(false);
+        $this->assertInstanceOf(User::class, $owner);
         $email->setCreatedBy($owner->getId());
         $this->em->flush();
 
         $emailId = $email->getId();
 
         $user = $this->getUser('sales');
+        $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
@@ -474,7 +476,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertTrue(isset($response['email']['sendToDnc']), print_r($response, true));
+        Assert::assertArrayHasKey('sendToDnc', $response['email'], print_r($response, true));
         Assert::assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
     }
 

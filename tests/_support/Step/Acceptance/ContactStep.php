@@ -40,7 +40,7 @@ class ContactStep extends \AcceptanceTester
     public function grabContactNameFromList($place)
     {
         $I           = $this;
-        $xpath       = "//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]";
+        $xpath       = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
         $contactName = $I->grabTextFrom($xpath);
         $I->see($contactName, $xpath);
 
@@ -54,10 +54,10 @@ class ContactStep extends \AcceptanceTester
     {
         $I = $this;
         // Click the dropdown menu
-        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/button");
+        $I->click("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/button");
         // Select the desired option
-        $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a", 30);
-        $I->click("//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/div/ul/li[$option]/a");
+        $I->waitForElementClickable("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/ul/li[{$option}]/a", 30);
+        $I->click("//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/div/ul/li[{$option}]/a");
     }
 
     /**
@@ -66,7 +66,7 @@ class ContactStep extends \AcceptanceTester
     public function selectContactFromList($place): void
     {
         $I     = $this;
-        $xpath = "//*[@id='leadTable']/tbody/tr[$place]/td[1]/div/span/input";
+        $xpath = "//*[@id='leadTable']/tbody/tr[{$place}]/td[1]/div/span/input";
         $I->waitForElementClickable($xpath, 10);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
@@ -78,7 +78,7 @@ class ContactStep extends \AcceptanceTester
     public function selectContactByNameFromList(string $contactName): void
     {
         $I     = $this;
-        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a/div[1][normalize-space()=\"$contactName\"]]/td[1]/div/span/input";
+        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a/div[1][normalize-space()=\"{$contactName}\"]]/td[1]/div/span/input";
         $I->waitForElementClickable($xpath, 10);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
@@ -90,7 +90,7 @@ class ContactStep extends \AcceptanceTester
     public function selectContactByLeadIdFromList(int $leadId): void
     {
         $I     = $this;
-        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a[contains(@href, '/contacts/view/$leadId')]]/td[1]/div/span/input";
+        $xpath = "//*[@id='leadTable']/tbody/tr[td[2]/a[contains(@href, '/contacts/view/{$leadId}')]]/td[1]/div/span/input";
         $I->waitForElementClickable($xpath, 10);
         $I->checkOption($xpath);
         $I->seeCheckboxIsChecked($xpath);
@@ -109,7 +109,7 @@ class ContactStep extends \AcceptanceTester
 
         // Select the desired option from the dropdown menu by label when provided.
         if (is_string($option) && !ctype_digit($option)) {
-            $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li/a[contains(normalize-space(), \"$option\")]";
+            $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li/a[contains(normalize-space(), \"{$option}\")]";
             $I->waitForElementClickable($xpathOption, 10);
             $I->click($xpathOption);
 
@@ -117,7 +117,7 @@ class ContactStep extends \AcceptanceTester
         }
 
         $position    = (int) $option;
-        $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li[$position]";
+        $xpathOption = "//ul[contains(@class, 'page-list-actions') and contains(@class, 'dropdown-menu')]/li[{$position}]";
         $I->waitForElementClickable($xpathOption, 10);
         $I->click($xpathOption);
     }
@@ -133,12 +133,12 @@ class ContactStep extends \AcceptanceTester
         $I->click("//*[@id='page-list-actions']");
 
         if (is_string($option) && !ctype_digit($option)) {
-            $I->click("//button[@id='page-list-actions']/following-sibling::ul/li/a[contains(normalize-space(), \"$option\")]");
+            $I->click("//button[@id='page-list-actions']/following-sibling::ul/li/a[contains(normalize-space(), \"{$option}\")]");
 
             return;
         }
 
-        $I->click("//*[@id='page-list-wrapper']/div[1]/div/div[2]/ul/li[$option]/a");
+        $I->click("//*[@id='page-list-wrapper']/div[1]/div/div[2]/ul/li[{$option}]/a");
     }
 
     /**
@@ -180,7 +180,7 @@ class ContactStep extends \AcceptanceTester
         // Navigate to the contacts page
         $I->amOnPage(ContactPage::$URL);
         // Grab the contact's name and navigate to their details page
-        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
+        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]");
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page
         $I->waitForText($contactName, 10, '#app-content');
@@ -200,7 +200,7 @@ class ContactStep extends \AcceptanceTester
         // Navigate to the contacts page
         $I->amOnPage('/s/contacts');
         // Grab the contact's name and navigate to their details page
-        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[$place]/td[2]/a/div[1]");
+        $contactName = $I->grabTextFrom("//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]");
         $I->click(['link' => $contactName]);
         // Wait for the contact's name to appear on the details page
         $I->waitForText($contactName, 10, '#app-content');

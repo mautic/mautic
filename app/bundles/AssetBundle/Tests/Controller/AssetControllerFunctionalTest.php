@@ -224,7 +224,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
         PageControllerTest::assertStringContainsString(
             '/asset/'.$this->asset->getSlug(),
-            $content,
+            (string) $content,
             'The return must contain the assert slug'
         );
     }
@@ -396,6 +396,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
     private function setPermission(User $user, array $permissions): void
     {
         $role = $user->getRole();
+        $this->assertInstanceOf(\Mautic\UserBundle\Entity\Role::class, $role);
 
         // Delete previous permissions
         $this->em->createQueryBuilder()
@@ -433,7 +434,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->submit($form, $data);
         preg_match_all('/Upload failed as the file extension, php/', $this->client->getResponse()->getContent(), $matches);
         $this->assertCount(1, $matches[0]);
-        $this->assertStringContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Upload failed as the file extension, php', (string) $this->client->getResponse()->getContent());
     }
 
     public function testPostRequestWithWrongTempNameFileExtension(): void
@@ -453,7 +454,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->submit($form, $data);
         preg_match_all('/Upload failed as the file extension, php/', $this->client->getResponse()->getContent(), $matches);
         $this->assertCount(1, $matches[0]);
-        $this->assertStringContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Upload failed as the file extension, php', (string) $this->client->getResponse()->getContent());
     }
 
     public function testPostResquetSuccessWithCorrectFileExtension(): void
@@ -472,7 +473,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $data['asset']['description']      = 'description';
         $this->client->submit($form, $data);
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
-        $this->assertStringNotContainsString('Upload failed as the file extension, php', $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Upload failed as the file extension, php', (string) $this->client->getResponse()->getContent());
     }
 
     public function testAssetWithProject(): void
@@ -498,6 +499,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertResponseIsSuccessful();
 
         $savedAsset = $this->em->find(Asset::class, $asset->getId());
+        $this->assertInstanceOf(Asset::class, $savedAsset);
         Assert::assertSame($project->getId(), $savedAsset->getProjects()->first()->getId());
     }
 
@@ -528,9 +530,9 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $content = $this->client->getResponse()->getContent();
 
         if ($isAllowed) {
-            Assert::assertStringNotContainsString($message, $content);
+            Assert::assertStringNotContainsString($message, (string) $content);
         } else {
-            Assert::assertStringContainsString($message, $content);
+            Assert::assertStringContainsString($message, (string) $content);
         }
     }
 }

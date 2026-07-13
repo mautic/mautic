@@ -73,7 +73,7 @@ class BuilderEvent extends Event
     public function addAbTestWinnerCriteria($key, array $criteria): void
     {
         if (array_key_exists($key, $this->abTestWinnerCriteria)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another criteria. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another criteria. Please use a different key.");
         }
 
         // check for required keys
@@ -91,7 +91,7 @@ class BuilderEvent extends Event
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $criteria)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+                throw new InvalidArgumentException("The key, '{$k}' is missing.");
             }
         }
     }

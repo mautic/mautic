@@ -188,7 +188,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 
@@ -992,7 +992,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param bool $canViewOthers
      */
-    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, $filter, $canViewOthers, $listName): array
+    public function getLifeCycleSegmentChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat, array $filter, $canViewOthers, $listName): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -1005,7 +1005,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             unset($filter['flag']);
         }
 
-        $allLists   = $query->getCountQuery('leads', 'id', 'date_added', null);
+        $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
         $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
@@ -1023,10 +1023,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];
@@ -1084,10 +1083,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param array $filter
-     * @param bool  $canViewOthers
+     * @param bool $canViewOthers
      */
-    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $data['values'] = [];
         $data['labels'] = [];

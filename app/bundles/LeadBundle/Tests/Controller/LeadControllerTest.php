@@ -207,9 +207,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
 
         $payload = [
             'lead_batch' => [
@@ -248,9 +248,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('3 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
     }
 
     public function testContactFieldsAreUpdatedWithBatchFindAndReplace(): void
@@ -297,9 +297,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('fr_FR', $contactC->getPreferredLocale());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('2 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('2 contacts affected', (string) $response['flashes']);
     }
 
     public function testContactFieldsAreUpdatedWithBatchFindAndReplaceForCurrentSearch(): void
@@ -367,9 +367,9 @@ final class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('en', $contactG->getPreferredLocale());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
-        $this->assertStringContainsString('5 contacts affected', $response['flashes']);
+        $this->assertStringContainsString('5 contacts affected', (string) $response['flashes']);
     }
 
     public function testCompanyChangesAreTrackedWhenContactAddedViaUI(): void
@@ -402,7 +402,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         /** @var AuditLog $auditLog */
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
 
-        Assert::assertTrue(isset($auditLog->getDetails()['fields']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertArrayHasKey('fields', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
 
         Assert::assertSame(
             [
@@ -427,9 +427,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         Assert::assertStringContainsString(
             'Contact export scheduled for CSV file type.',
-            $clientResponse->getContent()
+            (string) $clientResponse->getContent()
         );
         $contactExportScheduler = $this->em->getRepository(ContactExportScheduler::class)->findOneBy([]);
+        $this->assertInstanceOf(ContactExportScheduler::class, $contactExportScheduler);
         $data                   = $contactExportScheduler->getData();
         /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper = static::getContainer()->get('mautic.helper.core_parameters');
@@ -466,7 +467,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $this->assertResponseIsSuccessful();
         $content = $this->client->getInternalResponse()->getContent();
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
         $this->assertTrue(strlen($content) > 10000, $content);
     }
 
@@ -550,7 +551,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         // Test that a locale option is present correctly.
         $this->assertStringContainsString(
             '<option value="cs_CZ">Czech (Czechia)</option>',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -566,6 +567,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         /** @var FieldModel $fieldModel */
         $fieldModel     = self::getContainer()->get('mautic.lead.model.field');
         $firstnameField = $fieldModel->getEntity(2);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\LeadField::class, $firstnameField);
         $firstnameField->setIsRequired(true);
         $fieldModel->getRepository()->saveEntity($firstnameField);
 
@@ -579,7 +581,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+        $this->assertStringContainsString('firstname: This field is required.', (string) $clientResponse->getContent());
     }
 
     public function testAddContactsErrorMessageForEmailWithTwoDots(): void
@@ -595,7 +597,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertStringContainsString('email: john..doe@email.com is invalid.', $clientResponse->getContent());
+        $this->assertStringContainsString('email: john..doe@email.com is invalid.', (string) $clientResponse->getContent());
     }
 
     public function testCompanyIdSearchCommand(): void
@@ -747,7 +749,7 @@ EMAIL;
 
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
-        $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', $clientResponse->getContent());
+        $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', (string) $clientResponse->getContent());
     }
 
     public function testQuickAddRendersErrorOnEmailDuplicate(): void
@@ -784,7 +786,7 @@ EMAIL;
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $clientResponse = $this->client->getResponse();
-        Assert::assertStringContainsString('email: This field must be unique.', $clientResponse->getContent());
+        Assert::assertStringContainsString('email: This field must be unique.', (string) $clientResponse->getContent());
     }
 
     private function createCampaign(): Campaign
@@ -1167,8 +1169,8 @@ EMAIL;
 
         $content = $response->getContent();
 
-        Assert::assertStringContainsString('Company B', $content);
-        Assert::assertStringNotContainsString('Company A', $content);
+        Assert::assertStringContainsString('Company B', (string) $content);
+        Assert::assertStringNotContainsString('Company A', (string) $content);
     }
 
     public function testBatchDncIsNotUpdatingLeadEntities(): void
@@ -1195,7 +1197,7 @@ EMAIL;
         $clientResponse = $this->client->getResponse();
 
         Assert::assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertStringContainsString('1 contact affected', $clientResponse->getContent());
+        Assert::assertStringContainsString('1 contact affected', (string) $clientResponse->getContent());
 
         $dncRepository = $this->em->getRepository(DoNotContact::class);
         $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
@@ -1226,7 +1228,7 @@ EMAIL;
         $content = $this->client->getInternalResponse()->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
         $this->assertTrue(strlen($content) > 10000, $content);
 
         /** @var AuditLog $auditLog */
@@ -1237,7 +1239,7 @@ EMAIL;
             'action' => 'create',
         ]);
         $this->assertNotNull($auditLog);
-        Assert::assertTrue(isset($auditLog->getDetails()['args']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertArrayHasKey('args', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
         Assert::assertSame(
             [
                 'start'  => 0,

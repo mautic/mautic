@@ -179,7 +179,7 @@ class FormApiController extends CommonApiController
                     $requestFieldIds[] = $fieldParams['id'];
                 }
 
-                if (is_null($fieldEntity)) {
+                if (null === $fieldEntity) {
                     $msg = $this->translator->trans(
                         'mautic.core.error.entity.not.found',
                         [
@@ -240,7 +240,7 @@ class FormApiController extends CommonApiController
                 }
             }
 
-            if ($fieldsToDelete) {
+            if ([] !== $fieldsToDelete) {
                 $this->model->deleteFields($entity, $fieldsToDelete);
             }
         }
@@ -287,7 +287,7 @@ class FormApiController extends CommonApiController
                 }
             }
 
-            if ($actionsToDelete) {
+            if ([] !== $actionsToDelete) {
                 $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
