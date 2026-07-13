@@ -740,7 +740,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Results for Submission test form', $clientResponse->getContent());
+        $this->assertStringContainsString('Results for Submission test form', (string) $clientResponse->getContent());
 
         // Cleanup:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");

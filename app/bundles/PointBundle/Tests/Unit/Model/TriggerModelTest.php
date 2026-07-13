@@ -48,24 +48,19 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $ipLookupHelper               = $this->createMock(IpLookupHelper::class);
-        $leadModel                    = $this->createMock(LeadModel::class);
-        $triggerEventModel            = $this->createMock(TriggerEventModel::class);
-        $contactTracker               = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $translator                   = $this->createMock(Translator::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(
-            $ipLookupHelper,
-            $leadModel,
-            $triggerEventModel,
-            $contactTracker,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(LeadModel::class),
+            $this->createStub(TriggerEventModel::class),
+            $this->createStub(ContactTracker::class),
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->dispatcher,
             $this->createStub(UrlGeneratorInterface::class),
-            $translator,
+            $this->createStub(Translator::class),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class)
@@ -113,7 +108,8 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
                     );
 
                     return $event;
-                } elseif (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
+                }
+                if (EmailEvents::ON_SENT_EMAIL_TO_USER === $eventName) {
                     Assert::assertSame($contact, $event->getLead());
                     Assert::assertSame($triggerEvent, $event->getTriggerEvent());
 

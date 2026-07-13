@@ -27,7 +27,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
         $payload        = $clientResponse->getContent();
 
         self::assertResponseIsSuccessful();
-        $this->assertStringContainsString("Forms\n</h1>", $payload);
+        $this->assertStringContainsString("Forms\n</h1>", (string) $payload);
     }
 
     public function testUnlockActionWithInvalidReturnUrl(): void
@@ -49,7 +49,7 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
         $payload  = $response->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Dashboard</h1>', $payload);
+        $this->assertStringContainsString('Dashboard</h1>', (string) $payload);
     }
 
     public function testUnlockActionWithDifferentHostReturnUrl(): void
@@ -71,6 +71,6 @@ final class AbstractFormControllerTest extends MauticMysqlTestCase
         $payload  = $response->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Dashboard</h1>', $payload);
+        $this->assertStringContainsString('Dashboard</h1>', (string) $payload);
     }
 }

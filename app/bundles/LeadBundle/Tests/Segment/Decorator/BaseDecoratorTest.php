@@ -359,8 +359,6 @@ final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
 
     private function getDecorator(): BaseDecorator
     {
-        $contactSegmentFilterOperator = $this->createMock(ContactSegmentFilterOperator::class);
-
-        return new BaseDecorator($contactSegmentFilterOperator);
+        return new BaseDecorator($this->createStub(ContactSegmentFilterOperator::class));
     }
 }

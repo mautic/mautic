@@ -28,13 +28,7 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
     {
         $root = realpath(__DIR__.'/../../../../../');
 
-        /** @var Packages&MockObject $packagesMock */
-        $packagesMock = $this->createMock(Packages::class);
-
-        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        $assetsHelperMock = new AssetsHelper($packagesMock);
+        $assetsHelperMock = new AssetsHelper($this->createStub(Packages::class));
         $pathsHelperMock  = $this->createMock(PathsHelper::class);
         $pathsHelperMock->method('getSystemPath')
         ->willReturn('http://localhost');
@@ -45,7 +39,7 @@ final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 
         $assetsHelperMock->setPathsHelper($pathsHelperMock);
         $defaultAvatarHelperMock       = new DefaultAvatarHelper($assetsHelperMock);
-        $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $coreParametersHelper, $this->createStub(RequestStack::class));
+        $gravatarHelperMock            = new GravatarHelper($defaultAvatarHelperMock, $this->createStub(CoreParametersHelper::class), $this->createStub(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($assetsHelperMock, $pathsHelperMock, $gravatarHelperMock, $defaultAvatarHelperMock);
     }

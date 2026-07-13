@@ -78,7 +78,8 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
@@ -298,7 +299,8 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
@@ -478,7 +480,8 @@ class ResultController extends CommonFormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess('form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy())) {
+        }
+        if (!$this->security->hasEntityAccess('form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 

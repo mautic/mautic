@@ -1116,7 +1116,7 @@ class LeadModel extends FormModel
 
             /** @var ?LeadCategory $leadCategory */
             $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
-            if (is_null($leadCategory)) {
+            if (null === $leadCategory) {
                 $dispatchEvent = true;
 
                 $newLeadCategory = new LeadCategory();
@@ -1494,7 +1494,8 @@ class LeadModel extends FormModel
 
                 // Skip if the value is in the CSV row
                 continue;
-            } elseif ($lead->isNew() && !empty($leadField['defaultValue'])) {
+            }
+            if ($lead->isNew() && !empty($leadField['defaultValue'])) {
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
@@ -1651,7 +1652,7 @@ class LeadModel extends FormModel
         // cycle through calling appropriate setter
         foreach ($fields as $q => $setter) {
             if (isset($params[$q])) {
-                $utmTags->$setter($params[$q]);
+                $utmTags->{$setter}($params[$q]);
             }
         }
 
@@ -2437,14 +2438,15 @@ class LeadModel extends FormModel
      */
     private function validateSelectFields(Lead $entity, ?array $fields): void
     {
-        if (is_null($fields)) {
+        if (null === $fields) {
             return;
         }
         foreach ($fields as $group => $groupFields) {
             foreach ($groupFields as $field) {
                 if (!is_array($field)) {
                     return;
-                } elseif ('select' !== $field['type']) {
+                }
+                if ('select' !== $field['type']) {
                     continue;
                 }
                 $allowedValues = is_array($field['properties'])
@@ -2474,7 +2476,7 @@ class LeadModel extends FormModel
         $fieldData = [];
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && '' != $data[$importField]) {
+            if (array_key_exists($importField, $data) && null !== $data[$importField] && '' != $data[$importField]) {
                 $fieldEntity = $this->leadFieldModel->getEntityByAlias($leadField);
 
                 $fieldData[$leadField] = InputHelper::_(
@@ -2495,7 +2497,7 @@ class LeadModel extends FormModel
         $leadFieldValue = $lead->getFieldValue($leadField['alias']);
 
         if (CustomFieldValueHelper::TYPE_BOOLEAN === $leadField['type']) {
-            return is_null($leadFieldValue);
+            return null === $leadFieldValue;
         }
 
         return empty($leadFieldValue);

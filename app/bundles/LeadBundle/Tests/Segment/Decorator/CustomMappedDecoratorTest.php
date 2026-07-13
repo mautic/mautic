@@ -59,10 +59,8 @@ final class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
 
     private function getDecorator(): CustomMappedDecorator
     {
-        $contactSegmentFilterOperator   = $this->createMock(ContactSegmentFilterOperator::class);
-        $dispatcherMock                 = $this->createMock(EventDispatcherInterface::class);
-        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($dispatcherMock);
+        $contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->createStub(EventDispatcherInterface::class));
 
-        return new CustomMappedDecorator($contactSegmentFilterOperator, $contactSegmentFilterDictionary);
+        return new CustomMappedDecorator($this->createStub(ContactSegmentFilterOperator::class), $contactSegmentFilterDictionary);
     }
 }

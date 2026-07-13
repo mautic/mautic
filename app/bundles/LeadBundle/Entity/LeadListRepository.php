@@ -422,7 +422,7 @@ class LeadListRepository extends CommonRepository
                 $parameters[$subFilterParamter] = $value;
             }
 
-            $subExpr = $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":{$subFilterParamter}");
+            $subExpr = $subQb->expr()->{$subFunc}(sprintf('%s.%s', $alias, $column), ":{$subFilterParamter}");
         }
 
         $subQb->expr()->and(...$subExpr);

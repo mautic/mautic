@@ -192,7 +192,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($field, $func)) {
-                    $field->$func($v);
+                    $field->{$func}($v);
                 }
             }
             $field->setForm($entity);
@@ -274,7 +274,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 }
 
                 if (method_exists($action, $func)) {
-                    $action->$func($v);
+                    $action->{$func}($v);
                 }
             }
             $action->setForm($entity);

@@ -23,7 +23,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getEntities', 'getEntity'])
             ->getMock();
 
-        $mockListModel->expects($this->any())
+        $mockListModel
             ->method('getEntity')
             ->willReturnCallback(function ($id): MockObject {
                 $mockEntity = $this->getMockBuilder(LeadList::class)
@@ -48,7 +48,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity1->expects($this->once())
             ->method('getFilters')
             ->willReturn([]);
-        $mockEntity1->expects($this->any())
+        $mockEntity1
             ->method('getId')
             ->willReturn(1);
 
@@ -56,7 +56,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity2->expects($this->once())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters));
-        $mockEntity2->expects($this->any())
+        $mockEntity2
             ->method('getId')
             ->willReturn(2);
 
@@ -64,7 +64,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity3->expects($this->once())
             ->method('getFilters')
             ->willReturn([]);
-        $mockEntity3->expects($this->any())
+        $mockEntity3
             ->method('getId')
             ->willReturn(3);
 
@@ -72,7 +72,7 @@ final class LeadListModelTest extends \PHPUnit\Framework\TestCase
         $mockEntity4->expects($this->once())
             ->method('getFilters')
             ->willReturn(Serializer::decode($filters4));
-        $mockEntity4->expects($this->any())
+        $mockEntity4
             ->method('getId')
             ->willReturn(4);
 

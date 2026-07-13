@@ -398,7 +398,7 @@ class Ck5ForGrapesJs {
     return toolBarEl.parentElement.querySelector('.gjs-toolbar');
   }
 
-  
+
 }
 
 Object.assign(

@@ -383,7 +383,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         switch ($format) {
             case 'csv':
-                if (!is_null($handle)) {
+                if (null !== $handle) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
                     return;
