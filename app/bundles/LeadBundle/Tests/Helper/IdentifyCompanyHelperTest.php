@@ -46,7 +46,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
-        $model->expects($this->any())
+        $model
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
@@ -76,7 +76,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
-        $model->expects($this->any())
+        $model
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
@@ -108,7 +108,7 @@ final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
-        $model->expects($this->any())
+        $model
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 

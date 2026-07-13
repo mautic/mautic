@@ -638,7 +638,7 @@ class CommonApiController extends FetchCommonApiController
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
             if (null === $category) {
-                throw new \UnexpectedValueException("Category $categoryId does not exist");
+                throw new \UnexpectedValueException("Category {$categoryId} does not exist");
             }
 
             $entity->setCategory($category);

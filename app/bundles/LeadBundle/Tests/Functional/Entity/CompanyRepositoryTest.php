@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -29,6 +30,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
+        /** @var MailHelper $mailHelper */
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
@@ -157,6 +159,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
+        /** @var MailHelper $mailHelper */
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);

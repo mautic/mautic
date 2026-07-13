@@ -37,9 +37,9 @@ final class ConfigControllerTest extends MauticMysqlTestCase
         $label   = 'List of allowed remote domains (one per line)';
 
         if ($enabled) {
-            Assert::assertStringContainsString($label, $content);
+            Assert::assertStringContainsString($label, (string) $content);
         } else {
-            Assert::assertStringNotContainsString($label, $content);
+            Assert::assertStringNotContainsString($label, (string) $content);
         }
     }
 }

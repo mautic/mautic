@@ -145,14 +145,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $mockIpLookupHelper           = $this->createMock(IpLookupHelper::class);
         $this->mockLeadModel          = $this->createMock(LeadModel::class);
-        $mockLeadFieldModel           = $this->createMock(FieldModel::class);
-        $mockListModel                = $this->createMock(ListModel::class);
         $this->mockCompanyModel       = $this->createMock(CompanyModel::class);
-        $mockCampaignModel            = $this->createMock(CampaignModel::class);
         $this->doNotContact           = $this->createMock(DoNotContact::class);
-        $mockGroupModel               = $this->createMock(PointGroupModel::class);
         $filterOperatorProvider       = new FilterOperatorProvider(
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(TranslatorInterface::class)
@@ -162,15 +157,15 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('UTC');
 
         $this->subscriber = new CampaignSubscriber(
-            $mockIpLookupHelper,
+            $this->createStub(IpLookupHelper::class),
             $this->mockLeadModel,
-            $mockLeadFieldModel,
-            $mockListModel,
+            $this->createStub(FieldModel::class),
+            $this->createStub(ListModel::class),
             $this->mockCompanyModel,
-            $mockCampaignModel,
+            $this->createStub(CampaignModel::class),
             $mockCoreParametersHelper,
             $this->doNotContact,
-            $mockGroupModel,
+            $this->createStub(PointGroupModel::class),
             $filterOperatorProvider
         );
     }
@@ -204,7 +199,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([$companyEntityTo]);
 
-        $this->mockCompanyModel->expects($this->any())
+        $this->mockCompanyModel
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 

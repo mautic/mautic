@@ -29,20 +29,14 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
-    /**
-     * @var WebhookQueueRepository
-     */
-    private $webhookQueueRepository;
+    private WebhookQueueRepository $webhookQueueRepository;
 
-    /**
-     * @var NotificationRepository
-     */
-    private $notificationRepository;
+    private NotificationRepository $notificationRepository;
 
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private $webhhokRepository;
+    private \Mautic\WebhookBundle\Entity\WebhookRepository|EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {
@@ -197,7 +191,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(ProcessWebhookQueuesCommand::COMMAND_NAME);
 
         $webhook = $this->webhhokRepository->find($webhook->getId());
+        $this->assertInstanceOf(Webhook::class, $webhook);
         Assert::assertNull($webhook->getMarkedUnhealthyAt());
+        $this->assertInstanceOf(Webhook::class, $webhook);
         Assert::assertNull($webhook->getUnHealthySince());
         Assert::assertNull($webhook->getLastNotificationSentAt());
 
