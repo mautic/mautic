@@ -125,7 +125,7 @@ final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
             ->method('getEntities')
             ->willReturn([$field]);
 
-        $eventMock->expects($this->any())
+        $eventMock
             ->method('hasColumn')
             ->willReturn(false);
 

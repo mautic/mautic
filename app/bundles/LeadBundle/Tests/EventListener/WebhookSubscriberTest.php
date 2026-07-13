@@ -40,7 +40,11 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    fn ($type): bool => LeadEvents::LEAD_POST_SAVE.'_new' === $type
+                    function ($type): bool {
+                        $this->assertSame($type, LeadEvents::LEAD_POST_SAVE.'_new');
+
+                        return true;
+                    }
                 )
             );
 
@@ -63,7 +67,11 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('queueWebhooksByType')
             ->with(
                 $this->callback(
-                    fn ($type): bool => LeadEvents::LEAD_POST_SAVE.'_update' === $type
+                    function ($type): bool {
+                        $this->assertSame($type, LeadEvents::LEAD_POST_SAVE.'_update');
+
+                        return true;
+                    }
                 )
             );
 
@@ -221,7 +229,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadModel->expects($this->once())
             ->method('getEntity')
-            ->with($this->equalTo($contact['id']))
+            ->with($contact['id'])
             ->willReturn($contactEntity);
         $leadModel->expects($this->once())
             ->method('getRepository')
@@ -231,12 +239,12 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $webhookModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
-                $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
-                $this->equalTo([
+                LeadEvents::LEAD_LIST_CHANGE,
+                [
                     'contact'  => $contactEntity,
                     'segment'  => $changeEvent->getList(),
                     'action'   => 'added',
-                ])
+                ]
             );
 
         $example = new WebhookSubscriber($webhookModel, $leadModel);
@@ -269,12 +277,12 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $webhookModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
-                $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
-                $this->equalTo([
+                LeadEvents::LEAD_LIST_CHANGE,
+                [
                     'contact'  => $contactEntity,
                     'segment'  => $changeEvent->getList(),
                     'action'   => 'added',
-                ])
+                ]
             );
 
         $example = new WebhookSubscriber($webhookModel, $leadModel);
@@ -306,18 +314,18 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadModel->expects($this->once())
             ->method('getEntity')
-            ->with($this->equalTo($contact['id']))
+            ->with($contact['id'])
             ->willReturn($contactEntity);
 
         $webhookModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
-                $this->equalTo(LeadEvents::LEAD_LIST_CHANGE),
-                $this->equalTo([
+                LeadEvents::LEAD_LIST_CHANGE,
+                [
                     'contact'  => $contactEntity,
                     'segment'  => $changeEvent->getList(),
                     'action'   => 'added',
-                ])
+                ]
             );
 
         $example = new WebhookSubscriber($webhookModel, $leadModel);

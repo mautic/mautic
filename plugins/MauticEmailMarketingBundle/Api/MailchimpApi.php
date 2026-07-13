@@ -37,7 +37,8 @@ class MailchimpApi extends EmailMarketingApi
 
         if (is_array($response) && !empty($response['status']) && 'error' == $response['status']) {
             throw new ApiErrorException($response['error']);
-        } elseif (is_array($response) && !empty($response['errors'])) {
+        }
+        if (is_array($response) && !empty($response['errors'])) {
             $errors = [];
             foreach ($response['errors'] as $error) {
                 $errors[] = $error['message'];

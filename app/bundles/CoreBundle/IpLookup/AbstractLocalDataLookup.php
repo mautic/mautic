@@ -27,10 +27,8 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
 
     /**
      * Return the URL to manually download.
-     *
-     * @return string
      */
-    abstract public function getRemoteDateStoreDownloadUrl();
+    abstract public function getRemoteDateStoreDownloadUrl(): string;
 
     /**
      * @return string
@@ -233,12 +231,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         }
     }
 
-    /**
-     * Get if the string ends with.
-     *
-     * @param string $haystack
-     */
-    private function endsWith($haystack, string $needle): bool
+    private function endsWith(string $haystack, string $needle): bool
     {
         return str_ends_with($haystack, $needle);
     }

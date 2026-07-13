@@ -590,21 +590,25 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
 
                 return implode('; ', $errors);
-            } elseif (!empty($response->error->message)) {
+            }
+            if (!empty($response->error->message)) {
                 return $response->error->message;
             }
 
             return (string) $response;
-        } elseif (is_array($response)) {
+        }
+        if (is_array($response)) {
             if (isset($response['error_description'])) {
                 return $response['error_description'];
-            } elseif (isset($response['error'])) {
+            }
+            if (isset($response['error'])) {
                 if (is_array($response['error'])) {
                     return $response['error']['message'] ?? implode(', ', $response['error']);
                 }
 
                 return $response['error'];
-            } elseif (isset($response['errors'])) {
+            }
+            if (isset($response['errors'])) {
                 $errors = [];
                 foreach ($response['errors'] as $err) {
                     if (is_array($err)) {
@@ -1836,11 +1840,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 }
                 $values = $data[$field];
             } else {
-                if (!isset($data->$field)) {
+                if (!isset($data->{$field})) {
                     $info[$field] = '';
                     continue;
                 }
-                $values = $data->$field;
+                $values = $data->{$field};
             }
 
             switch ($fieldDetails['type']) {
@@ -1850,10 +1854,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     break;
                 case 'object':
                     foreach ($fieldDetails['fields'] as $f) {
-                        if (isset($values->$f)) {
+                        if (isset($values->{$f})) {
                             $fn = $this->matchFieldName($field, $f);
 
-                            $info[$fn] = $values->$f;
+                            $info[$fn] = $values->{$f};
                         }
                     }
                     break;

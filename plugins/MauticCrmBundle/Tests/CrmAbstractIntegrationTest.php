@@ -70,7 +70,7 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $companyModel->setEmailValidator($emailValidator);
         $companyModel->setCompanyDeduper($companyDeduper);
 
-        $companyModel->expects($this->any())
+        $companyModel
             ->method('fetchCompanyFields')
             ->willReturn([]);
         $companyModel->expects($this->once())

@@ -610,7 +610,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
     public function testFullMerge(): void
     {
         $winner = $this->createMock(Lead::class);
-        $winner->expects($this->any())
+        $winner
             ->method('getId')
             ->willReturn(1);
         $winner->expects($this->once())
@@ -627,7 +627,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new \DateTime('-30 minutes'));
 
         $loser = $this->createMock(Lead::class);
-        $loser->expects($this->any())
+        $loser
             ->method('getId')
             ->willReturn(2);
         $loser->expects($this->once())

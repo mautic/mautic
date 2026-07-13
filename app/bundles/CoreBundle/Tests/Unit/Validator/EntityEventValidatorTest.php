@@ -20,6 +20,9 @@ final class EntityEventValidatorTest extends TestCase
 {
     private EventDispatcherInterface $dispatcher;
 
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&ExecutionContextInterface
+     */
     private \PHPUnit\Framework\MockObject\Stub $context;
 
     private ConstraintValidatorInterface $validator;

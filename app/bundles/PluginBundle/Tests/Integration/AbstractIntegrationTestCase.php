@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class AbstractIntegrationTestCase extends TestCase
+abstract class AbstractIntegrationTestCase extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface
