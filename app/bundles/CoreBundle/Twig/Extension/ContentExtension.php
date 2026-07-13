@@ -15,7 +15,7 @@ class ContentExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('customContent', $this->getCustomContent(...), ['is_safe' => ['all']]),
