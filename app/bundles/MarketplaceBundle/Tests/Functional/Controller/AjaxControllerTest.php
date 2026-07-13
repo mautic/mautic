@@ -61,7 +61,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_INSTALL_PACKAGES)
             ->willReturn(true);
@@ -83,7 +83,7 @@ final class AjaxControllerTest extends AbstractMauticTestCase
 
         $this->marketplaceConfig->method('marketplaceIsEnabled')->willReturn(true);
         $this->marketplaceConfig->method('isComposerEnabled')->willReturn(true);
-        $this->security->expects($this->any())
+        $this->security
             ->method('isGranted')
             ->with(MarketplacePermissions::CAN_REMOVE_PACKAGES)
             ->willReturn(true);
@@ -205,17 +205,11 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $cacheHelper = $this->createMock(CacheHelper::class);
         $cacheHelper->method('clearSymfonyCache')->willReturn(0);
 
-        $logger                  = $this->createMock(LoggerInterface::class);
-        $doctrine                = $this->createMock(ManagerRegistry::class);
-        $modelFactory            = $this->createMock(ModelFactory::class);
-        $userHelper              = $this->createMock(UserHelper::class);
-        $user                    = $this->createMock(User::class);
+        $userHelper = $this->createMock(UserHelper::class);
+        $user       = $this->createMock(User::class);
         $user->method('getId')->willReturn(1);
         $userHelper->method('getUser')->willReturn($user);
-        $coreParametersHelper    = $this->createMock(CoreParametersHelper::class);
-        $dispatcher              = $this->createMock(EventDispatcherInterface::class);
-        $translator              = $this->createMock(Translator::class);
-        $flashBag                = $this->createMock(FlashBag::class);
+
         $this->requestStack      = $this->createMock(RequestStack::class);
         $this->security          = $this->createMock(CorePermissions::class);
         $this->marketplaceConfig = $this->createMock(Config::class);
@@ -225,17 +219,17 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $controller = new AjaxController(
             $composer,
             $cacheHelper,
-            $logger,
+            $this->createStub(LoggerInterface::class),
             $this->marketplaceConfig,
             $this->resourceInstaller,
             $this->packageModel,
-            $doctrine,
-            $modelFactory,
+            $this->createStub(ManagerRegistry::class),
+            $this->createStub(ModelFactory::class),
             $userHelper,
-            $coreParametersHelper,
-            $dispatcher,
-            $translator,
-            $flashBag,
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $this->requestStack,
             $this->security
         );

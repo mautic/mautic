@@ -25,8 +25,7 @@ final class TwilioTransportTest extends TestCase
     protected function setUp(): void
     {
         $this->logger      = $this->createMock(Logger::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $configuration     = new Configuration($integrationHelper);
+        $configuration     = new Configuration($this->createStub(IntegrationHelper::class));
 
         $this->twilioTransport = new TwilioTransport($configuration, $this->logger);
     }

@@ -42,7 +42,7 @@
     "phpstan/phpstan-phpunit": "^2.0",
     "phpstan/phpstan-symfony": "^2.0",
     "phpunit/phpunit": "^10.5.62",
-    "rector/rector": "dev-main",
+    "rector/rector": "^2.5.6",
     "symfony/browser-kit": "~7.4.0",
     "symfony/dom-crawler": "~7.4.0",
     "symfony/maker-bundle": "^1.64",
@@ -149,6 +149,7 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
+      "@gjs-build-safe",
       "@generate-assets",
       "@motd"
     ],
@@ -156,6 +157,7 @@
       "@githooks",
       "@npm-ci",
       "@npx-patch-package",
+      "@gjs-build-safe",
       "@generate-assets",
       "@motd"
     ],
@@ -172,6 +174,8 @@
     ],
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
+    "gjs-build": "npm ci --prefix plugins/GrapesJsBuilderBundle --prefer-offline --no-audit && npm run build --prefix plugins/GrapesJsBuilderBundle",
+    "gjs-build-safe": "@php build/gjs_build.php",
     "asset-map:clean": "php -r 'if (is_dir(\"assets/build\")) { $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(\"assets/build\", FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST); foreach ($it as $file) { $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname()); } rmdir(\"assets/build\"); }'",
     "sass:build": [
       "@asset-map:clean",

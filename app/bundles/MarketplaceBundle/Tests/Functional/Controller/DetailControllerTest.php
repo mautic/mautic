@@ -32,9 +32,9 @@ final class DetailControllerTest extends MauticMysqlTestCase
             return;
         }
 
-        Assert::assertStringContainsString($foundPackageDesc, $responseContent);
-        Assert::assertStringContainsString($foundPackageName, $responseContent);
-        Assert::assertStringContainsString($latestVersion, $responseContent);
+        Assert::assertStringContainsString($foundPackageDesc, (string) $responseContent);
+        Assert::assertStringContainsString($foundPackageName, (string) $responseContent);
+        Assert::assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
     /**

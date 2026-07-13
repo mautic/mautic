@@ -141,9 +141,11 @@ class InputHelper
             }
 
             return $value;
-        } elseif (null === $value) {
+        }
+        if (null === $value) {
             return $value;
-        } elseif (is_string($mask) && method_exists(self::class, $mask)) {
+        }
+        if (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
         }
 
@@ -165,7 +167,8 @@ class InputHelper
             }
 
             return $value;
-        } elseif ($urldecode) {
+        }
+        if ($urldecode) {
             $value = urldecode($value);
         }
 
