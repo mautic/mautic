@@ -198,8 +198,8 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
     protected function getColumnTypeSignedOrUnsigned(Schema $schema, string $tableName, string $columnName): string
     {
-        $pagesTable  = $schema->getTable($this->getPrefixedTableName($tableName));
-        $idColumn    = $pagesTable->getColumn($columnName);
+        $table       = $schema->getTable($this->getPrefixedTableName($tableName));
+        $idColumn    = $table->getColumn($columnName);
         $idDataType  = self::COLUMN_TYPE_SIGNED;
 
         if (true === $idColumn->getUnsigned()) {
@@ -207,5 +207,12 @@ abstract class AbstractMauticMigration extends AbstractMigration
         }
 
         return $idDataType;
+    }
+
+    protected function getColumnType(Schema $schema, string $tableName, string $columnName): string
+    {
+        $table = $schema->getTable($this->getPrefixedTableName($tableName));
+
+        return $table->getColumn($columnName)->getType()->getName();
     }
 }
