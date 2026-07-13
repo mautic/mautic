@@ -350,7 +350,7 @@ class FormModel extends AbstractCommonModel
         }
         $this->em->flush();
 
-        if ($unableToDelete) {
+        if ([] !== $unableToDelete) {
             throw new DeleteEntitiesDependencyException($deleted, $unableToDelete);
         }
 

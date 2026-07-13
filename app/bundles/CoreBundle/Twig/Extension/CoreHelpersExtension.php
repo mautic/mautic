@@ -105,7 +105,7 @@ class CoreHelpersExtension extends AbstractExtension
         }
 
         if ($jsCallback) {
-            if ($jsArguments) {
+            if ([] !== $jsArguments) {
                 foreach ($jsArguments as $key => $argument) {
                     if (is_array($argument)) {
                         $jsArguments[$key] = json_encode($argument);

@@ -123,7 +123,7 @@ final class EmailRepositoryTest extends TestCase
             'listIds'      => $listIds,
         ];
 
-        if ($excludedListIds) {
+        if ([] !== $excludedListIds) {
             $expectedParams['excludedListIds'] = $excludedListIds;
         }
 

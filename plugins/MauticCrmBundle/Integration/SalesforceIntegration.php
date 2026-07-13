@@ -364,7 +364,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if ($dataObject) {
+                if ([] !== $dataObject) {
                     $entity = null;
                     switch ($object) {
                         case 'Contact':
@@ -1425,7 +1425,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Catch left overs
-                if ($persistEntities) {
+                if ([] !== $persistEntities) {
                     $integrationEntityRepo->saveEntities($persistEntities);
                     $integrationEntityRepo->detachEntities($persistEntities);
                 }
@@ -2288,7 +2288,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($chunked as $chunk) {
             // We can only submit 25 at a time
-            if ($chunk) {
+            if ([] !== $chunk) {
                 $request['compositeRequest'] = $chunk;
                 $result                      = $apiHelper->syncMauticToSalesforce($request);
                 $this->logger->debug('SALESFORCE: Sync Composite  '.var_export($request, true));
@@ -2745,7 +2745,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 );
             }
 
-            if ($checkCompaniesInSF) {
+            if ([] !== $checkCompaniesInSF) {
                 $sfEntityRecords = $this->getSalesforceAccountsByName($checkCompaniesInSF, implode(',', array_keys($config['companyFields'])));
 
                 if (!isset($sfEntityRecords['records'])) {
@@ -2758,7 +2758,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // We're done
-            if (!$checkCompaniesInSF) {
+            if ([] === $checkCompaniesInSF) {
                 break;
             }
 
@@ -2775,7 +2775,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // Only create left over if Lead object is enabled in integration settings
-            if ($checkCompaniesInSF) {
+            if ([] !== $checkCompaniesInSF) {
                 $this->prepareMauticCompaniesToCreate(
                     $mauticData,
                     $checkCompaniesInSF,

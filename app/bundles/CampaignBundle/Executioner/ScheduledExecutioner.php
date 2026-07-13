@@ -109,7 +109,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         $this->output  = $output ?: new NullOutput();
         $this->counter = new Counter();
 
-        if (!$logIds) {
+        if ([] === $logIds) {
             return $this->counter;
         }
 
@@ -183,7 +183,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
-        $totalScheduledCount   = $scheduledEvents ? array_sum($scheduledEvents) : 0;
+        $totalScheduledCount   = [] !== $scheduledEvents ? array_sum($scheduledEvents) : 0;
         $this->scheduledEvents = array_keys($scheduledEvents);
         $this->logger->debug('CAMPAIGN: '.$totalScheduledCount.' events scheduled to execute.');
 

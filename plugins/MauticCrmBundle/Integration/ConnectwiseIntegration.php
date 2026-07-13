@@ -461,7 +461,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                if ($integrationEntities) {
+                if ([] !== $integrationEntities) {
                     $this->em->getRepository(IntegrationEntity::class)->saveEntities($integrationEntities);
                     $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
                 }
@@ -910,7 +910,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             }
         }
 
-        if ($persistEntities) {
+        if ([] !== $persistEntities) {
             $this->em->getRepository(IntegrationEntity::class)->saveEntities($persistEntities);
             $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
             unset($persistEntities);
