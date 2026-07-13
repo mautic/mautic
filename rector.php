@@ -93,12 +93,15 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         // checking child classes
         Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
         ],
 =======
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+=======
+>>>>>>> 10ecd30e3d (cleanup skipped never used rules)
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 >>>>>>> f78662c22d (remove fixed rector rules)
 
@@ -120,9 +123,14 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
+<<<<<<< HEAD
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+=======
+
+        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
+>>>>>>> 10ecd30e3d (cleanup skipped never used rules)
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -144,8 +152,14 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
 
+<<<<<<< HEAD
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
+=======
+        // phpunit
+        Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+>>>>>>> fab4e2d24f (cleanup skipped never used rules)
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
