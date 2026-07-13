@@ -38,7 +38,7 @@ final class RedirectModelTest extends PageTestAbstract
         $redirectModel = $this->getRedirectModel();
         $url           = $redirectModel->generateRedirectUrl($redirect);
 
-        $this->assertStringContainsString('http://some-url.com', $url);
+        $this->assertStringContainsString('http://some-url.com', (string) $url);
     }
 
     public function testRedirectGenerationEvent(): void

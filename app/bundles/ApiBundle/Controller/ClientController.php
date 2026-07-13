@@ -259,7 +259,8 @@ class ClientController extends AbstractStandardFormController
                         ],
                     ]
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $client->getId(), true);
             }
         }
@@ -322,7 +323,8 @@ class ClientController extends AbstractStandardFormController
                     ]
                 )
             );
-        } elseif ($this->clientModel->isLocked($client)) {
+        }
+        if ($this->clientModel->isLocked($client)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $client, 'api.client');
         }

@@ -67,7 +67,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // Both fields should be included
         $fields = $objectChangeDAO->getFields();
@@ -75,7 +75,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // First name is presumed to be changed
         $changedFields = $objectChangeDAO->getChangedFields();
-        $this->assertTrue(isset($changedFields['first_name']));
+        $this->assertArrayHasKey('first_name', $changedFields);
     }
 
     public function testFieldIsNotAddedToObjectChangeIfNotFound(): void
@@ -116,17 +116,17 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         // Email should be a required field
         $requiredFields = $objectChangeDAO->getRequiredFields();
-        $this->assertTrue(isset($requiredFields['email']));
+        $this->assertArrayHasKey('email', $requiredFields);
 
         // First name should not be included because it wasn't found in the internal object
         $fields = $objectChangeDAO->getFields();
-        $this->assertFalse(isset($fields['first_name']));
+        $this->assertArrayNotHasKey('first_name', $fields);
     }
 
     public function testFieldsWithDirectionToIntegrationAreSkipped(): void
     {
         $objectChangeGenerator = new ObjectChangeGenerator(
-            new class extends ValueHelper {
+            new class() extends ValueHelper {
             }
         );
 

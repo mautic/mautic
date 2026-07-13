@@ -56,7 +56,8 @@ class DecisionHelper
 
             if (1 === $pathTaken && !$parentEvent->getNegativeChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take negative path, event {$event->getId()} is on positive path.");
-            } elseif (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
+            }
+            if (0 === $pathTaken && !$parentEvent->getPositiveChildren()->contains($event)) {
                 throw new DecisionNotApplicableException("Parent {$parentEvent->getId()} take positive path, event {$event->getId()} is on negative path.");
             }
         }

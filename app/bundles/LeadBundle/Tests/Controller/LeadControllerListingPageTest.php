@@ -89,7 +89,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
             if (empty($value)) {
                 continue;
             }
-            $contact->$name($value);
+            $contact->{$name}($value);
         }
 
         $this->em->persist($contact);
