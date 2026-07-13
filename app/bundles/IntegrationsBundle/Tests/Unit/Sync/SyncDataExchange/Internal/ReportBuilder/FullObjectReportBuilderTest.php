@@ -112,7 +112,7 @@ final class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
@@ -166,7 +166,7 @@ final class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
@@ -269,7 +269,7 @@ final class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 
@@ -375,7 +375,7 @@ final class FullObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(MauticSyncDataExchange::OBJECT_COMPANY);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals(self::TEST_EMAIL, $objects[1]->getField('email')->getValue()->getNormalizedValue());
     }
 }

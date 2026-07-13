@@ -134,7 +134,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())
                 ->method('addViolation')
-                ->with($this->equalTo($expectedMessage));
+                ->with($expectedMessage);
         } else {
             $this->context->expects($this->never())
                 ->method('addViolation');

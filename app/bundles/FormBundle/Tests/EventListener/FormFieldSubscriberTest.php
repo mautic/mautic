@@ -22,7 +22,7 @@ final class FormFieldSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 FormEvents::FIELD_POST_DELETE => ['onFieldPostDelete', 0],
             ],
