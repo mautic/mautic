@@ -168,11 +168,7 @@
     "phpstan-baseline": "composer phpstan -- --generate-baseline phpstan-baseline.neon",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
     "fixcs": "bin/php-cs-fixer fix -v",
-    "rector-code": "bin/rector process --ansi",
-    "rector": [
-      "@rector-code",
-      "@rector-tests"
-    ],
+    "rector": "bin/rector process --ansi",
     "npm-ci": "npm ci --prefer-offline --no-audit",
     "npx-patch-package": "npx patch-package",
     "gjs-build": "npm ci --prefix plugins/GrapesJsBuilderBundle --prefer-offline --no-audit && npm run build --prefix plugins/GrapesJsBuilderBundle",
