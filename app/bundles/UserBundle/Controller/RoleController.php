@@ -180,7 +180,8 @@ class RoleController extends FormController
                         'mauticContent' => 'role',
                     ],
                 ]);
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 return $this->editAction($request, $entity->getId(), true);
             }
         }
@@ -380,7 +381,8 @@ class RoleController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($entity)) {
+        }
+        if ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'user.role');
         }

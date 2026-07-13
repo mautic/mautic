@@ -19,10 +19,7 @@ final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $connection          = $this->createMock(Connection::class);
-        $userTokenRepository = $this->createMock(UserTokenRepositoryInterface::class);
-        $translator          = $this->createMock(TranslatorInterface::class);
-        $this->subscriber    = new MaintenanceSubscriber($connection, $userTokenRepository, $translator);
+        $this->subscriber    = new MaintenanceSubscriber($this->createStub(Connection::class), $this->createStub(UserTokenRepositoryInterface::class), $this->createStub(TranslatorInterface::class));
     }
 
     public function testGetSubscribedEvents(): void

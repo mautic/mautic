@@ -185,7 +185,7 @@ class DashboardModel extends FormModel
         foreach ($data as $property => $value) {
             $method = 'set'.ucfirst($property);
             if (method_exists($entity, $method)) {
-                $entity->$method($value);
+                $entity->{$method}($value);
             }
             unset($data[$property]);
         }

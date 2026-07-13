@@ -15,9 +15,9 @@ final class CampaignModelTest extends CampaignTestAbstract
     {
         $model = $this->initCampaignModel();
         $lists = $model->getSourceLists();
-        $this->assertTrue(isset($lists['lists']));
+        $this->assertArrayHasKey('lists', $lists);
         $this->assertSame([parent::$mockAlias => parent::$mockName], $lists['lists']);
-        $this->assertTrue(isset($lists['forms']));
+        $this->assertArrayHasKey('forms', $lists);
         $this->assertSame([parent::$mockId => parent::$mockName], $lists['forms']);
     }
 

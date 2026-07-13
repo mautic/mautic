@@ -36,7 +36,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         static::getContainer()->set(
             'session',
             new Session(
-                new class extends FixedMockFileSessionStorage {
+                new class() extends FixedMockFileSessionStorage {
                     public function start(): bool
                     {
                         throw new \RuntimeException('Session cannot be started during API call. It must be stateless.');
@@ -725,7 +725,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertTrue(isset($response['contacts'][$contactId]));
+        $this->assertArrayHasKey($contactId, $response['contacts']);
         $contact = $response['contacts'][$contactId];
         $this->assertEquals($contactId, $contact['id']);
         $this->assertEquals($payload['email'], $contact['fields']['all']['email']);
@@ -966,7 +966,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertTrue(isset($response['contacts'][$contactId]));
+        $this->assertArrayHasKey($contactId, $response['contacts']);
         $contact = $response['contacts'][$contactId];
         $this->assertEquals($contactId, $contact['id']);
         $this->assertEquals($payload[0]['email'], $contact['fields']['all']['email']);

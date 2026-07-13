@@ -18,8 +18,7 @@ final class BuilderIntegrationsHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $integrationsHelper              = $this->createMock(IntegrationsHelper::class);
-        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($integrationsHelper);
+        $this->builderIntegrationsHelper = new BuilderIntegrationsHelper($this->createStub(IntegrationsHelper::class));
     }
 
     public function testBuilderNotFoundIfFeatureSupportedButNotEnabled(): void
