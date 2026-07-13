@@ -127,66 +127,64 @@ final class ListModelTest extends TestCase
     }
 
     /**
-     * @return array<int, array{0: array<int, mixed>, 1: string|null, 2: array<string|int, mixed>}>
+     * @return \Iterator<int, array{array<int, mixed>, (string | null), array<(int | string), mixed>}>
      */
-    public static function sourceTypeTestDataProvider(): array
+    public static function sourceTypeTestDataProvider(): \Iterator
     {
-        return [
+        yield [
+            [],
+            'categories',
+            [],
+        ];
+        yield [
             [
-                [],
-                'categories',
-                [],
-            ],
-            [
-                [
-                    0 => [
-                        'id'     => 1,
-                        'title'  => 'Segment Test Category 1',
-                        'alias'  => 'Alias Test Category 1',
-                        'bundle' => 'segment',
-                    ],
-                    1 => [
-                        'id'     => 2,
-                        'title'  => 'Segment Test Category 2',
-                        'alias'  => 'Alias Test Category 2',
-                        'bundle' => 'segment',
-                    ],
+                0 => [
+                    'id'     => 1,
+                    'title'  => 'Segment Test Category 1',
+                    'alias'  => 'Alias Test Category 1',
+                    'bundle' => 'segment',
                 ],
-                null,
-                [
-                    'categories' => [
-                        'Alias Test Category 1' => 'Segment Test Category 1',
-                        'Alias Test Category 2' => 'Segment Test Category 2',
-                    ],
+                1 => [
+                    'id'     => 2,
+                    'title'  => 'Segment Test Category 2',
+                    'alias'  => 'Alias Test Category 2',
+                    'bundle' => 'segment',
                 ],
             ],
+            null,
             [
-                [
-                    0 => [
-                        'id'     => 1,
-                        'title'  => 'Segment Test Category 1',
-                        'alias'  => 'Alias Test Category 1',
-                        'bundle' => 'segment',
-                    ],
-                    1 => [
-                        'id'     => 2,
-                        'title'  => 'Segment Test Category 2',
-                        'alias'  => 'Alias Test Category 2',
-                        'bundle' => 'segment',
-                    ],
-                ],
-                'categories',
-                [
+                'categories' => [
                     'Alias Test Category 1' => 'Segment Test Category 1',
                     'Alias Test Category 2' => 'Segment Test Category 2',
                 ],
             ],
+        ];
+        yield [
             [
-                [],
-                null,
-                [
-                    'categories' => [],
+                0 => [
+                    'id'     => 1,
+                    'title'  => 'Segment Test Category 1',
+                    'alias'  => 'Alias Test Category 1',
+                    'bundle' => 'segment',
                 ],
+                1 => [
+                    'id'     => 2,
+                    'title'  => 'Segment Test Category 2',
+                    'alias'  => 'Alias Test Category 2',
+                    'bundle' => 'segment',
+                ],
+            ],
+            'categories',
+            [
+                'Alias Test Category 1' => 'Segment Test Category 1',
+                'Alias Test Category 2' => 'Segment Test Category 2',
+            ],
+        ];
+        yield [
+            [],
+            null,
+            [
+                'categories' => [],
             ],
         ];
     }

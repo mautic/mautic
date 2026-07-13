@@ -943,25 +943,23 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return mixed[]
+     * @return \Iterator<(int | string), mixed>
      */
-    public static function provideEmails(): array
+    public static function provideEmails(): \Iterator
     {
-        return [
-            ['john@doe.com', true],
-            ['john@doe.email', true],
-            ['john@doe.whatevertldtheycomewithinthefuture', true],
-            ['john.doe@email.com', true],
-            ['john+doe@email.com', true],
-            ['john@doe', false],
-            ['jo hn@doe.email', false],
-            ['jo^hn@doe.email', false],
-            ['jo\'hn@doe.email', false],
-            ['jo;hn@doe.email', false],
-            ['jo&hn@doe.email', false],
-            ['jo*hn@doe.email', false],
-            ['jo%hn@doe.email', false],
-        ];
+        yield ['john@doe.com', true];
+        yield ['john@doe.email', true];
+        yield ['john@doe.whatevertldtheycomewithinthefuture', true];
+        yield ['john.doe@email.com', true];
+        yield ['john+doe@email.com', true];
+        yield ['john@doe', false];
+        yield ['jo hn@doe.email', false];
+        yield ['jo^hn@doe.email', false];
+        yield ['jo\'hn@doe.email', false];
+        yield ['jo;hn@doe.email', false];
+        yield ['jo&hn@doe.email', false];
+        yield ['jo*hn@doe.email', false];
+        yield ['jo%hn@doe.email', false];
     }
 
     public function testValidateEmailWithoutTld(): void
@@ -1475,14 +1473,12 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return array<array<bool|int|string>>
+     * @return \Iterator<(int | string), array<(bool | int | string)>>
      */
-    public static function minifyHtmlDataProvider(): array
+    public static function minifyHtmlDataProvider(): \Iterator
     {
-        return [
-            [false, self::MINIFY_HTML, self::MINIFY_HTML],
-            [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)],
-        ];
+        yield [false, self::MINIFY_HTML, self::MINIFY_HTML];
+        yield [true, self::MINIFY_HTML, InputHelper::minifyHTML(self::MINIFY_HTML)];
     }
 
     public function testHeadersAreTokenized(): void

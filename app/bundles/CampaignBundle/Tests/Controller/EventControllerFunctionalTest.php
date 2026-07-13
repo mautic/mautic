@@ -69,16 +69,14 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return string[][]
+     * @return \Iterator<(int | string), array<string>>
      */
-    public static function fieldAndValueProvider(): array
+    public static function fieldAndValueProvider(): \Iterator
     {
-        return [
-            'country'  => ['country', 'India'],
-            'region'   => ['state', 'Arizona'],
-            'timezone' => ['timezone', 'Marigot'],
-            'locale'   => ['preferred_locale', 'af'],
-        ];
+        yield 'country' => ['country', 'India'];
+        yield 'region' => ['state', 'Arizona'];
+        yield 'timezone' => ['timezone', 'Marigot'];
+        yield 'locale' => ['preferred_locale', 'af'];
     }
 
     public function testActionAtSpecificTimeWorkflow(): void

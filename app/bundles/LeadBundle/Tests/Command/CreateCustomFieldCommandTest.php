@@ -45,13 +45,12 @@ final class CreateCustomFieldCommandTest extends TestCase
     }
 
     /**
-     * @return array<int, array<int, bool|int>>
+     * @return \Iterator<int, array<int, (bool | int)>>
      */
-    public static function completeRunMethodProvider(): array
+    public static function completeRunMethodProvider(): \Iterator
     {
-        return [
-            [true, 1],  // `completeRun` should be called once
-            [false, 0], // `completeRun` should never be called
-        ];
+        yield [true, 1];
+        // `completeRun` should be called once
+        yield [false, 0];
     }
 }

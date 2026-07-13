@@ -493,15 +493,13 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{formType: string|null}>
+     * @return \Iterator<string, array{formType: (string | null)}>
      */
-    public static function formTypeDataProvider(): array
+    public static function formTypeDataProvider(): \Iterator
     {
-        return [
-            'campaign form type'   => ['formType' => 'campaign'],
-            'standalone form type' => ['formType' => 'standalone'],
-            'no form type'         => ['formType' => null],
-        ];
+        yield 'campaign form type' => ['formType' => 'campaign'];
+        yield 'standalone form type' => ['formType' => 'standalone'];
+        yield 'no form type' => ['formType' => null];
     }
 
     public function testFetchFormSubmissionsApiIfPermissionNotGrantedForUser(): void
@@ -909,120 +907,118 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
+     * @return \Iterator<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
      */
-    public static function formFieldValuesMappingDataProvider(): array
+    public static function formFieldValuesMappingDataProvider(): \Iterator
     {
-        return [
-            'normal_submission' => [
-                'submissionData' => [
-                    'email'           => 'john@example.com',
-                    'firstname'       => 'John',
-                    'lastname'        => 'Doe',
-                    'country'         => 'United States',
-                    'company_name'    => 'Acme Inc',
-                    'company_country' => 'United States',
-                    'company_city'    => 'New York',
-                    'message'         => 'Hello, this is a normal submission.',
-                ],
-                'expectedData' => [
-                    'email'           => 'john@example.com',
-                    'firstname'       => 'John',
-                    'lastname'        => 'Doe',
-                    'country'         => 'United States',
-                    'company_name'    => 'Acme Inc',
-                    'company_country' => 'United States',
-                    'company_city'    => 'New York',
-                    'message'         => 'Hello, this is a normal submission.',
-                ],
+        yield 'normal_submission' => [
+            'submissionData' => [
+                'email'           => 'john@example.com',
+                'firstname'       => 'John',
+                'lastname'        => 'Doe',
+                'country'         => 'United States',
+                'company_name'    => 'Acme Inc',
+                'company_country' => 'United States',
+                'company_city'    => 'New York',
+                'message'         => 'Hello, this is a normal submission.',
             ],
-            'special_characters' => [
-                'submissionData' => [
-                    'email'           => 'jane@example.com',
-                    'firstname'       => 'Jane',
-                    'lastname'        => 'O\'Brien-Smith',
-                    'country'         => 'Ireland',
-                    'company_name'    => '"Super" R&D Company, Ltd.',
-                    'company_country' => 'Ireland',
-                    'company_city'    => 'Dublin',
-                    'message'         => 'Super & Special',
-                ],
-                'expectedData' => [
-                    'email'           => 'jane@example.com',
-                    'firstname'       => 'Jane',
-                    'lastname'        => 'O\'Brien-Smith',
-                    'country'         => 'Ireland',
-                    'company_name'    => '"Super" R&D Company, Ltd.',
-                    'company_country' => 'Ireland',
-                    'company_city'    => 'Dublin',
-                    'message'         => 'Super & Special',
-                ],
+            'expectedData' => [
+                'email'           => 'john@example.com',
+                'firstname'       => 'John',
+                'lastname'        => 'Doe',
+                'country'         => 'United States',
+                'company_name'    => 'Acme Inc',
+                'company_country' => 'United States',
+                'company_city'    => 'New York',
+                'message'         => 'Hello, this is a normal submission.',
             ],
-            'xss_attempt' => [
-                'submissionData' => [
-                    'email'           => 'hacker@evil.com',
-                    'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'country'         => 'Poland',
-                    'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                    'message'         => '<script>alert("XSS")</script>',
-                ],
-                'expectedData' => [
-                    'email'           => 'hacker@evil.com',
-                    'firstname'       => 'alert("XSS")',
-                    'lastname'        => 'alert("XSS")',
-                    'country'         => 'Poland',
-                    'company_name'    => 'alert("XSS")',
-                    'company_country' => 'alert("XSS")',
-                    'company_city'    => 'alert("XSS")',
-                    'message'         => 'alert("XSS")',
-                ],
+        ];
+        yield 'special_characters' => [
+            'submissionData' => [
+                'email'           => 'jane@example.com',
+                'firstname'       => 'Jane',
+                'lastname'        => 'O\'Brien-Smith',
+                'country'         => 'Ireland',
+                'company_name'    => '"Super" R&D Company, Ltd.',
+                'company_country' => 'Ireland',
+                'company_city'    => 'Dublin',
+                'message'         => 'Super & Special',
             ],
-            'sql_injection_attempt' => [
-                'submissionData' => [
-                    'email'           => 'sqlhacker@evil.com',
-                    'firstname'       => "Robert'; DROP TABLE users; --",
-                    'lastname'        => 'Tables',
-                    'country'         => 'United States',
-                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
-                    'company_country' => 'United States',
-                    'company_city'    => 'SQL City',
-                    'message'         => "Robert'; DROP TABLE messages; --",
-                ],
-                'expectedData' => [
-                    'email'           => 'sqlhacker@evil.com',
-                    'firstname'       => "Robert'; DROP TABLE users; --",
-                    'lastname'        => 'Tables',
-                    'country'         => 'United States',
-                    'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
-                    'company_country' => 'United States',
-                    'company_city'    => 'SQL City',
-                    'message'         => "Robert'; DROP TABLE messages; --",
-                ],
+            'expectedData' => [
+                'email'           => 'jane@example.com',
+                'firstname'       => 'Jane',
+                'lastname'        => 'O\'Brien-Smith',
+                'country'         => 'Ireland',
+                'company_name'    => '"Super" R&D Company, Ltd.',
+                'company_country' => 'Ireland',
+                'company_city'    => 'Dublin',
+                'message'         => 'Super & Special',
             ],
-            'unicode_characters' => [
-                'submissionData' => [
-                    'email'           => 'unicode@example.com',
-                    'firstname'       => 'José',
-                    'lastname'        => 'Martínez',
-                    'country'         => 'Spain',
-                    'company_name'    => '株式会社スマイル',
-                    'company_country' => 'Japan',
-                    'company_city'    => '東京',
-                    'message'         => 'こんにちは、世界！',
-                ],
-                'expectedData' => [
-                    'email'           => 'unicode@example.com',
-                    'firstname'       => 'José',
-                    'lastname'        => 'Martínez',
-                    'country'         => 'Spain',
-                    'company_name'    => '株式会社スマイル',
-                    'company_country' => 'Japan',
-                    'company_city'    => '東京',
-                    'message'         => 'こんにちは、世界！',
-                ],
+        ];
+        yield 'xss_attempt' => [
+            'submissionData' => [
+                'email'           => 'hacker@evil.com',
+                'firstname'       => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'lastname'        => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'country'         => 'Poland',
+                'company_name'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'company_country' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'company_city'    => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
+                'message'         => '<script>alert("XSS")</script>',
+            ],
+            'expectedData' => [
+                'email'           => 'hacker@evil.com',
+                'firstname'       => 'alert("XSS")',
+                'lastname'        => 'alert("XSS")',
+                'country'         => 'Poland',
+                'company_name'    => 'alert("XSS")',
+                'company_country' => 'alert("XSS")',
+                'company_city'    => 'alert("XSS")',
+                'message'         => 'alert("XSS")',
+            ],
+        ];
+        yield 'sql_injection_attempt' => [
+            'submissionData' => [
+                'email'           => 'sqlhacker@evil.com',
+                'firstname'       => "Robert'; DROP TABLE users; --",
+                'lastname'        => 'Tables',
+                'country'         => 'United States',
+                'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                'company_country' => 'United States',
+                'company_city'    => 'SQL City',
+                'message'         => "Robert'; DROP TABLE messages; --",
+            ],
+            'expectedData' => [
+                'email'           => 'sqlhacker@evil.com',
+                'firstname'       => "Robert'; DROP TABLE users; --",
+                'lastname'        => 'Tables',
+                'country'         => 'United States',
+                'company_name'    => "Malicious' Corp; DELETE FROM companies WHERE 1=1; --",
+                'company_country' => 'United States',
+                'company_city'    => 'SQL City',
+                'message'         => "Robert'; DROP TABLE messages; --",
+            ],
+        ];
+        yield 'unicode_characters' => [
+            'submissionData' => [
+                'email'           => 'unicode@example.com',
+                'firstname'       => 'José',
+                'lastname'        => 'Martínez',
+                'country'         => 'Spain',
+                'company_name'    => '株式会社スマイル',
+                'company_country' => 'Japan',
+                'company_city'    => '東京',
+                'message'         => 'こんにちは、世界！',
+            ],
+            'expectedData' => [
+                'email'           => 'unicode@example.com',
+                'firstname'       => 'José',
+                'lastname'        => 'Martínez',
+                'country'         => 'Spain',
+                'company_name'    => '株式会社スマイル',
+                'company_country' => 'Japan',
+                'company_city'    => '東京',
+                'message'         => 'こんにちは、世界！',
             ],
         ];
     }
@@ -1133,90 +1129,88 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
+     * @return \Iterator<string, array{submissionData: array<string, string>, expectedData: array<string, string>}>
      */
-    public static function formCustomFieldsMappingDataProvider(): array
+    public static function formCustomFieldsMappingDataProvider(): \Iterator
     {
-        return [
-            'simple_value' => [
-                'submissionData' => [
-                    'animal' => 'Dog',
-                ],
-                'expectedData' => [
-                    'animal' => 'Dog',
-                ],
+        yield 'simple_value' => [
+            'submissionData' => [
+                'animal' => 'Dog',
             ],
-            'special_characters' => [
-                'submissionData' => [
-                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
-                ],
-                'expectedData' => [
-                    'animal' => 'Guinea-Pig & Hamster\'s "friend"',
-                ],
+            'expectedData' => [
+                'animal' => 'Dog',
             ],
-            'xss_attempt' => [
-                'submissionData' => [
-                    'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
-                ],
-                'expectedData' => [
-                    'animal' => 'alert("XSS")',
-                ],
+        ];
+        yield 'special_characters' => [
+            'submissionData' => [
+                'animal' => 'Guinea-Pig & Hamster\'s "friend"',
             ],
-            'sql_injection' => [
-                'submissionData' => [
-                    'animal' => "Cat'; DROP TABLE animals; --",
-                ],
-                'expectedData' => [
-                    'animal' => "Cat'; DROP TABLE animals; --",
-                ],
+            'expectedData' => [
+                'animal' => 'Guinea-Pig & Hamster\'s "friend"',
             ],
-            'unicode_and_emoji' => [
-                'submissionData' => [
-                    'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
-                ],
-                'expectedData' => [
-                    'animal' => '🐕 犬 🐈 猫',
-                ],
+        ];
+        yield 'xss_attempt' => [
+            'submissionData' => [
+                'animal' => '<script>alert("XSS")</script><img src=x onerror=alert("XSS")>',
             ],
-            'nested_tags' => [
-                'submissionData' => [
-                    'animal' => '<div><span>Text</span></div>',
-                ],
-                'expectedData' => [
-                    'animal' => 'Text',
-                ],
+            'expectedData' => [
+                'animal' => 'alert("XSS")',
             ],
-            'incomplete_tags' => [
-                'submissionData' => [
-                    'animal' => '<div><span>Text',
-                ],
-                'expectedData' => [
-                    'animal' => 'Text',
-                ],
+        ];
+        yield 'sql_injection' => [
+            'submissionData' => [
+                'animal' => "Cat'; DROP TABLE animals; --",
             ],
-            'null_byte' => [
-                'submissionData' => [
-                    'animal' => "Dog\x00Cat",
-                ],
-                'expectedData' => [
-                    'animal' => 'DogCat',
-                ],
+            'expectedData' => [
+                'animal' => "Cat'; DROP TABLE animals; --",
             ],
-            'javascript_protocol' => [
-                'submissionData' => [
-                    'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
-                ],
-                'expectedData' => [
-                    'animal' => 'Click me',
-                ],
+        ];
+        yield 'unicode_and_emoji' => [
+            'submissionData' => [
+                'animal' => '🐕 犬 🐈 猫',  // Dog and Cat in Japanese with emojis
             ],
-            'css_expression' => [
-                'submissionData' => [
-                    'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
-                ],
-                'expectedData' => [
-                    'animal' => 'Test',
-                ],
+            'expectedData' => [
+                'animal' => '🐕 犬 🐈 猫',
+            ],
+        ];
+        yield 'nested_tags' => [
+            'submissionData' => [
+                'animal' => '<div><span>Text</span></div>',
+            ],
+            'expectedData' => [
+                'animal' => 'Text',
+            ],
+        ];
+        yield 'incomplete_tags' => [
+            'submissionData' => [
+                'animal' => '<div><span>Text',
+            ],
+            'expectedData' => [
+                'animal' => 'Text',
+            ],
+        ];
+        yield 'null_byte' => [
+            'submissionData' => [
+                'animal' => "Dog\x00Cat",
+            ],
+            'expectedData' => [
+                'animal' => 'DogCat',
+            ],
+        ];
+        yield 'javascript_protocol' => [
+            'submissionData' => [
+                'animal' => '<a href="javascript:alert(\'XSS\')">Click me</a>',
+            ],
+            'expectedData' => [
+                'animal' => 'Click me',
+            ],
+        ];
+        yield 'css_expression' => [
+            'submissionData' => [
+                'animal' => '<div style="width: expression(alert(\'XSS\'));">Test</div>',
+            ],
+            'expectedData' => [
+                'animal' => 'Test',
             ],
         ];
     }
@@ -1403,19 +1397,17 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{0: string, 1: string}>
+     * @return \Iterator<string, array{string, string}>
      */
-    public static function htmlFieldSubmissionDataProvider(): array
+    public static function htmlFieldSubmissionDataProvider(): \Iterator
     {
-        return [
-            'any_text' => [
-                '<div></div>',
-                'test1@test.com',
-            ],
-            'with_content' => [
-                '<div>Some content</div>',
-                'test2@test.com',
-            ],
+        yield 'any_text' => [
+            '<div></div>',
+            'test1@test.com',
+        ];
+        yield 'with_content' => [
+            '<div>Some content</div>',
+            'test2@test.com',
         ];
     }
 

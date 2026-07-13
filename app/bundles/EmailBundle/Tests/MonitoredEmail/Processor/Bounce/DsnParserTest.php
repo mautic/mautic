@@ -38,34 +38,26 @@ final class DsnParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<string, array{
-     *     dsnReport: string,
-     *     expectedEmail: string,
-     *     expectedCategory: string,
-     *     expectedType: string,
-     *     expectedFinal: bool,
-     *     expectedRuleNumber?: string|null
-     * }>
+     * @return \Iterator<string, array{dsnReport: string, expectedEmail: string, expectedCategory: string, expectedType: string, expectedFinal: bool, expectedRuleNumber?: (string | null)}>
      */
-    public static function bouncedEmailProvider(): array
+    public static function bouncedEmailProvider(): \Iterator
     {
-        return [
-            'basic DNS unknown - host not found' => [
-                'dsnReport'   => <<<'DSN'
+        yield 'basic DNS unknown - host not found' => [
+            'dsnReport'   => <<<'DSN'
 Original-Recipient: sdfgsdfg@seznan.cz
 Final-Recipient: rfc822;sdfgsdfg@seznan.cz
 Action: failed
 Status: 5.4.4
 Diagnostic-Code: DNS; Host not found
 DSN,
-                'expectedEmail'      => 'sdfgsdfg@seznan.cz',
-                'expectedCategory'   => Category::DNS_UNKNOWN,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => null,
-            ],
-            'postfix unknown user - user does not exist' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'sdfgsdfg@seznan.cz',
+            'expectedCategory'   => Category::DNS_UNKNOWN,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => null,
+        ];
+        yield 'postfix unknown user - user does not exist' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; aaaaaaaaaaaaa@yoursite.com
 Original-Recipient: rfc822;aaaaaaaaaaaaa@yoursite.com
 Action: failed
@@ -74,116 +66,115 @@ Remote-MTA: dns; mail-server.yoursite.com
 Diagnostic-Code: smtp; 550 5.1.1 <aaaaaaaaaaaaa@yoursite.com> User doesn't
     exist: aaaaaaaaaaaaa@yoursite.com
 DSN,
-                'expectedEmail'      => 'aaaaaaaaaaaaa@yoursite.com',
-                'expectedCategory'   => Category::UNKNOWN,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => null,
-            ],
-            'unified group agent - sender not permitted to send to group' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'aaaaaaaaaaaaa@yoursite.com',
+            'expectedCategory'   => Category::UNKNOWN,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => null,
+        ];
+        yield 'unified group agent - sender not permitted to send to group' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; sender@example.com
 Action: failed
 Status: 5.7.193
 Diagnostic-Code: smtp;550 5.7.193 UnifiedGroupAgent; Delivery failed because the sender isn't a group member or external senders aren't permitted to send to this group.
 DSN,
-                'expectedEmail'      => 'sender@example.com',
-                'expectedCategory'   => Category::USER_REJECT,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => '0230',
-            ],
-            'message expired - cannot connect to remote server' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'sender@example.com',
+            'expectedCategory'   => Category::USER_REJECT,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => '0230',
+        ];
+        yield 'message expired - cannot connect to remote server' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; recipient@example.com
 Action: failed
 Status: 5.4.317
 Diagnostic-Code: smtp;550 5.4.317 Message expired, cannot connect to remote server
 DSN,
-                'expectedEmail'      => 'recipient@example.com',
-                'expectedCategory'   => Category::DNS_UNKNOWN,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => '0232',
-            ],
-            'outlook 550 5.4.1 access denied' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'recipient@example.com',
+            'expectedCategory'   => Category::DNS_UNKNOWN,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => '0232',
+        ];
+        yield 'outlook 550 5.4.1 access denied' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.4.1
 Diagnostic-Code: smtp;550 5.4.1 Recipient address rejected: Access denied
 DSN,
-                'expectedEmail'      => 'user@outlook.com',
-                'expectedCategory'   => Category::USER_REJECT,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => '0233',
-            ],
-            'outlook 550 5.1.10 recipient not found' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'user@outlook.com',
+            'expectedCategory'   => Category::USER_REJECT,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => '0233',
+        ];
+        yield 'outlook 550 5.1.10 recipient not found' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.1.10
 Diagnostic-Code: smtp;550 5.1.10 RESOLVER.ADR.RecipientNotFound; Recipient not found by Exchange address book
 DSN,
-                'expectedEmail'      => 'user@outlook.com',
-                'expectedCategory'   => Category::UNKNOWN,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => '0136',
-            ],
-            'outlook 550 5.7.133 sender not authenticated for group' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'user@outlook.com',
+            'expectedCategory'   => Category::UNKNOWN,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => '0136',
+        ];
+        yield 'outlook 550 5.7.133 sender not authenticated for group' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; group@outlook.com
 Action: failed
 Status: 5.7.133
 Diagnostic-Code: smtp;550 5.7.133 RESOLVER.RST.SenderNotAuthenticatedForGroup; Sender not authenticated for group
 DSN,
-                'expectedEmail'      => 'group@outlook.com',
-                'expectedCategory'   => Category::USER_REJECT,
-                'expectedType'       => Type::HARD,
-                'expectedFinal'      => true,
-                'expectedRuleNumber' => '0206',
-            ],
-            'outlook 550 5.7.1 client host blocked' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'group@outlook.com',
+            'expectedCategory'   => Category::USER_REJECT,
+            'expectedType'       => Type::HARD,
+            'expectedFinal'      => true,
+            'expectedRuleNumber' => '0206',
+        ];
+        yield 'outlook 550 5.7.1 client host blocked' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.7.1
 Diagnostic-Code: smtp;550 5.7.1 Service unavailable, Client host [1.2.3.4] blocked using Spamhaus
 DSN,
-                'expectedEmail'      => 'user@outlook.com',
-                'expectedCategory'   => Category::ANTISPAM,
-                'expectedType'       => Type::BLOCKED,
-                'expectedFinal'      => false,
-                'expectedRuleNumber' => '0201',
-            ],
-            'outlook 550 5.7.606 banned sending IP' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'user@outlook.com',
+            'expectedCategory'   => Category::ANTISPAM,
+            'expectedType'       => Type::BLOCKED,
+            'expectedFinal'      => false,
+            'expectedRuleNumber' => '0201',
+        ];
+        yield 'outlook 550 5.7.606 banned sending IP' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.7.606
 Diagnostic-Code: smtp;550 5.7.606 Access denied, banned sending IP [1.2.3.4]
 DSN,
-                'expectedEmail'      => 'user@outlook.com',
-                'expectedCategory'   => Category::ANTISPAM,
-                'expectedType'       => Type::BLOCKED,
-                'expectedFinal'      => false,
-                'expectedRuleNumber' => '0235',
-            ],
-            'outlook 550 5.7.511 banned sender' => [
-                'dsnReport'   => <<<'DSN'
+            'expectedEmail'      => 'user@outlook.com',
+            'expectedCategory'   => Category::ANTISPAM,
+            'expectedType'       => Type::BLOCKED,
+            'expectedFinal'      => false,
+            'expectedRuleNumber' => '0235',
+        ];
+        yield 'outlook 550 5.7.511 banned sender' => [
+            'dsnReport'   => <<<'DSN'
 Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.7.511
 Diagnostic-Code: smtp;550 5.7.511 Access denied, banned sender [user@outlook.com]
 DSN,
-                'expectedEmail'      => 'user@outlook.com',
-                'expectedCategory'   => Category::ANTISPAM,
-                'expectedType'       => Type::BLOCKED,
-                'expectedFinal'      => false,
-                'expectedRuleNumber' => '0234',
-            ],
+            'expectedEmail'      => 'user@outlook.com',
+            'expectedCategory'   => Category::ANTISPAM,
+            'expectedType'       => Type::BLOCKED,
+            'expectedFinal'      => false,
+            'expectedRuleNumber' => '0234',
         ];
     }
 

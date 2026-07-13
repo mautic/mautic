@@ -66,7 +66,6 @@ return RectorConfig::configure()
 
         // waits for descission
         Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
 
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [

@@ -198,16 +198,14 @@ final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return string[][]
+     * @return \Iterator<(int | string), array<string>>
      */
-    public static function getRelativeDateNotations(): array
+    public static function getRelativeDateNotations(): \Iterator
     {
-        return [
-            [DateRelativeInterval::class, 'first day of January 2021'],
-            [DateRelativeInterval::class, 'last day of January 2021'],
-            [DateRelativeInterval::class, '5 days ago'],
-            [DateDefault::class, 'day of January 2021'],
-        ];
+        yield [DateRelativeInterval::class, 'first day of January 2021'];
+        yield [DateRelativeInterval::class, 'last day of January 2021'];
+        yield [DateRelativeInterval::class, '5 days ago'];
+        yield [DateDefault::class, 'day of January 2021'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getRelativeDateNotations')]
