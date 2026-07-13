@@ -113,7 +113,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "MauticRector\\": "rector/"
+      "MauticRector\\": "rector/",
+      "MauticPhpStan\\": "phpstan/"
     }
   },
   "repositories": [
