@@ -1339,12 +1339,6 @@ parameters:
 			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
 
 		-
-			message: '#^Call to an undefined method Mautic\\CoreBundle\\Model\\AbstractCommonModel\<object\>\:\:getNameGetter\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/CoreBundle/Controller/AbstractFormController.php
-
-		-
 			message: '#^Expression in empty\(\) is not falsy\.$#'
 			identifier: empty.expr
 			count: 1
@@ -5956,15 +5950,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
 		-
-<<<<<<< HEAD
-			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormInterface\:\:isClicked\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Controller/ListController.php
-
-		-
-=======
->>>>>>> ef7f72d272 (rebuild baseline)
 			message: '#^Parameter \#1 \$unit of method Mautic\\LeadBundle\\Model\\ListModel\:\:getSegmentContactsLineChartData\(\) expects string, null given\.$#'
 			identifier: argument.type
 			count: 1
