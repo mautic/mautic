@@ -14,7 +14,7 @@ final class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
     {
         $array = ['foo' => 'bar'];
 
-        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
+        $this->assertSame($array, ClickthroughHelper::decodeArrayFromUrl(ClickthroughHelper::encodeArrayForUrl($array)));
     }
 
     public function testObjectInArrayIsDetectedOrIgnored(): void
@@ -37,6 +37,6 @@ final class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
     {
         $array = [];
 
-        $this->assertEquals($array, ClickthroughHelper::decodeArrayFromUrl(''));
+        $this->assertSame($array, ClickthroughHelper::decodeArrayFromUrl(''));
     }
 }

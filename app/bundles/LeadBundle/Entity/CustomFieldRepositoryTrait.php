@@ -324,7 +324,7 @@ trait CustomFieldRepositoryTrait
             if (isset($fields[$k])) {
                 $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
 
-                if (!is_null($r)) {
+                if (null !== $r) {
                     switch ($fields[$k]['type']) {
                         case 'number':
                             $r = (float) $r;

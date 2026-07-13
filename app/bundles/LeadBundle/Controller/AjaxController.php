@@ -276,7 +276,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $list) {
                 $class = 'add' == $action ? 'addToLists' : 'removeFromLists';
-                $leadModel->$class($lead, $list);
+                $leadModel->{$class}($lead, $list);
                 $dataArray['success'] = 1;
             }
         }
@@ -357,7 +357,7 @@ class AjaxController extends CommonAjaxController
 
             if (null !== $lead && null !== $company) {
                 $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
-                $companyModel->$class($company, $lead);
+                $companyModel->{$class}($company, $lead);
                 $dataArray['success'] = 1;
             }
         }

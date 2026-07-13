@@ -16,10 +16,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
         return $this->getDataDir().'/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE.BIN';
     }
 
-    /**
-     * @return string
-     */
-    public function getRemoteDateStoreDownloadUrl()
+    public function getRemoteDateStoreDownloadUrl(): string
     {
         $usernamePass = explode(':', $this->auth);
         $data         = [];
@@ -35,6 +32,8 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             return 'https://www.ip2location.com/download?'.$queryString;
         }
         $this->logger->warning('Both username and password are required');
+
+        return '';
     }
 
     /**

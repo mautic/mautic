@@ -147,7 +147,8 @@ class CompanyApiController extends CommonApiController
         // Does the contact exist and the user has permission to edit
         if (null === $contact) {
             return $this->notFound();
-        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+        }
+        if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
             return $this->accessDenied();
         }
 

@@ -347,7 +347,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -356,7 +356,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -365,7 +365,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -374,7 +374,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -464,7 +464,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -473,7 +473,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -482,7 +482,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -491,7 +491,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -559,7 +559,7 @@ final class FilterOperatorSubscriberTest extends TestCase
             ->method('getListablePublishedFields')
             ->willReturn(new ArrayCollection([$field]));
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -568,7 +568,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -577,7 +577,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -586,7 +586,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -685,7 +685,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -694,7 +694,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -703,7 +703,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -712,7 +712,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -802,7 +802,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator, $request);
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsForFieldType')
             ->willReturn(
                 [
@@ -811,7 +811,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->typeOperatorProvider->expects($this->any())
+        $this->typeOperatorProvider
             ->method('getOperatorsIncluding')
             ->willReturn(
                 [
@@ -820,7 +820,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->fieldChoicesProvider->expects($this->any())
+        $this->fieldChoicesProvider
             ->method('getChoicesForField')
             ->willReturn(
                 [
@@ -829,7 +829,7 @@ final class FilterOperatorSubscriberTest extends TestCase
                 ]
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 

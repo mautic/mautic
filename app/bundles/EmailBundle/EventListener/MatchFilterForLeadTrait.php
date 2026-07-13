@@ -92,10 +92,10 @@ trait MatchFilterForLeadTrait
                 case 'tags':
                 case 'select':
                 case 'multiselect':
-                    if (!is_null($leadVal) && !is_array($leadVal)) {
+                    if (null !== $leadVal && !is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-                    if (!is_null($filterVal) && !is_array($filterVal)) {
+                    if (null !== $filterVal && !is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
                     break;

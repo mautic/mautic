@@ -251,7 +251,8 @@ class LeadFieldRepository extends CommonRepository
 
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
-            } elseif (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
+            }
+            if (('neq' === $operatorExpr) || ('notLike' === $operatorExpr)) {
                 return empty($result['id']);
             }
 
@@ -329,7 +330,7 @@ class LeadFieldRepository extends CommonRepository
                 // include null
                 $expr = $expr->with(
                     $q->expr()->or(
-                        $q->expr()->$operatorExpr($property, ':value'),
+                        $q->expr()->{$operatorExpr}($property, ':value'),
                         $q->expr()->isNull($property)
                     )
                 );
@@ -350,7 +351,7 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $expr = $expr->with(
-                    $q->expr()->$operatorExpr($property, ':value')
+                    $q->expr()->{$operatorExpr}($property, ':value')
                 );
             }
 

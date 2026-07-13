@@ -51,7 +51,7 @@ class TelizeLookup extends AbstractRemoteDataLookup
                     $key = 'zipcode';
                 }
 
-                $this->$key = $value;
+                $this->{$key} = $value;
             }
         }
     }

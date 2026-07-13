@@ -292,7 +292,8 @@ class EmailController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'email:emails:viewown',
             'email:emails:viewother',
             $email->getCreatedBy()
@@ -687,7 +688,8 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'email:emails:editown',
             'email:emails:editother',
             $entity->getCreatedBy()
@@ -810,7 +812,8 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
                 $this->setOptimisticLockVersion($entity, $form);
@@ -942,7 +945,8 @@ class EmailController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->isGranted('email:emails:create')
+        }
+        if (!$this->security->isGranted('email:emails:create')
             || !$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',

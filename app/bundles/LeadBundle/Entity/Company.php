@@ -380,9 +380,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         if ($name = $this->getName()) {
             return $name;
-        } elseif (!empty($this->fields['core']['companyemail']['value'])) {
+        }
+        if (!empty($this->fields['core']['companyemail']['value'])) {
             return $this->fields['core']['companyemail']['value'];
         }
+
+        return '';
     }
 
     public function setOwner(?User $owner = null): static
@@ -691,7 +694,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getDeleted(): ?\DateTimeInterface

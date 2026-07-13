@@ -97,6 +97,6 @@ final class CanPublishValidatorTest extends TestCase
 
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->canPublishValidator->validate(1, new class extends Constraint {});
+        $this->canPublishValidator->validate(1, new class() extends Constraint {});
     }
 }
