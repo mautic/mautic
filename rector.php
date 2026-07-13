@@ -60,10 +60,17 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
 
+<<<<<<< HEAD
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
         ],
 
+=======
+        // waits for descission
+        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+
+<<<<<<< HEAD
+>>>>>>> 23e1b63f55 (remove fixed rector rules)
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
@@ -76,6 +83,8 @@ return RectorConfig::configure()
         // offer next
         Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,
 
+=======
+>>>>>>> e95ccb7c08 (remove fixed rector rules)
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
@@ -83,10 +92,15 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
         Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
+<<<<<<< HEAD
         // checking child classes
         Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
         ],
+=======
+        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
+>>>>>>> f78662c22d (remove fixed rector rules)
 
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
             // a getRepository() override
@@ -135,12 +149,6 @@ return RectorConfig::configure()
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveNeverUsedMockPropertyRector::class => [
-            __DIR__.'/app/bundles/LeadBundle/Tests/Entity/LeadListRepositoryTest.php',
-        ],
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector::class => [
-            __DIR__.'/app/bundles/ReportBundle/Tests/Builder/MauticReportBuilderTest.php',
-        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
