@@ -372,6 +372,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MoonFuji"><img src="https://avatars.githubusercontent.com/u/100423572?v=4?s=100" width="100px;" alt="Kadri Mohammed Mouncef"/><br /><sub><b>Kadri Mohammed Mouncef</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MoonFuji" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/TowyTowy"><img src="https://avatars.githubusercontent.com/u/85077986?v=4?s=100" width="100px;" alt="TowyTowy"/><br /><sub><b>TowyTowy</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=TowyTowy" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/wizard770"><img src="https://avatars.githubusercontent.com/u/112634981?v=4?s=100" width="100px;" alt="Jiho Ahn"/><br /><sub><b>Jiho Ahn</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=wizard770" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MrYamous"><img src="https://avatars.githubusercontent.com/u/32437818?v=4?s=100" width="100px;" alt="Matthieu Lempereur"/><br /><sub><b>Matthieu Lempereur</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=MrYamous" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
