@@ -448,7 +448,7 @@ final class ImportModelTest extends StandardImportTestHelper
         $importRepository->expects($this->exactly(3))->method('getValue')
             ->willReturnOnConsecutiveCalls(true, false, false);
 
-        $this->entityManager
+        $this->entityManager->expects($this->atLeast(2))
             ->method('getRepository')
             ->willReturnMap(
                 [

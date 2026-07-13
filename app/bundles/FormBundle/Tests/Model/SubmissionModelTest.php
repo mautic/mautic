@@ -264,7 +264,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $userMock = $this->createStub(UserRepository::class);
 
-        $this->entityManager
+        $this->entityManager->expects($this->atLeast(3))
             ->method('getRepository')
             ->willReturnMap(
                 [

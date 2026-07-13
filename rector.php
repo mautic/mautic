@@ -50,6 +50,7 @@ return RectorConfig::configure()
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
+        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
@@ -70,6 +71,7 @@ return RectorConfig::configure()
         Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 23e1b63f55 (remove fixed rector rules)
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
@@ -85,25 +87,15 @@ return RectorConfig::configure()
 
 =======
 >>>>>>> e95ccb7c08 (remove fixed rector rules)
+=======
+>>>>>>> d3a3fb6fc2 (use direct variables over compact to enable static analysis + fill expects to returm map in tests)
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
         ],
-        Rector\CodeQuality\Rector\FuncCall\SimplifyRegexPatternRector::class,
-        Rector\CodeQuality\Rector\FuncCall\CompactToVariablesRector::class,
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        // checking child classes
-        Rector\CodeQuality\Rector\Class_\CompleteDynamicPropertiesRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
-        ],
-=======
         Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-=======
->>>>>>> 10ecd30e3d (cleanup skipped never used rules)
         Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
->>>>>>> f78662c22d (remove fixed rector rules)
 
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
             // a getRepository() override
@@ -123,14 +115,7 @@ return RectorConfig::configure()
 
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
-<<<<<<< HEAD
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
-        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-=======
-
-        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
->>>>>>> 10ecd30e3d (cleanup skipped never used rules)
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -159,9 +144,16 @@ return RectorConfig::configure()
         // phpunit
         Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
         Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+<<<<<<< HEAD
 >>>>>>> fab4e2d24f (cleanup skipped never used rules)
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
+=======
+
+        Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
+        ],
+>>>>>>> d3a3fb6fc2 (use direct variables over compact to enable static analysis + fill expects to returm map in tests)
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
