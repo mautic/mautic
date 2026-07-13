@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
@@ -24,14 +25,13 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->previousTimeZone     = date_default_timezone_get();
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
         $dateHelper                 = new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             'F j, Y',
             'g:i a',
             $this->translator,
-            $coreParametersHelper
+            $this->createStub(CoreParametersHelper::class)
         );
         $this->formatterHelper               = new FormatterHelper($dateHelper, $this->translator);
     }
@@ -56,7 +56,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     {
         $matcher = $this->exactly(2);
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.core.yes', $parameters[0]);
 
@@ -67,6 +67,8 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
                     return 'no';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $result = $this->formatterHelper->_(1, 'bool');
@@ -92,11 +94,14 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('string', gettype($result));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('stringProvider')]
+    #[DataProvider('stringProvider')]
     public function testNormalizeStringValue(string|int|bool|\DateTime $input, string|int|bool|\DateTime $expected): void
     {
         date_default_timezone_set('Europe/Paris');
-        $this->assertEquals($this->formatterHelper->normalizeStringValue($input), $expected);
+        $this->assertEquals(
+            $expected,
+            $this->formatterHelper->normalizeStringValue($input)
+        );
     }
 
     /**
@@ -126,7 +131,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlFormatProvider')]
+    #[DataProvider('urlFormatProvider')]
     public function testUrlFormat(string $url, string $expected): void
     {
         $result = $this->formatterHelper->_($url, 'url');
@@ -186,7 +191,7 @@ final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('emailFormatProvider')]
+    #[DataProvider('emailFormatProvider')]
     public function testEmailFormat(string $email, string $expected): void
     {
         $result = $this->formatterHelper->_($email, 'email');

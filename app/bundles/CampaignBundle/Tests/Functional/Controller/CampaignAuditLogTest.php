@@ -110,12 +110,12 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated'),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         $this->assertStringContainsString(
             $translator->trans('mautic.campaign.changelog.event_updated_details', ['%event_id%' => $eventId]),
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
     }
 
@@ -152,10 +152,10 @@ final class CampaignAuditLogTest extends MauticMysqlTestCase
         $responseContent = $this->client->getResponse()->getContent();
 
         // Verify both project names appear
-        $this->assertStringContainsString('First Project', $responseContent);
-        $this->assertStringContainsString('Second Project', $responseContent);
+        $this->assertStringContainsString('First Project', (string) $responseContent);
+        $this->assertStringContainsString('Second Project', (string) $responseContent);
 
         // Should show the progression in audit log
-        $this->assertStringContainsString('First Project, Second Project', $responseContent);
+        $this->assertStringContainsString('First Project, Second Project', (string) $responseContent);
     }
 }

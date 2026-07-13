@@ -120,10 +120,10 @@ final class CampaignControllerTest extends MauticMysqlTestCase
 
         // Check that the campaign elements data includes isRedirectTarget
         $content = $clientResponse->getContent();
-        Assert::assertStringContainsString('isRedirectTarget', $content);
+        Assert::assertStringContainsString('isRedirectTarget', (string) $content);
 
         // Verify that the target event is marked as a redirect target
-        Assert::assertStringContainsString('"isRedirectTarget": true', $content);
+        Assert::assertStringContainsString('"isRedirectTarget": true', (string) $content);
     }
 
     public function testIndexActionWithTypeFilters(): void

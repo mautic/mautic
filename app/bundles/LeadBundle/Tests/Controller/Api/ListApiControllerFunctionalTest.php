@@ -91,7 +91,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         if ($expectedErrorMessage) {
             Assert::assertStringContainsString(
                 $expectedErrorMessage,
-                json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
+                (string) json_decode($this->client->getResponse()->getContent(), true)['errors'][0]['message'],
                 $this->client->getResponse()->getContent()
             );
         }
@@ -409,7 +409,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
             'validators'
         );
-        Assert::assertStringContainsString($errorMessage, $response['errors'][0]['message']);
+        Assert::assertStringContainsString($errorMessage, (string) $response['errors'][0]['message']);
     }
 
     public function testWeGet200ResponseCodeIfSegmentIsNotUsedInCampaignsAndWeUnpublishIt(): void
@@ -723,7 +723,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['message']);
+        Assert::assertStringContainsString($expectedErrorMessage, (string) $response['errors'][0]['message']);
 
         $expectedErrorMessage = $this->translator->trans(
             'mautic.lead.lists.used_in_campaigns.delete',
@@ -735,7 +735,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
             'validators'
         );
 
-        Assert::assertStringContainsString($expectedErrorMessage, $response['errors'][0]['details'][0]);
+        Assert::assertStringContainsString($expectedErrorMessage, (string) $response['errors'][0]['details'][0]);
     }
 
     public function testBatchDeleteUsedInCampaignSegment(): void

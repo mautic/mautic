@@ -133,7 +133,7 @@ class ContactRequestHelper
                 }
             }
 
-            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
+            if (null === $this->trackedContact or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 if (!$foundContact->isNew()) {
                     return $foundContact;

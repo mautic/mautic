@@ -38,7 +38,7 @@ class ExportSchedulerCommand extends Command
         $report      = $input->getOption('report');
         $cleanupOnly = $input->getOption('cleanup-only') ?? false;
 
-        if (!is_null($report) && !is_numeric($report)) {
+        if (null !== $report && !is_numeric($report)) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
             return Command::INVALID;

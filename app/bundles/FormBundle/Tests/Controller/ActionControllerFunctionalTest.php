@@ -56,6 +56,6 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         // Check the content was not changed
         $this->client->xmlHttpRequest(Request::METHOD_GET, $editPage);
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', json_decode($this->client->getResponse()->getContent())->newContent);
+        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', (string) json_decode($this->client->getResponse()->getContent())->newContent);
     }
 }

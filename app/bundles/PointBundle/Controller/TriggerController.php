@@ -133,7 +133,8 @@ class TriggerController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$permissions['point:triggers:view']) {
+        }
+        if (!$permissions['point:triggers:view']) {
             $this->throwAccessDenied();
         }
 
@@ -326,7 +327,8 @@ class TriggerController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->isGranted('point:triggers:edit')) {
+        }
+        if (!$this->security->isGranted('point:triggers:edit')) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -400,7 +402,8 @@ class TriggerController extends FormController
                         'contentTemplate' => $template,
                     ])
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
+            }
+            if ($form->get('buttons')->get('apply')->isClicked()) {
                 // do not clear session, just reload view with updated session
                 $cleanSlate = false;
             }

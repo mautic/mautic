@@ -351,7 +351,7 @@ class WidgetDetailEvent extends CommonEvent
      */
     private function usesLegacyCache(): bool
     {
-        return is_null($this->cacheProvider);
+        return null === $this->cacheProvider;
     }
 
     /**
