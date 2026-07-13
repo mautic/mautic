@@ -160,6 +160,115 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->followRedirects(true);
     }
 
+    public function testSameOriginReturnUrlIsAllowedOnValidationError(): void
+    {
+        $payload = [
+            'name'        => 'Same origin return test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'postAction'  => 'return',
+            'fields'      => [
+                [
+                    'label'      => 'Email',
+                    'type'       => 'email',
+                    'alias'      => 'email',
+                    'isRequired' => true,
+                    'leadField'  => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        // Use a relative return URL (same-origin by definition)
+        $this->client->followRedirects(false);
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'formId' => $formId,
+                    'return' => '/my-landing-page',
+                ],
+            ]
+        );
+
+        $submitResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode());
+
+        $redirectUrl = $submitResponse->headers->get('Location');
+        $this->assertNotNull($redirectUrl);
+
+        // Should redirect back to the same-origin return URL with the error
+        $urlParts = parse_url($redirectUrl);
+        $this->assertSame('/my-landing-page', $urlParts['path'] ?? null);
+        $this->assertStringContainsString('mauticError', $redirectUrl);
+
+        $this->client->followRedirects(true);
+    }
+
+    public function testMaliciousReturnUrlIsNotStoredAsReferrer(): void
+    {
+        $payload = [
+            'name'        => 'Referrer security test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'postAction'  => 'return',
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'formId' => $formId,
+                    'email'  => 'test@example.com',
+                    'return' => 'https://attacker.com/phishing',
+                ],
+            ]
+        );
+
+        /** @var SubmissionRepository $submissionRepository */
+        $submissionRepository = $this->em->getRepository(Submission::class);
+        $submissions          = $submissionRepository->findBy(['form' => $formId]);
+
+        $this->assertCount(1, $submissions);
+        $this->assertStringNotContainsString('attacker.com', $submissions[0]->getReferer());
+    }
+
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
         // Create the test form via API.

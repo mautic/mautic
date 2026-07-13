@@ -105,6 +105,44 @@ final class PublicController extends CommonFormController
     }
 
     /**
+     * Returns a sanitized return URL only if it is relative or same-origin as site_url.
+     * External/untrusted URLs are rejected and null is returned.
+     */
+    private function getTrustedReturnUrl(Request $request): ?string
+    {
+        $post   = $this->getSubmittedPost($request);
+        $return = $post['return'] ?? '';
+
+        if (empty($return)) {
+            $return = $request->server->get('HTTP_REFERER', '');
+        }
+
+        if (empty($return)) {
+            return null;
+        }
+
+        $return = InputHelper::url((string) $return, false, null, null, ['mauticError', 'mauticMessage'], true);
+
+        // Allow relative URLs (starting with /)
+        if (str_starts_with($return, '/') && !str_starts_with($return, '//')) {
+            return $return;
+        }
+
+        // Allow same-origin URLs
+        $siteUrl = (string) $this->coreParametersHelper->get('site_url');
+        if (!empty($siteUrl)) {
+            $siteHost   = parse_url($siteUrl, PHP_URL_HOST);
+            $returnHost = parse_url($return, PHP_URL_HOST);
+
+            if ($siteHost && $returnHost && strtolower($siteHost) === strtolower($returnHost)) {
+                return $return;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function processSubmittedForm(
@@ -201,6 +239,10 @@ final class PublicController extends CommonFormController
 
         $post   = $this->getSubmittedPost($request);
         $server = $request->server->all();
+
+        // Remove the user-controlled 'return' field so it is not stored as the submission referrer.
+        // The SubmissionModel will fall back to HTTP_REFERER which is a trusted browser header.
+        unset($post['return']);
 
         $result = $this->submissionModel->saveSubmission($post, $server, $form, $request, true);
 
@@ -415,7 +457,7 @@ final class PublicController extends CommonFormController
      */
     private function buildStandardResponse(Request $request, array $submissionResult): Response
     {
-        $response = $this->getStandardRedirectResponse($submissionResult);
+        $response = $this->getStandardRedirectResponse($request, $submissionResult);
 
         if (null === $response) {
             $msg     = $submissionResult['postActionProperty'];
@@ -446,10 +488,31 @@ final class PublicController extends CommonFormController
     /**
      * @param array<string, mixed> $submissionResult
      */
-    private function getStandardRedirectResponse(array $submissionResult): ?Response
+    private function getStandardRedirectResponse(Request $request, array $submissionResult): ?Response
     {
-        if ('redirect' === $submissionResult['postAction']) {
+        $error = $submissionResult['error'];
+
+        if (!empty($error)) {
+            $return = $this->getTrustedReturnUrl($request);
+            if ($return) {
+                $form  = $submissionResult['form'];
+                $hash  = ($form instanceof Form) ? '#'.strtolower($form->getAlias()) : '';
+                $query = !str_contains($return, '?') ? '?' : '&';
+
+                return $this->redirect($return.$query.'mauticError='.rawurlencode((string) $error).$hash);
+            }
+        } elseif ('redirect' === $submissionResult['postAction']) {
             return $this->redirect((string) $submissionResult['postActionProperty']);
+        } elseif ('return' === $submissionResult['postAction']) {
+            $return = $this->getTrustedReturnUrl($request);
+            if ($return) {
+                if (!empty($submissionResult['postActionProperty'])) {
+                    $query  = !str_contains($return, '?') ? '?' : '&';
+                    $return .= $query.'mauticMessage='.rawurlencode((string) $submissionResult['postActionProperty']);
+                }
+
+                return $this->redirect($return);
+            }
         }
 
         return null;
