@@ -733,7 +733,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {
-            return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
+            return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]), Response::HTTP_BAD_REQUEST);
         }
 
         return true;
