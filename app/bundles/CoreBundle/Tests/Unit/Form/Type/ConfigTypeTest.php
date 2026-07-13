@@ -118,17 +118,13 @@ final class ConfigTypeTest extends TypeTestCase
 
     private function getConfigFormType(): ConfigType
     {
-        $translator                 = $this->createMock(TranslatorInterface::class);
         $languageHelper             = $this->createMock(LanguageHelper::class);
-        $ipLookupFactory            = $this->createMock(IpLookupFactory::class);
-        $shortener                  = $this->createMock(Shortener::class);
-        $coreParametersHelper       = $this->createMock(CoreParametersHelper::class);
 
-        $languageHelper->expects($this->any())
+        $languageHelper
                        ->method('fetchLanguages')
                        ->willReturn(['en' => ['name'=>'English']]);
 
-        return new ConfigType($translator, $languageHelper, $ipLookupFactory, null, $shortener, $coreParametersHelper);
+        return new ConfigType($this->createStub(TranslatorInterface::class), $languageHelper, $this->createStub(IpLookupFactory::class), null, $this->createStub(Shortener::class), $this->createStub(CoreParametersHelper::class));
     }
 
     /**
@@ -145,16 +141,15 @@ final class ConfigTypeTest extends TypeTestCase
         $configType = $this->getConfigFormType();
 
         $repoMock = $this->createMock(PageRepository::class);
-        $repoMock->expects($this->any())
+        $repoMock
                  ->method('getPageList')
                  ->willReturn([]);
 
         $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock->expects($this->any())
+        $pageModelMock
                       ->method('getRepository')
                       ->willReturn($repoMock);
-        $permsMock    = $this->createMock(CorePermissions::class);
-        $pageListType = new PageListType($pageModelMock, $permsMock);
+        $pageListType = new PageListType($pageModelMock, $this->createStub(CorePermissions::class));
 
         return [
             // register the type instances with the PreloadedExtension

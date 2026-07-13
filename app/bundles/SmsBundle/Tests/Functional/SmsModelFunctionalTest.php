@@ -61,6 +61,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         /** @var SmsModel $smsModel */
         $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 4. Send SMS
         $smsModel->sendSms($sms, $contact);
@@ -162,6 +163,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         /** @var SmsModel $smsModel */
         $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 6. Send SMS
         $results = $smsModel->sendSms($sms, [$contact1, $contact2, $contact3]);

@@ -70,9 +70,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200');
-        $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
-        $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
-        $this->assertStringContainsString('Test User', $clientResponse->getContent());
+        $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('March 21, 2020', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('Test User', (string) $clientResponse->getContent());
 
         $urlAlias   = 'emails';
         $routeAlias = 'email';
@@ -591,9 +591,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
         $this->assertStringContainsString(
             "/s/emails/cloneWithTranslations/{$parent->getId()}",
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
-        $this->assertStringContainsString('Clone with translations and variants', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Clone with translations and variants', (string) $this->client->getResponse()->getContent());
 
         $this->setCsrfHeader();
         $this->client->xmlHttpRequest(
@@ -712,9 +712,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         $errString = sprintf('The Dynamic Content slot &#039;%s&#039; is not of type &#039;text&#039;.', $dwc->getSlotName());
         if (TypeList::TEXT === $type) {
-            $this->assertStringNotContainsString($errString, $this->client->getResponse()->getContent());
+            $this->assertStringNotContainsString($errString, (string) $this->client->getResponse()->getContent());
         } else {
-            $this->assertStringContainsString($errString, $this->client->getResponse()->getContent());
+            $this->assertStringContainsString($errString, (string) $this->client->getResponse()->getContent());
         }
     }
 
@@ -864,18 +864,18 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
         Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
-        Assert::assertSame($publishedByDefault, is_null($isUnpublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
+        Assert::assertSame($publishedByDefault, null === $isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
         Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
-        Assert::assertSame($publishedByDefault, !is_null($isPublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
+        Assert::assertSame($publishedByDefault, null !== $isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
-        Assert::assertSame($expectDisabled, !is_null($publishUpInput->attr('disabled')));
-        Assert::assertSame($expectDisabled, !is_null($publishDownInput->attr('disabled')));
+        Assert::assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
+        Assert::assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');
@@ -942,6 +942,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     {
         $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
         $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
+        $this->assertInstanceOf(User::class, $ownerUser);
         $email->setCreatedBy($ownerUser);
         $this->em->flush();
 
@@ -960,18 +961,18 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]');
         Assert::assertCount(1, $isUnpublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isUnpublishedInput->attr('disabled')));
-        Assert::assertTrue(is_null($isUnpublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isUnpublishedInput->attr('disabled'));
+        Assert::assertTrue(null === $isUnpublishedInput->attr('checked'));
 
         $isPublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="1"]');
         Assert::assertCount(1, $isPublishedInput, 'The unpublished field should be found.');
-        Assert::assertSame($expectDisabled, !is_null($isPublishedInput->attr('disabled')));
-        Assert::assertTrue(!is_null($isPublishedInput->attr('checked')));
+        Assert::assertSame($expectDisabled, null !== $isPublishedInput->attr('disabled'));
+        Assert::assertTrue(null !== $isPublishedInput->attr('checked'));
 
         $publishUpInput   = $crawler->filter('input[name="emailform[publishUp]"]');
         $publishDownInput = $crawler->filter('input[name="emailform[publishDown]"]');
-        Assert::assertSame($expectDisabled, !is_null($publishUpInput->attr('disabled')));
-        Assert::assertSame($expectDisabled, !is_null($publishDownInput->attr('disabled')));
+        Assert::assertSame($expectDisabled, null !== $publishUpInput->attr('disabled'));
+        Assert::assertSame($expectDisabled, null !== $publishDownInput->attr('disabled'));
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['emailform[emailType]']->setValue('template');
@@ -1299,7 +1300,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        $this->assertStringContainsString('Email name maximum length is 190 characters', $response->getContent());
+        $this->assertStringContainsString('Email name maximum length is 190 characters', (string) $response->getContent());
     }
 
     #[DataProvider('provideFromAddressValidationValues')]
@@ -1332,7 +1333,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         $this->assertNotInstanceOf(Email::class, $email);
-        $this->assertStringContainsString($fromAddress, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($fromAddress, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -1429,7 +1430,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        $this->assertStringContainsString('Email subject maximum length is 190 characters', $response->getContent());
+        $this->assertStringContainsString('Email subject maximum length is 190 characters', (string) $response->getContent());
     }
 
     /**
@@ -1458,7 +1459,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // Should contain validation messages for both name length and subject being required
         $content = $response->getContent();
-        $this->assertStringContainsString('Email name maximum length is 190 characters', $content);
+        $this->assertStringContainsString('Email name maximum length is 190 characters', (string) $content);
     }
 
     private function createSegment(string $name, string $alias): LeadList

@@ -57,8 +57,8 @@ final class EmailContactGridTest extends MauticMysqlTestCase
 
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString($contactOne->getName(), $content);
-        $this->assertStringContainsString($contactTwo->getName(), $content);
+        $this->assertStringContainsString($contactOne->getName(), (string) $content);
+        $this->assertStringContainsString($contactTwo->getName(), (string) $content);
     }
 
     /**
@@ -99,7 +99,7 @@ final class EmailContactGridTest extends MauticMysqlTestCase
 
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString('No Contacts Found', $content, $content);
+        $this->assertStringContainsString('No Contacts Found', (string) $content, $content);
     }
 
     /**

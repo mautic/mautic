@@ -131,7 +131,7 @@ class ContactSegmentFilterFactory
                 }
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
-                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) { /** @phpstan-ignore-line `Comparison operation ">" between 0 and 0 is always false.` I don't see anything wrong. Seems to be a PHPSTAN issue https://github.com/phpstan/phpstan/issues/3831 */
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
                     $previousFilter = array_pop($arrStacks[$previousKey]);
                     array_push($shrinkedFilters, $previousFilter);
                 }

@@ -90,9 +90,9 @@ final readonly class PutProcessor implements ProcessorInterface
         $setter = 'set'.ucfirst($fieldName);
 
         if (method_exists($sourceEntity, $getter) && method_exists($targetEntity, $setter)) {
-            $value = $sourceEntity->$getter();
+            $value = $sourceEntity->{$getter}();
             // For PUT, we replace the entire resource, so set the value even if it's null
-            $targetEntity->$setter($value);
+            $targetEntity->{$setter}($value);
         }
     }
 }

@@ -58,14 +58,14 @@ final class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
         $events = $event->getEvents();
 
         $id1 = hash('crc32', json_encode($payload[0]), false);
-        $this->assertTrue(isset($events[0]['eventId']));
+        $this->assertArrayHasKey('eventId', $events[0]);
         $this->assertEquals('foo'.$id1, $events[0]['eventId']);
 
         $id2 = hash('crc32', json_encode($payload[1]), false);
-        $this->assertTrue(isset($events[1]['eventId']));
+        $this->assertArrayHasKey('eventId', $events[1]);
         $this->assertEquals('bar'.$id2, $events[1]['eventId']);
 
-        $this->assertTrue(isset($events[2]['eventId']));
+        $this->assertArrayHasKey('eventId', $events[2]);
         $this->assertEquals('foobar123', $events[2]['eventId']);
     }
 }

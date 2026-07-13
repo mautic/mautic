@@ -147,7 +147,8 @@ class InputOptionsDAO
 
         if ($input[$optionName] instanceof ObjectIdsDAO) {
             return $input[$optionName];
-        } elseif (is_array($input[$optionName])) {
+        }
+        if (is_array($input[$optionName])) {
             return ObjectIdsDAO::createFromCliOptions($input[$optionName]);
         }
         throw new InvalidValueException("{$optionName} option has an unexpected type. Use an array or ObjectIdsDAO object.");
