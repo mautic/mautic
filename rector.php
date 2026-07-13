@@ -21,7 +21,7 @@ return RectorConfig::configure()
     ->withPreparedSets(
         deadCode: true,
         typeDeclarations: true,
-        // phpunitCodeQuality: true,
+        phpunitCodeQuality: true,
     )
     ->withPhpSets()
     ->withCache(__DIR__.'/var/cache/rector')
@@ -59,7 +59,6 @@ return RectorConfig::configure()
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
-    ->withCodeQualityLevel(38)
     ->withSkip([
         __DIR__.'/plugins/*/node_modules/*',
 
@@ -138,7 +137,15 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
 
+
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
+
+        // phpunit
+        \Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
+        \Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
+        // will be fixed
+        \Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
+        \Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
