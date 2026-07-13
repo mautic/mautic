@@ -505,7 +505,7 @@ class LeadApiController extends CommonApiController
         }
 
         // calls add/remove method as appropriate
-        $result = $this->model->$method($entity, $data);
+        $result = $this->model->{$method}($entity, $data);
 
         if (false === $result) {
             return $this->badRequest();

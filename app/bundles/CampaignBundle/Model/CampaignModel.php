@@ -240,7 +240,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
-                    $event->$func($v);
+                    $event->{$func}($v);
                 }
             }
 

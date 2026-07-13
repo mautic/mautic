@@ -62,6 +62,6 @@ final class PublicControllerTest extends MauticMysqlTestCase
             $twig->addExtension(new \Twig\Extension\EscaperExtension());
         }
         $url = $twig->getRuntime(\Twig\Runtime\EscaperRuntime::class)->escape($url, 'js');
-        Assert::assertStringContainsString($url, $content);
+        Assert::assertStringContainsString($url, (string) $content);
     }
 }

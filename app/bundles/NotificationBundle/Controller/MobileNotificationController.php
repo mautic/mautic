@@ -177,7 +177,8 @@ class MobileNotificationController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'notification:mobile_notifications:viewown',
             'notification:mobile_notifications:viewother',
             $notification->getCreatedBy()
@@ -431,7 +432,8 @@ class MobileNotificationController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'notification:mobile_notifications:viewown',
             'notification:mobile_notifications:viewother',
             $entity->getCreatedBy()

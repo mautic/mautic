@@ -53,14 +53,14 @@ final class SearchSubscriberTest extends TestCase
                     $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
                     $joins    = $q->getQueryPart('join');
                     if (!array_key_exists($primaryTable['alias'], $joins)) {
-                        $q->$joinType(
+                        $q->{$joinType}(
                             $primaryTable['from_alias'],
                             MAUTIC_TABLE_PREFIX.$primaryTable['table'],
                             $primaryTable['alias'],
                             $primaryTable['condition']
                         );
                         foreach ($tables as $table) {
-                            $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
+                            $q->{$joinType}($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
                         }
                         if ($whereExpression) {
                             $q->andWhere($whereExpression);
@@ -88,7 +88,7 @@ final class SearchSubscriberTest extends TestCase
         $leadModel->method('getRepository')
             ->willReturn($contactRepository);
 
-        $translator->expects($this->any())
+        $translator
             ->method('trans')
             ->willReturnCallback(function ($key): string|array|null {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name

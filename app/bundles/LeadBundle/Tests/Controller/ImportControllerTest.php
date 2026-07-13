@@ -493,7 +493,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $notifications    = $notificationRepo->getNotifications($userId);
 
         foreach ($notifications as $notification) {
-            Assert::assertStringNotContainsString($expectedSubstring, $notification['message']);
+            Assert::assertStringNotContainsString($expectedSubstring, (string) $notification['message']);
         }
     }
 
@@ -559,6 +559,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     {
         $user = $this->em->getRepository(User::class)
             ->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $field = new LeadField();
         $field->setType('boolean');

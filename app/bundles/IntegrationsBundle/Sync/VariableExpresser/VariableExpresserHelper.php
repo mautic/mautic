@@ -33,7 +33,7 @@ final readonly class VariableExpresserHelper implements VariableExpresserHelperI
      */
     public function encodeVariable($var): EncodedValueDAO
     {
-        if (is_null($var)) {
+        if (null === $var) {
             return new EncodedValueDAO(EncodedValueDAO::STRING_TYPE, '');
         }
 

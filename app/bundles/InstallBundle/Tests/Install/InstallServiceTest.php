@@ -64,10 +64,7 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
-        $kernel                     = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
-        $hasher                     = $this->createMock(UserPasswordHasher::class);
-        $fixtureLoader              = $this->createMock(FixturesLoaderInterface::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -75,10 +72,10 @@ final class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->pathsHelper,
             $this->entityManager,
             $this->translator,
-            $kernel,
+            $this->createStub(KernelInterface::class),
             $this->validator,
-            $hasher,
-            $fixtureLoader
+            $this->createStub(UserPasswordHasher::class),
+            $this->createStub(FixturesLoaderInterface::class)
         );
     }
 
