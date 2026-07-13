@@ -127,6 +127,8 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
 
+        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
+
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
