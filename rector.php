@@ -139,6 +139,9 @@ return RectorConfig::configure()
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\CallbackSingleAssertToSimplerRector::class,
+        Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveNeverUsedMockPropertyRector::class => [
+            __DIR__.'/app/bundles/LeadBundle/Tests/Entity/LeadListRepositoryTest.php',
+        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

@@ -39,11 +39,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
-                $this->callback(
-                    function ($type): void {
-                        $this->assertSame($type, LeadEvents::LEAD_POST_SAVE.'_new');
-                    }
-                )
+                LeadEvents::LEAD_POST_SAVE.'_new'
             );
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
@@ -64,11 +60,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->mockModel->expects($this->once())
             ->method('queueWebhooksByType')
             ->with(
-                $this->callback(
-                    function ($type): void {
-                        $this->assertSame($type, LeadEvents::LEAD_POST_SAVE.'_update');
-                    }
-                )
+                LeadEvents::LEAD_POST_SAVE.'_update'
             );
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class));
