@@ -32,6 +32,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @extends CrmAbstractIntegration<SugarcrmApi>
+ */
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
     /**
