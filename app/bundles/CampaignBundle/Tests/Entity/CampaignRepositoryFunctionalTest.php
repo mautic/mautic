@@ -79,6 +79,8 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertInstanceOf(Event::class, $eventOne);
         $this->assertInstanceOf(Event::class, $eventTwo);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $leadOne);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $leadTwo);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),
@@ -109,6 +111,8 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->assertInstanceOf(Event::class, $eventOne);
         $this->assertInstanceOf(Event::class, $eventTwo);
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Entity\Event::class, $eventThree);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $leadOne);
 
         $result = $this->repository->getCountsForPendingContacts(
             $campaign->getId(),

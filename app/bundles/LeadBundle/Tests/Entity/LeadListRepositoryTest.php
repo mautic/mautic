@@ -170,7 +170,6 @@ final class LeadListRepositoryTest extends TestCase
      */
     private function mockIsContactInAnySegment(array $queryResult): void
     {
-        $prefix = MAUTIC_TABLE_PREFIX;
         $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);
@@ -181,8 +180,6 @@ final class LeadListRepositoryTest extends TestCase
      */
     private function mockIsContactInSegments(array $queryResult): void
     {
-        $prefix = MAUTIC_TABLE_PREFIX;
-
         $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);

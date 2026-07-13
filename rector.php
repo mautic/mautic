@@ -45,17 +45,11 @@ return RectorConfig::configure()
 
         Rector\Instanceof_\Rector\Ternary\FlipNegatedTernaryInstanceofRector::class,
         Rector\TypeDeclarationDocblocks\Rector\ClassMethod\NarrowArrayCollectionUnionReturnDocblockRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\ClassMethod\ChangeMockObjectReturnUnionToIntersectionRector::class,
         TypedPropertyFromAssignsRector::class,
         ClassPropertyAssignToConstructorPromotionRector::class,
         SimplifyUselessVariableRector::class,
         UnserializeToSerializerDecodeRector::class,
         Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector::class,
-
-        // phpunit specific asserts
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertIssetToSpecificMethodRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\UseSpecificWithMethodRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class,
     ])
     ->reportUnusedSkips()
     ->withCodingStyleLevel(3)
