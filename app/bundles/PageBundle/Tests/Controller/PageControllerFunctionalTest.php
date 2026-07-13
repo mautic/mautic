@@ -36,7 +36,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $page->getAlias()));
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Test Html', $response->getContent());
+        $this->assertStringContainsString('Test Html', (string) $response->getContent());
     }
 
     private function createSegment(): LeadList

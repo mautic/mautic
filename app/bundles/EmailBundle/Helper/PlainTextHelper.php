@@ -352,7 +352,8 @@ class PlainTextHelper
             }
 
             return $display.' ['.($index + 1).']';
-        } elseif ('nextline' == $linkMethod) {
+        }
+        if ('nextline' == $linkMethod) {
             return $display."\n[".$url.']';
         }   // link_method defaults to inline
 

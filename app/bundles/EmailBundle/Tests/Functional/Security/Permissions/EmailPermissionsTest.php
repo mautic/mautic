@@ -16,7 +16,7 @@ final class EmailPermissionsTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, '/s/roles/new');
         self::assertResponseIsSuccessful();
 
-        Assert::assertStringContainsString('Send to unsubscribed contacts', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('Send to unsubscribed contacts', (string) $this->client->getResponse()->getContent());
 
         $emailPermissionTab = $crawler->filter('#emailPermissionTab');
         Assert::assertCount(1, $emailPermissionTab);

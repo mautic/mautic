@@ -36,9 +36,8 @@ final class EmailSubscriberTest extends TestCase
         $this->config               = $this->createMock(Config::class);
         $grapesJsBuilderModel       = $this->createMock(GrapesJsBuilderModel::class);
         $emailModel                 = $this->createMock(EmailModel::class);
-        $emailConfig                = $this->createMock(EmailConfigInterface::class);
         $this->grapesJsBuilderRepo  = $this->createMock(GrapesJsBuilderRepository::class);
-        $this->subscriber           = new EmailSubscriber($this->config, $grapesJsBuilderModel, $emailModel, $emailConfig);
+        $this->subscriber           = new EmailSubscriber($this->config, $grapesJsBuilderModel, $emailModel, $this->createStub(EmailConfigInterface::class));
 
         $emailModel->method('getRepository')
             ->willReturn($this->createStub(EmailRepository::class));

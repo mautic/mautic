@@ -46,7 +46,6 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $this->mailHelperMock  = $this->createMock(MailHelper::class);
         $this->messageSchedule = $this->createMock(MessageSchedule::class);
         $this->fileHandler     = $this->createMock(FileHandler::class);
-        $eventDispatcher       = $this->createMock(EventDispatcher::class);
 
         $this->mailHelperMock->expects($this->once())
             ->method('getMailer')
@@ -56,7 +55,7 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
             $this->mailHelperMock,
             $this->messageSchedule,
             $this->fileHandler,
-            $eventDispatcher
+            $this->createStub(EventDispatcher::class)
         );
     }
 

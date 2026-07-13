@@ -131,7 +131,8 @@ class CampaignApiController extends CommonApiController
 
             if (null == $lead) {
                 return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            }
+            if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                 return $this->accessDenied();
             }
 
@@ -189,7 +190,8 @@ class CampaignApiController extends CommonApiController
                 $msg = $this->translator->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
-            } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
+            }
+            if (empty($parameters['lists']) && empty($parameters['forms'])) {
                 $msg = $this->translator->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);

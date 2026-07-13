@@ -1094,7 +1094,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         try {
             if ($this->isAuthorized()) {
-                if (!is_null($lead->getOwner())) {
+                if (null !== $lead->getOwner()) {
                     $sugarOwnerId = $this->getApiHelper()->getIdBySugarEmail(['emails' => [$lead->getOwner()->getEmail()]]);
                     if (!empty($sugarOwnerId)) {
                         $mappedData[$object]['assigned_user_id'] = array_values($sugarOwnerId)[0];
@@ -1320,7 +1320,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
     private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
-        if (is_null($lead)) {
+        if (null === $lead) {
             return;
         }
 

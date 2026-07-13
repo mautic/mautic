@@ -84,7 +84,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)
-            ->method('isGranted')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('isGranted')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lead:leads:view', $parameters[0]);
 
@@ -95,6 +95,8 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
 
                     return true;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->repository->expects($this->once())

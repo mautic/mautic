@@ -90,7 +90,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         // The form failed to save when saved for the second time with renderStyle=No.
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', $this->client->getResponse()->getContent());
+        $this->assertStringNotContainsString('Internal Server Error - Expected argument of type "null or string", "boolean" given', (string) $this->client->getResponse()->getContent());
     }
 
     public function testNewActionCheckDisplayMessageOptionsForm(): void
@@ -99,9 +99,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $clientResponse = $this->client->getResponse();
         self::assertResponseStatusCodeSame(Response::HTTP_OK, $clientResponse->getContent());
-        $this->assertStringContainsString('Hide form', $clientResponse->getContent(), $clientResponse->getContent());
-        $this->assertStringContainsString('Redirect URL', $clientResponse->getContent(), $clientResponse->getContent());
-        $this->assertStringContainsString('Remain at form', $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Hide form', (string) $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Redirect URL', (string) $clientResponse->getContent(), $clientResponse->getContent());
+        $this->assertStringContainsString('Remain at form', (string) $clientResponse->getContent(), $clientResponse->getContent());
     }
 
     public function testErrorValidationWithHideFormTypeWithoutMessage(): void
@@ -125,7 +125,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
-        $this->assertStringContainsString('has-error', $divClass, $crawler->html());
+        $this->assertStringContainsString('has-error', (string) $divClass, $crawler->html());
     }
 
     public function testSuccessWithHideForm(): void
@@ -149,7 +149,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $divClass = $crawler->filter('#mauticform_postActionProperty')->ancestors()->first()->attr('class');
-        $this->assertStringNotContainsString('has-error', $divClass, $crawler->html());
+        $this->assertStringNotContainsString('has-error', (string) $divClass, $crawler->html());
     }
 
     public function testLanguageForm(): void
@@ -217,7 +217,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($formElement);
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('contact: Email', $response->getContent(), 'Email field should not be marked as mapped.');
+        $this->assertStringNotContainsString('contact: Email', (string) $response->getContent(), 'Email field should not be marked as mapped.');
     }
 
     public function testMappedFieldIsNotAutoFilledWhenUpdatingField(): void
@@ -291,8 +291,8 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         // Visit the form preview page
         $this->client->request('GET', sprintf('/s/forms/preview/%d', $form->getId()));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('First Option', $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('Second Option', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('First Option', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Second Option', (string) $this->client->getResponse()->getContent());
     }
 
     public function testCreateNewActionUsingBaseTemplateToDisplay(): void
