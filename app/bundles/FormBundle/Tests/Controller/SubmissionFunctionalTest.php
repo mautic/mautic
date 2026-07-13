@@ -1515,7 +1515,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $countSql = "SELECT submission_count FROM {$prefix}forms WHERE id = ?";
         $this->assertSame(1, (int) $this->connection->fetchOne($countSql, [$formId]));
 
-        // Second submission should be blocked by the submission limit and redirect with the custom message.
+        // Second submission should be blocked by the submission limit and redirect back with the error.
         $this->client->followRedirects(false);
         $this->client->request(
             Request::METHOD_POST,
@@ -1529,11 +1529,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $redirectUrl = $secondResponse->headers->get('Location');
         $this->assertNotNull($redirectUrl);
         $urlParts = parse_url($redirectUrl);
-        $this->assertSame('/form/message', $urlParts['path'] ?? null);
-
-        $this->client->followRedirect();
-        $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Stop here', $this->client->getResponse()->getContent());
+        $this->assertSame('/submission-limit-return', $urlParts['path'] ?? null);
+        parse_str($urlParts['query'] ?? '', $queryParams);
+        $this->assertSame('Stop here', $queryParams['mauticError'] ?? null);
         $this->client->followRedirects(true);
 
         // Ensure no additional submissions were created after hitting the limit.
