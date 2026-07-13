@@ -50,7 +50,25 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
         );
     }
 
-    private function createFormWithHoneypotCaptcha(): int
+    public function testHoneypotCaptchaFieldMergesHoneypotClassWithExistingContainerClasses(): void
+    {
+        $formId = $this->createFormWithHoneypotCaptcha('class="custom-class"');
+
+        /** @var FormModel $formModel */
+        $formModel = static::getContainer()->get('mautic.form.model.form');
+        $form      = $formModel->getEntity($formId);
+        self::assertInstanceOf(Form::class, $form);
+
+        $html = $formModel->generateHtml($form, false);
+
+        preg_match('/<div[^>]*\bid="mauticform_[^"]*honeypot"[^>]*>/', $html, $honeypotRow);
+        self::assertNotEmpty($honeypotRow, $html);
+        self::assertStringContainsString('custom-class', $honeypotRow[0], $html);
+        self::assertStringContainsString('mauticform-honeypot', $honeypotRow[0], $html);
+        self::assertSame(1, substr_count($honeypotRow[0], 'class="'), $html);
+    }
+
+    private function createFormWithHoneypotCaptcha(string $containerAttributes = ''): int
     {
         $payload = [
             'name'        => 'Honeypot captcha test form',
@@ -71,6 +89,7 @@ final class FormCaptchaHoneypotFunctionalTest extends MauticMysqlTestCase
                     'properties' => [
                         'captcha' => '',
                     ],
+                    'containerAttributes' => $containerAttributes,
                 ],
                 [
                     'label' => 'Submit',

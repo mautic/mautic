@@ -3,8 +3,16 @@
 
 {% if field.properties.captcha is not defined or field.properties.captcha is empty %}
     {% set required = false %}
+    {% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+    {% set containerAttributes = containerAttributes|merge({
+        'class': containerAttributes.class|default([])|merge(['mauticform-honeypot']),
+    }) %}
+    {% set containerAttributesString = '' %}
+    {% for attrName, attrValue in containerAttributes %}
+        {% set containerAttributesString = containerAttributesString ~ ' ' ~ attrName ~ '="' ~ (attrValue is iterable ? attrValue|join(' ') : attrValue) ~ '"' %}
+    {% endfor %}
     {% set field = field|merge({
-            'containerAttributes': (field.containerAttributes|default('') ~ ' class="mauticform-honeypot"')|trim,
+        'containerAttributes': containerAttributesString|trim,
     }) %}
     {% if inForm is defined and (true == inForm or inForm is not empty) %}
         {# Hide the input in the builder preview #}
