@@ -150,7 +150,7 @@ final class SortableValueLabelListTypeTest extends TestCase
     }
 
     /**
-     * @return \Iterator<string, array{mixed, bool, (string | null)}>
+     * @return \Iterator<string, array{mixed, bool, (string|null)}>
      */
     public static function eventListenerDataProvider(): \Iterator
     {

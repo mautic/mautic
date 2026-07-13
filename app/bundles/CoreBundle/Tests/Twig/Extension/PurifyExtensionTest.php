@@ -24,7 +24,7 @@ final class PurifyExtensionTest extends TestCase
     }
 
     /**
-     * @return \Iterator<string, array{input: (string | null), expected: string}>
+     * @return \Iterator<string, array{input: (string|null), expected: string}>
      */
     public static function purifyHtmlDataProvider(): \Iterator
     {

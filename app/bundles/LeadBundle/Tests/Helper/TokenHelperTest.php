@@ -273,7 +273,7 @@ final class TokenHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \Iterator<int, array<int, (int | string)>>
+     * @return \Iterator<int, array<int, (int|string)>>
      */
     public static function dataLabelProvider(): \Iterator
     {

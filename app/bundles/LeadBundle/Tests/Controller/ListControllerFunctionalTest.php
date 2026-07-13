@@ -844,7 +844,7 @@ final class ListControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<int, array<int, (bool | string | null)>>
+     * @return \Iterator<int, array<int, (bool|string|null)>>
      */
     public static function dateFieldProvider(): \Iterator
     {

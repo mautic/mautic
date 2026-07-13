@@ -493,7 +493,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<string, array{formType: (string | null)}>
+     * @return \Iterator<string, array{formType: (string|null)}>
      */
     public static function formTypeDataProvider(): \Iterator
     {

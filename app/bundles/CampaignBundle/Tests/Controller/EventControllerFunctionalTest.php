@@ -69,7 +69,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<(int | string), array<string>>
+     * @return \Iterator<(int|string), array<string>>
      */
     public static function fieldAndValueProvider(): \Iterator
     {

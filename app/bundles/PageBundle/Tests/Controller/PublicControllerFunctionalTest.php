@@ -64,7 +64,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<string, array<int, (string | null)>>
+     * @return \Iterator<string, array<int, (string|null)>>
      */
     public static function xssPayloadsProvider(): \Iterator
     {

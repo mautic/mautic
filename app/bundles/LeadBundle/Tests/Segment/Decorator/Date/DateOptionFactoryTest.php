@@ -198,7 +198,7 @@ final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), array<string>>
+     * @return \Iterator<(int|string), array<string>>
      */
     public static function getRelativeDateNotations(): \Iterator
     {

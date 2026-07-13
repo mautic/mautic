@@ -127,7 +127,7 @@ final class ListModelTest extends TestCase
     }
 
     /**
-     * @return \Iterator<int, array{array<int, mixed>, (string | null), array<(int | string), mixed>}>
+     * @return \Iterator<int, array{array<int, mixed>, (string|null), array<(int|string), mixed>}>
      */
     public static function sourceTypeTestDataProvider(): \Iterator
     {

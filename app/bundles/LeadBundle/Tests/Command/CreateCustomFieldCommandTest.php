@@ -45,7 +45,7 @@ final class CreateCustomFieldCommandTest extends TestCase
     }
 
     /**
-     * @return \Iterator<int, array<int, (bool | int)>>
+     * @return \Iterator<int, array<int, (bool|int)>>
      */
     public static function completeRunMethodProvider(): \Iterator
     {

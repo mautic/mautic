@@ -44,7 +44,7 @@ final class FieldAliasToFqcnMapTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function aliasFqcnProvider(): \Iterator
     {

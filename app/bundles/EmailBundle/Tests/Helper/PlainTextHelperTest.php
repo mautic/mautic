@@ -114,7 +114,7 @@ HTML,
     }
 
     /**
-     * @return \Iterator<int, array<int, (int | string | null)>>
+     * @return \Iterator<int, array<int, (int|string|null)>>
      */
     public static function getPreviewProvider(): \Iterator
     {

@@ -59,7 +59,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function fieldAndValueProvider(): \Iterator
     {

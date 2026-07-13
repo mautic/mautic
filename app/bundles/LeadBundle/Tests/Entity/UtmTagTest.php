@@ -41,7 +41,7 @@ final class UtmTagTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), (array<(bool | string)> | string)>
+     * @return \Iterator<(int|string), (array<(bool|string)>|string)>
      */
     public static function utmTagsDataProvider(): \Iterator
     {

@@ -691,7 +691,7 @@ CONTENT;
     }
 
     /**
-     * @return \Iterator<(int | string), array<(bool | null)>> Use null to include both <a> and <map> tags
+     * @return \Iterator<(int|string), array<(bool|null)>> Use null to include both <a> and <map> tags
      */
     public static function trackMapProvider(): \Iterator
     {

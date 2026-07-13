@@ -423,7 +423,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<(int | string), array<mixed>>
+     * @return \Iterator<(int|string), array<mixed>>
      */
     public static function scheduleProvider(): \Iterator
     {

@@ -149,7 +149,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<string, array{fieldType: string, label: string, expectedHtmlFragment: string, additionalValues: (array<string, mixed> | null)}>
+     * @return \Iterator<string, array{fieldType: string, label: string, expectedHtmlFragment: string, additionalValues: (array<string, mixed>|null)}>
      */
     public static function provideFieldTypesData(): \Iterator
     {

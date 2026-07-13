@@ -49,7 +49,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     ];
 
     /**
-     * @return \Iterator<int, array<string, (array<int, string> | bool | int | null)>>
+     * @return \Iterator<int, array<string, (array<int, string>|bool|int|null)>>
      */
     public static function provideFormDNC(): \Iterator
     {

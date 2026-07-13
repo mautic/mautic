@@ -255,7 +255,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function fieldValueProvider(): \Iterator
     {

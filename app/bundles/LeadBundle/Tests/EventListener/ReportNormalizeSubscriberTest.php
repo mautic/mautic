@@ -78,7 +78,7 @@ final class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return \Iterator<int, array<string, (array<string, (array<string, array<int, string>> | string)> | string)>> $properties
+     * @return \Iterator<int, array<string, (array<string, (array<string, array<int, string>>|string)>|string)>> $properties
      */
     public static function normalizeData(): \Iterator
     {

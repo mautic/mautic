@@ -328,7 +328,7 @@ final class ReportGeneratorEventTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function applyFilterProvider(): \Iterator
     {
@@ -378,7 +378,7 @@ final class ReportGeneratorEventTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function applyFilterWithoutNullValuesProvider(): \Iterator
     {

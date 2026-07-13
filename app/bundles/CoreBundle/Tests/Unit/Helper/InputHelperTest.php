@@ -305,7 +305,7 @@ final class InputHelperTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), array<string>>
+     * @return \Iterator<(int|string), array<string>>
      */
     public static function minifyHTMLProvider(): \Iterator
     {
@@ -335,7 +335,7 @@ final class InputHelperTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function underscoreProvider(): \Iterator
     {

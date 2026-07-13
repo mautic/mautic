@@ -943,7 +943,7 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), mixed>
+     * @return \Iterator<(int|string), mixed>
      */
     public static function provideEmails(): \Iterator
     {
@@ -1473,7 +1473,7 @@ final class MailHelperTest extends TestCase
     }
 
     /**
-     * @return \Iterator<(int | string), array<(bool | int | string)>>
+     * @return \Iterator<(int|string), array<(bool|int|string)>>
      */
     public static function minifyHtmlDataProvider(): \Iterator
     {

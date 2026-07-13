@@ -38,7 +38,7 @@ final class DsnParserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \Iterator<string, array{dsnReport: string, expectedEmail: string, expectedCategory: string, expectedType: string, expectedFinal: bool, expectedRuleNumber?: (string | null)}>
+     * @return \Iterator<string, array{dsnReport: string, expectedEmail: string, expectedCategory: string, expectedType: string, expectedFinal: bool, expectedRuleNumber?: (string|null)}>
      */
     public static function bouncedEmailProvider(): \Iterator
     {

@@ -158,7 +158,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \Iterator<int, array{(string | null), int, array<int, array<string, mixed>>}>
+     * @return \Iterator<int, array{(string|null), int, array<int, array<string, mixed>>}>
      */
     public static function validateDataProvider(): \Iterator
     {

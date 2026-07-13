@@ -48,7 +48,7 @@ final class EmailAddressHelperTest extends TestCase
     }
 
     /**
-     * @return \Iterator<int, array<int, (array<int, string> | string)>>
+     * @return \Iterator<int, array<int, (array<int, string>|string)>>
      */
     public static function variationsProvider(): \Iterator
     {

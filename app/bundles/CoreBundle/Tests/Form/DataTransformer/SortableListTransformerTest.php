@@ -94,7 +94,7 @@ final class SortableListTransformerTest extends TestCase
     }
 
     /**
-     * @return \Iterator<string, array{input: array<string, array<(int | string), string>>, expected: array<string, array<array<string, string>>>}>
+     * @return \Iterator<string, array{input: array<string, array<(int|string), string>>, expected: array<string, array<array<string, string>>>}>
      */
     public static function standardListProvider(): \Iterator
     {
@@ -131,7 +131,7 @@ final class SortableListTransformerTest extends TestCase
     }
 
     /**
-     * @return \Iterator<string, array{input: array<string, array<(int | string), string>>, expected: array<string, array<string>>}>
+     * @return \Iterator<string, array{input: array<string, array<(int|string), string>>, expected: array<string, array<string>>}>
      */
     public static function standardListWithoutLabelsProvider(): \Iterator
     {
