@@ -31,7 +31,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        Assert::assertStringContainsString($expectedMessage, $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString($expectedMessage, (string) $this->client->getResponse()->getContent());
     }
 
     /**

@@ -43,13 +43,11 @@ class IcontactApi extends EmailMarketingApi
     }
 
     /**
-     * @param array $fields
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function subscribeLead($listId, $fields)
+    public function subscribeLead($listId, array $fields)
     {
         $fields['status'] = 'normal';
 

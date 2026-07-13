@@ -12,7 +12,7 @@ final class WebhookTest extends \PHPUnit\Framework\TestCase
     public function testWasModifiedRecentlyWithNotModifiedWebhook(): void
     {
         $webhook = new Webhook();
-        $this->assertNull($webhook->getDateModified());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $webhook->getDateModified());
         $this->assertFalse($webhook->wasModifiedRecently());
     }
 

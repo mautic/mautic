@@ -218,7 +218,7 @@ trait CustomFieldRepositoryTrait
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $col   = $this->getTableAlias().'.'.$field;
         $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select("DISTINCT $col")
+            ->select("DISTINCT {$col}")
             ->from($table, 'l');
 
         $q->where(
@@ -229,7 +229,7 @@ trait CustomFieldRepositoryTrait
         );
 
         if (!empty($search)) {
-            $q->andWhere("$col LIKE :search")
+            $q->andWhere("{$col} LIKE :search")
                 ->setParameter('search', "{$search}%");
         }
 
@@ -291,10 +291,8 @@ trait CustomFieldRepositoryTrait
 
     /**
      * Function to remove non custom field columns from an arrayed lead row.
-     *
-     * @param array $fixedFields
      */
-    protected function removeNonFieldColumns(&$r, $fixedFields = [])
+    protected function removeNonFieldColumns(array &$r, array $fixedFields = [])
     {
         $baseCols = $this->getBaseColumns($this->getClassName(), true);
         foreach ($baseCols as $c) {
@@ -326,7 +324,7 @@ trait CustomFieldRepositoryTrait
             if (isset($fields[$k])) {
                 $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
 
-                if (!is_null($r)) {
+                if (null !== $r) {
                     switch ($fields[$k]['type']) {
                         case 'number':
                             $r = (float) $r;
@@ -401,7 +399,7 @@ trait CustomFieldRepositoryTrait
         return $this->customFieldList;
     }
 
-    protected function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(array &$fields)
     {
         // Ensure booleans are integers
         foreach ($fields as $field => &$value) {

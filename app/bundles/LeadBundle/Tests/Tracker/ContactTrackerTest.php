@@ -92,7 +92,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
     {
         $contactTracker = $this->getContactTracker();
 
-        $this->leadRepositoryMock->expects($this->any())
+        $this->leadRepositoryMock
             ->method('getFieldValues')
             ->willReturn([]);
 
@@ -133,6 +133,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($device);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getFieldValue('email'));
     }
@@ -152,6 +153,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($lead);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
@@ -174,7 +176,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getTrackedLead')
             ->willReturn(null);
 
-        $this->coreParametersHelperMock->expects($this->any())
+        $this->coreParametersHelperMock
             ->method('get')
             ->willReturn(true);
 
@@ -183,6 +185,7 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$lead]);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertEquals('test@test.com', $contact->getEmail());
     }
@@ -209,9 +212,10 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepositoryMock->expects($this->never())
             ->method('getLeadsByIp');
-        $this->leadFieldModelMock->expects($this->any())->method('getFieldListWithProperties')->willReturn([]);
+        $this->leadFieldModelMock->method('getFieldListWithProperties')->willReturn([]);
 
         $contact = $contactTracker->getContact();
+        $this->assertInstanceOf(Lead::class, $contact);
         $this->assertEquals(true, $contact->isNewlyCreated());
     }
 

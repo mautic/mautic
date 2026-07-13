@@ -71,7 +71,6 @@ final class NoNestingValidatorTest extends TestCase
     private function createContext(): ExecutionContextInterface
     {
         $locale     = 'en_US';
-        $validator  = $this->createMock(ValidatorInterface::class);
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
 
@@ -79,6 +78,6 @@ final class NoNestingValidatorTest extends TestCase
             'mautic.dynamicContent.no_nesting' => self::TRANSLATED_MESSAGE,
         ], $locale, 'validators');
 
-        return new ExecutionContext($validator, null, $translator, 'validators');
+        return new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator, 'validators');
     }
 }

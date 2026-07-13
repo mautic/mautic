@@ -141,9 +141,11 @@ class InputHelper
             }
 
             return $value;
-        } elseif (null === $value) {
+        }
+        if (null === $value) {
             return $value;
-        } elseif (is_string($mask) && method_exists(self::class, $mask)) {
+        }
+        if (is_string($mask) && method_exists(self::class, $mask)) {
             return self::$mask($value, $urldecode);
         }
 
@@ -165,7 +167,8 @@ class InputHelper
             }
 
             return $value;
-        } elseif ($urldecode) {
+        }
+        if ($urldecode) {
             $value = urldecode($value);
         }
 
@@ -413,7 +416,7 @@ class InputHelper
 
             // Was a doctype found?
             if ($doctypeFound && false === $hasUnicode) {
-                $value = "$doctype[0]$value";
+                $value = "{$doctype[0]}{$value}";
             }
 
             if ($cdataCount) {
@@ -582,7 +585,7 @@ class InputHelper
      */
     public static function stripTags(string $input, array $allowedTags = []): string
     {
-        $allowed = implode('', array_map(fn ($tag): string => "<$tag>", $allowedTags));
+        $allowed = implode('', array_map(fn (string $tag): string => "<{$tag}>", $allowedTags));
 
         return strip_tags($input, $allowed);
     }

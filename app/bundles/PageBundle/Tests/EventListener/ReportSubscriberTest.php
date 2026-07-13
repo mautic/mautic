@@ -45,12 +45,11 @@ final class ReportSubscriberTest extends TestCase
         $this->companyReportData   = $this->createMock(CompanyReportData::class);
         $this->hitRepository       = $this->createMock(HitRepository::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
-        $dncReportService          = $this->createMock(DncReportService::class);
         $this->subscriber          = new ReportSubscriber(
             $this->companyReportData,
             $this->hitRepository,
             $this->translator,
-            $dncReportService
+            $this->createStub(DncReportService::class)
         );
     }
 
@@ -233,7 +232,7 @@ final class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -266,11 +265,11 @@ final class ReportSubscriberTest extends TestCase
                 ]
             );
 
-        $mockQueryBuilder->expects($this->any())
+        $mockQueryBuilder
             ->method('expr')
             ->willReturn($mockExprBuilder);
 
-        $mockQueryBuilder->expects($this->any())
+        $mockQueryBuilder
             ->method('executeQuery')
             ->willReturn($mockStmt);
 
@@ -289,15 +288,15 @@ final class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('loadAndBuildTimeData')
             ->willReturn(['a', 'b', 'c']);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCount')
             ->willReturn(2);
 
-        $mockChartQuery->expects($this->any())
+        $mockChartQuery
             ->method('fetchCountDateDiff')
             ->willReturn(2);
 
@@ -312,7 +311,7 @@ final class ReportSubscriberTest extends TestCase
             ->method('checkContext')
             ->willReturn(true);
 
-        $mockEvent->expects($this->any())
+        $mockEvent
             ->method('getOptions')
             ->willReturn($graphOptions);
 

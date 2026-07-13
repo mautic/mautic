@@ -157,7 +157,7 @@ class ProfileController extends FormController
                 if ($this->isFormValid($form)) {
                     foreach ($overrides as $k => $v) {
                         $func = 'set'.ucfirst($k);
-                        $me->$func($v);
+                        $me->{$func}($v);
                     }
 
                     // form is valid so process the data

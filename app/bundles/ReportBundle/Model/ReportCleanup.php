@@ -8,8 +8,9 @@ class ReportCleanup
 {
     public const KEEP_FILE_DAYS = 7;
 
-    public function __construct(private readonly FileHandler $fileHandler)
-    {
+    public function __construct(
+        private readonly FileHandler $fileHandler,
+    ) {
     }
 
     public function cleanup(int $reportId): void

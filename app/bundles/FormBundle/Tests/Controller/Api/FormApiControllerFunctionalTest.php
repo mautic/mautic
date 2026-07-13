@@ -271,7 +271,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertTrue(isset($response['form']['id']), $clientResponse->getContent());
+        Assert::assertArrayHasKey('id', $response['form'], $clientResponse->getContent());
 
         $formId = $response['form']['id'];
 
@@ -418,6 +418,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
+        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
 
         Assert::assertSame('john@doe.test', $contact->getEmail());
         Assert::assertSame('Czech Republic', $contact->getCountry());

@@ -172,7 +172,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newDirName ?? $newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->mirror($root.$theme, $root.$dirName);
@@ -193,7 +193,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->rename($root.$theme, $root.$dirName);
@@ -432,7 +432,7 @@ class ThemeHelper implements ThemeHelperInterface
 
             $this->sandboxEnv->addRuntimeLoader(new class($this->twig) implements RuntimeLoaderInterface {
                 public function __construct(
-                    private Environment $twig,
+                    private readonly Environment $twig,
                 ) {
                 }
 

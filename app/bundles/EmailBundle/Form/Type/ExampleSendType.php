@@ -18,8 +18,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ExampleSendType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator, private readonly CorePermissions $security, private readonly UserHelper $userHelper)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        private readonly UserHelper $userHelper,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

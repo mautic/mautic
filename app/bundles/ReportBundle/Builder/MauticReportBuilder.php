@@ -397,16 +397,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $andGroup[] = $expression;
                         break;
                     case 'neq':
-                        $columnValue = ":$paramName";
+                        $columnValue = ":{$paramName}";
                         $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
+                            $queryBuilder->expr()->{$exprFunction}($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
                         $andGroup[] = $expression;
                         break;
                     default:
-                        $columnValue = ":$paramName";
+                        $columnValue = ":{$paramName}";
                         $type        = $filterDefinitions[$filter['column']]['type'];
                         if (isset($filterDefinitions[$filter['column']]['formula'])) {
                             $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
@@ -502,7 +502,8 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
             return $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL());
-        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
+        }
+        if (in_array($filter['condition'], ['notIn', 'empty'])) {
             return $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL());
         }
 
