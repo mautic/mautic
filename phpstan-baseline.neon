@@ -7474,12 +7474,6 @@ parameters:
 			path: app/bundles/LeadBundle/Helper/Progress.php
 
 		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\CustomFieldEntityInterface\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Model/CompanyModel.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\CompanyModel\:\:companyMerge\(\) has parameter \$mainCompany with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7610,12 +7604,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: app/bundles/LeadBundle/Model/ImportModel.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\CustomFieldEntityInterface\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:addToCompany\(\) has parameter \$company with no type specified\.$#'
@@ -8180,12 +8168,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Tests/StandardImportTestHelper.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\CustomFieldEntityInterface\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Tracker/ContactTracker.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Tracker\\ContactTracker\:\:dispatchContactChangeEvent\(\) has parameter \$previouslyTrackedId with no type specified\.$#'
@@ -11932,12 +11914,6 @@ parameters:
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getMauticCompany\(\) has parameter \$object with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but empty return statement found\.$#'
-			identifier: return.empty
-			count: 3
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
