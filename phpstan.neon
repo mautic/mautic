@@ -7,7 +7,6 @@ parameters:
 	reportUnmatchedIgnoredErrors: false
 	treatPhpDocTypesAsCertain: false
 	parallel:
-		maximumNumberOfProcesses: 2
 		processTimeout: 1000.0
     # see https://github.com/tomasVotruba/type-coverage
 	type_coverage:
