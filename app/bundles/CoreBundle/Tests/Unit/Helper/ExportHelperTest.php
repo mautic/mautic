@@ -56,13 +56,12 @@ final class ExportHelperTest extends TestCase
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
-        $processSignalService           = $this->createMock(ProcessSignalService::class);
 
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $processSignalService,
+            $this->createStub(ProcessSignalService::class),
             $this->createStub(EventDispatcherInterface::class),
         );
     }

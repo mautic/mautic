@@ -244,7 +244,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      *
      * @return CommonRepository<T>
      */

@@ -117,7 +117,8 @@ class InstagramIntegration extends SocialIntegration
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
-        } elseif (empty($identifier)) {
+        }
+        if (empty($identifier)) {
             return false;
         }
 

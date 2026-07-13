@@ -705,7 +705,8 @@ class LeadController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
             $lead->getPermissionUser()
@@ -762,8 +763,8 @@ class LeadController extends FormController
                     $image = $form['preferred_profile_image']->getData();
                     if ('custom' == $image) {
                         // Check for a file
-                        /** @var UploadedFile $file */
-                        if ($file = $form['custom_avatar']->getData()) {
+                        $file = $form['custom_avatar']->getData();
+                        if ($file instanceof UploadedFile) {
                             $this->uploadAvatar($request, $avatarHelper, $lead);
 
                             // Note the avatar update so that it can be forced to update
@@ -816,7 +817,8 @@ class LeadController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Refetch and recreate the form in order to populate data manipulated in the entity itself
                 $lead = $model->getEntity($objectId);
                 $form = $model->createForm($lead, $this->formFactory, $action, ['fields' => $fields]);
@@ -983,7 +985,8 @@ class LeadController extends FormController
                                 ]
                             )
                         );
-                    } elseif (
+                    }
+                    if (
                         !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $mainLead->getPermissionUser())
                         || !$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $secLead->getPermissionUser())
                     ) {
@@ -2443,12 +2446,12 @@ class LeadController extends FormController
                         $scoreKey = ContactGroupPointsType::getFieldKey($group->getId());
                         $oldScore = $initData[$scoreKey] ?? null;
                         $newScore = $postData[$scoreKey];
-                        if (!is_null($oldScore) && is_null($newScore)) {
+                        if (null !== $oldScore && null === $newScore) {
                             // set 0 when the new score is not present, but the record exists
                             $newScore = 0;
                         }
 
-                        if (!is_null($newScore) && $newScore !== $oldScore) {
+                        if (null !== $newScore && $newScore !== $oldScore) {
                             $pointGroupModel->adjustPoints($lead, $group, $newScore, Lead::POINTS_SET);
                             $delta = $newScore - ($oldScore ?? 0);
 

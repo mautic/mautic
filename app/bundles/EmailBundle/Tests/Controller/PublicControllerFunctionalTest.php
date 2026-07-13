@@ -95,7 +95,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
     }
 
     public function testContactPreferencesLandingPageTracking(): void
@@ -159,7 +159,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -173,7 +173,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -482,7 +482,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, $uri);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($message, $clientResponse->getContent());
+        $this->assertStringContainsString($message, (string) $clientResponse->getContent());
         $doNotContacts       = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $this->leadId]);
         $isAddedDoNotContact = (bool) count($doNotContacts);
         $addedDoNotContact   = $isAddedDoNotContact ? $doNotContacts[0] : null;
@@ -643,7 +643,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         // Assert that the response contains the expected string
         $this->assertStringContainsString(
             'We are sorry to see you go! john@doe.email will no longer receive emails from us',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         // Assert that a DoNotContact record was created

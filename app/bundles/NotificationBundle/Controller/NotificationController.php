@@ -165,7 +165,8 @@ class NotificationController extends AbstractFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_VIEW_OWN,
             self::PERMISSION_VIEW_OTHER,
             $notification->getCreatedBy()
@@ -410,7 +411,8 @@ class NotificationController extends AbstractFormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_VIEW_OWN,
             self::PERMISSION_VIEW_OTHER,
             $entity->getCreatedBy()

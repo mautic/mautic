@@ -152,7 +152,8 @@ class SmsController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_VIEW_OWN,
             self::PERMISSION_VIEW_OTHER,
             $sms->getCreatedBy()
@@ -412,7 +413,8 @@ class SmsController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_VIEW_OWN,
             self::PERMISSION_VIEW_OTHER,
             $entity->getCreatedBy()

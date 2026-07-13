@@ -28,7 +28,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
             return;
         }
 
-        if (is_null($report->getToAddress())) {
+        if (null === $report->getToAddress()) {
             $this->context->buildViolation('mautic.report.schedule.to_address_required')
                 ->atPath('toAddress')
                 ->addViolation();

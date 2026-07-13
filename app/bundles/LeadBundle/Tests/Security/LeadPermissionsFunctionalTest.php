@@ -16,10 +16,10 @@ final class LeadPermissionsFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
 
         $content = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString('Contacts - User has access to', $content);
-        $this->assertStringContainsString('Segments - User has access to', $content);
-        $this->assertStringContainsString('Custom Fields - User has access to', $content);
-        $this->assertStringContainsString('Import - User has access to', $content);
+        $this->assertStringContainsString('Contacts - User has access to', (string) $content);
+        $this->assertStringContainsString('Segments - User has access to', (string) $content);
+        $this->assertStringContainsString('Custom Fields - User has access to', (string) $content);
+        $this->assertStringContainsString('Import - User has access to', (string) $content);
 
         $leadPermissionTab = $crawler->filter('#leadPermissionTab');
         $this->assertCount(1, $leadPermissionTab);

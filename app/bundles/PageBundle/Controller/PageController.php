@@ -196,7 +196,8 @@ class PageController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $activePage->getCreatedBy()
         )
             || ($activePage->getIsPreferenceCenter()
@@ -518,7 +519,8 @@ class PageController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_PAGES_VIEW_OWN, self::PERMISSION_PAGES_VIEW_OTHER, $entity->getCreatedBy()
         )
             || ($entity->getIsPreferenceCenter() && !$this->security->hasEntityAccess(
@@ -593,7 +595,8 @@ class PageController extends FormController
                         'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action);
                 $this->setOptimisticLockVersion($entity, $form);
@@ -1019,7 +1022,8 @@ class PageController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_PAGES_VIEW_OWN,
             self::PERMISSION_PAGES_VIEW_OTHER,
             $activePage->getCreatedBy()
@@ -1156,7 +1160,8 @@ class PageController extends FormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             self::PERMISSION_PAGES_VIEW_OWN,
             self::PERMISSION_PAGES_VIEW_OTHER,
             $activePage->getCreatedBy()

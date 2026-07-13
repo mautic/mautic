@@ -31,7 +31,7 @@ class GlobalSearch
 
         $entities = $model->getEntitiesForGlobalSearch($filterDTO);
 
-        if (is_null($entities) || ($entities instanceof Paginator && empty($entities->count()))) {
+        if (null === $entities || ($entities instanceof Paginator && empty($entities->count()))) {
             return [];
         }
 

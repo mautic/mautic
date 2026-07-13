@@ -187,21 +187,13 @@ final class PublicControllerTest extends TestCase
         $pageEntityA->method('getVariantSettings')
             ->willReturn(['weight' => '50']);
 
-        $cookieHelper = $this->createMock(CookieHelper::class);
-
-        /** @var Packages&MockObject $packagesMock */
-        $packagesMock = $this->createMock(Packages::class);
-
-        /** @var CoreParametersHelper&MockObject $coreParametersHelper */
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-
-        $assetHelper = new AssetsHelper($packagesMock);
+        $assetHelper = new AssetsHelper($this->createStub(Packages::class));
 
         $mauticSecurity = $this->createMock(CorePermissions::class);
         $mauticSecurity->method('hasEntityAccess')
             ->willReturn(false);
 
-        $analyticsHelper = new AnalyticsHelper($coreParametersHelper);
+        $analyticsHelper = new AnalyticsHelper($this->createStub(CoreParametersHelper::class));
 
         $pageModel = $this->createMock(PageModel::class);
         $pageModel->method('getHitQuery')
@@ -235,7 +227,7 @@ final class PublicControllerTest extends TestCase
         $response = $controller->indexAction(
             $this->request,
             $this->contactRequestHelper,
-            $cookieHelper,
+            $this->createStub(CookieHelper::class),
             $analyticsHelper,
             $assetHelper,
             $themeHelper,

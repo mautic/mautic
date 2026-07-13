@@ -260,10 +260,12 @@ class CorePermissions implements ResetInterface
         if ('MATCH_ALL' == $mode) {
             // deny if any of the permissions are denied
             return !in_array(0, $permissions);
-        } elseif ('MATCH_ONE' == $mode) {
+        }
+        if ('MATCH_ONE' == $mode) {
             // grant if any of the permissions were granted
             return in_array(1, $permissions);
-        } elseif ('RETURN_ARRAY' == $mode) {
+        }
+        if ('RETURN_ARRAY' == $mode) {
             return $permissions;
         }
         throw new PermissionNotFoundException($this->getTranslator()->trans('mautic.core.permissions.mode.notfound', ['%mode%' => $mode]));
