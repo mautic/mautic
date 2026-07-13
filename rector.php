@@ -73,6 +73,13 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
         ],
 
+        Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Model/VariantModelTrait.php',
+        ],
+
+        // offer next
+        Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,
+
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',

@@ -385,12 +385,6 @@ parameters:
 			path: app/bundles/AssetBundle/Security/Permissions/AssetPermissions.php
 
 		-
-			message: '#^Variable \$campaign in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: app/bundles/CampaignBundle/Command/TriggerCampaignCommand.php
-
-		-
 			message: '#^Parameter \#1 \$batchLimit of class Mautic\\CampaignBundle\\Executioner\\ContactFinder\\Limiter\\ContactLimiter constructor expects int, null given\.$#'
 			identifier: argument.type
 			count: 1
@@ -827,12 +821,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/CampaignBundle/Executioner/Dispatcher/LegacyEventDispatcher.php
-
-		-
-			message: '#^Variable \$firstLog in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/Event/ActionExecutioner.php
 
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Executioner\\EventExecutioner\:\:recordLogsAsFailedForEvent\(\) has parameter \$reason with no type specified\.$#'
@@ -1481,18 +1469,6 @@ parameters:
 			identifier: missingType.return
 			count: 1
 			path: app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
-
-		-
-			message: '#^Access to deprecated property \$_eventManager of class Doctrine\\DBAL\\Connection\.$#'
-			identifier: property.deprecated
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Connection/ConnectionWrapper.php
-
-		-
-			message: '#^Access to deprecated property \$_eventManager of class Doctrine\\DBAL\\Connection\.$#'
-			identifier: property.deprecated
-			count: 1
-			path: app/bundles/CoreBundle/Doctrine/Connection/PrimaryReadReplicaConnectionWrapper.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Doctrine\\Helper\\ColumnSchemaHelper\:\:checkTableExists\(\) has parameter \$table with no type specified\.$#'
@@ -3624,12 +3600,6 @@ parameters:
 		-
 			message: '#^Property Mautic\\EmailBundle\\Controller\\PublicController\:\:\$leadLists has no type specified\.$#'
 			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/Controller/PublicController.php
-
-		-
-			message: '#^Variable \$prefCenter in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
 			count: 1
 			path: app/bundles/EmailBundle/Controller/PublicController.php
 
@@ -6022,12 +5992,6 @@ parameters:
 			path: app/bundles/LeadBundle/Controller/LeadController.php
 
 		-
-			message: '#^Variable \$file in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: app/bundles/LeadBundle/Controller/LeadController.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Component\\Form\\FormInterface\:\:isClicked\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -6985,12 +6949,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/MergeRecordRepository.php
 
 		-
-			message: '#^Variable \$record in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 1
-			path: app/bundles/LeadBundle/Entity/MergeRecordRepository.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\PointsChangeLogRepository\:\:getMostLeads\(\) has parameter \$limit with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7516,12 +7474,6 @@ parameters:
 			path: app/bundles/LeadBundle/Helper/Progress.php
 
 		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\CustomFieldEntityInterface\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Model/CompanyModel.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\CompanyModel\:\:companyMerge\(\) has parameter \$mainCompany with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -7652,12 +7604,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: app/bundles/LeadBundle/Model/ImportModel.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\CustomFieldEntityInterface\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:addToCompany\(\) has parameter \$company with no type specified\.$#'
@@ -8222,12 +8168,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: app/bundles/LeadBundle/Tests/StandardImportTestHelper.php
-
-		-
-			message: '#^Call to an undefined method Mautic\\LeadBundle\\Entity\\CustomFieldEntityInterface\:\:getId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: app/bundles/LeadBundle/Tracker/ContactTracker.php
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Tracker\\ContactTracker\:\:dispatchContactChangeEvent\(\) has parameter \$previouslyTrackedId with no type specified\.$#'
@@ -11809,12 +11749,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/ConnectwiseIntegration.php
 
 		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeads\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:amendLeadDataBeforeMauticPopulate\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -11983,12 +11917,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getMauticLead\(\) should return Mautic\\LeadBundle\\Entity\\Lead but empty return statement found\.$#'
-			identifier: return.empty
-			count: 3
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:getPriorityFieldsForIntegration\(\) has parameter \$config with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -12037,12 +11965,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
 
 		-
-			message: '#^Parameter \#2 \$objects of method MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:cleanPriorityFields\(\) expects array\|null, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
 			message: '#^Property MauticPlugin\\MauticCrmBundle\\Integration\\CrmAbstractIntegration\:\:\$auth has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -12053,42 +11975,6 @@ parameters:
 			identifier: missingType.property
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/CrmAbstractIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:createLeads\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getCompanies\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeadFields\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeads\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:updateLead\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:updateLeads\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\DynamicsIntegration\:\:getBearerToken\(\) should return string but returns false\.$#'
@@ -12829,30 +12715,6 @@ parameters:
 			path: plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
 
 		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getEmailBySugarUserId\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getIdBySugarEmail\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeadFields\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeads\(\)\.$#'
-			identifier: method.notFound
-			count: 4
-			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\SugarcrmIntegration\:\:authCallback\(\) should return array but returns bool\|string\.$#'
 			identifier: return.type
 			count: 1
@@ -13073,12 +12935,6 @@ parameters:
 			identifier: method.childReturnType
 			count: 1
 			path: plugins/MauticCrmBundle/Integration/SugarcrmIntegration.php
-
-		-
-			message: '#^Call to an undefined method MauticPlugin\\MauticCrmBundle\\Api\\CrmApi\:\:getLeadFields\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: plugins/MauticCrmBundle/Integration/VtigerIntegration.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticCrmBundle\\Integration\\VtigerIntegration\:\:amendLeadDataBeforePush\(\) has parameter \$mappedData with no type specified\.$#'
@@ -13510,12 +13366,6 @@ parameters:
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:validateRequest\(\) has parameter \$oid with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
-			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
-
-		-
-			message: '#^Variable \$fullcontact in PHPDoc tag @var does not exist\.$#'
-			identifier: varTag.variableNotFound
-			count: 2
 			path: plugins/MauticFullContactBundle/Helper/LookupHelper.php
 
 		-
