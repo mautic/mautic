@@ -105,7 +105,8 @@ final class PublicController extends CommonFormController
     }
 
     /**
-     * Returns a sanitized return URL only if it is relative or same-origin as site_url.
+     * Returns a sanitized return URL only if it is relative, same-origin as site_url,
+     * or matches a domain listed in the CORS valid_domains configuration.
      * External/untrusted URLs are rejected and null is returned.
      */
     private function getTrustedReturnUrl(Request $request): ?string
@@ -113,11 +114,11 @@ final class PublicController extends CommonFormController
         $post   = $this->getSubmittedPost($request);
         $return = $post['return'] ?? '';
 
-        if (empty($return)) {
+        if ('' === $return) {
             $return = $request->server->get('HTTP_REFERER', '');
         }
 
-        if (empty($return)) {
+        if ('' === $return) {
             return null;
         }
 
@@ -128,13 +129,26 @@ final class PublicController extends CommonFormController
             return $return;
         }
 
+        $returnHost = parse_url($return, PHP_URL_HOST);
+        if (!$returnHost) {
+            return null;
+        }
+
         // Allow same-origin URLs
         $siteUrl = (string) $this->coreParametersHelper->get('site_url');
-        if (!empty($siteUrl)) {
-            $siteHost   = parse_url($siteUrl, PHP_URL_HOST);
-            $returnHost = parse_url($return, PHP_URL_HOST);
+        if ('' !== $siteUrl) {
+            $siteHost = parse_url($siteUrl, PHP_URL_HOST);
+            if ($siteHost && strtolower($siteHost) === strtolower($returnHost)) {
+                return $return;
+            }
+        }
 
-            if ($siteHost && $returnHost && strtolower($siteHost) === strtolower($returnHost)) {
+        // Allow URLs matching CORS valid domains configuration
+        $validDomains = (array) $this->coreParametersHelper->get('cors_valid_domains');
+        $returnOrigin = parse_url($return, PHP_URL_SCHEME).'://'.$returnHost;
+
+        foreach ($validDomains as $validDomain) {
+            if (fnmatch($validDomain, $returnOrigin, FNM_CASEFOLD)) {
                 return $return;
             }
         }
@@ -492,7 +506,7 @@ final class PublicController extends CommonFormController
     {
         $error = $submissionResult['error'];
 
-        if (!empty($error)) {
+        if ($error) {
             $return = $this->getTrustedReturnUrl($request);
             if ($return) {
                 $form  = $submissionResult['form'];

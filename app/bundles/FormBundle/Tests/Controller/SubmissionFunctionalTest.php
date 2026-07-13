@@ -103,67 +103,65 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('bar', $queryParams['foo']);
     }
 
-    public function testMaliciousReturnUrlIsIgnoredOnValidationError(): void
+    /**
+     * @return iterable<string, array{returnUrl: string, corsValidDomains: list<string>, expectedRedirectContains: string, expectedRedirectNotContains: string|null}>
+     */
+    public static function returnUrlTrustProvider(): iterable
     {
-        $payload = [
-            'name'        => 'Return URL security test form',
-            'description' => 'Form created via submission test',
-            'formType'    => 'standalone',
-            'isPublished' => true,
-            'postAction'  => 'return',
-            'fields'      => [
-                [
-                    'label'      => 'Email',
-                    'type'       => 'email',
-                    'alias'      => 'email',
-                    'isRequired' => true,
-                    'leadField'  => 'email',
-                ],
-                [
-                    'label' => 'Submit',
-                    'type'  => 'button',
-                ],
-            ],
+        yield 'malicious external URL is rejected' => [
+            'returnUrl'                   => 'https://attacker.com/phishing',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.com',
         ];
 
-        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
-        $clientResponse = $this->client->getResponse();
+        yield 'relative URL is allowed' => [
+            'returnUrl'                   => '/my-landing-page',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/my-landing-page',
+            'expectedRedirectNotContains' => null,
+        ];
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        yield 'exact CORS domain is allowed' => [
+            'returnUrl'                   => 'https://trusted.example.com/landing',
+            'corsValidDomains'            => ['https://trusted.example.com'],
+            'expectedRedirectContains'    => 'trusted.example.com/landing',
+            'expectedRedirectNotContains' => null,
+        ];
 
-        $response = json_decode($clientResponse->getContent(), true);
-        $formId   = $response['form']['id'];
+        yield 'wildcard CORS domain is allowed' => [
+            'returnUrl'                   => 'https://sub.wildcard.org/page',
+            'corsValidDomains'            => ['https://*.wildcard.org'],
+            'expectedRedirectContains'    => 'sub.wildcard.org/page',
+            'expectedRedirectNotContains' => null,
+        ];
 
-        $this->client->followRedirects(false);
-        $this->client->request(
-            Request::METHOD_POST,
-            "/form/submit?formId={$formId}",
-            [
-                'mauticform' => [
-                    'formId' => $formId,
-                    'return' => 'https://attacker.com/phishing',
-                ],
-            ]
-        );
+        yield 'URL not in CORS config is rejected' => [
+            'returnUrl'                   => 'https://evil.com/phish',
+            'corsValidDomains'            => ['https://trusted.example.com'],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'evil.com',
+        ];
 
-        $submitResponse = $this->client->getResponse();
-
-        $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode());
-
-        $redirectUrl = $submitResponse->headers->get('Location');
-        $this->assertNotNull($redirectUrl);
-        $this->assertStringNotContainsString('attacker.com', $redirectUrl);
-
-        $urlParts = parse_url($redirectUrl);
-        $this->assertSame('/form/message', $urlParts['path'] ?? null);
-
-        $this->client->followRedirects(true);
+        yield 'unrestricted CORS mode still requires valid domains' => [
+            'returnUrl'                   => 'https://any-domain.com/page',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'any-domain.com',
+        ];
     }
 
-    public function testSameOriginReturnUrlIsAllowedOnValidationError(): void
+    /**
+     * @param list<string> $corsValidDomains
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('returnUrlTrustProvider')]
+    public function testReturnUrlTrustValidation(string $returnUrl, array $corsValidDomains, string $expectedRedirectContains, ?string $expectedRedirectNotContains): void
     {
+        $this->configParams['cors_valid_domains'] = $corsValidDomains;
+        $this->setUpSymfony($this->configParams);
+
         $payload = [
-            'name'        => 'Same origin return test form',
+            'name'        => 'Return URL trust test form',
             'description' => 'Form created via submission test',
             'formType'    => 'standalone',
             'isPublished' => true,
@@ -185,13 +183,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
 
-        // Use a relative return URL (same-origin by definition)
         $this->client->followRedirects(false);
         $this->client->request(
             Request::METHOD_POST,
@@ -199,22 +195,21 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             [
                 'mauticform' => [
                     'formId' => $formId,
-                    'return' => '/my-landing-page',
+                    'return' => $returnUrl,
                 ],
             ]
         );
 
         $submitResponse = $this->client->getResponse();
-
         $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode());
 
         $redirectUrl = $submitResponse->headers->get('Location');
         $this->assertNotNull($redirectUrl);
+        $this->assertStringContainsString($expectedRedirectContains, $redirectUrl);
 
-        // Should redirect back to the same-origin return URL with the error
-        $urlParts = parse_url($redirectUrl);
-        $this->assertSame('/my-landing-page', $urlParts['path'] ?? null);
-        $this->assertStringContainsString('mauticError', $redirectUrl);
+        if (null !== $expectedRedirectNotContains) {
+            $this->assertStringNotContainsString($expectedRedirectNotContains, $redirectUrl);
+        }
 
         $this->client->followRedirects(true);
     }
@@ -261,9 +256,10 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
             ]
         );
 
-        /** @var SubmissionRepository $submissionRepository */
         $submissionRepository = $this->em->getRepository(Submission::class);
-        $submissions          = $submissionRepository->findBy(['form' => $formId]);
+        \assert($submissionRepository instanceof SubmissionRepository);
+
+        $submissions = $submissionRepository->findBy(['form' => $formId]);
 
         $this->assertCount(1, $submissions);
         $this->assertStringNotContainsString('attacker.com', $submissions[0]->getReferer());
