@@ -159,14 +159,14 @@ final class FormModelTest extends TestCase
         $formModel->saveEntity($lead);
 
         $dateModified1 = $lead->getDateModified();
-        $dateAdded1 = $lead->getDateAdded();
+        $dateAdded1    = $lead->getDateAdded();
 
         // Step 2: Update the existing entity and save it
         $lead->setTitle('Lorem ipsum');
         $formModel->saveEntity($lead);
 
         $dateModified2 = $lead->getDateModified();
-        $dateAdded2 = $lead->getDateAdded();
+        $dateAdded2    = $lead->getDateAdded();
 
         self::assertSame(
             $dateAdded1,
