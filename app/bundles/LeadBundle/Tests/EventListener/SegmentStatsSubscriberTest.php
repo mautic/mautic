@@ -44,7 +44,8 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
 
         $this->subscriber->getStatsLeadEvents($event);
 
-        $this->assertContains($event->getResults()[0]['item_id'], $campaign->getLists()->map(fn ($list) => $list->getId())->toArray());
+        $itemId = $event->getResults()[0]['item_id'];
+        $this->assertContains((int) $itemId, $campaign->getLists()->map(fn ($list) => $list->getId())->toArray());
 
         $this->assertSame(1, (int) $event->getResults()[0]['is_used']);
         $this->assertSame(1, (int) $event->getResults()[0]['is_published']);
@@ -59,7 +60,7 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         $this->subscriber->getStatsLeadEvents($event);
 
         foreach ($event->getResults() as $segment) {
-            $this->assertContains($segment['item_id'], array_merge(
+            $this->assertContains((int) $segment['item_id'], array_merge(
                 $campaign->getEvents()[0]->getProperties()['addToLists'],
                 $campaign->getEvents()[0]->getProperties()['removeFromLists']
             ));
@@ -77,7 +78,7 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         $this->subscriber->getStatsLeadEvents($event);
 
         foreach ($event->getResults() as $segment) {
-            $this->assertContains($segment['item_id'], [
+            $this->assertContains((int) $segment['item_id'], [
                 $email->getExcludedLists()->toArray()[0]->getId(),
                 $email->getLists()->toArray()[0]->getId(),
             ]);

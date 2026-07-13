@@ -36,7 +36,11 @@ final class MauticReportBuilderTest extends TestCase
         $this->connection          = $this->getMockedConnection();
         $this->channelListHelper   = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
 
-        $this->connection->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
+            new QueryBuilder($this->connection),
+            new QueryBuilder($this->connection),
+            new QueryBuilder($this->connection),
+        );
         $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
         $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
     }

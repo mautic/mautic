@@ -142,6 +142,9 @@ return RectorConfig::configure()
         Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveNeverUsedMockPropertyRector::class => [
             __DIR__.'/app/bundles/LeadBundle/Tests/Entity/LeadListRepositoryTest.php',
         ],
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\NarrowIdenticalWithConsecutiveRector::class => [
+            __DIR__.'/app/bundles/ReportBundle/Tests/Builder/MauticReportBuilderTest.php',
+        ],
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,

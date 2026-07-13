@@ -166,9 +166,10 @@ final class SegmentOperatorQuerySubscriberTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('addLogic')
-            ->with(
-                CompositeExpression::TYPE_AND
-            );
+            ->willReturnCallback(function (CompositeExpression $expression, $glue) use ($expectedExpression): void {
+                $this->assertSame($expectedExpression, (string) $expression);
+                $this->assertSame(CompositeExpression::TYPE_AND, $glue);
+            });
 
         $this->expressionBuilder->expects($this->once())
             ->method('isNotNull')

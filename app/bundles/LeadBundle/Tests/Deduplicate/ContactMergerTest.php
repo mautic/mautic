@@ -767,18 +767,16 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
-            ->with(
-                $this->callback(function (array $companyLeads) use ($winner, $company): bool {
-                    $this->assertCount(1, $companyLeads);
-                    $this->assertSame($winner, $companyLeads[0]->getLead());
-                    $this->assertSame($company, $companyLeads[0]->getCompany());
-                    // The winner had no primary company so it inherits the loser's
-                    $this->assertTrue($companyLeads[0]->getPrimary());
+            ->willReturnCallback(function (array $companyLeads, bool $new) use ($winner, $company): void {
+                $this->assertCount(1, $companyLeads);
+                $this->assertSame($winner, $companyLeads[0]->getLead());
+                $this->assertSame($company, $companyLeads[0]->getCompany());
+                // The winner had no primary company so it inherits the loser's
 
-                    return true;
-                }),
-                false
-            );
+                $this->assertTrue($companyLeads[0]->getPrimary());
+
+                $this->assertFalse($new);
+            });
 
         $this->getMerger()->mergeCompanies($winner, $loser);
     }
@@ -810,13 +808,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
-            ->with($this->callback(function (array $companyLeads): bool {
+            ->willReturnCallback(function (array $companyLeads, bool $isNew): void {
                 $this->assertCount(1, $companyLeads);
                 // The winner already has a primary company so the loser's company is added as non-primary
                 $this->assertFalse((bool) $companyLeads[0]->getPrimary());
 
-                return true;
-            }), false);
+                $this->assertFalse($isNew);
+            });
 
         $this->getMerger()->mergeCompanies($winner, $loser);
     }
