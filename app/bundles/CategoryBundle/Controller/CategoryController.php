@@ -272,7 +272,8 @@ class CategoryController extends AbstractFormController
                     'closeModal'    => 1,
                 ],
             ]);
-        } elseif (!empty($valid)) {
+        }
+        if (!empty($valid)) {
             // return edit view to prevent duplicates
             return $this->editAction($request, $bundle, $entity->getId(), true);
         }

@@ -47,8 +47,6 @@ abstract class CampaignTestAbstract extends TestCase
             ->method('isGranted')
             ->willReturn(true);
 
-        $userHelper = $this->createMock(UserHelper::class);
-
         $formRepository = $this->createMock(FormRepository::class);
 
         $formRepository->expects($this->any())
@@ -85,7 +83,7 @@ abstract class CampaignTestAbstract extends TestCase
             $this->createStub(EventDispatcherInterface::class),
             $this->createStub(UrlGeneratorInterface::class),
             $this->createStub(Translator::class),
-            $userHelper,
+            $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(CoreParametersHelper::class),
         );

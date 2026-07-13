@@ -33,9 +33,8 @@ final class MauticWriteSubscriberTest extends TestCase
         $this->mauticWriteSubscriber = new MauticWriteSubscriber($this->userHelperMock);
         $this->requestMock           = $this->createMock(Request::class);
         $this->formEntityMock        = $this->createMock(FormEntity::class);
-        $kernelMock                  = $this->createMock(HttpKernelInterface::class);
         $this->event                 = new ViewEvent(
-            $kernelMock,
+            $this->createStub(HttpKernelInterface::class),
             $this->requestMock,
             HttpKernelInterface::MAIN_REQUEST,
             $this->formEntityMock,

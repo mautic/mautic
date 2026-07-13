@@ -29,7 +29,7 @@ class LoadReportData extends AbstractFixture implements OrderedFixtureInterface,
                     if (in_array($col, ['columns', 'filters', 'graphs', 'tableOrder'])) {
                         $val = Serializer::decode(stripslashes($val));
                     }
-                    $report->$setter($val);
+                    $report->{$setter}($val);
                 }
             }
 

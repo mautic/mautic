@@ -98,7 +98,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection([$decision]));
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(1);
 
@@ -159,7 +159,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(1);
 

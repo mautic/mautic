@@ -58,8 +58,8 @@ final class TagControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
-        $this->assertStringContainsString('tag2', $clientResponseContent, 'The return must contain tag2');
+        $this->assertStringContainsString('tag1', (string) $clientResponseContent, 'The return must contain tag1');
+        $this->assertStringContainsString('tag2', (string) $clientResponseContent, 'The return must contain tag2');
     }
 
     /**
@@ -72,8 +72,8 @@ final class TagControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
-        $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain tag2');
+        $this->assertStringContainsString('tag1', (string) $clientResponseContent, 'The return must contain tag1');
+        $this->assertStringNotContainsString('tag2', (string) $clientResponseContent, 'The return must not contain tag2');
     }
 
     public function testIndexActionWhenFilteredByDescription(): void
@@ -93,8 +93,8 @@ final class TagControllerTest extends MauticMysqlTestCase
         $clientResponseContent = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain the tag whose description matches.');
-        $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain unrelated tags.');
+        $this->assertStringContainsString('tag1', (string) $clientResponseContent, 'The return must contain the tag whose description matches.');
+        $this->assertStringNotContainsString('tag2', (string) $clientResponseContent, 'The return must not contain unrelated tags.');
     }
 
     public function testTagDeletion(): void
@@ -138,7 +138,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($tag->getTag(), $clientResponseContent, 'The return must contain tag');
+        $this->assertStringContainsString($tag->getTag(), (string) $clientResponseContent, 'The return must contain tag');
     }
 
     public function testViewActionNotFound(): void
@@ -173,7 +173,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit tag: '.$tag->getTag(), $clientResponseContent, 'The return must contain \'Edit tag\' text');
+        $this->assertStringContainsString('Edit tag: '.$tag->getTag(), (string) $clientResponseContent, 'The return must contain \'Edit tag\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['tag_entity[tag]']->setValue($TagName);
@@ -216,7 +216,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('A value is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testNewActionDuplicateTag(): void
@@ -251,7 +251,7 @@ final class TagControllerTest extends MauticMysqlTestCase
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('A value is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditTagWithNoPermission(): void

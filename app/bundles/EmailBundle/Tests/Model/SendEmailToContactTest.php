@@ -173,7 +173,6 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         $emailMock = $this->createMock(Email::class);
         $emailMock
-            ->expects($this->any())
             ->method('getId')
             ->willReturn(1);
 
@@ -739,7 +738,6 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         // Set invalid BCC (should use comma as separator)
         $emailMock
-            ->expects($this->any())
             ->method('getBccAddress')
             ->willReturn('test@mautic.com; test@mautic.com');
 

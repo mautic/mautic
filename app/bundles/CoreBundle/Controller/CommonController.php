@@ -127,7 +127,7 @@ class CommonController extends AbstractController implements MauticController
         }
 
         // It's not uncommon that the vars are array of mixed. Not just strings. I beliveve this is Symfony's issue.
-        return $this->renderView($contentTemplate, $parameters); // @phpstan-ignore parameterByRef.type
+        return $this->renderView($contentTemplate, $parameters);
     }
 
     /**
