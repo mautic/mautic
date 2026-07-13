@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -213,6 +214,6 @@ abstract class AbstractMauticMigration extends AbstractMigration
     {
         $table = $schema->getTable($this->getPrefixedTableName($tableName));
 
-        return $table->getColumn($columnName)->getType()->getName();
+        return Type::getTypeRegistry()->lookupName($table->getColumn($columnName)->getType());
     }
 }
