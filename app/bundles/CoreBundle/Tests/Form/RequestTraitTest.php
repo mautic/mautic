@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\RequestTrait;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
 
-class RequestTraitTest extends \PHPUnit\Framework\TestCase
+final class RequestTraitTest extends \PHPUnit\Framework\TestCase
 {
     use RequestTrait;
 
@@ -19,12 +21,11 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $dispatcher        = $this->createMock(EventDispatcherInterface::class);
-        $formConfigBuilder = new FormConfigBuilder('foo', null, $dispatcher);
+        $formConfigBuilder = new FormConfigBuilder('foo', null, $this->createStub(EventDispatcherInterface::class));
         $formConfigBuilder->setFormFactory((new FormFactoryBuilder())->getFormFactory());
         $formConfigBuilder->setCompound(true);
         $formConfigBuilder->setDataMapper(
-            $this->createMock(DataMapperInterface::class)
+            $this->createStub(DataMapperInterface::class)
         );
         $fooConfig = $formConfigBuilder->getFormConfig();
 
@@ -71,11 +72,8 @@ class RequestTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValues, $params);
     }
 
-    /**
-     * @param string|int|bool|null $value
-     */
     #[\PHPUnit\Framework\Attributes\DataProvider('boolProvider')]
-    public function testCleanFieldsBoolean(?bool $expected, $value): void
+    public function testCleanFieldsBoolean(?bool $expected, string|int|bool|null $value): void
     {
         $fieldData = ['boolVal' => $value];
         $leadField = [

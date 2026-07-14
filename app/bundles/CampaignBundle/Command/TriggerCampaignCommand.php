@@ -70,29 +70,26 @@ class TriggerCampaignCommand extends ModeratedCommand
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
                 '--campaign-id',
                 '-i',
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.',
-                null
+                'Trigger events for a specific campaign.  Otherwise, all campaigns will be triggered.'
             )
             ->addOption(
                 '--campaign-limit',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Limit number of contacts on a per campaign basis',
-                null
+                'Limit number of contacts on a per campaign basis'
             )
             ->addOption(
                 '--contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events for a specific contact.',
-                null
+                'Trigger events for a specific contact.'
             )
             ->addOption(
                 '--contact-ids',
@@ -104,15 +101,13 @@ class TriggerCampaignCommand extends ModeratedCommand
                 '--min-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events starting at a specific contact ID.',
-                null
+                'Trigger events starting at a specific contact ID.'
             )
             ->addOption(
                 '--max-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Trigger events starting up to a specific contact ID.',
-                null
+                'Trigger events starting up to a specific contact ID.'
             )
             ->addOption(
                 '--thread-id',
@@ -233,8 +228,8 @@ class TriggerCampaignCommand extends ModeratedCommand
             // Specific campaign;
             if ($id) {
                 $statusCode = ExitCode::SUCCESS;
-                /** @var Campaign $campaign */
-                if ($campaign = $this->campaignRepository->getEntity($id)) {
+                $campaign = $this->campaignRepository->getEntity($id);
+                if ($campaign instanceof Campaign) {
                     $this->triggerCampaign($campaign);
                 } else {
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');

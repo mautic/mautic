@@ -44,6 +44,16 @@ final class PageEvents
     public const PAGE_ON_DISPLAY = 'mautic.page_on_display';
 
     /**
+     * The mautic.page_on_toggle_publish event is dispatched right before a page is toggle publish.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\PageEvent instance.
+     *
+     * @var string
+     */
+    public const PAGE_ON_TOGGLE_PUBLISH = 'mautic.page_on_toggle_publish';
+
+    /**
      * The mautic.page_pre_save event is thrown right before a page is persisted.
      *
      * The event listener receives a Mautic\PageBundle\Event\PageEvent instance.
@@ -144,14 +154,4 @@ final class PageEvents
      * Mautic\PageBundle\Event\TrackingEvent
      */
     public const ON_CONTACT_TRACKED = 'mautic.page.on_contact_tracked';
-
-    /**
-     * The mautic.page.on_url_token_replace event is dispatched when replacing tokens in a URL.
-     *
-     * The event listener receives a
-     * Mautic\PageBundle\Event\UrlTokenReplaceEvent
-     *
-     * @var string
-     */
-    public const ON_URL_TOKEN_REPLACE = 'mautic.page.on_url_token_replace';
 }

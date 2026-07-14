@@ -14,30 +14,30 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserSummaryNotificationHelperTest extends TestCase
+final class UserSummaryNotificationHelperTest extends TestCase
 {
     /**
-     * @var Writer|MockObject
+     * @var MockObject&Writer
      */
     private MockObject $writer;
 
     /**
-     * @var UserHelper|MockObject
+     * @var MockObject&UserHelper
      */
     private MockObject $userHelper;
 
     /**
-     * @var OwnerProvider|MockObject
+     * @var MockObject&OwnerProvider
      */
     private MockObject $ownerProvider;
 
     /**
-     * @var RouteHelper|MockObject
+     * @var MockObject&RouteHelper
      */
     private MockObject $routeHelper;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
@@ -66,7 +66,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->ownerProvider->expects($matcher)
-            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
@@ -79,6 +79,8 @@ class UserSummaryNotificationHelperTest extends TestCase
 
                     return [['owner_id' => 2, 'id' => 2]];
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->never())
@@ -86,7 +88,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
@@ -119,7 +121,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->ownerProvider->expects($matcher)
-            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getOwnersForObjectIds')->willReturnCallback(function (...$parameters) use ($matcher): array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(Contact::NAME, $parameters[0]);
                     $this->assertSame([1 => 1], $parameters[1]);
@@ -132,6 +134,8 @@ class UserSummaryNotificationHelperTest extends TestCase
 
                     return [];
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->userHelper->expects($this->exactly(2))
@@ -140,7 +144,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $matcher = $this->exactly(4);
 
         $this->translator->expects($matcher)
-            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('trans')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic.integration.sync.user_notification.header', $parameters[0]);
                 }
@@ -188,7 +192,7 @@ class UserSummaryNotificationHelperTest extends TestCase
         $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->willReturnCallback(
-                function ($string, $params) {
+                function (string $string, array $params): string {
                     $expectedStrings = [
                         'mautic.integration.sync.user_notification.header',
                         'mautic.integration.sync.user_notification.count_message',

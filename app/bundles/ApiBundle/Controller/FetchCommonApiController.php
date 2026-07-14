@@ -271,7 +271,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Adds the repository alias to the column name if it doesn't exist.
      *
-     * @return string $column name with alias prefix
+     * @return string column name with alias prefix
      */
     protected function addAliasIfNotPresent(string $columns, string $alias): string
     {
@@ -465,10 +465,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $idHelper->setIsAssociative(true);
 
         [$entities, $total] = $prepareForSerialization
-                ?
-                $this->prepareEntitiesForView($entities)
-                :
-                $this->prepareEntityResultsToArray($entities);
+            ?
+            $this->prepareEntitiesForView($entities)
+            :
+            $this->prepareEntityResultsToArray($entities);
 
         // Set errors
         if ($idHelper->hasErrors()) {
@@ -498,7 +498,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Get the default properties of an entity and parents.
      *
-     * @phpstan-param E $entity
+     * @param E $entity
      *
      * @return array<mixed>
      */
@@ -540,8 +540,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Get a model instance from the service container.
-     *
-     * @return AbstractCommonModel<E>
      */
     protected function getModel(string $modelNameKey): AbstractCommonModel
     {
@@ -561,7 +559,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
      *
-     * @phpstan-param E $entity
+     * @param E $entity
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
@@ -578,7 +576,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         return $this->prepareEntityResultsToArray(
             $results,
-            function ($entity): void {
+            function (object $entity): void {
                 $this->preSerializeEntity($entity);
             }
         );
@@ -658,10 +656,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param array<int, array<string|int>> $errors
-     * @param array<int, object|null>       $entities
-     *
-     * @phpstan-param E|null $entity
-     * @phpstan-param array<int, E|null> $entities
+     * @param E|null                        $entity
+     * @param array<int, E|null>            $entities
      */
     protected function setBatchError(int $key, string $msg, int $code, array &$errors, array &$entities = [], ?object $entity = null): void
     {

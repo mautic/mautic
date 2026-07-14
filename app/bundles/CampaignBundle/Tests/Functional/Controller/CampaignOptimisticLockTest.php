@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 
-class CampaignOptimisticLockTest extends MauticMysqlTestCase
+final class CampaignOptimisticLockTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;
 
@@ -70,6 +70,8 @@ class CampaignOptimisticLockTest extends MauticMysqlTestCase
 
         $campaign = new Campaign();
         $campaign->setName('Test campaign');
+        $campaign->setIsPublished(true);
+        $campaign->setPublishUp(new \DateTime());
         $campaign->addList($leadList);
         $this->em->persist($campaign);
 

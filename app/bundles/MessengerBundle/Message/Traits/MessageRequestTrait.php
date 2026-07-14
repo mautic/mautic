@@ -60,7 +60,7 @@ trait MessageRequestTrait
         );
 
         foreach ($data as $key => $item) {
-            $this->$key = $item;
+            $this->{$key} = $item;
         }
     }
 }

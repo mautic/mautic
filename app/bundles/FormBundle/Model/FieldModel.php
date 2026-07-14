@@ -38,8 +38,8 @@ class FieldModel extends CommonFormModel
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private RequestStack $requestStack,
-        private ColumnSchemaHelper $columnSchemaHelper,
+        private readonly RequestStack $requestStack,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -65,10 +65,7 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
-    /**
-     * @return \Mautic\FormBundle\Entity\FieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\FormBundle\Entity\FieldRepository
     {
         return $this->em->getRepository(Field::class);
     }
@@ -155,7 +152,7 @@ class FieldModel extends CommonFormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormFieldEvent($entity, $isNew);
             }
 

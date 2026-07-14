@@ -86,7 +86,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
      *
      * @return mixed|string
      */
@@ -114,11 +113,7 @@ class IcontactIntegration extends EmailAbstractIntegration
             }
         }
 
-        if (empty($this->keys['accountId']) || empty($this->keys['clientFolderId'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($this->keys['accountId']) && !empty($this->keys['clientFolderId']);
     }
 
     /**
@@ -154,7 +149,7 @@ class IcontactIntegration extends EmailAbstractIntegration
                 $leadFields[$f] = [
                     'label'    => $this->translator->trans('mautic.icontact.field.'.$f),
                     'type'     => 'string',
-                    'required' => ('email' == $f) ? true : false,
+                    'required' => 'email' === $f,
                 ];
             }
 
@@ -186,9 +181,11 @@ class IcontactIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['email'])) {
+        }
+        if (empty($mappedData['email'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 

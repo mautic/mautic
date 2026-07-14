@@ -43,11 +43,11 @@ abstract class AbstractProjectSearchTestCase extends MauticMysqlTestCase
             $content = $isApiRequest ? $this->client->getResponse()->getContent() : $crawler->filter('body')->text();
 
             foreach ($expectedEntities as $expectedEntity) {
-                Assert::assertStringContainsString($expectedEntity, $content);
+                Assert::assertStringContainsString($expectedEntity, (string) $content);
             }
 
             foreach ($unexpectedEntities as $unexpectedEntity) {
-                Assert::assertStringNotContainsString($unexpectedEntity, $content);
+                Assert::assertStringNotContainsString($unexpectedEntity, (string) $content);
             }
 
             if ($isApiRequest) {

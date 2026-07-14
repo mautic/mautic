@@ -70,7 +70,7 @@ class MessageQueue
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $datePublished;
 
     /**
@@ -217,7 +217,7 @@ class MessageQueue
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannel()
     {
@@ -233,7 +233,7 @@ class MessageQueue
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getChannelId()
     {
@@ -242,10 +242,8 @@ class MessageQueue
 
     /**
      * @param mixed $channelId
-     *
-     * @return MessageQueue
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): static
     {
         $this->channelId = $channelId;
 
@@ -260,10 +258,7 @@ class MessageQueue
         return $this->event;
     }
 
-    /**
-     * @return MessageQueue
-     */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event): static
     {
         $this->event = $event;
 
@@ -271,7 +266,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDatePublished()
     {
@@ -287,7 +282,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -303,7 +298,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getLastAttempt()
     {
@@ -319,7 +314,7 @@ class MessageQueue
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -364,7 +359,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getScheduledDate()
     {
@@ -429,10 +424,8 @@ class MessageQueue
 
     /**
      * @param bool $failed
-     *
-     * @return MessageQueue
      */
-    public function setFailed($failed = true)
+    public function setFailed($failed = true): static
     {
         $this->failed = $failed;
 
@@ -449,10 +442,8 @@ class MessageQueue
 
     /**
      * @param bool $processed
-     *
-     * @return MessageQueue
      */
-    public function setProcessed($processed = true)
+    public function setProcessed($processed = true): static
     {
         $this->processed = $processed;
 
@@ -460,7 +451,7 @@ class MessageQueue
     }
 
     /**
-     * @return array|mixed
+     * @return array<array-key, mixed>
      */
     public function getMetadata()
     {

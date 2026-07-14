@@ -45,7 +45,7 @@ class FormBuilderEvent extends Event
     public function addSubmitAction(string $key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new \InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new \InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -60,12 +60,7 @@ class FormBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * Get submit actions.
-     *
-     * @return array
-     */
-    public function getSubmitActions()
+    public function getSubmitActions(): array
     {
         uasort(
             $this->actions,
@@ -122,7 +117,7 @@ class FormBuilderEvent extends Event
     public function addFormField($key, array $field): void
     {
         if (array_key_exists($key, $this->fields)) {
-            throw new \InvalidArgumentException("The key, '$key' is already used by another field. Please use a different key.");
+            throw new \InvalidArgumentException("The key, '{$key}' is already used by another field. Please use a different key.");
         }
 
         $callbacks = [];
@@ -143,11 +138,9 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * Get form fields.
-     *
-     * @return mixed
+     * @return array<string, mixed>
      */
-    public function getFormFields()
+    public function getFormFields(): array
     {
         return $this->fields;
     }
@@ -164,7 +157,7 @@ class FormBuilderEvent extends Event
     public function addValidator($key, array $validator): void
     {
         if (array_key_exists($key, $this->fields)) {
-            throw new \InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
+            throw new \InvalidArgumentException("The key, '{$key}' is already used by another validator. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable

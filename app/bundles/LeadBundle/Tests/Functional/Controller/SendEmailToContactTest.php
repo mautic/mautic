@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class SendEmailToContactTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private SMimeHelper $sMimeHelper;
 
     protected function setUp(): void
@@ -55,7 +56,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -72,7 +73,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -84,8 +85,9 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
     public function testSMimeWithEncryptedPrivateKey(): void
     {
+        /** @var EncryptionHelper $encryptionHelper */
         $encryptionHelper = self::getContainer()->get('mautic.helper.encryption');
-        \assert($encryptionHelper instanceof EncryptionHelper);
+        $this->assertInstanceOf(EncryptionHelper::class, $encryptionHelper);
 
         $certPath       = $this->sMimeHelper->getSMimeCertificatePath();
         $privateKeyPath = $certPath.'/admin@test-beta.mautibot.com.pem';
@@ -104,7 +106,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -121,7 +123,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -141,7 +143,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -158,7 +160,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $email = self::getMailerMessages()[0]->toString();
         Assert::assertStringContainsString('Hey John...', $email);
@@ -188,7 +190,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$contact->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -206,13 +208,13 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
             'lead_quickemail[templates]' => $emailEntity->getId(),
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $messages = self::getMailerMessages();
         Assert::assertCount(1, $messages, 'Expected exactly one email message to be sent');
         $rawMessage = $messages[0];
         Assert::assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
-        \assert($rawMessage instanceof \Symfony\Component\Mime\Message);
+        $this->assertInstanceOf(\Symfony\Component\Mime\Message::class, $rawMessage);
 
         // For signed messages, use toString() instead of getBody()
         $email   = $rawMessage->toString();
@@ -238,7 +240,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
 
         $content     = json_decode($this->client->getResponse()->getContent())->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -254,8 +256,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($subjectErrorMessage, $responseContent, 'The missing subject line should show an error');
-        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error about the email body');
+        $this->assertStringContainsString($subjectErrorMessage, (string) $responseContent, 'The missing subject line should show an error');
+        $this->assertStringNotContainsString($bodyErrorMessage, (string) $responseContent, 'There should be no error about the email body');
 
         $form->setValues([
             'lead_quickemail[fromname]'  => 'Admin',
@@ -265,8 +267,8 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringContainsString($bodyErrorMessage, $responseContent, 'The missing body should show an error');
-        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error about the subject line');
+        $this->assertStringContainsString($bodyErrorMessage, (string) $responseContent, 'The missing body should show an error');
+        $this->assertStringNotContainsString($subjectErrorMessage, (string) $responseContent, 'There should be no error about the subject line');
 
         $form->setValues([
             'lead_quickemail[fromname]'  => 'Admin',
@@ -276,7 +278,7 @@ final class SendEmailToContactTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertStringNotContainsString($subjectErrorMessage, $responseContent, 'There should be no error after adding the subject line');
-        $this->assertStringNotContainsString($bodyErrorMessage, $responseContent, 'There should be no error after adding the body');
+        $this->assertStringNotContainsString($subjectErrorMessage, (string) $responseContent, 'There should be no error after adding the subject line');
+        $this->assertStringNotContainsString($bodyErrorMessage, (string) $responseContent, 'There should be no error after adding the body');
     }
 }

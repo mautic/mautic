@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CampaignEventStatsTest extends MauticMysqlTestCase
+final class CampaignEventStatsTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 

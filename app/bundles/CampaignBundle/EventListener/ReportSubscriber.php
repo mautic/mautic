@@ -17,8 +17,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
 
     public function __construct(
-        private CompanyReportData $companyReportData,
-        private DncReportService $dncReportService,
+        private readonly CompanyReportData $companyReportData,
+        private readonly DncReportService $dncReportService,
     ) {
     }
 
@@ -222,7 +222,6 @@ class ReportSubscriber implements EventSubscriberInterface
                     $chart->setDataset($options['translator']->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
-
                     $event->setGraph($g, $data);
                     break;
                 */

@@ -16,19 +16,15 @@ use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PluginController extends FormController
 {
-    /**
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, IntegrationHelper $integrationHelper)
+    public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /** @var PluginModel $pluginModel */
@@ -92,7 +88,7 @@ class PluginController extends FormController
         // sort by name
         uksort(
             $integrations,
-            fn ($a, $b): int => strnatcasecmp($a, $b)
+            strnatcasecmp(...)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -127,13 +123,11 @@ class PluginController extends FormController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         if (!empty($request->get('activeTab'))) {
             $activeTab = $request->get('activeTab');
@@ -142,7 +136,7 @@ class PluginController extends FormController
         $session   = $request->getSession();
 
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
-        $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
+        $authorize              = !empty($integrationDetailsPost['in_auth']);
 
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
@@ -180,7 +174,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
@@ -364,13 +358,10 @@ class PluginController extends FormController
         );
     }
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function infoAction(IntegrationHelper $integrationHelper, $name)
+    public function infoAction(IntegrationHelper $integrationHelper, $name): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         /** @var PluginModel $pluginModel */
@@ -383,7 +374,7 @@ class PluginController extends FormController
         );
 
         if (!$bundle) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $bundle->splitDescriptions();
@@ -407,13 +398,11 @@ class PluginController extends FormController
 
     /**
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
-     *
-     * @return Response
      */
-    public function reloadAction(Request $request, ReloadFacade $reloadFacade)
+    public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->addFlashMessage(

@@ -164,12 +164,14 @@ class MailHelper
      * @var string
      */
     protected $subject              = '';
+
     private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
     protected $plainText              = '';
+
     private ?string $plainTextInitial = null;
 
     /**
@@ -230,25 +232,28 @@ class MailHelper
 
     private array $embedImagesReplaces = [];
 
+    /**
+     * @param MailerInterface $mailer @api cannot be readonly as changed in tests via reflection
+     */
     public function __construct(
         private MailerInterface $mailer,
-        private FromEmailHelper $fromEmailHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private Mailbox $mailbox,
-        private LoggerInterface $logger,
-        private MailHashHelper $mailHashHelper,
-        private RouterInterface $router,
-        private Environment $twig,
-        private ThemeHelper $themeHelper,
-        private PathsHelper $pathsHelper,
-        private EventDispatcherInterface $dispatcher,
-        private RequestStack $requestStack,
-        private EntityManagerInterface $entityManager,
-        private AssetModel $assetModel,
-        private TrackableModel $trackableModel,
-        private RedirectModel $redirectModel,
-        private SMimeHelper $sMimeHelper,
-        private EmailStatModel $emailStatModel,
+        private readonly FromEmailHelper $fromEmailHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Mailbox $mailbox,
+        private readonly LoggerInterface $logger,
+        private readonly MailHashHelper $mailHashHelper,
+        private readonly RouterInterface $router,
+        private readonly Environment $twig,
+        private readonly ThemeHelper $themeHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly RequestStack $requestStack,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly AssetModel $assetModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly RedirectModel $redirectModel,
+        private readonly SMimeHelper $sMimeHelper,
+        private readonly EmailStatModel $emailStatModel,
     ) {
         $this->transport  = $this->getTransport();
         $this->returnPath = $coreParametersHelper->get('mailer_return_path');
@@ -259,7 +264,7 @@ class MailHelper
             $coreParametersHelper->get('mailer_from_name')
         );
         $this->addressLengthLimit = (int) $coreParametersHelper->get('mailer_address_length_limit');
-        $this->setDefaultFrom(false, new AddressDTO($systemFromEmail, $systemFromName));
+        $this->setDefaultFrom(new AddressDTO($systemFromEmail, $systemFromName));
         $this->setDefaultReplyTo($systemReplyToEmail, $this->from);
 
         $this->message = $this->getMessageInstance();
@@ -278,10 +283,8 @@ class MailHelper
 
     /**
      * @param bool $cleanSlate
-     *
-     * @return $this
      */
-    public function getMailer($cleanSlate = true)
+    public function getMailer($cleanSlate = true): static
     {
         $this->reset($cleanSlate);
 
@@ -479,7 +482,7 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Assume success
-            return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
+            return self::QUEUE_RETURN_ERRORS === strtoupper($returnMode) ? [true, []] : true;
         }
         $success = $this->send($dispatchSendEvent);
 
@@ -717,12 +720,11 @@ class MailHelper
      * Use a template as the body.
      *
      * @param string $template
-     * @param array  $vars
      * @param bool   $returnContent
      *
      * @return void|string
      */
-    public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
     {
         $content = $this->twig->render($template, $vars);
 
@@ -857,10 +859,8 @@ class MailHelper
 
     /**
      * Return the content identifier.
-     *
-     * @return string
      */
-    public function getContentHash()
+    public function getContentHash(): ?string
     {
         return $this->contentHash;
     }
@@ -876,7 +876,7 @@ class MailHelper
             $addresses = [$addresses => $name];
         } elseif (0 === array_keys($addresses)[0]) {
             // We need an array of $email => $name pairs
-            $addresses = array_reduce($addresses, function ($address, $item) use ($name) {
+            $addresses = array_reduce($addresses, function (array $address, $item) use ($name): array {
                 $address[$item] = $name;
 
                 return $address;
@@ -1061,10 +1061,9 @@ class MailHelper
     /**
      * Set reply to address(es) for this mailer instance.
      *
-     * @param array<string>|string $addresses
-     * @param string               $name
+     * @param string $name
      */
-    public function setReplyTo($addresses, $name = null): void
+    public function setReplyTo(?string $addresses, $name = null): void
     {
         $this->replyTo = $addresses;
     }
@@ -1105,9 +1104,8 @@ class MailHelper
      * Sets FROM for the mailer which can overwrite the system default.
      *
      * @param string|array $fromEmail
-     * @param string       $fromName
      */
-    public function setFrom($fromEmail, $fromName = null): void
+    public function setFrom($fromEmail, ?string $fromName = null): void
     {
         if (is_array($fromEmail)) {
             $this->from = AddressDTO::fromAddressArray($fromEmail);
@@ -1130,10 +1128,7 @@ class MailHelper
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getIdHash()
+    public function getIdHash(): ?string
     {
         return $this->idHash;
     }
@@ -1232,7 +1227,7 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                $addresses = array_fill_keys(array_map(trim(...), explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $this->addBcc($bccAddress, $name);
                 }
@@ -1275,7 +1270,7 @@ class MailHelper
         // Set custom headers
         if ($headers = $email->getHeaders()) {
             // HTML decode headers
-            $headers = array_map('html_entity_decode', $headers);
+            $headers = array_map(html_entity_decode(...), $headers);
 
             foreach ($headers as $name => $value) {
                 $this->addCustomHeader($name, $value);
@@ -1286,8 +1281,6 @@ class MailHelper
     }
 
     /**
-     * Set custom headers.
-     *
      * @param bool $merge
      */
     public function setCustomHeaders(array $headers, $merge = true): void
@@ -1353,10 +1346,7 @@ class MailHelper
         return true;
     }
 
-    /**
-     * @return bool|string
-     */
-    private function getUnsubscribeHeader()
+    private function getUnsubscribeHeader(): string|false
     {
         if ($this->idHash) {
             $lead    = $this->getLead();
@@ -1380,7 +1370,7 @@ class MailHelper
                 );
             }
 
-            return "<$url>";
+            return "<{$url}>";
         }
 
         if (!empty($this->queuedRecipients) || !empty($this->lead)) {
@@ -1514,7 +1504,7 @@ class MailHelper
         }
 
         if ($context) {
-            $error .= " ($context)";
+            $error .= " ({$context})";
 
             if ('send' === $context) {
                 $error .= '; '.implode(', ', $this->errors['failures']);
@@ -1641,10 +1631,8 @@ class MailHelper
 
     /**
      * Returns if the mailer supports and is in tokenization mode.
-     *
-     * @return bool
      */
-    public function inTokenizationMode()
+    public function inTokenizationMode(): bool
     {
         return $this->tokenizationEnabled;
     }
@@ -1779,14 +1767,16 @@ class MailHelper
 
     /**
      * Generate bounce email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateBounceEmail($idHash = null)
+    public function generateBounceEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'bounces')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+bounce';
@@ -1801,14 +1791,16 @@ class MailHelper
 
     /**
      * Generate an unsubscribe email for the lead.
-     *
-     * @return bool|string
      */
-    public function generateUnsubscribeEmail($idHash = null)
+    public function generateUnsubscribeEmail($idHash = null): string|false
     {
         $monitoredEmail = false;
 
-        if ($settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+        if (!$settings = $this->isMontoringEnabled('EmailBundle', 'unsubscribes')) {
+            return false;
+        }
+
+        if (isset($settings['address']) && '' !== $settings['address']) {
             // Append the bounce notation
             [$email, $domain] = explode('@', $settings['address']);
             $email .= '+unsubscribe';
@@ -1823,13 +1815,11 @@ class MailHelper
 
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
-     *
-     * @return string|null
      */
-    protected function cleanName($name)
+    protected function cleanName(?string $name): ?string
     {
         if (null === $name) {
-            return $name;
+            return null;
         }
 
         $name = trim(html_entity_decode($name, ENT_QUOTES));
@@ -1859,7 +1849,7 @@ class MailHelper
         }
 
         // HTML decode headers
-        $systemHeaders = array_map('html_entity_decode', $systemHeaders);
+        $systemHeaders = array_map(html_entity_decode(...), $systemHeaders);
 
         return $systemHeaders;
     }
@@ -1943,17 +1933,9 @@ class MailHelper
         }
     }
 
-    private function setDefaultFrom($overrideFrom, AddressDTO $systemFrom): void
+    private function setDefaultFrom(AddressDTO $systemFrom): void
     {
-        if (is_array($overrideFrom)) {
-            $fromEmail    = key($overrideFrom);
-            $fromName     = $this->cleanName($overrideFrom[$fromEmail]);
-            $overrideFrom = [$fromEmail => $fromName];
-        } elseif (!empty($overrideFrom)) {
-            $overrideFrom = [$overrideFrom => null];
-        }
-
-        $this->systemFrom = $overrideFrom ?: $systemFrom;
+        $this->systemFrom = $systemFrom;
         $this->from       = $this->systemFrom;
     }
 

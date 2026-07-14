@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Functional;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use PHPUnit\Framework\Assert;
 
-class ParametersTest extends AbstractMauticTestCase
+final class ParametersTest extends AbstractMauticTestCase
 {
     public function testRememberMeParameterUsesIntProcessor(): void
     {

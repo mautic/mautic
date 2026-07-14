@@ -228,11 +228,6 @@ class MessageController extends AbstractStandardFormController
         return 'message';
     }
 
-    /***
-
-     *
-     * @return string
-     */
     protected function getSessionBase($objectId = null): string
     {
         return 'message'.(($objectId) ? '.'.$objectId : '');

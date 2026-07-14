@@ -26,7 +26,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertSame($expectedStatusCode, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($response->getContent(), true);
@@ -64,7 +64,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
      * @param array<string, mixed> $updateData
      */
     #[DataProvider('updateFormDataProvider')]
-    public function testUpdateFormWithFieldsAndActions(array $initialFormData, array $updateData, int $expectedStatusCode): void
+    public function testUpdateFormWithFieldsAndActions(array $initialFormData, array $updateData): void
     {
         $form = $this->createForm($initialFormData);
 
@@ -75,7 +75,6 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertSame($expectedStatusCode, $response->getStatusCode());
         $this->assertResponseIsSuccessful();
 
         $responseData = json_decode($response->getContent(), true);
@@ -122,7 +121,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         // The form creation should be rejected due to duplicate aliases
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $responseData = json_decode($response->getContent(), true);
 
         // Check for error response - could be either 'error' or 'errors' key depending on API format
@@ -133,9 +132,9 @@ final class FormApiControllerTest extends MauticMysqlTestCase
 
         // Check that the error mentions the duplicate alias
         if (isset($responseData['error']['message'])) {
-            $this->assertStringContainsString('duplicate_alias', $responseData['error']['message']);
+            $this->assertStringContainsString('duplicate_alias', (string) $responseData['error']['message']);
         } elseif (isset($responseData['errors'][0]['message'])) {
-            $this->assertStringContainsString('duplicate_alias', $responseData['errors'][0]['message']);
+            $this->assertStringContainsString('duplicate_alias', (string) $responseData['errors'][0]['message']);
         }
     }
 
@@ -157,8 +156,7 @@ final class FormApiControllerTest extends MauticMysqlTestCase
             $formData,
         );
 
-        $response = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
 
     public function testUpdateFormRemovesUnspecifiedFieldsOnPut(): void
@@ -245,7 +243,6 @@ final class FormApiControllerTest extends MauticMysqlTestCase
             'update name only' => [
                 ['name' => 'Original Form'],
                 ['name' => 'Updated Form Name'],
-                Response::HTTP_OK,
             ],
             'add fields to existing form' => [
                 ['name' => 'Form without fields'],
@@ -258,7 +255,6 @@ final class FormApiControllerTest extends MauticMysqlTestCase
                         ],
                     ],
                 ],
-                Response::HTTP_OK,
             ],
         ];
     }

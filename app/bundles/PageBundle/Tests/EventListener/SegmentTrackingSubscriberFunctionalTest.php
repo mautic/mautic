@@ -192,6 +192,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $firstSegmentId = array_key_first($segments);
         $segment        = $this->em->getRepository(LeadList::class)->find($firstSegmentId);
+        $this->assertInstanceOf(LeadList::class, $segment);
         $segment->setIsPublished(false);
         $this->em->persist($segment);
         $this->em->flush();
@@ -277,7 +278,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
         // Ensure entity manager is in sync before dispatching event
         $this->em->flush();
 
-        $event = new UrlTokenReplaceEvent($url, $contact, null);
+        $event = new UrlTokenReplaceEvent($url, $contact);
         $this->dispatcher->dispatch($event);
 
         return $event->getContent();

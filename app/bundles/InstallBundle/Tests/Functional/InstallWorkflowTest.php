@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
 #[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class InstallWorkflowTest extends MauticMysqlTestCase
+final class InstallWorkflowTest extends MauticMysqlTestCase
 {
     use IsolatedTestTrait;
 
@@ -102,7 +102,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $fieldRepository = $this->em->getRepository(LeadField::class);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
-        \assert($emailField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $emailField);
         Assert::assertSame('Email', $emailField->getLabel());
     }
 

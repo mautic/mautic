@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchContactController extends AbstractFormController
 {
     public function __construct(
-        private ContactActionModel $actionModel,
-        private CategoryModel $categoryModel,
+        private readonly ContactActionModel $actionModel,
+        private readonly CategoryModel $categoryModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

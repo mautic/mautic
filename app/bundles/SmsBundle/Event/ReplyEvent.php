@@ -13,20 +13,15 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
     private ?LeadEventLog $eventLog = null;
 
     /**
-     * ReplyEvent constructor.
-     *
      * @param string $message
      */
     public function __construct(
-        private Lead $contact,
+        private readonly Lead $contact,
         private $message,
     ) {
     }
 
-    /**
-     * @return Lead
-     */
-    public function getContact()
+    public function getContact(): Lead
     {
         return $this->contact;
     }
@@ -44,10 +39,7 @@ class ReplyEvent extends \Symfony\Contracts\EventDispatcher\Event
         $this->response = $response;
     }
 
-    /**
-     * @return Response|null
-     */
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->response;
     }

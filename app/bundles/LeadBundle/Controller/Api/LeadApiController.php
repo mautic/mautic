@@ -97,9 +97,9 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter  = $request->query->get('filter', null);
-        $limit   = $request->query->get('limit', null);
-        $start   = $request->query->get('start', null);
+        $filter  = $request->query->get('filter');
+        $limit   = $request->query->get('limit');
+        $start   = $request->query->get('start');
         $users   = $this->model->getLookupResults('user', $filter, $limit, $start);
         $view    = $this->view($users, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['userList']);
@@ -538,7 +538,7 @@ class LeadApiController extends CommonApiController
         }
 
         // calls add/remove method as appropriate
-        $result = $this->model->$method($entity, $data);
+        $result = $this->model->{$method}($entity, $data);
 
         if (false === $result) {
             return $this->badRequest();
@@ -618,9 +618,10 @@ class LeadApiController extends CommonApiController
     }
 
     /**
-     * @param Lead   $entity
-     * @param array  $parameters
-     * @param string $action
+     * @param Lead                 $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

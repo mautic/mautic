@@ -49,7 +49,7 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
                         </body></html>';
         $email = $this->createSegmentEmail(
             'test subject',
-            [$segment->getId() => $segment],
+            ['segment-a' => $segment],
             $content
         );
 
@@ -78,7 +78,7 @@ final class EmailSendDisabledTrackingFunctionalTest extends MauticMysqlTestCase
         ];
 
         foreach ($messages as $message) {
-            assert($message instanceof MauticMessage);
+            $this->assertInstanceOf(MauticMessage::class, $message);
             $body = quoted_printable_decode($message->getBody()->bodyToString());
             preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
             Assert::assertArrayHasKey(1, $match, $body);

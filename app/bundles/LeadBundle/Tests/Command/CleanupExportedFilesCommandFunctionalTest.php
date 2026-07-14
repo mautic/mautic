@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Command\CleanupExportedFilesCommand;
 use Mautic\LeadBundle\Command\ContactScheduledExportCommand;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -42,7 +43,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
             's/contacts/batchExport',
             ['filetype' => 'csv']
         );
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler     = $contactExportSchedulerRows[0];
@@ -71,6 +72,7 @@ final class CleanupExportedFilesCommandFunctionalTest extends MauticMysqlTestCas
             $contacts[] = $contact;
         }
 
+        /** @var LeadModel $leadModel */
         $leadModel = self::getContainer()->get('mautic.lead.model.lead');
         $leadModel->saveEntities($contacts);
     }

@@ -14,9 +14,6 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class FormFieldNumberType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('placeholder', TextType::class, [
@@ -42,9 +39,6 @@ class FormFieldNumberType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'formfield_number';

@@ -14,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
+final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testWithEventIds(): void
     {
@@ -66,9 +66,7 @@ class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
             $commandData['campaign_event_ids'] = [$event1->getId(), $event2->getId()];
         }
 
-        $exitCode = $applicationTester->run($commandData);
-
-        return $exitCode;
+        return $applicationTester->run($commandData);
     }
 
     private function createLead(): Lead

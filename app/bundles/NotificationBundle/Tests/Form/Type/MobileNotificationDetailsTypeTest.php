@@ -15,7 +15,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
-class MobileNotificationDetailsTypeTest extends TypeTestCase
+final class MobileNotificationDetailsTypeTest extends TypeTestCase
 {
     /**
      * @var MockObject&Integration
