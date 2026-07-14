@@ -2743,12 +2743,6 @@ parameters:
 			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
 
 		-
-			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:parseString\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CoreBundle/Helper/SearchStringHelper.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Helper\\SearchStringHelper\:\:parseString\(\) has parameter \$input with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -9268,19 +9262,7 @@ parameters:
 			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:getAuthorizationHeader\(\) has parameter \$method with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:getAuthorizationHeader\(\) has parameter \$parameters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
-
-		-
-			message: '#^Method Mautic\\PluginBundle\\Helper\\oAuthHelper\:\:getAuthorizationHeader\(\) has parameter \$url with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Helper/oAuthHelper.php
