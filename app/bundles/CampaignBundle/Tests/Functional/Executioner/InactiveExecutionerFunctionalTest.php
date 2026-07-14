@@ -396,7 +396,7 @@ final class InactiveExecutionerFunctionalTest extends MauticMysqlTestCase
             'campaign' => $campaign,
             'lead'     => $contact,
         ]);
-        \assert($campaignLeadAfter instanceof CampaignLead);
+        $this->assertInstanceOf(CampaignLead::class, $campaignLeadAfter);
         $this->assertSame(2, $campaignLeadAfter->getRotation(), 'campaign_leads.rotation increments once per redirect');
     }
 

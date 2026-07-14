@@ -44,7 +44,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
 
     public function testGetRequiredKeyFields(): void
     {
-        self::assertSame([], $this->integration->getRequiredKeyFields());
+        $this->assertSame([], $this->integration->getRequiredKeyFields());
     }
 
     public function testGetBearerTokenEmpty(): void
@@ -62,7 +62,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        self::assertNull($this->integration->getBearerToken());
+        $this->assertNull($this->integration->getBearerToken());
     }
 
     public function testGetBearerTokenSet(): void
@@ -82,18 +82,15 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        self::assertSame($token, $this->integration->getBearerToken());
+        $this->assertSame($token, $this->integration->getBearerToken());
     }
 
     public function testGetFormSettings(): void
     {
-        self::assertSame(
-            [
-                'requires_callback'      => false,
-                'requires_authorization' => false,
-            ],
-            $this->integration->getFormSettings()
-        );
+        $this->assertSame([
+            'requires_callback'      => false,
+            'requires_authorization' => false,
+        ], $this->integration->getFormSettings());
     }
 
     public function testGetAuthenticationTypeNoOauthToken(): void
@@ -111,7 +108,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        self::assertSame('key', $this->integration->getAuthenticationType());
+        $this->assertSame('key', $this->integration->getAuthenticationType());
     }
 
     public function testGetAuthenticationTypeWithOauthToken(): void
@@ -129,7 +126,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        self::assertSame('oauth2', $this->integration->getAuthenticationType());
+        $this->assertSame('oauth2', $this->integration->getAuthenticationType());
     }
 
     public function testIsAuthorizedNoOauthToken(): void
@@ -147,7 +144,7 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        self::assertFalse($this->integration->isAuthorized());
+        $this->assertFalse($this->integration->isAuthorized());
     }
 
     public function testIsAuthorizedWithOauthToken(): void
@@ -165,13 +162,13 @@ final class HubspotIntegrationTest extends AbstractIntegrationTestCase
             ->willReturn($event);
 
         $this->integration->encryptAndSetApiKeys([HubspotIntegration::ACCESS_KEY], $this->createStub(Integration::class));
-        self::assertTrue($this->integration->isAuthorized());
+        $this->assertTrue($this->integration->isAuthorized());
     }
 
     public function testAppendToFormKeys(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $matcher = self::exactly(2);
+        $matcher = $this->exactly(2);
         $builder->expects($matcher)
             ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {

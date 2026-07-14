@@ -864,7 +864,7 @@ class CompanyController extends FormController
             $entities = $this->getCompanyFindReplaceEntities($request, $model, $data, $ids);
             $updated  = $this->replaceCompanyFieldValues($findReplace, $fieldAlias, $data, $entities, $model);
 
-            if ($updated) {
+            if ([] !== $updated) {
                 $model->saveEntities($updated);
             }
         }

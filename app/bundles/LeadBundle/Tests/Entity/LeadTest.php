@@ -270,8 +270,8 @@ final class LeadTest extends TestCase
         $lead->addUpdatedField('email', $email);
         $changes = $lead->getChanges();
 
-        $this->assertFalse(empty($changes['email']));
-        $this->assertFalse(empty($changes['fields']['email']));
+        $this->assertNotEmpty($changes['email']);
+        $this->assertNotEmpty($changes['fields']['email']);
 
         $this->assertEquals($email, $changes['email'][1]);
         $this->assertEquals($email, $changes['fields']['email'][1]);

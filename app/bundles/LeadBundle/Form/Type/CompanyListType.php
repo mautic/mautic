@@ -52,7 +52,7 @@ class CompanyListType extends AbstractType
             $existingChoices = array_column($view->vars['choices'], 'value');
             $missingIds      = array_diff($selectedIds, $existingChoices);
 
-            if ($missingIds) {
+            if ([] !== $missingIds) {
                 $missingCompanies = $this->companyRepository->findBy(['id' => $missingIds]);
                 foreach ($missingCompanies as $company) {
                     $view->vars['choices'][] = new ChoiceView(

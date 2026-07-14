@@ -50,7 +50,7 @@ final class ContactSegmentFilterTest extends TestCase
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => $type]);
         $filter                          = $this->createContactSegmentFilter();
 
-        self::assertEquals($type, $filter->getType());
+        $this->assertEquals($type, $filter->getType());
     }
 
     public function testGetParameterValue(): void
@@ -64,7 +64,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertEquals($value, $filter->getParameterValue());
+        $this->assertEquals($value, $filter->getParameterValue());
     }
 
     public function testGetTable(): void
@@ -78,7 +78,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertEquals($table, $filter->getTable());
+        $this->assertEquals($table, $filter->getTable());
     }
 
     public function testIsColumnTypeBoolean(): void
@@ -86,12 +86,12 @@ final class ContactSegmentFilterTest extends TestCase
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'boolean']);
         $filter                          = $this->createContactSegmentFilter();
 
-        self::assertTrue($filter->isColumnTypeBoolean());
+        $this->assertTrue($filter->isColumnTypeBoolean());
 
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => 'something']);
         $filter                          = $this->createContactSegmentFilter();
 
-        self::assertFalse($filter->isColumnTypeBoolean());
+        $this->assertFalse($filter->isColumnTypeBoolean());
     }
 
     public function testGetFilterQueryBuilder(): void
@@ -107,8 +107,8 @@ final class ContactSegmentFilterTest extends TestCase
 
         $parts = $filter->getDoNotContactParts();
 
-        self::assertSame('email', $parts->getChannel());
-        self::assertSame(1, $parts->getParameterType());
+        $this->assertSame('email', $parts->getChannel());
+        $this->assertSame(1, $parts->getParameterType());
     }
 
     public function testGetParameterHolder(): void
@@ -123,7 +123,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertEquals($expectedResult, $filter->getParameterHolder($argument));
+        $this->assertEquals($expectedResult, $filter->getParameterHolder($argument));
     }
 
     public function testGetWhere(): void
@@ -137,7 +137,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->with($this->contactSegmentFilterCrate)
             ->willReturn($where);
 
-        self::assertEquals($where, $filter->getWhere());
+        $this->assertEquals($where, $filter->getWhere());
     }
 
     public function testIsContactSegmentReference(): void
@@ -158,8 +158,8 @@ final class ContactSegmentFilterTest extends TestCase
             }
         });
 
-        self::assertTrue($filter->isContactSegmentReference());
-        self::assertFalse($filter->isContactSegmentReference());
+        $this->assertTrue($filter->isContactSegmentReference());
+        $this->assertFalse($filter->isContactSegmentReference());
     }
 
     public function testGetGlue(): void
@@ -169,7 +169,7 @@ final class ContactSegmentFilterTest extends TestCase
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['glue' => $glue]);
         $filter                          = $this->createContactSegmentFilter();
 
-        self::assertSame($glue, $filter->getGlue());
+        $this->assertSame($glue, $filter->getGlue());
     }
 
     public function testGetIntegrationCampaignParts(): void
@@ -185,7 +185,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $parts = $filter->getIntegrationCampaignParts();
 
-        self::assertSame($value, $parts->getCampaignId());
+        $this->assertSame($value, $parts->getCampaignId());
     }
 
     public function testApplyQuery(): void
@@ -198,7 +198,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertSame($queryBuilder, $filter->applyQuery($queryBuilder));
+        $this->assertSame($queryBuilder, $filter->applyQuery($queryBuilder));
     }
 
     public function testGetRelationJoinTable(): void
@@ -207,7 +207,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertNull($filter->getRelationJoinTable());
+        $this->assertNull($filter->getRelationJoinTable());
 
         $this->filterDecorator = $this->createMock(CompanyDecorator::class);
         $this->filterDecorator->expects($this->once())
@@ -216,7 +216,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertEquals($table, $filter->getRelationJoinTable());
+        $this->assertEquals($table, $filter->getRelationJoinTable());
     }
 
     public function testGetQueryType(): void
@@ -229,7 +229,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->method('getQueryType')
             ->willReturn($type);
 
-        self::assertSame($type, $filter->getQueryType());
+        $this->assertSame($type, $filter->getQueryType());
     }
 
     public function testGetNullValue(): void
@@ -240,7 +240,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertSame($value, $filter->getNullValue());
+        $this->assertSame($value, $filter->getNullValue());
     }
 
     public function testGetColumnMissingColumn(): void
@@ -253,7 +253,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->method('getCurrentDatabaseName')
             ->willReturn($dbName);
 
-        $this->filterDecorator->expects(self::exactly(2))
+        $this->filterDecorator->expects($this->exactly(2))
             ->method('getTable')
             ->with($this->contactSegmentFilterCrate)
             ->willReturn($tableName);
@@ -263,7 +263,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->with($tableName)
             ->willReturn($columns);
 
-        $this->filterDecorator->expects(self::exactly(2))
+        $this->filterDecorator->expects($this->exactly(2))
             ->method('getField')
             ->willReturn('notExistingColumn');
 
@@ -292,7 +292,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->with($tableName)
             ->willReturn($columns);
 
-        $this->filterDecorator->expects(self::exactly(2))
+        $this->filterDecorator->expects($this->exactly(2))
             ->method('getField')
             ->willReturn('column1');
 
@@ -310,7 +310,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertSame($field, $filter->getField());
+        $this->assertSame($field, $filter->getField());
     }
 
     public function testGetRelationJoinTableField(): void
@@ -319,7 +319,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertNull($filter->getRelationJoinTableField());
+        $this->assertNull($filter->getRelationJoinTableField());
 
         $this->filterDecorator = $this->createMock(CompanyDecorator::class);
         $this->filterDecorator->expects($this->once())
@@ -328,7 +328,7 @@ final class ContactSegmentFilterTest extends TestCase
 
         $filter = $this->createContactSegmentFilter();
 
-        self::assertEquals($field, $filter->getRelationJoinTableField());
+        $this->assertEquals($field, $filter->getRelationJoinTableField());
     }
 
     public function testGetAggregateFunction(): void
@@ -342,7 +342,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->with($this->contactSegmentFilterCrate)
             ->willReturn($function);
 
-        self::assertSame($function, $filter->getAggregateFunction());
+        $this->assertSame($function, $filter->getAggregateFunction());
     }
 
     public function testGetOperator(): void
@@ -356,7 +356,7 @@ final class ContactSegmentFilterTest extends TestCase
             ->with($this->contactSegmentFilterCrate)
             ->willReturn($operator);
 
-        self::assertSame($operator, $filter->getOperator());
+        $this->assertSame($operator, $filter->getOperator());
     }
 
     public function testToString(): void
@@ -403,7 +403,7 @@ final class ContactSegmentFilterTest extends TestCase
         $filter = $this->createContactSegmentFilter();
 
         $result = $filter->__toString();
-        self::assertSame($expectedResult, $result);
+        $this->assertSame($expectedResult, $result);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dataDoesColumnSupportEmptyValue')]
@@ -412,7 +412,7 @@ final class ContactSegmentFilterTest extends TestCase
         $this->contactSegmentFilterCrate = new ContactSegmentFilterCrate(['type' => $type]);
         $filter                          = $this->createContactSegmentFilter();
 
-        self::assertSame($doesColumnSupportEmptyValue, $filter->doesColumnSupportEmptyValue());
+        $this->assertSame($doesColumnSupportEmptyValue, $filter->doesColumnSupportEmptyValue());
     }
 
     public function testBatchLimitersAreSetCorrectly(): void
@@ -427,7 +427,7 @@ final class ContactSegmentFilterTest extends TestCase
                 'maxId' => 1,
             ]
         );
-        self::assertSame([
+        $this->assertSame([
             'minId' => 1,
             'maxId' => 1,
         ], $filter->getBatchLimiters());

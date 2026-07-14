@@ -121,18 +121,17 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
         $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->with($this->callback(function ($arg) use ($matcher): true {
+            ->willReturnCallback(function (string $arg) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('/path/to/report.csv', $arg);
 
                     throw new FileTooBigException();
                 }
+
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('/path/to/report.zip', $arg);
                 }
-
-                return true;
-            }));
+            });
 
         $this->fileHandler->expects($this->once())
             ->method('zipIt')
@@ -188,17 +187,15 @@ final class SendScheduleTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
         $this->fileHandler->expects($matcher)
             ->method('fileCanBeAttached')
-            ->with($this->callback(function ($arg) use ($matcher): true {
+            ->willReturnCallback(function (string $arg) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('path-to-a-file', $arg);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('path-to-a-zip-file', $arg);
                 }
-
-                return true;
-            }))
-            ->will($this->throwException(new FileTooBigException()));
+            })
+            ->willThrowException(new FileTooBigException());
 
         $this->mailHelperMock->expects($this->once())
             ->method('setTo')
