@@ -14,9 +14,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private AvatarHelper $avatarHelper,
-        private FormUploader $uploader,
-        private LeadModel $leadModel,
+        private readonly AvatarHelper $avatarHelper,
+        private readonly FormUploader $uploader,
+        private readonly LeadModel $leadModel,
     ) {
     }
 

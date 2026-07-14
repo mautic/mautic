@@ -23,22 +23,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
+final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|EventDispatcherInterface
-     */
-    private MockObject $dispatcher;
+    private MockObject&EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var MockObject|EventScheduler
-     */
-    private MockObject $scheduler;
+    private MockObject&EventScheduler $scheduler;
 
-    /**
-     * @var MockObject|LegacyEventDispatcher
-     */
-    private MockObject $legacyDispatcher;
+    private MockObject&LegacyEventDispatcher $legacyDispatcher;
 
     protected function setUp(): void
     {
@@ -46,6 +37,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
         $this->scheduler          = $this->createMock(EventScheduler::class);
+        /** @phpstan-ignore classConstant.deprecatedClass */
         $this->legacyDispatcher   = $this->createMock(LegacyEventDispatcher::class);
     }
 
@@ -97,25 +89,25 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($matcher)
             ->method('dispatch')
             ->willReturnCallback(
-                function (\Symfony\Contracts\EventDispatcher\Event $event, string $eventName) use ($logs, &$dispatcCounter, $matcher) {
+                function (\Symfony\Contracts\EventDispatcher\Event $event, string $eventName) use ($logs, &$dispatcCounter, $matcher): \Symfony\Contracts\EventDispatcher\Event {
                     if (1 === $matcher->numberOfInvocations()) {
                     }
                     if (2 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof ExecutedEvent);
+                        $this->assertInstanceOf(ExecutedEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                     }
                     if (3 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof ExecutedBatchEvent);
+                        $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                     }
                     if (4 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof FailedEvent);
+                        $this->assertInstanceOf(FailedEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                     }
                     ++$dispatcCounter;
                     if (1 === $dispatcCounter) {
                         Assert::assertInstanceOf(PendingEvent::class, $event);
-                        \assert($event instanceof PendingEvent);
+                        $this->assertInstanceOf(PendingEvent::class, $event);
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     } elseif (2 === $dispatcCounter) {
@@ -202,7 +194,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs): PendingEvent {
                     $pendingEvent->pass($logs->get(1));
 
                     return $pendingEvent;
@@ -263,7 +255,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
+                function (PendingEvent $pendingEvent, string $eventName) use ($logs): PendingEvent {
                     $pendingEvent->fail($logs->get(2), 'something');
 
                     return $pendingEvent;
@@ -292,10 +284,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->getEventDispatcher()->dispatchEvent($config, $event, new ArrayCollection());
     }
 
-    /**
-     * @return ActionDispatcher
-     */
-    private function getEventDispatcher()
+    private function getEventDispatcher(): ActionDispatcher
     {
         return new ActionDispatcher(
             $this->dispatcher,

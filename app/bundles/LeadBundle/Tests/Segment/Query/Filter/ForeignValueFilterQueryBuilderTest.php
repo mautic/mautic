@@ -23,15 +23,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ForeignValueFilterQueryBuilderTest extends TestCase
+final class ForeignValueFilterQueryBuilderTest extends TestCase
 {
     use MockedConnectionTrait;
-    private RandomParameterName $randomParameter;
-
-    /**
-     * @var EventDispatcherInterface&MockObject
-     */
-    private MockObject $dispatcher;
 
     private ForeignValueFilterQueryBuilder $queryBuilder;
 
@@ -40,21 +34,20 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
      */
     private MockObject $connectionMock;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->randomParameter     = new RandomParameterName();
-        $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
+        $randomParameter           = new RandomParameterName();
         $this->connectionMock      = $this->getMockedConnection();
         $this->queryBuilder        = new ForeignValueFilterQueryBuilder(
-            $this->randomParameter,
-            $this->dispatcher
+            $randomParameter,
+            $this->createStub(EventDispatcherInterface::class)
         );
     }
 
     public function testGetServiceId(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             'mautic.lead.query.builder.foreign.value',
             $this->queryBuilder::getServiceId()
         );
@@ -264,11 +257,11 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
             new ContactSegmentFilterCrate($filter),
             new CustomMappedDecorator(
                 new ContactSegmentFilterOperator(
-                    new FilterOperatorProvider($this->dispatcher, $this->createMock(TranslatorInterface::class))
+                    new FilterOperatorProvider($this->createStub(EventDispatcherInterface::class), $this->createStub(TranslatorInterface::class))
                 ),
-                new ContactSegmentFilterDictionary($this->dispatcher)
+                new ContactSegmentFilterDictionary($this->createStub(EventDispatcherInterface::class))
             ),
-            new TableSchemaColumnsCache($this->createMock(EntityManager::class)),
+            new TableSchemaColumnsCache($this->createStub(EntityManager::class)),
             $this->queryBuilder,
             $batchLimiters
         );

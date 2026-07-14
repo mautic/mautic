@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use PHPUnit\Framework\Assert;
 
-class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private EmailRepository $emailRepository;
 
@@ -106,6 +106,8 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $leadTwo   = $this->createLead('two');
         $leadThree = $this->createLead('three');
         $leadFour  = $this->createLead('four');
+        $leadFive  = $this->createLead('five');
+        $leadSix   = $this->createLead('six');
 
         // create some categories
         $catOne     = $this->createCategory('one');
@@ -121,7 +123,13 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         // lead to unsubscribe categories
         $this->subscribeCategory($leadOne, false, $catThree);
 
-        $sourceListOne  = $this->createLeadList('Source', $leadOne, $leadTwo, $leadThree, $leadFour);
+        // add some leads in lists for inclusion
+        $sourceListOne  = $this->createLeadList('Source One', $leadOne, $leadTwo, $leadThree);
+        $sourceListTwo  = $this->createLeadList('Source Two', $leadOne, $leadFour, $leadFive, $leadSix);
+
+        // add some leads in lists for exclusion
+        $excludeListOne = $this->createLeadList('Exclude One', $leadTwo, $leadSix);
+        $excludeListTwo = $this->createLeadList('Exclude Two', $leadTwo, $leadThree);
 
         // create an email with included/excluded lists
         $email = new Email();
@@ -129,6 +137,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $email->setSubject('Subject');
         $email->setEmailType('list');
         $email->addList($sourceListOne);
+        $email->addList($sourceListTwo);
+        $email->addExcludedList($excludeListOne);
+        $email->addExcludedList($excludeListTwo);
         $email->setCategory($catThree);
         $this->em->persist($email);
 
@@ -142,7 +153,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $actualLeadIds  = array_map('intval', array_column($result, 'id'));
         sort($actualLeadIds);
 
-        $expectedLeadIds = [$leadTwo->getId(), $leadThree->getId(), $leadFour->getId()];
+        $expectedLeadIds = [$leadFour->getId(), $leadFive->getId()];
         sort($expectedLeadIds);
 
         $this->assertSame($expectedLeadIds, $actualLeadIds);
@@ -186,7 +197,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];
-        $expectedLeadIds = array_map(fn (int $id) => (string) $id, $expectedLeadIds);
+        $expectedLeadIds = array_map(fn (int $id): string => (string) $id, $expectedLeadIds);
         sort($expectedLeadIds);
 
         Assert::assertSame($expectedLeadIds, $actualLeadIds);
@@ -206,11 +217,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lead ...$leads
-     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, ...$leads): LeadList
+    private function createLeadList(string $name, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);
@@ -245,10 +254,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         return $category;
     }
 
-    /**
-     * @param Category ...$categories
-     */
-    private function subscribeCategory(Lead $lead, bool $subscribed, ...$categories): void
+    private function subscribeCategory(Lead $lead, bool $subscribed, Category ...$categories): void
     {
         foreach ($categories as $category) {
             $leadCategory = new LeadCategory();

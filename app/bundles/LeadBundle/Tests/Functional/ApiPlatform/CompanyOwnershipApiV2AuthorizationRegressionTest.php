@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\HttpFoundation\Response;
 
 final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
 {
@@ -47,7 +46,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->clear();
 
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -55,7 +54,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
@@ -108,7 +107,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->clear();
 
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -117,7 +116,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
@@ -169,7 +168,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         // Test 1: newOwner (current owner) SHOULD see the company
         $newOwner = $this->em->getRepository(User::class)->findOneBy(['username' => 'new.owner']);
-        \assert($newOwner instanceof User);
+        $this->assertInstanceOf(User::class, $newOwner);
         $this->loginUser($newOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $newOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -177,7 +176,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertCount(
@@ -189,7 +188,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
 
         // Test 2: originalOwner (creator but no longer owner) should NOT see the company
         $originalOwner = $this->em->getRepository(User::class)->findOneBy(['username' => 'original.owner']);
-        \assert($originalOwner instanceof User);
+        $this->assertInstanceOf(User::class, $originalOwner);
         $this->loginUser($originalOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $originalOwner->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -197,7 +196,7 @@ final class CompanyOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->client->request('GET', '/api/v2/companies?page=1&itemsPerPage=10');
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_OK, $response->getStatusCode(), $response->getContent());
+        self::assertResponseIsSuccessful();
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         self::assertCount(

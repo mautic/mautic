@@ -25,10 +25,10 @@ class SysinfoModel
     public function __construct(
         protected PathsHelper $pathsHelper,
         protected CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         protected Connection $connection,
-        private InstallService $installService,
-        private CheckStep $checkStep,
+        private readonly InstallService $installService,
+        private readonly CheckStep $checkStep,
     ) {
     }
 
@@ -39,11 +39,11 @@ class SysinfoModel
      */
     public function getPhpInfo()
     {
-        if (!is_null($this->phpInfo)) {
+        if (null !== $this->phpInfo) {
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
+        if (function_exists('phpinfo') && 'cli' !== PHP_SAPI) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -93,7 +93,7 @@ class SysinfoModel
      */
     public function getFolders()
     {
-        if (!is_null($this->folders)) {
+        if (null !== $this->folders) {
             return $this->folders;
         }
 

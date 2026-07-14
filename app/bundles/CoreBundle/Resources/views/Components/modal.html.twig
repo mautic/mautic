@@ -1,4 +1,4 @@
-<div class="modal fade" id="{{ id }}" {% if preventCloseOnClickOutside is defined and preventCloseOnClickOutside %}data-backdrop="static"{% endif %} tabindex="-1" role="dialog" aria-label="{{ modalAriaLabel|default(modalLabel|default(modalHeading|default('')))|trans }}" aria-modal="true">
+<div class="modal fade" id="{{ id }}" {% if preventCloseOnClickOutside is defined and preventCloseOnClickOutside %}data-backdrop="static"{% endif %} tabindex="-1" role="dialog" aria-label="{{ modalAriaLabel|default(modalLabel|default(modalHeading|default('')))|trans }}" aria-modal="true"{% if modalAttributes is defined %}{% for key, value in modalAttributes %} {{ key|e('html_attr') }}="{{ value|e('html_attr') }}"{% endfor %}{% endif %}>
     <div class="modal-dialog modal-{{ size|default('md') }}">
         <div class="modal-content">
             <div class="modal-header {% if type is defined and type == 'expressive' %}pr-32 pl-32 pt-32 pb-0{% endif %}">

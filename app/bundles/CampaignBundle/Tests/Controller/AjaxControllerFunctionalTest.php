@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     private FixtureHelper $campaignFixturesHelper;
 
@@ -53,7 +53,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         /** @var LeadEventLog $log */
         $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         Assert::assertSame('{"success":1}', $this->client->getResponse()->getContent());
         Assert::assertFalse($log->getIsScheduled());
     }

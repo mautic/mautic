@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -28,7 +27,6 @@ final class ListControllerTest extends MauticMysqlTestCase
 
     public function testMarketplaceListTableWithNoAllowList(): void
     {
-        /** @var MockHandler $handlerStack */
         $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/list.json'))  // Getting the package list from Packagist API.
@@ -40,7 +38,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         Assert::assertSame(
             [
@@ -51,7 +49,7 @@ final class ListControllerTest extends MauticMysqlTestCase
                 'Mautic Do Not Contact Extras Bundle',
             ],
             array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                trim(...),
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );
@@ -61,7 +59,6 @@ final class ListControllerTest extends MauticMysqlTestCase
     {
         $mockResults = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/list.json'), true)['results'];
 
-        /** @var MockHandler $handlerStack */
         $handlerStack = $this->getClientMockHandler();
         $handlerStack->append(
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../../ApiResponse/allowlist.json')), // Getting Allow list from Github API.
@@ -75,7 +72,7 @@ final class ListControllerTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', 's/marketplace');
 
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+        self::assertResponseIsSuccessful();
 
         Assert::assertSame(
             [
@@ -83,7 +80,7 @@ final class ListControllerTest extends MauticMysqlTestCase
                 'Mautic Referrals Bundle',
             ],
             array_map(
-                fn (string $dirtyPackageName) => trim($dirtyPackageName),
+                trim(...),
                 $crawler->filter('#marketplace-packages-table .package-name a')->extract(['_text'])
             )
         );

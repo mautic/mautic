@@ -12,8 +12,8 @@ use Symfony\Component\Routing\RouteCollection;
 class RouteLoader extends Loader
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private CoreParametersHelper $coreParameters,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CoreParametersHelper $coreParameters,
     ) {
     }
 

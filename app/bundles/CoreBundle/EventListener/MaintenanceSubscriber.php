@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
@@ -12,9 +13,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private Connection $db,
-        private UserTokenRepositoryInterface $userTokenRepository,
-        private TranslatorInterface $translator,
+        private readonly Connection $db,
+        private readonly UserTokenRepositoryInterface $userTokenRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -34,10 +35,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $event->setStat($this->translator->trans('mautic.maintenance.user_tokens'), $rows);
     }
 
-    /**
-     * @param string $table
-     */
-    private function cleanupData(MaintenanceEvent $event, $table): void
+    private function cleanupData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()
             ->setParameter('date', $event->getDate()->format('Y-m-d H:i:s'));
@@ -71,9 +69,10 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.$table)
                   ->where(
                       $qb2->expr()->in(
-                          'id', $ids
+                          'id', ':ids'
                       )
                   )
+                  ->setParameter('ids', array_map(intval(...), $ids), ArrayParameterType::INTEGER)
                   ->executeStatement();
             }
         }

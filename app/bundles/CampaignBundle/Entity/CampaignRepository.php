@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Types;
@@ -133,8 +134,10 @@ class CampaignRepository extends CommonRepository
             ->where($this->getPublishedByDateExpression($q));
 
         $q->andWhere(
-            $q->expr()->in('ll.leadlist_id', $leadLists)
+            $q->expr()->in('ll.leadlist_id', ':leadLists')
         );
+
+        $q->setParameter('leadLists', $leadLists, ArrayParameterType::INTEGER);
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -278,7 +281,7 @@ class CampaignRepository extends CommonRepository
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":$unique"),
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishDown'),
                     $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
@@ -288,7 +291,7 @@ class CampaignRepository extends CommonRepository
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending'):
             case $this->translator->trans('mautic.campaign.campaign.searchcommand.ispending', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('c.isPublished', ":$unique"),
+                    $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishUp'),
                     $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
@@ -376,14 +379,15 @@ class CampaignRepository extends CommonRepository
                     $sq->expr()->and(
                         $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
                         $sq->expr()->eq('e.rotation', 'cl.rotation'),
-                        $sq->expr()->in('e.event_id', $pendingEvents)
+                        $sq->expr()->in('e.event_id', ':pendingEvents')
                     )
                 );
             $this->updateQueryFromContactLimiter('e', $sq, $limiter, true);
 
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
-            );
+            )
+                ->setParameter('pendingEvents', $pendingEvents, ArrayParameterType::INTEGER);
         }
 
         $result = $q->executeQuery()->fetchAssociative();
@@ -606,10 +610,9 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * @param int   $segmentId
-     * @param array $campaignIds
+     * @param int[] $campaignIds
      */
-    public function getCampaignsSegmentShare($segmentId, $campaignIds = []): array
+    public function getCampaignsSegmentShare(int $segmentId, array $campaignIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('c.id, c.name, ROUND(IFNULL(COUNT(DISTINCT t.lead_id)/COUNT(DISTINCT cl.lead_id)*100, 0),1) segmentCampaignShare');
@@ -624,7 +627,8 @@ class CampaignRepository extends CommonRepository
         $q->groupBy('c.id');
 
         if (!empty($campaignIds)) {
-            $q->where($q->expr()->in('c.id', $campaignIds));
+            $q->where($q->expr()->in('c.id', ':campaignIds'));
+            $q->setParameter('campaignIds', $campaignIds, ArrayParameterType::INTEGER);
         }
 
         return $q->executeQuery()->fetchAllAssociative();

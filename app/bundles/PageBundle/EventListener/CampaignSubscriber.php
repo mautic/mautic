@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\CampaignEventPageHitType;
@@ -19,9 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CampaignSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LeadModel $leadModel,
-        private TrackingHelper $trackingHelper,
-        private RealTimeExecutioner $realTimeExecutioner,
+        private readonly LeadModel $leadModel,
+        private readonly TrackingHelper $trackingHelper,
+        private readonly RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 
@@ -105,7 +106,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
-    public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event): false|CampaignExecutionEvent
     {
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();
@@ -113,6 +114,10 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (!$event->checkContext('page.devicehit')) {
             return false;
+        }
+
+        if (!$eventDetails instanceof Hit) {
+            return $event->setResult(false);
         }
 
         $deviceRepo = $this->leadModel->getDeviceRepository();
@@ -147,7 +152,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult($result);
     }
 
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event): bool|CampaignExecutionEvent
     {
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();
@@ -159,6 +164,11 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (null == $eventDetails) {
             return true;
         }
+
+        if (!$eventDetails instanceof Hit) {
+            return $event->setResult(false);
+        }
+
         $pageHit = $eventDetails->getPage();
 
         // Check Landing Pages
@@ -218,11 +228,13 @@ class CampaignSubscriber implements EventSubscriberInterface
         return $event->setResult(false);
     }
 
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         $config = $event->getConfig();
         if (empty($config['services'])) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         $values = [];
@@ -231,6 +243,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
         $this->trackingHelper->updateCacheItem($values);
 
-        return $event->setResult(true);
+        $event->setResult(true);
     }
 }

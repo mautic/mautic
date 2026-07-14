@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignRepositoryTest extends TestCase
+final class CampaignRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -23,10 +23,10 @@ class CampaignRepositoryTest extends TestCase
 
         $this->repository = $this->configureRepository(Campaign::class);
 
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new DbalQueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): DbalQueryBuilder => new DbalQueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.campaign.campaign.searchcommand.isexpired' => 'is:expired',
             'mautic.campaign.campaign.searchcommand.ispending' => 'is:pending',
             default                                            => $id,

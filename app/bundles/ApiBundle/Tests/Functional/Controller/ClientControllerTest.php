@@ -7,9 +7,8 @@ namespace Mautic\ApiBundle\Tests\Functional\Controller;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
-class ClientControllerTest extends MauticMysqlTestCase
+final class ClientControllerTest extends MauticMysqlTestCase
 {
     private const TOTAL_COUNT = 6;
 
@@ -62,20 +61,20 @@ class ClientControllerTest extends MauticMysqlTestCase
     private function assertPaginationDetails(int $pageCount): void
     {
         $content = $this->client->getResponse()->getContent();
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
 
         $translator = static::getContainer()->get('translator');
 
         // Check for total item count in pagination
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.items', ['%count%' => self::TOTAL_COUNT]),
-            $content
+            (string) $content
         );
 
         // Check for total page count in pagination
         $this->assertStringContainsString(
             $translator->trans('mautic.core.pagination.pages', ['%count%' => $pageCount]),
-            $content
+            (string) $content
         );
     }
 }

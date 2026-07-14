@@ -10,10 +10,12 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class UTCDateTimeImmutableTypeTest extends TestCase
+final class UTCDateTimeImmutableTypeTest extends TestCase
 {
     private string $previousTimeZone;
+
     private UTCDateTimeImmutableType $type;
+
     private MySQL80Platform $platform;
 
     protected function setUp(): void

@@ -22,7 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailTypeTest extends MauticMysqlTestCase
+final class EmailTypeTest extends MauticMysqlTestCase
 {
     /**
      * @var array<mixed>
@@ -150,7 +150,7 @@ class EmailTypeTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
         Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][0], $clientResponse->getContent());
         Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][1], $clientResponse->getContent());
         Assert::assertSame(Response::HTTP_CREATED, $response['statusCodes'][2], $clientResponse->getContent());

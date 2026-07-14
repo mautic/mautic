@@ -34,19 +34,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class AssetModelTest extends \PHPUnit\Framework\TestCase
+final class AssetModelTest extends \PHPUnit\Framework\TestCase
 {
     private AssetModel $assetModel;
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private ContainerInterface&MockObject $container;
+    private LeadModel&\PHPUnit\Framework\MockObject\Stub $leadModel;
 
-    private CacheProvider $cacheProvider;
-
-    private LeadModel&MockObject $leadModel;
-
-    private CategoryModel&MockObject $categoryModel;
+    private CategoryModel&\PHPUnit\Framework\MockObject\Stub $categoryModel;
 
     private RequestStack&MockObject $requestStack;
 
@@ -66,13 +62,13 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    private MockObject&UrlGeneratorInterface $urlGenerator;
+    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
 
-    private Translator&MockObject $translator;
+    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
 
-    private UserHelper&MockObject $userHelper;
+    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
 
-    private LoggerInterface&MockObject $logger;
+    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
 
     protected function setUp(): void
     {
@@ -80,26 +76,24 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
-            ->with($this->equalTo('max_size'))
+            ->with('max_size')
             ->willReturn('2MB');
-
-        $this->container             = $this->createMock(ContainerInterface::class);
-        $this->cacheProvider         = new CacheProvider($this->coreParametersHelper, $this->container);
-        $this->leadModel             = $this->createMock(LeadModel::class);
-        $this->categoryModel         = $this->createMock(CategoryModel::class);
+        $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
+        $this->leadModel             = $this->createStub(LeadModel::class);
+        $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
-        $this->deviceDetectorFactory = new DeviceDetectorFactory($this->cacheProvider);
+        $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
         $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
         $this->contactTracker        = $this->createMock(ContactTracker::class);
         $this->entityManager         = $this->createMock(EntityManager::class);
         $this->corePermissions       = $this->createMock(CorePermissions::class);
         $this->eventDispatcher       = $this->createMock(EventDispatcherInterface::class);
-        $this->urlGenerator          = $this->createMock(UrlGeneratorInterface::class);
-        $this->translator            = $this->createMock(Translator::class);
-        $this->userHelper            = $this->createMock(UserHelper::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
+        $this->urlGenerator          = $this->createStub(UrlGeneratorInterface::class);
+        $this->translator            = $this->createStub(Translator::class);
+        $this->userHelper            = $this->createStub(UserHelper::class);
+        $this->logger                = $this->createStub(LoggerInterface::class);
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
@@ -168,14 +162,14 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $serverBag->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('HTTP_REFERER'))
+            ->with('HTTP_REFERER')
             ->willReturn('http://localhost');
 
         $request->server = $serverBag;
         $matcher         = $this->exactly(6);
 
         $request->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): string|false {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals('utm_campaign', $parameters[0]);
 
@@ -206,6 +200,8 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
                     return false;
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $this->requestStack->expects($this->once())
@@ -228,15 +224,15 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->with($this->equalTo(Asset::class))
+            ->with(Asset::class)
             ->willReturn($assetRepository);
 
         $assetRepository->expects($this->once())
             ->method('upDownloadCount')
             ->with(
-                $this->equalTo($asset->getId()),
-                $this->equalTo(1),
-                $this->equalTo(true),
+                $asset->getId(),
+                1,
+                true,
             );
 
         $ipAddress = new IpAddress('127.0.0.1');
@@ -247,7 +243,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with($this->equalTo(AssetEvents::ASSET_ON_LOAD))
+            ->with(AssetEvents::ASSET_ON_LOAD)
             ->willReturn(false);
 
         /** @var ?Download $download */
@@ -255,10 +251,11 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($downloadPersist) use (&$download) {
+            ->with($this->callback(function ($downloadPersist) use (&$download): bool {
                 $download = $downloadPersist;
+                $this->assertInstanceOf(Download::class, $download);
 
-                return $download instanceof Download;
+                return true;
             }));
 
         $this->entityManager->expects($this->once())
@@ -266,7 +263,7 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->once())
             ->method('detach')
-            ->with($this->callback(function ($downloadDetach) use (&$download) {
+            ->with($this->callback(function ($downloadDetach) use (&$download): true {
                 $this->assertSame($downloadDetach, $download);
 
                 return true;
@@ -274,11 +271,11 @@ class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assetModel->trackDownload($asset);
 
-        $this->assertEquals('test_utm_campaign', $download->getUtmCampaign());
-        $this->assertEquals('test_utm_content', $download->getUtmContent());
-        $this->assertEquals('test_utm_medium', $download->getUtmMedium());
-        $this->assertEquals('test_utm_source', $download->getUtmSource());
-        $this->assertEquals('test_utm_term', $download->getUtmTerm());
+        $this->assertSame('test_utm_campaign', $download->getUtmCampaign());
+        $this->assertSame('test_utm_content', $download->getUtmContent());
+        $this->assertSame('test_utm_medium', $download->getUtmMedium());
+        $this->assertSame('test_utm_source', $download->getUtmSource());
+        $this->assertSame('test_utm_term', $download->getUtmTerm());
         $this->assertEquals('200', $download->getCode());
         $this->assertEquals($ipAddress, $download->getIpAddress());
         $this->assertEquals($lead, $download->getLead());

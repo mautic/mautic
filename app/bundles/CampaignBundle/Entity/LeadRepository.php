@@ -111,8 +111,10 @@ class LeadRepository extends CommonRepository
 
         if (!empty($campaigns)) {
             $q->andWhere(
-                $q->expr()->notIn('campaign_id', $campaigns)
-            )->executeStatement();
+                $q->expr()->notIn('campaign_id', ':ids')
+            )
+                ->setParameter('ids', $campaigns, ArrayParameterType::INTEGER)
+                ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -127,10 +129,9 @@ class LeadRepository extends CommonRepository
     /**
      * Check Lead in campaign.
      *
-     * @param Lead  $lead
-     * @param array $options
+     * @param Lead $lead
      */
-    public function checkLeadInCampaigns($lead, $options = []): bool
+    public function checkLeadInCampaigns($lead, array $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
@@ -141,9 +142,10 @@ class LeadRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('l.lead_id', ':leadId'),
-                $q->expr()->in('l.campaign_id', $options['campaigns'])
+                $q->expr()->in('l.campaign_id', ':campaigns')
             )
-        );
+        )
+            ->setParameter('campaigns', $options['campaigns'], ArrayParameterType::INTEGER);
 
         if (!empty($options['dataAddedLimit'])) {
             $q->andWhere($q->expr()
@@ -363,9 +365,10 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.manually_removed', 0),
-                    $qb->expr()->in('ll.leadlist_id', $segments)
+                    $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
-            );
+            )
+            ->setParameter('segments', $segments, ArrayParameterType::INTEGER);
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
@@ -402,9 +405,11 @@ class LeadRepository extends CommonRepository
             ->where(
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.manually_removed', 0),
-                    $qb->expr()->in('ll.leadlist_id', $segments)
+                    $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
-            )->orderBy('ll.lead_id');
+            )
+            ->setParameter('segments', $segments, ArrayParameterType::INTEGER)
+            ->orderBy('ll.lead_id');
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
@@ -571,9 +576,11 @@ class LeadRepository extends CommonRepository
                 $qb->expr()->and(
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
                     $qb->expr()->eq('ll.manually_removed', 0),
-                    $qb->expr()->in('ll.leadlist_id', $segments)
+                    $qb->expr()->in('ll.leadlist_id', ':segments')
                 )
             );
+
+        $qb->setParameter('segments', $segments, ArrayParameterType::INTEGER);
 
         $qb->andWhere(
             sprintf('NOT EXISTS (%s)', $subq->getSQL())
@@ -612,7 +619,7 @@ class LeadRepository extends CommonRepository
         $leadAlias         = 'l';
 
         $queryBuilder->select(
-            "$leadAlias.country",
+            "{$leadAlias}.country",
             'count(id) AS contacts'
         )
         ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', $leadCampaignAlias)
@@ -620,13 +627,13 @@ class LeadRepository extends CommonRepository
             $leadCampaignAlias,
             MAUTIC_TABLE_PREFIX.'leads',
             $leadAlias,
-            "$leadAlias.id = $leadCampaignAlias.lead_id"
+            "{$leadAlias}.id = {$leadCampaignAlias}.lead_id"
         )
-        ->andWhere("$leadCampaignAlias.campaign_id = :campaign")
-        ->andWhere("$leadCampaignAlias.manually_removed = :false")
-        ->andWhere("$leadCampaignAlias.date_added BETWEEN :dateFrom AND :dateTo")
-        ->groupBy("$leadAlias.country")
-        ->orderBy("$leadAlias.country", 'ASC')
+        ->andWhere("{$leadCampaignAlias}.campaign_id = :campaign")
+        ->andWhere("{$leadCampaignAlias}.manually_removed = :false")
+        ->andWhere("{$leadCampaignAlias}.date_added BETWEEN :dateFrom AND :dateTo")
+        ->groupBy("{$leadAlias}.country")
+        ->orderBy("{$leadAlias}.country", 'ASC')
         ->setParameter('campaign', $campaign->getId())
         ->setParameter('false', false)
         ->setParameter('dateFrom', $dateFromObject->format('Y-m-d H:i:s'))

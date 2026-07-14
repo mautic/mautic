@@ -19,7 +19,7 @@ class WebhookQueue
 
     private ?\DateTime $dateAdded = null;
 
-    private ?\DateTimeImmutable $dateModified = null; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+    private ?\DateTimeImmutable $dateModified = null;
 
     /**
      * @var string|resource|null
@@ -57,48 +57,29 @@ class WebhookQueue
             ->build();
     }
 
-    /**
-     * @return string|null
-     */
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    /**
-     * @return Webhook|null
-     */
-    public function getWebhook()
+    public function getWebhook(): ?Webhook
     {
         return $this->webhook;
     }
 
-    /**
-     * @param Webhook|null $webhook
-     *
-     * @return WebhookQueue
-     */
-    public function setWebhook($webhook)
+    public function setWebhook(?Webhook $webhook): static
     {
         $this->webhook = $webhook;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTime
     {
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime|null $dateAdded
-     *
-     * @return WebhookQueue
-     */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(?\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -108,7 +89,7 @@ class WebhookQueue
     /**
      * @return string|null
      */
-    public function getPayload()
+    public function getPayload(): string|false|null
     {
         if (null === $this->payloadCompressed) {
             // no payload is set
@@ -127,30 +108,20 @@ class WebhookQueue
 
     /**
      * @param string $payload
-     *
-     * @return WebhookQueue
      */
-    public function setPayload($payload)
+    public function setPayload($payload): static
     {
         $this->payloadCompressed = gzcompress($payload, 9);
 
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
 
-    /**
-     * @param Event|null $event
-     *
-     * @return WebhookQueue
-     */
-    public function setEvent($event)
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
 

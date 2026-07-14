@@ -8,6 +8,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
 {
@@ -170,7 +173,24 @@ final class MessageOfTheDayCommandTest extends MauticMysqlTestCase
 
         $tester = $this->testSymfonyCommand('mautic:motd');
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
-        $this->assertStringContainsString('Could not decode MOTD JSON', $tester->getDisplay());
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertStringContainsString('Skipped MOTD: Could not decode MOTD JSON', $tester->getDisplay());
+    }
+
+    public function testItSkipsMotdWhenFetchFails(): void
+    {
+        file_put_contents($this->cachePath, 'stale-cache');
+        touch($this->cachePath, time() - 7200);
+
+        $httpClient = static::getContainer()->get(HttpClientInterface::class);
+        self::assertInstanceOf(MockHttpClient::class, $httpClient);
+        $httpClient->setResponseFactory([
+            new MockResponse('', ['http_code' => 500]),
+        ]);
+
+        $tester = $this->testSymfonyCommand('mautic:motd');
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertStringContainsString('Skipped MOTD: Could not fetch motd.json', $tester->getDisplay());
     }
 }

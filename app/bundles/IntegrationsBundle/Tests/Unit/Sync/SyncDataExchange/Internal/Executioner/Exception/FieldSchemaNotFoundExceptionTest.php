@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\Excepti
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class FieldSchemaNotFoundExceptionTest extends TestCase
+final class FieldSchemaNotFoundExceptionTest extends TestCase
 {
     public function testMessage(): void
     {

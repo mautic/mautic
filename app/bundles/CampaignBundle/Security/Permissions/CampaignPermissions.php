@@ -7,7 +7,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignPermissions extends AbstractPermissions
 {
-    public function __construct($params)
+    /**
+     * @param mixed[] $params
+     */
+    public function __construct(array $params)
     {
         parent::__construct($params);
         $this->addExtendedPermissions('campaigns');

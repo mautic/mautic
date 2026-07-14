@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -11,7 +13,7 @@ use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class ReportApiControllerTest extends MauticMysqlTestCase
+final class ReportApiControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -19,35 +21,35 @@ class ReportApiControllerTest extends MauticMysqlTestCase
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', []);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testGetReportSuccessByCorrectAccessIsAdmin(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', [], false, true);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testGetReportSuccessByNoCorrectAccessToViewOther(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewother']]);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     public function testReportFailByNoCorrectAccessToViewOwn(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']]);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testReportSuccessViewOwnBySameUser(): void
     {
         $reportId = $this->createReportStructure('Maut1cR0cks!!!!!', ['report:reports'=>['viewown']], true);
         $this->client->request('GET', '/api/reports/'.$reportId);
-        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     /**
@@ -63,7 +65,7 @@ class ReportApiControllerTest extends MauticMysqlTestCase
         }
         $report   = $this->createReportData($createByIdUser);
 
-        if ($permissions) {
+        if ([] !== $permissions) {
             $this->setPermission($user, $permissions);
         }
         // Disable the default logging in via username and password.
@@ -93,8 +95,9 @@ class ReportApiControllerTest extends MauticMysqlTestCase
 
         // Set new permissions
         $role->setIsAdmin(false);
+        /** @var RoleModel $roleModel */
         $roleModel = static::getContainer()->get('mautic.user.model.role');
-        \assert($roleModel instanceof RoleModel);
+        $this->assertInstanceOf(RoleModel::class, $roleModel);
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
@@ -110,7 +113,7 @@ class ReportApiControllerTest extends MauticMysqlTestCase
         $user->setUsername('john.doe');
         $user->setEmail('john.doe@email.com');
         $hasher = self::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
-        \assert($hasher instanceof PasswordHasherInterface);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
         $user->setPassword($hasher->hash($password));
         $user->setRole($role);
 

@@ -27,13 +27,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
         Assert::assertArrayHasKey('html', $content);
-        Assert::assertStringContainsString('has-error', $content['html']);
-        Assert::assertStringContainsString('No URL specified', $content['html']);
+        Assert::assertStringContainsString('has-error', (string) $content['html']);
+        Assert::assertStringContainsString('No URL specified', (string) $content['html']);
     }
 
     public function testSendHookTestWithMissingTypes(): void
@@ -51,13 +51,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
         Assert::assertArrayHasKey('html', $content);
-        Assert::assertStringContainsString('has-error', $content['html']);
-        Assert::assertStringContainsString('No events selected', $content['html']);
+        Assert::assertStringContainsString('has-error', (string) $content['html']);
+        Assert::assertStringContainsString('No events selected', (string) $content['html']);
     }
 
     public function testSendHookTestWithPrivateAddress(): void
@@ -75,13 +75,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
         Assert::assertArrayHasKey('html', $content);
-        Assert::assertStringContainsString('has-error', $content['html']);
-        Assert::assertStringContainsString('private IP address range', $content['html']);
+        Assert::assertStringContainsString('has-error', (string) $content['html']);
+        Assert::assertStringContainsString('private IP address range', (string) $content['html']);
     }
 
     #[DataProvider('provideInvalidUrls')]
@@ -100,13 +100,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
         Assert::assertArrayHasKey('html', $content);
-        Assert::assertStringContainsString('has-error', $content['html']);
-        Assert::assertStringContainsString($expectedError, $content['html']);
+        Assert::assertStringContainsString('has-error', (string) $content['html']);
+        Assert::assertStringContainsString($expectedError, (string) $content['html']);
     }
 
     /**
@@ -141,13 +141,13 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         );
 
         $response = $this->client->getResponse();
-        Assert::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
 
         $content = json_decode($response->getContent(), true);
         Assert::assertIsArray($content);
         Assert::assertArrayHasKey('html', $content);
-        Assert::assertStringContainsString('has-error', $content['html']);
-        Assert::assertStringContainsString('No events selected', $content['html']);
+        Assert::assertStringContainsString('has-error', (string) $content['html']);
+        Assert::assertStringContainsString('No events selected', (string) $content['html']);
     }
 
     /**

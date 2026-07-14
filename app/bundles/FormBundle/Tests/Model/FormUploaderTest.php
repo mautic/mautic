@@ -14,13 +14,13 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FormUploaderTest extends \PHPUnit\Framework\TestCase
+final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 {
-    private $formId1   = 1;
+    private int $formId1   = 1;
 
-    private $formId2   = 2;
+    private int $formId2   = 2;
 
-    private $uploadDir = __DIR__.'/DummyFiles';
+    private string $uploadDir = __DIR__.'/DummyFiles';
 
     #[\PHPUnit\Framework\Attributes\TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUploadFiles(): void
@@ -28,8 +28,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock         = $this->createMock(FileUploader::class);
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $formUploader             = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
-        $file1Mock                = $this->createMock(UploadedFile::class);
-        $file2Mock                = $this->createMock(UploadedFile::class);
+        $file1Mock                = $this->createStub(UploadedFile::class);
+        $file2Mock                = $this->createStub(UploadedFile::class);
         $form1Mock                = $this->createMock(Form::class);
         $field1Mock               = $this->createMock(Field::class);
         $form2Mock                = $this->createMock(Form::class);
@@ -92,7 +92,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $fileUploaderMock->expects($matcher)
-            ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock) {
+            ->method('upload')->willReturnCallback(function (...$parameters) use ($matcher, $path1, $file1Mock, $path2, $file2Mock): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($path1, $parameters[0]);
                     $this->assertSame($file1Mock, $parameters[1]);
@@ -105,6 +105,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
                     return 'upload2.txt';
                 }
+
+                throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
         $formUploader->uploadFiles($filesToUpload, $submission);
@@ -124,8 +126,8 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock         = $this->createMock(FileUploader::class);
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $formUploader             = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
-        $file1Mock                = $this->createMock(UploadedFile::class);
-        $file2Mock                = $this->createMock(UploadedFile::class);
+        $file1Mock                = $this->createStub(UploadedFile::class);
+        $file2Mock                = $this->createStub(UploadedFile::class);
         $form1Mock                = $this->createMock(Form::class);
         $field1Mock               = $this->createMock(Field::class);
         $form2Mock                = $this->createMock(Form::class);
@@ -223,7 +225,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $fileUploaderMock->expects($this->never())
             ->method('delete');
 
-        $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
@@ -236,7 +238,7 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('Uploader returs correct path for file')]
     public function testGetCompleteFilePath(): void
     {
-        $fileUploaderMock = $this->createMock(FileUploader::class);
+        $fileUploaderMock = $this->createStub(FileUploader::class);
 
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelperMock->expects($this->once())

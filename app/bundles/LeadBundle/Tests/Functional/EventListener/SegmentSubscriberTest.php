@@ -10,11 +10,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentSubscriberTest extends MauticMysqlTestCase
+final class SegmentSubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
@@ -33,11 +32,11 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     {
         $segment   = $this->saveSegment('Segment D', 'segment-d', $filters);
         $crawler   = $this->client->request(Request::METHOD_GET, '/s/segments/edit/'.$segment->getId());
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
         /** @var TranslatorInterface $translator */
         $translator = $this->getContainer()->get('translator');
 
-        $expectedTranslationString = implode(' ', array_map(fn ($trans) => $translator->trans($trans), $expectedTranslations));
+        $expectedTranslationString = implode(' ', array_map(fn (string $trans) => $translator->trans($trans), $expectedTranslations));
 
         $crawlerText = $crawler->filter('#leadlist_filters_0_properties')->filter('.alert')->text();
         $this->assertStringContainsString($expectedTranslationString, $crawlerText);
@@ -104,8 +103,9 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
+        /** @var ListModel $listModel */
         $listModel = $this->getContainer()->get('mautic.lead.model.list');
-        \assert($listModel instanceof ListModel);
+        $this->assertInstanceOf(ListModel::class, $listModel);
 
         $leadCount = $listModel->getListLeadRepository()->getContactsCountBySegment($segmentId);
         self::assertSame(5, $leadCount);
@@ -129,7 +129,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     {
         // Add 5 contacts
         $contactRepo = $this->em->getRepository(Lead::class);
-        \assert($contactRepo instanceof LeadRepository);
+        $this->assertInstanceOf(LeadRepository::class, $contactRepo);
 
         $contacts = [];
 
@@ -150,7 +150,7 @@ class SegmentSubscriberTest extends MauticMysqlTestCase
     private function saveSegment(string $name, string $alias, array $filters): LeadList
     {
         $segmentRepo = $this->em->getRepository(LeadList::class);
-        \assert($segmentRepo instanceof LeadListRepository);
+        $this->assertInstanceOf(LeadListRepository::class, $segmentRepo);
         $segment     = new LeadList();
         $segment->setName($name)
             ->setPublicName($name)
