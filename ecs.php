@@ -29,19 +29,12 @@ return ECSConfig::configure()
         PhpCsFixer\Fixer\ControlStructure\YodaStyleFixer::class,
     ])
     ->withRules([
-        PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer::class,
         Symplify\CodingStandard\Fixer\Spacing\StandaloneLinePromotedPropertyFixer::class,
-        PhpCsFixer\Fixer\StringNotation\ExplicitStringVariableFixer::class,
-        PhpCsFixer\Fixer\ControlStructure\NoSuperfluousElseifFixer::class,
-        PhpCsFixer\Fixer\LanguageConstruct\IsNullFixer::class,
-        PhpCsFixer\Fixer\LanguageConstruct\ExplicitIndirectVariableFixer::class,
-        PhpCsFixer\Fixer\Operator\NewWithParenthesesFixer::class,
-        PhpCsFixer\Fixer\ClassNotation\SelfAccessorFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
         docblocks: true,
         namespaces: true,
         cleanup: true,
-        // controlStructures: true,
+        controlStructures: true,
     );
