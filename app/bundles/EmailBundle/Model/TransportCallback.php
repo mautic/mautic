@@ -65,7 +65,7 @@ class TransportCallback
         $this->dncModel->addDncForContact($id, $channel, $dncReason, $comments);
     }
 
-    private function updateStatDetails(Stat $stat, $comments, $dncReason): void
+    private function updateStatDetails(Stat $stat, ?string $comments, int $dncReason): void
     {
         if (DNC::BOUNCED === $dncReason) {
             $stat->setIsFailed(true);

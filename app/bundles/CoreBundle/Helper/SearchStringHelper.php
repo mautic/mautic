@@ -69,7 +69,7 @@ class SearchStringHelper
         return $this->splitUpSearchString($input);
     }
 
-    public static function mergeCommands(&$filters, array $commands): void
+    public static function mergeCommands(\stdClass &$filters, array $commands): void
     {
         if (!isset($filters->commands)) {
             $filters->commands = $commands;
@@ -227,7 +227,7 @@ class SearchStringHelper
         return $filters;
     }
 
-    private function setFilter(&$filters, &$baseName, &$keyCount, string &$string, &$command, $overrideCommand,
+    private function setFilter(\stdClass &$filters, string &$baseName, int &$keyCount, string &$string, string &$command, string $overrideCommand,
         bool $setFilter = true,
         ?string $type = null,
         bool $setUpNext = true): void

@@ -102,7 +102,7 @@ class ConfigMetadata
     /**
      *  Encodes percent signs so they are not compiled in the container.
      */
-    private function encodeParameters($valueToEncode)
+    private function encodeParameters(mixed $valueToEncode): mixed
     {
         if (is_array($valueToEncode)) {
             foreach ($valueToEncode as $key => $value) {

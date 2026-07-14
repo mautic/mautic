@@ -1112,7 +1112,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @return mixed|string
      */
-    private function getPageUrl(Request $request, $page)
+    private function getPageUrl(Request $request, Redirect|Page|null $page)
     {
         // Default to page_url set in the query from tracking pixel and/or contactfield token
         if ($pageURL = $request->get('page_url')) {

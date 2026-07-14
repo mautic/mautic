@@ -136,7 +136,7 @@ class InactiveHelper
     /**
      * @return array<string, \DateTimeInterface>|null
      */
-    private function getLastActiveDates($lastActiveEventId, array $contactIds): ?array
+    private function getLastActiveDates(?int $lastActiveEventId, array $contactIds): ?array
     {
         // If there is a parent ID, get last active dates based on when that event was executed for the given contact
         // Otherwise, use when the contact was added to the campaign for comparison

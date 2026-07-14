@@ -665,17 +665,15 @@ class TrackableModel extends AbstractCommonModel
         return $query;
     }
 
-    private function isContactFieldToken($token): bool
+    private function isContactFieldToken(string $token): bool
     {
         return str_contains($token, '{contactfield') || str_contains($token, '{leadfield') || str_contains($token, '{ownerfield');
     }
 
     /**
      * @param array<int|string, Redirect|Trackable> $trackableTokens
-     *
-     * @return string
      */
-    private function parseContent($content, $channel, $channelId, array &$trackableTokens)
+    private function parseContent(string $content, ?string $channel, ?int $channelId, array &$trackableTokens): string
     {
         $this->hasFirstPassReplacements = false;
 
