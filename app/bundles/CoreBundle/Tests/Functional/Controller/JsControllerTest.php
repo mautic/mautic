@@ -27,8 +27,14 @@ final class JsControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/mtc.js');
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
-        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\')', (string) $this->client->getResponse()->getContent());
+        $content = (string) $this->client->getResponse()->getContent();
+        Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', $content);
+        Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\')', $content);
+        $runtimeReadyPosition    = strpos($content, 'runtimeReady');
+        $trackingEnabledPosition = strrpos($content, 'trackingEnabled');
+        Assert::assertNotFalse($runtimeReadyPosition);
+        Assert::assertNotFalse($trackingEnabledPosition);
+        Assert::assertLessThan($trackingEnabledPosition, $runtimeReadyPosition);
     }
 
     public function testIndexActionRendersSuccessfullyWithAnonymizeIp(): void
@@ -37,6 +43,31 @@ final class JsControllerTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         Assert::assertStringContainsString('https://www.googletagmanager.com/gtag/js?id=G-F3825DS9CD', (string) $this->client->getResponse()->getContent());
         Assert::assertStringContainsString('gtag(\'config\',\'G-F3825DS9CD\',{"anonymize_ip":!0})', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testEssentialEndpointContainsAnonymousRuntimeOnly(): void
+    {
+        $this->client->request('GET', '/mautic-essential.js');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        Assert::assertStringContainsString('runtimeReady', $content);
+        Assert::assertStringContainsString('appendTrackedContact', $content);
+        Assert::assertStringContainsString('requestWithCredentials', $content);
+        Assert::assertStringNotContainsString("localStorage.getItem('mtc_id')", $content);
+        Assert::assertStringNotContainsString('getTrackedContact', $content);
+    }
+
+    public function testTrackingEndpointContainsIdentityWithoutRuntime(): void
+    {
+        $this->client->request('GET', '/mautic-tracking.js');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        Assert::assertStringContainsString('runtimeReady', $content);
+        Assert::assertStringContainsString("localStorage.getItem('mtc_id')", $content);
+        Assert::assertStringNotContainsString('serialize=function', $content);
+        Assert::assertStringNotContainsString('setCookie=function', $content);
     }
 
     #[DataProvider('scriptEndpointProvider')]
