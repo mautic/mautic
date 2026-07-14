@@ -207,7 +207,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
 
@@ -248,7 +248,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         );
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('3 contacts affected', (string) $response['flashes']);
     }
@@ -297,7 +297,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('fr_FR', $contactC->getPreferredLocale());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 contacts affected', (string) $response['flashes']);
     }
@@ -367,7 +367,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         Assert::assertSame('en', $contactG->getPreferredLocale());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), self::CLOSE_MODAL_ASSERTION_MESSAGE);
+        $this->assertArrayHasKey('closeModal', $response, self::CLOSE_MODAL_ASSERTION_MESSAGE);
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('5 contacts affected', (string) $response['flashes']);
     }
@@ -402,7 +402,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
         /** @var AuditLog $auditLog */
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy(['object' => 'lead', 'objectId' => $contact, 'userId' => 1]);
 
-        Assert::assertTrue(isset($auditLog->getDetails()['fields']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertArrayHasKey('fields', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
 
         Assert::assertSame(
             [
@@ -467,8 +467,8 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/batchExport?filetype=xlsx');
         $this->assertResponseIsSuccessful();
         $content = $this->client->getInternalResponse()->getContent();
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
-        $this->assertTrue(strlen($content) > 10000, $content);
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertGreaterThan(10000, strlen($content), $content);
     }
 
     public function testContactsAreAddedAndRemovedFromCompanies(): void
@@ -767,8 +767,8 @@ EMAIL;
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
-        self::assertCount(1, $errorContainer);
-        self::assertSame('This field must be unique.', $errorContainer->text(null, true));
+        $this->assertCount(1, $errorContainer);
+        $this->assertSame('This field must be unique.', $errorContainer->text(null, true));
     }
 
     public function testEditRendersErrorOnEmailDuplicate(): void
@@ -1145,7 +1145,7 @@ EMAIL;
     {
         $crawler     = $this->client->request('GET', 's/contacts/new/');
         $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
-        self::assertSame('multiple', $multiple);
+        $this->assertSame('multiple', $multiple);
     }
 
     public function testCompanyMergeList(): void
@@ -1228,8 +1228,8 @@ EMAIL;
         $content = $this->client->getInternalResponse()->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertEquals('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
-        $this->assertTrue(strlen($content) > 10000, $content);
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $this->client->getInternalResponse()->getHeader('content-type'));
+        $this->assertGreaterThan(10000, strlen($content), $content);
 
         /** @var AuditLog $auditLog */
         $auditLog = $this->em->getRepository(AuditLog::class)->findOneBy([
@@ -1239,7 +1239,7 @@ EMAIL;
             'action' => 'create',
         ]);
         $this->assertNotNull($auditLog);
-        Assert::assertTrue(isset($auditLog->getDetails()['args']), json_encode($auditLog, JSON_PRETTY_PRINT));
+        Assert::assertArrayHasKey('args', $auditLog->getDetails(), json_encode($auditLog, JSON_PRETTY_PRINT));
         Assert::assertSame(
             [
                 'start'  => 0,

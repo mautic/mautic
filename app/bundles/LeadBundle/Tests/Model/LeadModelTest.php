@@ -242,7 +242,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->saveEntity($entity);
 
         $this->assertSame($companyFromEntity, $entity->getCompany());
-        $this->assertFalse(isset($entity->getUpdatedFields()['company']));
+        $this->assertArrayNotHasKey('company', $entity->getUpdatedFields());
     }
 
     public function testCheckForDuplicateContact(): void

@@ -209,7 +209,7 @@ final class RestrictionHelperTest extends TypeTestCase
         $translator = $this->createMock(Translator::class);
         $translator->method('trans')
             ->willReturnCallback(
-                fn ($key) => $key
+                fn (string $key): string => $key
             );
 
         $validator = $this->createMock(ValidatorInterface::class);

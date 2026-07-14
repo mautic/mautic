@@ -63,7 +63,7 @@ final class EventRepositoryTest extends TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('setParameter')
-            ->with('id', $this->equalTo(42))
+            ->with('id', 42)
             ->willReturn($queryBuilderMock);
 
         $connMock->expects($this->once())

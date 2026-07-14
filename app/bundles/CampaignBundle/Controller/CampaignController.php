@@ -1109,7 +1109,7 @@ class CampaignController extends AbstractStandardFormController
 
         // Extract IDs from deleted events and use as keys for filtering
         $deletedEventIds = array_column($this->deletedEvents, 'id');
-        $deletedEventIds = $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
+        $deletedEventIds = [] !== $deletedEventIds ? array_fill_keys($deletedEventIds, true) : [];
 
         $this->campaignEvents = array_diff_key($this->modifiedEvents, $deletedEventIds);
     }

@@ -101,8 +101,8 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $engagementData = $datasets[0]['data'] ?? [];
         $totalContacts  = array_sum($engagementData);
 
-        self::assertStringContainsString('Engagements', (string) $response->getContent());
-        self::assertSame(1, $totalContacts);
+        $this->assertStringContainsString('Engagements', (string) $response->getContent());
+        $this->assertSame(1, $totalContacts);
     }
 
     /**
@@ -221,15 +221,15 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $companyB = $companyModel->getEntity($companyB->getId());
         $companyC = $companyModel->getEntity($companyC->getId());
 
-        self::assertInstanceOf(Company::class, $companyA);
-        self::assertInstanceOf(Company::class, $companyB);
-        self::assertInstanceOf(Company::class, $companyC);
-        self::assertSame('Retail', $companyA->getIndustry());
-        self::assertSame('Retail', $companyB->getIndustry());
-        self::assertSame('Services', $companyC->getIndustry());
+        $this->assertInstanceOf(Company::class, $companyA);
+        $this->assertInstanceOf(Company::class, $companyB);
+        $this->assertInstanceOf(Company::class, $companyC);
+        $this->assertSame('Retail', $companyA->getIndustry());
+        $this->assertSame('Retail', $companyB->getIndustry());
+        $this->assertSame('Services', $companyC->getIndustry());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('2 companies affected', (string) $response['flashes']);
     }
@@ -279,23 +279,23 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $companyF = $companyModel->getEntity($companyF->getId());
         $companyG = $companyModel->getEntity($companyG->getId());
 
-        self::assertInstanceOf(Company::class, $companyA);
-        self::assertInstanceOf(Company::class, $companyB);
-        self::assertInstanceOf(Company::class, $companyC);
-        self::assertInstanceOf(Company::class, $companyD);
-        self::assertInstanceOf(Company::class, $companyE);
-        self::assertInstanceOf(Company::class, $companyF);
-        self::assertInstanceOf(Company::class, $companyG);
-        self::assertSame('Retail', $companyA->getIndustry());
-        self::assertSame('Retail', $companyB->getIndustry());
-        self::assertSame('Goods', $companyC->getIndustry());
-        self::assertSame('Services', $companyD->getIndustry());
-        self::assertSame('Retail', $companyE->getIndustry());
-        self::assertSame('Retail', $companyF->getIndustry());
-        self::assertSame('Retail', $companyG->getIndustry());
+        $this->assertInstanceOf(Company::class, $companyA);
+        $this->assertInstanceOf(Company::class, $companyB);
+        $this->assertInstanceOf(Company::class, $companyC);
+        $this->assertInstanceOf(Company::class, $companyD);
+        $this->assertInstanceOf(Company::class, $companyE);
+        $this->assertInstanceOf(Company::class, $companyF);
+        $this->assertInstanceOf(Company::class, $companyG);
+        $this->assertSame('Retail', $companyA->getIndustry());
+        $this->assertSame('Retail', $companyB->getIndustry());
+        $this->assertSame('Goods', $companyC->getIndustry());
+        $this->assertSame('Services', $companyD->getIndustry());
+        $this->assertSame('Retail', $companyE->getIndustry());
+        $this->assertSame('Retail', $companyF->getIndustry());
+        $this->assertSame('Retail', $companyG->getIndustry());
 
         $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue(isset($response['closeModal']), 'The response does not contain the `closeModal` param.');
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
         $this->assertTrue($response['closeModal']);
         $this->assertStringContainsString('5 companies affected', (string) $response['flashes']);
     }
