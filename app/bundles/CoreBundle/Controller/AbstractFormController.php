@@ -13,6 +13,8 @@ abstract class AbstractFormController extends CommonController
     protected ?string $permissionBase = null;
 
     /**
+     * @param string $objectModel
+     *
      * @return mixed
      */
     public function unlockAction(Request $request, $objectId, $objectModel)
@@ -85,7 +87,7 @@ abstract class AbstractFormController extends CommonController
                             'objectModel'  => $model,
                             'objectId'     => $entity->getId(),
                             'returnUrl'    => $returnUrl,
-                            'name'         => urlencode($entity->$nameFunction()),
+                            'name'         => urlencode($entity->{$nameFunction}()),
                         ]
                     ),
                 ]
@@ -96,7 +98,7 @@ abstract class AbstractFormController extends CommonController
             'type'    => 'error',
             'msg'     => 'mautic.core.error.locked',
             'msgVars' => [
-                '%name%'       => $entity->$nameFunction(),
+                '%name%'       => $entity->{$nameFunction}(),
                 '%user%'       => $entity->getCheckedOutByUser(),
                 '%contactUrl%' => $this->generateUrl(
                     'mautic_user_action',
@@ -187,7 +189,8 @@ abstract class AbstractFormController extends CommonController
                     $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+            }
+            if ($this->security->checkPermissionExists($permissionBase.':edit')) {
                 return $this->security->isGranted(
                     $permissionBase.':edit'
                 );
@@ -214,7 +217,7 @@ abstract class AbstractFormController extends CommonController
     /**
      * generate $postActionVars with respect to available referer.
      *
-     * @return array $postActionVars
+     * @return array
      */
     protected function refererPostActionVars($vars)
     {

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DateRangeUnitTraitTest extends TestCase
+final class DateRangeUnitTraitTest extends TestCase
 {
     private MockObject&ChartQuery $trait;
 

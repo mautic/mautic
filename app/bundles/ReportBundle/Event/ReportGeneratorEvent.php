@@ -32,7 +32,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         Report $report,
         private array $options,
         private QueryBuilder $queryBuilder,
-        private ChannelListHelper $channelListHelper,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
         $this->report            = $report;
         $this->context           = $report->getSource();
@@ -87,10 +87,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this->options;
     }
 
-    /**
-     * @return $this
-     */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         $this->options = array_merge($this->options, $options);
 
@@ -110,8 +107,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add category left join.
-     *
      * @param string $prefix
      * @param string $categoryPrefix
      */
@@ -125,8 +120,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * Add lead left join.
-     *
      * @param string $prefix
      * @param string $leadPrefix
      */
@@ -229,9 +222,6 @@ class ReportGeneratorEvent extends AbstractReportEvent
         return $this;
     }
 
-    /**
-     * Add company left join.
-     */
     public function addCompanyLeftJoin(QueryBuilder $queryBuilder, string $companyPrefix = self::COMPANY_PREFIX, string $contactPrefix = self::CONTACT_PREFIX): void
     {
         if ($this->usesColumnWithPrefix($companyPrefix) || $this->usesColumnWithPrefix(self::COMPANY_LEAD_PREFIX)) {
@@ -246,13 +236,9 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Apply date filters to the query.
      *
-     * @param string $dateColumn
-     * @param string $tablePrefix
-     * @param bool   $dateOnly
-     *
      * @throws \Exception
      */
-    public function applyDateFilters(QueryBuilder $queryBuilder, $dateColumn, $tablePrefix = 't', $dateOnly = false): ReportGeneratorEvent
+    public function applyDateFilters(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): ReportGeneratorEvent
     {
         $this->setDateRangeQueryFilters(
             $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,

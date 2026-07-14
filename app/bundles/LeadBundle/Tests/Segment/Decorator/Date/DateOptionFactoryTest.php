@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -25,7 +27,7 @@ use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 use Mautic\LeadBundle\Segment\RelativeDate;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateOptionFactory::class)]
-class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
+final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testBirthday(): void
     {
@@ -236,9 +238,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
 
     private function getFilterDecorator(?string $filterName): FilterDecoratorInterface
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
         $relativeDate     = $this->createMock(RelativeDate::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $relativeDate->method('getRelativeDateStrings')
             ->willReturn(
@@ -260,7 +260,7 @@ class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $dateOptionFactory = new DateOptionFactory($dateDecorator, $relativeDate, $timezoneResolver);
+        $dateOptionFactory = new DateOptionFactory($this->createStub(DateDecorator::class), $relativeDate, $this->createStub(TimezoneResolver::class));
 
         $filter                    = [
             'glue'     => 'and',

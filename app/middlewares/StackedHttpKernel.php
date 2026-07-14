@@ -46,18 +46,12 @@ class StackedHttpKernel implements HttpKernelInterface, TerminableInterface
         $this->middlewares = $middlewares;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function handle(Request $request, $type = HttpKernelInterface::MAIN_REQUEST, $catch = true): Response
     {
         return $this->kernel
             ->handle($request, $type, $catch);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function terminate(Request $request, Response $response): void
     {
         $previous = null;

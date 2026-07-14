@@ -35,8 +35,8 @@ class LineChart extends AbstractChart implements ChartInterface
      */
     public function __construct(
         ?string $unit = null,
-        $dateFrom = null,
-        $dateTo = null,
+        ?\DateTimeInterface $dateFrom = null,
+        ?\DateTimeInterface $dateTo = null,
         protected $dateFormat = null,
     ) {
         $this->unit       = $unit ?? $this->getTimeUnitFromDateRange($dateFrom, $dateTo);
@@ -62,10 +62,8 @@ class LineChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and data. Method will add the rest.
      *
      * @param string $label
-     *
-     * @return $this
      */
-    public function setDataset($label, array $data)
+    public function setDataset($label, array $data): static
     {
         $datasetId = count($this->datasets);
 

@@ -401,14 +401,12 @@ class TagController extends FormController
     /**
      * Return tag if exists and user has access.
      *
-     * @param int $tagId
-     *
      * @return Tag
      *
      * @throws EntityNotFoundException
      * @throws AccessDeniedException
      */
-    private function getTag($tagId)
+    private function getTag(int $tagId)
     {
         /** @var Tag|null $tag */
         $tag = $this->getModel('lead.tag')->getEntity($tagId);
@@ -483,7 +481,8 @@ class TagController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->isGranted(self::PERMISSION_VIEW)) {
+        }
+        if (!$this->security->isGranted(self::PERMISSION_VIEW)) {
             $this->throwAccessDenied();
         }
 

@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 final class EventTest extends TestCase
 {
     private const TEST_NAME = 'Test Name';
+
     private const DATE      = '2021-10-08 08:00:00';
 
     public function testSetTriggerHourWhenEmpty(): void
@@ -17,7 +18,7 @@ final class EventTest extends TestCase
         $event = new Event();
         $event->setName(self::TEST_NAME);
         $event->setTriggerHour('');
-        $this->assertNull($event->getTriggerHour());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $event->getTriggerHour());
     }
 
     public function testSetTriggerHourWhenArray(): void

@@ -78,7 +78,8 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
@@ -110,7 +111,7 @@ class ResultController extends CommonFormController
         if ($request->query->has('result')) {
             // Force ID
             $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $request->query->get('result'), 'strict' => false];
-            $session->set("mautic.formresult.$objectId.filters", $filters);
+            $session->set("mautic.formresult.{$objectId}.filters", $filters);
         }
 
         // get the results
@@ -264,11 +265,9 @@ class ResultController extends CommonFormController
      * @param int    $objectId
      * @param string $format
      *
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function exportAction(Request $request, $objectId, $format = 'csv')
+    public function exportAction(Request $request, $objectId, $format = 'csv'): Response
     {
         $formModel = $this->getModel('form.form');
         $form      = $formModel->getEntity($objectId);
@@ -300,7 +299,8 @@ class ResultController extends CommonFormController
                     ],
                 ]
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
             $form->getCreatedBy()
@@ -439,11 +439,9 @@ class ResultController extends CommonFormController
     }
 
     /**
-     * @param array $parameters
-     *
      * @return mixed
      */
-    protected function getFormIdFromRequest($parameters = [])
+    protected function getFormIdFromRequest(array $parameters = [])
     {
         $request = $this->getCurrentRequest();
         if ($request->attributes->has('formId')) {
@@ -482,7 +480,8 @@ class ResultController extends CommonFormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess('form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy())) {
+        }
+        if (!$this->security->hasEntityAccess('form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 

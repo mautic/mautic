@@ -9,22 +9,22 @@ use Mautic\IntegrationsBundle\Integration\ConfigFormNotesTrait;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use PHPUnit\Framework\TestCase;
 
-class ConfigFormNotesTraitTest extends TestCase
+final class ConfigFormNotesTraitTest extends TestCase
 {
     public function testConfigFormNotesTraitFormDefaultValues(): void
     {
-        $configFormNotes = new class implements ConfigFormNotesInterface {
+        $configFormNotes = new class() implements ConfigFormNotesInterface {
             use ConfigFormNotesTrait;
         };
 
-        $this->assertNull($configFormNotes->getAuthorizationNote());
-        $this->assertNull($configFormNotes->getFeaturesNote());
-        $this->assertNull($configFormNotes->getFieldMappingNote());
+        $this->assertNotInstanceOf(Note::class, $configFormNotes->getAuthorizationNote());
+        $this->assertNotInstanceOf(Note::class, $configFormNotes->getFeaturesNote());
+        $this->assertNotInstanceOf(Note::class, $configFormNotes->getFieldMappingNote());
     }
 
     public function testConfigFormNotesTraitFormForCustomValues(): void
     {
-        $configFormNotes = new class implements ConfigFormNotesInterface {
+        $configFormNotes = new class() implements ConfigFormNotesInterface {
             use ConfigFormNotesTrait;
 
             public function getAuthorizationNote(): Note

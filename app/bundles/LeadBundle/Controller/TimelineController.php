@@ -14,7 +14,7 @@ class TimelineController extends CommonController
     use LeadAccessTrait;
     use LeadDetailsTrait;
 
-    public function indexAction(Request $request, $leadId, $page = 1)
+    public function indexAction(Request $request, $leadId, int $page = 1)
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -28,7 +28,7 @@ class TimelineController extends CommonController
         $this->setListFilters();
 
         $session = $request->getSession();
-        if ('POST' == $request->getMethod() && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
@@ -63,7 +63,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function pluginIndexAction(Request $request, $integration, $page = 1)
+    public function pluginIndexAction(Request $request, $integration, int $page = 1)
     {
         $limit = 25;
         $leads = $this->checkAllAccess('view', $limit);
@@ -125,7 +125,7 @@ class TimelineController extends CommonController
         );
     }
 
-    public function pluginViewAction(Request $request, $integration, $leadId, $page = 1)
+    public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1)
     {
         if (empty($leadId)) {
             return $this->notFound();
@@ -205,7 +205,7 @@ class TimelineController extends CommonController
         $this->setListFilters();
 
         $session = $request->getSession();
-        if ('POST' == $request->getMethod() && $request->request->has('search')) {
+        if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
                 'includeEvents' => InputHelper::clean($request->request->all()['includeEvents'] ?? []),
@@ -223,7 +223,7 @@ class TimelineController extends CommonController
 
         $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) use ($dateHelper): array {
+        $resultsCallback = function (array $event) use ($dateHelper): array {
             $eventLabel = $event['eventLabel'] ?? $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];

@@ -15,19 +15,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
 
-class LeadListRepositoryTest extends TestCase
+final class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
     private LeadListRepository $repository;
 
     /**
-     * @var QueryBuilder&MockObject
+     * @var MockObject&QueryBuilder
      */
     private MockObject $queryBuilderMock;
 
     /**
-     * @var Expr&MockObject
+     * @var MockObject&Expr
      */
     private MockObject $expressionMock;
 
@@ -181,11 +181,11 @@ class LeadListRepositoryTest extends TestCase
                 AND manually_removed = 0
             LIMIT 1
 SQL;
-        $this->connection->expects(self::once())
+        $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with($sql, [$contactId], [\PDO::PARAM_INT])
             ->willReturn($this->result);
-        $this->result->expects(self::once())
+        $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
@@ -204,7 +204,7 @@ SQL;
                 AND leadlist_id IN (?)
                 AND manually_removed = 0
 SQL;
-        $this->connection->expects(self::once())
+        $this->connection->expects($this->once())
             ->method('executeQuery')
             ->with(
                 $sql,
@@ -213,7 +213,7 @@ SQL;
             )
             ->willReturn($this->result);
 
-        $this->result->expects(self::once())
+        $this->result->expects($this->once())
             ->method('fetchFirstColumn')
             ->willReturn($queryResult);
     }
@@ -239,17 +239,17 @@ SQL;
 
         $this->mockGetLeadCount($queryResult, false);
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->willReturnSelf();
 
-        $this->expressionMock->expects(self::once())
+        $this->expressionMock->expects($this->once())
             ->method('in')
             ->with('l.leadlist_id', ':listIds')
             ->willReturnSelf();
 
-        $this->expressionMock->expects(self::once())
+        $this->expressionMock->expects($this->once())
             ->method('eq')
             ->with('l.manually_removed', ':false')
             ->willReturnSelf();
@@ -260,7 +260,7 @@ SQL;
         ];
         $this->queryBuilderMock->expects(self::exactly(2))
             ->method('setParameter')
-            ->willReturnCallback(function (...$parameters) use (&$expectedCalls) {
+            ->willReturnCallback(function (...$parameters) use (&$expectedCalls): MockObject {
                 $this->assertSame(array_shift($expectedCalls), $parameters);
 
                 return $this->queryBuilderMock;
@@ -289,7 +289,7 @@ SQL;
             ],
         ];
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('getQueryPart')
             ->willReturn($fromPart);
         $matcher = self::exactly(2);
@@ -312,7 +312,7 @@ SQL;
         $matcher = self::exactly(2);
 
         $this->expressionMock->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds) {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher, $listIds): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.leadlist_id', $parameters[0]);
                     $this->assertSame($listIds[0], $parameters[1]);
@@ -336,7 +336,7 @@ SQL;
         $this->connection->method('createQueryBuilder')
             ->willReturn($this->queryBuilderMock);
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('select')
             ->with('count(l.lead_id) as thecount, l.leadlist_id')
             ->willReturnSelf();
@@ -346,22 +346,22 @@ SQL;
             ->willReturn($this->expressionMock);
 
         if ($addParam) {
-            $this->queryBuilderMock->expects(self::once())
+            $this->queryBuilderMock->expects($this->once())
                 ->method('setParameter')
                 ->with('false', false, 'boolean')
                 ->willReturnSelf();
         }
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('where')
             ->with($this->expressionMock)
             ->willReturnSelf();
 
-        $this->queryBuilderMock->expects(self::once())
+        $this->queryBuilderMock->expects($this->once())
             ->method('executeQuery')
             ->willReturn($this->result);
 
-        $this->result->expects(self::once())
+        $this->result->expects($this->once())
             ->method('fetchAllAssociative')
             ->willReturn($queryResult);
     }

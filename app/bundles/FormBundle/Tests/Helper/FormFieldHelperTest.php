@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Translation\Translator;
@@ -7,7 +9,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var FormFieldHelper
@@ -16,11 +18,7 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translatorMock = $this->createMock(Translator::class);
-
-        $validatorMock = $this->createMock(ValidatorInterface::class);
-
-        $this->fixture = new FormFieldHelper($translatorMock, $validatorMock);
+        $this->fixture = new FormFieldHelper($this->createStub(Translator::class), $this->createStub(ValidatorInterface::class));
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
@@ -31,7 +29,9 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /** @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}> */
+    /**
+     * @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}>
+     */
     public static function fieldProvider(): array
     {
         return [
@@ -205,10 +205,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $name
      * @param string $type
-     *
-     * @return Field
      */
-    protected static function getField($name, $type)
+    protected static function getField($name, $type): Field
     {
         $field = new Field();
 
@@ -221,10 +219,8 @@ class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $name
-     *
-     * @return string
      */
-    private static function getAliasFromName($name)
+    private static function getAliasFromName($name): string
     {
         return strtolower(str_replace(' ', '', $name));
     }

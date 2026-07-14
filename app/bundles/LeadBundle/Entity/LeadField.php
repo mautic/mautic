@@ -381,8 +381,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -396,13 +394,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set label.
-     *
      * @param string $label
-     *
-     * @return LeadField
      */
-    public function setLabel($label)
+    public function setLabel($label): static
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -411,8 +405,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get label.
-     *
      * @return string
      */
     public function getLabel()
@@ -424,10 +416,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * Proxy function to setLabel().
      *
      * @param string $label
-     *
-     * @return LeadField
      */
-    public function setName($label)
+    public function setName($label): static
     {
         $this->isChanged('label', $label);
 
@@ -445,13 +435,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set type.
-     *
      * @param string $type
-     *
-     * @return LeadField
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -460,8 +446,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get type.
-     *
      * @return string
      */
     public function getType()
@@ -470,13 +454,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set defaultValue.
-     *
      * @param string|array<string> $defaultValue
-     *
-     * @return LeadField
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): static
     {
         $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
@@ -486,8 +466,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get defaultValue.
-     *
      * @return string|null
      */
     public function getDefaultValue()
@@ -496,13 +474,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set isRequired.
-     *
      * @param bool $isRequired
-     *
-     * @return LeadField
      */
-    public function setIsRequired($isRequired)
+    public function setIsRequired($isRequired): static
     {
         $this->isChanged('isRequired', $isRequired);
         $this->isRequired = $isRequired;
@@ -511,8 +485,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get isRequired.
-     *
      * @return bool
      */
     public function getIsRequired()
@@ -531,13 +503,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set isFixed.
-     *
      * @param bool $isFixed
-     *
-     * @return LeadField
      */
-    public function setIsFixed($isFixed)
+    public function setIsFixed($isFixed): static
     {
         $this->isFixed = $isFixed;
 
@@ -545,8 +513,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get isFixed.
-     *
      * @return bool
      */
     public function getIsFixed()
@@ -566,10 +532,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
 
     /**
      * @param mixed[] $properties
-     *
-     * @return LeadField
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -586,13 +550,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set order.
-     *
      * @param int $order
-     *
-     * @return LeadField
      */
-    public function setOrder($order)
+    public function setOrder($order): static
     {
         $this->isChanged('order', $order);
         $this->order = $order;
@@ -601,8 +561,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get object.
-     *
      * @return string|null
      */
     public function getObject()
@@ -633,13 +591,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set object.
-     *
      * @param string $object
-     *
-     * @return LeadField
      */
-    public function setObject($object)
+    public function setObject($object): static
     {
         $this->isChanged('object', $object);
         $this->object = $object;
@@ -648,8 +602,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get order.
-     *
      * @return int|null
      */
     public function getOrder()
@@ -658,13 +610,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set isVisible.
-     *
      * @param bool $isVisible
-     *
-     * @return LeadField
      */
-    public function setIsVisible($isVisible)
+    public function setIsVisible($isVisible): static
     {
         $this->isChanged('isVisible', $isVisible);
         $this->isVisible = $isVisible;
@@ -673,8 +621,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get isVisible.
-     *
      * @return bool
      */
     public function getIsVisible()
@@ -702,8 +648,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get isShortVisible.
-     *
      * @return bool
      */
     public function getIsShortVisible()
@@ -735,10 +679,8 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * Set the unique identifer state of the field.
      *
      * @param mixed $isUniqueIdentifer
-     *
-     * @return LeadField
      */
-    public function setIsUniqueIdentifer($isUniqueIdentifer)
+    public function setIsUniqueIdentifer($isUniqueIdentifer): static
     {
         if ($isUniqueIdentifer) {
             $this->isIndex = true;
@@ -763,22 +705,16 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
      * Wrapper for incorrectly spelled setIsUniqueIdentifer.
      *
      * @param mixed $isUniqueIdentifier
-     *
-     * @return LeadField
      */
-    public function setIsUniqueIdentifier($isUniqueIdentifier)
+    public function setIsUniqueIdentifier($isUniqueIdentifier): static
     {
         return $this->setIsUniqueIdentifer($isUniqueIdentifier);
     }
 
     /**
-     * Set alias.
-     *
      * @param string $alias
-     *
-     * @return LeadField
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -787,8 +723,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get alias.
-     *
      * @return string
      */
     public function getAlias()
@@ -797,13 +731,9 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Set isListable.
-     *
      * @param bool $isListable
-     *
-     * @return LeadField
      */
-    public function setIsListable($isListable)
+    public function setIsListable($isListable): static
     {
         $this->isChanged('isListable', $isListable);
         $this->isListable = $isListable;
@@ -812,8 +742,6 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     }
 
     /**
-     * Get isListable.
-     *
      * @return bool
      */
     public function getIsListable()

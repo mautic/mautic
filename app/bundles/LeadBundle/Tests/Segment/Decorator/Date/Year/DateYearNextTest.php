@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Year;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -10,12 +12,12 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearNext;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(DateYearNext::class)]
-class DateYearNextTest extends \PHPUnit\Framework\TestCase
+final class DateYearNextTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetOperatorBetween(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $filter        = [
             'operator' => '=',
@@ -31,7 +33,7 @@ class DateYearNextTest extends \PHPUnit\Framework\TestCase
     public function testGetOperatorLessOrEqual(): void
     {
         $dateDecorator    = $this->createMock(DateDecorator::class);
-        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+        $timezoneResolver = $this->createStub(TimezoneResolver::class);
 
         $dateDecorator->method('getOperator')
             ->with()
@@ -50,7 +52,7 @@ class DateYearNextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueBetween(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');
@@ -74,7 +76,7 @@ class DateYearNextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParameterValueSingle(): void
     {
-        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $dateDecorator    = $this->createStub(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
         $date = new DateTimeHelper('', null, 'local');

@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ObjectMappingsDAOTest extends TestCase
+final class ObjectMappingsDAOTest extends TestCase
 {
     public function testGetters(): void
     {

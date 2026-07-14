@@ -21,7 +21,7 @@ class TransportChain
      */
     public function __construct(
         private $primaryTransport,
-        private IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
         $this->transports        = [];
     }
@@ -30,10 +30,8 @@ class TransportChain
      * @param string $alias
      * @param string $translatableAlias
      * @param string $integrationAlias
-     *
-     * @return $this
      */
-    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias)
+    public function addTransport($alias, TransportInterface $transport, $translatableAlias, $integrationAlias): static
     {
         $this->transports[$alias]['alias']            = $translatableAlias;
         $this->transports[$alias]['integrationAlias'] = $integrationAlias;

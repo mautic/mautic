@@ -15,21 +15,15 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
+final class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
 {
     private const CAMPAIGN_SUMMARY_PARAM = 'campaign_use_summary';
 
     private const CAMPAIGN_RANGE_PARAM   = 'campaign_by_range';
 
-    /**
-     * @var CampaignModel
-     */
-    private $campaignModel;
+    private CampaignModel $campaignModel;
 
-    /**
-     * @var string
-     */
-    private $campaignLeadsLabel;
+    private string $campaignLeadsLabel;
 
     protected function setUp(): void
     {
@@ -365,7 +359,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $crawler  = $this->client->request('GET', sprintf('/s/campaigns/view/%d', $campaign->getId()));
         $response = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('Campaign ABC', $response->getContent());
+        self::assertStringContainsString('Campaign ABC', (string) $response->getContent());
         self::assertSame('', trim($crawler->filter('#decisions-container')->text()));
         self::assertSame('', trim($crawler->filter('#actions-container')->text()));
         self::assertSame('', trim($crawler->filter('#conditions-container')->text()));
@@ -383,6 +377,6 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTestCase
         $body     = json_decode($response->getContent(), true);
         self::assertCount(2, $body);
         self::arrayHasKey('actions');
-        self::assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
+        self::assertStringContainsString('100% 2 0 Event A mautic.campaign.type.a 100% 2 0 Event B mautic.campaign.type.b', (string) preg_replace('/\s+/', ' ', strip_tags($body['actions'])));
     }
 }

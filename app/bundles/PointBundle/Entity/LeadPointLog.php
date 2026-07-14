@@ -12,7 +12,7 @@ class LeadPointLog
 
     /**
      * @var Point
-     **/
+     */
     private $point;
 
     /**
@@ -27,7 +27,7 @@ class LeadPointLog
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $dateFired;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

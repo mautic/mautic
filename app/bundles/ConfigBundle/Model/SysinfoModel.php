@@ -25,10 +25,10 @@ class SysinfoModel
     public function __construct(
         protected PathsHelper $pathsHelper,
         protected CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
         protected Connection $connection,
-        private InstallService $installService,
-        private CheckStep $checkStep,
+        private readonly InstallService $installService,
+        private readonly CheckStep $checkStep,
     ) {
     }
 
@@ -39,7 +39,7 @@ class SysinfoModel
      */
     public function getPhpInfo()
     {
-        if (!is_null($this->phpInfo)) {
+        if (null !== $this->phpInfo) {
             return $this->phpInfo;
         }
 
@@ -93,7 +93,7 @@ class SysinfoModel
      */
     public function getFolders()
     {
-        if (!is_null($this->folders)) {
+        if (null !== $this->folders) {
             return $this->folders;
         }
 

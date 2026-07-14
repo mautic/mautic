@@ -52,12 +52,12 @@ class ImportController extends FormController
 
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    private ImportModel $importModel;
+    private readonly ImportModel $importModel;
 
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -65,7 +65,7 @@ class ImportController extends FormController
         EventDispatcherInterface $dispatcher,
         Translator $translator,
         FlashBag $flashBag,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
         CorePermissions $security,
     ) {
         /** @var ImportModel $model */
@@ -388,7 +388,7 @@ class ImportController extends FormController
                             } catch (\Exception) {
                                 $errorMessage = 'mautic.lead.import.filenotreadable';
                             } finally {
-                                if (!is_null($errorMessage)) {
+                                if (null !== $errorMessage) {
                                     $form->addError(
                                         new FormError(
                                             $this->translator->trans($errorMessage, $errorParameters, 'validators')
@@ -545,11 +545,9 @@ class ImportController extends FormController
 
         if ($browserImportLimit && $this->getLineCount($object) < $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
-            return true;
         }
 
-        return false;
+        return !$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked();
     }
 
     protected function getLineCountLimit()
@@ -569,11 +567,9 @@ class ImportController extends FormController
 
         if ($browserImportLimit && $this->getLineCount($object) >= $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
-            return true;
         }
 
-        return false;
+        return !$browserImportLimit && $this->getFormButton($form, ['buttons', 'apply'])->isClicked();
     }
 
     /**

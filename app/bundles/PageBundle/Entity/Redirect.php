@@ -130,8 +130,6 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Set hits.
-     *
      * @param int $hits
      */
     public function setHits($hits): Redirect
@@ -142,8 +140,6 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Get hits.
-     *
      * @return int
      */
     public function getHits()
@@ -152,8 +148,6 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Set uniqueHits.
-     *
      * @param int $uniqueHits
      */
     public function setUniqueHits($uniqueHits): Redirect
@@ -164,8 +158,6 @@ class Redirect extends FormEntity
     }
 
     /**
-     * Get uniqueHits.
-     *
      * @return int
      */
     public function getUniqueHits()
@@ -183,10 +175,8 @@ class Redirect extends FormEntity
 
     /**
      * @param ArrayCollection $trackables
-     *
-     * @return Redirect
      */
-    public function setTrackables($trackables)
+    public function setTrackables($trackables): static
     {
         $this->trackables = $trackables;
 

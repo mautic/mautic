@@ -10,10 +10,12 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Tests\Helper\ConditionalFieldOrderTestData;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormModelFunctionalTest extends MauticMysqlTestCase
+final class FormModelFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
@@ -206,8 +208,10 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
     {
         $multiselectFieldId = $this->createMultiselectLeadField();
 
+        /** @var FieldModel $fieldModel */
         $fieldModel       = $this->getContainer()->get('mautic.lead.model.field');
         $multiselectField = $fieldModel->getEntity($multiselectFieldId);
+        $this->assertInstanceOf(LeadField::class, $multiselectField);
         $fieldAlias       = $multiselectField->getAlias();
 
         $form   = $this->createFormWithMultiselect($fieldAlias);
@@ -221,6 +225,7 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
 
         $this->logoutUser();
 
+        /** @var ContactTracker $contactTracker */
         $contactTracker = $this->getContainer()->get('mautic.tracker.contact');
         $contactTracker->setTrackedContact($lead);
 
@@ -286,7 +291,7 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
 
     private function createMultiselectLeadField(): int
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+        /** @var FieldModel $fieldModel */
         $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
         $alias      = 'test_multiselect_'.uniqid();
 

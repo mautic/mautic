@@ -19,7 +19,7 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
+final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {

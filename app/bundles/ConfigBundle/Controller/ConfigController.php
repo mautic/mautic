@@ -24,10 +24,8 @@ class ConfigController extends FormController
 {
     /**
      * Controller action for editing the application configuration.
-     *
-     * @return JsonResponse|Response
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage)
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper, TokenStorageInterface $tokenStorage): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {
@@ -61,7 +59,7 @@ class ConfigController extends FormController
         $openTab    = null;
 
         // Check for a submitted form and process it
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritable && $isValid = $this->isFormValid($form)) {

@@ -22,7 +22,7 @@ final class Allowlist
     public static function fromArray(array $array): Allowlist
     {
         return new self(
-            array_map(fn (array $item): AllowlistEntry => AllowlistEntry::fromArray($item), $array['allowlist'] ?? []),
+            array_map(AllowlistEntry::fromArray(...), $array['allowlist'] ?? []),
         );
     }
 
@@ -34,6 +34,6 @@ final class Allowlist
             }
         }
 
-        throw new RecordNotFoundException("Package '$packageName' not found in allowlist.");
+        throw new RecordNotFoundException("Package '{$packageName}' not found in allowlist.");
     }
 }

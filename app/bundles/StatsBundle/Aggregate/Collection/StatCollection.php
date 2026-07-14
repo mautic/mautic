@@ -8,7 +8,7 @@ use Mautic\StatsBundle\Aggregate\Helper\CalculatorHelper;
 
 class StatCollection
 {
-    private StatsDAO $stats;
+    private readonly StatsDAO $stats;
 
     private ?Calculator $calculator = null;
 
@@ -24,11 +24,9 @@ class StatCollection
      * @param int $hour
      * @param int $count
      *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function addStat($year, $month, $day, $hour, $count)
+    public function addStat($year, $month, $day, $hour, $count): static
     {
         $this->stats
             ->getYear($year)
@@ -43,11 +41,9 @@ class StatCollection
     /**
      * @param int $count
      *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function addStatByDateTime(\DateTime $dateTime, $count)
+    public function addStatByDateTime(\DateTime $dateTime, $count): static
     {
         $dateTime->setTimezone(new \DateTimeZone('UTC'));
 
@@ -63,11 +59,9 @@ class StatCollection
     }
 
     /**
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count)
+    public function addStatByDateTimeStringInUTC($dateTimeInUTC, $count): static
     {
         if (preg_match('/([0-9]{4})\\s([0-9]{2})/', $dateTimeInUTC, $matches)) {    //  Is this a week?
             $dateTimeString = CalculatorHelper::getWeekDateString($matches[1].'-'.$matches[2]);
@@ -91,7 +85,7 @@ class StatCollection
 
     public function getCalculator(\DateTime $fromDateTime, \DateTime $toDateTime): Calculator
     {
-        if (is_null($this->calculator)) {
+        if (null === $this->calculator) {
             $this->calculator = new Calculator($this->stats, $fromDateTime, $toDateTime);
         }
 

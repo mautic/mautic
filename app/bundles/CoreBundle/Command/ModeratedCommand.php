@@ -45,7 +45,7 @@ abstract class ModeratedCommand extends Command
 
     public function __construct(
         protected PathsHelper $pathsHelper,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
@@ -53,7 +53,7 @@ abstract class ModeratedCommand extends Command
     /**
      * Set moderation options.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('--bypass-locking', null, InputOption::VALUE_NONE, 'Bypass locking.')

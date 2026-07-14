@@ -21,10 +21,10 @@ class ContactSegmentFilterFactory
     private array $operatorsWithEmptyValuesAllowed = ['empty', '!empty', self::CUSTOM_OPERATOR];
 
     public function __construct(
-        private TableSchemaColumnsCache $schemaCache,
-        private Container $container,
-        private DecoratorFactory $decoratorFactory,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly TableSchemaColumnsCache $schemaCache,
+        private readonly Container $container,
+        private readonly DecoratorFactory $decoratorFactory,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -131,7 +131,7 @@ class ContactSegmentFilterFactory
                 }
             } else { // glue = and
                 // if 'or' followed by 'and', it becomes - or (cond1 and cond2)
-                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) { /** @phpstan-ignore-line `Comparison operation ">" between 0 and 0 is always false.` I don't see anything wrong. Seems to be a PHPSTAN issue https://github.com/phpstan/phpstan/issues/3831 */
+                if (isset($arrStacks[$previousKey]) && count($arrStacks[$previousKey]) > 0) {
                     $previousFilter = array_pop($arrStacks[$previousKey]);
                     array_push($shrinkedFilters, $previousFilter);
                 }
@@ -170,7 +170,7 @@ class ContactSegmentFilterFactory
 
         $filter                         = $stack[0];
         $filter['operator']             = 'in';
-        $filter['properties']['filter'] = $filter['filter'] = array_map(fn ($ele): mixed => $ele['filter'], $stack);
+        $filter['properties']['filter'] = $filter['filter'] = array_map(fn (array $ele): mixed => $ele['filter'], $stack);
 
         return $filter;
     }

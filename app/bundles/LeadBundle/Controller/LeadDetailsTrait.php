@@ -14,10 +14,7 @@ trait LeadDetailsTrait
 {
     private ?RequestStack $requestStack = null;
 
-    /**
-     * @param int $page
-     */
-    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getAllEngagements(array $leads, ?array $filters = null, ?array $orderBy = null, int $page = 1, $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 
@@ -120,7 +117,7 @@ trait LeadDetailsTrait
         return $filters;
     }
 
-    private function cmp($a, $b): int
+    private function cmp(array $a, array $b): int
     {
         return $b['timestamp'] <=> $a['timestamp'];
     }
@@ -222,7 +219,7 @@ trait LeadDetailsTrait
         $logCount = $repo->getAuditLogsCount($lead, $filters);
         $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
 
-        $logEvents = array_map(fn ($l): array => [
+        $logEvents = array_map(fn (array $l): array => [
             'eventType'       => $l['action'],
             'userName'        => $l['userName'],
             'timestamp'       => $l['dateAdded'],
@@ -251,11 +248,7 @@ trait LeadDetailsTrait
         ];
     }
 
-    /**
-     * @param int $page
-     * @param int $limit
-     */
-    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, $page = 1, $limit = 25): array
+    protected function getEngagements(Lead $lead, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25): array
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();
 

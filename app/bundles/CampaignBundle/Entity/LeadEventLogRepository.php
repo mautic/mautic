@@ -234,7 +234,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
-        $q->$join(
+        $q->{$join}(
             'o',
             MAUTIC_TABLE_PREFIX.'campaign_leads',
             'l',
@@ -369,7 +369,7 @@ class LeadEventLogRepository extends CommonRepository
         }
     }
 
-    public function getChartQuery($options): array
+    public function getChartQuery(array $options): array
     {
         $chartQuery = new ChartQuery($this->getReplicaConnection(), $options['dateFrom'], $options['dateTo']);
 
@@ -408,11 +408,9 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $eventId
      *
-     * @return ArrayCollection
-     *
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter): ArrayCollection
     {
         if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
             return new ArrayCollection();
@@ -679,7 +677,7 @@ SQL;
      */
     public function markEventLogsQueued(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

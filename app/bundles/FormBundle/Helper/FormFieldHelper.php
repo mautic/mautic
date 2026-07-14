@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ValidatorInterface $validator;
+    private readonly ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -254,12 +254,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         }
     }
 
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public function sanitizeValue($value)
+    public function sanitizeValue(mixed $value): mixed
     {
         $valueType = gettype($value);
         $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));

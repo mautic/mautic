@@ -11,8 +11,8 @@ class LogoutEvent extends Event
     private array $session = [];
 
     public function __construct(
-        private User $user,
-        private Request $request,
+        private readonly User $user,
+        private readonly Request $request,
     ) {
     }
 

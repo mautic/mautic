@@ -30,7 +30,7 @@ final class ExportSchedulerCommandTest extends MauticMysqlTestCase
 
         // Execute command normally
         $commandTester = $this->testSymfonyCommand('mautic:reports:scheduler', ['--report' => $report->getId()]);
-        Assert::assertEquals(ExitCode::SUCCESS, $commandTester->getStatusCode());
+        Assert::assertSame(ExitCode::SUCCESS, $commandTester->getStatusCode());
     }
 
     public function testCleanupOnlyDoesNotProcessExports(): void

@@ -11,14 +11,14 @@ use Twig\TwigFunction;
 class VersionExtension extends AbstractExtension
 {
     public function __construct(
-        private AppVersion $appVersion,
+        private readonly AppVersion $appVersion,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('mauticAppVersion', [$this, 'getVersion']),
+            new TwigFunction('mauticAppVersion', $this->getVersion(...)),
         ];
     }
 

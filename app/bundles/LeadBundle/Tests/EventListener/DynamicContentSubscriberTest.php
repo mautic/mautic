@@ -13,17 +13,14 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class DynamicContentSubscriberTest extends TestCase
+final class DynamicContentSubscriberTest extends TestCase
 {
     /**
-     * @var LeadListRepository|MockObject
+     * @var MockObject&LeadListRepository
      */
-    private $segmentRepository;
+    private MockObject $segmentRepository;
 
-    /**
-     * @var DynamicContentSubscriber
-     */
-    private $subscriber;
+    private DynamicContentSubscriber $subscriber;
 
     protected function setUp(): void
     {
@@ -76,7 +73,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
-        $this->segmentRepository->expects(self::once())
+        $this->segmentRepository->expects($this->once())
             ->method('isNotContactInAnySegment')
             ->with($contactId)
             ->willReturn(true);
@@ -100,7 +97,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
-        $this->segmentRepository->expects(self::once())
+        $this->segmentRepository->expects($this->once())
             ->method('isContactInAnySegment')
             ->with($contactId)
             ->willReturn(true);
@@ -124,7 +121,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
-        $this->segmentRepository->expects(self::once())
+        $this->segmentRepository->expects($this->once())
             ->method('isContactInSegments')
             ->with($contactId, $filters[0]['filter'])
             ->willReturn(true);
@@ -148,7 +145,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
-        $this->segmentRepository->expects(self::once())
+        $this->segmentRepository->expects($this->once())
             ->method('isNotContactInSegments')
             ->with($contactId, $filters[0]['filter'])
             ->willReturn(true);
@@ -172,7 +169,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
-        $this->segmentRepository->expects(self::once())
+        $this->segmentRepository->expects($this->once())
             ->method('isContactInAllSegments')
             ->with($contactId, $filters[0]['filter'])
             ->willReturn(true);
@@ -196,7 +193,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
 
-        $this->segmentRepository->expects(self::once())
+        $this->segmentRepository->expects($this->once())
             ->method('isNotContactInAllSegments')
             ->with($contactId, $filters[0]['filter'])
             ->willReturn(true);

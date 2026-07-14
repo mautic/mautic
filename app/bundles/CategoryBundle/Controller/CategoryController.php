@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CategoryController extends AbstractFormController
 {
     public function __construct(
-        private FormFactoryInterface $formFactory,
+        private readonly FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
@@ -202,10 +202,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function newAction(Request $request, $bundle)
+    public function newAction(Request $request, $bundle): JsonResponse|Response
     {
         $model = $this->getModel('category');
         \assert($model instanceof CategoryModel);
@@ -274,7 +272,8 @@ class CategoryController extends AbstractFormController
                     'closeModal'    => 1,
                 ],
             ]);
-        } elseif (!empty($valid)) {
+        }
+        if (!empty($valid)) {
             // return edit view to prevent duplicates
             return $this->editAction($request, $bundle, $entity->getId(), true);
         }
@@ -299,10 +298,8 @@ class CategoryController extends AbstractFormController
 
     /**
      * Generates edit form and processes post data.
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false)
+    public function editAction(Request $request, $bundle, $objectId, $ignorePost = false): JsonResponse|Response
     {
         $session = $request->getSession();
         $model   = $this->getModel('category');
@@ -345,7 +342,7 @@ class CategoryController extends AbstractFormController
         $form['inForm']->setData($inForm);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -598,7 +595,7 @@ class CategoryController extends AbstractFormController
     private function getInFormValue(Request $request, string $method): int
     {
         $inForm = $request->get('inForm', 0);
-        if (Request::METHOD_POST == $method) {
+        if (Request::METHOD_POST === $method) {
             $category_form = $request->request->all()['category_form'] ?? [];
             $inForm        = $category_form['inForm'] ?? 0;
         }

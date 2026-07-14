@@ -21,7 +21,7 @@ class SysinfoController extends FormController
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
-        private SysinfoModel $sysinfoModel,
+        private readonly SysinfoModel $sysinfoModel,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         UserHelper $userHelper,

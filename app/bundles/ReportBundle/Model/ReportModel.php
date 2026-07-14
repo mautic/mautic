@@ -65,8 +65,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         protected ChannelListHelper $channelListHelper,
         protected FieldModel $fieldModel,
         protected ReportHelper $reportHelper,
-        private CsvExporter $csvExporter,
-        private ExcelExporter $excelExporter,
+        private readonly CsvExporter $csvExporter,
+        private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -74,17 +74,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         Translator $translator,
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\ReportBundle\Entity\ReportRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\ReportBundle\Entity\ReportRepository
     {
         return $this->em->getRepository(Report::class);
     }
@@ -300,7 +297,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 continue;
             }
             if (isset($data['label'])) {
-                $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"{$column}\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];
                 $return->definitions[$column] = $data;
             }
@@ -330,13 +327,13 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             if (isset($data['label'])) {
                 $return->definitions[$filter] = $data;
                 $return->choices[$filter]     = $data['label'];
-                $return->choiceHtml .= "<option value=\"$filter\">{$data['label']}</option>\n";
+                $return->choiceHtml .= "<option value=\"{$filter}\">{$data['label']}</option>\n";
 
                 $return->operatorChoices[$filter] = $this->getOperatorOptions($data);
                 $return->operatorHtml[$filter]    = '';
 
                 foreach ($return->operatorChoices[$filter] as $value => $label) {
-                    $return->operatorHtml[$filter] .= "<option value=\"$value\">$label</option>\n";
+                    $return->operatorHtml[$filter] .= "<option value=\"{$value}\">{$label}</option>\n";
                 }
             }
         }
@@ -386,7 +383,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         switch ($format) {
             case 'csv':
-                if (!is_null($handle)) {
+                if (null !== $handle) {
                     $this->csvExporter->export($reportDataResult, $handle, $page);
 
                     return;
@@ -451,7 +448,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         $debugData     = [];
 
         // UI doesn't set time so reset it to midnight. API can set time so do not reset it. Using DateTimeImmutable to distinguish.
-        $resetTime = !(isset($options['dateFrom']) && $options['dateFrom'] instanceof \DateTimeImmutable);
+        $resetTime = !isset($options['dateFrom']) || !$options['dateFrom'] instanceof \DateTimeImmutable;
 
         if ($resetTime && isset($options['dateFrom'])) {
             $now = new \DateTime();
@@ -637,7 +634,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
                 if (is_array($param)) {
                     $param = implode("','", $param);
                 }
-                $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
+                $debugData['query'] = str_replace(":{$name}", "'{$param}'", $debugData['query']);
             }
 
             $debugData['query_time'] = $queryTime ?? 'N/A';

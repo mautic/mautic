@@ -333,9 +333,6 @@ class AppKernel extends Kernel
         return $this->getProjectDir().'/var/logs';
     }
 
-    /**
-     * Get local config file.
-     */
     public function getLocalConfigFile(): string
     {
         return ParameterLoader::getLocalConfigFile($this->getApplicationDir().'/app');

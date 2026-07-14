@@ -25,8 +25,8 @@ class SyncIntegrationsHelper
     private ?array $enabled = null;
 
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
-        private ObjectProvider $objectProvider,
+        private readonly IntegrationsHelper $integrationsHelper,
+        private readonly ObjectProvider $objectProvider,
     ) {
     }
 
@@ -43,7 +43,7 @@ class SyncIntegrationsHelper
     public function getIntegration(string $integration)
     {
         if (!isset($this->integrations[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.sync_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.sync_integration");
         }
 
         return $this->integrations[$integration];

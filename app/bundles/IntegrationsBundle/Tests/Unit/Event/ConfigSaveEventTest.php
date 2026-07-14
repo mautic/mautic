@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\TestCase;
 
-class ConfigSaveEventTest extends TestCase
+final class ConfigSaveEventTest extends TestCase
 {
     public function testGetters(): void
     {
@@ -16,7 +16,7 @@ class ConfigSaveEventTest extends TestCase
         $integration = $this->createMock(Integration::class);
         $event       = new ConfigSaveEvent($integration);
 
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getName')
             ->willReturn($name);
 
