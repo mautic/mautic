@@ -32,7 +32,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&InactiveHelper $inactiveHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventExecutioner $eventExecutioner;
+    private MockObject&EventExecutioner $eventExecutioner;
 
     private MockObject&EventRedirectionHelper $redirectionHelper;
 
@@ -46,7 +46,8 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->inactiveHelper = $this->createMock(InactiveHelper::class);
 
-        $this->eventExecutioner = $this->createStub(EventExecutioner::class);
+        $this->eventExecutioner = $this->createMock(EventExecutioner::class);
+        $this->eventExecutioner->method('getExecutionDate')->willReturn(new \DateTime());
 
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
@@ -67,6 +68,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getEvaluated());
     }
@@ -84,6 +86,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
         $counter = $this->getExecutioner()->execute($campaign, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
 
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
@@ -95,7 +98,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('getEventsByType')
             ->willReturn(new ArrayCollection([$decision]));
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(1);
 
@@ -146,6 +149,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
         $counter = $this->getExecutioner()->validate(1, $limiter, new BufferedOutput());
+        $this->assertInstanceOf(\Mautic\CampaignBundle\Executioner\Result\Counter::class, $counter);
         $this->assertEquals(0, $counter->getTotalEvaluated());
     }
 
@@ -155,7 +159,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
         $campaign->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
-        $campaign->expects($this->any())
+        $campaign
             ->method('getId')
             ->willReturn(1);
 

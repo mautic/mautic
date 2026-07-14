@@ -14,10 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TriggerController extends FormController
 {
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -131,7 +128,8 @@ class TriggerController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$permissions['point:triggers:view']) {
+        }
+        if (!$permissions['point:triggers:view']) {
             $this->throwAccessDenied();
         }
 
@@ -324,7 +322,8 @@ class TriggerController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->security->isGranted('point:triggers:edit')) {
+        }
+        if (!$this->security->isGranted('point:triggers:edit')) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -398,7 +397,8 @@ class TriggerController extends FormController
                         'contentTemplate' => $template,
                     ])
                 );
-            } elseif ($form->get('buttons')->get('apply')->isClicked()) {
+            }
+            if ($form->get('buttons')->get('apply')->isClicked()) {
                 // do not clear session, just reload view with updated session
                 $cleanSlate = false;
             }

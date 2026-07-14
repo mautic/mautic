@@ -14,10 +14,10 @@ final class FieldCollectorTest extends \PHPUnit\Framework\TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {
-        $dispatcher                               = new class extends EventDispatcher {
+        $dispatcher                               = new class() extends EventDispatcher {
             public int $dispatchMethodCallCounter = 0;
 
-            public function dispatch(object $event, ?string $eventName = null): object
+            public function dispatch(object $event, ?string $eventName = null): FieldCollection
             {
                 ++$this->dispatchMethodCallCounter;
 

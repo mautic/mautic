@@ -14,7 +14,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -170,7 +172,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newDirName ?? $newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->mirror($root.$theme, $root.$dirName);
@@ -191,7 +193,7 @@ class ThemeHelper implements ThemeHelperInterface
         $dirName = $this->getDirectoryName($newName);
 
         if ($this->filesystem->exists($root.$dirName)) {
-            throw new FileExistsException("$dirName already exists");
+            throw new FileExistsException("{$dirName} already exists");
         }
 
         $this->filesystem->rename($root.$theme, $root.$dirName);
@@ -427,6 +429,31 @@ class ThemeHelper implements ThemeHelperInterface
                     $this->sandboxEnv->addExtension($extension);
                 }
             }
+
+            $this->sandboxEnv->addRuntimeLoader(new class($this->twig) implements RuntimeLoaderInterface {
+                public function __construct(
+                    private readonly Environment $twig,
+                ) {
+                }
+
+                /**
+                 * @template TRuntime of object
+                 *
+                 * @param class-string<TRuntime> $class
+                 *
+                 * @return TRuntime|null
+                 */
+                public function load(string $class): ?object
+                {
+                    try {
+                        $runtime = $this->twig->getRuntime($class);
+                    } catch (RuntimeError) {
+                        return null;
+                    }
+
+                    return is_object($runtime) ? $runtime : null;
+                }
+            });
 
             $this->sandboxEnv->addExtension(new SandboxExtension(new ThemeSandboxPolicy(), true));
         }

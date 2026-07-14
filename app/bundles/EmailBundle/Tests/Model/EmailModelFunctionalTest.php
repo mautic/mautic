@@ -20,7 +20,10 @@ use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
@@ -44,6 +47,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->configParams['email_frequency_time']   = 'MONTH';
         parent::setUp();
 
+        /** @var EmailModel $emailModel */
         $emailModel = static::getContainer()->get('mautic.email.model.email');
         $this->assertInstanceOf(EmailModel::class, $emailModel);
         $this->emailModel = $emailModel;
@@ -138,6 +142,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
             $contacts[] = $contact;
         }
 
+        /** @var LeadModel $contactModel */
         $contactModel = static::getContainer()->get('mautic.lead.model.lead');
         $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntities($contacts);
@@ -332,6 +337,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $emailStat->setDateRead(new \DateTime());
         $emailStat->setOpenCount(1);
         $email = $emailStat->getEmail();
+        $this->assertInstanceOf(Email::class, $email);
         $email->setReadCount($email->getReadCount() + 1);
         $this->em->persist($emailStat);
         $this->em->persist($email);
@@ -531,6 +537,100 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->assertArrayHasKey('companies', $result);
         $this->assertEmpty($result['companies']);
+    }
+
+    public function testGetEntityReturnsFreshPendingCountAfterPendingCacheInvalidation(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
+        $this->emailModel->invalidatePendingCountCacheForList($segment->getId());
+
+        $loadedEmail = $this->emailModel->getEntity($email->getId());
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
+    public function testGetEntityReturnsFreshPendingCountAfterSegmentListChangeEvent(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
+
+        static::getContainer()->get('event_dispatcher')->dispatch(
+            new ListChangeEvent($contacts[2], $segment, true),
+            LeadEvents::LEAD_LIST_CHANGE
+        );
+
+        $loadedEmail = $this->emailModel->getEntity($email->getId());
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
+    public function testGetEntityReturnsFreshPendingCountForSegmentEmail(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $this->assertInstanceOf(ListModel::class, $listModel);
+
+        foreach (array_slice($contacts, 2, 3) as $contact) {
+            $listModel->addLead($contact, $segment, true);
+        }
+
+        $loadedEmail = $this->emailModel->getEntity($email->getId());
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
+    }
+
+    public function testGetEntitiesReturnsFreshPendingCountForSegmentEmail(): void
+    {
+        $contacts = $this->generateContacts(5);
+        $segment  = $this->createSegment();
+        $this->addContactsToSegment(array_slice($contacts, 0, 2), $segment);
+        $email = $this->createEmail($segment);
+
+        $this->emailModel->getPendingLeads($email, null, true);
+
+        $listModel = static::getContainer()->get('mautic.lead.model.list');
+        $this->assertInstanceOf(ListModel::class, $listModel);
+
+        foreach (array_slice($contacts, 2, 3) as $contact) {
+            $listModel->addLead($contact, $segment, true);
+        }
+
+        $entities = $this->emailModel->getEntities([
+            'ids'              => [$email->getId()],
+            'ignore_paginator' => true,
+        ]);
+
+        $loadedEmail = null;
+        foreach ($entities as $entity) {
+            $loadedEmail = $entity;
+            break;
+        }
+
+        $this->assertInstanceOf(Email::class, $loadedEmail);
+
+        $this->assertEquals(5, $loadedEmail->getPendingCount());
     }
 
     /**

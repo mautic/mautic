@@ -16,9 +16,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
 {
     public function testPopulatedLeadDataReturnsIntAndNotDncEntityForMauticContactIsContactableByEmail(): void
     {
-        /**
-         * @var MockObject&AbstractIntegration
-         */
+        /** @var MockObject&AbstractIntegration $integration */
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
@@ -73,9 +71,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('requestProvider')]
     public function testMakeRequest(string $uri, array $parameters, string $method, array $settings, object $assertRequest): void
     {
-        /**
-         * @var MockObject&AbstractIntegration
-         */
+        /** @var MockObject&AbstractIntegration $integration */
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integration = $this->getMockBuilder(AbstractIntegration::class)
             ->setConstructorArgs([
@@ -137,7 +133,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
                 'ignore_event_dispatch' => true,
                 'encode_parameters'     => 'json',
             ],
-            new class {
+            new class() {
                 /**
                  * @param mixed[] $options
                  */
@@ -163,7 +159,7 @@ final class AbstractIntegrationTest extends AbstractIntegrationTestCase
             ['this will be' => 'encoded to form array'],
             'POST',
             ['ignore_event_dispatch' => true],
-            new class {
+            new class() {
                 /**
                  * @param mixed[] $options
                  */

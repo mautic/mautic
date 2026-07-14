@@ -105,14 +105,9 @@ final class EmailControllerTest extends TestCase
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
-        $formFieldHelper                  = $this->createMock(FormFieldHelper::class);
-        $doctrine                         = $this->createMock(ManagerRegistry::class);
         $this->modelFactoryMock           = $this->createMock(ModelFactory::class);
         $helperUserMock                   = $this->createMock(UserHelper::class);
-        $coreParametersHelper             = $this->createMock(CoreParametersHelper::class);
         $this->dispatcher                 = $this->createMock(EventDispatcherInterface::class);
-        $translatorMock                   = $this->createMock(Translator::class);
-        $flashBagMock                     = $this->createMock(FlashBag::class);
         $this->requestStack               = new RequestStack();
         $this->corePermissionsMock        = $this->createMock(CorePermissions::class);
 
@@ -121,14 +116,14 @@ final class EmailControllerTest extends TestCase
 
         $this->controller = new EmailController(
             $this->formFactoryMock,
-            $formFieldHelper,
-            $doctrine,
+            $this->createStub(FormFieldHelper::class),
+            $this->createStub(ManagerRegistry::class),
             $this->modelFactoryMock,
             $helperUserMock,
-            $coreParametersHelper,
+            $this->createStub(CoreParametersHelper::class),
             $this->dispatcher,
-            $translatorMock,
-            $flashBagMock,
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
             $this->requestStack,
             $this->corePermissionsMock
         );
@@ -153,7 +148,7 @@ final class EmailControllerTest extends TestCase
             ->with(5)
             ->willReturn(null);
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
@@ -186,7 +181,7 @@ final class EmailControllerTest extends TestCase
             ->with(5)
             ->willReturn($this->emailMock);
 
-        $this->routerMock->expects($this->any())
+        $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
@@ -218,7 +213,7 @@ final class EmailControllerTest extends TestCase
             ['twig', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->twigMock],
         ];
 
-        $serviceExists = fn ($key): bool => count(array_filter($services, fn ($service): bool => $service[0] === $key)) > 0;
+        $serviceExists = fn ($key): bool => count(array_filter($services, fn (array $service): bool => $service[0] === $key)) > 0;
 
         $this->containerMock->method('has')->willReturnCallback($serviceExists);
         $this->containerMock->method('get')->willReturnMap($services);

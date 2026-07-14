@@ -286,7 +286,7 @@ class SalesforceApi extends CrmApi
                 $results              = [];
                 foreach ($chunked as $chunk) {
                     // We can only submit 25 at a time
-                    if ($chunk) {
+                    if ([] !== $chunk) {
                         $request['compositeRequest'] = $chunk;
                         $result                      = $this->syncMauticToSalesforce($request);
                         $results[]                   = $result;
@@ -447,8 +447,8 @@ class SalesforceApi extends CrmApi
         $campaignMembers = [];
         if (!empty($people)) {
             $idField = "{$object}Id";
-            $query   = "Select Id, $idField from CampaignMember where CampaignId = '".$campaignId
-                ."' and $idField in ('".implode("','", $people)."')";
+            $query   = "Select Id, {$idField} from CampaignMember where CampaignId = '".$campaignId
+                ."' and {$idField} in ('".implode("','", $people)."')";
 
             $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
             if (!empty($foundCampaignMembers['records'])) {
@@ -492,7 +492,7 @@ class SalesforceApi extends CrmApi
      */
     public function getCompaniesByName(array $names, $requiredFieldString)
     {
-        $names     = array_map([$this, 'escapeQueryValue'], $names);
+        $names     = array_map($this->escapeQueryValue(...), $names);
         $queryUrl  = $this->integration->getQueryUrl();
         $findQuery = 'select Id, '.$requiredFieldString.' from Account where isDeleted = false and Name in (\''.implode("','", $names).'\')';
 

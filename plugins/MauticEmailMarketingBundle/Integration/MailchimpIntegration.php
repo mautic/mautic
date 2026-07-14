@@ -51,7 +51,6 @@ class MailchimpIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param array $settings
      * @param array $parameters
      *
      * @return bool|string
@@ -128,9 +127,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['EMAIL'])) {
+        }
+        if (empty($mappedData['EMAIL'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 

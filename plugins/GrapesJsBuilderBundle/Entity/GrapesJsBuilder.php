@@ -44,8 +44,6 @@ class GrapesJsBuilder
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()

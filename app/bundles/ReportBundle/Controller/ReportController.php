@@ -22,12 +22,9 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ReportController extends FormController
 {
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model = $this->getModel('report');
 
         // set some permissions
@@ -156,7 +153,7 @@ class ReportController extends FormController
      *
      * @return array<string, string|array<string, string>>|bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, int $objectId)
     {
         $page      = $request->getSession()->get('mautic.report.page', 1);
         $returnUrl = $this->generateUrl('mautic_report_index', ['page' => $page]);
@@ -293,7 +290,7 @@ class ReportController extends FormController
      *
      * @return HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
      */
-    public function editAction(Request $request, $objectId, $ignorePost = false)
+    public function editAction(Request $request, int $objectId, $ignorePost = false)
     {
         $model = $this->getModel('report');
         \assert($model instanceof ReportModel);
@@ -406,7 +403,8 @@ class ReportController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form for updated columns
                 $form = $model->createForm($entity, $this->formFactory, $action);
             }
@@ -561,7 +559,8 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        }
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         }
 
@@ -751,7 +750,8 @@ class ReportController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
+        }
+        if (!$this->security->hasEntityAccess($permissions[0], $permissions[1], $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
@@ -797,7 +797,8 @@ class ReportController extends FormController
                     ],
                 ]
             );
-        } elseif (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
+        }
+        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $entity->getCreatedBy())) {
             $this->throwAccessDenied();
         } elseif (!$this->security->isAdmin() && !$this->security->isGranted('report:export:enable', 'MATCH_ONE')) {
             $this->throwAccessDenied();

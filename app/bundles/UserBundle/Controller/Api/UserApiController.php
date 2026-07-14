@@ -150,7 +150,7 @@ class UserApiController extends CommonApiController
     }
 
     /**
-     * @param User                 &$entity
+     * @param User                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
      * @param string               $action
@@ -194,7 +194,8 @@ class UserApiController extends CommonApiController
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
-        } elseif (!is_array($permissions)) {
+        }
+        if (!is_array($permissions)) {
             $permissions = [$permissions];
         }
 

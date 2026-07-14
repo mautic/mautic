@@ -34,6 +34,7 @@ use Mautic\EmailBundle\Validator\EmailLists;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\EmailBundle\Validator\ScheduleDateRange;
 use Mautic\EmailBundle\Validator\TextOnlyDynamicContent;
+use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
@@ -82,6 +83,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public const MAX_NAME_SUBJECT_LENGTH = 190;
 
     public const TABLE_NAME = 'emails';
+
+    private const SETTINGS_PREFIX = 'settings_';
 
     /**
      * @var int
@@ -217,7 +220,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['email:read', 'email:write'])]
     private $category;
 
@@ -306,6 +309,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private bool $isDuplicate = false;
+
+    /**
+     * @var mixed[]|null
+     */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private ?array $settings = null;
 
     public function __clone()
     {
@@ -446,6 +455,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->cascadeAll()
             ->build();
 
+        $builder->createField('settings', Types::JSON)
+            ->columnName('settings')
+            ->nullable()
+            ->build();
+
         static::addUuidField($builder);
         self::addProjectsField($builder, 'email_projects_xref', 'email_id');
         self::addVersionField($builder);
@@ -529,6 +543,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $metadata->addConstraint(new EmailLists());
         $metadata->addConstraint(new EntityEvent());
         $metadata->addConstraint(new ScheduleDateRange());
+        $metadata->addConstraint(new ValidEmailLinks());
 
         $metadata->addConstraint(new Callback(
             function (Email $email, ExecutionContextInterface $context): void {
@@ -601,6 +616,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'dynamicContent',
                     'lists',
                     'headers',
+                    'settings',
                 ]
             )
             ->build();
@@ -608,10 +624,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         self::addProjectsInLoadApiMetadata($metadata, 'email');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -1006,9 +1022,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->lists;
     }
 
-    /**
-     * Add list.
-     */
     public function addList(LeadList $list): static
     {
         $this->listsChangedAdd('lists', $list->getId());
@@ -1029,9 +1042,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * Remove list.
-     */
     public function removeList(LeadList $list): void
     {
         $this->listsChangedRemove('lists', $list->getId());
@@ -1197,8 +1207,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Get assetAttachments.
-     *
      * @return Collection
      */
     public function getAssetAttachments()
@@ -1384,7 +1392,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private function initListChanges(string $property): void
     {
         if (!isset($this->changes[$property])) {
-            $list                     = $this->$property;
+            $list                     = $this->{$property};
             $current                  = $this->getListKeys($list);
             $this->changes[$property] = [$current, $current];
         }
@@ -1429,7 +1437,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $variantSettings = $this->getVariantParent() ? $this->getVariantParent()->getVariantSettings() : $this->getVariantSettings();
 
-        return true === (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
+        return (bool) ($variantSettings['enableAbTest'] ?? false) && 100 === (int) ($variantSettings['totalWeight'] ?? null);
     }
 
     public function getSendingStatus(): string
@@ -1475,5 +1483,56 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setIsDuplicate(bool $isDuplicate): void
     {
         $this->isDuplicate = $isDuplicate;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getSettings(): array
+    {
+        return $this->settings ?? [];
+    }
+
+    /**
+     * @param array<mixed> $settings
+     */
+    public function setSettings(array $settings): Email
+    {
+        $this->isChanged('settings', $settings);
+        $this->settings = $settings;
+
+        return $this;
+    }
+
+    public function __get(string $name): mixed
+    {
+        if (!$this->isSettingsKey($name)) {
+            return null;
+        }
+
+        return $this->getSettings()[$this->translateSettingsKey($name)] ?? null;
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        if (!$this->isSettingsKey($name)) {
+            return;
+        }
+
+        $settings         = $this->getSettings();
+        $field            = $this->translateSettingsKey($name);
+        $settings[$field] = $value;
+
+        $this->setSettings($settings);
+    }
+
+    private function isSettingsKey(string $name): bool
+    {
+        return str_starts_with($name, self::SETTINGS_PREFIX);
+    }
+
+    private function translateSettingsKey(string $name): string
+    {
+        return str_replace(self::SETTINGS_PREFIX, '', $name);
     }
 }

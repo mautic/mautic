@@ -222,14 +222,11 @@ final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportDevicesSubscriber(): ReportDevicesSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-
-        return new ReportDevicesSubscriber($fieldsBuilderMock, $companyReportDataMock);
+        return new ReportDevicesSubscriber($this->createStub(FieldsBuilder::class), $this->createStub(CompanyReportData::class));
     }
 
     /**
-     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getReportGeneratorEventMock(): \PHPUnit\Framework\MockObject\MockObject
     {
@@ -244,7 +241,7 @@ final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getQueryBuilderMock(): \PHPUnit\Framework\MockObject\MockObject
     {

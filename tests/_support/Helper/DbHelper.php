@@ -105,9 +105,9 @@ class DbHelper extends Module
         $process->run();
 
         if (!$process->isSuccessful()) {
-            $this->fail("$description failed with error: ".$process->getErrorOutput());
+            $this->fail("{$description} failed with error: ".$process->getErrorOutput());
         } else {
-            $this->debug("$description completed successfully");
+            $this->debug("{$description} completed successfully");
         }
     }
 }

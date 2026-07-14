@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData;
 use Mautic\LeadBundle\Entity\Lead;
@@ -18,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,6 +44,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
+        /** @var MailHelper $mailHelper */
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
@@ -54,6 +57,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
+        /** @var MailHelper $mailHelper */
         $mailHelper = static::getContainer()->get('mautic.helper.mailer');
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
@@ -372,12 +376,14 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $owner = $this->getUser($creatorUsername);
         $email = $this->createEmail('Email C', 'Email C Subject', 'template', 'empty', 'Test html');
         $email->setIsPublished(false);
+        $this->assertInstanceOf(User::class, $owner);
         $email->setCreatedBy($owner->getId());
         $this->em->flush();
 
         $emailId = $email->getId();
 
         $user = $this->getUser('sales');
+        $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUserIdentifier());
@@ -470,7 +476,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
-        Assert::assertTrue(isset($response['email']['sendToDnc']), print_r($response, true));
+        Assert::assertArrayHasKey('sendToDnc', $response['email'], print_r($response, true));
         Assert::assertFalse($response['email']['sendToDnc']); // it will not change as sales user does not have permission to change sendToDnc
     }
 
@@ -834,6 +840,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function setPermission(Role $role, array $permissions): void
     {
+        /** @var RoleModel $roleModel */
         $roleModel = $this->getContainer()->get('mautic.user.model.role');
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);

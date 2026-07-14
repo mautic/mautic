@@ -281,13 +281,13 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         ];
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $prefix = 'company';
 
         if (str_starts_with($prop, $prefix)) {
             $getter  = 'get'.ucfirst(substr($prop, strlen($prefix)));
-            $current = $this->$getter();
+            $current = $this->{$getter}();
             if ($current !== $val) {
                 $this->addChange($prop, [$current, $val]);
             }
@@ -325,9 +325,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     {
         if ($name = $this->getName()) {
             return $name;
-        } elseif (!empty($this->fields['core']['companyemail']['value'])) {
+        }
+        if (!empty($this->fields['core']['companyemail']['value'])) {
             return $this->fields['core']['companyemail']['value'];
         }
+
+        return '';
     }
 
     public function setOwner(?User $owner = null): static
@@ -604,7 +607,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 
     public function isDeleted(): bool
     {
-        return !is_null($this->deleted);
+        return null !== $this->deleted;
     }
 
     public function getDeleted(): ?\DateTimeInterface

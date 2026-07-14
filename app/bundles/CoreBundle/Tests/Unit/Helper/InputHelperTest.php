@@ -75,19 +75,19 @@ final class InputHelperTest extends TestCase
     #[\PHPUnit\Framework\Attributes\TestDox('The array is cleaned')]
     public function testCleanArrayWithEmptyValue(): void
     {
-        $this->assertEquals([], InputHelper::cleanArray(null));
+        $this->assertSame([], InputHelper::cleanArray(null));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('The string is converted to an array')]
     public function testCleanArrayWithStringValue(): void
     {
-        $this->assertEquals(['kuk'], InputHelper::cleanArray('kuk'));
+        $this->assertSame(['kuk'], InputHelper::cleanArray('kuk'));
     }
 
     #[\PHPUnit\Framework\Attributes\TestDox('Javascript is encoded')]
     public function testCleanArrayWithJS(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['&#60;script&#62;console.log(&#34;log me&#34;);&#60;/script&#62;'],
             InputHelper::cleanArray(['<script>console.log("log me");</script>'])
         );
@@ -140,7 +140,9 @@ final class InputHelperTest extends TestCase
         Assert::assertEquals($cleanedUrl, $outputUrl);
     }
 
-    /** @return iterable<array{0: string, 1: string, 2: string, 3?: bool}> */
+    /**
+     * @return iterable<array{0: string, 1: string, 2: string, 3?: bool}>
+     */
     public static function urlProvider(): iterable
     {
         yield [
@@ -363,8 +365,8 @@ final class InputHelperTest extends TestCase
         $cleanResult         = InputHelper::clean($valueWithApostrophe);
         $rawResult           = InputHelper::raw($valueWithApostrophe);
 
-        $this->assertNotEquals($valueWithApostrophe, $cleanResult);
-        $this->assertStringContainsString('&#', $cleanResult);
+        $this->assertNotSame($valueWithApostrophe, $cleanResult);
+        $this->assertStringContainsString('&#', (string) $cleanResult);
 
         $this->assertEquals($valueWithApostrophe, $rawResult);
     }

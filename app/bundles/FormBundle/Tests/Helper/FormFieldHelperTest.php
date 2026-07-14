@@ -18,11 +18,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translatorMock = $this->createMock(Translator::class);
-
-        $validatorMock = $this->createMock(ValidatorInterface::class);
-
-        $this->fixture = new FormFieldHelper($translatorMock, $validatorMock);
+        $this->fixture = new FormFieldHelper($this->createStub(Translator::class), $this->createStub(ValidatorInterface::class));
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('fieldProvider')]
@@ -33,7 +29,9 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $formHtml, $message);
     }
 
-    /** @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}> */
+    /**
+     * @return array<int, array{0: Field, 1: mixed, 2: string, 3: mixed, 4: string}>
+     */
     public static function fieldProvider(): array
     {
         return [

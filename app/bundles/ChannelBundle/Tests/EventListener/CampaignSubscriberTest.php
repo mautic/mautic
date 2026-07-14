@@ -87,14 +87,12 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $scheduler = $this->createMock(EventScheduler::class);
 
-        $contactTracker = $this->createMock(ContactTracker::class);
-
         /** @phpstan-ignore new.deprecated */
         $legacyDispatcher = new LegacyEventDispatcher(
             $this->dispatcher,
             $scheduler,
             new NullLogger(),
-            $contactTracker
+            $this->createStub(ContactTracker::class)
         );
 
         $eventDispatcher = new ActionDispatcher(
@@ -142,19 +140,17 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $translator = $this->createMock(Translator::class);
-
         $campaignSubscriber = new CampaignSubscriber(
             $messageModel,
             $eventDispatcher,
             $eventCollector,
             new NullLogger(),
-            $translator
+            $this->createStub(Translator::class)
         );
 
         $this->dispatcher->addSubscriber($campaignSubscriber);
-        $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, [$this, 'sendMarketingMessageEmail']);
-        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, [$this, 'sendMarketingMessageSms']);
+        $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
+        $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_ACTION, $this->sendMarketingMessageSms(...));
     }
 
     public function testCorrectChannelIsUsed(): void
@@ -196,10 +192,10 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $successful = $pendingEvent->getSuccessful();
 
         // SMS should be noted as DNC
-        $this->assertFalse(empty($successful->get(2)->getMetadata()['sms']['dnc']));
+        $this->assertNotEmpty($successful->get(2)->getMetadata()['sms']['dnc']);
 
         // Nothing recorded for success
-        $this->assertTrue(empty($successful->get(1)->getMetadata()));
+        $this->assertEmpty($successful->get(1)->getMetadata());
     }
 
     public function sendMarketingMessageEmail(PendingEvent $event): void
@@ -226,7 +222,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * BC support for old campaign.
      */
-    /** @phpstan-ignore parameter.deprecatedClass */
+    /**
+     * @phpstan-ignore parameter.deprecatedClass
+     */
     public function sendMarketingMessageSms(CampaignExecutionEvent $event): void
     {
         $lead = $event->getLead();
@@ -242,7 +240,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return Event|\PHPUnit\Framework\MockObject\MockObject
+     * @return Event&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getEvent(): \PHPUnit\Framework\MockObject\MockObject
     {

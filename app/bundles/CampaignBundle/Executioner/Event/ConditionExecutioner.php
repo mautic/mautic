@@ -32,7 +32,7 @@ class ConditionExecutioner implements EventInterface
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
             try {
-                /* @var ConditionAccessor $config */
+                /** @var ConditionAccessor $config */
                 $this->dispatchEvent($config, $log);
                 $evaluatedContacts->pass($log->getLead());
             } catch (ConditionFailedException) {

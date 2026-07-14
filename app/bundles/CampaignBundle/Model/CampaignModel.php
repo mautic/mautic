@@ -71,10 +71,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return CampaignRepository
-     */
-    public function getRepository()
+    public function getRepository(): CampaignRepository
     {
         $repo = $this->em->getRepository(Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
@@ -82,26 +79,17 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return $repo;
     }
 
-    /**
-     * @return EventRepository
-     */
-    public function getEventRepository()
+    public function getEventRepository(): EventRepository
     {
         return $this->em->getRepository(Event::class);
     }
 
-    /**
-     * @return LeadRepository
-     */
-    public function getCampaignLeadRepository()
+    public function getCampaignLeadRepository(): LeadRepository
     {
         return $this->em->getRepository(CampaignLead::class);
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getCampaignLeadEventLogRepository()
+    public function getCampaignLeadEventLogRepository(): LeadEventLogRepository
     {
         return $this->em->getRepository(LeadEventLog::class);
     }
@@ -222,7 +210,10 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
         return null;
     }
 
-    public function setEvents(Campaign $entity, $sessionEvents, $sessionConnections, $deletedEvents): array
+    /**
+     * @param mixed[] $deletedEvents
+     */
+    public function setEvents(Campaign $entity, $sessionEvents, array $sessionConnections, array $deletedEvents): array
     {
         $existingEvents = $entity->getEvents()->toArray();
         $events         = [];
@@ -249,7 +240,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
-                    $event->$func($v);
+                    $event->{$func}($v);
                 }
             }
 
@@ -366,11 +357,11 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param bool $persist
+     * @param array<string, mixed> $settings
      *
-     * @return array
+     * @return mixed[]
      */
-    public function setCanvasSettings($entity, $settings, $persist = true, $events = null)
+    public function setCanvasSettings(Campaign $entity, array $settings, bool $persist = true, $events = null): array
     {
         if (null === $events) {
             $events = $entity->getEvents();
@@ -714,9 +705,8 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
-    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
+    public function getCampaignMetricsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
         $events = [];
         $chart  = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -738,7 +728,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                 }
             }
 
-            if ($events) {
+            if ([] !== $events) {
                 foreach ($events as $type => $eventIds) {
                     $filter['event_id'] = $eventIds;
 
@@ -778,7 +768,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
      * @param string   $root
      * @param int      $order
      */
-    protected function buildOrder($hierarchy, &$events, $entity, $root = 'null', $order = 1)
+    protected function buildOrder(array $hierarchy, array &$events, $entity, $root = 'null', $order = 1)
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
@@ -975,7 +965,7 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
             ];
         }
 
-        if ($deletedIds) {
+        if ([] !== $deletedIds) {
             $this->getEventRepository()->nullEventRelationships($deletedIds);
 
             $this->getEventRepository()->setEventsAsDeletedWithRedirect($deletedData);

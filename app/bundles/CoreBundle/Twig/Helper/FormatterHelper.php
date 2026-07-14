@@ -132,7 +132,7 @@ final readonly class FormatterHelper
     {
         $pairs = [];
         foreach ($array as $key => $value) {
-            $pairs[] = "$key: $value";
+            $pairs[] = "{$key}: {$value}";
         }
 
         return implode($delimeter, $pairs);

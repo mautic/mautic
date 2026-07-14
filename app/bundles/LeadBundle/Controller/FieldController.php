@@ -204,15 +204,15 @@ class FieldController extends FormController
                         ],
                     ]
                 );
-            } elseif ($valid) {
-                return $this->editAction($request, $field->getId(), true);
-            } elseif (!$valid) {
-                // some bug in Symfony prevents repopulating list options on errors
-                $field   = $form->getData();
-                $newForm = $model->createForm($field, $this->formFactory, $action);
-                $this->copyErrorsRecursively($form, $newForm);
-                $form = $newForm;
             }
+            if ($valid) {
+                return $this->editAction($request, $field->getId(), true);
+            }
+            // some bug in Symfony prevents repopulating list options on errors
+            $field   = $form->getData();
+            $newForm = $model->createForm($field, $this->formFactory, $action);
+            $this->copyErrorsRecursively($form, $newForm);
+            $form = $newForm;
         }
 
         return $this->delegateView(
@@ -272,7 +272,8 @@ class FieldController extends FormController
                     ],
                 ])
             );
-        } elseif ($model->isLocked($field)) {
+        }
+        if ($model->isLocked($field)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $field, 'lead.field');
         }
@@ -334,7 +335,8 @@ class FieldController extends FormController
                     ]
                     )
                 );
-            } elseif ($valid) {
+            }
+            if ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $field->getId()]);
                 $form   = $model->createForm($field, $this->formFactory, $action);
@@ -497,7 +499,7 @@ class FieldController extends FormController
             }
 
             // Delete everything we are able to
-            if ($deleteIds) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $model->deleteEntities($deleteIds);
                     if ($entities) {
@@ -567,7 +569,7 @@ class FieldController extends FormController
         $deletedEntities        = $e->getDeletedEntities();
         $unableToDeleteEntities = $e->getUnableToDeleteEntities();
 
-        if ($deletedEntities) {
+        if ([] !== $deletedEntities) {
             $flashes[] = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.lead.field.notice.batch_deleted',
@@ -575,7 +577,7 @@ class FieldController extends FormController
             ];
         }
 
-        if ($unableToDeleteEntities) {
+        if ([] !== $unableToDeleteEntities) {
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.core.notice.used.fields',

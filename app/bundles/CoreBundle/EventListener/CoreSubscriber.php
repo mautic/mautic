@@ -176,7 +176,7 @@ class CoreSubscriber implements EventSubscriberInterface
 
                         foreach (['name', 'path', 'controller'] as $required) {
                             if (empty($details[$required])) {
-                                throw new \InvalidArgumentException("$bundle.$name must have $required defined");
+                                throw new \InvalidArgumentException("{$bundle}.{$name} must have {$required} defined");
                             }
                         }
 
@@ -245,7 +245,7 @@ class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addRouteToCollection(RouteCollection $collection, $type, $name, $details): void
+    private function addRouteToCollection(RouteCollection $collection, $type, string $name, array $details): void
     {
         // Set defaults and controller
         $defaults = (!empty($details['defaults'])) ? $details['defaults'] : [];

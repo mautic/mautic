@@ -84,7 +84,7 @@ trait RequestTrait
                     $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                     $data = (bool) $data;
                     try {
-                        $entity->$setter($data);
+                        $entity->{$setter}($data);
                         // Manually handled so remove from form processing
                         unset($form[$name], $params[$name]);
                         break;

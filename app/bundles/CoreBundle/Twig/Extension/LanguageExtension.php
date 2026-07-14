@@ -10,8 +10,9 @@ use Twig\TwigFilter;
 
 class LanguageExtension extends AbstractExtension
 {
-    public function __construct(private readonly Security $security)
-    {
+    public function __construct(
+        private readonly Security $security,
+    ) {
     }
 
     public function getFilters()

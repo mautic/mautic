@@ -68,18 +68,12 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\SmsBundle\Entity\SmsRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\SmsBundle\Entity\SmsRepository
     {
         return $this->em->getRepository(Sms::class);
     }
 
-    /**
-     * @return \Mautic\SmsBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): \Mautic\SmsBundle\Entity\StatRepository
     {
         return $this->em->getRepository(Stat::class);
     }
@@ -189,10 +183,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     /**
      * @param Lead|int|array<Lead>|array<int> $sendTo
-     * @param array                           $options
      * @param array<int, Lead>                $contacts
      */
-    public function sendSms(Sms $sms, $sendTo, $options = [], array &$contacts = []): array
+    public function sendSms(Sms $sms, $sendTo, array $options = [], array &$contacts = []): array
     {
         $channel = $options['channel'] ?? null;
         $listId  = $options['listId'] ?? null;
@@ -211,7 +204,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($fetchContacts) {
+        if ([] !== $fetchContacts) {
             /** @var Lead[] $foundContacts */
             $foundContacts = $this->leadModel->getEntities(['ids' => $fetchContacts]);
 
@@ -261,7 +254,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         $contacts = $queueEvent->getContacts();
 
         // Check if any contacts remain. If not, return early.
-        if (!$contacts) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -277,7 +270,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
         $contacts = $filterEvent->getContacts();
 
-        if (!$contacts) {
+        if ([] === $contacts) {
             return $results;
         }
 
@@ -329,7 +322,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             try {
                 // assumption made that the Sms message is same for all contacts
                 $message = $translatedSms->getMessage();
-                if ($media) {
+                if ([] !== $media) {
                     $this->transport->sendMMS($recipientCollection, $media);
                 } else {
                     $this->transport->sendBatchSms($recipientCollection, $message);
@@ -364,7 +357,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             }
         }
 
-        if ($sentCount) {
+        if ([] !== $sentCount) {
             $repo = $this->getRepository();
             foreach ($sentCount as $id => $count) {
                 $repo->upCount($id, 'sent', $count);
@@ -469,10 +462,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @param ?string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string  $dateFormat
-     * @param array   $filter
      * @param bool    $canViewOthers
      */
-    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], $canViewOthers = true): array
+    public function getHitsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], $canViewOthers = true): array
     {
         $flag = null;
 

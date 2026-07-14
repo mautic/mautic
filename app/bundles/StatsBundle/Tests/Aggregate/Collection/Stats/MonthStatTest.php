@@ -40,7 +40,7 @@ final class MonthStatTest extends TestCase
     public function testGetStats(): void
     {
         $result = $this->monthStat->getStats();
-        $this->assertSame(["$this->month-$this->day" => $this->dayStat], $result);
+        $this->assertSame(["{$this->month}-{$this->day}" => $this->dayStat], $result);
     }
 
     public function testGetSum(): void

@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PointController extends AbstractFormController
 {
-    /**
-     * @param int $page
-     */
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted([
@@ -243,7 +240,8 @@ class PointController extends AbstractFormController
                     ],
                 ])
             );
-        } elseif (!$this->security->isGranted('point:points:edit')) {
+        }
+        if (!$this->security->isGranted('point:points:edit')) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked

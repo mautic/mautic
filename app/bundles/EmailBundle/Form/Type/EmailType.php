@@ -229,7 +229,7 @@ class EmailType extends AbstractType
         );
 
         $template = $emailEntity->getTemplate() ?? 'blank';
-        if (true === $this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getTemplate())) {
+        if ($this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getTemplate())) {
             $template = $emailEntity->getDraft()->getTemplate();
         }
         // If theme does not exist, set empty
@@ -282,7 +282,7 @@ class EmailType extends AbstractType
         );
 
         $html = $emailEntity->getCustomHtml();
-        if (true === $this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getHtml())) {
+        if ($this->isDraftEnabled && $emailEntity->hasDraft() && !empty($emailEntity->getDraft()->getHtml())) {
             $html = $emailEntity->getDraft()->getHtml();
         }
         $builder->add(

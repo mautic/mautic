@@ -12,7 +12,6 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -115,7 +114,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
-        /* @var CacheItemInterface $item */
+
         $item = $this->cache->getItem('dwc.slot_name.lead.'.$lead->getId());
         $slot = $item->get();
 

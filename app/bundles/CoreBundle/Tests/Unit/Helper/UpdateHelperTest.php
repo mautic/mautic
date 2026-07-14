@@ -114,11 +114,11 @@ final class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertFalse($result['error']);
 
         $updatePackage = __DIR__.'/resource/update/tmp/update.zip';
-        $this->assertTrue(file_exists($updatePackage));
+        $this->assertFileExists($updatePackage);
         @unlink($updatePackage);
     }
 
@@ -136,7 +136,7 @@ final class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertTrue($result['error']);
         $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
@@ -414,7 +414,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -483,7 +483,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -550,7 +550,7 @@ final class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request);
@@ -874,7 +874,7 @@ final class UpdateHelperTest extends TestCase
 
     private function getFailingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class extends AbstractPreUpdateCheck {
+        return new class() extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('Dummy')]);
@@ -884,7 +884,7 @@ final class UpdateHelperTest extends TestCase
 
     private function getPassingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class extends AbstractPreUpdateCheck {
+        return new class() extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(true, null);

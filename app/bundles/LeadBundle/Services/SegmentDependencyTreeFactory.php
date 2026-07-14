@@ -61,7 +61,7 @@ class SegmentDependencyTreeFactory
             fn (array $filter): bool => 'leadlist' === $filter['type']
         );
 
-        if (!$segmentMembershipFilters) {
+        if ([] === $segmentMembershipFilters) {
             return [];
         }
 

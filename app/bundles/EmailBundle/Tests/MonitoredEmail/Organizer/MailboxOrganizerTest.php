@@ -13,7 +13,9 @@ use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 #[\PHPUnit\Framework\Attributes\CoversClass(ParseEmailEvent::class)]
 final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var array<string, array<string, int|string>> */
+    /**
+     * @var array<string, array<string, int|string>>
+     */
     protected array $mailboxes = [
         'EmailBundle_bounces' => [
             'address'           => 'bounces@test.com',
