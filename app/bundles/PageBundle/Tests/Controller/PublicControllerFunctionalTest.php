@@ -11,7 +11,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PublicControllerFunctionalTest extends MauticMysqlTestCase
+final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testTrackingImageAction(): void
     {
@@ -35,7 +35,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $encodedPayload = urlencode($payload);
         $this->client->request(Request::METHOD_GET, "/xss-test?tags={$encodedPayload}");
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
 
         $tagRepository = $this->em->getRepository(Tag::class);
         $tags          = $tagRepository->findAll();
@@ -60,7 +60,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check the response content to ensure no script is present
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringNotContainsString($payload, $content);
+        Assert::assertStringNotContainsString($payload, (string) $content);
     }
 
     /**
@@ -129,13 +129,13 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
 
-        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
+        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
 
         $crawler = $this->client->request('GET', sprintf('/s/contacts/edit/%d', $response['id']));
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
 
-        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
+        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
 
         $buttonCrawlerNode = $crawler->selectButton('Save & Close');
         Assert::assertCount(1, $buttonCrawlerNode, $crawler->html());
@@ -143,6 +143,6 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $content = $this->client->getResponse()->getContent();
-        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', $content);
+        Assert::assertStringNotContainsString('<img src onerror=alert(\'Company\')>', (string) $content);
     }
 }

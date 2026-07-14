@@ -127,8 +127,8 @@ class SmsRepository extends CommonRepository
                     $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
+                    $q->expr()->eq('e.language', ":{$unique}"),
+                    $q->expr()->like('e.language', ":{$langUnique}")
                 );
                 $returnParameter = true;
                 break;
@@ -152,7 +152,7 @@ class SmsRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -227,11 +227,11 @@ class SmsRepository extends CommonRepository
         array $ignoreIds = [],
     ) {
         $q = $this->createQueryBuilder('e');
-        $q->select('partial e.{id, name, language}');
+        $q->select('partial e.{id, name, language, media}');
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {

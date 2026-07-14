@@ -9,7 +9,7 @@ use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
+final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testGenerateFocusItemScript(): void
     {
@@ -20,7 +20,7 @@ class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/focus/{$focus->getId()}.js");
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
         $this->assertNotEmpty($response->getContent());
     }
 

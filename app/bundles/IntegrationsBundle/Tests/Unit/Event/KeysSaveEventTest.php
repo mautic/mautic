@@ -8,13 +8,13 @@ use Mautic\IntegrationsBundle\Event\KeysSaveEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use PHPUnit\Framework\TestCase;
 
-class KeysSaveEventTest extends TestCase
+final class KeysSaveEventTest extends TestCase
 {
     public function testGetters(): void
     {
         $integration = $this->createMock(Integration::class);
         $keys        = ['apikey' => 'test'];
-        $integration->expects(self::once())
+        $integration->expects($this->once())
             ->method('getApiKeys')
             ->willReturn($keys);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -11,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LeadTest extends TestCase
+final class LeadTest extends TestCase
 {
     use RequestTrait;
 
@@ -66,7 +68,7 @@ class LeadTest extends TestCase
 
         foreach ($frequencyRules as $channel => $rule) {
             $frequencyRule = (new FrequencyRule())
-                ->setPreferredChannel($rule['preferredChannel'])
+                ->setPreferredChannel((bool) $rule['preferredChannel'])
                 ->setFrequencyNumber($rule['frequencyNumber'])
                 ->setFrequencyTime($rule['frequencyTime'])
                 ->setChannel($channel)
@@ -80,7 +82,7 @@ class LeadTest extends TestCase
         $lead->addDoNotContactEntry($dnc);
 
         $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
-        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
+        $this->assertSame(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
 
     public function testAdjustPoints(): void
@@ -126,11 +128,11 @@ class LeadTest extends TestCase
         $lead->setFields($fields);
 
         // This should not killover with a segmentation fault due to a loop
-        $lead->setNotes('hello');
+        $lead->setNotes('hello'); // @phpstan-ignore method.notFound
 
         // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
-        $lead->setTest('hello');
-        $this->assertEquals('hello', $lead->getTest());
+        $lead->setTest('hello'); // @phpstan-ignore method.notFound
+        $this->assertEquals('hello', $lead->getTest()); // @phpstan-ignore method.notFound
     }
 
     public function testDataIsCleanedCorrectly(): void
@@ -268,8 +270,8 @@ class LeadTest extends TestCase
         $lead->addUpdatedField('email', $email);
         $changes = $lead->getChanges();
 
-        $this->assertFalse(empty($changes['email']));
-        $this->assertFalse(empty($changes['fields']['email']));
+        $this->assertNotEmpty($changes['email']);
+        $this->assertNotEmpty($changes['fields']['email']);
 
         $this->assertEquals($email, $changes['email'][1]);
         $this->assertEquals($email, $changes['fields']['email'][1]);
@@ -317,11 +319,11 @@ class LeadTest extends TestCase
     }
 
     /**
-     * @param bool $operator
+     * @param array<string|int, mixed> $expected
      */
-    private function adjustPointsTest($points, $expected, Lead $lead, $operator = false): void
+    private function adjustPointsTest(int $points, array $expected, Lead $lead, string|false $operator = false): void
     {
-        if ($operator) {
+        if (false !== $operator) {
             $lead->adjustPoints($points, $operator);
         } else {
             $lead->adjustPoints($points);
@@ -331,12 +333,9 @@ class LeadTest extends TestCase
     }
 
     /**
-     * @param int $oldValue
-     * @param int $newValue
-     *
-     * @return array
+     * @return array{points: array{0: int, 1: int}}
      */
-    private function getLeadChangedArray($oldValue = 0, $newValue = 0)
+    private function getLeadChangedArray(int $oldValue = 0, int $newValue = 0): array
     {
         return [
             'points' => [

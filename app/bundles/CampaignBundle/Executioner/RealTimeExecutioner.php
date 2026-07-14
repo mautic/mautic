@@ -22,10 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class RealTimeExecutioner
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var array
@@ -35,16 +32,16 @@ class RealTimeExecutioner
     private ?Responses $responses = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private LeadModel $leadModel,
-        private EventRepository $eventRepository,
-        private EventExecutioner $executioner,
-        private Executioner $decisionExecutioner,
-        private EventCollector $collector,
-        private EventScheduler $scheduler,
-        private ContactTracker $contactTracker,
-        private DecisionHelper $decisionHelper,
-        private EventRedirectionHelper $redirectionHelper,
+        private readonly LoggerInterface $logger,
+        private readonly LeadModel $leadModel,
+        private readonly EventRepository $eventRepository,
+        private readonly EventExecutioner $executioner,
+        private readonly Executioner $decisionExecutioner,
+        private readonly EventCollector $collector,
+        private readonly EventScheduler $scheduler,
+        private readonly ContactTracker $contactTracker,
+        private readonly DecisionHelper $decisionHelper,
+        private readonly EventRedirectionHelper $redirectionHelper,
     ) {
     }
 
@@ -54,14 +51,12 @@ class RealTimeExecutioner
      * @param string|null $channel
      * @param int|null    $channelId
      *
-     * @return Responses
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null)
+    public function execute($type, $passthrough = null, $channel = null, $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();

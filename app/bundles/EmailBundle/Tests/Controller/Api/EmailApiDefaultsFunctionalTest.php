@@ -48,6 +48,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
 
         // Re-authenticate: setUpSymfony() destroys the previous client and its security token.
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
         $payload = [
@@ -59,7 +60,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true)['email'];
 
@@ -94,7 +95,7 @@ final class EmailApiDefaultsFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        Assert::assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
         $response = json_decode($clientResponse->getContent(), true)['email'];
 

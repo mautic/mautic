@@ -24,10 +24,10 @@ class MembershipBuilder
     private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
 
     public function __construct(
-        private MembershipManager $manager,
-        private CampaignLeadRepository $campaignLeadRepository,
-        private LeadRepository $leadRepository,
-        private TranslatorInterface $translator,
+        private readonly MembershipManager $manager,
+        private readonly CampaignLeadRepository $campaignLeadRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -72,7 +72,8 @@ class MembershipBuilder
         if ($this->output) {
             $countResult = $this->campaignLeadRepository->getCountsForCampaignContactsBySegment(
                 $this->campaign->getId(),
-                $this->contactLimiter
+                $this->contactLimiter,
+                $this->campaign->allowRestart()
             );
 
             $this->output->writeln(

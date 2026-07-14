@@ -380,6 +380,11 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Give the controller an opportunity to process the entity before persisting.
      *
+     * @param E                    $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     *
      * @return mixed
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -400,6 +405,10 @@ class CommonApiController extends FetchCommonApiController
         return $parameters;
     }
 
+    /**
+     * @param mixed[] $errors
+     * @param mixed[] $entities
+     */
     protected function processBatchForm(Request $request, $key, $entity, $params, $method, &$errors, &$entities)
     {
         $this->inBatchMode = true;
@@ -629,7 +638,7 @@ class CommonApiController extends FetchCommonApiController
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
             if (null === $category) {
-                throw new \UnexpectedValueException("Category $categoryId does not exist");
+                throw new \UnexpectedValueException("Category {$categoryId} does not exist");
             }
 
             $entity->setCategory($category);

@@ -12,8 +12,7 @@ return function (ContainerConfigurator $configurator): void {
         ->autoconfigure()
         ->public();
 
-    $excludes = [
-    ];
+    $excludes = ['Helper/DTO', 'Collection'];
 
     $services->load('Mautic\\SmsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');

@@ -50,19 +50,15 @@ class FeatureSettingsType extends AbstractType
             $settings    = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => (1 == $page && 'POST' !== strtoupper($method)) ? true : false,
+                'ignore_field_cache' => 1 == $page && 'POST' !== strtoupper($method),
             ];
 
             try {
-                if (empty($fields)) {
-                    $fields = $integrationObject->getFormLeadFields($settings);
-                    $fields = $fields[0] ?? $fields;
-                }
+                $fields = $integrationObject->getFormLeadFields($settings);
+                $fields = $fields[0] ?? $fields;
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
-                    if (empty($integrationCompanyFields)) {
-                        $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
-                    }
+                    $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }

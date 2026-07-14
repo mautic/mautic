@@ -20,8 +20,8 @@ class ChannelListHelper
     private array $featureChannels = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private Translator $translator,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly Translator $translator,
     ) {
     }
 
@@ -75,10 +75,7 @@ class ChannelListHelper
         return $channels;
     }
 
-    /**
-     * @return array
-     */
-    public function getChannels()
+    public function getChannels(): array
     {
         $this->setupChannels();
 
@@ -100,9 +97,7 @@ class ChannelListHelper
     }
 
     /**
-     * Setup channels.
-     *
-     * Done this way to avoid a circular dependency error with LeadModel
+     * Done this way to avoid a circular dependency error with LeadModel.
      */
     private function setupChannels(): void
     {

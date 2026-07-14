@@ -50,7 +50,6 @@ class ContactSegmentQueryBuilder
             $connection->ensureConnectedToReplica();
         }
 
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = new QueryBuilder($connection);
 
         $leadsTableAlias = $changeAlias ? $this->generateRandomParameterName() : Lead::DEFAULT_ALIAS;
@@ -173,7 +172,7 @@ class ContactSegmentQueryBuilder
             );
 
         $existingQueryWherePart = $existsQueryBuilder->getQueryPart('where');
-        $existsQueryBuilder->where("$leadsTableAlias.id = $tableAlias.lead_id");
+        $existsQueryBuilder->where("{$leadsTableAlias}.id = {$tableAlias}.lead_id");
         $existsQueryBuilder->andWhere($existingQueryWherePart);
 
         $queryBuilder->orWhere(

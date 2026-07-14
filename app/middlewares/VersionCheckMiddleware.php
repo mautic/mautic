@@ -41,7 +41,7 @@ class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewa
     /**
      * Check Minimum / Maximum PHP versions.
      *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = true): Response
     {

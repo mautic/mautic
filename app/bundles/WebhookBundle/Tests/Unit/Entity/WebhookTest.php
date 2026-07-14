@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Tests\Unit\Entity;
 
 use Mautic\WebhookBundle\Entity\Webhook;
 use PHPUnit\Framework\Assert;
 
-class WebhookTest extends \PHPUnit\Framework\TestCase
+final class WebhookTest extends \PHPUnit\Framework\TestCase
 {
     public function testWasModifiedRecentlyWithNotModifiedWebhook(): void
     {
         $webhook = new Webhook();
-        $this->assertNull($webhook->getDateModified());
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $webhook->getDateModified());
         $this->assertFalse($webhook->wasModifiedRecently());
     }
 

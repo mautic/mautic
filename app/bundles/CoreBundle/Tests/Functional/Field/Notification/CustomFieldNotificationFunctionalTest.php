@@ -12,11 +12,14 @@ use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
+final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
     private TranslatorInterface $translator;
+
     private CustomFieldNotification $notifier;
+
     private LeadField $leadField;
 
     protected function setUp(): void
@@ -45,7 +48,7 @@ class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo   = $this->em->getRepository(Notification::class);
         $notifications      = $notificationRepo->getNotifications(1);
-        $this->assertEquals(1, count($notifications));
+        $this->assertCount(1, $notifications);
 
         $notification = array_shift($notifications);
         $this->assertEquals($notification['header'], $this->translator->trans('mautic.lead.field.notification.cannot_be_updated_header'));

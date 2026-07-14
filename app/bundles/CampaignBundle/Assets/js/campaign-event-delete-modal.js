@@ -201,7 +201,8 @@ Mautic.campaignEventDeleteModal = {
 
         // Add all available events to the select
         mQuery.each(availableEvents, (index, event) => {
-            const optionLabel = '(' + event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1).toLowerCase() + ') ' + event.name;
+            const optionLabel = '('+ Mautic.translate('mautic.campaign.event.id') +': ' + event.id+ ') (' +
+                event.eventType.charAt(0).toUpperCase() + event.eventType.slice(1).toLowerCase() + ') ' + event.name;
             mQuery("<option />", { value: event.id, text: optionLabel }).appendTo(this.redirectSelect);
         });
 

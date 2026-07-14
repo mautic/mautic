@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Tests\Form\Type;
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Symfony\Component\Form\Test\TypeTestCase;
 
-class LookupTypeTest extends TypeTestCase
+final class LookupTypeTest extends TypeTestCase
 {
     /**
      * @param array<string, string> $attributes

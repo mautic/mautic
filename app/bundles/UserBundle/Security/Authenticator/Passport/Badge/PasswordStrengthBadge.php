@@ -10,8 +10,9 @@ class PasswordStrengthBadge implements BadgeInterface
 {
     private bool $resolved = false;
 
-    public function __construct(private ?string $presentedPassword)
-    {
+    public function __construct(
+        private readonly ?string $presentedPassword,
+    ) {
     }
 
     public function getPresentedPassword(): ?string

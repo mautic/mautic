@@ -13,7 +13,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class TwilioTransportTest extends TestCase
+final class TwilioTransportTest extends TestCase
 {
     private TwilioTransport $twilioTransport;
 
@@ -25,8 +25,7 @@ class TwilioTransportTest extends TestCase
     protected function setUp(): void
     {
         $this->logger      = $this->createMock(Logger::class);
-        $integrationHelper = $this->createMock(IntegrationHelper::class);
-        $configuration     = new Configuration($integrationHelper);
+        $configuration     = new Configuration($this->createStub(IntegrationHelper::class));
 
         $this->twilioTransport = new TwilioTransport($configuration, $this->logger);
     }
@@ -49,7 +48,7 @@ class TwilioTransportTest extends TestCase
 
         $payload = ['messagingServiceSid' => 'MS1234', 'body' => 'some_content'];
 
-        $result = $method->invokeArgs($this->twilioTransport, array_values($payload));
+        $result = $method->invokeArgs($this->twilioTransport, [...array_values($payload), []]);
         Assert::assertSame($payload, $result);
     }
 }

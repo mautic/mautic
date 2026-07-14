@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 
-class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
+final class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
 {
     public function testCheckLeadSegmentsByIds(): void
     {
@@ -49,9 +49,9 @@ class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
     private function createSegment(string $suffix = 'A'): LeadList
     {
         $segment = new LeadList();
-        $segment->setName("Segment $suffix");
-        $segment->setPublicName("Segment $suffix");
-        $segment->setAlias("segment-$suffix");
+        $segment->setName("Segment {$suffix}");
+        $segment->setPublicName("Segment {$suffix}");
+        $segment->setAlias("segment-{$suffix}");
 
         $this->em->persist($segment);
         $this->em->flush();

@@ -16,8 +16,8 @@ class LeadSubscriber implements EventSubscriberInterface
     private const FEATURE_PUSH_LEAD = 'push_lead';
 
     public function __construct(
-        private PluginModel $pluginModel,
-        private IntegrationRepository $integrationRepository,
+        private readonly PluginModel $pluginModel,
+        private readonly IntegrationRepository $integrationRepository,
     ) {
     }
 
@@ -30,12 +30,8 @@ class LeadSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /*
-     * Delete lead event
-     */
     public function onLeadDelete(LeadEvent $event): bool
     {
-        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         $integrationEntityRepo->findLeadsToDelete('lead%', $lead->getId());
@@ -43,9 +39,6 @@ class LeadSubscriber implements EventSubscriberInterface
         return false;
     }
 
-    /*
-     * Delete company event
-     */
     public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var \Mautic\LeadBundle\Entity\Company $company */
@@ -61,7 +54,6 @@ class LeadSubscriber implements EventSubscriberInterface
     */
     public function onLeadSave(LeadEvent $event): void
     {
-        /** @var Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
         if ($this->isAnyIntegrationEnabled()) {
