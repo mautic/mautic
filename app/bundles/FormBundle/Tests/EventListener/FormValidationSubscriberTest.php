@@ -238,8 +238,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, '+5511999999999');
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Please enter a valid United States phone number.', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Please enter a valid United States phone number.', $event->getInvalidReason());
     }
 
     public function testCountryPhoneValidationUsesCustomMessage(): void
@@ -254,8 +254,8 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, '+5511999999999');
         $this->subscriber->onFormValidate($event);
 
-        self::assertFalse($event->isValid());
-        self::assertSame('Use a US phone number.', $event->getInvalidReason());
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Use a US phone number.', $event->getInvalidReason());
     }
 
     public function testCountryPhoneValidationAllowsMatchingCountry(): void
@@ -267,7 +267,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, '+12025550123');
         $this->subscriber->onFormValidate($event);
 
-        self::assertTrue($event->isValid());
+        $this->assertTrue($event->isValid());
     }
 
     public function testCountryPhoneValidationSkippedForUnknownCountry(): void
@@ -281,7 +281,7 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, '+5511999999999');
         $this->subscriber->onFormValidate($event);
 
-        self::assertTrue($event->isValid());
+        $this->assertTrue($event->isValid());
     }
 
     public function testCountryPhoneValidationFallsThroughToInternational(): void
@@ -300,6 +300,6 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ValidationEvent($field, '+12025550123');
         $this->subscriber->onFormValidate($event);
 
-        self::assertTrue($event->isValid());
+        $this->assertTrue($event->isValid());
     }
 }

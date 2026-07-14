@@ -52,10 +52,10 @@ final class FormFieldTelTypeTest extends TypeTestCase
             ],
         ]);
 
-        self::assertTrue($form->has('country'));
-        self::assertTrue($form->has('international'));
-        self::assertTrue($form->has('international_validationmsg'));
-        self::assertTrue($form->has('country_validationmsg'));
+        $this->assertTrue($form->has('country'));
+        $this->assertTrue($form->has('international'));
+        $this->assertTrue($form->has('international_validationmsg'));
+        $this->assertTrue($form->has('country_validationmsg'));
     }
 
     public function testCountryFieldConfiguration(): void
@@ -66,11 +66,11 @@ final class FormFieldTelTypeTest extends TypeTestCase
 
         $countryField = $form->get('country');
 
-        self::assertFalse($countryField->isRequired());
-        self::assertSame('mautic.form.field.type.tel.country_validation', $countryField->getConfig()->getOption('label'));
-        self::assertSame('mautic.core.none', $countryField->getConfig()->getOption('placeholder'));
-        self::assertSame(self::COUNTRY_UNITED_STATES, $countryField->getData());
-        self::assertArrayHasKey(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
+        $this->assertFalse($countryField->isRequired());
+        $this->assertSame('mautic.form.field.type.tel.country_validation', $countryField->getConfig()->getOption('label'));
+        $this->assertSame('mautic.core.none', $countryField->getConfig()->getOption('placeholder'));
+        $this->assertSame(self::COUNTRY_UNITED_STATES, $countryField->getData());
+        $this->assertArrayHasKey(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
     }
 
     public function testCountryValidationMessageFieldConfiguration(): void
@@ -82,11 +82,11 @@ final class FormFieldTelTypeTest extends TypeTestCase
         $messageField = $form->get('country_validationmsg');
         $attr         = $messageField->getConfig()->getOption('attr');
 
-        self::assertFalse($messageField->isRequired());
-        self::assertSame('mautic.form.field.form.validationmsg', $messageField->getConfig()->getOption('label'));
-        self::assertSame('form-control', $attr['class']);
-        self::assertSame('mautic.form.field.type.tel.country_validationmsg.tooltip', $attr['tooltip']);
-        self::assertSame('mautic.form.field.type.tel.country_validationmsg.placeholder', $attr['placeholder']);
+        $this->assertFalse($messageField->isRequired());
+        $this->assertSame('mautic.form.field.form.validationmsg', $messageField->getConfig()->getOption('label'));
+        $this->assertSame('form-control', $attr['class']);
+        $this->assertSame('mautic.form.field.type.tel.country_validationmsg.tooltip', $attr['tooltip']);
+        $this->assertSame('mautic.form.field.type.tel.country_validationmsg.placeholder', $attr['placeholder']);
     }
 
     public function testInternationalValidationMessageFieldConfiguration(): void
@@ -98,10 +98,10 @@ final class FormFieldTelTypeTest extends TypeTestCase
         $messageField = $form->get('international_validationmsg');
         $attr         = $messageField->getConfig()->getOption('attr');
 
-        self::assertFalse($messageField->isRequired());
-        self::assertSame('mautic.form.field.form.validationmsg', $messageField->getConfig()->getOption('label'));
-        self::assertSame('form-control', $attr['class']);
-        self::assertSame('mautic.form.field.type.tel.international_validationmsg.tooltip', $attr['tooltip']);
-        self::assertSame('{"formfield_validation_international_1": "checked"}', $attr['data-show-on']);
+        $this->assertFalse($messageField->isRequired());
+        $this->assertSame('mautic.form.field.form.validationmsg', $messageField->getConfig()->getOption('label'));
+        $this->assertSame('form-control', $attr['class']);
+        $this->assertSame('mautic.form.field.type.tel.international_validationmsg.tooltip', $attr['tooltip']);
+        $this->assertSame('{"formfield_validation_international_1": "checked"}', $attr['data-show-on']);
     }
 }

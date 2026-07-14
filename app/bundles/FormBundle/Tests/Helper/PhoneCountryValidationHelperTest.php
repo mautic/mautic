@@ -14,15 +14,15 @@ final class PhoneCountryValidationHelperTest extends TestCase
     {
         $countries = PhoneCountryValidationHelper::getCountries();
 
-        self::assertGreaterThan(50, count($countries));
-        self::assertArrayHasKey('United States', $countries);
-        self::assertSame('US', $countries['United States']);
+        $this->assertGreaterThan(50, count($countries));
+        $this->assertArrayHasKey('United States', $countries);
+        $this->assertSame('US', $countries['United States']);
     }
 
     public function testValidatesPhoneNumberForCountry(): void
     {
-        self::assertTrue(PhoneCountryValidationHelper::isValidForCountry('+12025550123', 'US'));
-        self::assertFalse(PhoneCountryValidationHelper::isValidForCountry('+5511999999999', 'US'));
-        self::assertFalse(PhoneCountryValidationHelper::isValidForCountry('not a phone number', 'US'));
+        $this->assertTrue(PhoneCountryValidationHelper::isValidForCountry('+12025550123', 'US'));
+        $this->assertFalse(PhoneCountryValidationHelper::isValidForCountry('+5511999999999', 'US'));
+        $this->assertFalse(PhoneCountryValidationHelper::isValidForCountry('not a phone number', 'US'));
     }
 }
