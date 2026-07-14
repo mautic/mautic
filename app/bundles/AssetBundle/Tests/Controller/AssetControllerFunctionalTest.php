@@ -213,7 +213,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         Assert::assertSame('application/zip', $response->headers->get('Content-Type'));
 
         $contentDisposition = $response->headers->get('Content-Disposition');
-        Assert::assertStringContainsString('assets-batch-', $contentDisposition);
+        Assert::assertStringContainsString('assets-batch-', (string) $contentDisposition);
         Assert::assertStringEndsWith('.zip', $contentDisposition);
 
         $zipContent = $this->client->getInternalResponse()->getContent();
@@ -223,7 +223,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         file_put_contents($zipPath, $zipContent);
 
         $zipArchive = new \ZipArchive();
-        Assert::assertTrue(true === $zipArchive->open($zipPath));
+        Assert::assertTrue($zipArchive->open($zipPath));
         Assert::assertSame(1, $zipArchive->numFiles);
 
         $entryName     = $zipArchive->getNameIndex(0);
