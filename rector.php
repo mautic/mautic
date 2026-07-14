@@ -61,34 +61,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/LeadBundle/Entity/CustomFieldEntityTrait.php',
         ],
 
-<<<<<<< HEAD
-        Rector\PHPUnit\CodeQuality\Rector\MethodCall\AssertEqualsToSameRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Twig/Helper/FormatterHelperTest.php',
-        ],
-
-=======
-        // waits for descission
-        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
-
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 23e1b63f55 (remove fixed rector rules)
-        // fix in rector-dev
-        Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Entity/CommonRepository.php',
-        ],
-
-        Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector::class => [
-            __DIR__.'/app/bundles/CoreBundle/Model/VariantModelTrait.php',
-        ],
-
-        // offer next
-        Rector\CodeQuality\Rector\If_\ArrayExplicitBoolCompareRector::class,
-
-=======
->>>>>>> e95ccb7c08 (remove fixed rector rules)
-=======
->>>>>>> d3a3fb6fc2 (use direct variables over compact to enable static analysis + fill expects to returm map in tests)
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
@@ -137,23 +109,14 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',
         ],
 
-<<<<<<< HEAD
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
-=======
-        // phpunit
-        Rector\PHPUnit\CodeQuality\Rector\Class_\AssertClassToThisAssertRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
-<<<<<<< HEAD
->>>>>>> fab4e2d24f (cleanup skipped never used rules)
         // will be fixed
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class,
-=======
 
         Rector\PHPUnit\CodeQuality\Rector\Expression\DecorateWillReturnMapWithExpectsMockRector::class => [
             __DIR__.'/app/bundles/EmailBundle/Tests/Model/EmailModelTest.php',
         ],
->>>>>>> d3a3fb6fc2 (use direct variables over compact to enable static analysis + fill expects to returm map in tests)
 
         // handle later with full PHP 8.0 upgrade
         OptionalParametersAfterRequiredRector::class,
