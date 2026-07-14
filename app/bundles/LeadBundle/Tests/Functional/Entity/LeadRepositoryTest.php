@@ -20,15 +20,13 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<int, list<array<string, bool>>>
+     * @return \Iterator<int, list<array<string, bool>>>
      */
-    public static function joinIpAddressesProvider(): array
+    public static function joinIpAddressesProvider(): \Iterator
     {
-        return [
-            [[]],
-            [['joinIpAddresses' => true]],
-            [['joinIpAddresses' => false]],
-        ];
+        yield [[]];
+        yield [['joinIpAddresses' => true]];
+        yield [['joinIpAddresses' => false]];
     }
 
     /**

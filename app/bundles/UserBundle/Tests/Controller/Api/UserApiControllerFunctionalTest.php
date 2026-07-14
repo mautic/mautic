@@ -274,21 +274,19 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array<string, array{userData: array<string, mixed>, expectedStatusCode: int}>
+     * @return \Iterator<string, array{userData: array<string, mixed>, expectedStatusCode: int}>
      */
-    public static function userCreateDataProvider(): array
+    public static function userCreateDataProvider(): \Iterator
     {
-        return [
-            'valid user with password' => [
-                'userData' => [
-                    'username'      => 'john',
-                    'plainPassword' => 'jjohn@123',
-                    'firstName'     => 'John',
-                    'lastName'      => 'Doe',
-                    'email'         => 'john.doe@email.com',
-                ],
-                'expectedStatusCode' => Response::HTTP_CREATED,
+        yield 'valid user with password' => [
+            'userData' => [
+                'username'      => 'john',
+                'plainPassword' => 'jjohn@123',
+                'firstName'     => 'John',
+                'lastName'      => 'Doe',
+                'email'         => 'john.doe@email.com',
             ],
+            'expectedStatusCode' => Response::HTTP_CREATED,
         ];
     }
 

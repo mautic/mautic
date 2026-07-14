@@ -86,7 +86,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
             ->first()
             ->filter('td:first-child')
             ->extract(['_text']);
-        $actualLabels = array_map('trim', $actualLabels);
+        $actualLabels = array_map(trim(...), $actualLabels);
 
         Assert::assertSame($expectedLabels, $actualLabels);
     }

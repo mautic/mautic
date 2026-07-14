@@ -66,7 +66,6 @@ return RectorConfig::configure()
 
         // waits for descission
         Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector::class,
-        Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector::class,
 
         // fix in rector-dev
         Rector\DeadCode\Rector\ClassMethod\RemoveReturnTagIncompatibleWithNativeTypeRector::class => [
@@ -92,9 +91,6 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Controller/AbstractStandardFormController.php',
         ],
 
-        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
-        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-
         Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromGetRepositoryDocblockRector::class => [
             // a getRepository() override
             __DIR__.'/app/bundles/LeadBundle/Model/TagModel.php',
@@ -111,14 +107,11 @@ return RectorConfig::configure()
             __DIR__.'/app/bundles/CoreBundle/Twig/Helper/DateHelper.php',
         ],
 
-        // from upcoming PHP 8.1
-        Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector::class,
-
         // too many changes
         Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector::class,
         Rector\CodeQuality\Rector\If_\SimplifyIfElseToTernaryRector::class,
-
-        Rector\Renaming\Rector\FuncCall\RenameFunctionRector::class,
+        Rector\CodeQuality\Rector\If_\CombineIfRector::class,
+        Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
 
         // Avoiding breaking BC breaks with forced return types in public methods
         ReturnTypeFromReturnNewRector::class => [
@@ -133,6 +126,8 @@ return RectorConfig::configure()
             // test fixture
             __DIR__.'/app/bundles/CoreBundle/Tests/Unit/Doctrine/ArrayTypeTest.php',
         ],
+
+        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
 
         StringReturnTypeFromStrictStringReturnsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Entity/FormEntity.php',

@@ -328,14 +328,12 @@ final class ReportGeneratorEventTest extends TestCase
     }
 
     /**
-     * @return array<mixed>
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function applyFilterProvider(): array
+    public static function applyFilterProvider(): \Iterator
     {
-        return [
-            [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s'],
-            [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'],
-        ];
+        yield [false, 't.a_date IS NULL OR (t.a_date BETWEEN :dateFrom AND :dateTo)', 'Y-m-d H:i:s'];
+        yield [true, 't.a_date IS NULL OR (DATE(t.a_date) BETWEEN :dateFrom AND :dateTo)', 'Y-m-d'];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('applyFilterWithoutNullValuesProvider')]
@@ -380,13 +378,11 @@ final class ReportGeneratorEventTest extends TestCase
     }
 
     /**
-     * @return array<mixed>
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function applyFilterWithoutNullValuesProvider(): array
+    public static function applyFilterWithoutNullValuesProvider(): \Iterator
     {
-        return [
-            [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s'],
-            [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'],
-        ];
+        yield [false, 't.a_date BETWEEN :dateFrom AND :dateTo', 'Y-m-d H:i:s'];
+        yield [true, 'DATE(t.a_date) BETWEEN :dateFrom AND :dateTo', 'Y-m-d'];
     }
 }
