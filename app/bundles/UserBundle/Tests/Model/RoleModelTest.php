@@ -34,7 +34,7 @@ final class RoleModelTest extends TestCase
             ->with('mautic.user.role.clone.prefix', ['%name%' => 'Test Role'], 'messages')
             ->willReturn('Clone of Test Role');
 
-        $roleModel = $this->createRoleModel($this->createMock(CorePermissions::class), $mockTranslator);
+        $roleModel = $this->createRoleModel($this->createStub(CorePermissions::class), $mockTranslator);
 
         $clonedRole = $roleModel->cloneEntity($sourceRole);
 
@@ -58,7 +58,7 @@ final class RoleModelTest extends TestCase
             ->with('mautic.user.role.clone.prefix', ['%name%' => 'Admin Role'], 'messages')
             ->willReturn('Clone of Admin Role');
 
-        $roleModel = $this->createRoleModel($this->createMock(CorePermissions::class), $mockTranslator);
+        $roleModel = $this->createRoleModel($this->createStub(CorePermissions::class), $mockTranslator);
 
         $clonedRole = $roleModel->cloneEntity($sourceRole);
 
@@ -75,14 +75,14 @@ final class RoleModelTest extends TestCase
         }
 
         return new RoleModel(
-            $this->createMock(EntityManagerInterface::class),
+            $this->createStub(EntityManagerInterface::class),
             $security,
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $translator,
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CoreParametersHelper::class)
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class)
         );
     }
 }

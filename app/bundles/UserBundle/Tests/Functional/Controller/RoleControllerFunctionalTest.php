@@ -82,8 +82,8 @@ final class RoleControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
-        $this->assertStringContainsString($newName, $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('Original Description', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($newName, (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Original Description', (string) $this->client->getResponse()->getContent());
 
         $rolesAfterCount = $this->em->getRepository(Role::class)->count([]);
         $this->assertSame($rolesBefore + 1, $rolesAfterCount);
