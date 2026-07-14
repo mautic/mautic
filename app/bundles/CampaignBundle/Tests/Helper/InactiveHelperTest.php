@@ -113,8 +113,7 @@ final class InactiveHelperTest extends TestCase
             ->willReturnOnConsecutiveCalls(new ArrayCollection(), new ArrayCollection([$event]));
 
         $parentEvent
-            ->method('getPositiveChildren')
-            ->willReturnOnConsecutiveCalls(new ArrayCollection(), new ArrayCollection());
+            ->method('getPositiveChildren')->willReturn(new ArrayCollection());
 
         $this->leadRepository->expects($this->exactly(4))
             ->method('getContactRotations')

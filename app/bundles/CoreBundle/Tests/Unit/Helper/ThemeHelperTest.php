@@ -555,8 +555,7 @@ final class ThemeHelperTest extends TestCase
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->exactly(5))
-            ->method('exists')
-            ->willReturnOnConsecutiveCalls(true, true, true, true, true);
+            ->method('exists')->willReturn(true);
 
         $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
 

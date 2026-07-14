@@ -213,7 +213,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('HEAD', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
         $dncCollection = $stat->getLead()->getDoNotContact();
-        $this->assertEquals(0, $dncCollection->count());
+        $this->assertCount(0, $dncCollection);
     }
 
     public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void

@@ -552,7 +552,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emailModel->invalidatePendingCountCacheForList($segment->getId());
 
         $loadedEmail = $this->emailModel->getEntity($email->getId());
-        \assert($loadedEmail instanceof Email);
+        $this->assertInstanceOf(Email::class, $loadedEmail);
 
         $this->assertEquals(5, $loadedEmail->getPendingCount());
     }
@@ -574,7 +574,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         );
 
         $loadedEmail = $this->emailModel->getEntity($email->getId());
-        \assert($loadedEmail instanceof Email);
+        $this->assertInstanceOf(Email::class, $loadedEmail);
 
         $this->assertEquals(5, $loadedEmail->getPendingCount());
     }
@@ -589,14 +589,14 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emailModel->getPendingLeads($email, null, true);
 
         $listModel = static::getContainer()->get('mautic.lead.model.list');
-        \assert($listModel instanceof ListModel);
+        $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
             $listModel->addLead($contact, $segment, true);
         }
 
         $loadedEmail = $this->emailModel->getEntity($email->getId());
-        \assert($loadedEmail instanceof Email);
+        $this->assertInstanceOf(Email::class, $loadedEmail);
 
         $this->assertEquals(5, $loadedEmail->getPendingCount());
     }
@@ -611,7 +611,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->emailModel->getPendingLeads($email, null, true);
 
         $listModel = static::getContainer()->get('mautic.lead.model.list');
-        \assert($listModel instanceof ListModel);
+        $this->assertInstanceOf(ListModel::class, $listModel);
 
         foreach (array_slice($contacts, 2, 3) as $contact) {
             $listModel->addLead($contact, $segment, true);
@@ -628,7 +628,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
             break;
         }
 
-        \assert($loadedEmail instanceof Email);
+        $this->assertInstanceOf(Email::class, $loadedEmail);
 
         $this->assertEquals(5, $loadedEmail->getPendingCount());
     }

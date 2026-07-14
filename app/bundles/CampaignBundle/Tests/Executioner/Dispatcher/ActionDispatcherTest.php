@@ -93,15 +93,15 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                     if (1 === $matcher->numberOfInvocations()) {
                     }
                     if (2 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof ExecutedEvent);
+                        $this->assertInstanceOf(ExecutedEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED, $eventName);
                     }
                     if (3 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof ExecutedBatchEvent);
+                        $this->assertInstanceOf(ExecutedBatchEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_EXECUTED_BATCH, $eventName);
                     }
                     if (4 === $matcher->numberOfInvocations()) {
-                        $this->assertTrue($event instanceof FailedEvent);
+                        $this->assertInstanceOf(FailedEvent::class, $event);
                         $this->assertSame(CampaignEvents::ON_EVENT_FAILED, $eventName);
                     }
                     ++$dispatcCounter;

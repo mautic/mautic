@@ -173,12 +173,10 @@ BODY;
 
         $stat->expects($this->once())
             ->method('addReply')
-            ->with($this->callback(function (EmailReply $emailReply) use ($stat): true {
+            ->willReturnCallback(function (EmailReply $emailReply) use ($stat): void {
                 $this->assertSame($stat, $emailReply->getStat());
                 $this->assertSame('api-msg1d', $emailReply->getMessageId());
-
-                return true;
-            }));
+            });
 
         $this->emailStatModel->expects($this->once())
             ->method('saveEntity')
