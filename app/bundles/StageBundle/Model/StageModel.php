@@ -43,10 +43,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return \Mautic\StageBundle\Entity\StageRepository
-     */
-    public function getRepository()
+    public function getRepository(): \Mautic\StageBundle\Entity\StageRepository
     {
         return $this->em->getRepository(Stage::class);
     }
@@ -107,7 +104,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new StageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }

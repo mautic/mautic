@@ -7,7 +7,7 @@ use Mautic\UserBundle\Entity\User;
 
 class EmailToUserAccessor
 {
-    private ArrayStringTransformer $transformer;
+    private readonly ArrayStringTransformer $transformer;
 
     public function __construct(
         private array $config,

@@ -17,7 +17,7 @@ class TagEntityModelTransformer implements DataTransformerInterface
      * @param bool   $isArray
      */
     public function __construct(
-        private EntityManager $em,
+        private readonly EntityManager $em,
         private $repository = '',
         private $isArray = false,
     ) {
@@ -26,14 +26,14 @@ class TagEntityModelTransformer implements DataTransformerInterface
     public function reverseTransform(mixed $entity): mixed
     {
         if (!$this->isArray) {
-            if (is_null($entity) || !is_object($entity)) {
+            if (null === $entity || !is_object($entity)) {
                 return null;
             }
 
             return $entity->getTag();
         }
 
-        if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
             return [];
         }
 

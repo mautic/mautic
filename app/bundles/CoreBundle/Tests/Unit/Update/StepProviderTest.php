@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Update\StepProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class StepProviderTest extends TestCase
+final class StepProviderTest extends TestCase
 {
     private StepProvider $provider;
 

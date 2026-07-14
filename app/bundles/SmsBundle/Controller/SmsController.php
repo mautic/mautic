@@ -22,10 +22,8 @@ class SmsController extends FormController
 
     /**
      * @param int $page
-     *
-     * @return JsonResponse|Response
      */
-    public function indexAction(Request $request, TransportChain $transportChain, $page = 1)
+    public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
     {
         /** @var SmsModel $model */
         $model = $this->getModel('sms');
@@ -47,7 +45,7 @@ class SmsController extends FormController
         );
 
         if (!$permissions['sms:smses:viewown'] && !$permissions['sms:smses:viewother']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -137,10 +135,8 @@ class SmsController extends FormController
 
     /**
      * Loads a specific form into the detailed panel.
-     *
-     * @return JsonResponse|Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, $objectId): Response
     {
         /** @var SmsModel $model */
         $model    = $this->getModel('sms');
@@ -171,13 +167,14 @@ class SmsController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'sms:smses:viewown',
             'sms:smses:viewother',
             $sms->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // Audit Log
@@ -270,7 +267,7 @@ class SmsController extends FormController
         $session = $request->getSession();
 
         if (!$this->security->isGranted('sms:smses:create')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // set the page we came from
@@ -289,7 +286,7 @@ class SmsController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
-        if ('POST' == $method) {
+        if ('POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -431,13 +428,14 @@ class SmsController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->security->hasEntityAccess(
+        }
+        if (!$this->security->hasEntityAccess(
             'sms:smses:viewown',
             'sms:smses:viewother',
             $entity->getCreatedBy()
         )
         ) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
             // deny access if the entity is locked
             return $this->isLocked($postActionVars, $entity, 'sms');
@@ -453,7 +451,7 @@ class SmsController extends FormController
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
         // /Check for a submitted form and process it
-        if (!$ignorePost && 'POST' == $method) {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -572,7 +570,7 @@ class SmsController extends FormController
                     $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $entity = clone $entity;
@@ -619,7 +617,7 @@ class SmsController extends FormController
                 $entity->getCreatedBy()
             )
             ) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'sms');
             }
@@ -663,7 +661,7 @@ class SmsController extends FormController
             ],
         ];
 
-        if (Request::METHOD_POST == $request->getMethod()) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             $model = $this->getModel('sms');
             \assert($model instanceof SmsModel);
             $ids = json_decode($request->query->get('ids', '{}'));
@@ -686,7 +684,7 @@ class SmsController extends FormController
                     $entity->getCreatedBy()
                 )
                 ) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'sms', true);
                 } else {

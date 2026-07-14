@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Assert;
 
-class CampaignOptimisticLockTest extends MauticMysqlTestCase
+final class CampaignOptimisticLockTest extends MauticMysqlTestCase
 {
     use CampaignControllerTrait;
 

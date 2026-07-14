@@ -48,10 +48,10 @@ class FieldType extends AbstractType
     ];
 
     public function __construct(
-        private EntityManagerInterface $em,
-        private Translator $translator,
-        private IdentifierFields $identifierFields,
-        private IndexHelper $indexHelper,
+        private readonly EntityManagerInterface $em,
+        private readonly Translator $translator,
+        private readonly IdentifierFields $identifierFields,
+        private readonly IndexHelper $indexHelper,
     ) {
     }
 
@@ -95,7 +95,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $new         = $options['data']->getId() ? false : true;
+        $new         = !(bool) $options['data']->getId();
         $type        = $options['data']->getType();
         $isIndex     = $options['data']->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
@@ -226,7 +226,7 @@ class FieldType extends AbstractType
                 'required'    => false,
                 'disabled'    => $disableDefaultValue,
                 'constraints' => [
-                    new Assert\Callback([$this, 'validateDefaultValue']),
+                    new Assert\Callback($this->validateDefaultValue(...)),
                 ],
             ]
         );
@@ -245,7 +245,7 @@ class FieldType extends AbstractType
             switch ($type) {
                 case 'select':
                 case 'lookup':
-                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    $constraints = new Assert\Callback($this->validateDefaultValue(...));
                     // no break
                 case 'multiselect':
                     $cleaningRules['defaultValue'] = 'raw';
@@ -406,7 +406,7 @@ class FieldType extends AbstractType
                 case 'tel':
                 case 'url':
                 case 'email':
-                    $constraints = new Assert\Callback([$this, 'validateDefaultValue']);
+                    $constraints = new Assert\Callback($this->validateDefaultValue(...));
                     // no break
                 case 'number':
                     $form->add(
@@ -531,7 +531,7 @@ class FieldType extends AbstractType
 
         if ($options['data']->getColumnIsNotRemoved()) {
             if (array_key_exists('tooltip', $attr)) {
-                $attr['tooltip'] = $attr['tooltip'].' mautic.lead.field.being_removed_in_background';
+                $attr['tooltip'] .= ' mautic.lead.field.being_removed_in_background';
             } else {
                 $attr['tooltip'] = 'mautic.lead.field.being_removed_in_background';
             }

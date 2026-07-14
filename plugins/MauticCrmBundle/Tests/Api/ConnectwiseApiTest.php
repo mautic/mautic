@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
@@ -7,7 +9,7 @@ use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ConnectwiseApi::class)]
-class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
+final class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
 {
     use DataGeneratorTrait;
 
@@ -26,7 +28,7 @@ class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
         $integration->expects($this->exactly(3))
             ->method('makeRequest')
             ->willReturnCallback(
-                function ($endpoint, $parameters) use (&$page) {
+                function ($endpoint, $parameters) use (&$page): array {
                     ++$page;
 
                     // Page should be incremented 3 times by fetchAllRecords method

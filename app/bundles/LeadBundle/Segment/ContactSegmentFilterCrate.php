@@ -40,7 +40,7 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
-    private array $sourceArray;
+    private readonly array $sourceArray;
 
     private $nullValue;
 
@@ -165,10 +165,7 @@ class ContactSegmentFilterCrate
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->sourceArray;
     }

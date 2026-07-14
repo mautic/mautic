@@ -28,7 +28,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
                 $formType = $this->getFormType();
 
                 if ($formType) {
-                    if ('integration' == $formArea && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
+                    if ('integration' === $formArea && isset($data['leadFields']) && empty($data['list_settings']['leadFields'])) {
                         $data['list_settings']['leadFields'] = $data['leadFields'];
                     }
 

@@ -82,7 +82,7 @@ class TwitterIntegration extends SocialIntegration
 
     public function getApiUrl($endpoint): string
     {
-        return "https://api.twitter.com/1.1/$endpoint.json";
+        return "https://api.twitter.com/1.1/{$endpoint}.json";
     }
 
     public function getUserData($identifier, &$socialCache)
@@ -138,6 +138,9 @@ class TwitterIntegration extends SocialIntegration
         return $data;
     }
 
+    /**
+     * @param array<string, mixed> $socialCache
+     */
     public function getPublicActivity($identifier, &$socialCache): void
     {
         if (!isset($socialCache['id'])) {

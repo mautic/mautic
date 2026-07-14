@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
 class UpdatedObjectMappingDAO
 {
-    private \DateTimeInterface $objectModifiedDate;
+    private readonly \DateTimeInterface $objectModifiedDate;
 
     private ?ObjectMapping $objectMapping = null;
 

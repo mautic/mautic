@@ -28,7 +28,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
     {
         return new self(
             array_map(
-                fn (array $record) => Version::fromArray($record),
+                Version::fromArray(...),
                 $array
             )
         );
@@ -45,7 +45,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 
         usort(
             $records,
-            fn (Version $versionA, Version $versionB) => $versionB->time->getTimestamp() - $versionA->time->getTimestamp()
+            fn (Version $versionA, Version $versionB): int => $versionB->time->getTimestamp() - $versionA->time->getTimestamp()
         );
 
         return new self($records);
@@ -61,7 +61,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
      */
     public function findLatestStableVersionPackage(): ?Version
     {
-        return $this->sortByLatest()->filter(fn (Version $version) => $version->isStable())->first();
+        return $this->sortByLatest()->filter(fn (Version $version): bool => $version->isStable())->first();
     }
 
     /**
@@ -109,7 +109,7 @@ class VersionCollection implements \Iterator, \Countable, \ArrayAccess
 
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->records[] = $value;
         } else {
             $this->records[$offset] = $value;

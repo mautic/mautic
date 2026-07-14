@@ -28,7 +28,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class DashboardModelTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelper;
+
     private MockObject&Session $session;
+
     private DashboardModel $model;
 
     protected function setUp(): void
@@ -41,18 +43,18 @@ final class DashboardModelTest extends TestCase
 
         $this->model = new DashboardModel(
             $this->coreParametersHelper,
-            $this->createMock(PathsHelper::class),
-            $this->createMock(WidgetDetailEventFactory::class),
-            $this->createMock(Filesystem::class),
+            $this->createStub(PathsHelper::class),
+            $this->createStub(WidgetDetailEventFactory::class),
+            $this->createStub(Filesystem::class),
             $requestStack,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
-            $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
-            $this->createMock(LoggerInterface::class),
-            $this->createMock(CacheProviderTagAwareInterface::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CacheProviderTagAwareInterface::class),
         );
     }
 
@@ -62,7 +64,7 @@ final class DashboardModelTest extends TestCase
         $dateFrom    = new \DateTime($dateFromStr);
         $dateTo      = new \DateTime('23:59:59'); // till end of the 'to' date selected
 
-        $this->coreParametersHelper->expects(self::once())
+        $this->coreParametersHelper->expects($this->once())
             ->method('get')
             ->with('default_daterange_filter', $dateFromStr)
             ->willReturn($dateFromStr);
@@ -91,18 +93,18 @@ final class DashboardModelTest extends TestCase
     {
         $widget    = new Widget();
         $exception = new \RuntimeException('DB connection failed — secret host: db.internal');
-        $event     = $this->createMock(WidgetDetailEvent::class);
+        $event     = $this->createStub(WidgetDetailEvent::class);
 
         $widgetEventFactory = $this->createMock(WidgetDetailEventFactory::class);
         $widgetEventFactory->method('create')->willReturn($event);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(self::once())
+        $dispatcher->expects($this->once())
             ->method('dispatch')
             ->willThrowException($exception);
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(self::once())
+        $logger->expects($this->once())
             ->method('error')
             ->with(
                 self::stringContains('failed to load'),
@@ -116,18 +118,18 @@ final class DashboardModelTest extends TestCase
 
         $model = new DashboardModel(
             $this->coreParametersHelper,
-            $this->createMock(PathsHelper::class),
+            $this->createStub(PathsHelper::class),
             $widgetEventFactory,
-            $this->createMock(Filesystem::class),
+            $this->createStub(Filesystem::class),
             $requestStack,
-            $this->createMock(EntityManagerInterface::class),
-            $this->createMock(CorePermissions::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
             $dispatcher,
-            $this->createMock(UrlGeneratorInterface::class),
-            $this->createMock(Translator::class),
-            $this->createMock(UserHelper::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
             $logger,
-            $this->createMock(CacheProviderTagAwareInterface::class),
+            $this->createStub(CacheProviderTagAwareInterface::class),
         );
 
         // Pass timezone to skip userHelper->getUser()->getTimezone()

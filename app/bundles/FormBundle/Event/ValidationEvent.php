@@ -15,15 +15,12 @@ class ValidationEvent extends CommonEvent
      * @param mixed $value
      */
     public function __construct(
-        private Field $field,
+        private readonly Field $field,
         private $value,
     ) {
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }
@@ -36,7 +33,7 @@ class ValidationEvent extends CommonEvent
         return $this->value;
     }
 
-    public function failedValidation($reason): void
+    public function failedValidation(string $reason): void
     {
         $this->valid         = false;
         $this->invalidReason = $reason;

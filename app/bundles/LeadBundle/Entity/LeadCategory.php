@@ -44,7 +44,7 @@ class LeadCategory
 
     /**
      * @var Category
-     **/
+     */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
     private $category;
 

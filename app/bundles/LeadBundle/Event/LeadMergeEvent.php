@@ -8,17 +8,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 class LeadMergeEvent extends Event
 {
     public function __construct(
-        private Lead $victor,
-        private Lead $loser,
+        private readonly Lead $victor,
+        private readonly Lead $loser,
     ) {
     }
 
     /**
      * Returns the victor (loser merges into the victor).
-     *
-     * @return Lead
      */
-    public function getVictor()
+    public function getVictor(): Lead
     {
         return $this->victor;
     }
@@ -26,7 +24,7 @@ class LeadMergeEvent extends Event
     /**
      * Returns the loser (loser merges into the victor).
      */
-    public function getLoser()
+    public function getLoser(): Lead
     {
         return $this->loser;
     }

@@ -8,12 +8,9 @@ use Mautic\CoreBundle\Helper\CommandHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 
-class CommandHelperTest extends MauticMysqlTestCase
+final class CommandHelperTest extends MauticMysqlTestCase
 {
-    /**
-     * @var CommandHelper
-     */
-    private $commandHelper;
+    private CommandHelper $commandHelper;
 
     protected function setUp(): void
     {

@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
+use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use PHPUnit\Framework\Assert;
@@ -28,6 +29,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     {
         $contactRepository = $this->em->getRepository(Lead::class);
 
+        /** @var ContactDeduper $contactDeduper */
         $contactDeduper = static::getContainer()->get('mautic.lead.deduper');
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
@@ -73,7 +75,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $this->saveContact('jane.gabriel@gmail.com', '4444444444'); // 5
 
         $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
-        \assert($phoneField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $phoneField);
         $phoneField->setIsUniqueIdentifer(true);
         $phoneField->setLabel('Cell phone'); // Testing also field with more words.
         $this->em->persist($phoneField);
@@ -105,7 +107,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $this->saveContact('jane.gabriel@gmail.com', '4444444444'); // 3
 
         $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
-        \assert($phoneField instanceof LeadField);
+        $this->assertInstanceOf(LeadField::class, $phoneField);
         $phoneField->setIsUniqueIdentifer(true);
         $phoneField->setLabel('Cell phone'); // Testing also field with more words.
         $this->em->persist($phoneField);

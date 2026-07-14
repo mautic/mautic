@@ -10,10 +10,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CoreParametersHelperTest extends TestCase
+final class CoreParametersHelperTest extends TestCase
 {
     /**
-     * @var MockObject|ContainerInterface
+     * @var MockObject&ContainerInterface
      */
     private MockObject $container;
 
@@ -26,7 +26,7 @@ class CoreParametersHelperTest extends TestCase
     {
         $this->container->method('hasParameter')
             ->willReturnCallback(
-                fn (string $key) => 'mautic.cache_path' === $key
+                fn (string $key): bool => 'mautic.cache_path' === $key
             );
 
         $this->container->expects($this->once())

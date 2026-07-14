@@ -16,11 +16,14 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class NoNestingValidatorTest extends TestCase
+final class NoNestingValidatorTest extends TestCase
 {
     private const TRANSLATED_MESSAGE = 'DWC tokens cannot be used within another DWC.';
+
     private NoNesting $constraint;
+
     private NoNestingValidator $validator;
+
     private ExecutionContextInterface $context;
 
     protected function setUp(): void
@@ -68,7 +71,6 @@ class NoNestingValidatorTest extends TestCase
     private function createContext(): ExecutionContextInterface
     {
         $locale     = 'en_US';
-        $validator  = $this->createMock(ValidatorInterface::class);
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
 
@@ -76,6 +78,6 @@ class NoNestingValidatorTest extends TestCase
             'mautic.dynamicContent.no_nesting' => self::TRANSLATED_MESSAGE,
         ], $locale, 'validators');
 
-        return new ExecutionContext($validator, null, $translator, 'validators');
+        return new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator, 'validators');
     }
 }

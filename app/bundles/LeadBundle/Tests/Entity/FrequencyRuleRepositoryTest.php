@@ -14,12 +14,9 @@ use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
+final class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
 {
-    /**
-     * @var FrequencyRuleRepository
-     */
-    private $frequencyRuleRepository;
+    private FrequencyRuleRepository $frequencyRuleRepository;
 
     protected function setUp(): void
     {

@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
-class EventRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @return iterable<string, array{?\DateTime, ?\DateTime, int}>
@@ -33,8 +33,9 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('dataGetContactPendingEventsConsidersCampaignPublishUpAndDown')]
     public function testGetContactPendingEventsConsidersCampaignPublishUpAndDown(?\DateTime $publishUp, ?\DateTime $publishDown, int $expectedCount): void
     {
+        /** @var EventRepository $repository */
         $repository = static::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
         $event    = $this->createEvent($campaign);
@@ -51,8 +52,9 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testSetEventsAsDeletedWithRedirectUpdatesChains(): void
     {
+        /** @var EventRepository $repository */
         $repository = static::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        $this->assertInstanceOf(EventRepository::class, $repository);
 
         $campaign = $this->createCampaign();
 
@@ -95,9 +97,12 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $reloadedEventA = $this->em->find(Event::class, $eventA->getId());
         $reloadedEventB = $this->em->find(Event::class, $eventB->getId());
         $reloadedEventC = $this->em->find(Event::class, $eventCId);
+        $this->assertInstanceOf(Event::class, $reloadedEventC);
 
         Assert::assertNotNull($reloadedEventC->getDeleted());
+        $this->assertInstanceOf(Event::class, $reloadedEventA);
         Assert::assertSame($eventDId, $reloadedEventA->getRedirectEvent()?->getId());
+        $this->assertInstanceOf(Event::class, $reloadedEventB);
         Assert::assertSame($eventDId, $reloadedEventB->getRedirectEvent()?->getId());
         Assert::assertSame($eventDId, $reloadedEventC->getRedirectEvent()?->getId());
     }
@@ -152,8 +157,9 @@ class EventRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // 4. Call the method under test
+        /** @var EventRepository $repository */
         $repository   = self::getContainer()->get('mautic.campaign.repository.event');
-        \assert($repository instanceof EventRepository);
+        $this->assertInstanceOf(EventRepository::class, $repository);
         $resultEmails = $repository->getCampaignEmailEvents($campaign->getId());
 
         // 5. Assert the results

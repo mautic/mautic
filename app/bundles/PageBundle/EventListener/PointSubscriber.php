@@ -15,8 +15,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private PointModel $pointModel,
-        private PointActionHelper $pointActionHelper,
+        private readonly PointModel $pointModel,
+        private readonly PointActionHelper $pointActionHelper,
     ) {
     }
 
