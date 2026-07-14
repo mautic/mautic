@@ -158,7 +158,7 @@ final class Oauth2Test extends MauticMysqlTestCase
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
     {
         $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
-        self::assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $accessToken = $this->createUserBoundAccessToken($adminUser);
 
@@ -216,7 +216,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->em->clear();
 
         $reloadedToken = $this->em->getRepository(AccessToken::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
-        self::assertInstanceOf(AccessToken::class, $reloadedToken);
+        $this->assertInstanceOf(AccessToken::class, $reloadedToken);
 
         return $reloadedToken;
     }

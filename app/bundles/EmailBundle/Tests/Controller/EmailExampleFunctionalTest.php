@@ -66,7 +66,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
@@ -138,7 +138,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
@@ -146,7 +146,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_OK, verbose: true);
 
         $message = self::getMailerMessagesByToAddress('admin@yoursite.com')[0];
-        self::assertInstanceOf(MauticMessage::class, $message);
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
         Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
         Assert::assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
@@ -169,7 +169,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $response);
-        self::assertJson($response);
+        $this->assertJson($response);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();
@@ -241,7 +241,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $response);
-        self::assertJson($response);
+        $this->assertJson($response);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();
@@ -333,7 +333,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $response);
-        self::assertJson($response);
+        $this->assertJson($response);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();

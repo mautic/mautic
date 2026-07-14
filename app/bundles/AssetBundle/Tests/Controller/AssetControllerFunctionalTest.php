@@ -435,8 +435,8 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertArrayHasKey('tmpFileName', $responseData);
 
         // Assert file was created in the correct directory
-        $expectedDir      = $container->getParameter('mautic.upload_dir').join('/', ['', 'tmp', $tmpDir]);
-        $expectedFilePath = join('/', [$expectedDir, $responseData['tmpFileName']]);
+        $expectedDir      = $container->getParameter('mautic.upload_dir').implode('/', ['', 'tmp', $tmpDir]);
+        $expectedFilePath = implode('/', [$expectedDir, $responseData['tmpFileName']]);
         $this->assertFileExists($expectedFilePath);
 
         // Clean up

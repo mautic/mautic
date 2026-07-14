@@ -28,7 +28,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
     {
         parent::setUp();
         $modelTranslator = $this->createMock(Translator::class);
-        $modelTranslator->expects(self::any())
+        $modelTranslator
             ->method('trans')
             ->willReturnArgument(0);
 
