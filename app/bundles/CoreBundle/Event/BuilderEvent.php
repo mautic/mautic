@@ -246,7 +246,7 @@ class BuilderEvent extends Event
      *
      * @return array|void
      */
-    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, $labelColumn = 'name', $valueColumn = 'id')
+    public function getTokensFromHelper(BuilderTokenHelper $tokenHelper, $tokens, string $labelColumn = 'name', $valueColumn = 'id')
     {
         return $tokenHelper->getTokens(
             $tokens,
