@@ -14,15 +14,15 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldValidatorTest extends TestCase
+final class FieldValidatorTest extends TestCase
 {
     /**
-     * @var LeadFieldRepository&MockObject
+     * @var MockObject&LeadFieldRepository
      */
     private MockObject $leadFieldRepository;
 
     /**
-     * @var BulkNotification&MockObject
+     * @var MockObject&BulkNotification
      */
     private MockObject $bulkNotification;
 
@@ -101,7 +101,7 @@ class FieldValidatorTest extends TestCase
 
         $this->bulkNotification->expects($matcher)
             ->method('addNotification')
-            ->willReturnCallback(function (...$parameters) use ($matcher, $firstChangedObject, $secondChangedObject) {
+            ->willReturnCallback(function (...$parameters) use ($matcher, $firstChangedObject, $secondChangedObject): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->getNotificationAssertion($parameters, "Custom field 'Company' with value 'Some company' exceeded maximum allowed length and was ignored during the sync. Your integration integration plugin may be configured improperly.", $firstChangedObject, 'company', 'length');
                 }
@@ -137,7 +137,7 @@ class FieldValidatorTest extends TestCase
         Assert::assertSame($parameters[2], $changedObject->getIntegration());
         Assert::assertSame($parameters[3], sprintf('%s %s', $changedObject->getMappedObjectId(), $changedObject->getObject()));
         Assert::assertSame($parameters[4], $changedObject->getObject());
-        Assert::assertSame($parameters[5], 0);
+        Assert::assertSame(0, $parameters[5]);
         Assert::assertSame($parameters[6], sprintf('%s %s %s', $changedObject->getIntegration(), $changedObject->getObject(), $changedObject->getMappedObjectId()));
     }
 }

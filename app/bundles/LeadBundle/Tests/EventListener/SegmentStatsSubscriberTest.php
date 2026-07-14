@@ -20,7 +20,7 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
     /**
      * @throws \Exception
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,12 +44,8 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
 
         $this->subscriber->getStatsLeadEvents($event);
 
-        $this->assertTrue(
-            in_array(
-                $event->getResults()[0]['item_id'],
-                $campaign->getLists()->map(fn ($list) => $list->getId())->toArray()
-            )
-        );
+        $itemId = $event->getResults()[0]['item_id'];
+        $this->assertContains((int) $itemId, $campaign->getLists()->map(fn ($list) => $list->getId())->toArray());
 
         $this->assertSame(1, (int) $event->getResults()[0]['is_used']);
         $this->assertSame(1, (int) $event->getResults()[0]['is_published']);
@@ -64,15 +60,10 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         $this->subscriber->getStatsLeadEvents($event);
 
         foreach ($event->getResults() as $segment) {
-            $this->assertTrue(
-                in_array(
-                    $segment['item_id'],
-                    array_merge(
-                        $campaign->getEvents()[0]->getProperties()['addToLists'],
-                        $campaign->getEvents()[0]->getProperties()['removeFromLists']
-                    )
-                )
-            );
+            $this->assertContains((int) $segment['item_id'], array_merge(
+                $campaign->getEvents()[0]->getProperties()['addToLists'],
+                $campaign->getEvents()[0]->getProperties()['removeFromLists']
+            ));
             $this->assertSame(1, (int) $segment['is_used']);
             $this->assertSame(1, (int) $segment['is_published']);
         }
@@ -87,15 +78,10 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         $this->subscriber->getStatsLeadEvents($event);
 
         foreach ($event->getResults() as $segment) {
-            $this->assertTrue(
-                in_array(
-                    $segment['item_id'],
-                    [
-                        $email->getExcludedLists()->toArray()[0]->getId(),
-                        $email->getLists()->toArray()[0]->getId(),
-                    ]
-                )
-            );
+            $this->assertContains((int) $segment['item_id'], [
+                $email->getExcludedLists()->toArray()[0]->getId(),
+                $email->getLists()->toArray()[0]->getId(),
+            ]);
             $this->assertSame(1, (int) $segment['is_used']);
             $this->assertSame(1, (int) $segment['is_published']);
         }

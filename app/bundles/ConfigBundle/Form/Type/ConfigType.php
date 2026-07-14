@@ -16,8 +16,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConfigType extends AbstractType
 {
     public function __construct(
-        private RestrictionHelper $restrictionHelper,
-        private EscapeTransformer $escapeTransformer,
+        private readonly RestrictionHelper $restrictionHelper,
+        private readonly EscapeTransformer $escapeTransformer,
     ) {
     }
 

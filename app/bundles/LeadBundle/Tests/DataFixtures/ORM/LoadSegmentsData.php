@@ -12,8 +12,8 @@ use Mautic\LeadBundle\Model\ListModel;
 class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private ListModel $listModel,
-        private LeadModel $contactModel,
+        private readonly ListModel $listModel,
+        private readonly LeadModel $contactModel,
     ) {
     }
 
@@ -1067,7 +1067,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         }
     }
 
-    protected function createSegment($listConfig, ObjectManager $manager)
+    protected function createSegment(array $listConfig, ObjectManager $manager)
     {
         $adminUser = $this->getReference('admin-user');
 

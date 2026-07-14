@@ -12,17 +12,15 @@ use Mautic\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class LocalFileAdapterServiceTest extends MauticMysqlTestCase
+final class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 {
-    /**
-     * @var string
-     */
-    private $folderName;
+    private ?string $folderName = null;
 
     protected function beforeTearDown(): void
     {
+        /** @var PathsHelper $pathsHelper */
         $pathsHelper = static::getContainer()->get('mautic.helper.paths');
-        $folderPath  = "{$pathsHelper->getImagePath()}/$this->folderName";
+        $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
 
         if (is_dir($folderPath)) {
             rmdir($folderPath);
@@ -57,16 +55,17 @@ class LocalFileAdapterServiceTest extends MauticMysqlTestCase
 
         $this->folderName = (string) time();
         $user             = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
         $_SERVER['REQUEST_METHOD'] = Request::METHOD_POST;
         $this->client->request(
             Request::METHOD_POST,
-            "efconnect?cmd=mkdir&name=$this->folderName&target=fls1_Lw"
+            "efconnect?cmd=mkdir&name={$this->folderName}&target=fls1_Lw"
         );
         self::assertResponseIsSuccessful();
         /** @var PathsHelper $pathsHelper */
         $pathsHelper = static::getContainer()->get('mautic.helper.paths');
-        $folderPath  = "{$pathsHelper->getImagePath()}/$this->folderName";
+        $folderPath  = "{$pathsHelper->getImagePath()}/{$this->folderName}";
         self::assertDirectoryExists($folderPath);
         self::assertSame('777', substr(sprintf('%o', fileperms($folderPath)), -3));
     }

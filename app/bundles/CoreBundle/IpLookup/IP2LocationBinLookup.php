@@ -11,18 +11,12 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
         return 'IP2Location Local Bin File DB9BIN only';
     }
 
-    /**
-     * @return string
-     */
-    public function getLocalDataStoreFilepath()
+    public function getLocalDataStoreFilepath(): string
     {
-        return $this->getDataDir();
+        return $this->getDataDir().'/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE.BIN';
     }
 
-    /**
-     * @return string
-     */
-    public function getRemoteDateStoreDownloadUrl()
+    public function getRemoteDateStoreDownloadUrl(): string
     {
         $usernamePass = explode(':', $this->auth);
         $data         = [];
@@ -38,6 +32,8 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
             return 'https://www.ip2location.com/download?'.$queryString;
         }
         $this->logger->warning('Both username and password are required');
+
+        return '';
     }
 
     /**
@@ -46,7 +42,7 @@ class IP2LocationBinLookup extends AbstractLocalDataLookup
     protected function lookup()
     {
         try {
-            $reader = new Database($this->getLocalDataStoreFilepath().'/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE.BIN', Database::FILE_IO);
+            $reader = new Database($this->getLocalDataStoreFilepath(), Database::FILE_IO);
             $record = $reader->lookup($this->ip, Database::ALL);
 
             if (isset($record['countryName'])) {

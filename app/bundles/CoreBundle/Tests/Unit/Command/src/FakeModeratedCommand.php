@@ -9,7 +9,7 @@ use Symfony\Component\Lock\LockInterface;
 
 class FakeModeratedCommand extends ModeratedCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mautic:fake:command');
 

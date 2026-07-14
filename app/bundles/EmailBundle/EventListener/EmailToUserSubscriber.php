@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class EmailToUserSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private SendEmailToUser $sendEmailToUser,
+        private readonly SendEmailToUser $sendEmailToUser,
     ) {
     }
 
@@ -20,7 +20,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         return [EmailEvents::ON_SENT_EMAIL_TO_USER => ['onEmailToUser', 0]];
     }
 
-    public function onEmailToUser(TriggerExecutedEvent $event): TriggerExecutedEvent
+    public function onEmailToUser(TriggerExecutedEvent $event): void
     {
         $triggerEvent = $event->getTriggerEvent();
         $config       = $triggerEvent->getProperties();
@@ -32,7 +32,5 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         } catch (EmailCouldNotBeSentException) {
             $event->setFailed();
         }
-
-        return $event;
     }
 }

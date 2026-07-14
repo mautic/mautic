@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExportHelperTest extends TestCase
+final class ExportHelperTest extends TestCase
 {
     private MockObject&TranslatorInterface $translatorInterfaceMock;
 
@@ -50,21 +50,19 @@ class ExportHelperTest extends TestCase
     private array $filePaths = [];
 
     private MockObject&FilePathResolver $filePathResolver;
-    private MockObject&ProcessSignalService $processSignalService;
 
     protected function setUp(): void
     {
         $this->translatorInterfaceMock  = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->filePathResolver         = $this->createMock(FilePathResolver::class);
-        $this->processSignalService     = $this->createMock(ProcessSignalService::class);
 
         $this->exportHelper             = new ExportHelper(
             $this->translatorInterfaceMock,
             $this->coreParametersHelperMock,
             $this->filePathResolver,
-            $this->processSignalService,
-            $this->createMock(EventDispatcherInterface::class),
+            $this->createStub(ProcessSignalService::class),
+            $this->createStub(EventDispatcherInterface::class),
         );
     }
 
@@ -118,9 +116,9 @@ class ExportHelperTest extends TestCase
         $zip = new \ZipArchive();
         $zip->open($zipFilePath);
 
-        $this->assertTrue(false !== $zip->locateName('entity_data.json'));
-        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath1)));
-        $this->assertTrue(false !== $zip->locateName('assets/'.basename($assetFilePath2)));
+        $this->assertNotFalse($zip->locateName('entity_data.json'));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath1)));
+        $this->assertNotFalse($zip->locateName('assets/'.basename($assetFilePath2)));
 
         $zip->close();
 
@@ -239,7 +237,7 @@ class ExportHelperTest extends TestCase
 
         $result   = $this->exportHelper->parseLeadToExport($lead);
         $expected = $leadFieldsData + ['stage' => 'Stage 3'];
-        $this->assertEquals($expected, $result);
+        $this->assertSame($expected, $result);
     }
 
     public function testSupportedExportTypes(): void
@@ -368,7 +366,7 @@ class ExportHelperTest extends TestCase
      */
     private function removeBomUtf8(string $s): string
     {
-        if (substr($s, 0, 3) == chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
+        if (substr($s, 0, 3) === chr(hexdec('EF')).chr(hexdec('BB')).chr(hexdec('BF'))) {
             return substr($s, 3);
         }
 
@@ -394,12 +392,12 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('current')
             ->willReturnCallback(
-                fn () => $iteratorData->array[$iteratorData->position]
+                fn (): mixed => $iteratorData->array[$iteratorData->position]
             );
 
         $iteratorExportDataModelMock->method('key')
             ->willReturnCallback(
-                fn () => $iteratorData->position
+                fn (): int => $iteratorData->position
             );
 
         $iteratorExportDataModelMock->method('next')
@@ -411,7 +409,7 @@ class ExportHelperTest extends TestCase
 
         $iteratorExportDataModelMock->method('valid')
             ->willReturnCallback(
-                fn () => isset($iteratorData->array[$iteratorData->position])
+                fn (): bool => isset($iteratorData->array[$iteratorData->position])
             );
 
         return $iteratorExportDataModelMock;

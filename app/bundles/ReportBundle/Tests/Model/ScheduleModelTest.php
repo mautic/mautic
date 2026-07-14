@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -11,27 +13,22 @@ use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class ScheduleModelTest extends \PHPUnit\Framework\TestCase
+final class ScheduleModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|SchedulerRepository
+     * @var MockObject&SchedulerRepository
      */
     private MockObject $schedulerRepository;
 
     /**
-     * @var MockObject|EntityManager
+     * @var MockObject&EntityManager
      */
     private MockObject $entityManager;
 
     /**
-     * @var MockObject|SchedulerPlanner
+     * @var MockObject&SchedulerPlanner
      */
     private MockObject $schedulerPlanner;
-
-    /**
-     * @var MockObject|ExportOption
-     */
-    private MockObject $exportOption;
 
     private ScheduleModel $scheduleModel;
 
@@ -40,7 +37,6 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
         $this->schedulerRepository = $this->createMock(SchedulerRepository::class);
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->schedulerPlanner    = $this->createMock(SchedulerPlanner::class);
-        $this->exportOption        = $this->createMock(ExportOption::class);
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')
@@ -54,9 +50,9 @@ class ScheduleModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->schedulerRepository->expects($this->once())
             ->method('getScheduledReportsForExport')
-            ->with($this->exportOption);
+            ->with($this->createStub(ExportOption::class));
 
-        $this->scheduleModel->getScheduledReportsForExport($this->exportOption);
+        $this->scheduleModel->getScheduledReportsForExport($this->createStub(ExportOption::class));
     }
 
     public function testReportWasScheduled(): void

@@ -9,12 +9,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 use PHPUnit\Framework\Assert;
 
-class BulkNotificationTest extends MauticMysqlTestCase
+final class BulkNotificationTest extends MauticMysqlTestCase
 {
-    /**
-     * @var BulkNotification
-     */
-    private $bulkNotification;
+    private BulkNotification $bulkNotification;
 
     protected function setUp(): void
     {

@@ -30,7 +30,7 @@ class BatchTagController extends AbstractFormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions['tagManager:tagManager:view']) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         return $this->delegateView([
@@ -49,6 +49,7 @@ class BatchTagController extends AbstractFormController
     public function execAction(Request $request): JsonResponse
     {
         $params   = $request->get('batch_tag');
+
         $tagModel = $this->getModel('tagmanager.tag');
         assert($tagModel instanceof TagModel);
         $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);

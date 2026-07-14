@@ -132,12 +132,11 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param int|string $expected
      * @param array<int> $addTagsToContact
      * @param array<int> $addTagsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
-    public function testTagIncludeExclude(string $filter, $expected, array $addTagsToContact, array $addTagsToSegment): void
+    public function testTagIncludeExclude(string $filter, int $expected, array $addTagsToContact, array $addTagsToSegment): void
     {
         $tag1 = new Tag('tag1');
         $tag2 = new Tag('tag2');
@@ -226,12 +225,11 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param int|string $expected
      * @param array<int> $addFieldsToContact
      * @param array<int> $addFieldsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
-    public function testCustomFieldIncludeExclude(string $filter, $expected, array $addFieldsToContact, array $addFieldsToSegment): void
+    public function testCustomFieldIncludeExclude(string $filter, int $expected, array $addFieldsToContact, array $addFieldsToSegment): void
     {
         $fieldAlias = 'test_inc_ex_field';
 
@@ -284,7 +282,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, $contactValue);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $segmentValue = [];
@@ -395,7 +393,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         $contact->addUpdatedField($fieldAlias, $contactValue);
         $contactModel = self::getContainer()->get(LeadModel::class);
-        \assert($contactModel instanceof LeadModel);
+        $this->assertInstanceOf(LeadModel::class, $contactModel);
         $contactModel->saveEntity($contact);
 
         $segmentValue = [];
@@ -504,7 +502,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->addUpdatedField($fieldAlias, $companyValue);
 
         $companyModel = self::getContainer()->get(\Mautic\LeadBundle\Model\CompanyModel::class);
-        \assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Model\CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
@@ -598,7 +596,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $company->addUpdatedField($fieldAlias, $companyValue);
 
         $companyModel = self::getContainer()->get(\Mautic\LeadBundle\Model\CompanyModel::class);
-        \assert($companyModel instanceof \Mautic\LeadBundle\Model\CompanyModel);
+        $this->assertInstanceOf(\Mautic\LeadBundle\Model\CompanyModel::class, $companyModel);
         $companyModel->saveEntity($company);
 
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
@@ -650,12 +648,11 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param int|string $expected
      * @param array<int> $addSegmentsToContact
      * @param array<int> $addSegmentsToSegment
      */
     #[DataProvider('provideIncludeExclude')]
-    public function testSegmentIncludeExclude(string $filter, $expected, array $addSegmentsToContact, array $addSegmentsToSegment): void
+    public function testSegmentIncludeExclude(string $filter, int $expected, array $addSegmentsToContact, array $addSegmentsToSegment): void
     {
         $contact = $this->createLead('First name', emailId: 'halusky@bramborak.makovec');
 

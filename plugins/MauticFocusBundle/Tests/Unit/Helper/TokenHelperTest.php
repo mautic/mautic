@@ -12,20 +12,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 
-class TokenHelperTest extends TestCase
+final class TokenHelperTest extends TestCase
 {
     /**
-     * @var FocusModel|MockObject
+     * @var MockObject&FocusModel
      */
     private MockObject $model;
 
     /**
-     * @var MockObject|RouterInterface
-     */
-    private MockObject $router;
-
-    /**
-     * @var CorePermissions|MockObject
+     * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
@@ -36,10 +31,9 @@ class TokenHelperTest extends TestCase
         parent::setUp();
 
         $this->model    = $this->createMock(FocusModel::class);
-        $this->router   = $this->createMock(RouterInterface::class);
         $this->security = $this->createMock(CorePermissions::class);
 
-        $this->helper = new TokenHelper($this->model, $this->router, $this->security);
+        $this->helper = new TokenHelper($this->model, $this->createStub(RouterInterface::class), $this->security);
     }
 
     public function testFindFocusTokensNotFound(): void
@@ -59,12 +53,12 @@ class TokenHelperTest extends TestCase
     public function testFindFocusTokensFoundAddScriptByFocusPublishedStatus(): void
     {
         $focusItemId = 1;
-        $content     = "content {focus=$focusItemId}";
+        $content     = "content {focus={$focusItemId}}";
 
         $focusItem = new Focus();
         $focusItem->setIsPublished(true);
 
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('getEntity')
             ->with($focusItemId)
             ->willReturn($focusItem);
@@ -79,18 +73,18 @@ class TokenHelperTest extends TestCase
     {
         $focusItemId = 1;
         $createdById = 2;
-        $content     = "content {focus=$focusItemId}";
+        $content     = "content {focus={$focusItemId}}";
 
         $focusItem = new Focus();
         $focusItem->setIsPublished(false);
         $focusItem->setCreatedBy($createdById);
 
-        $this->model->expects(self::once())
+        $this->model->expects($this->once())
             ->method('getEntity')
             ->with($focusItemId)
             ->willReturn($focusItem);
 
-        $this->security->expects(self::once())
+        $this->security->expects($this->once())
             ->method('hasEntityAccess')
             ->with(
                 'focus:items:viewown',

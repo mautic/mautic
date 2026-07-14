@@ -22,8 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConstantContactType extends AbstractType
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper,
-        private PluginModel $pluginModel,
+        private readonly IntegrationHelper $integrationHelper,
+        private readonly PluginModel $pluginModel,
         protected RequestStack $requestStack,
         protected CoreParametersHelper $coreParametersHelper,
     ) {
@@ -81,9 +81,7 @@ class ConstantContactType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($error): void {
                 $form = $event->getForm();
 
-                if ($error) {
-                    $form['list']->addError(new FormError($error));
-                }
+                $form['list']->addError(new FormError($error));
             });
         }
 

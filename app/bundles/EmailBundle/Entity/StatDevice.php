@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class StatDevice
 {
     public const TABLE_NAME = 'email_stats_devices';
+
     /**
      * @var string
      */

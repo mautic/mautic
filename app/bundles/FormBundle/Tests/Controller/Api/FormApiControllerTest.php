@@ -132,9 +132,9 @@ final class FormApiControllerTest extends MauticMysqlTestCase
 
         // Check that the error mentions the duplicate alias
         if (isset($responseData['error']['message'])) {
-            $this->assertStringContainsString('duplicate_alias', $responseData['error']['message']);
+            $this->assertStringContainsString('duplicate_alias', (string) $responseData['error']['message']);
         } elseif (isset($responseData['errors'][0]['message'])) {
-            $this->assertStringContainsString('duplicate_alias', $responseData['errors'][0]['message']);
+            $this->assertStringContainsString('duplicate_alias', (string) $responseData['errors'][0]['message']);
         }
     }
 

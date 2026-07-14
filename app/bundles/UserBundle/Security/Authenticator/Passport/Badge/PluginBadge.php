@@ -10,8 +10,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
 class PluginBadge implements BadgeInterface
 {
-    public function __construct(private ?TokenInterface $preAuthenticatedToken, private ?Response $pluginResponse, private ?string $authenticatingService)
-    {
+    public function __construct(
+        private readonly ?TokenInterface $preAuthenticatedToken,
+        private readonly ?Response $pluginResponse,
+        private readonly ?string $authenticatingService,
+    ) {
     }
 
     public function getPreAuthenticatedToken(): ?TokenInterface

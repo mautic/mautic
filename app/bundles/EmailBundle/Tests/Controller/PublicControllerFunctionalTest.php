@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
@@ -20,12 +21,9 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerFunctionalTest extends MauticMysqlTestCase
+final class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var int
-     */
-    private $leadId;
+    private ?int $leadId = null;
 
     /**
      * Tests that use the classic unsubscribe page. Not preference center.
@@ -33,6 +31,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
     private const UNSUBSCRIBE_TESTS = [
         'testUnsubscribeWithEmailStat',
         'testUnsubscribeEmail',
+        'testHeadRequestWithNoShowContactPreferences',
     ];
 
     protected function setUp(): void
@@ -73,7 +72,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testMailerCallbackWhenTransportDoesNotProccessIt(): void
     {
-        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn () => null /* exists but does nothing */);
+        self::getContainer()->get('event_dispatcher')->addListener(EmailEvents::ON_TRANSPORT_WEBHOOK, fn (): null => null /* exists but does nothing */);
         $this->client->request('POST', '/mailer/callback');
 
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
@@ -100,7 +99,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
     }
 
     public function testContactPreferencesLandingPageTracking(): void
@@ -139,14 +138,14 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
 
-        $this->assertEquals(1, $crawler->filter('#success-message-text')->count(), $this->client->getResponse()->getContent());
+        $this->assertCount(1, $crawler->filter('#success-message-text'), $this->client->getResponse()->getContent());
         $expectedMessage = static::getContainer()->get('translator')->trans('mautic.email.preferences_center_success_message.text');
         $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertResponseIsSuccessful();
 
         // Assert that the contact has the DNC record now.
         $dncRepository = $this->em->getRepository(DoNotContact::class);
-        \assert($dncRepository instanceof DoNotContactRepository);
+        $this->assertInstanceOf(DoNotContactRepository::class, $dncRepository);
         $dncRecords = $dncRepository->findBy(['lead' => $lead->getId()]);
         Assert::assertCount(1, $dncRecords);
         Assert::assertSame(DoNotContact::UNSUBSCRIBED, $dncRecords[0]->getReason());
@@ -164,7 +163,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -178,7 +177,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
 
-        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), $crawler->filter('form')->eq(0)->attr('action'));
+        self::assertStringContainsString('form/submit?formId='.$stat->getEmail()->getUnsubscribeForm()->getId(), (string) $crawler->filter('form')->eq(0)->attr('action'));
         $this->assertResponseIsSuccessful();
     }
 
@@ -206,8 +205,19 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
         $dncCollection = $stat->getLead()->getDoNotContact();
-        $this->assertEquals(1, $dncCollection->count());
+        $this->assertCount(1, $dncCollection);
         $this->assertEquals(DoNotContact::UNSUBSCRIBED, $dncCollection->first()->getReason());
+    }
+
+    public function testHeadRequestWithNoShowContactPreferences(): void
+    {
+        $lead = $this->createLead();
+        $stat = $this->getStat(null, $lead);
+        $this->em->flush();
+        $this->client->request('HEAD', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertResponseIsSuccessful();
+        $dncCollection = $stat->getLead()->getDoNotContact();
+        $this->assertCount(0, $dncCollection);
     }
 
     public function testUnsubscribeActionWithCustomPreferenceCenterHasCsrfToken(): void
@@ -220,7 +230,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
         $this->assertResponseIsSuccessful();
         $tokenInput = $crawler->filter('input[name="lead_contact_frequency_rules[_token]"]');
-        $this->assertEquals(1, $tokenInput->count(), $this->client->getResponse()->getContent());
+        $this->assertCount(1, $tokenInput, $this->client->getResponse()->getContent());
     }
 
     private function getPreferencesCenterLandingPage(): Page
@@ -476,7 +486,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, $uri);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($message, $clientResponse->getContent());
+        $this->assertStringContainsString($message, (string) $clientResponse->getContent());
         $doNotContacts       = $this->em->getRepository(DoNotContact::class)->findBy(['lead' => $this->leadId]);
         $isAddedDoNotContact = (bool) count($doNotContacts);
         $addedDoNotContact   = $isAddedDoNotContact ? $doNotContacts[0] : null;
@@ -504,6 +514,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail($rightEmail);
         $this->em->persist($lead);
         // Email hash
+        /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper   = self::getContainer()->get('mautic.helper.core_parameters');
         $configSecretEmailHash  = $coreParametersHelper->get('secret_key');
         $rightHashForWrongEmail = hash_hmac('sha256', $wrongEmail, $configSecretEmailHash);
@@ -636,7 +647,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         // Assert that the response contains the expected string
         $this->assertStringContainsString(
             'We are sorry to see you go! john@doe.email will no longer receive emails from us',
-            $this->client->getResponse()->getContent()
+            (string) $this->client->getResponse()->getContent()
         );
 
         // Assert that a DoNotContact record was created
@@ -673,7 +684,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $successMessage = $crawler->filter('div.pref-successmessage');
-        $this->assertEquals(1, $successMessage->count());
+        $this->assertCount(1, $successMessage);
     }
 
     public function testContactPreferencesFormRenderOnUnsubscribePage(): void

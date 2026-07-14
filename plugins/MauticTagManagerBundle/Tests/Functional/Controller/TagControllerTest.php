@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\TagModel;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
@@ -23,18 +24,16 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class TagControllerTest extends MauticMysqlTestCase
+final class TagControllerTest extends MauticMysqlTestCase
 {
     private const MERGE_ROUTE_BASE = '/s/tags/merge/';
 
-    /**
-     * @var TagRepository
-     */
-    private $tagRepository;
+    private TagRepository $tagRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
+        /** @var TagModel $tagModel */
         $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
         $this->tagRepository = $tagModel->getRepository();
 
@@ -59,8 +58,8 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
-        $this->assertStringContainsString('tag2', $clientResponseContent, 'The return must contain tag2');
+        $this->assertStringContainsString('tag1', (string) $clientResponseContent, 'The return must contain tag1');
+        $this->assertStringContainsString('tag2', (string) $clientResponseContent, 'The return must contain tag2');
     }
 
     /**
@@ -73,19 +72,19 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponseContent  = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain tag1');
-        $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain tag2');
+        $this->assertStringContainsString('tag1', (string) $clientResponseContent, 'The return must contain tag1');
+        $this->assertStringNotContainsString('tag2', (string) $clientResponseContent, 'The return must not contain tag2');
     }
 
     public function testIndexActionWhenFilteredByDescription(): void
     {
         $matchingTag = $this->tagRepository->findOneBy(['tag' => 'tag1']);
-        \assert($matchingTag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $matchingTag);
         $matchingTag->setDescription('Contains the test keyword.');
         $this->tagRepository->saveEntity($matchingTag, false);
 
         $otherTag = $this->tagRepository->findOneBy(['tag' => 'tag2']);
-        \assert($otherTag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $otherTag);
         $otherTag->setDescription('No related content.');
         $this->tagRepository->saveEntity($otherTag);
 
@@ -94,8 +93,8 @@ class TagControllerTest extends MauticMysqlTestCase
         $clientResponseContent = $clientResponse->getContent();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('tag1', $clientResponseContent, 'The return must contain the tag whose description matches.');
-        $this->assertStringNotContainsString('tag2', $clientResponseContent, 'The return must not contain unrelated tags.');
+        $this->assertStringContainsString('tag1', (string) $clientResponseContent, 'The return must contain the tag whose description matches.');
+        $this->assertStringNotContainsString('tag2', (string) $clientResponseContent, 'The return must not contain unrelated tags.');
     }
 
     public function testTagDeletion(): void
@@ -103,13 +102,13 @@ class TagControllerTest extends MauticMysqlTestCase
         $tagId = $this->tagRepository->findOneBy([])->getId();
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
     }
 
     public function testTagDeletionRemovesContactAssociations(): void
     {
         $tag = $this->tagRepository->findOneBy([]);
-        \assert($tag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $contact = new Lead();
         $contact->setEmail('tagged-contact@example.com');
@@ -123,7 +122,7 @@ class TagControllerTest extends MauticMysqlTestCase
 
         $this->client->request('POST', '/s/tags/delete/'.$tagId);
         $this->assertResponseIsSuccessful();
-        $this->assertSame($this->tagRepository->find($tagId), null, 'Assert that tag is deleted');
+        $this->assertNotInstanceOf(Tag::class, $this->tagRepository->find($tagId), 'Assert that tag is deleted');
         Assert::assertSame(0, $this->countLeadTagAssociations($tagId));
     }
 
@@ -133,12 +132,13 @@ class TagControllerTest extends MauticMysqlTestCase
     public function testViewAction(): void
     {
         $tag = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $this->client->request('GET', '/s/tags/view/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($tag->getTag(), $clientResponseContent, 'The return must contain tag');
+        $this->assertStringContainsString($tag->getTag(), (string) $clientResponseContent, 'The return must contain tag');
     }
 
     public function testViewActionNotFound(): void
@@ -167,12 +167,13 @@ class TagControllerTest extends MauticMysqlTestCase
     {
         $TagName = 'Test tag';
         $tag     = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(Tag::class, $tag);
 
         $crawler                = $this->client->request('GET', '/s/tags/edit/'.$tag->getId());
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Edit tag: '.$tag->getTag(), $clientResponseContent, 'The return must contain \'Edit tag\' text');
+        $this->assertStringContainsString('Edit tag: '.$tag->getTag(), (string) $clientResponseContent, 'The return must contain \'Edit tag\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['tag_entity[tag]']->setValue($TagName);
@@ -215,7 +216,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('A value is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testNewActionDuplicateTag(): void
@@ -250,7 +251,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $form->setValues(['tag_entity[tag]' => '']);
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('A value is required.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testEditTagWithNoPermission(): void
@@ -261,6 +262,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->loginUser($user);
 
         $tag     = $this->tagRepository->findOneBy([]);
+        $this->assertInstanceOf(Tag::class, $tag);
         $this->client->request(Request::METHOD_GET, '/s/tags/edit/'.$tag->getId());
         $this->assertResponseStatusCodeSame(403, (string) $this->client->getResponse()->getStatusCode());
     }
@@ -354,13 +356,14 @@ class TagControllerTest extends MauticMysqlTestCase
         Assert::assertSame(2, $this->countLeadTagAssociations($secondaryTagId));
 
         // Test the actual merge functionality by calling the model directly
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();
 
         $remainingTags   = $this->tagRepository->findAll();
-        $remainingTagIds = array_map(fn ($tag) => $tag->getId(), $remainingTags);
+        $remainingTagIds = array_map(fn (Tag $tag) => $tag->getId(), $remainingTags);
 
         Assert::assertSame(2, $this->countLeadTagAssociations($primaryTagId));
         Assert::assertSame(0, $this->countLeadTagAssociations($secondaryTagId));
@@ -372,8 +375,8 @@ class TagControllerTest extends MauticMysqlTestCase
     {
         $primaryTag   = $this->tagRepository->findOneBy(['tag' => 'tag1']);
         $secondaryTag = $this->tagRepository->findOneBy(['tag' => 'tag2']);
-        \assert($primaryTag instanceof Tag);
-        \assert($secondaryTag instanceof Tag);
+        $this->assertInstanceOf(Tag::class, $primaryTag);
+        $this->assertInstanceOf(Tag::class, $secondaryTag);
 
         $primaryTagId     = (int) $primaryTag->getId();
         $secondaryTagId   = (int) $secondaryTag->getId();
@@ -393,35 +396,36 @@ class TagControllerTest extends MauticMysqlTestCase
         $pointTriggerEventId   = (int) $pointTriggerEvent->getId();
         $reportId              = (int) $report->getId();
 
+        /** @var TagModel $tagModel */
         $tagModel = static::getContainer()->get('mautic.lead.model.tag');
         $tagModel->tagMerge($primaryTag, $secondaryTag);
 
         $this->em->clear();
 
         $campaignChangeEvent = $this->em->find(Event::class, $campaignChangeEventId);
-        \assert($campaignChangeEvent instanceof Event);
+        $this->assertInstanceOf(Event::class, $campaignChangeEvent);
         Assert::assertSame([$primaryTagName], $campaignChangeEvent->getProperties()['add_tags']);
         Assert::assertSame([$primaryTagId], $campaignChangeEvent->getProperties()['properties']['add_tags']);
 
         $campaignTagCondition = $this->em->find(Event::class, $campaignConditionId);
-        \assert($campaignTagCondition instanceof Event);
+        $this->assertInstanceOf(Event::class, $campaignTagCondition);
         Assert::assertSame([$primaryTagName], $campaignTagCondition->getProperties()['tags']);
         Assert::assertSame([$primaryTagId], $campaignTagCondition->getProperties()['properties']['tags']);
 
         $segment = $this->em->find(LeadList::class, $segmentId);
-        \assert($segment instanceof LeadList);
+        $this->assertInstanceOf(LeadList::class, $segment);
         Assert::assertSame([$primaryTagId], $segment->getFilters()[0]['properties']['filter']);
 
         $formAction = $this->em->find(Action::class, $formActionId);
-        \assert($formAction instanceof Action);
+        $this->assertInstanceOf(Action::class, $formAction);
         Assert::assertSame([$primaryTagName], $formAction->getProperties()['add_tags']);
 
         $pointTriggerEvent = $this->em->find(TriggerEvent::class, $pointTriggerEventId);
-        \assert($pointTriggerEvent instanceof TriggerEvent);
+        $this->assertInstanceOf(TriggerEvent::class, $pointTriggerEvent);
         Assert::assertSame([$primaryTagName], $pointTriggerEvent->getProperties()['add_tags']);
 
         $report = $this->em->find(Report::class, $reportId);
-        \assert($report instanceof Report);
+        $this->assertInstanceOf(Report::class, $report);
         Assert::assertSame([$primaryTagId], $report->getFilters()[0]['value']);
         Assert::assertNull($this->tagRepository->find($secondaryTagId));
     }

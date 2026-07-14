@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DynamicFiltersType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -74,7 +74,7 @@ class DynamicFiltersType extends AbstractType
                         ];
 
                         if (isset($options['data'][$definition['alias']])) {
-                            $args['data'] = (1 == (int) $options['data'][$definition['alias']]);
+                            $args['data'] = (1 === (int) $options['data'][$definition['alias']]);
                         } elseif (isset($filter['value']) && '' !== $filter['value']) {
                             $args['data'] = (int) $filter['value'];
                         }

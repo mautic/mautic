@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Field;
 
 use Mautic\LeadBundle\Field\FieldList;
@@ -8,17 +10,14 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldsWithUniqueIdentifierTest extends TestCase
+final class FieldsWithUniqueIdentifierTest extends TestCase
 {
     /**
-     * @var MockObject|FieldList
+     * @var MockObject&FieldList
      */
-    private $fieldList;
+    private MockObject $fieldList;
 
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {

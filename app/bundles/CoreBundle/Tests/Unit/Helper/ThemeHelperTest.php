@@ -21,37 +21,41 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\RuntimeLoader\FactoryRuntimeLoader;
+use Twig\TwigFilter;
 
-class ThemeHelperTest extends TestCase
+final class ThemeHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper|MockObject
+     * @var MockObject&PathsHelper
      */
     private MockObject $pathsHelper;
 
     /**
-     * @var Environment|MockObject
+     * @var MockObject&Environment
      */
     private MockObject $twig;
 
     /**
-     * @var FilesystemLoader|MockObject
+     * @var MockObject&FilesystemLoader
      */
     private MockObject $loader;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParameterHelper;
 
     /**
-     * @var BuilderIntegrationsHelper|MockObject
+     * @var MockObject&BuilderIntegrationsHelper
      */
     private MockObject $builderIntegrationsHelper;
 
@@ -97,7 +101,7 @@ class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('config.json', $parameters['%files%']);
+                    $this->assertStringContainsString('config.json', (string) $parameters['%files%']);
                 }
             );
 
@@ -117,7 +121,7 @@ class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('message.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('message.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -137,7 +141,7 @@ class ThemeHelperTest extends TestCase
             ->with('mautic.core.theme.missing.files', $this->anything(), 'validators')
             ->willReturnCallback(
                 function ($key, array $parameters): void {
-                    $this->assertStringContainsString('page.html.twig', $parameters['%files%']);
+                    $this->assertStringContainsString('page.html.twig', (string) $parameters['%files%']);
                 }
             );
 
@@ -188,7 +192,7 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/page.html.twig');
-        $this->assertEquals('@themes/_1-2-1-2-column/html/page.html.twig', $template);
+        $this->assertSame('@themes/_1-2-1-2-column/html/page.html.twig', $template);
     }
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
@@ -223,20 +227,20 @@ class ThemeHelperTest extends TestCase
         $this->themeHelper->setDefaultTheme('nature');
 
         $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/page.html.twig');
-        $this->assertNotEquals('@themes/nature/page.html.twig', $template);
-        $this->assertNotEquals('@themes/goldstar/page.html.twig', $template);
+        $this->assertNotSame('@themes/nature/page.html.twig', $template);
+        $this->assertNotSame('@themes/goldstar/page.html.twig', $template);
         $this->assertStringContainsString('/page.html.twig', $template);
     }
 
     public function testCopyWithNoNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class extends PathsHelper {
+            new class() extends PathsHelper {
                 public function __construct()
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath($name, $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
@@ -244,31 +248,23 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class extends Translator {
+            new class() extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class extends CoreParametersHelper {
+            new class() extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class extends Filesystem {
-                public function __construct()
-                {
-                }
-
+            new class() extends Filesystem {
                 /**
                  * @param string $files
                  */
                 public function exists($files): bool
                 {
-                    if ('/path/to/themes/new-theme-name' === $files) {
-                        return false;
-                    }
-
-                    return true;
+                    return '/path/to/themes/new-theme-name' !== $files;
                 }
 
                 /**
@@ -294,8 +290,10 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class extends Finder {
-                /** @var SplFileInfo[] */
+            new class() extends Finder {
+                /**
+                 * @var SplFileInfo[]
+                 */
                 private array $dirs = [];
 
                 public function __construct()
@@ -325,12 +323,12 @@ class ThemeHelperTest extends TestCase
     public function testCopyWithNewDirName(): void
     {
         $themeHelper = new ThemeHelper(
-            new class extends PathsHelper {
+            new class() extends PathsHelper {
                 public function __construct()
                 {
                 }
 
-                public function getSystemPath($name, $fullPath = false)
+                public function getSystemPath($name, $fullPath = false): string
                 {
                     Assert::assertSame('themes', $name);
 
@@ -338,31 +336,23 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new Environment(new FilesystemLoader()),
-            new class extends Translator {
+            new class() extends Translator {
                 public function __construct()
                 {
                 }
             },
-            new class extends CoreParametersHelper {
+            new class() extends CoreParametersHelper {
                 public function __construct()
                 {
                 }
             },
-            new class extends Filesystem {
-                public function __construct()
-                {
-                }
-
+            new class() extends Filesystem {
                 /**
                  * @param string $files
                  */
                 public function exists($files): bool
                 {
-                    if ('/path/to/themes/requested-theme-dir' === $files) {
-                        return false;
-                    }
-
-                    return true;
+                    return '/path/to/themes/requested-theme-dir' !== $files;
                 }
 
                 /**
@@ -388,7 +378,7 @@ class ThemeHelperTest extends TestCase
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
                 }
             },
-            new class extends Finder {
+            new class() extends Finder {
                 /**
                  * @var SplFileInfo[]
                  */
@@ -507,7 +497,7 @@ class ThemeHelperTest extends TestCase
 
         $this->pathsHelper
             ->expects($matcher)
-            ->method('getSystemPath')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getSystemPath')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('themes', $parameters[0]);
                     $this->assertTrue($parameters[1]);
@@ -565,8 +555,7 @@ class ThemeHelperTest extends TestCase
 
         $filesystem = $this->createMock(Filesystem::class);
         $filesystem->expects($this->exactly(5))
-            ->method('exists')
-            ->willReturnOnConsecutiveCalls(true, true, true, true, true);
+            ->method('exists')->willReturn(true);
 
         $filesystem->method('readFile')->willReturn('{"name": "Test Theme"}');
 
@@ -592,5 +581,48 @@ class ThemeHelperTest extends TestCase
 
         $this->expectException(FileNotFoundException::class);
         $this->themeHelper->delete('theme-legacy-email-foo');
+    }
+
+    public function testRenderThemeTemplateResolvesRuntimeBackedFiltersInsideSandbox(): void
+    {
+        $twig = new Environment(new ArrayLoader([
+            '@themes/test/html/page.html.twig' => '{{ value|runtime_backed }}',
+        ]));
+        $twig->addExtension(new ThemeHelperRuntimeBackedFilterExtension());
+        $twig->addRuntimeLoader(new FactoryRuntimeLoader([
+            ThemeHelperRuntimeBackedFilterRuntime::class => static fn (): ThemeHelperRuntimeBackedFilterRuntime => new ThemeHelperRuntimeBackedFilterRuntime(),
+        ]));
+
+        $themeHelper = new ThemeHelper(
+            $this->pathsHelper,
+            $twig,
+            $this->translator,
+            $this->coreParameterHelper,
+            new Filesystem(),
+            new Finder(),
+            $this->builderIntegrationsHelper
+        );
+
+        $rendered = $themeHelper->renderThemeTemplate('@themes/test/html/page.html.twig', ['value' => 'runtime ok']);
+
+        Assert::assertSame('runtime ok [runtime]', $rendered);
+    }
+}
+
+final class ThemeHelperRuntimeBackedFilterExtension extends AbstractExtension
+{
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('runtime_backed', [ThemeHelperRuntimeBackedFilterRuntime::class, 'transform']),
+        ];
+    }
+}
+
+final class ThemeHelperRuntimeBackedFilterRuntime
+{
+    public function transform(string $value): string
+    {
+        return $value.' [runtime]';
     }
 }
