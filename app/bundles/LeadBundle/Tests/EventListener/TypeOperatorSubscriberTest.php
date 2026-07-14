@@ -48,8 +48,6 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $emailModel;
 
-    private StageRepository $stageRepository;
-
     /**
      * @var MockObject&CategoryModel
      */
@@ -81,7 +79,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->campaignModel   = $this->createMock(CampaignModel::class);
         $this->emailModel      = $this->createMock(EmailModel::class);
         $stageModel            = $this->createMock(StageModel::class);
-        $this->stageRepository = new class() extends StageRepository {
+        $stageRepository = new class() extends StageRepository {
             public function __construct()
             {
             }
@@ -111,7 +109,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             $translator
         );
 
-        $stageModel->method('getRepository')->willReturn($this->stageRepository);
+        $stageModel->method('getRepository')->willReturn($stageRepository);
         $translator->method('trans')->willReturnArgument(0);
     }
 

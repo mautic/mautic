@@ -152,8 +152,8 @@ final class StageControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler = $this->client->request(Request::METHOD_GET, '/s/stages/merge/'.$mergedStageId);
         $this->assertResponseIsSuccessful();
-        Assert::assertStringContainsString('Primary stage from form', $this->client->getResponse()->getContent());
-        Assert::assertStringNotContainsString('Merged stage from form', $this->client->getResponse()->getContent());
+        Assert::assertStringContainsString('Primary stage from form', (string) $this->client->getResponse()->getContent());
+        Assert::assertStringNotContainsString('Merged stage from form', (string) $this->client->getResponse()->getContent());
 
         $form = $crawler->selectButton('stage_merge[buttons][save]')->form();
         $form['stage_merge[stage_to_merge]']->setValue((string) $primaryStageId);
