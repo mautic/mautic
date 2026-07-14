@@ -86,7 +86,7 @@ final class PageControllerTest extends MauticMysqlTestCase
 
         $sql = "SELECT id FROM $leadsTable";
         if (!empty($leadIdsBeforeTest)) {
-            $sanitizedIds = array_map('intval', $leadIdsBeforeTest);
+            $sanitizedIds = array_map(intval(...), $leadIdsBeforeTest);
             $sql .= ' WHERE id NOT IN ('.implode(',', $sanitizedIds).');';
         }
         $newLeads = $this->connection->fetchAllAssociative($sql);
@@ -137,7 +137,7 @@ final class PageControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $sql = "SELECT id FROM $leadsTable";
         if (!empty($leadIdsBeforeTest)) {
-            $sanitizedIds = array_map('intval', $leadIdsBeforeTest);
+            $sanitizedIds = array_map(intval(...), $leadIdsBeforeTest);
             $sql .= ' WHERE id NOT IN ('.implode(',', $sanitizedIds).');';
         }
         $newLeadsAfterFirstVisit = $this->connection->fetchAllAssociative($sql);
