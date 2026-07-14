@@ -17,7 +17,7 @@ class MenuExtension extends AbstractExtension
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('menuRender', $this->menuRender(...), ['is_safe' => ['all']]),

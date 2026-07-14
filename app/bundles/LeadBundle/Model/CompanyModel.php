@@ -1064,7 +1064,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        if ($fieldErrors) {
+        if ([] !== $fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
 
             throw new \Exception($fieldErrors);

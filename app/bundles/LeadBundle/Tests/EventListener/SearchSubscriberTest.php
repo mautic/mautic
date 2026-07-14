@@ -90,7 +90,7 @@ final class SearchSubscriberTest extends TestCase
 
         $translator
             ->method('trans')
-            ->willReturnCallback(function ($key): string|array|null {
+            ->willReturnCallback(function (string $key): ?string {
                 return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
             });
 

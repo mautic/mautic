@@ -74,12 +74,12 @@ final class DashboardSubscriberTest extends TestCase
         $this->event->expects($this->once())
             ->method('getType')
             ->willReturn('random');
-        $this->event->expects(self::never())
+        $this->event->expects($this->never())
             ->method('isCached');
-        $this->event->expects(self::never())
+        $this->event->expects($this->never())
             ->method('setTemplate');
 
-        $this->auditLogModel->expects(self::never())
+        $this->auditLogModel->expects($this->never())
             ->method('getLogForObject');
 
         $subscriber = new DashboardSubscriber(
@@ -106,7 +106,7 @@ final class DashboardSubscriberTest extends TestCase
         $this->event->expects($this->once())
             ->method('stopPropagation');
 
-        $this->auditLogModel->expects(self::never())
+        $this->auditLogModel->expects($this->never())
             ->method('getLogForObject');
 
         $subscriber = new DashboardSubscriber(
@@ -206,7 +206,7 @@ final class DashboardSubscriberTest extends TestCase
             ->with(789)
             ->willThrowException($this->createStub(\Exception::class));
 
-        $this->modelFactory->expects(self::exactly(7))
+        $this->modelFactory->expects($this->exactly(7))
             ->method('getModel')
             ->willReturnMap([
                 ['null.object', $nullObjectModel],
@@ -220,7 +220,7 @@ final class DashboardSubscriberTest extends TestCase
 
         $route           = $this->createStub(Route::class);
         $routeCollection = $this->createMock(RouteCollection::class);
-        $matcher         = self::exactly(5);
+        $matcher         = $this->exactly(5);
         $routeCollection->expects($matcher) // no null object and  exception object
             ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route): ?\PHPUnit\Framework\MockObject\Stub {
                 if (1 === $matcher->numberOfInvocations()) {
@@ -252,10 +252,10 @@ final class DashboardSubscriberTest extends TestCase
                 throw new \PHPUnit\Framework\Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
-        $this->router->expects(self::exactly(5))
+        $this->router->expects($this->exactly(5))
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
-        $this->router->expects(self::exactly(3))
+        $this->router->expects($this->exactly(3))
             ->method('generate')
             ->willReturnMap([
                 ['mautic_model_action', ['objectAction' => 'view', 'objectId' => 345], UrlGeneratorInterface::ABSOLUTE_PATH, '/not-getter'],

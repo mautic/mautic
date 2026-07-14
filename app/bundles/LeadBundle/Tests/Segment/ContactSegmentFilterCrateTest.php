@@ -101,7 +101,7 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertSame(2.0, $contactSegmentFilterCrate->getFilter());
+        $this->assertEqualsWithDelta(2.0, $contactSegmentFilterCrate->getFilter(), PHP_FLOAT_EPSILON);
         $this->assertTrue($contactSegmentFilterCrate->isNumberType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
@@ -264,16 +264,14 @@ final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array<int, array{0: string}>
+     * @return \Iterator<int, array{string}>
      */
-    public static function specialFieldsToConvertToEmptyProvider(): array
+    public static function specialFieldsToConvertToEmptyProvider(): \Iterator
     {
-        return [
-            ['page_id'],
-            ['email_id'],
-            ['redirect_id'],
-            ['notification'],
-        ];
+        yield ['page_id'];
+        yield ['email_id'];
+        yield ['redirect_id'];
+        yield ['notification'];
     }
 
     public function testBehaviorsTypeFilter(): void

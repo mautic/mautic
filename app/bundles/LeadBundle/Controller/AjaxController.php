@@ -591,6 +591,9 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($data);
     }
 
+    /**
+     * @deprecated since Mautic 7.2, will be removed in 8.0 with no replacement.
+     */
     public function addLeadUtmTagsAction(Request $request, LeadModel $leadModel): JsonResponse
     {
         $utmTags = $request->request->get('utmtags');
@@ -602,7 +605,7 @@ class AjaxController extends CommonAjaxController
                 if (!is_numeric($utmTag)) {
                     // New tag
                     $utmTagEntity = new UtmTag();
-                    $utmTagEntity->setUtmTag(InputHelper::clean($utmTag));
+                    $utmTagEntity->setUtmContent(InputHelper::clean($utmTag));
                     $newUtmTags[] = $utmTagEntity;
                 }
             }

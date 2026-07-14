@@ -51,7 +51,7 @@ final class DateHelperTest extends \PHPUnit\Framework\TestCase
 
         // Setup translator mock for humanized dates
         $this->translator->method('trans')
-            ->willReturnCallback(fn ($key, $parameters = []) => match ($key) {
+            ->willReturnCallback(fn (string $key, array $parameters = []): string => match ($key) {
                 'mautic.core.date.years.ago'   => $parameters['%count%'].' year(s) ago',
                 'mautic.core.date.months.ago'  => $parameters['%count%'].' month(s) ago',
                 'mautic.core.date.days.ago'    => $parameters['%count%'].' day(s) ago',

@@ -482,7 +482,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Assert the tag is removed from the lead
         $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $updatedLead);
-        $this->assertFalse(in_array($tag, $updatedLead->getTags()->toArray()));
+        $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
 
     public function testRemoveTagFromCompanyAction(): void
@@ -519,10 +519,10 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         /** @var User $adminUser */
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
-        self::assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $salesUser = $userRepository->findOneBy(['username' => 'sales']);
-        self::assertInstanceOf(User::class, $salesUser);
+        $this->assertInstanceOf(User::class, $salesUser);
 
         $leads = [];
 
@@ -553,10 +553,10 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $data       = json_decode($response->getContent(), true);
         $foundNames = array_column($data, 'value');
 
-        self::assertCount(4, $foundNames);
+        $this->assertCount(4, $foundNames);
 
         foreach ($foundNames as $key => $name) {
-            self::assertSame('User '.($key + 1), $name);
+            $this->assertSame('User '.($key + 1), $name);
         }
     }
 
@@ -566,7 +566,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $userRepository = $this->em->getRepository(User::class);
 
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
-        self::assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $leads = [];
 
@@ -637,9 +637,9 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $data       = json_decode($response->getContent(), true);
         $foundNames = array_column($data, 'value');
 
-        self::assertCount(2, $foundNames);
-        self::assertSame('User 3', $foundNames[0]);
-        self::assertSame('User 4', $foundNames[1]);
+        $this->assertCount(2, $foundNames);
+        $this->assertSame('User 3', $foundNames[0]);
+        $this->assertSame('User 4', $foundNames[1]);
     }
 
     /**

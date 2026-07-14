@@ -90,7 +90,7 @@ final class TriggerModelTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function ($event, $eventName) use ($dispatchCalls, $contact, $triggerEvent) {
+            ->willReturnCallback(function (object $event, ?string $eventName) use ($dispatchCalls, $contact, $triggerEvent): object {
                 $dispatchCalls->append($eventName);
 
                 if (PointEvents::TRIGGER_ON_BUILD === $eventName) {

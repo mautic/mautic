@@ -34,10 +34,7 @@ class LoadDncData extends AbstractFixture implements OrderedFixtureInterface
         return $managedLead;
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 8;
     }
