@@ -8704,6 +8704,12 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
+			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:parseContentForTrackables\(\) has parameter \$channelId with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: app/bundles/PageBundle/Model/TrackableModel.php
+
+		-
 			message: '#^Method Mautic\\PageBundle\\Model\\TrackableModel\:\:parseTokenizedQuery\(\) has parameter \$query with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
